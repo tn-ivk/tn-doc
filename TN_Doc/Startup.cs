@@ -26,8 +26,6 @@ namespace TN_Doc
             //services.AddDbContext<DocGeneral>(options => options.UseMySql(Configuration.GetConnectionString("IVK"), MySqlServerVersion.LatestSupportedServerVersion));
             services.AddDbContext<DocGeneral>();
             //services.AddDbContext<DocGeneral>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), MySqlServerVersion.LatestSupportedServerVersion));
-            
-            services.AddTransient<OPCUAClient.OPCUAClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure

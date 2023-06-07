@@ -41,6 +41,7 @@ namespace TN_Doc.Controllers
             {
                 return View();
             }
+            
         }
 
         // GET: Get2H/Edit/5

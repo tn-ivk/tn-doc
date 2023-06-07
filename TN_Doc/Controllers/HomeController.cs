@@ -57,19 +57,15 @@ namespace TN_Doc.Controllers
 
         string reportsPath = "";
 
-        private OPCUAClient.OPCUAClient opc;
-
         CancellationToken stoppingToken;
 
-        public HomeController(ILogger<HomeController> logger, Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> context, OPCUAClient.OPCUAClient OpcUA)
+        public HomeController(ILogger<HomeController> logger, Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> context)
         {
             _logger = logger;
 
             //dbIVK = context;
             //dbDoc = context;
             options = context;
-
-            opc = OpcUA;
 
             modelReport = new ModelReport();
             FR = new WebReport();

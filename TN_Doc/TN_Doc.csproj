@@ -35,6 +35,11 @@
     <None Include="wwwroot\js\signalr\dist\browser\signalr.js.map" />
     <None Include="wwwroot\js\signalr\dist\browser\signalr.min.js" />
     <None Include="wwwroot\js\signalr\dist\browser\signalr.min.js.map" />
+    <None Include="wwwroot\lib\PDFObject\.gitignore" />
+    <None Include="wwwroot\lib\PDFObject\LICENSE.md" />
+    <None Include="wwwroot\lib\PDFObject\pdfobject.js" />
+    <None Include="wwwroot\lib\PDFObject\pdfobject.min.js" />
+    <None Include="wwwroot\lib\PDFObject\readme.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,7 +54,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AspFastReport\OPCUAClient\OPCUAClient.csproj" />
     <ProjectReference Include="..\TN_DocGeneral\TN_DocGeneral.csproj" />
   </ItemGroup>
 
