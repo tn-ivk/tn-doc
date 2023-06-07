@@ -1,0 +1,104 @@
+﻿@using System.Data
+@using FastReport.Web;
+@*@model TN_Doc.Models.Home.ModelReport*@
+@*@model TN.DocData.CfgApp*@
+
+@*@model (string dt1, string dt2)*@
+
+@{
+    ViewData["Title"] = "Модуль - документы";
+}
+<body>
+
+   @* <iframe src="https://localhost:44357/" height="500px" width="500px"></iframe>*@
+
+    <div class="Device">
+        <table border="0" cellpadding="5">
+            <tr>
+                <td>
+                    <label for="ComboboxDevice">Устройство:</label>
+                    <select id="ComboboxDevice"></select>
+                    <br>
+                    <label for="ComboboxDocGUID">Документ:</label>
+                    <select id="ComboboxDocGUID"></select>
+                </td>
+                <td>
+                    <label for="DatepickerBegin">Дата начала:</label>
+                    <input id="DatepickerBegin"/>
+                    <br>
+                    <label for="DatepickerEnd">Дата окончания:</label>
+                    <input id="DatepickerEnd"/>
+                </td>
+                <td>
+                    @*<a name="ButtonGetData">Получить данные</a>*@
+                    <input id="ButtonGetData" type="button" value="Получить данные" onclick="table.ajax.reload()">
+                    <br>
+                    @*<a id="ButtonSave" name="ButtonSave">Сохранить</a>*@
+                    <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
+                </td>
+                <td>
+                    @*<a id="ButtonReview" name="ButtonReview">Просмотр</a>*@
+                    <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
+                    <br>
+                    @*<a id="ButtonEdit" name="ButtonEdit">Редактирование</a>*@
+                    <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
+                </td>
+                @*<td>
+                    <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
+                    <br>
+                    <input id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
+                </td>*@
+            </tr>
+        </table>       
+    </div>
+
+    <div class="Table">        
+        <table id="DataTable" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Дата, время</th>
+                    <th>Описание</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>dt</td>
+                    <td>description</td>
+                </tr>
+            </tbody>        
+        
+            @*<tfoot>
+                <tr>
+                    <th>id</th>
+                    <th>strBegin</th>
+
+                </tr>
+            </tfoot>*@
+        </table> 
+    </div>
+
+@*    <iframe name=print_frame class="FR" src=""> </iframe>
+*@
+    <div class="Doc">
+        <table>
+            <tr>
+                <td>
+                    <select id="ComboboxTemplateDoc">Форма документа</select>
+                    <select id="ComboboxPrinterName">Принтер</select>
+                    <select id="ComboboxProtocolNumber">Номер протокола</select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <iframe name=print_frame class="FR" src=""></iframe>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>   
+        InitElement();
+    </script>
+
+</body>

@@ -1,0 +1,108 @@
+﻿{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN",
+      "Type": "text",
+      "Name": "СИКН №"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Наименование организации"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Name",
+      "Type": "text",
+      "Name": "ПР: Линия"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Type",
+      "Type": "text",
+      "Name": "ПР: Тип"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_FactoryNumber",
+      "Type": "text",
+      "Name": "ПР: Заводской №"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Type",
+      "Type": "text",
+      "Name": "ПУ: Тип"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_FactoryNumber",
+      "Type": "text",
+      "Name": "ПУ: Заводской №"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_CheckDate",
+      "Type": "text",
+      "Name": "Дата поверки ПУ"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffData",
+      "Type": "text",
+      "Name": "Сервисная организация (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryStaffData",
+      "Type": "text",
+      "Name": "Сдающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffData",
+      "Type": "text",
+      "Name": "Принимающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_KMH_Result",
+      "Type": "list",
+      "Name": "Заключение"
+    }
+  ]
+}

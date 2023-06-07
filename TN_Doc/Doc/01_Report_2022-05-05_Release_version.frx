@@ -1,0 +1,618 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Report.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="06/18/2021 09:21:52" ReportInfo.Modified="05/31/2023 11:48:57" ReportInfo.CreatorVersion="2021.4.4.0">
+  <ScriptText>using System;
+using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;    // удалить перед передачей шаблона Алексею!!! (также убрать из Свойства... -&gt;  Скрипт: System.Windows.Forms.dll)
+using System.Drawing;
+using System.Data;
+using System.IO;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Linq;
+using Newtonsoft.Json;
+using TN.DocData;
+ 
+namespace FastReport
+{  
+   public class ReportScript
+   {
+      int numLineParams=0;                                              // кол-во параметров линий в основной таблице
+      int numBIKParams=0;                                               // кол-во параметров БИК,в таблице БИК
+      int showNumberColumns=0;                                          // кол-во линий, требуемых отобразить в основной таблице
+      bool isIllegalTimeResult=false;  
+               
+      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+    
+      TN.Doc.Doc report;                                        // переменная, для хранения данных из входного параметра
+      TN.Doc.DataIVKDoc DataIVK;
+      TN.Doc.HeaderDoc Header;
+      TN.Doc.DataDoc Data;
+      TN.Doc.FooterDoc Footer;
+      TN.Doc.DictionarysDoc Dictionarys;
+        
+      List&lt;TN.Doc.Line&gt; listUsedLines;
+      List&lt;TN.Doc.Parameters&gt; listLineParams;
+      List&lt;TN.Doc.Parameters&gt; listBIKParams;                //visibleBIKfields;       
+      List&lt;TN.Doc.Signers&gt;signersList;
+      Dictionary&lt;int, string&gt; reportName;
+      Dictionary&lt;int, string&gt; reportIncompleteName;
+      Dictionary&lt;string, TextRenderType&gt;  dictTextRenderType;
+      int reportType;
+      DateTime dtBegin;
+      DateTime dtEnd;
+      int tempCounter;
+        
+      private void Page_StartPage(object sender, EventArgs e)
+      {  
+         //using (var sr = new StreamReader(&quot;C:/DocReports.json&quot;))
+         //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/01_Report/DocReports.json&quot;))
+         //{
+         //  Report.SetParameterValue(&quot;JsonDoc&quot;, sr.ReadToEnd());
+         //}
+         //// === Десериализация данных (формат json) из входного параметра - Report                             
+         string reportJson = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+         Newtonsoft.Json.JsonSerializerSettings settingsReport = new Newtonsoft.Json.JsonSerializerSettings();
+         settingsReport.TypeNameHandling = TypeNameHandling.All;
+         
+         report = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(reportJson, settingsReport);         
+      
+         DataIVK = (TN.Doc.DataIVKDoc)report.Doc.DataIVK;
+         Header = (TN.Doc.HeaderDoc)report.Doc.Settings.Header;
+         Data = (TN.Doc.DataDoc)report.Doc.Settings.Data;
+         Footer = (TN.Doc.FooterDoc)report.Doc.Settings.Footer;
+         Dictionarys = (TN.Doc.DictionarysDoc)report.Doc.Settings.Dictionarys;
+        
+         //// === Определение кол-ва ИЛ, необходимых отобразить в отчете  для основной таблицы.
+         showNumberColumns = Data.TableLine.ShowNumberColumns;
+         
+         //=== Определение кол-ва ИЛ (с данными).
+         listUsedLines = DataIVK.TableReport.Report.Obj.Line.Where(y =&gt; y.Used == 1).ToList();
+         
+         // === Определение кол-ва параметров ИЛ для основной таблицы.
+         listLineParams = Data.TableLine.Parameters.Where(x =&gt; x.Visible == true).ToList();
+         numLineParams = listLineParams.Count;
+         
+         //// === Определение кол-ва параметров БИКа, для таблицы БИК
+         listBIKParams = Data.TableBIK.Parameters.Where(x =&gt; x.Visible == true).ToList();
+         
+         //// === Создание списка свойств класса CfgReport.Signer.
+         signersList = Footer.Signers.Where(x =&gt; x.Name.Length &gt;0).ToList();
+          
+         dtBegin = tools.UnixTimestampToDatetime((long)DataIVK.TableReport.Begin);
+         dtEnd = tools.UnixTimestampToDatetime((long)DataIVK.TableReport.End);
+         
+         //// === Настройки страницы 
+         // Ширина и высота (в мм)
+         Page.PaperWidth =report.Doc.Settings.General.PageSettings.PaperWidth;
+         Page.PaperHeight =report.Doc.Settings.General.PageSettings.PaperHeight;
+      
+         // Поля/отступы от краёв (в мм)
+         Page.TopMargin=report.Doc.Settings.General.PageSettings.TopMargin;
+         Page.BottomMargin=report.Doc.Settings.General.PageSettings.BottomMargin;
+         Page.LeftMargin=report.Doc.Settings.General.PageSettings.LeftMargin;
+         Page.RightMargin=report.Doc.Settings.General.PageSettings.RightMargin;
+         
+         //// ===  Определение типа отчетов: за два часа, за смену, за сутки, за месяц, за время ведения ТКО.
+         reportName = new Dictionary&lt;int, string&gt;();
+         reportName[0] = &quot;Отчет за один час&quot;;
+         reportName[1] = &quot;Отчет за два часа&quot;;
+         reportName[2] = &quot;Отчет за смену&quot;;
+         reportName[3] = &quot;Отчет за сутки&quot;;
+         reportName[4] = &quot;Отчет за месяц&quot;;
+         reportName[5] = &quot;Отчет за время ведения ТКО&quot;;
+
+         reportIncompleteName = new Dictionary&lt;int, string&gt;();
+         reportIncompleteName[0] = &quot;Незавершенный отчет за один час&quot;;
+         reportIncompleteName[1] = &quot;Незавершенный отчет за два часа&quot;;
+         reportIncompleteName[2] = &quot;Незавершенный отчет за смену&quot;;
+         reportIncompleteName[3] = &quot;Незавершенный отчет за сутки&quot;;
+         reportIncompleteName[4] = &quot;Незавершенный отчет за месяц&quot;;
+         reportIncompleteName[5] = &quot;Незавершенный отчет за время ведения ТКО&quot;;
+      
+         reportType = Convert.ToInt32(DataIVK.TableReport.ReportType);
+         
+         // Запуск отрисовки таблиц на странице отчета
+         DrawTableHeader(); 
+         
+         if (Data.TableBIK.Visible==true)
+         {
+            for(int i= 0; i &lt; DataIVK.TableReport.Report.Obj.BIK.Count; i++)
+            {
+               TN.Doc.BIK bik = DataIVK.TableReport.Report.Obj.BIK[i];
+               DrawTableBIK(bik, i);  // Создание, настройка, заполнение данными и вывод на страницу таблицы BIKTable (таблицы БИК)
+            }
+         }
+         DrawTableSigners();      
+      }
+   
+      //// &quot;Шапка&quot; отчета //
+      private void DrawTableHeader()
+      {
+         //ReportTitle.FillColor = Color.Green; //for test
+         
+         // Setup Columns
+         float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/TableHeader.ColumnCount;         
+         for (int i = 0; i &lt; (TableHeader.ColumnCount); i++)                 
+         {
+            TableHeader.Columns[i].Width = widthDynamicCols*Units.Millimeters;
+         }
+         // === Fill table with the data                                                                                
+         Prefix_SIKN_Name.Text = string.Format(&quot;{0} {1}&quot;, Header.Prefix_SIKN_Name, DataIVK.TableReport.Report.Obj.Additional[0].SIKN_Name);
+         NameIVK.Text = Header.NameIVK; 
+         Factory.Text = DataIVK.TableReport.Report.Obj.Additional[0].Factory;
+         TankerName.Text = DataIVK.TableReport.Report.Obj.Additional[0].TankerName;
+         ExtendAddInfo.Text = DataIVK.TableReport.Report.Obj.Additional[0].ExtendAddInfo;
+         
+         if (DataIVK.TableReport.id &gt; 7)
+            ReportType.Text = reportName[reportType]; // Тип отчета
+         else 
+            ReportType.Text = reportIncompleteName[reportType]; // Тип незавершенного отчета
+         
+         ReportTime.Text = String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy HH:mm}&quot;, dtBegin, dtEnd);
+      } 
+
+      //// ======================== //// ======================== //// ======================== ////
+      private void TableReport_ManualBuild(object sender, EventArgs e)
+      {
+         if (Data.TableLine.Visible==true)
+         {
+            bool columnSIKNVisible = Data.TableLine.ColumnSIKN.Visible;
+            int amountLinesCols= listUsedLines.Count;
+            int amountSumCols=0;
+            double widthLinesCols =0;
+            double widthSIKNCol = 0;
+            float widthFixedCols = 0;
+            tempCounter = 0;
+
+            // Get num cols for  Lines &amp; SIKN (depend from &quot;СolumnSIKN&quot; - &quot;Visible&quot;: true/false)
+            if (Data.TableLine.ColumnSIKN.Visible==true)
+            {
+               amountSumCols = amountLinesCols+1;
+            }
+            else 
+            {
+               amountSumCols = amountLinesCols;
+            }
+            
+            //MessageBox.Show(&quot;amountSumCols - &quot; + amountSumCols.ToString());
+            //MessageBox.Show(&quot;TableReport.ColumnCount - &quot; + TableReport.ColumnCount.ToString());
+            
+            if (Engine.FirstPass == true)
+            {
+               tempCounter = 0;
+               //// ===  Add dynamic columns
+               for (int i = 3; i &lt; amountSumCols+3; i++)
+               {
+                  TableColumn column = new TableColumn();  
+                  TableReport.Columns.Add(column);   
+                  
+                  // Set names for Columns
+                  if (columnSIKNVisible==true &amp; i==(amountSumCols+3)-1) // проверка: нужно ли задавать name для столбца СИКН
+                  {
+                     column.Name = &quot;colSIKN&quot;;
+                  }
+                  else
+                  {
+                     column.Name = &quot;colLine&quot; + tempCounter.ToString();
+                  }
+                                    
+                  // Assign property of the previous cells for new cell (for dynamic columns)
+                  for (int j=0;j&lt;TableReport.RowCount;j++)
+                  {
+                     TableReport[i,j].AssignAll(TableReport[(i-1),j]);
+                  }
+                  tempCounter++;
+               }
+            }
+            
+            //// ===  Calculate common width for Lines columns &amp; SIKN column
+            widthLinesCols = Data.TableLine.ColumnsWidth; //Get common width for Lines columns 
+            widthSIKNCol = Data.TableLine.ColumnSIKN.Width; //Get width for SIKN column
+            widthFixedCols =(Column01.Width+Column02.Width+Column03.Width)/Units.Millimeters;
+
+            if (widthLinesCols==0) 
+            {
+               if (Data.TableLine.ColumnSIKN.Visible== true) 
+               {
+                  if (Data.TableLine.ColumnSIKN.Width==0) 
+                  {
+                     widthSIKNCol=widthLinesCols = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols) / amountSumCols; 
+                  }
+                  else
+                  {
+                     widthSIKNCol = Data.TableLine.ColumnSIKN.Width;
+                     widthLinesCols = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols - widthSIKNCol) / amountSumCols; 
+                  }
+               }
+               else
+               {
+                  widthLinesCols = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols) / amountSumCols; 
+               }
+            }    
+            else
+            {
+               if (Data.TableLine.ColumnSIKN.Visible== true) 
+               {
+                  if (Data.TableLine.ColumnSIKN.Width==0) 
+                  {
+                     widthSIKNCol = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols) - (widthLinesCols * amountLinesCols);
+                  }
+               }
+            }    
+            
+            int numLine = 0;
+            // Setup width for Line &amp; SIKN columns
+            for (int i = 3; i &lt; (TableReport.Columns.Count); i++) 
+            {                                                                                                          
+               if (TableReport.Columns[i].Name.Contains(&quot;colLine&quot;)==true) 
+               {
+                  TableReport.Columns[i].Width=(float)widthLinesCols*Units.Millimeters; // set width for Line columns
+                  TableReport[i,0].Text = listUsedLines[numLine].Name;
+               }
+               else
+               {
+                  TableReport.Columns[i].Width=(float)widthSIKNCol *Units.Millimeters; // set width for SIKN column
+                  TableReport[TableReport.Columns.Count-1,0].Text = Data.TableLine.ColumnSIKN.Name;
+               }
+               numLine++;
+            }       
+           
+            for (int n = 0; n &lt; TableReport.FixedRows; n++)            
+            {
+               TableReport.PrintRow(n);
+               TableReport.PrintColumns();                                             
+            } 
+            
+            // Fill table with data
+            object result = &quot;-&quot;;
+            object IllegalTimeResult = 0;
+            for (int j = 1; j &lt; listLineParams.Count; j++)
+            {
+               Counter.Text=j.ToString();   
+               Name.Text=listLineParams[j].Name;
+               SI.Text=listLineParams[j].SI;
+                               
+               //Data for Lines columns
+               for (int z = 0; z &lt; listUsedLines.Count; z++)
+               {                     
+                  result = &quot;-&quot;;
+                  tools.GetPropertyValue(listUsedLines[z], listLineParams[j].Key, ref result);
+            
+                  tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.LineIllegalTime[z], listLineParams[j].Key, ref IllegalTimeResult);                        
+                  result = tools.GetNormalizedValue(result).ToString();
+                  if ((long)IllegalTimeResult!=0 &amp;&amp; result.ToString() !=&quot;-&quot;)
+                  {
+                    result = result + &quot; *&quot;;
+                    isIllegalTimeResult = true;
+                  }             
+                  TableReport[(z+3),1].Text = result.ToString();
+               }
+                
+               //Data for SIKN column
+               if (Data.TableLine.ColumnSIKN.Visible==true)
+               {             
+                  for (int z = 0; z &lt; listUsedLines.Count; z++)
+                  {                     
+                     result = &quot;-&quot;;
+                     tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.SIKN, listLineParams[j].Key, ref result);
+                      TableReport[(TableReport.ColumnCount-1),1].Text = tools.GetNormalizedValue(result).ToString();
+                  }
+               }
+               TableReport.PrintRow(1);
+               TableReport.PrintColumns();                                             
+            }
+         }
+      }
+     
+      public void DrawTableBIK(TN.Doc.BIK bik, int idx)
+      {
+         if (Engine.FirstPass == true)
+         {
+            int rows = 0;
+            //// Create &amp; setup: Band as dataBandBIK //
+            DataBand dataBandBIK = new DataBand(); // создание экземпляра датабенда
+            dataBandBIK.Name = &quot;DataBandBIK&quot;;
+            dataBandBIK.CanGrow=true;
+            //dataBandBIK.Height = 10f * Units.Millimeters;           
+            //dataBandBIK.FillColor = Color.Red; // for test
+            Page.Bands.Add(dataBandBIK);  // &quot;прикрепление&quot; датабенда к странице 1
+            
+            //// Create &amp; setup: Table as tableBIK// ---------------------------------
+            TableObject tableBIK = new TableObject(); // создание экземпляра таблицы tableBIK
+            //tableBIK.Top = (float)conf.Data.TableBIKSettings.Offset*Units.Millimeters; // установка отступа сверху (в см.) для таблицы
+            dataBandBIK.Objects.Add(tableBIK); // &quot;прикрепление&quot; таблицы к  датабенду 
+            tableBIK.Top =2f * Units.Millimeters;           
+
+            // Set columns numbers for table
+            decimal columns = 8;
+         
+            //// === Setup columns of the tableBIK
+            // ширина нединамических  столбцов (в мм)
+            float widthColumn1 = 7.5f; // width column 1 
+
+            // ширина динамических столбцов. От ширины страницы отнимаются: 
+            //отступы (слева, справа), ширин первого столбца. Результат делится на заданное кол-во колонок минус 1 (первый столбец).
+            float widthRemainingColumns = ((Page.PaperWidth-Page.LeftMargin-Page.RightMargin-widthColumn1)/((float)columns-1));
+
+            //Calculate Rows number
+            decimal tempvar = (decimal)listBIKParams.Count/(columns-1);
+            rows = (Decimal.ToInt32(Math.Ceiling(tempvar))*2);
+         
+            //// === Create columns, set width, link their to the tableBIK // 
+            for (int i = 0; i &lt; columns ; i++)
+            {
+               TableColumn column = new TableColumn();  
+               tableBIK.Columns.Add(column);   
+               switch (i)
+               {
+                  case 0: 
+                     column.Width = widthColumn1* Units.Millimeters; 
+                     break;
+                  default:
+                     column.Width = widthRemainingColumns* Units.Millimeters; 
+                     break;
+               } 
+            }
+            //Create rows, set width, link their to the tableBIK //
+            for (int n = 0; n &lt; rows; n++)
+            {
+               TableRow row = new TableRow();  
+               tableBIK.Rows.Add(row);          
+               tableBIK.Rows[n].AutoSize = true;
+            }
+            
+            //// Fill the cells with color and Data
+            int z=0;
+            object result = &quot;-&quot;;
+            object IllegalTimeResult = 0;
+            for (int j = 0; j &lt; (tableBIK.RowCount); j++)
+            {
+               for (int i = 1; i &lt; tableBIK.ColumnCount; i++,  z++ )
+               {
+                  if (z==listBIKParams.Count) 
+                     break;             
+                                              
+                  // Fill table headers cells with text
+                  tableBIK[i,j].Text = String.Format(&quot;&lt;b&gt;{0}, {1}&quot;, listBIKParams[z].Name, listBIKParams[z].SI);
+                  //tableBIK[i,j].FillColor=Color.Gainsboro;
+                  tableBIK[i,j].FontWidthRatio=(float)0.85;
+                  tableBIK[i,j].Font =  new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Bold); 
+                  tableBIK[i,j].Border.Lines=BorderLines.All;
+                  
+                  // Fill regular cells with data
+                  result = &quot;-&quot;;
+                  tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.BIK[0], listBIKParams[z].Key, ref result); //SearchSuitableValueBIK
+                  
+                  tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.BikIllegalTime, listBIKParams[z].Key, ref IllegalTimeResult);
+                  
+                  result = tools.GetNormalizedValue(result).ToString();
+                  if ((long)IllegalTimeResult!=0 &amp;&amp; result.ToString() !=&quot;-&quot;)
+                  {
+                      result = result + &quot; *&quot;;
+                      isIllegalTimeResult = true;
+                  }                    
+            
+                  tableBIK[i,j+1].Text = result.ToString();
+                  tableBIK[i,j+1].Font = new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Regular); 
+                  tableBIK[i,j+1].Border.Lines=BorderLines.All;                               
+               }
+               j++;
+            }
+            // Fill with data 1 column
+            if (DataIVK.TableReport.Report.Obj.BIK.Count==1)
+            {     
+               tableBIK[0,0].Text = &quot;&lt;b&gt;БИК&quot;;
+            }
+            else
+            {
+               tableBIK[0,0].Text = &quot;&lt;b&gt;БИК &quot;+(idx+1).ToString(); 
+            }
+            
+            tableBIK[0,0].Angle = 270; // rotate font to 270 degree 
+            tableBIK[0,0].Font =  new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Bold); 
+            tableBIK[0,0].RowSpan =rows;
+            tableBIK[0,0].Border.Lines=BorderLines.All;
+         
+            //setup of the all cells
+            for (int i = 0; i &lt; columns; i++)
+            {
+               for (int j = 0; j &lt; rows; j++)
+               {
+                  tableBIK[i,j].HorzAlign=HorzAlign.Center; // отцентровать текст в ячейке по горизонтали
+                  tableBIK[i,j].VertAlign=VertAlign.Center; // отцентровать текст в ячейке по вертикали
+                  tableBIK[i,j].TextRenderType=TextRenderType.HtmlTags;
+                  tableBIK[i,j].FontWidthRatio=(float)0.85;
+               }
+            }       
+         }
+      }    
+      
+      //// === &quot;Подвал&quot; отчета =======================================
+      private void DrawTableSigners()
+      {
+         if (Page.PaperWidth&gt;  210 )
+         {
+            Signers.Width = 110*Units.Millimeters;
+         }
+         else
+         {
+            Signers.Width = 90*Units.Millimeters;
+         }
+         
+         // Fill the table with data                  
+         TableSigners[0,0].Text = String.Format(&quot;Основное СИ плотности на момент формирования отчета: плотномер № {0}.&quot;, DataIVK.TableReport.Report.Obj.Additional[0].NumOfUsedDens);
+         
+         TextDelivePost.Text = Footer.Signers[0].Name;
+         TextReceivePost.Text = Footer.Signers[1].Name;
+         TextOperator.Text = Footer.Signers[2].Name;         
+         
+         int reportID = (Convert.ToInt32(DataIVK.TableReport.ReportType)-1);
+         
+         // Отображение подписантов согласно типа отчета
+         for (int y = 0; y &lt; signersList.Count ; y++) 
+         {
+            switch(y)
+            {
+               case 0:
+                  RowDelivePost1.Visible=signersList[y].ShowSigner[reportID].Visible;
+                  RowDelivePost2.Visible=signersList[y].ShowSigner[reportID].Visible;
+                  break;
+               
+               case 1:  
+                  RowReceivePost1.Visible=signersList[y].ShowSigner[reportID].Visible;
+                  RowReceivePost2.Visible=signersList[y].ShowSigner[reportID].Visible;
+                  break;
+               
+               case 2:  
+                  RowOperator1.Visible=signersList[y].ShowSigner[reportID].Visible;
+                  RowOperator2.Visible=signersList[y].ShowSigner[reportID].Visible;
+                  break;
+            }
+         }
+        
+         TableSigners.Rows[1].Visible = isIllegalTimeResult;  
+      }
+
+      private void PageFooter_BeforeLayout(object sender, EventArgs e)
+      {
+         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+         { 
+            //MessageBox.Show(&quot;TotalPages &lt; 2&quot;);
+            PageFooter.Visible = false; 
+         }
+         else
+         {
+            // MessageBox.Show(&quot;TotalPages &gt; 1&quot;);
+            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+         }
+      }  
+   }    
+}
+
+
+</ScriptText>
+  <Dictionary>
+    <Parameter Name="JsonDoc" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
+    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="113.4" CanGrow="true" CanShrink="true">
+      <TableObject Name="TableHeader" Width="1047.06" Height="113.4" GrowToBottom="true">
+        <TableColumn Name="Column6" Width="523.53"/>
+        <TableColumn Name="Column7" Width="523.53"/>
+        <TableRow Name="Row43" AutoSize="true">
+          <TableCell Name="Prefix_SIKN_Name" Text="Prefix_SIKN_Name" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="NameIVK" Text="NameIVK" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row44" AutoSize="true">
+          <TableCell Name="Factory" Text="Factory" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell361" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row45" AutoSize="true">
+          <TableCell Name="TankerName" Text="TankerName" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell366" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row46" AutoSize="true">
+          <TableCell Name="ExtendAddInfo" Text="ExtendAddInfo" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell371" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row47" AutoSize="true">
+          <TableCell Name="ReportType" Text="ReportType" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="Cell376" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row48" AutoSize="true">
+          <TableCell Name="ReportTime" Text="ReportTime" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="Cell378" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="DataBandTableReport" Top="115.46" Width="1047.06" Height="39.69" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableReport" Width="292.95" Height="39.69" Border.Lines="All" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableReport_ManualBuild">
+        <TableColumn Name="Column01" Width="28.35"/>
+        <TableColumn Name="Column02" Width="207.9"/>
+        <TableColumn Name="Column03" Width="56.7"/>
+        <TableRow Name="Row8" Height="22.68" AutoSize="true">
+          <TableCell Name="Cell419" Border.Lines="All" Fill.Color="Gainsboro" Text="№" Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Gainsboro" Text="НАИМЕНОВАНИЕ  ПАРАМЕТРА" Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" Wysiwyg="true" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Gainsboro" Text="Ед. изм." Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="17.01">
+          <TableCell Name="Counter" Border.Lines="All" Text="Counter" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Name" Border.Lines="All" Text="Name" Padding="5, 1, 2, 1" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="SI" Border.Lines="All" Text="SI" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary" Top="157.21" Width="1047.06" Height="170.1">
+      <TableObject Name="TableSigners" Top="7.56" Width="665.28" Height="162.54">
+        <TableColumn Name="Column9" Width="207.9"/>
+        <TableColumn Name="Column10" Width="151.2"/>
+        <TableColumn Name="Column11" Width="3.78"/>
+        <TableColumn Name="Signers" Width="302.4"/>
+        <TableRow Name="Row51" Visible="false">
+          <TableCell Name="Cell390" Text="Основное СИ плотности на момент формирования отчета:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="4"/>
+          <TableCell Name="Cell391" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell392" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell393" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row57">
+          <TableCell Name="Cell420" Text="* - в отчётном периоде значение параметра было недостоверно." VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="4"/>
+          <TableCell Name="Cell421" Font="Arial, 10pt"/>
+          <TableCell Name="Cell422" Font="Arial, 10pt"/>
+          <TableCell Name="Cell423" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="11.34">
+          <TableCell Name="Cell395" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell396" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell397" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell398" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="RowDelivePost1" MaxHeight="0" CanBreak="true">
+          <TableCell Name="TextDelivePost" CanBreak="false" Text="Представитель сдающей стороны:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell401" Border.Lines="Bottom" Border.BottomLine.Width="0.75" CanBreak="false" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell402" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell403" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="RowDelivePost2" MaxHeight="0" CanBreak="true">
+          <TableCell Name="Cell317" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell318" CanBreak="false" Text="подпись" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell319" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell340" Text="(И.О. Фамилия)" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="RowReceivePost1" MaxHeight="0" CanBreak="true">
+          <TableCell Name="TextReceivePost" CanBreak="false" Text="Представитель принимающей стороны:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell406" Border.Lines="Bottom" Border.BottomLine.Width="0.75" CanBreak="false" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell407" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell408" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="RowReceivePost2" MaxHeight="0" CanBreak="true">
+          <TableCell Name="Cell327" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell328" CanBreak="false" Text="подпись" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell329" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell342" Text="(И.О. Фамилия)" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="RowOperator1" MaxHeight="0" CanBreak="true">
+          <TableCell Name="TextOperator" Text="Оператор товарный:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell411" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell412" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell413" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="RowOperator2" CanBreak="true">
+          <TableCell Name="Cell415" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell416" Text="подпись" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell417" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell418" Text="(И.О. Фамилия)" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter" Top="329.38" Width="1047.06" Height="26.55" BeforeLayoutEvent="PageFooter_BeforeLayout">
+      <TextObject Name="PageNumeration" Top="3.87" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

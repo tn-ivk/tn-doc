@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/12/2023 14:58:48" ReportInfo.CreatorVersion="2021.4.4.0">
+  <ScriptText>//1 mm on the screen = 3.78 pixels
+using System;
+using System.Reflection;
+using System;
+using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;         
+using System.Windows.Forms;          //TODO delete?
+using System.Drawing;
+using System.Data;
+using System.IO;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Linq;
+using Newtonsoft.Json;
+using TN.DocData;
+   
+namespace FastReport
+{
+   public class ReportScript
+   {
+      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+      TN.Doc.Doc doc; // данные из входного параметра
+      TN.DocData.General General;
+      TN.Doc.HeaderDoc Header;
+      TN.Doc.DataDoc SettingsData;
+      TN.Doc.FooterDoc Footer;
+      TN.Doc.DictionarysDoc Dictionarys;
+      TN.Doc.DataIVKDoc DataIVK; 
+    
+      List &lt;TN.Doc.Table1&gt; listMeasures;
+      List &lt;TN.Doc.KoefsSolartron&gt; listKoefsSolartron;
+      List &lt;TN.Doc.KoefsSarasota&gt; listKoefsSarasota;
+      
+      float sumAllObjectsHeights=0;
+      float sumTableRowsHeights =0;
+      float tempRepSumHeight =0;
+      int NefType;
+      int protocolNumber;        
+    
+      private void Page_StartPage(object sender, EventArgs e)
+      {               
+         //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/09_TablePoverka2816/DocPoverka2816.json&quot;))
+         //{
+            // Read the stream as a string
+         //   Report.SetParameterValue(&quot;Protocol&quot;, sr.ReadToEnd());
+         //}
+         
+         //// Десериализация данных (формат json) из входного параметра - Json                         
+         string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+         Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+         settings.TypeNameHandling = TypeNameHandling.All;
+         
+         doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
+         General = (TN.DocData.General) doc.Doc.Settings.General;
+         Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
+         SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
+         Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
+         Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
+         DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
+      
+         NefType = General.NefType;
+         
+         //// === Настройки страницы 
+         // Ширина и высота (в мм)
+         
+         Page.PaperHeight = General.PageSettings.PaperHeight;
+         Page.PaperWidth = General.PageSettings.PaperWidth;
+         //Page.Border.Lines = BorderLines.All;
+         
+         // Поля/отступы от краёв (в мм)
+         Page.TopMargin = General.PageSettings.TopMargin;
+         Page.BottomMargin = General.PageSettings.BottomMargin;
+         Page.LeftMargin = General.PageSettings.LeftMargin;
+         Page.RightMargin = General.PageSettings.RightMargin;
+         
+         //Definition for which device create the protocol
+         protocolNumber = General.ProtocolNumber;
+      
+         // Load Data from classes
+          listMeasures = DataIVK.TablePoverka2816.Protokol.PP1_Table1.Where(i =&gt; ! i.t_PP.Contains(&quot;-&quot;) &amp; ! i.t_PP.Contains(&quot;-&quot;)).ToList(); 
+         
+         // Запуск отрисовки таблиц на странице отчета
+         DrawTableHeader();
+         DrawTableConclusion();
+      }
+      
+//// ======================== //// ======================== //// ======================== ////
+      public void DrawTableHeader()
+      {
+         // Setup Columns
+         float widthDynamicCols=Page.PaperWidth-Page.LeftMargin-Page.RightMargin;  
+         TableHeader.Columns[0].Width = widthDynamicCols*Units.Millimeters;
+         
+          switch (protocolNumber)
+          {
+            case 2:
+              Protokol_Number.Text = &quot;&lt;b&gt;П Р О Т О К О Л № &lt;u&gt;&quot; + DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Protokol_Number;
+              Type_of_converter.Text = &quot;Тип преобразователя: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Type_of_converter;
+              Factory_number.Text = &quot;Заводской номер: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Factory_number;
+              SIKN_Factory.Text = &quot;Владелец: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_Factory;
+              SIKN_PSP.Text = &quot;Место поверки: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_PSP;
+              Environment_temperature.Text = &quot;Температура окружающего воздуха при взвешивании пикнометров: &lt;u&gt;&quot; +  
+                DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Environment_temperature + &quot; &lt;/u&gt;&lt;sup&gt;0&lt;/sup&gt;С&quot;;
+              Atmosphere_pressure.Text = &quot;Атмосферное давление: &lt;u&gt;&quot; +  
+                DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Atmosphere_pressure + &quot; &lt;/u&gt;мм рт. ст.&quot;;          
+            break;
+            default:
+              Protokol_Number.Text = &quot;&lt;b&gt;П Р О Т О К О Л № &lt;u&gt;&quot; + DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Protokol_Number;
+              Type_of_converter.Text = &quot;Тип преобразователя: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Type_of_converter;
+              Factory_number.Text = &quot;Заводской номер: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Factory_number;
+              SIKN_Factory.Text = &quot;Владелец: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_Factory;
+              SIKN_PSP.Text = &quot;Место поверки: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_PSP;
+              Environment_temperature.Text = &quot;Температура окружающего воздуха при взвешивании пикнометров: &lt;u&gt;&quot; +  
+                DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Environment_temperature + &quot; &lt;/u&gt;&lt;sup&gt;0&lt;/sup&gt;С&quot;;
+              Atmosphere_pressure.Text = &quot;Атмосферное давление: &lt;u&gt;&quot; +  
+                DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Atmosphere_pressure + &quot; &lt;/u&gt;мм рт. ст.&quot;;          
+            break;
+          }         
+      }
+               
+//// ======================== //// ======================== //// ======================== ////
+      private void TableResults_ManualBuild(object sender, EventArgs e)
+      {
+         var rand = new Random();
+         TableResultsHeader.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters; 
+         
+         // Setup Columns
+         int sumDynamicCols=TableResults.ColumnCount;
+         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         for (int w = 0; w &lt; (TableResults.ColumnCount); w++)                 
+         {
+            TableResults.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+         }
+         
+         //Draw Fixed rows
+         for (int n = 0; n &lt; TableResults.FixedRows; n++)
+         {
+            TableResults.PrintRow(n);
+            TableResults.PrintColumns();                                             
+         }
+
+         //Fill table with data
+         for (int n = 0; n &lt; (listMeasures.Count); n++)
+         {
+            t_PP.Text = tools.GetNormalizedValue(listMeasures[n].t_PP);  
+            t_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].t_Pycn);
+            P_PP.Text = tools.GetNormalizedValue(listMeasures[n].P_PP);
+            P_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].P_Pycn);
+            Dens_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].Dens_Pycn);
+            Dens_Pycn_Normalized.Text = tools.GetNormalizedValue(listMeasures[n].Dens_Pycn_Normalized);
+            Period.Text = tools.GetNormalizedValue(listMeasures[n].Period);
+            Dens_PP.Text = tools.GetNormalizedValue(listMeasures[n].Dens_PP);
+            Delta.Text = tools.GetNormalizedValue(listMeasures[n].Delta);
+         
+            TableResults.PrintRow(TableResults.FixedRows);     
+            TableResults.PrintColumns();  
+         }  
+      }
+  
+//// ======================== //// ======================== //// ======================== ////
+    public void  DrawTableConclusion()
+    { 
+      int isUsedKoefsSolartron;
+      
+      switch (protocolNumber)
+      {
+        case 2:
+          // Setup Cols width
+          TableConclusion.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin) * Units.Millimeters;
+                  
+          //// ===  Fill with grad coefficients
+          // Select coefficients for output 
+          isUsedKoefsSolartron= DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.KoefsSolartron.IsUsed;
+               
+            
+          if (isUsedKoefsSolartron == 1)
+          {
+            //var listPicn1Params = typeof(Root.Picn1).GetProperties().Select(x=&gt;x.GetValue(protocol.Doc.DataIVK.TableKMH_MI2816.ARMData.Picn1 , null)).ToList();
+            Type KoefsSolartron = typeof(TN.Doc.KoefsSolartron);
+            PropertyInfo[] props =  KoefsSolartron.GetProperties();
+            List &lt;String&gt; listKoefsSolartronValues  = new List&lt;string&gt;(props.Length-1);
+            for (int i=1; i&lt;props.Length; i++)
+            {
+              listKoefsSolartronValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.KoefsSolartron, null).ToString());
+            }
+            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSolartronValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Koefs_CheckDate);
+          }
+          else
+          {
+            Type KoefsSarasota = typeof(TN.Doc.KoefsSarasota);
+            PropertyInfo[] props =  KoefsSarasota.GetProperties();
+               
+            List &lt;String&gt; listKoefsSarasotaValues  = new List&lt;string&gt;();
+            for (int i=1; i&lt;props.Length; i++)
+            {
+              //MessageBox.Show(props[i].GetValue(protocol.Doc.DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSarasota, null).ToString());  
+              listKoefsSarasotaValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.KoefsSarasota, null).ToString());
+            }
+            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSarasotaValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Koefs_CheckDate);; 
+          }
+          //Fill table with data
+          StaffData.Text =string.Format(&quot;Должность, подпись, И.О. Фамилия лица, проводившего поверку: &lt;u&gt;                                                                                 &lt;/u&gt; &lt;u&gt;                           &lt;/u&gt; &lt;u&gt;{0}&quot;,
+            DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.StaffData);
+          DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;, tools.UnixTimestampToDatetime(DataIVK.TablePoverka2816.DateTimeLong));          
+          break;
+        
+        default:
+          // Setup Cols width
+          TableConclusion.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin) * Units.Millimeters;
+                  
+          //// ===  Fill with grad coefficients
+          // Select coefficients for output 
+          isUsedKoefsSolartron= DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSolartron.IsUsed;
+               
+            
+          if (isUsedKoefsSolartron == 1)
+          {
+            //var listPicn1Params = typeof(Root.Picn1).GetProperties().Select(x=&gt;x.GetValue(protocol.Doc.DataIVK.TableKMH_MI2816.ARMData.Picn1 , null)).ToList();
+            Type KoefsSolartron = typeof(TN.Doc.KoefsSolartron);
+            PropertyInfo[] props =  KoefsSolartron.GetProperties();
+            List &lt;String&gt; listKoefsSolartronValues  = new List&lt;string&gt;(props.Length-1);
+            for (int i=1; i&lt;props.Length; i++)
+            {
+              listKoefsSolartronValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSolartron, null).ToString());
+            }
+            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSolartronValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Koefs_CheckDate);
+          }
+          else
+          {
+            Type KoefsSarasota = typeof(TN.Doc.KoefsSarasota);
+            PropertyInfo[] props =  KoefsSarasota.GetProperties();
+               
+            List &lt;String&gt; listKoefsSarasotaValues  = new List&lt;string&gt;();
+            for (int i=1; i&lt;props.Length; i++)
+            {
+              //MessageBox.Show(props[i].GetValue(protocol.Doc.DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSarasota, null).ToString());  
+              listKoefsSarasotaValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSarasota, null).ToString());
+            }
+            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSarasotaValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Koefs_CheckDate);; 
+          }
+          //Fill table with data
+          StaffData.Text =string.Format(&quot;Должность, подпись, И.О. Фамилия лица, проводившего поверку: &lt;u&gt;                                                                                 &lt;/u&gt; &lt;u&gt;                           &lt;/u&gt; &lt;u&gt;{0}&quot;,
+            DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.StaffData);
+          DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;, tools.UnixTimestampToDatetime(DataIVK.TablePoverka2816.DateTimeLong));          
+          break;      
+      }  
+    }
+      //// ======================== //// ======================== //// ======================== ////
+
+      private void PageFooter_BeforeLayout(object sender, EventArgs e)
+      {
+         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+         { 
+            PageFooter.Visible = false; 
+         }
+         else
+         {
+            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+         }
+      }
+   }    
+}
+
+</ScriptText>
+  <Styles>
+    <Style Name="Arial_Bold_9" Font="Arial, 9pt, style=Bold"/>
+    <Style Name="Arial_Reg_8" Font="Arial, 8pt"/>
+  </Styles>
+  <Dictionary>
+    <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
+    <Parameter Name="JsonDoc" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
+    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="173.88" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableHeader" Width="708.75" Height="173.88">
+        <TableColumn Name="Column143" Width="708.75"/>
+        <TableRow Name="Row110" Height="22.68">
+          <TableCell Name="Protokol_Number" Text="Protokol_Number" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row111">
+          <TableCell Name="Cell811" Text="поверки преобразователя плотности" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row113">
+          <TableCell Name="Cell821" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row114">
+          <TableCell Name="Type_of_converter" Text="Type_of_converter" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row125">
+          <TableCell Name="Factory_number" Text="Factory_number" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row115">
+          <TableCell Name="SIKN_Factory" Text="SIKN_Factory" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row126">
+          <TableCell Name="SIKN_PSP" Text="SIKN_PSP" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row116">
+          <TableCell Name="Environment_temperature" Text="Environment_temperature" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row118">
+          <TableCell Name="Atmosphere_pressure" Text="Atmosphere_pressure" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="DataBandTableResults" Top="176.66" Width="1047.06" Height="124.74" CanBreak="true">
+      <TableObject Name="TableResults" Top="26.46" Width="981.12" Height="98.28" FixedRows="3" ManualBuildEvent="TableResults_ManualBuild">
+        <TableColumn Name="Column151" Width="103.74"/>
+        <TableColumn Name="Column152" Width="103.74"/>
+        <TableColumn Name="Column153" Width="103.74"/>
+        <TableColumn Name="Column154" Width="103.74"/>
+        <TableColumn Name="Column155" Width="103.74"/>
+        <TableColumn Name="Column156" Width="151.2"/>
+        <TableColumn Name="Column157" Width="103.74"/>
+        <TableColumn Name="Column158" Width="103.74"/>
+        <TableColumn Name="Column159" Width="103.74"/>
+        <TableRow Name="Row137" Height="22.68" AutoSize="true">
+          <TableCell Name="Cell891" Border.Lines="All" Text="Температура продукта" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell892" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell893" Border.Lines="All" Text="Давление продукта" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell894" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell895" Border.Lines="All" Text="Плотность, из-&lt;br&gt;меренная пик-&lt;br&gt;нометрами" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell896" Border.Lines="All" Text="Плотность, из-&lt;br&gt;меренная пик-&lt;br&gt;нометрами,&lt;br&gt;приведенная" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell897" Border.Lines="All" Text="Значение пери-&lt;br&gt;ода колебаний&lt;br&gt;преобразовате-&lt;br&gt;ля плотности" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell898" Border.Lines="All" Text="Плотность, изме-&lt;br&gt;ренная преобразо-&lt;br&gt;вателем плотно-&lt;br&gt;сти" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell899" Border.Lines="All" Text="Абсолютная&lt;br&gt;погрешность&lt;br&gt;преобразовате-&lt;br&gt;ля плотности" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row138" Height="45.36" AutoSize="true">
+          <TableCell Name="Cell900" Border.Lines="All" Text="в преобра-&lt;br&gt;зователе&lt;br&gt;плотности" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell901" Border.Lines="All" Text="в пикно-&lt;br&gt;метрах" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell902" Border.Lines="All" Text="в преобразова-&lt;br&gt;теле плотности" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell903" Border.Lines="All" Text="в пикномет-&lt;br&gt;рах" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell904" Border.Lines="All" HorzAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell905" Border.Lines="All" HorzAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell906" Border.Lines="All" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell907" Border.Lines="All" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell908" Border.Lines="All" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row139" Height="15.12">
+          <TableCell Name="Cell909" Border.Lines="All" Text="&lt;sup&gt;о&lt;/sup&gt;C" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell910" Border.Lines="All" Text="&lt;sup&gt;о&lt;/sup&gt;C" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell911" Border.Lines="All" Text="МПа" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell912" Border.Lines="All" Text="МПа" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell913" Border.Lines="All" Text="кг/м &lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell914" Border.Lines="All" Text="кг/м &lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell915" Border.Lines="All" Text="мкс" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell916" Border.Lines="All" Text="кг/м &lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell917" Border.Lines="All" Text="кг/м &lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="RowAsTemplate" Height="15.12">
+          <TableCell Name="t_PP" Border.Lines="All" Text="t_PP" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="t_Pycn" Border.Lines="All" Text="t_Pycn" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="P_PP" Border.Lines="All" Text="P_PP" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="P_Pycn" Border.Lines="All" Text="P_Pycn" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Dens_Pycn" Border.Lines="All" Text="Dens_Pycn" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Dens_Pycn_Normalized" Border.Lines="All" Text="Dens_Pycn_Normalized" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Period" Border.Lines="All" Text="Period" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Dens_PP" Border.Lines="All" Text="Dens_PP" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Delta" Border.Lines="All" Text="Delta" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+      <TextObject Name="TableResultsHeader" Top="7.56" Width="652.05" Height="18.9" Text="Определение метрологических характеристик" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary" Top="304.18" Width="1047.06" Height="86.94" CanGrow="true" CanShrink="true">
+      <TableObject Name="TableConclusion" Top="7.56" Width="699.41" Height="79.38">
+        <TableColumn Name="Column144" Width="699.41"/>
+        <TableRow Name="Row127" Height="26.46" AutoSize="true">
+          <TableCell Name="GradKoefs" Text="GradKoefs" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row128" Height="26.46">
+          <TableCell Name="StaffData" Text="StaffData" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row129" Height="26.46">
+          <TableCell Name="DateTimeLong" Text="DateTimeLong" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter" Top="393.89" Width="1047.06" Height="22.68" CanGrow="true" CanShrink="true" CanBreak="true" BeforeLayoutEvent="PageFooter_BeforeLayout">
+      <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.9"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

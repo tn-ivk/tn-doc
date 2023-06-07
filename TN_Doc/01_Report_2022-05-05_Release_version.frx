@@ -1,0 +1,563 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_Docs.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="06/18/2021 09:21:52" ReportInfo.Modified="05/29/2022 17:40:16" ReportInfo.CreatorVersion="2021.4.4.0">
+  <ScriptText>using System;
+using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+//using System.Windows.Forms;    // удалить перед передачей шаблона Алексею!!! (также убрать из Свойства... -&gt;  Скрипт: System.Windows.Forms.dll)
+using System.Drawing;
+using System.Data;
+using System.IO;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Linq;
+using Newtonsoft.Json;
+ 
+namespace FastReport
+{
+   public class ReportScript
+   {
+      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+      TN_DocReport.Root report; // переменная, для хранения данных из входного параметра
+      int numLineParams=0; //кол-во параметров линий в основной таблице
+      int numBIKParams=0; // кол-во параметров БИК,в таблице БИК
+      int showNumberColumns =0;// кол-во линий, требуемых отобразить в основной таблице
+     // int linesCount=0;
+                          
+      
+      List &lt;TN_DocReport.Line&gt; listUsedLines;
+      List&lt;TN_DocReport.Parameters&gt; listLineParams;
+      List&lt;TN_DocReport.Parameters&gt; listBIKParams;//visibleBIKfields;       
+      List&lt;TN_DocReport.Signers&gt;signersList;
+      Dictionary&lt;int, string&gt; reportName;
+      Dictionary&lt;string, TextRenderType&gt;  dictTextRenderType;
+      int reportType;
+      DateTime dtBegin;
+      DateTime dtEnd;
+      int tempCounter;
+      
+    private void Page_StartPage(object sender, EventArgs e)
+      {         
+         //using (var sr = new StreamReader(&quot;C:/SVN/FastReport/Входящие данные от Алексея (классы и json)/01_Report/DocReports.json&quot;))
+         //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/01_Report/DocReports.json&quot;))
+         //{
+            // Read the stream as a string, and write the string to the console.
+            //Report.SetParameterValue(&quot;Report&quot;, sr.ReadToEnd());
+         //}
+        
+         //// === Десериализация данных (формат json) из входного параметра - Report                             
+         string reportJson = (string)Report.GetParameterValue(&quot;Report&quot;);
+         Newtonsoft.Json.JsonSerializerSettings settingsReport = new Newtonsoft.Json.JsonSerializerSettings();
+         settingsReport.TypeNameHandling = TypeNameHandling.All;
+         report = JsonConvert.DeserializeObject&lt;TN_DocReport.Root&gt;(reportJson, settingsReport);
+         
+         //// === Определение кол-ва ИЛ, необходимых отобразить в отчете  для основной таблицы.
+         showNumberColumns=report.Doc.Settings.Data.TableLine.ShowNumberColumns;
+         
+         //=== Определение кол-ва ИЛ (с данными).
+         listUsedLines = report.Doc.DataIVK.TableReport.Report.Obj.Line.Where(y =&gt; y.Used == 1).ToList();
+         
+         // === Определение кол-ва параметров ИЛ для основной таблицы.
+         listLineParams = report.Doc.Settings.Data.TableLine.Parameters.Where(x =&gt; x.Visible == true).ToList();
+         numLineParams = listLineParams.Count;
+         
+         //// === Определение кол-ва параметров БИКа, для таблицы БИК
+         listBIKParams = report.Doc.Settings.Data.TableBIK.Parameters.Where(x =&gt; x.Visible == true).ToList();
+         
+         //// === Создание списка свойств класса CfgReport.Signer.
+         signersList = report.Doc.Settings.Footer.Signers.Where(x =&gt; x.Name.Length &gt;0).ToList();
+          
+         dtBegin = tools.UnixTimestampToDatetime((long)report.Doc.DataIVK.TableReport.Begin);
+         dtEnd = tools.UnixTimestampToDatetime((long)report.Doc.DataIVK.TableReport.End);
+         
+         //// === Настройки страницы 
+         // Ширина и высота (в мм)
+         Page.PaperWidth =report.Doc.Settings.General.PageSettings.PaperWidth;
+         Page.PaperHeight =report.Doc.Settings.General.PageSettings.PaperHeight;
+      
+         // Поля/отступы от краёв (в мм)
+         Page.TopMargin=report.Doc.Settings.General.PageSettings.TopMargin;
+         Page.BottomMargin=report.Doc.Settings.General.PageSettings.BottomMargin;
+         Page.LeftMargin=report.Doc.Settings.General.PageSettings.LeftMargin;
+         Page.RightMargin=report.Doc.Settings.General.PageSettings.RightMargin;
+         
+         //// ===  Определение типа отчетов: за два часа, за смену, за сутки, за месяц, за время ведения ТКО.
+         reportName = new Dictionary&lt;int, string&gt;();
+         reportName[0] = &quot;Отчет за один час&quot;;
+         reportName[1] = &quot;Отчет за два часа&quot;;
+         reportName[2] = &quot;Отчет за смену&quot;;
+         reportName[3] = &quot;Отчет за сутки&quot;;
+         reportName[4] = &quot;Отчет за месяц&quot;;
+         reportName[5] = &quot;Отчет за время ведения ТКО&quot;;
+         reportType = Convert.ToInt32(report.Doc.DataIVK.TableReport.ReportType);
+         
+         // Запуск отрисовки таблиц на странице отчета
+         DrawTableHeader(); 
+         
+         if (report.Doc.Settings.Data.TableBIK.Visible==true)
+         {
+            for(int i= 0; i &lt; report.Doc.DataIVK.TableReport.Report.Obj.BIK.Count; i++)
+            {
+               TN_DocReport.BIK bik = report.Doc.DataIVK.TableReport.Report.Obj.BIK[i];
+               DrawTableBIK(bik, i);  // Создание, настройка, заполнение данными и вывод на страницу таблицы BIKTable (таблицы БИК)
+            }
+         }
+         DrawTableSigners();
+      }
+      
+      //// ======================== //// ======================== //// ======================== ////
+
+      //// &quot;Шапка&quot; отчета //
+      private void DrawTableHeader()
+      {
+         //ReportTitle.FillColor = Color.Green; //for test
+         
+         // Setup Columns
+         float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/TableHeader.ColumnCount;         
+         for (int i = 0; i &lt; (TableHeader.ColumnCount); i++)                 
+         {
+            TableHeader.Columns[i].Width = widthDynamicCols*Units.Millimeters;
+         }
+         // === Fill table with the data                                                                                
+         Prefix_SIKN_Name.Text = string.Format(&quot;{0} {1}&quot;, report.Doc.Settings.Header.Prefix_SIKN_Name,
+         report.Doc.DataIVK.TableReport.Report.Obj.Additional[0].SIKN_Name);
+         NameIVK.Text = report.Doc.Settings.Header.NameIVK; 
+         Factory.Text=report.Doc.DataIVK.TableReport.Report.Obj.Additional[0].Factory;
+         TankerName.Text=report.Doc.DataIVK.TableReport.Report.Obj.Additional[0].TankerName;
+         ExtendAddInfo.Text=report.Doc.DataIVK.TableReport.Report.Obj.Additional[0].ExtendAddInfo;
+         ReportType.Text = reportName[reportType]; // Тип отчета
+         ReportTime.Text= String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy HH:mm}&quot;, dtBegin, dtEnd);
+         //TableHeader[z,y].Border.Lines=BorderLines.All; // for tests
+         } 
+
+      //// ======================== //// ======================== //// ======================== ////
+      private void TableReport_ManualBuild(object sender, EventArgs e)
+      {
+         if (report.Doc.Settings.Data.TableLine.Visible==true)
+         {
+            bool columnSIKNVisible = report.Doc.Settings.Data.TableLine.ColumnSIKN.Visible;
+            int amountLinesCols= listUsedLines.Count;
+            int amountSumCols=0;
+            double widthLinesCols =0;
+            double widthSIKNCol = 0;
+            float widthFixedCols = 0;
+            tempCounter = 0;
+
+            // Get num cols for  Lines &amp; SIKN (depend from &quot;СolumnSIKN&quot; - &quot;Visible&quot;: true/false)
+            if (report.Doc.Settings.Data.TableLine.ColumnSIKN.Visible==true)
+            {
+               amountSumCols = amountLinesCols+1;
+            }
+            else 
+            {
+               amountSumCols = amountLinesCols;
+            }
+            
+            //MessageBox.Show(&quot;amountSumCols - &quot; + amountSumCols.ToString());
+            //MessageBox.Show(&quot;TableReport.ColumnCount - &quot; + TableReport.ColumnCount.ToString());
+            
+            if (Engine.FirstPass == true)
+            {
+               tempCounter = 0;
+               //// ===  Add dynamic columns
+               for (int i = 3; i &lt; amountSumCols+3; i++)
+               {
+                  TableColumn column = new TableColumn();  
+                  TableReport.Columns.Add(column);   
+                  
+                  // Set names for Columns
+                  if (columnSIKNVisible==true &amp; i==(amountSumCols+3)-1) // проверка: нужно ли задавать name для столбца СИКН
+                  {
+                     column.Name = &quot;colSIKN&quot;;
+                  }
+                  else
+                  {
+                     column.Name = &quot;colLine&quot; + tempCounter.ToString();
+                  }
+                                    
+                  // Assign property of the previous cells for new cell (for dynamic columns)
+                  for (int j=0;j&lt;TableReport.RowCount;j++)
+                  {
+                     TableReport[i,j].AssignAll(TableReport[(i-1),j]);
+                  }
+                  tempCounter++;
+               }
+            }
+            
+            //// ===  Calculate common width for Lines columns &amp; SIKN column
+            widthLinesCols = report.Doc.Settings.Data.TableLine.ColumnsWidth; //Get common width for Lines columns 
+            widthSIKNCol=report.Doc.Settings.Data.TableLine.ColumnSIKN.Width; //Get width for SIKN column
+            widthFixedCols =(Column01.Width+Column02.Width+Column03.Width)/Units.Millimeters;
+
+            if (widthLinesCols==0) 
+            {
+               if (report.Doc.Settings.Data.TableLine.ColumnSIKN.Visible== true) 
+               {
+                  if (report.Doc.Settings.Data.TableLine.ColumnSIKN.Width==0) 
+                  {
+                     widthSIKNCol=widthLinesCols = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols) / amountSumCols; 
+                  }
+                  else
+                  {
+                     widthSIKNCol = report.Doc.Settings.Data.TableLine.ColumnSIKN.Width;
+                     widthLinesCols = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols - widthSIKNCol) / amountSumCols; 
+                  }
+               }
+               else
+               {
+                  widthLinesCols = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols) / amountSumCols; 
+               }
+            }    
+            else
+            {
+               if (report.Doc.Settings.Data.TableLine.ColumnSIKN.Visible== true) 
+               {
+                  if (report.Doc.Settings.Data.TableLine.ColumnSIKN.Width==0) 
+                  {
+                     widthSIKNCol = (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - widthFixedCols) - (widthLinesCols * amountLinesCols);
+                  }
+               }
+            }    
+            
+            int numLine = 0;
+            // Setup width for Line &amp; SIKN columns
+            for (int i = 3; i &lt; (TableReport.Columns.Count); i++) 
+            {                                                                                                          
+               if (TableReport.Columns[i].Name.Contains(&quot;colLine&quot;)==true) 
+               {
+                  TableReport.Columns[i].Width=(float)widthLinesCols*Units.Millimeters; // set width for Line columns
+                  TableReport[i,0].Text = listUsedLines[numLine].Name;
+               }
+               else
+               {
+                  TableReport.Columns[i].Width=(float)widthSIKNCol *Units.Millimeters; // set width for SIKN column
+                  TableReport[TableReport.Columns.Count-1,0].Text = report.Doc.Settings.Data.TableLine.ColumnSIKN.Name;
+               }
+               numLine++;
+            }       
+           
+            for (int n = 0; n &lt; TableReport.FixedRows; n++)            
+            {
+               TableReport.PrintRow(n);
+               TableReport.PrintColumns();                                             
+            } 
+            
+            // Fill table with data
+            object result = &quot;-&quot;;
+            for (int j = 1; j &lt; listLineParams.Count; j++)
+            {
+               Counter.Text=j.ToString();   
+               Name.Text=listLineParams[j].Name;
+               SI.Text=listLineParams[j].SI;
+                               
+               //Data for Lines columns
+               for (int z = 0; z &lt; listUsedLines.Count; z++)
+               {                     
+                  result = &quot;-&quot;;
+                  tools.GetPropertyValue(listUsedLines[z], listLineParams[j].Key, ref result);
+                  TableReport[(z+3),1].Text = tools.GetNormalizedValue(result).ToString();
+               }
+                
+               //Data for SIKN column
+               if (report.Doc.Settings.Data.TableLine.ColumnSIKN.Visible==true)
+               {             
+                  for (int z = 0; z &lt; listUsedLines.Count; z++)
+                  {                     
+                     result = &quot;-&quot;;
+                     tools.GetPropertyValue(report.Doc.DataIVK.TableReport.Report.Obj.SIKN, listLineParams[j].Key, ref result);
+                      TableReport[(TableReport.ColumnCount-1),1].Text = tools.GetNormalizedValue(result).ToString();
+                  }
+               }
+               TableReport.PrintRow(1);
+               TableReport.PrintColumns();                                             
+            }
+         }
+      }
+     
+      public void DrawTableBIK(TN_DocReport.BIK bik, int idx)
+      {
+         if (Engine.FirstPass == true)
+         {
+            int rows = 0;
+            //// Create &amp; setup: Band as dataBandBIK //
+            DataBand dataBandBIK = new DataBand(); // создание экземпляра датабенда
+            dataBandBIK.Name = &quot;DataBandBIK&quot;;
+            dataBandBIK.CanGrow=true;
+            //dataBandBIK.Height = 10f * Units.Millimeters;           
+            //dataBandBIK.FillColor = Color.Red; // for test
+            Page.Bands.Add(dataBandBIK);  // &quot;прикрепление&quot; датабенда к странице 1
+            
+            //// Create &amp; setup: Table as tableBIK// ---------------------------------
+            TableObject tableBIK = new TableObject(); // создание экземпляра таблицы tableBIK
+            //tableBIK.Top = (float)conf.Data.TableBIKSettings.Offset*Units.Millimeters; // установка отступа сверху (в см.) для таблицы
+            dataBandBIK.Objects.Add(tableBIK); // &quot;прикрепление&quot; таблицы к  датабенду 
+            tableBIK.Top =2f * Units.Millimeters;           
+
+            // Set columns numbers for table
+            decimal columns = 8;
+         
+            //// === Setup columns of the tableBIK
+            // ширина нединамических  столбцов (в мм)
+            float widthColumn1 = 7.5f; // width column 1 
+
+            // ширина динамических столбцов. От ширины страницы отнимаются: 
+            //отступы (слева, справа), ширин первого столбца. Результат делится на заданное кол-во колонок минус 1 (первый столбец).
+            float widthRemainingColumns = ((Page.PaperWidth-Page.LeftMargin-Page.RightMargin-widthColumn1)/((float)columns-1));
+
+            //Calculate Rows number
+            decimal tempvar = (decimal)listBIKParams.Count/(columns-1);
+            rows = (Decimal.ToInt32(Math.Ceiling(tempvar))*2);
+         
+            //// === Create columns, set width, link their to the tableBIK // 
+            for (int i = 0; i &lt; columns ; i++)
+            {
+               TableColumn column = new TableColumn();  
+               tableBIK.Columns.Add(column);   
+               switch (i)
+               {
+                  case 0: 
+                     column.Width = widthColumn1* Units.Millimeters; 
+                     break;
+                  default:
+                     column.Width = widthRemainingColumns* Units.Millimeters; 
+                     break;
+               } 
+            }
+            //Create rows, set width, link their to the tableBIK //
+            for (int n = 0; n &lt; rows; n++)
+            {
+               TableRow row = new TableRow();  
+               tableBIK.Rows.Add(row);          
+               tableBIK.Rows[n].AutoSize = true;
+            }
+            
+            //// Fill the cells with color and Data
+            int z=0;
+            object result = &quot;-&quot;;
+            for (int j = 0; j &lt; (tableBIK.RowCount); j++)
+            {
+               for (int i = 1; i &lt; tableBIK.ColumnCount; i++,  z++ )
+               {
+                  if (z==listBIKParams.Count) 
+                     break;             
+                                              
+                  // Fill table headers cells with text
+                  tableBIK[i,j].Text = String.Format(&quot;&lt;b&gt;{0}, {1}&quot;, listBIKParams[z].Name, listBIKParams[z].SI);
+                  //tableBIK[i,j].FillColor=Color.Gainsboro;
+                  tableBIK[i,j].FontWidthRatio=(float)0.85;
+                  tableBIK[i,j].Font =  new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Bold); 
+                  tableBIK[i,j].Border.Lines=BorderLines.All;
+                  
+                  // Fill regular cells with data
+                  result = &quot;-&quot;;
+                  tools.GetPropertyValue(report.Doc.DataIVK.TableReport.Report.Obj.BIK[0], listBIKParams[z].Key, ref result); //SearchSuitableValueBIK
+                  tableBIK[i,j+1].Text = tools.GetNormalizedValue(result).ToString();
+                  tableBIK[i,j+1].Font = new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Regular); 
+                  tableBIK[i,j+1].Border.Lines=BorderLines.All;                               
+               }
+               j++;
+            }
+            // Fill with data 1 column
+            if (report.Doc.DataIVK.TableReport.Report.Obj.BIK.Count==1)
+            {     
+               tableBIK[0,0].Text = &quot;&lt;b&gt;БИК&quot;;
+            }
+            else
+            {
+               tableBIK[0,0].Text = &quot;&lt;b&gt;БИК &quot;+(idx+1).ToString(); 
+            }
+            
+            tableBIK[0,0].Angle = 270; // rotate font to 270 degree 
+            tableBIK[0,0].Font =  new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Bold); 
+            tableBIK[0,0].RowSpan =rows;
+            tableBIK[0,0].Border.Lines=BorderLines.All;
+         
+            //setup of the all cells
+            for (int i = 0; i &lt; columns; i++)
+            {
+               for (int j = 0; j &lt; rows; j++)
+               {
+                  tableBIK[i,j].HorzAlign=HorzAlign.Center; // отцентровать текст в ячейке по горизонтали
+                  tableBIK[i,j].VertAlign=VertAlign.Center; // отцентровать текст в ячейке по вертикали
+                  tableBIK[i,j].TextRenderType=TextRenderType.HtmlTags;
+                  tableBIK[i,j].FontWidthRatio=(float)0.85;
+               }
+            }       
+         }
+      }    
+      
+      //// === &quot;Подвал&quot; отчета =======================================
+      private void DrawTableSigners()
+      {
+         if (Page.PaperWidth&gt;  210 )
+         {
+            Signers.Width = 110*Units.Millimeters;
+         }
+         else
+         {
+            Signers.Width = 90*Units.Millimeters;
+         }
+         
+         // Fill the table with data                  
+         TableSigners[0,0].Text = String.Format(&quot;Основное СИ плотности на момент формирования отчета: плотномер № {0}.&quot;, report.Doc.DataIVK.TableReport.Report.Obj.Additional[0].NumOfUsedDens);
+         TableSigners[0,2].Text = report.Doc.Settings.Footer.Signers[0].Name;
+         TableSigners[0,4].Text = report.Doc.Settings.Footer.Signers[1].Name;
+         TableSigners[0,6].Text = report.Doc.Settings.Footer.Signers[2].Name;         
+         
+         int reportID = (Convert.ToInt32(report.Doc.DataIVK.TableReport.ReportType)-1);
+         
+         // Отображение подписантов согласно типа отчета
+         for (int y = 0; y &lt; signersList.Count ; y++) 
+         {
+            switch(y)
+            {
+               case 0:
+                  TableSigners.Rows[2].Visible=signersList[y].ShowSigner[reportID].Visible;
+                  TableSigners.Rows[3].Visible=TableSigners.Rows[2].Visible;
+                  break;
+               
+               case 1:  
+                  TableSigners.Rows[4].Visible=signersList[y].ShowSigner[reportID].Visible;
+                  TableSigners.Rows[5].Visible=TableSigners.Rows[4].Visible;
+                  break;
+               
+               case 2:  
+                  TableSigners.Rows[6].Visible=signersList[y].ShowSigner[reportID].Visible;
+                  TableSigners.Rows[7].Visible=TableSigners.Rows[6].Visible;
+                  break;
+            }
+         }
+      }
+
+      private void PageFooter_BeforeLayout(object sender, EventArgs e)
+      {
+         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+         { 
+            //MessageBox.Show(&quot;TotalPages &lt; 2&quot;);
+            PageFooter.Visible = false; 
+         }
+         else
+         {
+            // MessageBox.Show(&quot;TotalPages &gt; 1&quot;);
+            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+         }
+      }
+   }
+}</ScriptText>
+  <Dictionary>
+    <Parameter Name="Report" DataType="System.String" Expression="&quot;{\&quot;IVKData\&quot;: {\&quot;id\&quot;: 3971,\&quot;strBegin\&quot;: \&quot;2021.10.2714:12:21\&quot;,\&quot;Begin\&quot;: 1635343941,\&quot;strEnd\&quot;: \&quot;2021.10.2813:18:19\&quot;,\&quot;End\&quot;: 1635427099,\&quot;ReportType\&quot;: 2,\&quot;ReportPeriod\&quot;: 2,\&quot;BIK_ID\&quot;: 1,\&quot;Report\&quot;: {\&quot;Additional\&quot;: [{\&quot;SIKN_Name\&quot;: \&quot;&lt;b&gt;449&lt;/b&gt;\&quot;,\&quot;Factory\&quot;: \&quot;АО «Транснефть - Западная Сибирь»\&quot;,\&quot;NumOfUsedDens\&quot;: 1,\&quot;TankerName\&quot;: \&quot;\&quot;,\&quot;ExtendAddInfo\&quot;: \&quot;\&quot;}],\&quot;BIK\&quot;: [{\&quot;Dens\&quot;: \&quot;877,4\&quot;,\&quot;Dens15\&quot;: \&quot;876,7\&quot;,\&quot;Dens20\&quot;: \&quot;873,2\&quot;,\&quot;DynamicVisc\&quot;: \&quot;22,6\&quot;,\&quot;KinemVisc\&quot;: \&quot;25,8\&quot;,\&quot;Flow\&quot;: \&quot;5,6\&quot;,\&quot;VolWater\&quot;: \&quot;0,17\&quot;,\&quot;MasWater\&quot;: \&quot;0,19\&quot;,\&quot;MasSulphur\&quot;: \&quot;1,91\&quot;,\&quot;DensTemp\&quot;: \&quot;14,5\&quot;,\&quot;DensPress\&quot;: \&quot;0,64\&quot;,\&quot;Oil_Type\&quot;: \&quot;Нефть\&quot;,\&quot;ViscTemp\&quot;: \&quot;14,5\&quot;}],\&quot;Line\&quot;: [{\&quot;Used\&quot;: 1,\&quot;Name\&quot;: \&quot;Линия 1\&quot;,\&quot;Dens\&quot;: \&quot;878,0\&quot;,\&quot;MassFlow\&quot;: \&quot;470,2\&quot;,\&quot;VolFlow\&quot;: \&quot;535,5\&quot;,\&quot;Vol\&quot;: \&quot;1072\&quot;,\&quot;Vol20\&quot;: \&quot;1077\&quot;,\&quot;Vol15\&quot;: \&quot;1073\&quot;,\&quot;Mass\&quot;: \&quot;940\&quot;,\&quot;Temp\&quot;: \&quot;13,4\&quot;,\&quot;Press\&quot;: \&quot;0,41\&quot;,\&quot;BeginVol\&quot;: \&quot;33116\&quot;,\&quot;EndVol\&quot;: \&quot;34188\&quot;,\&quot;BeginVol15\&quot;: \&quot;33170\&quot;,\&quot;EndVol15\&quot;: \&quot;34243\&quot;,\&quot;BeginVol20\&quot;: \&quot;33303\&quot;,\&quot;EndVol20\&quot;: \&quot;34380\&quot;,\&quot;BeginMass\&quot;: \&quot;29070\&quot;,\&quot;EndMass\&quot;: \&quot;30010\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;33116\&quot;,\&quot;EndVolTotal\&quot;: \&quot;34188\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;33170\&quot;,\&quot;EndVol15Total\&quot;: \&quot;34243\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;33303\&quot;,\&quot;EndVol20Total\&quot;: \&quot;34380\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;29070\&quot;,\&quot;EndMassTotal\&quot;: \&quot;30010\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;0\&quot;,\&quot;VolTotal\&quot;: \&quot;1072\&quot;,\&quot;Vol20Total\&quot;: \&quot;1077\&quot;,\&quot;Vol15Total\&quot;: \&quot;1073\&quot;,\&quot;MassTotal\&quot;: \&quot;940\&quot;,\&quot;Vol15Flow\&quot;: \&quot;536,3\&quot;,\&quot;Vol20Flow\&quot;: \&quot;538,5\&quot;},{\&quot;Used\&quot;: 1,\&quot;Name\&quot;: \&quot;Линия 2\&quot;,\&quot;Dens\&quot;: \&quot;878,0\&quot;,\&quot;MassFlow\&quot;: \&quot;493,8\&quot;,\&quot;VolFlow\&quot;: \&quot;562,5\&quot;,\&quot;Vol\&quot;: \&quot;1125\&quot;,\&quot;Vol20\&quot;: \&quot;1131\&quot;,\&quot;Vol15\&quot;: \&quot;1127\&quot;,\&quot;Mass\&quot;: \&quot;988\&quot;,\&quot;Temp\&quot;: \&quot;13,4\&quot;,\&quot;Press\&quot;: \&quot;0,41\&quot;,\&quot;BeginVol\&quot;: \&quot;23845\&quot;,\&quot;EndVol\&quot;: \&quot;24970\&quot;,\&quot;BeginVol15\&quot;: \&quot;23883\&quot;,\&quot;EndVol15\&quot;: \&quot;25010\&quot;,\&quot;BeginVol20\&quot;: \&quot;23979\&quot;,\&quot;EndVol20\&quot;: \&quot;25110\&quot;,\&quot;BeginMass\&quot;: \&quot;20937\&quot;,\&quot;EndMass\&quot;: \&quot;21925\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;23845\&quot;,\&quot;EndVolTotal\&quot;: \&quot;24970\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;23883\&quot;,\&quot;EndVol15Total\&quot;: \&quot;25010\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;23979\&quot;,\&quot;EndVol20Total\&quot;: \&quot;25110\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;20937\&quot;,\&quot;EndMassTotal\&quot;: \&quot;21925\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;0\&quot;,\&quot;VolTotal\&quot;: \&quot;1125\&quot;,\&quot;Vol20Total\&quot;: \&quot;1131\&quot;,\&quot;Vol15Total\&quot;: \&quot;1127\&quot;,\&quot;MassTotal\&quot;: \&quot;988\&quot;,\&quot;Vol15Flow\&quot;: \&quot;563,3\&quot;,\&quot;Vol20Flow\&quot;: \&quot;565,6\&quot;},{\&quot;Used\&quot;: 1,\&quot;Name\&quot;: \&quot;Линия 3\&quot;,\&quot;Dens\&quot;: \&quot;878,0\&quot;,\&quot;MassFlow\&quot;: \&quot;435,0\&quot;,\&quot;VolFlow\&quot;: \&quot;495,4\&quot;,\&quot;Vol\&quot;: \&quot;990\&quot;,\&quot;Vol20\&quot;: \&quot;997\&quot;,\&quot;Vol15\&quot;: \&quot;992\&quot;,\&quot;Mass\&quot;: \&quot;869\&quot;,\&quot;Temp\&quot;: \&quot;13,4\&quot;,\&quot;Press\&quot;: \&quot;0,41\&quot;,\&quot;BeginVol\&quot;: \&quot;19863\&quot;,\&quot;EndVol\&quot;: \&quot;20853\&quot;,\&quot;BeginVol15\&quot;: \&quot;19895\&quot;,\&quot;EndVol15\&quot;: \&quot;20887\&quot;,\&quot;BeginVol20\&quot;: \&quot;19974\&quot;,\&quot;EndVol20\&quot;: \&quot;20971\&quot;,\&quot;BeginMass\&quot;: \&quot;17445\&quot;,\&quot;EndMass\&quot;: \&quot;18314\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;19863\&quot;,\&quot;EndVolTotal\&quot;: \&quot;20853\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;19895\&quot;,\&quot;EndVol15Total\&quot;: \&quot;20887\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;19974\&quot;,\&quot;EndVol20Total\&quot;: \&quot;20971\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;17445\&quot;,\&quot;EndMassTotal\&quot;: \&quot;18314\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;0\&quot;,\&quot;VolTotal\&quot;: \&quot;990\&quot;,\&quot;Vol20Total\&quot;: \&quot;997\&quot;,\&quot;Vol15Total\&quot;: \&quot;992\&quot;,\&quot;MassTotal\&quot;: \&quot;869\&quot;,\&quot;Vol15Flow\&quot;: \&quot;496,2\&quot;,\&quot;Vol20Flow\&quot;: \&quot;498,1\&quot;},{\&quot;Used\&quot;: 1,\&quot;Name\&quot;: \&quot;Линия 4\&quot;,\&quot;Dens\&quot;: \&quot;-\&quot;,\&quot;MassFlow\&quot;: \&quot;0,0\&quot;,\&quot;VolFlow\&quot;: \&quot;0,0\&quot;,\&quot;Vol\&quot;: \&quot;0\&quot;,\&quot;Vol20\&quot;: \&quot;0\&quot;,\&quot;Vol15\&quot;: \&quot;0\&quot;,\&quot;Mass\&quot;: \&quot;0\&quot;,\&quot;Temp\&quot;: \&quot;-\&quot;,\&quot;Press\&quot;: \&quot;-\&quot;,\&quot;BeginVol\&quot;: \&quot;481\&quot;,\&quot;EndVol\&quot;: \&quot;481\&quot;,\&quot;BeginVol15\&quot;: \&quot;482\&quot;,\&quot;EndVol15\&quot;: \&quot;482\&quot;,\&quot;BeginVol20\&quot;: \&quot;484\&quot;,\&quot;EndVol20\&quot;: \&quot;484\&quot;,\&quot;BeginMass\&quot;: \&quot;420\&quot;,\&quot;EndMass\&quot;: \&quot;420\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;486\&quot;,\&quot;EndVolTotal\&quot;: \&quot;486\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;487\&quot;,\&quot;EndVol15Total\&quot;: \&quot;487\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;489\&quot;,\&quot;EndVol20Total\&quot;: \&quot;489\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;425\&quot;,\&quot;EndMassTotal\&quot;: \&quot;425\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;-\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;-\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;-\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;-\&quot;,\&quot;VolTotal\&quot;: \&quot;0\&quot;,\&quot;Vol20Total\&quot;: \&quot;0\&quot;,\&quot;Vol15Total\&quot;: \&quot;0\&quot;,\&quot;MassTotal\&quot;: \&quot;0\&quot;,\&quot;Vol15Flow\&quot;: \&quot;0,0\&quot;,\&quot;Vol20Flow\&quot;: \&quot;0,0\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;},{\&quot;Used\&quot;: 0,\&quot;Name\&quot;: \&quot;\&quot;,\&quot;Dens\&quot;: \&quot;\&quot;,\&quot;MassFlow\&quot;: \&quot;\&quot;,\&quot;VolFlow\&quot;: \&quot;\&quot;,\&quot;Vol\&quot;: \&quot;\&quot;,\&quot;Vol20\&quot;: \&quot;\&quot;,\&quot;Vol15\&quot;: \&quot;\&quot;,\&quot;Mass\&quot;: \&quot;\&quot;,\&quot;Temp\&quot;: \&quot;\&quot;,\&quot;Press\&quot;: \&quot;\&quot;,\&quot;BeginVol\&quot;: \&quot;\&quot;,\&quot;EndVol\&quot;: \&quot;\&quot;,\&quot;BeginVol15\&quot;: \&quot;\&quot;,\&quot;EndVol15\&quot;: \&quot;\&quot;,\&quot;BeginVol20\&quot;: \&quot;\&quot;,\&quot;EndVol20\&quot;: \&quot;\&quot;,\&quot;BeginMass\&quot;: \&quot;\&quot;,\&quot;EndMass\&quot;: \&quot;\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;\&quot;,\&quot;EndVolTotal\&quot;: \&quot;\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;\&quot;,\&quot;EndVol15Total\&quot;: \&quot;\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;\&quot;,\&quot;EndVol20Total\&quot;: \&quot;\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;\&quot;,\&quot;EndMassTotal\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;\&quot;,\&quot;VolTotal\&quot;: \&quot;\&quot;,\&quot;Vol20Total\&quot;: \&quot;\&quot;,\&quot;Vol15Total\&quot;: \&quot;\&quot;,\&quot;MassTotal\&quot;: \&quot;\&quot;,\&quot;Vol15Flow\&quot;: \&quot;\&quot;,\&quot;Vol20Flow\&quot;: \&quot;\&quot;}],\&quot;SIKN\&quot;: [{\&quot;Name\&quot;: \&quot;СИКН\&quot;,\&quot;Dens\&quot;: \&quot;878,0\&quot;,\&quot;MassFlow\&quot;: \&quot;1399,0\&quot;,\&quot;VolFlow\&quot;: \&quot;1593,4\&quot;,\&quot;Vol\&quot;: \&quot;3187\&quot;,\&quot;Vol20\&quot;: \&quot;3205\&quot;,\&quot;Vol15\&quot;: \&quot;3192\&quot;,\&quot;Mass\&quot;: \&quot;2797\&quot;,\&quot;Temp\&quot;: \&quot;13,4\&quot;,\&quot;Press\&quot;: \&quot;0,41\&quot;,\&quot;BeginVol\&quot;: \&quot;77305\&quot;,\&quot;EndVol\&quot;: \&quot;80492\&quot;,\&quot;BeginVol15\&quot;: \&quot;77430\&quot;,\&quot;EndVol15\&quot;: \&quot;80622\&quot;,\&quot;BeginVol20\&quot;: \&quot;77740\&quot;,\&quot;EndVol20\&quot;: \&quot;80945\&quot;,\&quot;BeginMass\&quot;: \&quot;67872\&quot;,\&quot;EndMass\&quot;: \&quot;70669\&quot;,\&quot;BeginVolTotal\&quot;: \&quot;77310\&quot;,\&quot;EndVolTotal\&quot;: \&quot;80497\&quot;,\&quot;BeginVol15Total\&quot;: \&quot;77435\&quot;,\&quot;EndVol15Total\&quot;: \&quot;80627\&quot;,\&quot;BeginVol20Total\&quot;: \&quot;77745\&quot;,\&quot;EndVol20Total\&quot;: \&quot;80950\&quot;,\&quot;BeginMassTotal\&quot;: \&quot;67877\&quot;,\&quot;EndMassTotal\&quot;: \&quot;70674\&quot;,\&quot;CheckDeltaVol\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol20\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaVol15\&quot;: \&quot;0\&quot;,\&quot;CheckDeltaMass\&quot;: \&quot;0\&quot;,\&quot;VolTotal\&quot;: \&quot;3187\&quot;,\&quot;Vol20Total\&quot;: \&quot;3205\&quot;,\&quot;Vol15Total\&quot;: \&quot;3192\&quot;,\&quot;MassTotal\&quot;: \&quot;2797\&quot;,\&quot;Vol15Flow\&quot;: \&quot;1595,8\&quot;,\&quot;Vol20Flow\&quot;: \&quot;1602,2\&quot;}]}},\&quot;CfgReport\&quot;: {\&quot;Doc\&quot;: [{\&quot;Use\&quot;: false,\&quot;Description\&quot;: \&quot;Description\&quot;,\&quot;TypeDevice\&quot;: 1,\&quot;TypeDoc\&quot;: 1,\&quot;GUIDoc\&quot;: 0,\&quot;Name\&quot;: \&quot;Report\&quot;},{\&quot;Use\&quot;: true,\&quot;Description\&quot;: \&quot;Description\&quot;,\&quot;TypeDevice\&quot;: 1,\&quot;TypeDoc\&quot;: 1,\&quot;GUIDoc\&quot;: 1,\&quot;Name\&quot;: \&quot;ОТЧЕТЫ (АРХИВНЫЕ)\&quot;},{\&quot;Use\&quot;: false,\&quot;Description\&quot;: \&quot;Description\&quot;,\&quot;TypeDevice\&quot;: 1,\&quot;TypeDoc\&quot;: 1,\&quot;GUIDoc\&quot;: 2,\&quot;Name\&quot;: \&quot;ОТЧЕТЫ СИКН 531\&quot;}],\&quot;TemplateReport\&quot;: \&quot;Report_Cfg.rdlc\&quot;,\&quot;IsVisibleNumberIVK\&quot;: true,\&quot;IsVisibleTableSIKN\&quot;: true,\&quot;IsVisibleTableSIKN_ColumnSIKN\&quot;: true,\&quot;IsVisibleTableBIK\&quot;: true,\&quot;LINES\&quot;: {\&quot;LineCounts\&quot;: 4},\&quot;PageSettings\&quot;: {\&quot;PaperWidth\&quot;: 297,\&quot;PaperHeight\&quot;: 210,\&quot;TopMargin\&quot;: 10,\&quot;BottomMargin\&quot;: 10,\&quot;LeftMargin\&quot;: 10,\&quot;RightMargin\&quot;: 10},\&quot;TableOffsets\&quot;: {\&quot;TableHeaderOffset\&quot;: 0.0,\&quot;TableSIKNOffset\&quot;: 4.0,\&quot;TableBIKOffset\&quot;: 4.0,\&quot;TableSignersOffset\&quot;: 4.0},\&quot;HeightRows\&quot;: {\&quot;TableHeaderHeightReportTypeRow\&quot;: 6.0,\&quot;TableHeaderHeightReportTimeRow\&quot;: 6.0,\&quot;TableHeaderHeightRegularRow\&quot;: 5.0,\&quot;TableSIKNHeightHeaderRow\&quot;: 6.0,\&quot;TableSIKNHeightRegularRow\&quot;: 5.0,\&quot;TableBIKHeightHeaderRow\&quot;: 6.0,\&quot;TableBIKHeightRegularRow\&quot;: 5.0,\&quot;TableSignersHeightHeaderRow\&quot;: 6.0,\&quot;TableSignersHeightRegularRow\&quot;: 5.0,\&quot;TableSignersHeightRegularRowDescription\&quot;: 5.0},\&quot;Fonts\&quot;: {\&quot;TableHeaderFontHeaderCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Bold\&quot;},\&quot;TableHeaderFontRegularCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Regular\&quot;},\&quot;TableSIKNFontHeaderCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Bold\&quot;},\&quot;TableSIKNFontRegularCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Regular\&quot;},\&quot;TableBIKFontHeaderCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Bold\&quot;},\&quot;TableBIKFontRegularCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Regular\&quot;},\&quot;TableSignersFontHeaderCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Bold\&quot;},\&quot;TableSignersFontRegularCell\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Regular\&quot;},\&quot;TableSignersFontRegularCellDescription\&quot;: {\&quot;Name\&quot;: \&quot;Arial\&quot;,\&quot;Size\&quot;: 9.0,\&quot;FontStyle\&quot;: \&quot;Regular\&quot;}},\&quot;FontWidthRatios\&quot;: {\&quot;TableHeaderFontWidthRatioHeaderCell\&quot;: 0.85,\&quot;TableHeaderFontWidthRatioRegularCell\&quot;: 0.85,\&quot;TableSIKNFontWidthRatioHeaderCell\&quot;: 0.85,\&quot;TableSIKNFontWidthRatioRegularCell\&quot;: 0.85,\&quot;TableBIKFontWidthRatioHeaderCell\&quot;: 0.85,\&quot;TableBIKFontWidthRatioRegularCell\&quot;: 0.85,\&quot;TableSignersFontWidthRatioHeaderCell\&quot;: 0.85,\&quot;TableSignersFontWidthRatioRegularCell\&quot;: 0.85,\&quot;TableSignersFontWidthRatioRegularCellDescription\&quot;: 0.85},\&quot;RenderTypes\&quot;: {\&quot;RenderTypeHeaderCell\&quot;: \&quot;HtmlTags\&quot;,\&quot;RenderTypeRegularCell\&quot;: \&quot;HtmlTags\&quot;,\&quot;RenderTypeRegularCellDescription\&quot;: \&quot;HtmlTags\&quot;},\&quot;BackColors\&quot;: {\&quot;TableHeaderBackColorHeaderCell\&quot;: {\&quot;ColorR\&quot;: 255,\&quot;ColorG\&quot;: 255,\&quot;ColorB\&quot;: 255},\&quot;TableHeaderBackColorRegularCell\&quot;: {\&quot;ColorR\&quot;: 255,\&quot;ColorG\&quot;: 255,\&quot;ColorB\&quot;: 255},\&quot;TableSIKNBackColorHeaderCell\&quot;: {\&quot;ColorR\&quot;: 235,\&quot;ColorG\&quot;: 235,\&quot;ColorB\&quot;: 235},\&quot;TableSIKNBackColorRegularCell\&quot;: {\&quot;ColorR\&quot;: 255,\&quot;ColorG\&quot;: 255,\&quot;ColorB\&quot;: 255},\&quot;TableSignersBackColorHeaderCell\&quot;: {\&quot;ColorR\&quot;: 255,\&quot;ColorG\&quot;: 255,\&quot;ColorB\&quot;: 255},\&quot;TableSignersBackColorRegularCell\&quot;: {\&quot;ColorR\&quot;: 255,\&quot;ColorG\&quot;: 255,\&quot;ColorB\&quot;: 255},\&quot;TableSignersBackColorRegularCellDescription\&quot;: {\&quot;ColorR\&quot;: 255,\&quot;ColorG\&quot;: 255,\&quot;ColorB\&quot;: 255}},\&quot;TableHeaderSettings\&quot;: {},\&quot;TableSIKNSettings\&quot;: {\&quot;FirstThreeColumnsHeadersNames\&quot;: {\&quot;Column1_Name\&quot;: \&quot;№\&quot;,\&quot;Column2_Name\&quot;: \&quot;Наименование параметра\&quot;,\&quot;Column3_Name\&quot;: \&quot;Ед. изм.\&quot;},\&quot;WidthColumn1\&quot;: 5.0,\&quot;WidthColumn2\&quot;: 60.0,\&quot;WidthColumn3\&quot;: 15.0},\&quot;TableBIKSettings\&quot;: {\&quot;SumСolumns\&quot;: 7.0,\&quot;ColumnsHeadersNames\&quot;: {\&quot;Column1_Name\&quot;: \&quot;БИК\&quot;},\&quot;WidthColumn1\&quot;: 7.5},\&quot;TableSignersSettings\&quot;: {\&quot;WidthColumn1\&quot;: 7.5,\&quot;WidthColumn2\&quot;: 60,\&quot;WidthColumn3\&quot;: 55,\&quot;WidthColumn4\&quot;: 5,\&quot;WidthColumn5\&quot;: 120},\&quot;Signers\&quot;: [{\&quot;Name\&quot;: \&quot;Представитель сдающей стороны:\&quot;,\&quot;Id\&quot;: 1,\&quot;IsVisible\&quot;: [{\&quot;Name\&quot;: \&quot;Отчет за два часа\&quot;,\&quot;Id\&quot;: 1,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Отчет за смену\&quot;,\&quot;Id\&quot;: 2,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за сутки\&quot;,\&quot;Id\&quot;: 3,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Отчет за месяц\&quot;,\&quot;Id\&quot;: 4,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за время ведения ТКО\&quot;,\&quot;Id\&quot;: 5,\&quot;IsVisible\&quot;: false}]},{\&quot;Name\&quot;: \&quot;Представитель принимающей стороны:\&quot;,\&quot;Id\&quot;: 2,\&quot;IsVisible\&quot;: [{\&quot;Name\&quot;: \&quot;Отчет за два часа\&quot;,\&quot;Id\&quot;: 1,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за смену\&quot;,\&quot;Id\&quot;: 2,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Отчет за сутки\&quot;,\&quot;Id\&quot;: 3,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за месяц\&quot;,\&quot;Id\&quot;: 4,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за время ведения ТКО\&quot;,\&quot;Id\&quot;: 5,\&quot;IsVisible\&quot;: false}]},{\&quot;Name\&quot;: \&quot;Оператор товарный:\&quot;,\&quot;Id\&quot;: 3,\&quot;IsVisible\&quot;: [{\&quot;Name\&quot;: \&quot;Отчет за два часа\&quot;,\&quot;Id\&quot;: 1,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за смену\&quot;,\&quot;Id\&quot;: 2,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Отчет за сутки\&quot;,\&quot;Id\&quot;: 3,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за месяц\&quot;,\&quot;Id\&quot;: 4,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Отчет за время ведения ТКО\&quot;,\&quot;Id\&quot;: 5,\&quot;IsVisible\&quot;: false}]}],\&quot;BIK\&quot;: [{\&quot;Name\&quot;: \&quot;ПЛОТНОСТЬ, кг/м³\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleDens\&quot;,\&quot;Parametr\&quot;: \&quot;Dens\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;ПЛОТНОСТЬ ПРИ 15°C, кг/м³\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleDens15\&quot;,\&quot;Parametr\&quot;: \&quot;Dens15\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;ПЛОТНОСТЬ ПРИ 20°C, кг/м³\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleDens20\&quot;,\&quot;Parametr\&quot;: \&quot;Dens20\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;ДИНАМ. ВЯЗКОСТЬ, мПа·с (сП)\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleDynamicVisc\&quot;,\&quot;Parametr\&quot;: \&quot;DynamicVisc\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;КИНЕМ. ВЯЗКОСТЬ, мм²/с (сСт)\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleKinemVisc\&quot;,\&quot;Parametr\&quot;: \&quot;KinemVisc\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;РАСХОД, м³/ч\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleFlow\&quot;,\&quot;Parametr\&quot;: \&quot;Flow\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;ОБЪЕМНАЯ ДОЛЯ ВОДЫ, %\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleVolWater\&quot;,\&quot;Parametr\&quot;: \&quot;VolWater\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;МАССОВАЯ ДОЛЯ ВОДЫ, %\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleMasWater\&quot;,\&quot;Parametr\&quot;: \&quot;MasWater\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;МАССОВАЯ ДОЛЯ СЕРЫ, %\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleMasSulphur\&quot;,\&quot;Parametr\&quot;: \&quot;MasSulphur\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;ТЕМПЕР. ПЛОТНОМЕРА, °C\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleDensTemp\&quot;,\&quot;Parametr\&quot;: \&quot;DensTemp\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;ДАВЛЕНИЕ ПЛОТНОМЕРА, МПа\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleDensPress\&quot;,\&quot;Parametr\&quot;: \&quot;DensPress\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;ТЕМПЕР. ВИСКОЗИМЕТРА, °C\&quot;,\&quot;Id\&quot;: \&quot;IsVisibleViscTemp\&quot;,\&quot;Parametr\&quot;: \&quot;ViscTemp\&quot;,\&quot;IsVisible\&quot;: true}],\&quot;SIKN\&quot;: [{\&quot;Name\&quot;: \&quot;Массовый расход\&quot;,\&quot;SI\&quot;: \&quot;т/ч\&quot;,\&quot;Key\&quot;: \&quot;MassFlow\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объемный расход\&quot;,\&quot;SI\&quot;: \&quot;м³/ч\&quot;,\&quot;Key\&quot;: \&quot;VolFlow\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;Vol\&quot;,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Объем при 20 °C\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;Vol20\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем при 15 °C\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;Vol15\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Масса\&quot;,\&quot;SI\&quot;: \&quot;т\&quot;,\&quot;Key\&quot;: \&quot;Mass\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Средневзвешенное значение температуры\&quot;,\&quot;SI\&quot;: \&quot;°C\&quot;,\&quot;Key\&quot;: \&quot;Temp\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Средневзвешенное значение давления\&quot;,\&quot;SI\&quot;: \&quot;МПа\&quot;,\&quot;Key\&quot;: \&quot;Press\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Средневзвешенное значение плотности\&quot;,\&quot;SI\&quot;: \&quot;кг/м³\&quot;,\&quot;Key\&quot;: \&quot;Dens\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем на начало отчета\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;BeginVol\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем на конец отчета\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;EndVol\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем при 15 °C на начало отчета\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;BeginVol15\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем при 15 °C на конец отчета\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;EndVol15\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем при 20 °C на начало отчета\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;BeginVol20\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Объем при 20 °C на конец отчета\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;EndVol20\&quot;,\&quot;IsVisible\&quot;: true},{\&quot;Name\&quot;: \&quot;Масса на начало отчета\&quot;,\&quot;SI\&quot;: \&quot;т\&quot;,\&quot;Key\&quot;: \&quot;BeginMass\&quot;,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Масса на конец отчета\&quot;,\&quot;SI\&quot;: \&quot;т\&quot;,\&quot;Key\&quot;: \&quot;EndMass\&quot;,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Масса балласта\&quot;,\&quot;SI\&quot;: \&quot;т\&quot;,\&quot;Key\&quot;: \&quot;Balast_Mass\&quot;,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Масса нетто\&quot;,\&quot;SI\&quot;: \&quot;т\&quot;,\&quot;Key\&quot;: \&quot;Net_Mass\&quot;,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Объем неучтенной нефти\&quot;,\&quot;SI\&quot;: \&quot;м³\&quot;,\&quot;Key\&quot;: \&quot;CheckDeltaVol\&quot;,\&quot;IsVisible\&quot;: false},{\&quot;Name\&quot;: \&quot;Масса неучтенной нефти\&quot;,\&quot;SI\&quot;: \&quot;т\&quot;,\&quot;Key\&quot;: \&quot;CheckDeltaMass\&quot;,\&quot;IsVisible\&quot;: false}],\&quot;Filters\&quot;: [{\&quot;Use\&quot;: true,\&quot;HeaderText\&quot;: \&quot;ТИП ОТЧЕТА\&quot;,\&quot;Name\&quot;: \&quot;ReportType\&quot;},{\&quot;Use\&quot;: true,\&quot;HeaderText\&quot;: \&quot;ТЗК\&quot;,\&quot;Name\&quot;: \&quot;DIR_ID\&quot;}],\&quot;DGV\&quot;: {\&quot;Columns\&quot;: [{\&quot;Use\&quot;: true,\&quot;HeaderText\&quot;: \&quot;ТИП ОТЧЕТА\&quot;,\&quot;Name\&quot;: \&quot;NameReport\&quot;},{\&quot;Use\&quot;: true,\&quot;HeaderText\&quot;: \&quot;ТТН\&quot;,\&quot;Name\&quot;: \&quot;TTN_NAME\&quot;},{\&quot;Use\&quot;: true,\&quot;HeaderText\&quot;: \&quot;СЕКЦИЯ\&quot;,\&quot;Name\&quot;: \&quot;SECTION\&quot;},{\&quot;Use\&quot;: true,\&quot;HeaderText\&quot;: \&quot;ТЗК\&quot;,\&quot;Name\&quot;: \&quot;DIR_ID\&quot;}]},\&quot;DIR_ID\&quot;: [{\&quot;Key\&quot;: 0,\&quot;Value\&quot;: \&quot;Все\&quot;},{\&quot;Key\&quot;: 1,\&quot;Value\&quot;: \&quot;Напр. 1\&quot;},{\&quot;Key\&quot;: 2,\&quot;Value\&quot;: \&quot;Напр. 2\&quot;},{\&quot;Key\&quot;: 3,\&quot;Value\&quot;: \&quot;Напр. 3\&quot;},{\&quot;Key\&quot;: 4,\&quot;Value\&quot;: \&quot;Напр. 4\&quot;},{\&quot;Key\&quot;: 5,\&quot;Value\&quot;: \&quot;Напр. 5\&quot;}]}}&quot;"/>
+  </Dictionary>
+  <ReportPage Name="Page" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
+    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="113.4" CanGrow="true" CanShrink="true">
+      <TableObject Name="TableHeader" Width="1047.06" Height="113.4" GrowToBottom="true">
+        <TableColumn Name="Column6" Width="523.53"/>
+        <TableColumn Name="Column7" Width="523.53"/>
+        <TableRow Name="Row43" AutoSize="true">
+          <TableCell Name="Prefix_SIKN_Name" Text="Prefix_SIKN_Name" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="NameIVK" Text="NameIVK" HorzAlign="Right" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row44" AutoSize="true">
+          <TableCell Name="Factory" Text="Factory" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell361" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row45" AutoSize="true">
+          <TableCell Name="TankerName" Text="TankerName" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell366" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row46" AutoSize="true">
+          <TableCell Name="ExtendAddInfo" Text="ExtendAddInfo" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell371" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row47" AutoSize="true">
+          <TableCell Name="ReportType" Text="ReportType" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="Cell376" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row48" AutoSize="true">
+          <TableCell Name="ReportTime" Text="ReportTime" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="Cell378" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="DataBandTableReport" Top="116.73" Width="1047.06" Height="39.69" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableReport" Width="292.95" Height="39.69" Border.Lines="All" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableReport_ManualBuild">
+        <TableColumn Name="Column01" Width="28.35"/>
+        <TableColumn Name="Column02" Width="207.9"/>
+        <TableColumn Name="Column03" Width="56.7"/>
+        <TableRow Name="Row8" Height="22.68" AutoSize="true">
+          <TableCell Name="Cell419" Border.Lines="All" Fill.Color="Gainsboro" Text="№" Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Gainsboro" Text="НАИМЕНОВАНИЕ  ПАРАМЕТРА" Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" Wysiwyg="true" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Gainsboro" Text="Ед. изм." Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row9" Height="17.01">
+          <TableCell Name="Counter" Border.Lines="All" Text="Counter" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Name" Border.Lines="All" Text="Name" Padding="5, 1, 2, 1" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="SI" Border.Lines="All" Text="SI" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary" Top="159.76" Width="1047.06" Height="158.76">
+      <TableObject Name="TableSigners" Top="7.56" Width="665.28" Height="143.64">
+        <TableColumn Name="Column9" Width="207.9"/>
+        <TableColumn Name="Column10" Width="151.2"/>
+        <TableColumn Name="Column11" Width="3.78"/>
+        <TableColumn Name="Signers" Width="302.4"/>
+        <TableRow Name="Row51">
+          <TableCell Name="Cell390" Visible="false" Text="Основное СИ плотности на момент формирования отчета:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="4"/>
+          <TableCell Name="Cell391" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell392" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell393" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row52" Height="11.34">
+          <TableCell Name="Cell395" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell396" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell397" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell398" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row53" MaxHeight="0" CanBreak="true">
+          <TableCell Name="Cell400" CanBreak="false" Text="Представитель сдающей стороны:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell401" Border.Lines="Bottom" Border.BottomLine.Width="0.75" CanBreak="false" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell402" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell403" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row36" MaxHeight="0" CanBreak="true">
+          <TableCell Name="Cell317" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell318" CanBreak="false" Text="подпись" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell319" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell340" Text="(И.О. Фамилия)" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row54" MaxHeight="0" CanBreak="true">
+          <TableCell Name="Cell405" CanBreak="false" Text="Представитель принимающей стороны:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell406" Border.Lines="Bottom" Border.BottomLine.Width="0.75" CanBreak="false" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell407" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell408" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row38" MaxHeight="0" CanBreak="true">
+          <TableCell Name="Cell327" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell328" CanBreak="false" Text="подпись" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell329" CanBreak="false" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell342" Text="(И.О. Фамилия)" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row55" MaxHeight="0" CanBreak="true">
+          <TableCell Name="Cell410" Text="Оператор товарный:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell411" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell412" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell413" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+        </TableRow>
+        <TableRow Name="Row56" CanBreak="true">
+          <TableCell Name="Cell415" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell416" Text="подпись" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell417" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell418" Text="(И.О. Фамилия)" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter" Top="321.85" Width="1047.06" Height="26.55" BeforeLayoutEvent="PageFooter_BeforeLayout">
+      <TextObject Name="PageNumeration" Top="3.87" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "strBegin": "System Architect"
+    },
+    {
+      "id": 2,
+      "strBegin": "Accountant"
+    },
+    {
+      "id": 3,
+      "strBegin": "Junior Technical Author"
+    },
+    {
+      "id": 4,
+      "strBegin": "Junior Technical Author"
+    },
+    {
+      "id": 5,
+      "strBegin": "Junior Technical Author"
+    }
+  ]
+}

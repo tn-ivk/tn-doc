@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <style>
+        td, th 
+        {
+            font-size: 70%;             /* Размер шрифта в процентах */
+            padding: 2px;               /* Поля вокруг содержимого таблицы */
+            border: 0.5px solid black;  /* Параметры рамки */
+        }
+
+        Edit 
+        {
+            border-collapse: collapse;  /* Убираем двойные линии между ячейками */
+        }
+    </style>
+
+    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/js/EditDoc.js"></script>
+
+
+    <script id="ElementChangeEventHandling" type="text/javascript">
+
+        var dictionaries;
+
+        function funcOnLoad() {
+            dictionaries = GetUsers();
+        }
+
+        function UserChangeEvent(selectObject)
+        {
+            if (selectObject.name == "Delive_IOF")
+            {
+                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                document.getElementById("Delive_Post").value = user[0].Post;
+                document.getElementById("Delive_Factory").value = user[0].Factory;
+
+                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
+            }
+            else if (selectObject.name == "Receive_IOF")
+            {
+                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                document.getElementById("Receive_Post").value = user[0].Post;
+                document.getElementById("Receive_Factory").value = user[0].Factory;
+
+                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
+            }
+        }
+    </script>
+
+</head>
+<body onload="funcOnLoad()">
+
+    <table id="AdditionalInfo">
+        <tbody>
+
+        </tbody>
+    </table>
+
+</body>
+</html>

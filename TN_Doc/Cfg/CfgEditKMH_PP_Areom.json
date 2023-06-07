@@ -1,0 +1,180 @@
+﻿{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": false,
+      "Edit": false,
+      "Key": "PP1_AddInfo.SensName_Oper",
+      "Type": "text",
+      "Name": "ПП1: Наименование"
+    },
+    {
+      "Id": 2,
+      "Use": false,
+      "Edit": false,
+      "Key": "PP1_AddInfo.ManufNum_Oper",
+      "Type": "text",
+      "Name": "ПП1: Заводской №"
+    },
+    {
+      "Id": 3,
+      "Use": false,
+      "Edit": false,
+      "Key": "PP1_AddInfo.CheckDate_Oper",
+      "Type": "text",
+      "Name": "ПП1: Дата поверки"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.SensName_Areom",
+      "Type": "text",
+      "Name": "ПП1: Тип, марка (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.ManufNum_Areom",
+      "Type": "text",
+      "Name": "ПП1: Заводской № (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.CheckDate_Areom",
+      "Type": "text",
+      "Name": "ПП1: Дата последней поверки (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.AbsError_Areom",
+      "Type": "text",
+      "Name": "ПП1: Предел допускаемой абсолютной погрешности (Δ, кг/м3) (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.ServiceStaffData",
+      "Type": "text",
+      "Name": "ПП1: Сервисная организация (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.DeliveryStaffData",
+      "Type": "text",
+      "Name": "ПП1: Сдающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.RecievingStaffData",
+      "Type": "text",
+      "Name": "ПП1: Принимающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AddInfo.ARM_KMH_Result",
+      "Type": "list",
+      "Name": "ПП1: Заключение"
+    },
+    {
+      "Id": 12,
+      "Use": false,
+      "Edit": false,
+      "Key": "PP2_AddInfo.SensName_Oper",
+      "Type": "text",
+      "Name": "ПП2: Наименование"
+    },
+    {
+      "Id": 13,
+      "Use": false,
+      "Edit": false,
+      "Key": "PP2_AddInfo.ManufNum_Oper",
+      "Type": "text",
+      "Name": "ПП2: Заводской №"
+    },
+    {
+      "Id": 14,
+      "Use": false,
+      "Edit": false,
+      "Key": "PP2_AddInfo.CheckDate_Oper",
+      "Type": "text",
+      "Name": "ПП2: Дата поверки"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.SensName_Areom",
+      "Type": "text",
+      "Name": "ПП2: Тип, марка (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.ManufNum_Areom",
+      "Type": "text",
+      "Name": "ПП2: Заводской № (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.CheckDate_Areom",
+      "Type": "text",
+      "Name": "ПП2: Дата последней поверки (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.AbsError_Areom",
+      "Type": "text",
+      "Name": "ПП2: Предел допускаемой абсолютной погрешности (Δ, кг/м3) (ареометра/лабораторного плотномера)"
+    },
+    {
+      "Id": 19,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.ServiceStaffData",
+      "Type": "text",
+      "Name": "ПП2: Сервисная организация (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 20,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.DeliveryStaffData",
+      "Type": "text",
+      "Name": "ПП2: Сдающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 21,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.RecievingStaffData",
+      "Type": "text",
+      "Name": "ПП2: Принимающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 22,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AddInfo.ARM_KMH_Result",
+      "Type": "list",
+      "Name": "ПП2: Заключение"
+    }
+  ]
+}

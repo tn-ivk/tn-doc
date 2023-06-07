@@ -1,0 +1,40 @@
+{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 1,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 297,
+          "PaperHeight": 210,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "PathToTemplateFile": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {
+        "FieldSIKN": "����"
+      },
+      "Data": {
+        
+      },
+      "Footer": {
+
+      },
+      "Dictionarys": {
+
+      }
+    },
+    "DataIVK": {
+
+    }
+  }
+}

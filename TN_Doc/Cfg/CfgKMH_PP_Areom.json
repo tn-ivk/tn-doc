@@ -1,0 +1,206 @@
+{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 1,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 210,
+          "PaperHeight": 297,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "PathToTemplateFile": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {
+        "FieldSIKN": "СИКН№",
+        "FieldPSP": "ПСП (НСП)"
+      },
+      "Data": {
+
+      },
+      "Footer": {
+
+      },
+      "Dictionarys": {
+        "Users": [
+          {
+            "Use": true,
+            "Id": 1,
+            "IdGroup": 1,
+            "F": "Гущина",
+            "I": "Марина",
+            "O": "Валерьевна",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Лаборант"
+          },
+          {
+            "Use": true,
+            "Id": 2,
+            "IdGroup": 1,
+            "F": "Кильматова",
+            "I": "Гульнара",
+            "O": "Зуфаровна",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Лаборант"
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "IdGroup": 1,
+            "F": "Ошвинцева",
+            "I": "Екатерина",
+            "O": "Геннадьевна",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Лаборант"
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "IdGroup": 2,
+            "F": "Ковалев",
+            "I": "Вячеслав",
+            "O": "Викторович",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Начальник ЦППН №1"
+          },
+          {
+            "Use": true,
+            "Id": 5,
+            "IdGroup": 2,
+            "F": "Мухаметшин",
+            "I": "Кабир",
+            "O": "Фиргатович",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "РН по подготовке нефти Восток"
+          },
+          {
+            "Use": true,
+            "Id": 6,
+            "IdGroup": 2,
+            "F": "Черный",
+            "I": "Евгений",
+            "O": "Дмитриевич",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Руковадитель ПП по ПСН и ППД"
+          },
+          {
+            "Use": true,
+            "Id": 7,
+            "IdGroup": 3,
+            "F": "Коняева",
+            "I": "Ирэна",
+            "O": "Анатольевна",
+            "Factory": "АО «Транснефть-Сибирь»",
+            "Post": "Оператор товарный"
+          },
+          {
+            "Use": true,
+            "Id": 8,
+            "IdGroup": 3,
+            "F": "Данилюк",
+            "I": "Елена",
+            "O": "Юрьевна",
+            "Factory": "АО «Транснефть-Сибирь»",
+            "Post": "Оператор товарный"
+          },
+          {
+            "Use": true,
+            "Id": 9,
+            "IdGroup": 3,
+            "F": "Личманова",
+            "I": "Полина",
+            "O": "Борисовна",
+            "Factory": "АО «Транснефть-Сибирь»",
+            "Post": "Оператор товарный"
+          }
+        ],
+        "UsersGroup": [
+          {
+            "Use": true,
+            "Id": 1,
+            "Name": "Представители испытательной лаборатории"
+          },
+          {
+            "Use": true,
+            "Id": 2,
+            "Name": "Представители сдающей стороны"
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "Name": "Представители принимающей стороны"
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "Name": "Представители ТНМ"
+          }
+        ],
+        "Licenses": [
+          {
+            "Use": true,
+            "IdUser": 1,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 1,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 2,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 2,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 3,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 3,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          }
+        ],
+        "ProtocolType": {
+          "0": "ПРОТОКОЛ КМХ РАБОЧЕГО ПП ПО ЛАБОРАТОРНОМУ ПЛОТНОМЕРУ",
+          "1": "ПРОТОКОЛ КМХ РАБОЧЕГО ПП ПО АРЕОМЕТРУ",
+          "2": "ПРОТОКОЛ КМХ РАБОЧЕГО ПП ПО АРЕОМЕТРУ"
+        },
+        "DensityMeterType": {
+          "0": "Лабораторный плотномер",
+          "1": "Ареометр",
+          "2": "Ареометр"
+        },
+        "OilTechParams": {
+          "1": "Технологические параметры\nнефти в БИК",
+          "2": "Технологические параметры\nнефтепродукта в БИК"
+        }
+      }
+    },
+    "DataIVK": {
+
+    }
+  }
+}

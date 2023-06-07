@@ -1,0 +1,149 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_PSP",
+      "Type": "text",
+      "Name": ""
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN",
+      "Type": "text",
+      "Name": "Место проведения поверки"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": ""
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "UPR_Type",
+      "Type": "text",
+      "Name": "УПР: Тип"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "UPR_FactoryNumber",
+      "Type": "text",
+      "Name": "УПР: Заводской №"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Type",
+      "Type": "text",
+      "Name": "ПУ: Тип"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_FactoryNumber",
+      "Type": "text",
+      "Name": "ПУ: Заводской №"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP_Type",
+      "Type": "text",
+      "Name": "ПП: Тип"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP_FactoryNumber",
+      "Type": "text",
+      "Name": "ПП: Заводской №"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": false,
+      "Key": "IVK_Type",
+      "Type": "text",
+      "Name": "ИВК: Тип"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": false,
+      "Key": "IVK_FactoryNumber",
+      "Type": "text",
+      "Name": "ИВК: Заводской №"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": false,
+      "Key": "Oil_Type",
+      "Type": "text",
+      "Name": "Рабочая жидкость"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "ProtokolNum",
+      "Type": "text",
+      "Name": "Номер протокола"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "Заключение: УПР к дальнейшей эксплуатации"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "StaffData",
+      "Type": "text",
+      "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffData",
+      "Type": "text",
+      "Name": "Сервисная организация"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryStaffData",
+      "Type": "text",
+      "Name": "Сдающая сторона"
+    },
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffData",
+      "Type": "text",
+      "Name": "Принимающая сторона"
+    }
+  ]
+}
+

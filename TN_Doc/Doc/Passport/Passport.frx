@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Passport.dll" StartReportEvent="_StartReport" FinishReportEvent="_FinishReport" ReportInfo.Created="04/02/2022 14:13:27" ReportInfo.Modified="04/10/2023 17:06:04" ReportInfo.CreatorVersion="2021.4.4.0">
+  <ScriptText>using System;
+using System.Reflection;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;  
+using FastReport.Utils;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
+using System.Globalization;
+using TN.DocData;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    TN_ToolsFastReport.Tools com = new TN_ToolsFastReport.Tools();    
+    TN.Doc.Doc doc;
+    TN.Doc.DataIVKDoc DataIVK;
+    TN.Doc.HeaderDoc Header;
+    TN.Doc.DataDoc SettingsData;
+    TN.Doc.FooterDoc Footer;
+    TN.Doc.DictionarysDoc Dictionarys;
+    
+    JObject json;
+    
+    private void Page1_StartPage(object sender, EventArgs e)
+    {
+      //using (var sr = new StreamReader(&quot;C:/SVN/FastReport/Входящие данные от Алексея (классы и json)/12_Passport/DocPassport.json&quot;))
+      //{
+      //  Report.SetParameterValue(&quot;JsonDoc&quot;, sr.ReadToEnd());
+      //}              
+      
+      string jsonDoc = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+      json = JObject.Parse(jsonDoc);      
+      
+      Newtonsoft.Json.JsonSerializerSettings settingsReport = new Newtonsoft.Json.JsonSerializerSettings();
+      settingsReport.TypeNameHandling = TypeNameHandling.All;
+      
+      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(jsonDoc, settingsReport);
+      DataIVK = (TN.Doc.DataIVKDoc)doc.Doc.DataIVK;
+      Header = (TN.Doc.HeaderDoc)doc.Doc.Settings.Header;
+      SettingsData = (TN.Doc.DataDoc)doc.Doc.Settings.Data;
+      Footer = (TN.Doc.FooterDoc)doc.Doc.Settings.Footer;
+      Dictionarys = (TN.Doc.DictionarysDoc)doc.Doc.Settings.Dictionarys;
+      
+      _TableSummary2();
+    }
+    
+    private void PrintTable(TableObject table)
+    {
+      for (int i=0;i&lt;table.RowCount;i++)
+      {       
+        table.PrintRow(i);
+        table.PrintColumns();
+      }    
+    } 
+    
+    private void TableHeader_ManualBuild(object sender, EventArgs e)
+    {      
+      DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(DataIVK.TablePassport.Begin);
+      DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(DataIVK.TablePassport.End);
+      
+      NumberAndDatePassport.Text = string.Format(&quot;№ &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&lt;/u&gt; г.&quot;,DataIVK.TablePassport.PassportResult.PassportId, Begin.ToShortDateString());
+      Laboratory.Text = DataIVK.TablePassport.AdditionalData.Laboratory;
+      AccrSertifNumber.Text = DataIVK.TablePassport.AdditionalData.AccrSertifNumber;
+      SIKN_Number.Text = DataIVK.TablePassport.AdditionalData.SIKN_Number;
+      Reservoir.Text = &quot;&quot;;
+      
+      Period.Text = Begin.ToShortDateString() + 
+        &quot; г. с &quot; +
+        Begin.ToString(&quot;HH:mm&quot;) +
+        &quot; до &quot; +
+        End.ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;);
+
+      PrintTable(TableHeader); 
+    }
+
+    private void TableData_ManualBuild(object sender, EventArgs e)
+    {
+      TableRow rowTemplate = new TableRow();
+      
+      List &lt;TN.Doc.Parameter&gt; param = SettingsData.Parameters.Where(x =&gt; x.Use == true).ToList();
+      
+      for (int i=0;i&lt;param.Count;i++)
+      {
+        object result;
+        rowTemplate = new TableRow();
+        rowTemplate.AssignAll(TableDataRowTemplat);        
+        rowTemplate.Name = &quot;TableDataRow&quot; + (i+1).ToString();
+        rowTemplate.Visible = true;
+        TableData.Rows.Add(rowTemplate);
+        
+        //Порядковый номер
+        rowTemplate[0].Text = (i+1).ToString();
+        
+        //Название параметра
+        rowTemplate[1].Text = param[i].Name + &quot;, &quot; + param[i].SI;
+        
+        //Метод
+        result = &quot;&quot;;
+        //rowTemplate[2].Text = (string)json.SelectToken(&quot;Doc.DataIVK.TablePassport.TableActAndPassport.Passport.&quot; + param[i].KeyPassportResult + &quot;.Desc&quot;);
+        com.GetPropertyValue(DataIVK.TablePassport.TableActAndPassport.Passport, param[i].KeyPassportResult, ref result);
+        rowTemplate[2].Text = ((TN.Doc.ParameterProperties)result).Desc;
+          
+        //Результат
+        result = &quot;&quot;;
+        com.GetPropertyValue(DataIVK.TablePassport.PassportResult, param[i].KeyPassportResult, ref result);
+        rowTemplate[3].Text = com.GetNormalizedValue(result);
+      }
+      
+      PrintTable(TableData);      
+    }       
+
+    private void TableSummary1_ManualBuild(object sender, EventArgs e)
+    {
+      GOSTIndexResult.Text = &quot;Обозначение нефти по ГОСТ Р 51858 &quot; + DataIVK.TablePassport.PassportResult.GostIndexResult.Replace('X','-');
+      
+      PrintTable(TableSummary1);
+    }
+
+    private void _TableSummary2()
+    {
+      DelivePoint.Text = DataIVK.TablePassport.AdditionalData.DelivePoint;
+      Laboratory_IOF.Text = DataIVK.TablePassport.AdditionalData.Laboratory_IOF;
+      Delive_Post.Text = DataIVK.TablePassport.AdditionalData.Delive_Post;
+      Delive_Factory.Text = DataIVK.TablePassport.AdditionalData.Delive_Factory;
+      Delive_IOF.Text = DataIVK.TablePassport.AdditionalData.Delive_IOF;
+      Receive_Post.Text = DataIVK.TablePassport.AdditionalData.Receive_Post;
+      Receive_Factory.Text = DataIVK.TablePassport.AdditionalData.Receive_Factory;
+      Receive_IOF.Text = DataIVK.TablePassport.AdditionalData.Receive_IOF;
+    }  
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <Parameter Name="JsonDoc" DataType="System.String"/>
+  </Dictionary>
+  <ReportPage Name="Page1" RawPaperSize="9" Watermark.Font="Arial, 60pt" StartPageEvent="Page1_StartPage" FinishPageEvent="Page1_FinishPage">
+    <ReportTitleBand Name="ReportTitle" Width="718.2" Height="185.43">
+      <TableObject Name="TableHeader" Width="717.02" Height="175.98" ManualBuildEvent="TableHeader_ManualBuild">
+        <TableColumn Name="Column1" Width="259.9"/>
+        <TableColumn Name="Column2" Width="457.12"/>
+        <TableRow Name="Row1" MaxHeight="1000.19" Height="22.44">
+          <TableCell Name="Cell1" Text="ПАСПОРТ КАЧЕСТВА НЕФТИ" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell2" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row2" Height="22.44">
+          <TableCell Name="NumberAndDatePassport" HorzAlign="Center" Font="Arial, 12pt, style=Bold" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell7" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row3" AutoSize="true">
+          <TableCell Name="Cell11" Text="Пункт приема-сдачи нефти" VertAlign="Center" Font="Arial, 11pt"/>
+          <TableCell Name="DelivePoint" VertAlign="Center" Font="Arial, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row4" Height="22.44" AutoSize="true">
+          <TableCell Name="Cell16" Text="Лаборатория предприятия" VertAlign="Center" Font="Arial, 11pt"/>
+          <TableCell Name="Laboratory" VertAlign="Center" Font="Arial, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row5" Height="22.44" AutoSize="true">
+          <TableCell Name="Cell21" Text="Номер аттестата аккредитации" VertAlign="Center" Font="Arial, 11pt"/>
+          <TableCell Name="AccrSertifNumber" VertAlign="Center" Font="Arial, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row6" Height="22.44" AutoSize="true">
+          <TableCell Name="Cell26" Text="СИКН №" VertAlign="Center" Font="Arial, 11pt"/>
+          <TableCell Name="SIKN_Number" VertAlign="Center" Font="Arial, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row7" MaxHeight="1000.19" Height="22.44" AutoSize="true">
+          <TableCell Name="Cell31" Text="Резервуар (мера вместимости)" VertAlign="Center" Font="Arial, 11pt"/>
+          <TableCell Name="Reservoir" VertAlign="Center" Font="Arial, 11pt"/>
+        </TableRow>
+        <TableRow Name="Row8" Height="22.44" AutoSize="true">
+          <TableCell Name="Cell36" Text="Дата и время отбора пробы" VertAlign="Center" Font="Arial, 11pt"/>
+          <TableCell Name="Period" VertAlign="Center" Font="Arial, 11pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="Data" Top="188.21" Width="718.2" Height="37.8">
+      <TableObject Name="TableData" Width="718.41" Height="37.8" ManualBuildEvent="TableData_ManualBuild">
+        <TableColumn Name="Column3" Width="33.88" AutoSize="true"/>
+        <TableColumn Name="Column4" Width="418.94"/>
+        <TableColumn Name="Column5" Width="166.18"/>
+        <TableColumn Name="Column6" Width="99.41"/>
+        <TableRow Name="TableDataRowHeader" MaxHeight="1000.19" AutoSize="true">
+          <TableCell Name="Cell37" Border.Lines="All" Border.Width="0.5" Text="№" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+          <TableCell Name="Cell38" Border.Lines="All" Border.Width="0.5" Text="Наименование показателя" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+          <TableCell Name="Cell39" Border.Lines="All" Border.Width="0.5" Text="Метод&#13;&#10;испытаний" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+          <TableCell Name="Cell40" Border.Lines="All" Border.Width="0.5" Text="Результат &#13;&#10;испытаний" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt"/>
+        </TableRow>
+        <TableRow Name="TableDataRowTemplat" Visible="false" AutoSize="true">
+          <TableCell Name="Cell41" Border.Lines="All" Border.Width="0.5" Text="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell42" Border.Lines="All" Border.Width="0.5" Text="2" VertAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell43" Border.Lines="All" Border.Width="0.5" Text="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell44" Border.Lines="All" Border.Width="0.5" Text="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary" Top="228.79" Width="718.2" Height="85.05">
+      <TableObject Name="TableSummary1" Width="716.68" Height="75.6" ManualBuildEvent="TableSummary1_ManualBuild">
+        <TableColumn Name="Column7" Width="716.68"/>
+        <TableRow Name="Row9" MaxHeight="1000.19" AutoSize="true">
+          <TableCell Name="Cell45" Text="Пункт 3 заполняют по показаниям поточного плотномера (средневзвешенное значение плотно-&#13;&#10;сти нефти за смену)." Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row10" MaxHeight="962.39" AutoSize="true">
+          <TableCell Name="Cell50" Text="Пункты 4 и 5 заполняют по показаниям поточного плотномера (средневзвешенное значение&#13;&#10;плотности нефти за смену), приведенным к стандартным условиям." Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row11" MaxHeight="1000.19" AutoSize="true">
+          <TableCell Name="Cell55" Text="При отказе поточного плотномера плотность нефти определяют в испытательной лаборатории." Font="Arial, 9pt"/>
+        </TableRow>
+        <TableRow Name="Row12" AutoSize="true">
+          <TableCell Name="GOSTIndexResult" Text="Обозначение нефти по ГОСТ Р 51858" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter1" Top="316.61" Width="718.2" Height="227.04">
+      <TableObject Name="TableSummary2" Width="716.5" Height="227.04">
+        <TableColumn Name="Column13" Width="315.29"/>
+        <TableColumn Name="Column14" Width="12.89"/>
+        <TableColumn Name="Column15" Width="192.44"/>
+        <TableColumn Name="Column16" Width="12.89"/>
+        <TableColumn Name="Column17" Width="182.99"/>
+        <TableRow Name="Row25" MaxHeight="1000.19" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell121" Text="Представитель испытательной лаборатории" Font="Arial, 10pt"/>
+          <TableCell Name="Cell122" Font="Arial, 10pt"/>
+          <TableCell Name="Cell123" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell124" Font="Arial, 10pt"/>
+          <TableCell Name="Laboratory_IOF" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row26" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell126" Font="Arial, 10pt"/>
+          <TableCell Name="Cell127" Font="Arial, 10pt"/>
+          <TableCell Name="Cell128" Text="подпись" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell129" Font="Arial, 10pt"/>
+          <TableCell Name="Cell130" Text="И.О. Фамилия" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row27" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell131" Text="Представитель сдающей стороны" Font="Arial, 10pt"/>
+          <TableCell Name="Cell132" Font="Arial, 10pt"/>
+          <TableCell Name="Delive_Post" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell134" Font="Arial, 10pt"/>
+          <TableCell Name="Delive_Factory" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row28" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell136" Font="Arial, 10pt"/>
+          <TableCell Name="Cell137" Font="Arial, 10pt"/>
+          <TableCell Name="Cell138" Text="должность" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell139" Font="Arial, 10pt"/>
+          <TableCell Name="Cell140" Text="предприятие" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row29" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell141" Font="Arial, 10pt"/>
+          <TableCell Name="Cell142" Font="Arial, 10pt"/>
+          <TableCell Name="Cell143" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell144" Font="Arial, 10pt"/>
+          <TableCell Name="Delive_IOF" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row30" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell146" Font="Arial, 10pt"/>
+          <TableCell Name="Cell147" Font="Arial, 10pt"/>
+          <TableCell Name="Cell148" Text="подпись" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell149" Font="Arial, 10pt"/>
+          <TableCell Name="Cell150" Text="И.О. Фамилия" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row31" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell151" Text="Представитель принимающей стороны" Font="Arial, 10pt"/>
+          <TableCell Name="Cell152" Font="Arial, 10pt"/>
+          <TableCell Name="Receive_Post" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell154" Font="Arial, 10pt"/>
+          <TableCell Name="Receive_Factory" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row32" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell156" Font="Arial, 10pt"/>
+          <TableCell Name="Cell157" Font="Arial, 10pt"/>
+          <TableCell Name="Cell158" Text="должность" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell159" Font="Arial, 10pt"/>
+          <TableCell Name="Cell160" Text="предприятие" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row33" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell161" Font="Arial, 10pt"/>
+          <TableCell Name="Cell162" Font="Arial, 10pt"/>
+          <TableCell Name="Cell163" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell164" Font="Arial, 10pt"/>
+          <TableCell Name="Receive_IOF" Border.Lines="Bottom" Border.BottomLine.Width="0.5" HorzAlign="Center" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row34" Height="20.64" AutoSize="true">
+          <TableCell Name="Cell166" Font="Arial, 10pt"/>
+          <TableCell Name="Cell167" Font="Arial, 10pt"/>
+          <TableCell Name="Cell168" Text="подпись" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell169" Font="Arial, 10pt"/>
+          <TableCell Name="Cell170" Text="И.О. Фамилия" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Row35" Height="20.64">
+          <TableCell Name="Cell171" Text="*) - предприятия трубопроводного транспорта не заполняют" Font="Arial, 10pt" ColSpan="5"/>
+          <TableCell Name="Cell172" Font="Arial, 10pt"/>
+          <TableCell Name="Cell173" Font="Arial, 10pt"/>
+          <TableCell Name="Cell174" Font="Arial, 10pt"/>
+          <TableCell Name="Cell175" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,188 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "ProtokolNum",
+      "Type": "text",
+      "Name": "Номер протокола"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Type",
+      "Type": "text",
+      "Name": "МПР: Сенсор"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_PSP",
+      "Type": "text",
+      "Name": "Место проведения поверки"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Наименование владельца ПСП"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Sensor_Type",
+      "Type": "text",
+      "Name": "МПР: Сенсор"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Sensor_DU",
+      "Type": "text",
+      "Name": "МПР: Ду"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Sensor_FactoryNumber",
+      "Type": "text",
+      "Name": "МПР: Заводской №"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_PEP",
+      "Type": "text",
+      "Name": "МПР: ПЭП"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_PEP_FactoryNumber",
+      "Type": "text",
+      "Name": "МПР: ПЭП Заводской №"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": false,
+      "Key": "SIKN",
+      "Type": "text",
+      "Name": "СИКН"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Name",
+      "Type": "text",
+      "Name": "ТПУ: Тип"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Category",
+      "Type": "text",
+      "Name": "ТПУ: Разряд"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_FactoryNumber",
+      "Type": "text",
+      "Name": "ТПУ: Заводской №"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_CheckDate",
+      "Type": "text",
+      "Name": "ТПУ: Дата поверки"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP_Name",
+      "Type": "text",
+      "Name": "ПП: Тип"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP_FactoryNumber",
+      "Type": "text",
+      "Name": "ПП: Заводской №"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP_CheckDate",
+      "Type": "text",
+      "Name": "ПП: Дата поверки"
+    },
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "Заключение: массомер к дальнейшей эксплуатации"
+    },
+    {
+      "Id": 19,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Result_Type",
+      "Type": "list",
+      "Name": "В качестве"
+    },
+    {
+      "Id": 20,
+      "Use": true,
+      "Edit": true,
+      "Key": "Certificate_Num",
+      "Type": "text",
+      "Name": "Свидетельство о поверке: №"
+    },
+    {
+      "Id": 21,
+      "Use": true,
+      "Edit": true,
+      "Key": "Certificate_Date",
+      "Type": "text",
+      "Name": "Свидетельство о поверке: дата"
+    },
+    {
+      "Id": 22,
+      "Use": true,
+      "Edit": true,
+      "Key": "StaffData_company",
+      "Type": "text",
+      "Name": "Поверитель: Организация"
+    },
+    {
+      "Id": 23,
+      "Use": true,
+      "Edit": true,
+      "Key": "StaffData_fio",
+      "Type": "text",
+      "Name": "Поверитель: И.О. Фамилия"
+    }
+  ]
+}

@@ -1,0 +1,359 @@
+﻿{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 0,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 297,
+          "PaperHeight": 210,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "PathToTemplateFile": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {
+        "Prefix_SIKN_Name": "СИКН",
+        "NameIVK": "ИВК-1"
+      },
+      "Data": {
+        "TableBIK": {
+          "Visible": true,
+          "Parameters": [
+            {
+              "Visible": true,
+              "Name": "ПЛОТНОСТЬ",
+              "SI": "кг/м³",
+              "Key": "Dens"
+            },
+            {
+              "Visible": true,
+              "Name": "ПЛОТНОСТЬ ПРИ 15°C",
+              "SI": "кг/м³",
+              "Key": "Dens15"
+            },
+            {
+              "Visible": true,
+              "Name": "ПЛОТНОСТЬ ПРИ 20°C",
+              "SI": "кг/м³",
+              "Key": "Dens20"
+            },
+            {
+              "Visible": true,
+              "Name": "ДИНАМ. ВЯЗКОСТЬ",
+              "SI": "мПа·с (сП)",
+              "Key": "DynamicVisc"
+            },
+            {
+              "Visible": true,
+              "Name": "КИНЕМ. ВЯЗКОСТЬ",
+              "SI": "мм²/с (сСт)",
+              "Key": "KinemVisc"
+            },
+            {
+              "Visible": true,
+              "Name": "РАСХОД",
+              "SI": "м³/ч",
+              "Key": "Flow"
+            },
+            {
+              "Visible": true,
+              "Name": "ОБЪЕМНАЯ ДОЛЯ ВОДЫ",
+              "SI": "%",
+              "Key": "VolWater"
+            },
+            {
+              "Visible": true,
+              "Name": "МАССОВАЯ ДОЛЯ ВОДЫ",
+              "SI": "%",
+              "Key": "MasWater"
+            },
+            {
+              "Visible": true,
+              "Name": "МАССОВАЯ ДОЛЯ СЕРЫ",
+              "SI": "%",
+              "Key": "MasSulphur"
+            },
+            {
+              "Visible": true,
+              "Name": "ТЕМПЕР. ПЛОТНОМЕРА",
+              "SI": "°C",
+              "Key": "DensTemp"
+            },
+            {
+              "Visible": true,
+              "Name": "ДАВЛЕНИЕ ПЛОТНОМЕРА",
+              "SI": "МПа",
+              "Key": "DensPress"
+            },
+            {
+              "Visible": false,
+              "Name": "ТЕМПЕР. ВИСКОЗИМЕТРА",
+              "SI": "°C",
+              "Key": "ViscTemp"
+            }
+          ]
+        },
+        "TableLine": {
+          "Visible": true,
+          "ShowNumberColumns": 4,
+          "ColumnsWidth": 0,
+          "Parameters": [
+            {
+              "Visible": true,
+              "Name": "Наименование параметра",
+              "SI": "Ед. изм.",
+              "Key": "Name"
+            },
+            {
+              "Visible": true,
+              "Name": "Массовый расход",
+              "SI": "т/ч",
+              "Key": "MassFlow"
+            },
+            {
+              "Visible": true,
+              "Name": "Объемный расход",
+              "SI": "м³/ч",
+              "Key": "VolFlow"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем",
+              "SI": "м³",
+              "Key": "Vol"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 20 °C",
+              "SI": "м³",
+              "Key": "Vol20"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 15 °C",
+              "SI": "м³",
+              "Key": "Vol15"
+            },
+            {
+              "Visible": true,
+              "Name": "Масса",
+              "SI": "т",
+              "Key": "Mass"
+            },
+            {
+              "Visible": true,
+              "Name": "Средневзвешенное значение температуры",
+              "SI": "°C",
+              "Key": "Temp"
+            },
+            {
+              "Visible": true,
+              "Name": "Средневзвешенное значение давления",
+              "SI": "МПа",
+              "Key": "Press"
+            },
+            {
+              "Visible": true,
+              "Name": "Средневзвешенное значение плотности",
+              "SI": "кг/м³",
+              "Key": "Dens"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем на начало отчета",
+              "SI": "м³",
+              "Key": "BeginVol"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем на конец отчета",
+              "SI": "м³",
+              "Key": "EndVol"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 15 °C на начало отчета",
+              "SI": "м³",
+              "Key": "BeginVol15"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 15 °C на конец отчета",
+              "SI": "м³",
+              "Key": "EndVol15"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 20 °C на начало отчета",
+              "SI": "м³",
+              "Key": "BeginVol20"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 20 °C на конец отчета",
+              "SI": "м³",
+              "Key": "EndVol20"
+            },
+            {
+              "Visible": true,
+              "Name": "Масса на начало отчета",
+              "SI": "т",
+              "Key": "BeginMass"
+            },
+            {
+              "Visible": true,
+              "Name": "Масса на конец отчета",
+              "SI": "т",
+              "Key": "EndMass"
+            },
+            {
+              "Visible": false,
+              "Name": "Масса балласта",
+              "SI": "т",
+              "Key": "Balast_Mass"
+            },
+            {
+              "Visible": false,
+              "Name": "Масса нетто",
+              "SI": "т",
+              "Key": "Net_Mass"
+            },
+            {
+              "Visible": false,
+              "Name": "Объем неучтенной нефти",
+              "SI": "м³",
+              "Key": "CheckDeltaVol"
+            },
+            {
+              "Visible": false,
+              "Name": "Масса неучтенной нефти",
+              "SI": "т",
+              "Key": "CheckDeltaMass"
+            }
+          ],
+          "ColumnSIKN": {
+            "Visible": true,
+            "Name": "СИКН",
+            "Width": 0
+          }
+        }
+      },
+      "Footer": {
+        "Signers": [
+          {
+            "Id": 1,
+            //Представитель сдающей стороны
+            "Name": "Оператор товарный сдающей стороны:",
+            "ShowSigner": [
+              {
+                "Id": 1,
+                "Name": "Отчет за два часа",
+                "Visible": true
+              },
+              {
+                "Id": 2,
+                "Name": "Отчет за смену",
+                "Visible": true
+              },
+              {
+                "Id": 3,
+                "Name": "Отчет за сутки",
+                "Visible": true
+              },
+              {
+                "Id": 4,
+                "Name": "Отчет за месяц",
+                "Visible": true
+              },
+              {
+                "Id": 5,
+                "Name": "Отчет за время ведения ТКО",
+                "Visible": true
+              }
+            ]
+          },
+          {
+            "Id": 2,
+            //Представитель принимающей стороны
+            "Name": "Оператор товарный принимающей стороны:",
+            "ShowSigner": [
+              {
+                "Id": 1,
+                "Name": "Отчет за два часа",
+                "Visible": true
+              },
+              {
+                "Id": 2,
+                "Name": "Отчет за смену",
+                "Visible": true
+              },
+              {
+                "Id": 3,
+                "Name": "Отчет за сутки",
+                "Visible": true
+              },
+              {
+                "Id": 4,
+                "Name": "Отчет за месяц",
+                "Visible": true
+              },
+              {
+                "Id": 5,
+                "Name": "Отчет за время ведения ТКО",
+                "Visible": true
+              }
+            ]
+          },
+          {
+            "Id": 3,
+            "Name": "Оператор товарный:",
+            "ShowSigner": [
+              {
+                "Id": 1,
+                "Name": "Отчет за два часа",
+                "Visible": false
+              },
+              {
+                "Id": 2,
+                "Name": "Отчет за смену",
+                "Visible": false
+              },
+              {
+                "Id": 3,
+                "Name": "Отчет за сутки",
+                "Visible": false
+              },
+              {
+                "Id": 4,
+                "Name": "Отчет за месяц",
+                "Visible": false
+              },
+              {
+                "Id": 5,
+                "Name": "Отчет за время ведения ТКО",
+                "Visible": false
+              }
+            ]
+          }
+        ]
+      },
+      "Dictionarys": 
+      {
+
+      }
+    },
+    "DataIVK": 
+    {
+
+    }
+  }
+}

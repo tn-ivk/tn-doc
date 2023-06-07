@@ -1,0 +1,84 @@
+﻿{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AdditionalInfo.Protokol_Number",
+      "Type": "text",
+      "Name": "ПП1: Номер протокола"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP1_AdditionalInfo.Factory_number",
+      "Type": "text",
+      "Name": "ПП1: Заводской №"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP1_AdditionalInfo.SIKN_Factory",
+      "Type": "text",
+      "Name": "ПП1: Владелец"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP1_AdditionalInfo.SIKN_PSP",
+      "Type": "text",
+      "Name": "ПП1: Место поверки"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP1_AdditionalInfo.StaffData",
+      "Type": "text",
+      "Name": "ПП1: Должность, подпись, И.О. Фамилия лица, проводившего поверку"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AdditionalInfo.Protokol_Number",
+      "Type": "text",
+      "Name": "ПП2: Номер протокола"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP2_AdditionalInfo.Factory_number",
+      "Type": "text",
+      "Name": "ПП2: Заводской №"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP2_AdditionalInfo.SIKN_Factory",
+      "Type": "text",
+      "Name": "ПП2: Владелец"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PP2_AdditionalInfo.SIKN_PSP",
+      "Type": "text",
+      "Name": "ПП2: Место поверки"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "PP2_AdditionalInfo.StaffData",
+      "Type": "text",
+      "Name": "ПП2: Должность, подпись, И.О. Фамилия лица, проводившего поверку"
+    }
+  ]
+}

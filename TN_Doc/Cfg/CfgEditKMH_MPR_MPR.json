@@ -1,0 +1,124 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "ProtokolNum",
+      "Type": "text",
+      "Name": "Номер протокола"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "LineName",
+      "Type": "text",
+      "Name": "Линия"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_PSP",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Заводской №"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN_Name",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "MPR_Type",
+      "Type": "text",
+      "Name": "ПР: Тип"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "MPR_FactoryNum",
+      "Type": "text",
+      "Name": "ПР: Заводской №"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "MPR_CTRL_Type",
+      "Type": "text",
+      "Name": "Контрольный ПР: Тип"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "MPR_CTRL_Factory",
+      "Type": "text",
+      "Name": "Контрольный ПР: Заводской №"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "MPR_CTRL_CheckDate",
+      "Type": "text",
+      "Name": "Контрольный ПР: Дата поверки"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_KMH_Result",
+      "Type": "list",
+      "Name": "Заключение"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffData",
+      "Type": "text",
+      "Name": "Сервисная организация"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryStaffData",
+      "Type": "text",
+      "Name": "Сдающая сторона"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffData",
+      "Type": "text",
+      "Name": "Принимающая сторона"
+    },
+    {
+      "Id": 13,
+      "Use": false,
+      "Edit": true,
+      "Key": "ARM_CheckDate",
+      "Type": "list",
+      "Name": ""
+    }
+  ]
+}

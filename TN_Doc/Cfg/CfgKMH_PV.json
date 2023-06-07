@@ -1,0 +1,71 @@
+﻿{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 1,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 210,
+          "PaperHeight": 297,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "PathToTemplateFile": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {
+        "FieldSIKN": "СИКН"
+      },
+      "Data": {
+
+      },
+      "Footer": {
+
+      },
+      "Dictionarys": {
+        "Parameter01Name": {
+          "0": "Верхний предел измерений <b>динамической вязкости</b>, мПа·с (сП)",
+          "1": "Верхний предел измерений <b>кинематической вязкости</b>, мм<sup>2</sup>/с (сСт) "
+        },
+        "Parameter02Name": {
+          "0": "Пределы допускаемой абсолютной погрешности измерений Δ, мПа·с (сП)",
+          "1": "Пределы допускаемой абсолютной погрешности измерений Δ, мм<sup>2</sup>/с (сСт)"
+        },
+        "ControlConditions": {
+          "0": "Условие контроля: | <i>η<sub>П</sub> - η <sub>Л</sub></i> | ≤ |Δ<i><sub> ПД</sub></i>| + | Δ<i> <sub>ЛД</sub></i> | = ",
+          "1": "Условие контроля: | <i>ν <sub>П</sub> - ν <sub>Л</sub></i> | ≤ |Δ<i><sub> ПК</sub></i>| + | Δ<i> <sub>ЛК</sub></i> | = "
+        },
+        "UnitsMeasurement": {
+          "0": " мПа·с (сП)",
+          "1": " мм<sup> 2</sup>/с (сСт)"
+        },
+        "OilTechParams": {
+          "1": "Технологические параметры \n нефти в БИК",
+          "2": "Технологические параметры \n нефтепродукта в БИК"
+        },
+        "Dens": {
+          "0": "<i>η<sub> П</sub></i>,\nмПа·с (сП)",
+          "1": "<i>ν <sub> П</sub></i>,\nмм<sup>2</sup>/с (сСт) "
+        },
+        "Visc_LAB": {
+          "0": "<i>η<sub> Л</sub></i>,\nмПа·с (сП)",
+          "1": "<i>ν <sub> Л</sub></i>,\nмм<sup>2</sup>/с (сСт)"
+        },
+        "Delta": {
+          "0": "<i>|η<sub> П</sub> - η<sub> Л</sub>|</i>,\nмПа·с (сП)",
+          "1": "<i>|ν <sub> П</sub> - ν <sub> Л</sub>|</i>,\nмм<sup>2</sup>/с (сСт)"
+        }
+      }
+    },
+    "DataIVK": {
+
+    }
+  }
+}

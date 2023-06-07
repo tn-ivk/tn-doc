@@ -1,0 +1,68 @@
+﻿{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 1,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 210,
+          "PaperHeight": 297,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "PathToTemplateFile": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {
+        "FieldSIKN": " СИКН №",
+        "FieldPSP": " ПСП (НСП): "
+      },
+      "Data": {
+
+      },
+      "Footer": {
+
+      },
+      "Dictionarys": {
+        "ProtocolType": {
+          "0": "ПРОТОКОЛ КМХ РАБОЧЕГО ПП ПО РЕЗЕРВНОМУ ПП",
+          "1": "ПРОТОКОЛ КМХ РАБОЧЕГО ПП ПО ЭТАЛОННОМУ ПП"
+        },
+        "ControlConditions": {
+          "0": "    <i>Условие контроля: | </i>ρ<i> <sub>iраб</sub> - </i>ρ<i> <sub>iрез</sub> | ≤ </i>Δ<i> <sub>раб</sub> + </i>Δ<i> <sub>рез</sub> (для каждого измерения)",
+          "1": "    <i>Условие контроля: | </i>ρ<i> <sub>iраб</sub> - </i>ρ<i> <sub>iэтал</sub> | ≤ </i>Δ<i> <sub>раб</sub> + </i>Δ<i> <sub>этал</sub> (для каждого измерения)"
+        },
+        "DensityMeterType": {
+          "0": "Резервный ПП",
+          "1": "Эталонный плотномер"
+        },
+        "Footnote": {
+          "0": "<i>*указывается только для резервного ПП.",
+          "1": "<i>*указывается только для эталонного плотномера при условии, что он установлен в БИК стационарно."
+        },
+        "OilTechParams": {
+          "1": "Технологические параметры нефти в БИК",
+          "2": "Технологические параметры нефтепродукта в БИК"
+        },
+        "Dens": {
+          "0": "ρ <sub><i>iрез</i></sub>, кг/м<sup>3</sup>",
+          "1": "ρ <sub><i>iэтал</i></sub>, кг/м<sup>3</sup>"
+        },
+        "DensDiff": {
+          "0": "ρ <sub><i>iраб </i></sub> - ρ <sub><i>iрез</i></sub>, кг/м<sup>3</sup>",
+          "1": "ρ <sub><i>iраб </i></sub> - ρ <sub><i>iэтал</i></sub>,<br>кг/м<sup>3</sup>"
+        }
+      }
+    },
+    "DataIVK": {
+
+    }
+  }
+}

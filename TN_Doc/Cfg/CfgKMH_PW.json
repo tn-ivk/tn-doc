@@ -1,0 +1,72 @@
+﻿{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 1,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 210,
+          "PaperHeight": 297,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "PathToTemplateFile": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {
+        "FieldSIKN": "СИКН"
+      },
+      "Data": {
+
+      },
+      "Footer": {
+
+      },
+      "Dictionarys": {
+        "ParameterName": {
+          "1": "Пределы допускаемой абсолютной основной погрешности измерений<br><b>массовой доли</b> воды, %",
+          "0": "Пределы допускаемой абсолютной основной погрешности измерений<br><b>объемной доли</b> воды, %"
+        },
+        "FlowMeterColHeader": {
+          "1": "Поточный<br>влагомер Δ <sub><i>ПМ</sub>",
+          "0": "Поточный<br>влагомер Δ <sub><i>ПО</sub>"
+        },
+        "LabMethodColHeader": {
+          "1": "Лабораторный<br>метод  Δ <sub><i>ЛМ</sub>",
+          "0": "Лабораторный<br>метод  Δ <sub><i>ЛО</sub>"
+        },
+        "ControlConditions": {
+          "1": "Условие контроля: | <i>W<sub>ПМ</sub> - W <sub>ЛМ</sub></i> | ≤ |Δ<i><sub> ПМ</sub></i>| + | Δ<i> <sub>ЛМ</sub></i> | = ",
+          "0": "Условие контроля: | <i>φ <sub>ПО</sub> - φ <sub>ЛО</sub></i> | ≤ |Δ<i><sub> ПО</sub></i>| + | Δ<i> <sub>ЛО</sub></i> | = "
+        },
+
+        "FlowMeterUnitMeasurement": {
+          "1": "<i>W</i><sub> ПМ</sub>,<br>%",
+          "0": "<i>φ</i><sub> ПО</sub>,<br>%"
+        },
+        "LabMethodUnitMeasurement": {
+          "1": "<i>W</i><sub> ЛМ</sub>,<br>%",
+          "0": "<i>φ</i><sub> ЛО</sub>,<br>%"
+        },
+        "ControlResult": {
+          "1": "<i>W</i><sub> ПМ</sub> - <i>W</i><sub> ПМ</sub>,<br>%",
+          "0": "|<i>φ</i><sub> ПО</sub> - <i>φ</i><sub> ЛО</sub>|,<br>%"
+        },
+        "OilTechParams": {
+          "1": "Технологические параметры нефти в БИК",
+          "2": "Технологические параметры нефтепродукта в БИК"
+        }
+      }
+    },
+    "DataIVK": {
+
+    }
+  }
+}

@@ -1,0 +1,140 @@
+﻿{
+/*
+<input type="button">
+<input type="checkbox">
+<input type="color">
+<input type="date">
+<input type="datetime-local">
+<input type="email">
+<input type="file">
+<input type="hidden">
+<input type="image">
+<input type="month">
+<input type="number">
+<input type="password">
+<input type="radio">
+<input type="range">
+<input type="reset">
+<input type="search">
+<input type="submit">
+<input type="tel">
+<input type="text">
+<input type="time">
+<input type="url">
+<input type="week">
+*/
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Key": "DelivePoint",
+      "Type": "number",
+      "Name": "Пункт приема сдачи нефти"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Key": "AccrSertifNumber",
+      "Type": "text",
+      "Name": "Номер аттестата аккредитации"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Key": "Laboratory",
+      "Type": "text",
+      "Name": "Лаборатория предприятия"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Key": "SIKN_Number",
+      "Type": "text",
+      "Name": "СИКН №"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Key": "Laboratory_Post",
+      "Type": "text",
+      "Name": "Представитель испытательной лаборатории (должность)"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Key": "Laboratory_Factory",
+      "Type": "text",
+      "Name": "Представитель испытательной лаборатории (предприятие)"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Key": "Laboratory_IOF",
+      "Type": "list",
+      "Name": "Представитель испытательной лаборатории (ИОФ)"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Key": "Delive_Post",
+      "Type": "text",
+      "Name": "Представитель сдающей стороны (должность)"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Key": "Delive_Factory",
+      "Type": "text",
+      "Name": "Представитель сдающей стороны (предприятие)"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Key": "Delive_IOF",
+      "Type": "list",
+      "Name": "Представитель сдающей стороны (ИОФ)"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Key": "Receive_Post",
+      "Type": "text",
+      "Name": "Представитель принимающей стороны (должность)"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Key": "Receive_Factory",
+      "Type": "text",
+      "Name": "Представитель принимающей стороны (предприятие)"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Key": "Receive_IOF",
+      "Type": "list",
+      "Name": "Представитель принимающей стороны (ИОФ)"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Key": "PassportPeriodDT.Begin",
+      "Type": "datetime-local",
+      "Name": "Дата и время отбора пробы (начало)"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Key": "PassportPeriodDT.End",
+      "Type": "datetime-local",
+      "Name": "Дата и время отбора пробы (окончание)"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Key": "TankerName",
+      "Type": "text",
+      "Name": "Название танкера"
+    }
+  ]
+}

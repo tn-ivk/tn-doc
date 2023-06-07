@@ -1,0 +1,164 @@
+﻿{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_PSP",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN_Name",
+      "Type": "text",
+      "Name": "СИКН №"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "Laboratory_Name",
+      "Type": "text",
+      "Name": "Принадлежность"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "LAB_Type",
+      "Type": "text",
+      "Name": "ЛВ: Тип"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "LAB_ManufNum",
+      "Type": "text",
+      "Name": "ЛВ: Заводской №"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "LAB_CheckDate",
+      "Type": "text",
+      "Name": "ЛВ: Дата последней поверки"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffData",
+      "Type": "text",
+      "Name": "Сервисная организация (И.О. Фамилия)"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryStaffData",
+      "Type": "text",
+      "Name": "Сдающая сторона (И.О. Фамилия)"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffData",
+      "Type": "text",
+      "Name": "Принимающая сторона (И.О. Фамилия)"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "PW1_AddInfo.ProtokolNum",
+      "Type": "text",
+      "Name": "ПВ1: Номер протокола"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": false,
+      "Key": "PW1_AddInfo.PW_Type",
+      "Type": "text",
+      "Name": "ПВ1: Тип"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": false,
+      "Key": "PW1_AddInfo.PW_ManufNum",
+      "Type": "text",
+      "Name": "ПВ1: Заводской №"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": false,
+      "Key": "PW1_AddInfo.PW_CheckDate",
+      "Type": "text",
+      "Name": "ПВ1: Дата последней поверки"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "PW1_AddInfo.ARM_KMH_Result",
+      "Type": "list",
+      "Name": "ПВ1: Заключение"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": true,
+      "Key": "PW2_AddInfo.ProtokolNum",
+      "Type": "text",
+      "Name": "ПВ2: Номер протокола"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": false,
+      "Key": "PW2_AddInfo.PW_Type",
+      "Type": "text",
+      "Name": "ПВ2: Тип"
+    },
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": false,
+      "Key": "PW2_AddInfo.PW_ManufNum",
+      "Type": "text",
+      "Name": "ПВ2: Заводской №"
+    },
+    {
+      "Id": 19,
+      "Use": true,
+      "Edit": false,
+      "Key": "PW2_AddInfo.PW_CheckDate",
+      "Type": "text",
+      "Name": "ПВ2: Дата последней поверки"
+    },
+    {
+      "Id": 20,
+      "Use": true,
+      "Edit": true,
+      "Key": "PW2_AddInfo.ARM_KMH_Result",
+      "Type": "list",
+      "Name": "ПВ2: Заключение"
+    }
+  ]
+}

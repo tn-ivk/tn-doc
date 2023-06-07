@@ -1,0 +1,331 @@
+﻿{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 1,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 210,
+          "PaperHeight": 297,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "PathToTemplateFile": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {
+        "FieldSIKN": "СИКН"
+      },
+      "Data": {
+        "Parameters": [
+          {
+            "Use": true,
+            "Edit": false,
+            "Name": "Температура нефти при условиях измерений объема",
+            "SI": "°C",
+            "KeyPassportResult": "TempResult"
+          },
+          {
+            "Use": true,
+            "Edit": false,
+            "Name": "Давление нефти при условиях измерений объема",
+            "SI": "МПа",
+            "KeyPassportResult": "PressResult"
+          },
+          {
+            "Use": true,
+            "Edit": false,
+            "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема",
+            "SI": "кг/м³",
+            "KeyPassportResult": "DensResult"
+          },
+          {
+            "Use": true,
+            "Edit": false,
+            "Name": "Плотность нефти при 20 °C",
+            "SI": "кг/м³",
+            "KeyPassportResult": "Dens20Result"
+          },
+          {
+            "Use": true,
+            "Edit": false,
+            "Name": "Плотность нефти при 15 °C",
+            "SI": "кг/м³",
+            "KeyPassportResult": "Dens15Result"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая доля воды",
+            "SI": "%",
+            "KeyPassportResult": "MassWaterFracResult"
+          },
+
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая концентрация хлористых солей",
+            "SI": "мг/дм³",
+            "KeyPassportResult": "Concentration"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая концентрация хлористых солей",
+            "SI": "%",
+            "KeyPassportResult": "MassFraction"
+          },
+
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая доля механических примесей",
+            "SI": "%",
+            "KeyPassportResult": "Impurity"
+          },
+
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая доля серы",
+            "SI": "%",
+            "KeyPassportResult": "SulfurResult"
+          },
+
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Давление насыщенных паров",
+            "SI": "кПа",
+            "KeyPassportResult": "kPa"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Давление насыщенных паров",
+            "SI": "мм рт. ст.",
+            "KeyPassportResult": "mercury_mm"
+          },
+
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Выход фракций, %:    при температуре до 200 °С",
+            "SI": "",
+            "KeyPassportResult": "Yield_fraction_200"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Выход фракций, %:    при температуре до 300 °С",
+            "SI": "",
+            "KeyPassportResult": "Yield_fraction_300"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Выход фракций: при температуре до 350 °С, %",
+            "SI": "",
+            "KeyPassportResult": "Yield_fraction_350"
+          },
+
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая доля парафина",
+            "SI": "%",
+            "KeyPassportResult": "Mass_fraction_of_paraffin"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая доля сероводорода",
+            "SI": "млнˉ¹ (ppm)",
+            "KeyPassportResult": "Mass_fraction_of_hydrogen_sulfide"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая доля метил- и этилмеркаптанов в сумме",
+            "SI": "млнˉ¹ (ppm)",
+            "KeyPassportResult": "Mass_fraction_of_methyl_and_ethyl_mercaptan"
+          },
+          {
+            "Use": true,
+            "Edit": true,
+            "Name": "Массовая доля органических хлоридов во фракции,\nвыкипающей до температуры 204 °С",
+            "SI": "млнˉ¹ (ppm)",
+            "KeyPassportResult": "Mass_fraction_of_organic_chlorides"
+          }
+        ]
+      },
+      "Footer": {
+
+      },
+      "Dictionarys": {
+        "Users": [
+          {
+            "Use": true,
+            "Id": 1,
+            "IdGroup": 1,
+            "F": "Гущина",
+            "I": "Марина",
+            "O": "Валерьевна",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Лаборант"
+          },
+          {
+            "Use": true,
+            "Id": 2,
+            "IdGroup": 1,
+            "F": "Кильматова",
+            "I": "Гульнара",
+            "O": "Зуфаровна",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Лаборант"
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "IdGroup": 1,
+            "F": "Ошвинцева",
+            "I": "Екатерина",
+            "O": "Геннадьевна",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Лаборант"
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "IdGroup": 2,
+            "F": "Ковалев",
+            "I": "Вячеслав",
+            "O": "Викторович",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Начальник ЦППН №1"
+          },
+          {
+            "Use": true,
+            "Id": 5,
+            "IdGroup": 2,
+            "F": "Мухаметшин",
+            "I": "Кабир",
+            "O": "Фиргатович",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "РН по подготовке нефти Восток"
+          },
+          {
+            "Use": true,
+            "Id": 6,
+            "IdGroup": 2,
+            "F": "Черный",
+            "I": "Евгений",
+            "O": "Дмитриевич",
+            "Factory": "АО «Газпромнефть-ННГ»",
+            "Post": "Руковадитель ПП по ПСН и ППД"
+          },
+          {
+            "Use": true,
+            "Id": 7,
+            "IdGroup": 3,
+            "F": "Коняева",
+            "I": "Ирэна",
+            "O": "Анатольевна",
+            "Factory": "АО «Транснефть-Сибирь»",
+            "Post": "Оператор товарный"
+          },
+          {
+            "Use": true,
+            "Id": 8,
+            "IdGroup": 3,
+            "F": "Данилюк",
+            "I": "Елена",
+            "O": "Юрьевна",
+            "Factory": "АО «Транснефть-Сибирь»",
+            "Post": "Оператор товарный"
+          },
+          {
+            "Use": true,
+            "Id": 9,
+            "IdGroup": 3,
+            "F": "Личманова",
+            "I": "Полина",
+            "O": "Борисовна",
+            "Factory": "АО «Транснефть-Сибирь»",
+            "Post": "Оператор товарный"
+          }
+        ],
+        "UsersGroup": [
+          {
+            "Use": true,
+            "Id": 1,
+            "Name": "Представители испытательной лаборатории"
+          },
+          {
+            "Use": true,
+            "Id": 2,
+            "Name": "Представители сдающей стороны"
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "Name": "Представители принимающей стороны"
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "Name": "Представители ТНМ"
+          }
+        ],
+        "Licenses": [
+          {
+            "Use": true,
+            "IdUser": 1,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 1,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 2,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 2,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 3,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          },
+          {
+            "Use": true,
+            "IdUser": 3,
+            "LicensesNumber": "",
+            "LicensesDate": ""
+          }
+        ]
+      }
+    },
+    "DataIVK": {
+
+    }
+  }
+}

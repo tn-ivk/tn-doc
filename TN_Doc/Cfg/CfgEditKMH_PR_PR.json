@@ -1,0 +1,108 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Наименование организации"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN_Name",
+      "Type": "text",
+      "Name": "СИКН №"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Name",
+      "Type": "text",
+      "Name": "ПР: Линия"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Type_Oper",
+      "Type": "text",
+      "Name": "ПР: Тип"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_FactoryNumber_Oper",
+      "Type": "text",
+      "Name": "ПР: Заводской №"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Type_Ctrl",
+      "Type": "text",
+      "Name": "ПР (контрольный): Тип"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_FactoryNumber_Ctrl",
+      "Type": "text",
+      "Name": "ПР (контрольный): Заводской №"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_CheckDate_Ctrl",
+      "Type": "text",
+      "Name": "ПР (контрольный): Дата поверки"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffData",
+      "Type": "text",
+      "Name": "Сервисная организация (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryStaffData",
+      "Type": "text",
+      "Name": "Сдающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffData",
+      "Type": "text",
+      "Name": "Принимающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_KMH_Result",
+      "Type": "list",
+      "Name": "Заключение"
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Model_Top",
+      "Type": "text",
+      "Name": "ПР: тип (модель)"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "PoverkaPlace",
+      "Type": "text",
+      "Name": "Место проведения поверки"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "PlaceSIKN",
+      "Type": "text",
+      "Name": "Пункт приема сдачи нефти"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "PlaceFactory",
+      "Type": "text",
+      "Name": "Наименование организации"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Model",
+      "Type": "text",
+      "Name": "ПР: тип (модель)"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_DN",
+      "Type": "text",
+      "Name": "ПР: DN"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_PN",
+      "Type": "text",
+      "Name": "ПР: PN"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_FactoryNumber",
+      "Type": "text",
+      "Name": "ПР: Заводской №"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "LineName",
+      "Type": "text",
+      "Name": "Линия"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": false,
+      "Key": "Oil",
+      "Type": "text",
+      "Name": "Рабочая жидкость"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU",
+      "Type": "text",
+      "Name": "ПУ"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Category",
+      "Type": "text",
+      "Name": "ПУ: Разряд"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_FactoryNumber",
+      "Type": "text",
+      "Name": "ПУ: Заводской №"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_PN",
+      "Type": "text",
+      "Name": "ПУ: PN"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Poverka_Date",
+      "Type": "text",
+      "Name": "ПУ: Дата поверки"
+    },
+
+
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": true,
+      "Key": "ProtokolNum",
+      "Type": "text",
+      "Name": "Номер протокола"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": true,
+      "Key": "StaffData_company",
+      "Type": "text",
+      "Name": "Наименование поверяющей организации"
+    },
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": true,
+      "Key": "StaffData_fio",
+      "Type": "text",
+      "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 19,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "Заключение: преобразователь объемного расхода"
+    },
+    {
+      "Id": 20,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Poverka_Result_Type",
+      "Type": "list",
+      "Name": "Применение в качестве"
+    }
+  ]
+}
+
