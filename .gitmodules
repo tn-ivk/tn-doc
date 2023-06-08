@@ -1,0 +1,3 @@
+[submodule "tn.utils"]
+	path = tn.utils
+	url = http://192.168.100.100/orpovy/ivk/tn.utils.git

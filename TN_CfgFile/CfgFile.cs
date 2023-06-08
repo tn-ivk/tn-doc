@@ -14,7 +14,6 @@ namespace TN_CfgFile
             string PathFileName = path + fileName;
             if (File.Exists(PathFileName)) File.Delete(PathFileName);
             File.WriteAllText(PathFileName, JsonConvert.SerializeObject(obj), Encoding.UTF8);
-
             return true;
         }
         

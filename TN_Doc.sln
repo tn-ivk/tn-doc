@@ -139,6 +139,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Poverka3189", "Poverka3189"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Poverka3189", "Poverka3189\Poverka3189.csproj", "{9E2F659E-F9FE-481B-A169-E98F265814F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TN.Utils", "tn.utils\TN.Utils\TN.Utils.csproj", "{89A838CD-9616-47FF-9B98-CE2F5A6C382D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -285,6 +287,10 @@ Global
 		{9E2F659E-F9FE-481B-A169-E98F265814F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E2F659E-F9FE-481B-A169-E98F265814F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E2F659E-F9FE-481B-A169-E98F265814F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89A838CD-9616-47FF-9B98-CE2F5A6C382D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89A838CD-9616-47FF-9B98-CE2F5A6C382D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89A838CD-9616-47FF-9B98-CE2F5A6C382D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89A838CD-9616-47FF-9B98-CE2F5A6C382D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
