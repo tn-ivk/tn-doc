@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Newtonsoft.Json;
 using System.Text;
 
 namespace TN_CfgFile
 {
+    [Obsolete]
     public class CfgFile
     {
         public static bool SaveCfg(string path, string fileName, object obj)

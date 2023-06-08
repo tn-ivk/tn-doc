@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
-using TN_CfgFile;
 using TN.DocData;
+using TN.Utils.Helpers;
 
 namespace TN.Doc
 {
@@ -128,7 +128,7 @@ namespace TN.Doc
 
         public static void LoadCfg<T>(string fileName, ref T obj)
         {
-            CfgFile.LoadCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", fileName), ref obj);
+            CfgFileRW.LoadCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", fileName), ref obj);
         }
 
         public static DateTime UnixTimestampToDatetime(long UnixTimestamp)
