@@ -9,7 +9,7 @@ namespace TN_Doc.Controllers
 {
     public class PrintController : Controller
     {
-        private readonly ILogger<PrintController> _logger;
+        // private readonly ILogger<PrintController> _logger;
 
         public List<string> GetListPrinters()
         {

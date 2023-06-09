@@ -6,7 +6,7 @@ namespace TN_Doc.Controllers
 {
     public class ExportController : Controller
     {
-        private readonly ILogger<PrintController> _logger;
+        // private readonly ILogger<PrintController> _logger;
 
         public List<string> GetListFormats()
         {

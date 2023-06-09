@@ -45,7 +45,7 @@ namespace TN_Doc.Controllers
         /// </summary>
         private List<DocGeneral> Docs = new List<DocGeneral>();
 
-        private DocGeneral dbDoc;
+        // private DocGeneral dbDoc;
 
         private ModelReport modelReport;      
 
@@ -53,7 +53,7 @@ namespace TN_Doc.Controllers
 
         string reportsPath = "";
 
-        CancellationToken stoppingToken;
+        // CancellationToken stoppingToken;
 
         public HomeController(ILogger<HomeController> logger, Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> context)
         {
@@ -238,7 +238,7 @@ namespace TN_Doc.Controllers
                 FR.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), $"01_Report_2022-05-05_Release_version.frx"));
                 FR.Render();             
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }

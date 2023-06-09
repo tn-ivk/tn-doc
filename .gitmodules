@@ -4,3 +4,6 @@
 [submodule "tn.docgeneral"]
 	path = tn.docgeneral
 	url = http://192.168.100.100/orpovy/ivk/tn.docgeneral.git
+[submodule "tn_toolsfastreport"]
+	path = tn_toolsfastreport
+	url = http://192.168.100.100/orpovy/ivk/tn_toolsfastreport.git
