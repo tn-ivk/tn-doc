@@ -54,6 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
     <ProjectReference Include="..\TN_DocGeneral\TN_DocGeneral.csproj" />
   </ItemGroup>
 

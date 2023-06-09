@@ -77,11 +77,5 @@ namespace TN_Doc.Controllers
 
             }
         }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
     }
 }
