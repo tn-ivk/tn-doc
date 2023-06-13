@@ -16,7 +16,6 @@ namespace TN_Doc.Controllers
             //var installedPrinters = PrinterSettings.InstalledPrinters;
 
             List<string> printers = new List<string>();
-
             var process = new Process()
             {
                 StartInfo =

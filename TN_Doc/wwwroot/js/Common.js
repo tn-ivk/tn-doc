@@ -370,7 +370,7 @@ function InitElement ()
 { 
     InitDevices();
     InitDocs();
-
+    
     InitDatepickerBegin();
     InitDatepickerEnd();
 
@@ -487,19 +487,20 @@ function GetDoc()
                 //    //#toolbar=0&view=FitH
                 //    $(this).attr('src', '/PDF/PDF.pdf');
                 //});
-
-                //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0');
-
-                var myPDF = new PDFObject({
-                    url: '/PDF/PDF.pdf',
-                    pdfOpenParams: {
-                        view: 'Fit',
-                        scrollbars: '0',
-                        toolbar: '0',
-                        statusbar: '0',
-                        navpanes: '0'
-                    }
-                }).embed('FR'); 
+                //
+                
+                $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
+                document.querySelector('.FR').src += '';
+                // var myPDF = new PDFObject({
+                //     url: '/PDF/PDF.pdf',
+                //     pdfOpenParams: {
+                //         view: 'Fit',
+                //         scrollbars: '0',
+                //         toolbar: '0',
+                //         statusbar: '0',
+                //         navpanes: '0'
+                //     }
+                // }).embed('FR'); 
             },
         });
 }
