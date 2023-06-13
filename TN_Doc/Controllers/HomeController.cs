@@ -5,20 +5,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+
 using TN_Doc.Models;
 using TN_Doc.Models.Home;
 using FastReport.Web;
 using System.IO;
 using System.Threading;
+
 using System.Text;
+
 using Newtonsoft.Json;
 using System.Collections;
-using TN.DocGeneral;
-using CfgApp = TN.DocGeneral.CfgApp;
-using Device = TN.DocGeneral.Device;
-using DocGeneral = TN.DocGeneral.DocGeneral;
-using Document = TN.DocGeneral.Document;
-using RequestListDocs = TN.DocGeneral.RequestListDocs;
+using Newtonsoft.Json.Linq;
+using System.Data;
+using TN_Doc.Class;
+
+using System.Drawing.Printing;
+using TN.Doc;
+using TN.DocData;
 
 
 namespace TN_Doc.Controllers
@@ -45,15 +49,16 @@ namespace TN_Doc.Controllers
         /// </summary>
         private List<DocGeneral> Docs = new List<DocGeneral>();
 
-        // private DocGeneral dbDoc;
+        private DocGeneral dbDoc;
 
         private ModelReport modelReport;      
 
         private WebReport FR;
 
         string reportsPath = "";
+        
 
-        // CancellationToken stoppingToken;
+        CancellationToken stoppingToken;
 
         public HomeController(ILogger<HomeController> logger, Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> context)
         {
@@ -62,6 +67,7 @@ namespace TN_Doc.Controllers
             //dbIVK = context;
             //dbDoc = context;
             options = context;
+            
 
             modelReport = new ModelReport();
             FR = new WebReport();
@@ -121,7 +127,7 @@ namespace TN_Doc.Controllers
         }
 */
 
-        private DocGeneral LoadDocsModule(int IdDevice, TN.DocGeneral.IdDoc idDoc)
+        private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
         {
             Device deviceCfg = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             Document docCfg = deviceCfg.Docs.Single(x => x.IdDoc == idDoc);
@@ -169,7 +175,7 @@ namespace TN_Doc.Controllers
             return list;
         }
 
-        public List<ListItem> GetTemplatesDoc(int IdDevice, TN.DocGeneral.IdDoc idDoc)
+        public List<ListItem> GetTemplatesDoc(int IdDevice, IdDoc idDoc)
         {
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             var doc = device.Docs.Single(x => x.IdDoc == idDoc);
@@ -177,7 +183,7 @@ namespace TN_Doc.Controllers
             return doc.TemplateDocs.Where(x => x.Use).Select(x => new ListItem() { Id = x.Id, Name = x.Name }).ToList();
         }
 
-        public List<ListItem> GetListProtocolNumber(int IdDevice, TN.DocGeneral.IdDoc idDoc)
+        public List<ListItem> GetListProtocolNumber(int IdDevice, IdDoc idDoc)
         {
             //var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             //var doc = device.Docs.Single(x => x.IdDoc == idDoc);
@@ -192,7 +198,7 @@ namespace TN_Doc.Controllers
         }
 
 
-        public void SetIdTemplateDoc(int IdDevice, TN.DocGeneral.IdDoc IdDoc, int IdTemplateDoc)
+        public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {
             CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                 .Docs.Single(x => x.IdDoc == IdDoc)
@@ -200,13 +206,13 @@ namespace TN_Doc.Controllers
 
             cfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
         }
-        public int GetIdTemplateDoc(int IdDevice, TN.DocGeneral.IdDoc IdDoc)
+        public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
         {
             return CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                 .Docs.Single(x => x.IdDoc == IdDoc)
                 .LastUsedTemplateId;
         }
-        public string GetPathTemplateDoc(int IdDevice, TN.DocGeneral.IdDoc IdDoc, int IdTemplateDoc)
+        public string GetPathTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {
             return CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                             .Docs.Single(x => x.IdDoc == IdDoc)
@@ -238,7 +244,7 @@ namespace TN_Doc.Controllers
                 FR.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), $"01_Report_2022-05-05_Release_version.frx"));
                 FR.Render();             
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
             }
@@ -252,7 +258,7 @@ namespace TN_Doc.Controllers
         public class data
         {
             public int IdDevice { get; set; }
-            public TN.DocGeneral.IdDoc IdDoc { get; set; }
+            public IdDoc IdDoc { get; set; }
             public string DTBegin { get; set; }
             public string DTEnd { get; set; }
         }
@@ -265,7 +271,7 @@ namespace TN_Doc.Controllers
 
         public List<RequestListDocs> GetList(data data)
         {
-            if (data.IdDoc == TN.DocGeneral.IdDoc.ReportIncomplete)
+            if (data.IdDoc == IdDoc.ReportIncomplete)
                 return ReportIncompleteListDoc;
 
             List<ListDoc> docs = new List<ListDoc>();
@@ -365,7 +371,7 @@ namespace TN_Doc.Controllers
             return html;// FR.Render().Result;        
         }
 
-        public string GetDocEdit(int IdDevice, TN.DocGeneral.IdDoc IdDoc, int id)
+        public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
             //var doc = Docs.Single(x => x.IdDoc == IdDoc);                       
@@ -373,7 +379,7 @@ namespace TN_Doc.Controllers
             return doc.GetEditDoc(id);
         }
 
-        public void ExportDoc(int IdDevice, TN.DocGeneral.IdDoc IdDoc, int id)
+        public void ExportDoc(int IdDevice, IdDoc IdDoc, int id)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
 
@@ -392,7 +398,7 @@ namespace TN_Doc.Controllers
             FR.Report.Dispose();
         }
 
-        public void SaveDoc(int IdDevice, TN.DocGeneral.IdDoc IdDoc, string data)
+        public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
 
