@@ -83,18 +83,36 @@
     <div class="Doc">
         <table>
             <tr>
-                <td>
+
+@*                <td align="left"><select id="ComboboxTemplateDoc">Форма документа</select></td>
+                <td align="left"><select id="ComboboxProtocolNumber">Номер протокола</select></td>
+                <td align="right"><select id="ComboboxExportFormat">Экспорт</select></td>
+                <td align="right"><input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()"></td>
+                <td align="right"><select id="ComboboxPrinterName">Принтер</select></td>
+                <td align="right"><input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()"></td>*@
+
+                <td align="left">
                     <select id="ComboboxTemplateDoc">Форма документа</select>
-                    <select id="ComboboxPrinterName">Принтер</select>
                     <select id="ComboboxProtocolNumber">Номер протокола</select>
                 </td>
+                
+                <td align="right">
+                    <select id="ComboboxExportFormat">Экспорт</select>
+                    <input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
+                    <select id="ComboboxPrinterName">Принтер</select>
+                    <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
+                </td>
+
+
+
+
             </tr>
             <tr>
-                <td>
-                    <iframe class="FR" src=""></iframe>
+                <td colspan="6">
+                    <iframe name=print_frame class="FR" src=""></iframe>
   
-                    @* <div class="FR" src=""></div> *@
-                </td>
+@*                    <div class="FR" src=""></div>
+*@                </td>
             </tr>
         </table>
     </div>

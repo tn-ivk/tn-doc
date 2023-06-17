@@ -277,6 +277,22 @@ function InitPrinterName() {
         });
 }
 
+function InitExportFormat() {
+    $('#ComboboxExportFormat').empty();
+
+    $.ajax(
+        {
+            async: false,
+            url: "Export/GetListFormats",
+            type: "GET",
+            success: function (data) {
+                data.forEach((item) => {
+                    $('#ComboboxExportFormat').append('<option value=' + item + '>' + item + '</option>');
+                });
+            }
+        });
+}
+
 function InitProtocolNumber() {
     $('#ComboboxProtocolNumber').empty();
 
@@ -370,16 +386,15 @@ function InitElement ()
 { 
     InitDevices();
     InitDocs();
-    
+
     InitDatepickerBegin();
     InitDatepickerEnd();
 
     InitTableDocs();
 
     InitTemplatesDoc();
-
     InitPrinterName();
-
+    InitExportFormat();
     InitProtocolNumber();
 
     $('#ComboboxDocGUID').change(function () {
@@ -468,7 +483,20 @@ function GetData()
 
 function GetDoc()
 {
-    //$('.FR').attr('src', '');
+    $('.FR').attr('src', '');
+
+    //var x = 10;// Math.random() * 10;
+
+    //var PDFObject = new PDFObject({
+    //    url: '/PDF/PDF.pdf',
+    //    pdfOpenParams: {
+    //        view: 'Fit',
+    //        scrollbars: '0',
+    //        toolbar: '0',
+    //        statusbar: '0',
+    //        navpanes: '0'
+    //    }
+    //});
 
     $.ajax(
         {
@@ -487,20 +515,11 @@ function GetDoc()
                 //    //#toolbar=0&view=FitH
                 //    $(this).attr('src', '/PDF/PDF.pdf');
                 //});
-                //
-                
+
+                //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&id=' + x);
                 $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
-                document.querySelector('.FR').src += '';
-                // var myPDF = new PDFObject({
-                //     url: '/PDF/PDF.pdf',
-                //     pdfOpenParams: {
-                //         view: 'Fit',
-                //         scrollbars: '0',
-                //         toolbar: '0',
-                //         statusbar: '0',
-                //         navpanes: '0'
-                //     }
-                // }).embed('FR'); 
+                
+                //PDFObject.embed("/PDF/PDF.pdf", ".FR");                
             },
         });
 }
@@ -560,7 +579,12 @@ function ExportDoc() {
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                id: currentId
+                id: currentId,
+                format: $('#ComboboxExportFormat').val()
+            },
+            success: function (data) {
+
+                alert('Экспорт успешно завершен!\nФайл:' + data);
             }
         });
 }

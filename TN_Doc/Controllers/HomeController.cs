@@ -56,9 +56,11 @@ namespace TN_Doc.Controllers
         private WebReport FR;
 
         string reportsPath = "";
-        
 
         CancellationToken stoppingToken;
+
+        Device deviceCfg;
+        Document docCfg;
 
         public HomeController(ILogger<HomeController> logger, Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> context)
         {
@@ -67,7 +69,6 @@ namespace TN_Doc.Controllers
             //dbIVK = context;
             //dbDoc = context;
             options = context;
-            
 
             modelReport = new ModelReport();
             FR = new WebReport();
@@ -129,8 +130,8 @@ namespace TN_Doc.Controllers
 
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
         {
-            Device deviceCfg = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-            Document docCfg = deviceCfg.Docs.Single(x => x.IdDoc == idDoc);
+            deviceCfg = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            docCfg = deviceCfg.Docs.Single(x => x.IdDoc == idDoc);
 
             Assembly assembly = Assembly.LoadFrom(Directory.GetCurrentDirectory() + docCfg.PathToDocDll);
 
@@ -379,23 +380,36 @@ namespace TN_Doc.Controllers
             return doc.GetEditDoc(id);
         }
 
-        public void ExportDoc(int IdDevice, IdDoc IdDoc, int id)
-        {
+        public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format)
+        {                
             var doc = LoadDocsModule(IdDevice, IdDoc);
+
+            if (!System.IO.Directory.Exists($"{CfgApp.ExportDoc.Path}/{docCfg.Name}"))
+            {
+                System.IO.Directory.CreateDirectory($"{CfgApp.ExportDoc.Path}/{docCfg.Name}");
+            }
 
             FR.Report.Load(doc.GetPathTemplateFile());
 
-            FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id));
+            var jsonDoc = doc.GetViewDoc(id);
+            FR.Report.SetParameterValue("JsonDoc", jsonDoc);
 
-            FR.Report.Prepare();
+            FR.Report.Prepare();         
 
-            FastReport.Export.OoXML.Excel2007Export excelExport = new FastReport.Export.OoXML.Excel2007Export();
-            excelExport.ShowProgress = false;
+            string path = $"{CfgApp.ExportDoc.Path}/{docCfg.Name}/{JObject.Parse(doc.GetViewDoc(id).ToString())["Doc"]["Settings"]["General"]["FileNameForExportDoc"]}";
 
-            FR.Report.Export(excelExport, Directory.GetCurrentDirectory() + "/wwwroot/PDF/exel.xlsx");
+            if (format == "pdf")
+                FR.Report.Export(new FastReport.Export.Pdf.PDFExport() { ShowProgress = false }, path += ".pdf");
+            else if (format == "excel")
+                FR.Report.Export(new FastReport.Export.OoXML.Excel2007Export() { ShowProgress = false }, path += ".xlsx");
+            else if (format == "ods")
+                FR.Report.Export(new FastReport.Export.Odf.ODSExport() { ShowProgress = false }, path += ".ods");
+            else if (format == "xml")
+                FR.Report.Export(new FastReport.Export.Xml.XMLExport() { ShowProgress = false }, path += ".xml");
 
-            excelExport.Dispose();
             FR.Report.Dispose();
+
+            return path;
         }
 
         public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)

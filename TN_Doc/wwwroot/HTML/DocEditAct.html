@@ -30,21 +30,14 @@
         function UserChangeEvent(selectObject) {
             if (selectObject.name == "Delive_IOF") {
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
-                //var license = dictionaries.Licenses.filter(licenses => licenses["IdUser"] == 4);
+                var license = dictionaries.Licenses.filter(licenses => licenses["IdUser"] == $(selectObject).val());
 
-
-                //alert('userId=' + $(selectObject).val() + '' +
-                //    'LicensesDate=' + license[0].LicensesDate);
-
+                alert(license[0].length);
 
                 document.getElementById("Delive_Factory").value = user[0].Factory;
                 document.getElementById("Delive_FIO").value = user[0].FIO;
-                //document.getElementById("Delive_Lic_Date").value = license[0].LicensesDate;
-                //document.getElementById("Delive_Lic_Number").value = license[0].LicensesNumber;
-
-                
-                
-
+                document.getElementById("Delive_Lic_Date").value = license[0].LicensesDate;
+                document.getElementById("Delive_Lic_Number").value = license[0].LicensesNumber;
 
                 //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
@@ -54,8 +47,8 @@
 
                 document.getElementById("Receive_Factory").value = user[0].Factory;
                 document.getElementById("Receive_FIO").value = user[0].FIO;
-                //document.getElementById("Receive_Lic_Date").value = license[0].LicensesDate;
-                //document.getElementById("Receive_Lic_Number").value = license[0].LicensesNumber;
+                document.getElementById("Receive_Lic_Date").value = license[0].LicensesDate;
+                document.getElementById("Receive_Lic_Number").value = license[0].LicensesNumber;
 
                 //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
