@@ -420,6 +420,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="TN_ToolsFastReport">
+      <HintPath>..\tn_toolsfastreport\TN_Tools\bin\Release\net5.0\TN_ToolsFastReport.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -432,12 +438,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="TN_ToolsFastReport">
-      <HintPath>..\tn_toolsfastreport\TN_Tools\bin\Release\net5.0\TN_ToolsFastReport.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties cfg_4cfgapp_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" /></VisualStudio></ProjectExtensions>
