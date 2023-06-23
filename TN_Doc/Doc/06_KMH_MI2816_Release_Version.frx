@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/29/2023 11:19:32" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/22/2023 12:41:05" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;         
-using System.Windows.Forms;          //TODO delete?
 using System.Drawing;
 using System.Data;
 using System.IO;
@@ -21,279 +20,285 @@ using TN.DocData;
 
 namespace FastReport
 {
-   public class ReportScript
-   {
-      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
-      TN.Doc.Doc doc; // данные из входного параметра
-      TN.DocData.General General;
-      TN.Doc.HeaderDoc Header;
-      TN.Doc.DataDoc SettingsData;
-      TN.Doc.FooterDoc Footer;
-      TN.Doc.DictionarysDoc Dictionarys;
-      TN.Doc.DataIVKDoc DataIVK; 
+  public class ReportScript
+  {
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+    TN.Doc.Doc doc; // данные из входного параметра
+    TN.DocData.General General;
+    TN.Doc.HeaderDoc Header;
+    TN.Doc.DataDoc SettingsData;
+    TN.Doc.FooterDoc Footer;
+    TN.Doc.DictionarysDoc Dictionarys;
+    TN.Doc.DataIVKDoc DataIVK; 
     
-      int protocolNumber;       
+    int protocolNumber;       
       
-      // Collecting Properties of the class to the List
-      List &lt;string&gt; GetProps&lt;T&gt;(T inputClass, out List&lt;string&gt; listProps)
+    // Collecting Properties of the class to the List
+    List &lt;string&gt; GetProps&lt;T&gt;(T inputClass, out List&lt;string&gt; listProps)
+    {
+      listProps = new List&lt;string&gt;();
+      PropertyInfo[] props =  inputClass.GetType().GetProperties();
+      foreach (var prop in props)
       {
-         listProps = new List&lt;string&gt;();
-         PropertyInfo[] props =  inputClass.GetType().GetProperties();
-         foreach (var prop in props)
-         {
-            listProps.Add(prop.GetValue(inputClass).ToString());
-         }
-//            MessageBox.Show(listPicn[0].ToString());  
-         return listProps; 
-      }  
-      
-      private void Page_StartPage(object sender, EventArgs e)
-      {
-         //using (var sr = new StreamReader
-         //      (&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/06_TableKMH_MI2816/DocKMH_MI2816.json&quot;))
-         //{
-            // Read the stream as a string
-         //   Report.SetParameterValue(&quot;Protocol&quot;, sr.ReadToEnd());
-         //}
-         
-         //// Десериализация данных (формат json) из входного параметра - Json                         
-         string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
-         Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-         settings.TypeNameHandling = TypeNameHandling.All;
-      
-         doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
-         General = (TN.DocData.General) doc.Doc.Settings.General;
-         Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
-         SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
-         Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
-         Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
-         DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
-         
-         //// === Настройки страницы 
-         // Ширина и высота (в мм)
-         
-         Page.PaperHeight = General.PageSettings.PaperHeight;
-         Page.PaperWidth = General.PageSettings.PaperWidth;
-         //Page.Border.Lines = BorderLines.All;
-         
-         // Поля/отступы от краёв (в мм)
-         Page.TopMargin = General.PageSettings.TopMargin;
-         Page.BottomMargin = General.PageSettings.BottomMargin;
-         Page.LeftMargin = General.PageSettings.LeftMargin;
-         Page.RightMargin = General.PageSettings.RightMargin;
-         
-         //Definition for which device create the protocol
-         protocolNumber = General.ProtocolNumber;
-      
-         // Запуск отрисовки таблиц на странице отчета
-         DrawTableHeader();
-         DrawTableSourceData();
-         DrawTableResults(); 
-         DrawTableConclusion();
+        listProps.Add(prop.GetValue(inputClass).ToString());
       }
+      //            MessageBox.Show(listPicn[0].ToString());  
+      return listProps; 
+    }  
       
-//// ======================== //// ======================== //// ======================== ////
-      public void DrawTableHeader()
-      {
-         // Setup Columns
-         float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/TableHeader.ColumnCount;         
-         for (int i = 0; i &lt; (TableHeader.ColumnCount); i++)                 
-         {
-            TableHeader.Columns[i].Width = widthDynamicCols*Units.Millimeters;
-         }
+    private void Page_StartPage(object sender, EventArgs e)
+    {
+      //using (var sr = new StreamReader
+      //      (&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/06_TableKMH_MI2816/DocKMH_MI2816.json&quot;))
+      //{
+      // Read the stream as a string
+      //   Report.SetParameterValue(&quot;Protocol&quot;, sr.ReadToEnd());
+      //}
          
-        switch (protocolNumber)
-        {
-          case 2:
-            SIKN_Name.Text = string.Format(&quot;{0}{1}&quot;,Header.FieldSIKN,DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_Name);
-            PSP_Name.Text = string.Format(&quot;{0} {1}&quot;,Header.FieldPSP,DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.PSP_Name);        
-            break;
-          default:
-            SIKN_Name.Text = string.Format(&quot;{0}{1}&quot;,Header.FieldSIKN,DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_Name);
-            PSP_Name.Text = string.Format(&quot;{0} {1}&quot;,Header.FieldPSP,DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PSP_Name);        
-            break;
-        }        
+      //// Десериализация данных (формат json) из входного параметра - Json                         
+      string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+      Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+      settings.TypeNameHandling = TypeNameHandling.All;
+      
+      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
+      General = (TN.DocData.General) doc.Doc.Settings.General;
+      Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
+      SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
+      Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
+      Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
+      DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
+         
+      //// === Настройки страницы 
+      // Ширина и высота (в мм)
+         
+      Page.PaperHeight = General.PageSettings.PaperHeight;
+      Page.PaperWidth = General.PageSettings.PaperWidth;
+      //Page.Border.Lines = BorderLines.All;
+         
+      // Поля/отступы от краёв (в мм)
+      Page.TopMargin = General.PageSettings.TopMargin;
+      Page.BottomMargin = General.PageSettings.BottomMargin;
+      Page.LeftMargin = General.PageSettings.LeftMargin;
+      Page.RightMargin = General.PageSettings.RightMargin;
+         
+      //Definition for which device create the protocol
+      protocolNumber = General.ProtocolNumber;
+      
+      // Запуск отрисовки таблиц на странице отчета
+      DrawTableHeader();
+      DrawTableSourceData();
+      DrawTableResults(); 
+      DrawTableConclusion();
+    }
+      
+    public void DrawTableHeader()
+    {
+      // Setup Columns
+      float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/TableHeader.ColumnCount;         
+      for (int i = 0; i &lt; (TableHeader.ColumnCount); i++)                 
+      {
+        TableHeader.Columns[i].Width = widthDynamicCols*Units.Millimeters;
       }
+         
+      switch (protocolNumber)
+      {
+        case 2:
+          SIKN_Name.Text = string.Format(&quot;{0}{1}&quot;,Header.FieldSIKN,DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_Name);
+          PSP_Name.Text = string.Format(&quot;{0} {1}&quot;,Header.FieldPSP,DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.PSP_Name);        
+          break;
+        default:
+          SIKN_Name.Text = string.Format(&quot;{0}{1}&quot;,Header.FieldSIKN,DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_Name);
+          PSP_Name.Text = string.Format(&quot;{0} {1}&quot;,Header.FieldPSP,DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PSP_Name);        
+          break;
+      }        
+    }
                
-//// ======================== //// ======================== //// ======================== ////
-      public void  DrawTableSourceData()
+    public void  DrawTableSourceData()
+    {
+      ////Create lists for Classes properties values
+      List &lt;string&gt; listPicn1Params = new List &lt;string&gt;();
+      List &lt;string&gt; listPicn2Params = new List &lt;string&gt;();
+      List &lt;string&gt; listWeigherParams = new List &lt;string&gt;();
+      List &lt;string&gt; listTempParams = new List &lt;string&gt;();
+      List &lt;string&gt; listPressParams = new List &lt;string&gt;();
+      string delta_Picn;
+         
+      if (DataIVK.TableKMH_MI2816.ARMData ==null)
       {
-         ////Create lists for Classes properties values
-         List &lt;string&gt; listPicn1Params = new List &lt;string&gt;();
-         List &lt;string&gt; listPicn2Params = new List &lt;string&gt;();
-         List &lt;string&gt; listWeigherParams = new List &lt;string&gt;();
-         List &lt;string&gt; listTempParams = new List &lt;string&gt;();
-         List &lt;string&gt; listPressParams = new List &lt;string&gt;();
-         string delta_Picn;
-         
-         if (DataIVK.TableKMH_MI2816.ARMData ==null)
-         {
-            for (int i = 0; i &lt; 11; i++)
-            {
-               listPicn1Params.Add(&quot;&quot;);//No data from IVK
-               listPicn2Params.Add(&quot;&quot;);//No data from IVK
-            }
-            for (int i = 0; i &lt; 5; i++)
-            {
-               listWeigherParams.Add(&quot;&quot;);//No data from IVK
-               listTempParams.Add(&quot;&quot;);//No data from IVK
-               listPressParams.Add(&quot;&quot;);//No data from IVK
-            }
-            delta_Picn = &quot;&quot;;//No data from IVK
-         }
-         else
-         {                                                                                    
-            GetProps(DataIVK.TableKMH_MI2816.ARMData.Picn1, out listPicn1Params);
-            GetProps(DataIVK.TableKMH_MI2816.ARMData.Picn2, out listPicn2Params);
-            GetProps(DataIVK.TableKMH_MI2816.ARMData.Weigher, out listWeigherParams);
-            GetProps(DataIVK.TableKMH_MI2816.ARMData.Temp, out listTempParams);
-            GetProps(DataIVK.TableKMH_MI2816.ARMData.Press, out listPressParams);
-            delta_Picn = tools.GetNormalizedValue(DataIVK.TableKMH_MI2816.ARMData.Delta_Picn);
-         }
-         
-         // Setup Columns         
-         int sumDynamicCols=2;
-         float widthDynamicCol=((Page.PaperWidth-Page.LeftMargin-Page.RightMargin-(Col1.Width+Col2.Width)/Units.Millimeters)/sumDynamicCols);                  
-         for (int w = sumDynamicCols; w &lt; (TableSourceData.ColumnCount); w++)                 
-         {
-            TableSourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }
-
-         //// ===  Fill table with data
-         // Column 3, rows for Section 1         
-         for (int i = 0; i &lt; listPicn1Params.Count; i++)
-         {
-            TableSourceData[2,i+5].Text =tools.GetNormalizedValue(listPicn1Params[i]);
-         }          
-         // Column 4, rows for Section 1         
-         for (int i = 0; i &lt; listPicn2Params.Count; i++)
-         {
-            TableSourceData[3,i+5].Text = tools.GetNormalizedValue(listPicn2Params[i]);
-         }          
-         // Column 3, rows for Section 2
-         for (int i = 0; i &lt; listWeigherParams.Count; i++)
-         {
-            TableSourceData[2,i+17].Text =  tools.GetNormalizedValue(listWeigherParams[i]);
-         }
-         // Column 3, rows for Section 3
-         for (int i = 0; i &lt; listTempParams.Count; i++)
-         {
-            TableSourceData[2,i+23].Text =  tools.GetNormalizedValue(listTempParams[i]);
-         }
-         // Column 3, rows for Section 4
-         for (int i = 0; i &lt; listPressParams.Count; i++)
-         {
-            TableSourceData[2,i+29].Text =  tools.GetNormalizedValue(listPressParams[i]);
-         }
-         
-         //Предел допускаемой абсолютной погрешности, Раздел 1.5
-         Delta_Picn.Text = delta_Picn;
-         
-         // Column 3, rows for Sensor data
-        switch (protocolNumber)
+        for (int i = 0; i &lt; 11; i++)
         {
-          case 2:
-            DensSensor_Name.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.DensSensor_Name;
-            DensSensor_FactoryNumber.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.DensSensor_FactoryNumber;
-            DensSensor_CheckDate.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.DensSensor_CheckDate;
+          listPicn1Params.Add(&quot;&quot;);   //No data from IVK
+          listPicn2Params.Add(&quot;&quot;);   //No data from IVK
+        }
+        for (int i = 0; i &lt; 5; i++)
+        {
+          listWeigherParams.Add(&quot;&quot;); //No data from IVK
+          listTempParams.Add(&quot;&quot;);    //No data from IVK
+          listPressParams.Add(&quot;&quot;);   //No data from IVK
+        }
+        delta_Picn = &quot;&quot;;              //No data from IVK
+      }
+      else
+      {                                                                                    
+        GetProps(DataIVK.TableKMH_MI2816.ARMData.Picn1, out listPicn1Params);
+        GetProps(DataIVK.TableKMH_MI2816.ARMData.Picn2, out listPicn2Params);
+        GetProps(DataIVK.TableKMH_MI2816.ARMData.Weigher, out listWeigherParams);
+        GetProps(DataIVK.TableKMH_MI2816.ARMData.Temp, out listTempParams);
+        GetProps(DataIVK.TableKMH_MI2816.ARMData.Press, out listPressParams);
+        delta_Picn = tools.GetNormalizedValue(DataIVK.TableKMH_MI2816.ARMData.Delta_Picn);
+      }
+         
+      // Setup Columns         
+      int sumDynamicCols=2;
+      float widthDynamicCol=((Page.PaperWidth-Page.LeftMargin-Page.RightMargin-(Col1.Width+Col2.Width)/Units.Millimeters)/sumDynamicCols);                  
+      for (int w = sumDynamicCols; w &lt; (TableSourceData.ColumnCount); w++)                 
+      {
+        TableSourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }
+
+      //// ===  Fill table with data
+      // Column 3, rows for Section 1         
+      for (int i = 0; i &lt; listPicn1Params.Count; i++)
+      {
+        TableSourceData[2,i+5].Text =tools.GetNormalizedValue(listPicn1Params[i]);      
+      }
+      //PicnInit1_V.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].V;
+      //PicnInit1_FP.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].FP;
+      //PicnInit1_Ft.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].Ft;
+      //PicnInit1_t0.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].t0;
+      
+      // Column 4, rows for Section 1         
+      for (int i = 0; i &lt; listPicn2Params.Count; i++)
+      {
+        TableSourceData[3,i+5].Text = tools.GetNormalizedValue(listPicn2Params[i]);
+      }
+      //PicnInit2_V.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].V;
+      //PicnInit2_FP.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].FP;
+      //PicnInit2_Ft.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].Ft;
+      //PicnInit2_t0.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].t0;
+      
+      // Column 3, rows for Section 2
+      for (int i = 0; i &lt; listWeigherParams.Count; i++)
+      {
+        TableSourceData[2,i+17].Text =  tools.GetNormalizedValue(listWeigherParams[i]);
+      }
+      // Column 3, rows for Section 3
+      for (int i = 0; i &lt; listTempParams.Count; i++)
+      {
+        TableSourceData[2,i+23].Text =  tools.GetNormalizedValue(listTempParams[i]);
+      }
+      // Column 3, rows for Section 4
+      for (int i = 0; i &lt; listPressParams.Count; i++)
+      {
+        TableSourceData[2,i+29].Text =  tools.GetNormalizedValue(listPressParams[i]);
+      }
+         
+      //Предел допускаемой абсолютной погрешности, Раздел 1.5
+      Delta_Picn.Text = delta_Picn;
+         
+      // Column 3, rows for Sensor data
+      switch (protocolNumber)
+      {
+        case 2:
+          DensSensor_Name.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.DensSensor_Name;
+          DensSensor_FactoryNumber.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.DensSensor_FactoryNumber;
+          DensSensor_CheckDate.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.DensSensor_CheckDate;
           
-            if (DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.Delta_PP == 0.0)
-            { 
-              Delta_PP.Text = &quot;0,0&quot;;
-            }                                    
-            else 
-            {
-              Delta_PP.Text = string.Format(&quot;{0}&quot;, tools.GetNormalizedValue(DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.Delta_PP));
-            }
+          if (DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.Delta_PP == 0.0)
+          { 
+            Delta_PP.Text = &quot;0,0&quot;;
+          }                                    
+          else 
+          {
+            Delta_PP.Text = string.Format(&quot;{0}&quot;, tools.GetNormalizedValue(DataIVK.TableKMH_MI2816.AdditionalInfo.PP2_AdditionalInfo.Delta_PP));
+          }
           
           break;
-          default:
-            DensSensor_Name.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.DensSensor_Name;
-            DensSensor_FactoryNumber.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.DensSensor_FactoryNumber;
-            DensSensor_CheckDate.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.DensSensor_CheckDate;
+        default:
+          DensSensor_Name.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.DensSensor_Name;
+          DensSensor_FactoryNumber.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.DensSensor_FactoryNumber;
+          DensSensor_CheckDate.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.DensSensor_CheckDate;
           
-            if (DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.Delta_PP == 0.0)
-            { 
-              Delta_PP.Text = &quot;0,0&quot;;
-            }                                    
-            else 
-            {
-              Delta_PP.Text = string.Format(&quot;{0}&quot;, tools.GetNormalizedValue(DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.Delta_PP));
-            }
+          if (DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.Delta_PP == 0.0)
+          { 
+            Delta_PP.Text = &quot;0,0&quot;;
+          }                                    
+          else 
+          {
+            Delta_PP.Text = string.Format(&quot;{0}&quot;, tools.GetNormalizedValue(DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.Delta_PP));
+          }
 
           break;
-        }     
-      }
+      }     
+    }
       
-//// ======================== //// ======================== //// ======================== ////
-      public void  DrawTableResults()
+    public void  DrawTableResults()
+    {
+         
+      //Lists of the classes properties names
+      var listTable1ParamsNames = typeof(TN.Doc.Table1).GetProperties().Select(x=&gt;x.Name).ToList();
+      var listTable1_1ParamsNames = typeof(TN.Doc.Table1_1).GetProperties().Select(x=&gt;x.Name).ToList();
+         
+      //Dictionaries of the classes properties names &amp; values
+      var dictTable1Params =  typeof(TN.Doc.Table1)
+        .GetProperties()
+      .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1[0] , null));
+         
+      var dictTable1_1Pic1Params =  typeof(TN.Doc.Table1_1)
+        .GetProperties()
+      .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1_1[0] , null));
+         
+      var dictTable1_1Pic2Params =  typeof(TN.Doc.Table1_1)
+        .GetProperties()
+        .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1_1[1] , null));
+         
+      //// Fill table with the data
+      //object TempValue = &quot;not found&quot;;
+      string TempValue = &quot;&quot;;//not found
+      for (int j = 0; j &lt; (TableResults.RowCount); j++)                 
       {
-         
-         //Lists of the classes properties names
-         var listTable1ParamsNames = typeof(TN.Doc.Table1).GetProperties().Select(x=&gt;x.Name).ToList();
-         var listTable1_1ParamsNames = typeof(TN.Doc.Table1_1).GetProperties().Select(x=&gt;x.Name).ToList();
-         
-         //Dictionaries of the classes properties names &amp; values
-         var dictTable1Params =  typeof(TN.Doc.Table1)
-            .GetProperties()
-            .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1[0] , null));
-         
-         var dictTable1_1Pic1Params =  typeof(TN.Doc.Table1_1)
-            .GetProperties()
-            .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1_1[0] , null));
-         
-         var dictTable1_1Pic2Params =  typeof(TN.Doc.Table1_1)
-            .GetProperties()
-         .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1_1[1] , null));
-         
-         //// Fill table with the data
-         //object TempValue = &quot;not found&quot;;
-         string TempValue = &quot;&quot;;//not found
-         for (int j = 0; j &lt; (TableResults.RowCount); j++)                 
-            {
-            for (int i = 0; i &lt; (TableResults.ColumnCount); i++)                 
-            {
-               switch (i)
-               {     
-                  case 0:
-                  case 1:   
-                  case 2:   
-                  case 3:
-                     dictTable1Params.TryGetValue(listTable1ParamsNames[i], out TempValue);                     
-                     //tools.GetPropertyValue(dictTable1Params, listTable1ParamsNames[i], ref TempValue);
-                     TableResults[i,3].Text = tools.GetNormalizedValue(TempValue.ToString());   
-                     break;
-                  case 5:   
-                  case 6:   
-                  case 7:
-                  case 8:  
-                     switch (j)
-                     { 
-                        case 0:
-                           dictTable1_1Pic1Params.TryGetValue(listTable1_1ParamsNames[i-4], out TempValue);
-                           //tools.GetPropertyValue(dictTable1_1Pic1Params, listTable1_1ParamsNames[i-4], ref TempValue);
-                           TableResults[i,j+3].Text =  tools.GetNormalizedValue(TempValue.ToString());
-                        break;
-                        case 1:   
-                           dictTable1_1Pic2Params.TryGetValue(listTable1_1ParamsNames[i-4], out TempValue);
-                           //tools.GetPropertyValue(dictTable1_1Pic2Params, listTable1_1ParamsNames[i-4], ref TempValue);
-                           TableResults[i,j+3].Text = tools.GetNormalizedValue(TempValue.ToString());
-                        break;
-                     }
-                     break;
-                  case 9:   
-                  case 10:   
-                  case 11:
-                     dictTable1Params.TryGetValue(listTable1ParamsNames[i-5], out TempValue);
-                     //tools.GetPropertyValue(dictTable1Params, listTable1ParamsNames[i-5], ref TempValue);
-                     TableResults[i,3].Text = tools.GetNormalizedValue(TempValue.ToString());
-                     break;
-               }
-            }
-         }
+        for (int i = 0; i &lt; (TableResults.ColumnCount); i++)                 
+        {
+          switch (i)
+          {     
+            case 0:
+            case 1:   
+            case 2:   
+            case 3:
+              dictTable1Params.TryGetValue(listTable1ParamsNames[i], out TempValue);                     
+              //tools.GetPropertyValue(dictTable1Params, listTable1ParamsNames[i], ref TempValue);
+              TableResults[i,3].Text = tools.GetNormalizedValue(TempValue.ToString());   
+              break;
+            case 5:   
+            case 6:   
+            case 7:
+            case 8:  
+              switch (j)
+              { 
+                case 0:
+                  dictTable1_1Pic1Params.TryGetValue(listTable1_1ParamsNames[i-4], out TempValue);
+                  //tools.GetPropertyValue(dictTable1_1Pic1Params, listTable1_1ParamsNames[i-4], ref TempValue);
+                  TableResults[i,j+3].Text =  tools.GetNormalizedValue(TempValue.ToString());
+                  break;
+                case 1:   
+                  dictTable1_1Pic2Params.TryGetValue(listTable1_1ParamsNames[i-4], out TempValue);
+                  //tools.GetPropertyValue(dictTable1_1Pic2Params, listTable1_1ParamsNames[i-4], ref TempValue);
+                  TableResults[i,j+3].Text = tools.GetNormalizedValue(TempValue.ToString());
+                  break;
+              }
+              break;
+            case 9:   
+            case 10:   
+            case 11:
+              dictTable1Params.TryGetValue(listTable1ParamsNames[i-5], out TempValue);
+              //tools.GetPropertyValue(dictTable1Params, listTable1ParamsNames[i-5], ref TempValue);
+              TableResults[i,3].Text = tools.GetNormalizedValue(TempValue.ToString());
+              break;
+          }
+        }
       }
+    }
       
-//// ======================== //// ======================== //// ======================== ////
     public void  DrawTableConclusion()
     {
       string arm_KMH_Result = &quot;&quot;;
@@ -355,21 +360,18 @@ namespace FastReport
       RecievingStaffData.Text=recievingStaffData;
     }  
       
-//// ======================== //// ======================== //// ======================== ////
-
-
-      private void PageFooter_BeforeLayout(object sender, EventArgs e)
-      {
-         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
-         { 
-            PageFooter.Visible = false; 
-         }
-         else
-         {
-            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         }
+    private void PageFooter_BeforeLayout(object sender, EventArgs e)
+    {
+      if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+      { 
+        PageFooter.Visible = false; 
       }
-   }    
+      else
+      {
+        PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+      }
+    }
+  }    
 }
 </ScriptText>
   <Styles>
@@ -466,8 +468,8 @@ namespace FastReport
         <TableRow Name="Row59" Height="17.95">
           <TableCell Name="Cell579" Border.Lines="Left, Right" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell580" Border.Lines="All" Text="1.1.6. Вместимость пикнометра, см&lt;sup&gt; 3" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell581" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell582" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit1_V" Border.Lines="All" Text="PicnInit1_V" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit2_V" Border.Lines="All" Text="PicnInit2_V" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row60" Height="17.95">
           <TableCell Name="Cell583" Border.Lines="Left, Right" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
@@ -478,24 +480,24 @@ namespace FastReport
         <TableRow Name="Row61" Height="17.95">
           <TableCell Name="Cell587" Border.Lines="Left, Right" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell588" Border.Lines="All" Text="1.1.8. Коэффициент изменения вместимости пикнометра от давления, см &lt;sup&gt;3&lt;/sup&gt;/бар" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell589" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell590" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit1_FP" Border.Lines="All" Text="PicnInit1_FP" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit2_FP" Border.Lines="All" Text="PicnInit2_FP" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row62" Height="17.95">
           <TableCell Name="Cell591" Border.Lines="Left, Right" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell592" Border.Lines="All" Text="1.1.9. Коэффициент изменения вместимости пикнометра от температуры, см&lt;sup&gt; 3&lt;/sup&gt;/°С" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell593" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell594" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit1_Ft" Border.Lines="All" Text="PicnInit1_Ft" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit2_Ft" Border.Lines="All" Text="PicnInit2_Ft" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row63" Height="17.95">
           <TableCell Name="Cell595" Border.Lines="Left, Right" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell596" Border.Lines="All" Text="1.1.9. Температура при поверке пикнометра, °С" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell597" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell598" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell596" Border.Lines="All" Text="1.1.10. Температура при поверке пикнометра, °С" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit1_t0" Border.Lines="All" Text="PicnInit1_t0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="PicnInit2_t0" Border.Lines="All" Text="PicnInit2_t0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row64" Height="17.95">
           <TableCell Name="Cell599" Border.Lines="Left, Right" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell600" Border.Lines="All" Text="1.1.10. Предел допускаемой абсолютной погрешности, кг/м&lt;sup&gt; 3&lt;/sup&gt;" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell600" Border.Lines="All" Text="1.1.11. Предел допускаемой абсолютной погрешности, кг/м&lt;sup&gt; 3&lt;/sup&gt;" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell601" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell602" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
@@ -645,7 +647,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableResults" Top="798.51" Width="718.2" Height="109.6" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableResults" Top="799.23" Width="718.2" Height="109.6" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableResults" Top="7.56" Width="716.64" Height="102.04">
         <TableColumn Name="Column129" Width="59.72"/>
         <TableColumn Name="Column130" Width="59.72"/>
@@ -731,7 +733,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="910.17" Width="718.2" Height="204.12" CanGrow="true" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="911.61" Width="718.2" Height="204.12" CanGrow="true" CanShrink="true">
       <TableObject Name="TableConclusion" Top="7.56" Width="718.2" Height="167.26">
         <TableColumn Name="Column13" Width="151.2"/>
         <TableColumn Name="Column14" Width="359.1"/>
@@ -810,7 +812,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1116.36" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1118.5" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

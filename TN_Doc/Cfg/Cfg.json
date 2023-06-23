@@ -148,31 +148,49 @@
           },
           {
             "Use": true,
-            "IdUser": 1,
+            "IdUser": 2,
             "LicensesNumber": "NumZ-243",
             "LicensesDate": "10.02.2023"
           },
           {
             "Use": true,
-            "IdUser": 2,
+            "IdUser": 3,
             "LicensesNumber": "NumB-52437",
             "LicensesDate": "10.02.2023"
           },
           {
             "Use": true,
-            "IdUser": 2,
+            "IdUser": 4,
             "LicensesNumber": "NumQB-4243",
             "LicensesDate": "10.02.2023"
           },
           {
             "Use": true,
-            "IdUser": 3,
+            "IdUser": 5,
             "LicensesNumber": "NumV-147",
             "LicensesDate": "10.02.2023"
           },
           {
             "Use": true,
-            "IdUser": 3,
+            "IdUser": 6,
+            "LicensesNumber": "NumS-177",
+            "LicensesDate": "10.02.2023"
+          },
+          {
+            "Use": true,
+            "IdUser": 7,
+            "LicensesNumber": "NumS-177",
+            "LicensesDate": "10.02.2023"
+          },
+          {
+            "Use": true,
+            "IdUser": 8,
+            "LicensesNumber": "NumS-177",
+            "LicensesDate": "10.02.2023"
+          },
+          {
+            "Use": true,
+            "IdUser": 9,
             "LicensesNumber": "NumS-177",
             "LicensesDate": "10.02.2023"
           }

@@ -32,8 +32,6 @@
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 var license = dictionaries.Licenses.filter(licenses => licenses["IdUser"] == $(selectObject).val());
 
-                alert(license[0].length);
-
                 document.getElementById("Delive_Factory").value = user[0].Factory;
                 document.getElementById("Delive_FIO").value = user[0].FIO;
                 document.getElementById("Delive_Lic_Date").value = license[0].LicensesDate;

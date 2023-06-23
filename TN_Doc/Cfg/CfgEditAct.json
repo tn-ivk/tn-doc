@@ -131,7 +131,7 @@
     {
       "Id": 14,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Receive_Lic_Number",
       "Type": "false",
       "Name": "Номер доверенности"

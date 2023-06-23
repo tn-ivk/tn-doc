@@ -94,7 +94,6 @@ var docTemplates = {};
     datepicker.setDefaults(datepicker.regional.ru);
 
     return datepicker.regional.ru;
-
 });
 
 $(document).ready
@@ -463,7 +462,8 @@ function GetData()
             },
             complete: function (data)
             {
-                if ($('#ComboboxDocGUID').val() == 0) {
+                if ($('#ComboboxDocGUID').val() == 0 ||
+                    $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
                     $('#ButtonReview').prop('disabled', true);
                     $('#ButtonEdit').prop('disabled', true);

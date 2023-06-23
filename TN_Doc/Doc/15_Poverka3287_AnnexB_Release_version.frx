@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3287.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/25/2023 12:21:26" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3287.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/20/2023 10:41:23" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -697,8 +697,8 @@ namespace FastReport
           <TableCell Name="Cell1270" Border.Lines="All" Text="P&lt;sub&gt; ПП ji&lt;/sub&gt;,&lt;br&gt;°C" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1271" Border.Lines="All" Text="β &lt;sub&gt;ji&lt;/sub&gt;,&lt;br&gt;&lt;sup&gt;о&lt;/sup&gt;C&lt;sup&gt;-1&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1272" Border.Lines="All" Text="ν,&lt;br&gt;мм&lt;sup&gt;2&lt;/sup&gt;/с" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1273" Border.Lines="All" Text="t &lt;sub&gt;ПР ji&lt;/sub&gt;,&lt;br&gt;°С" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1274" Border.Lines="All" Text="P&lt;sub&gt;ПР ji&lt;/sub&gt;,&lt;br&gt;МПа" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1273" Border.Lines="All" Text="t &lt;sub&gt;ПР   ji&lt;/sub&gt;,&lt;br&gt;°С" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1274" Border.Lines="All" Text="P&lt;sub&gt;ПР   ji&lt;/sub&gt;,&lt;br&gt;МПа" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1275" Border.Lines="All" Text="f &lt;sub&gt;ji&lt;/sub&gt;,&lt;br&gt;Гц" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1276" Border.Lines="All" Text="N &lt;sub&gt;ji&lt;/sub&gt;,&lt;br&gt;имп" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="T2_K_MF" Border.Lines="All" Text="K&lt;sub&gt; jI &lt;/sub&gt;(MF&lt;sub&gt;jI&lt;/sub&gt;),&lt;br&gt;имп/м&lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>

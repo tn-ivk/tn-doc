@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3380.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/29/2023 10:05:06" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3380.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/20/2023 10:07:04" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -631,7 +631,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1SourceData" Top="175.83" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable1SourceData" Top="176.55" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="718.2" Height="102.06" FixedRows="4" ManualBuildEvent="Table1SourceData_ManualBuild">
         <TableColumn Name="Column4" Width="62.37"/>
         <TableColumn Name="Column5" Width="62.37"/>
@@ -711,7 +711,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2Results" Top="293.18" Width="718.2" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable2Results" Top="294.62" Width="718.2" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table2Results" Top="7.56" Width="718.19" Height="102.06" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2Results_ManualBuild">
         <TableColumn Name="Column158" Width="65.29"/>
         <TableColumn Name="Column159" Width="65.29"/>
@@ -791,7 +791,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2ResultsEnding" Top="404.87" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable2ResultsEnding" Top="407.01" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table2ResultsEnding" Top="7.56" Width="718.2" Height="105.84" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2ResultsEnding_ManualBuild">
         <TableColumn Name="Column219" Width="59.85"/>
         <TableColumn Name="Column228" Width="59.85"/>
@@ -877,7 +877,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3Results" Top="520.33" Width="718.2" Height="64.26">
+    <DataBand Name="DataBandTable3Results" Top="523.19" Width="718.2" Height="64.26">
       <TableObject Name="Table3Results" Top="7.56" Width="718.2" Height="56.7" GrowToBottom="true" FixedRows="2" ManualBuildEvent="Table3Results_ManualBuild">
         <TableColumn Name="Column275" Width="158.76"/>
         <TableColumn Name="Column276" Width="158.76"/>
@@ -899,7 +899,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_1Results" Top="586.65" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_1Results" Top="590.23" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_1Results" Top="7.56" Width="718.24" Height="94.5" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_1Results_ManualBuild">
         <TableColumn Name="Column34" Width="89.78"/>
         <TableColumn Name="Column35" Width="89.78"/>
@@ -951,7 +951,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_2Results" Top="690.77" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_2Results" Top="695.07" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_2Results" Top="7.56" Width="718.2" Height="94.5" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_2Results_ManualBuild">
         <TableColumn Name="Column293" Width="79.8"/>
         <TableColumn Name="Column294" Width="79.8"/>
@@ -1008,7 +1008,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_3Results" Top="794.89" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_3Results" Top="799.9" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_3Results" Top="7.56" Width="718.25" Height="94.5" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_3Results_ManualBuild">
         <TableColumn Name="Column304" Width="59.33"/>
         <TableColumn Name="Column305" Width="59.33"/>
@@ -1042,8 +1042,8 @@ namespace FastReport
           <TableCell Name="T4_3_f" Border.Lines="All" Text="&lt;i&gt;f &lt;sub&gt;j&lt;/sub&gt;, &lt;/i&gt;Гц&lt;br&gt; (&lt;i&gt;f &lt;sub&gt;j&lt;/sub&gt; / ν &lt;sub&gt;j&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;Гц / сСт)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1622" Border.Lines="All" Text="&lt;i&gt;K&lt;sub&gt; j&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;имп/м&lt;sup&gt;3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1589" Border.Lines="All" Text="№ подди-&lt;br&gt;апазона&lt;br&gt;&lt;i&gt;(k)" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1585" Border.Lines="All" Text="&lt;i&gt;Q&lt;sub&gt; k min&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;т/ч" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1557" Border.Lines="All" Text="&lt;i&gt;Q&lt;sub&gt; k max&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;т/ч" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1585" Border.Lines="All" Text="&lt;i&gt;Q&lt;sub&gt; k min&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;/ч" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1557" Border.Lines="All" Text="&lt;i&gt;Q&lt;sub&gt; k max&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;/ч" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1558" Border.Lines="All" Text="&lt;i&gt;S &lt;sub&gt;пдk&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;%" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1560" Border.Lines="All" Text="&lt;i&gt;ε &lt;sub&gt;пдk&lt;/sub&gt; ,&lt;/i&gt;&lt;br&gt;%" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1561" Border.Lines="All" Text="&lt;i&gt;Θ&lt;sub&gt; aпдk&lt;/sub&gt;,&lt;/i&gt;&lt;br&gt;%" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
@@ -1080,7 +1080,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable5Results" Top="900.9" Width="718.2" Height="113.4">
+    <DataBand Name="DataBandTable5Results" Top="906.63" Width="718.2" Height="113.4">
       <TableObject Name="Table5Results" Top="7.56" Width="718.24" Height="105.84" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table5Results_ManualBuild">
         <TableColumn Name="Column336" Width="89.78"/>
         <TableColumn Name="Column337" Width="89.78"/>
@@ -1132,7 +1132,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable6Results" Top="1016.37" Width="718.2" Height="109.62">
+    <DataBand Name="DataBandTable6Results" Top="1022.81" Width="718.2" Height="109.62">
       <TableObject Name="Table6ApproximationEquations" Top="7.56" Width="538.68" Height="102.06" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table6ApproximationEquations_ManualBuild">
         <TableColumn Name="Column356" Width="89.78"/>
         <TableColumn Name="Column357" Width="89.78"/>
@@ -1182,7 +1182,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="1128.05" Width="718.2" Height="139.86" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="1135.21" Width="718.2" Height="139.86" CanShrink="true">
       <TableObject Name="TableConclusion1" Top="7.56" Width="554.23" Height="30.24" GrowToBottom="true">
         <TableColumn Name="Column178" Width="234.36"/>
         <TableColumn Name="Column236" Width="113.4"/>
@@ -1247,7 +1247,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1269.97" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1277.85" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

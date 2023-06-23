@@ -1,12 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3288.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/18/2023 16:57:30" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3288.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/21/2023 17:54:40" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;         
-using System.Windows.Forms;          //TODO delete?
 using System.Drawing;
 using System.Data;
 using System.IO;
@@ -22,238 +21,234 @@ using TN.DocData;
 
 namespace FastReport
 {
-   public class ReportScript
-   {
-      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
-      TN.Doc.Doc doc; // данные из входного параметра
-      TN.DocData.General General;
-      TN.Doc.HeaderDoc Header;
-      TN.Doc.DataDoc SettingsData;
-      TN.Doc.FooterDoc Footer;
-      TN.Doc.DictionarysDoc Dictionarys;
-      TN.Doc.DataIVKDoc DataIVK;
+  public class ReportScript
+  {
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+    TN.Doc.Doc doc; // данные из входного параметра
+    TN.DocData.General General;
+    TN.Doc.HeaderDoc Header;
+    TN.Doc.DataDoc SettingsData;
+    TN.Doc.FooterDoc Footer;
+    TN.Doc.DictionarysDoc Dictionarys;
+    TN.Doc.DataIVKDoc DataIVK;
       
-      List &lt;TN.Doc.Table1MPR&gt; listMPR_Table1SourceData;
+    List &lt;TN.Doc.Table1MPR&gt; listMPR_Table1SourceData;
 
-      private void Page_StartPage(object sender, EventArgs e)
-      {
-         //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/31_TablePoverka3288/DocPoverka3288.json&quot;))
-         //{
-            // Read the stream as a string
-         //   Report.SetParameterValue(&quot;JsonDoc&quot;, sr.ReadToEnd());
-         //}
+    private void Page_StartPage(object sender, EventArgs e)
+    {
+      //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/31_TablePoverka3288/DocPoverka3288.json&quot;))
+      //{
+      // Read the stream as a string
+      //   Report.SetParameterValue(&quot;JsonDoc&quot;, sr.ReadToEnd());
+      //}
          
-         //// Десериализация данных (формат json) из входного параметра - Json                         
-         string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
-         Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-         settings.TypeNameHandling = TypeNameHandling.All;
+      //// Десериализация данных (формат json) из входного параметра - Json                         
+      string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+      Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+      settings.TypeNameHandling = TypeNameHandling.All;
          
-         doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
-         General = (TN.DocData.General) doc.Doc.Settings.General;
-         Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
-         SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
-         Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
-         Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
-         DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;      
+      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
+      General = (TN.DocData.General) doc.Doc.Settings.General;
+      Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
+      SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
+      Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
+      Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
+      DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;      
       
-         //// === Настройки страницы 
-         // Ширина и высота (в мм)
+      //// === Настройки страницы 
+      // Ширина и высота (в мм)
          
-         Page.PaperHeight = General.PageSettings.PaperHeight;
-         Page.PaperWidth = General.PageSettings.PaperWidth;
-         //Page.Border.Lines = BorderLines.All;
+      Page.PaperHeight = General.PageSettings.PaperHeight;
+      Page.PaperWidth = General.PageSettings.PaperWidth;
+      //Page.Border.Lines = BorderLines.All;
          
-         // Поля/отступы от краёв (в мм)
-         Page.TopMargin = General.PageSettings.TopMargin;
-         Page.BottomMargin = General.PageSettings.BottomMargin;
-         Page.LeftMargin = General.PageSettings.LeftMargin;
-         Page.RightMargin = General.PageSettings.RightMargin;
+      // Поля/отступы от краёв (в мм)
+      Page.TopMargin = General.PageSettings.TopMargin;
+      Page.BottomMargin = General.PageSettings.BottomMargin;
+      Page.LeftMargin = General.PageSettings.LeftMargin;
+      Page.RightMargin = General.PageSettings.RightMargin;
                                                                 
-         //// ==== Get Data from classes
-         listMPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_MPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
+      //// ==== Get Data from classes
+      listMPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_MPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
     
-         // Запуск отрисовки таблиц на странице отчета
-         Draw_MPR_TableHeader();    
-         Draw_MPR_TableConclusion();
+      // Запуск отрисовки таблиц на странице отчета
+      Draw_MPR_TableHeader();    
+      Draw_MPR_TableConclusion();
          
-         if (DataIVK.TablePoverka3288.Mode &gt; 3)
-         {
-            Draw_TPR_TableHeader();
-            Draw_TPR_TableConclusion();
-         }
-         else
-         {
-            DataBand_TPR_ReportTitle.Visible = false;
-            DataBand_TPR_ReportSummary.Visible = false;
-         
-         }
-      }
-      #region //Имхо лишний метод
-      private void PrintTable(TableObject table)
+      if (DataIVK.TablePoverka3288.Mode &lt; 3)
       {
-         for (int i=0;i&lt;table.RowCount;i++)
-         {       
-            table.PrintRow(i);
-            table.PrintColumns();
-         }    
-      } 
-      #endregion
+        Draw_TPR_TableHeader();
+        Draw_TPR_TableConclusion();
+      }
+      else
+      {
+        DataBand_TPR_ReportTitle.Visible = false;
+        DataBand_TPR_ReportSummary.Visible = false;
+         
+      }
+    }
+    #region //Имхо лишний метод
+    private void PrintTable(TableObject table)
+    {
+      for (int i=0;i&lt;table.RowCount;i++)
+      {       
+        table.PrintRow(i);
+        table.PrintColumns();
+      }    
+    } 
+    #endregion
       
-      //// ======================== //// ======================== //// ======================== ////
-      public void Draw_MPR_TableHeader()
-      {
-         //Setup Columns width
-         MPR_TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+    public void Draw_MPR_TableHeader()
+    {
+      //Setup Columns width
+      MPR_TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
          
-         // Fill table with data   
-         MPR_ProtokolNum.Text = string.Format(&quot;П Р О Т О К О Л  № {0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_MPR.ProtokolNum);
-         MPR_Place.Text = string.Format(&quot;СИКН №{0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_MPR.Place_SIKN_Name);
-         MPR_Sensor_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_Sensor_Type;
-         MPR_Sensor_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_Sensor_FactoryNumber;
-         MPR_LineName.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.LineName;
-         MPR_PEP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_PEP_Type;
-         MPR_PEP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_PEP_FactoryNumber;
-         MPR_CP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.CP_Type;
-         MPR_CP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.CP_FactoryNumber;
-         MPR_PP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PP_Type;
-         MPR_PP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PP_FactoryNumber;
-         MPR_PR_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PR_Type;
-         MPR_PR_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PR_FactoryNumber;
-         MPR_IVK_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.IVK_Type;
-         MPR_IVK_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.IVK_FactoryNumber;
-         MPR_OilType.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.Oil_Type;
-      }
+      // Fill table with data   
+      MPR_ProtokolNum.Text = string.Format(&quot;П Р О Т О К О Л  № {0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_MPR.ProtokolNum);
+      MPR_Place.Text = string.Format(&quot;СИКН №{0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_MPR.Place_SIKN_Name);
+      MPR_Sensor_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_Sensor_Type;
+      MPR_Sensor_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_Sensor_FactoryNumber;
+      MPR_LineName.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.LineName;
+      MPR_PEP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_PEP_Type;
+      MPR_PEP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.MPR_PEP_FactoryNumber;
+      MPR_CP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.CP_Type;
+      MPR_CP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.CP_FactoryNumber;
+      MPR_PP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PP_Type;
+      MPR_PP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PP_FactoryNumber;
+      MPR_PR_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PR_Type;
+      MPR_PR_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.PR_FactoryNumber;
+      MPR_IVK_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.IVK_Type;
+      MPR_IVK_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.IVK_FactoryNumber;
+      MPR_OilType.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.Oil_Type;
+    }
               
-      //// ======================== //// ======================== //// ======================== ////
-      private void MPR_Table1SourceData_ManualBuild(object sender, EventArgs e)
-      {
+    private void MPR_Table1SourceData_ManualBuild(object sender, EventArgs e)
+    {
          
-            //Setup Columns width
-            int sumDynamicCols=MPR_Table1SourceData.ColumnCount;
-            float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+      //Setup Columns width
+      int sumDynamicCols=MPR_Table1SourceData.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
  
-            for (int w = 0; w &lt; (MPR_Table1SourceData.ColumnCount); w++)                 
-            {
-               MPR_Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-            }      
+      for (int w = 0; w &lt; (MPR_Table1SourceData.ColumnCount); w++)                 
+      {
+        MPR_Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
                             
-            //Draw Fixed rows
-            for (int n = 0; n &lt; MPR_Table1SourceData.FixedRows; n++)
-            {
-               MPR_Table1SourceData.PrintRow(n);
-               MPR_Table1SourceData.PrintColumns();                                             
-            }
-                                                     
-            //Fill table with data
-         for (int n = 0; n &lt; (listMPR_Table1SourceData.Count); n++)
-         {
-            MPR_V0.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].V0);        
-            MPR_m_D.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].m_D);        
-            MPR_m_S.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].m_S);        
-            MPR_m_E.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].m_E);        
-            MPR_Alpha_k1.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Alpha_k1);        
-            MPR_Alpha_D.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Alpha_D);        
-            
-            MPR_Teta_Sum_0.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Teta_Sum_0);        
-            MPR_Teta_V_0.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Teta_V_0);        
-            
-            MPR_Delta_t_PU.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_t_PU);        
-            MPR_Delta_t_PP.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_t_PP);        
-            MPR_Delta_PP.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_PP);        
-            MPR_Delta_t_PR.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_t_PR);        
-            MPR_delta_PR.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_PR);        
-
-            //RowSpans
-            for (int i = 0; i &lt; (MPR_Table1SourceData.ColumnCount); i++)
-            {          
-               switch(i)
-               {
-                  case 1:
-                  case 2:
-                  case 3:  
-                  case 4:
-                  case 5:  
-                  case 8:     
-                  case 9:     
-                  case 10:     
-                  case 11:     
-                  case 12:     
-                     MPR_Table1SourceData[i,3].RowSpan =  listMPR_Table1SourceData.Count;
-                     break;  
-               }
-            }
-            MPR_Table1SourceData.PrintRow(3);     
-            MPR_Table1SourceData.PrintColumns();  
-         }                                                    
+      //Draw Fixed rows
+      for (int n = 0; n &lt; MPR_Table1SourceData.FixedRows; n++)
+      {
+        MPR_Table1SourceData.PrintRow(n);
+        MPR_Table1SourceData.PrintColumns();                                             
       }
-      
-      //// ======================== //// ======================== //// ======================== ////
-      private void MPR_Table1SourceDataEnding_ManualBuild(object sender, EventArgs e)
-      {               
-         string MPR_K_M_MF; 
-         switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
-         {
-            case 0:
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode1);
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode2);
-               MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
-               
-               break;  
-            case 1:  
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode0);
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode2);
-               MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
-               break;  
-            case 2:   
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode0);
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode1);
-               MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
-               break;  
-            default:
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode0);
-               MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode1);
-               MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust2&quot;; 
-            break;  
-         }
+                                                     
+      //Fill table with data
+      for (int n = 0; n &lt; (listMPR_Table1SourceData.Count); n++)
+      {
+        MPR_V0.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].V0);        
+        MPR_m_D.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].m_D);        
+        MPR_m_S.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].m_S);        
+        MPR_m_E.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].m_E);        
+        MPR_Alpha_k1.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Alpha_k1);        
+        MPR_Alpha_D.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Alpha_D);        
+            
+        MPR_Teta_Sum_0.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Teta_Sum_0);        
+        MPR_Teta_V_0.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Teta_V_0);        
+            
+        MPR_Delta_t_PU.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_t_PU);        
+        MPR_Delta_t_PP.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_t_PP);        
+        MPR_Delta_PP.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_PP);        
+        MPR_Delta_t_PR.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].Delta_t_PR);        
+        MPR_delta_PR.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_PR);        
 
-         //Setup Columns width
-         int sumDynamicCols=(MPR_Table1SourceDataEnding.ColumnCount);
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+        //RowSpans
+        for (int i = 0; i &lt; (MPR_Table1SourceData.ColumnCount); i++)
+        {          
+          switch(i)
+          {
+            case 1:
+            case 2:
+            case 3:  
+            case 4:
+            case 5:  
+            case 8:     
+            case 9:     
+            case 10:     
+            case 11:     
+            case 12:     
+              MPR_Table1SourceData[i,3].RowSpan =  listMPR_Table1SourceData.Count;
+              break;  
+          }
+        }
+        MPR_Table1SourceData.PrintRow(3);     
+        MPR_Table1SourceData.PrintColumns();  
+      }                                                    
+    }
+      
+    private void MPR_Table1SourceDataEnding_ManualBuild(object sender, EventArgs e)
+    {               
+      string MPR_K_M_MF; 
+      switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
+      {
+        case 0:
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode1);
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode2);
+          MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
+               
+          break;  
+        case 1:  
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode0);
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode2);
+          MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
+          break;  
+        case 2:   
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode0);
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode1);
+          MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
+          break;  
+        default:
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode0);
+          MPR_Table1SourceDataEnding.Columns.Remove(tab1_CalcMode1);
+          MPR_K_M_MF= &quot;MPR_tab1_K_M_MF_ust2&quot;; 
+          break;  
+      }
+
+      //Setup Columns width
+      int sumDynamicCols=(MPR_Table1SourceDataEnding.ColumnCount);
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
          
-         for (int w = 0; w &lt; (MPR_Table1SourceDataEnding.ColumnCount); w++)                 
-         {
-            MPR_Table1SourceDataEnding.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
+      for (int w = 0; w &lt; (MPR_Table1SourceDataEnding.ColumnCount); w++)                 
+      {
+        MPR_Table1SourceDataEnding.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
          
-         
-         //Draw Fixed rows
-         for (int n = 0; n &lt; MPR_Table1SourceDataEnding.FixedRows; n++)
-         {
-            MPR_Table1SourceDataEnding.PrintRow(n);
-            MPR_Table1SourceDataEnding.PrintColumns();                                             
-         }
+      //Draw Fixed rows
+      for (int n = 0; n &lt; MPR_Table1SourceDataEnding.FixedRows; n++)
+      {
+        MPR_Table1SourceDataEnding.PrintRow(n);
+        MPR_Table1SourceDataEnding.PrintColumns();                                             
+      }
         
-         //Selecting the Сell by name (depending on the calcMode value)
-        TableCell MPR_K_M_MF_ust = (TableCell )MPR_Table1SourceDataEnding.FindObject(MPR_K_M_MF); 
+      //Selecting the Сell by name (depending on the calcMode value)
+      TableCell MPR_K_M_MF_ust = (TableCell )MPR_Table1SourceDataEnding.FindObject(MPR_K_M_MF); 
          
-         //Fill table with data
-         for (int n = 0; n &lt; (listMPR_Table1SourceData.Count); n++)
-         {
-            MPR_delta_IVK_PU.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_IVK_PU);        
-            MPR_delta_IVK_PR.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_IVK_PR); 
-            MPR_K_PM_ust.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].K_PM_ust); 
+      //Fill table with data
+      for (int n = 0; n &lt; (listMPR_Table1SourceData.Count); n++)
+      {
+        MPR_delta_IVK_PU.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_IVK_PU);        
+        MPR_delta_IVK_PR.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_IVK_PR); 
+        MPR_K_PM_ust.Text =  tools.GetNormalizedValue(listMPR_Table1SourceData[n].K_PM_ust); 
             
-            MPR_K_M_MF_ust.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].K_M_MF_ust);        
+        MPR_K_M_MF_ust.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].K_M_MF_ust);        
             
-            MPR_Q_M_max.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].Q_M_max);        
-            MPR_ZS.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].ZS);        
-            MPR_delta_t_dop.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_t_dop);        
-            MPR_Q_nom.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].Q_nom);        
-            MPR_t_min.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].t_min);        
-            MPR_t_max.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].t_max);        
-            MPR_delta_P_dop.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_P_dop);        
-            MPR_P_min.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].P_min);        
-            MPR_P_max.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].P_max);        
+        MPR_Q_M_max.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].Q_M_max);        
+        MPR_ZS.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].ZS);        
+        MPR_delta_t_dop.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_t_dop);        
+        MPR_Q_nom.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].Q_nom);        
+        MPR_t_min.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].t_min);        
+        MPR_t_max.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].t_max);        
+        MPR_delta_P_dop.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].delta_P_dop);        
+        MPR_P_min.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].P_min);        
+        MPR_P_max.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].P_max);        
                                             
             /* TEMP 
             //RowSpans
@@ -269,594 +264,589 @@ namespace FastReport
                }
             }*/
             
-            MPR_Table1SourceDataEnding.PrintRow(3);     
-            MPR_Table1SourceDataEnding.PrintColumns();           
-         }   
-      }
-      //// ======================== //// ======================== //// ======================== ////
-      private void MPR_Table2_1Results_ManualBuild(object sender, EventArgs e)
-      {                         
-         List &lt;TN.Doc.Table2_Part1&gt; listTable2_1Results;
-         listTable2_1Results = DataIVK.TablePoverka3288.Protokol_MPR.Table2_part1.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
-         string K_MF_F_ji; 
-         
-         switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
-         {
-            case 0:
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
-               break;  
-            
-            case 1:  
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
-               break;  
-            
-            case 2:   
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
-               break;  
-            
-            case 3:   
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
-               MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
-               break;  
-         }
-         
-         K_MF_F_ji= &quot;K_MF_F_ji_2_1_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
-         
-         //Setup Columns width
-         int sumDynamicCols=MPR_Table2_1Results.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         
-         for (int w = 0; w &lt; (MPR_Table2_1Results.ColumnCount); w++)                 
-         {
-            MPR_Table2_1Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
-         
-         //Draw Fixed rows
-         for (int n = 0; n &lt; MPR_Table2_1Results.FixedRows; n++)
-         {
-            MPR_Table2_1Results.PrintRow(n);
-            MPR_Table2_1Results.PrintColumns();                                             
-         }
-         
-         //Selecting the Сell by name (depending on the calcMode value)
-         TableCell K_MF_F_ji_2_1 = (TableCell )MPR_Table2_1Results.FindObject(K_MF_F_ji); 
-         
-         //Fill table with data
-         for (int n = 0; n &lt; (listTable2_1Results.Count); n++)
-         {
-            SerRow_2_1.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_1Results[n].Ser, listTable2_1Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
-            Q_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].Q_ji);        
-            T_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].T_ji);        
-            t_PU_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].t_PU_ji);        
-            P_PU_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].P_PU_ji);        
-            t_D_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].t_D_ji);        
-            Dens_PP_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].Dens_PP_ji);        
-            DensTemp_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].DensTemp_ji);        
-            DensPress_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].DensPress_ji);        
-            Beta_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].Beta_ji);        
-            N_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].N_ji);        
-            M_0_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].M_0_ji);        
-            M_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].M_ji);        
-            K_MF_F_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].K_MF_F_ji);        
-            f_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].f_ji);        
-
-            MPR_Table2_1Results.PrintRow(3);     
-            MPR_Table2_1Results.PrintColumns();      
-         }                                                                       
-      }                                                                          
-      //// ======================== //// ======================== //// ======================== ////
-      private void MPR_Table2_2Results_ManualBuild(object sender, EventArgs e)
-      {                                                       
-         List &lt;TN.Doc.Table2_Part2&gt; listTable2_2Results;
-         listTable2_2Results=DataIVK.TablePoverka3288.Protokol_MPR.Table2_part2.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
-         string K_MF_F_ji; 
-         
-         switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
-         {
-            case 0:
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
-               break;  
-            
-            case 1:  
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
-               break;  
-            
-            case 2:   
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
-               break;  
-            
-            case 3:   
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
-               MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
-               break;  
-         }
-         
-         K_MF_F_ji= &quot;K_MF_F_ji_2_2_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
-         
-         //Setup Columns width
-         int sumDynamicCols=MPR_Table2_2Results.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         
-         for (int w = 0; w &lt; (MPR_Table2_2Results.ColumnCount); w++)                 
-         {
-            MPR_Table2_2Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
-         
-         //Draw Fixed rows
-         for (int n = 0; n &lt; MPR_Table2_2Results.FixedRows; n++)
-         {
-            MPR_Table2_2Results.PrintRow(n);
-            MPR_Table2_2Results.PrintColumns();                                             
-         }
-         
-         //Selecting the Сell by name (depending on the calcMode value)
-         TableCell K_MF_F_ji_2_2 = (TableCell )MPR_Table2_2Results.FindObject(K_MF_F_ji); 
-         
-         //Fill table with data
-         for (int n = 0; n &lt; (listTable2_2Results.Count); n++)
-         {
-            SerRow_2_2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_2Results[n].Ser, listTable2_2Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
-            Q_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Q_ji);        
-            T_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].T_ji);        
-            Q_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Q_PR_ji);        
-            t_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].t_PR_ji);        
-            P_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].P_PR_ji);     
-            K_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].K_PR_ji);     
-            N_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].N_PR_ji);        
-            
-            Dens_PP_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Dens_PP_ji);        
-            DensTemp_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].DensTemp_ji);        
-            DensPress_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].DensPress_ji);        
-            Beta_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Beta_ji);        
-            N_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].N_ji);        
-            M_0_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].M_0_ji);        
-            M_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].M_ji);        
-            K_MF_F_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].K_MF_F_ji);        
-            f_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].f_ji);        
-
-            MPR_Table2_2Results.PrintRow(3);     
-            MPR_Table2_2Results.PrintColumns();      
-         }                   
-      }
-      
-      //// ======================== //// ======================== //// ======================== ////
-      private void MPR_Table3Results_ManualBuild(object sender, EventArgs e)
-      {                                                   
-         List &lt;TN.Doc.Table3MPR&gt; listTable3Results;
-         listTable3Results = DataIVK.TablePoverka3288.Protokol_MPR.Table3.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
-         string K_MF_F_j; 
-         
-         switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
-         {
-            case 0:
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
-               break;  
-            
-            case 1:  
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
-               break;  
-            
-            case 2:   
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
-               break;  
-            
-            case 3:   
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
-               MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
-               break;  
-         }
-         
-         K_MF_F_j= &quot;MPR_K_MF_F_j_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
-         
-         //Setup Columns width
-         int sumDynamicCols=MPR_Table3Results.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         
-         for (int w = 0; w &lt; (MPR_Table3Results.ColumnCount); w++)                 
-         {
-            MPR_Table3Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
-         
-         //Draw Fixed rows
-         for (int n = 0; n &lt; MPR_Table3Results.FixedRows; n++)
-         {
-            MPR_Table3Results.PrintRow(n);
-            MPR_Table3Results.PrintColumns();                                             
-         }
-         
-         //Selecting the Сell by name (depending on the calcMode value)
-         TableCell MPR_K_MF_F_j_3 = (TableCell )MPR_Table3Results.FindObject(K_MF_F_j); 
-         
-         //Fill table with data
-         for (int n = 0; n &lt; (listTable3Results.Count); n++)
-         {
-            MPR_Point.Text =  listTable3Results[n].Point;//+ &quot; | &quot; + (n+1).ToString();
-            MPR_Q_j.Text=tools.GetNormalizedValue(listTable3Results[n].Q_j);        
-            MPR_K_MF_F_j_3.Text=tools.GetNormalizedValue(listTable3Results[n].K_MF_F_j);        
-            MPR_n_j.Text=tools.GetNormalizedValue(listTable3Results[n].n_j);        
-            MPR_S_j.Text=tools.GetNormalizedValue(listTable3Results[n].S_j);        
-            MPR_S_0_j.Text=tools.GetNormalizedValue(listTable3Results[n].S_0_j);        
-            MPR_t_095_j.Text=tools.GetNormalizedValue(listTable3Results[n].t_095_j);        
-            MPR_Epsilon_j.Text=tools.GetNormalizedValue(listTable3Results[n].Epsilon_j);        
-            MPR_f_j.Text=tools.GetNormalizedValue(listTable3Results[n].f_j);        
-            
-            MPR_Table3Results.PrintRow(3);     
-            MPR_Table3Results.PrintColumns();      
-         }         
-      }    
-      //// ======================== //// ======================== //// ======================== ////
-      private void MPR_Table4Results_ManualBuild(object sender, EventArgs e)
-      {                  
-         List &lt;TN.Doc.Table4&gt; listTable4Results;                                             
-         listTable4Results = DataIVK.TablePoverka3288.Protokol_MPR.Table4.Where(i =&gt;! i.Q_min.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Q_min) == false).ToList();
-         string K_MF_F_j; 
-         
-         switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
-         {
-            case 0:
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
-               break;  
-            
-            case 1:  
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
-               break;  
-            
-            case 2:   
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
-               break;  
-            
-            case 3:   
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
-               MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
-               break;  
-         }
-         
-         K_MF_F_j= &quot;K_MF_F_ji_4_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
-         
-         //Setup Columns width
-         int sumDynamicCols=MPR_Table4Results.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         
-         for (int w = 0; w &lt; (MPR_Table4Results.ColumnCount); w++)                 
-         {
-            MPR_Table4Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
-         
-         //Draw Fixed rows
-         for (int n = 0; n &lt; MPR_Table4Results.FixedRows; n++)
-         {
-            MPR_Table4Results.PrintRow(n);
-            MPR_Table4Results.PrintColumns();                                             
-         }
-         
-         //Selecting the Сell by name (depending on the calcMode value)
-         TableCell MPR_K_MF_F_j_4 = (TableCell )MPR_Table4Results.FindObject(K_MF_F_j); 
-         
-         //Fill table with data
-         for (int n = 0; n &lt; (listTable4Results.Count); n++)
-         {
-            Q_min_4.Text =  listTable4Results[n].Q_min;
-            Q_max_4.Text =  listTable4Results[n].Q_max;
-            MPR_K_MF_F_j_4.Text=tools.GetNormalizedValue(listTable4Results[n].K_MF_F);  
-            S_0_4.Text=tools.GetNormalizedValue(listTable4Results[n].S_0);        
-            Epsilon_4.Text=tools.GetNormalizedValue(listTable4Results[n].Epsilon);
-            Teta_A_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_A);        
-            Teta_Z_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_Z);   
-            Teta_ro_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_ro);   
-            Teta_t_PU_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_t_PU);   
-            Teta_t_PR_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_t_PR);   
-            t_P_4.Text=tools.GetNormalizedValue(listTable4Results[n].t_P);   
-            Teta_Mt_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_Mt);   
-            P_P_4.Text=tools.GetNormalizedValue(listTable4Results[n].P_P);   
-            Teta_MP_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_MP);   
-            Teta_Sum_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_Sum);   
-            delta_4.Text=tools.GetNormalizedValue(listTable4Results[n].delta);   
-            
-            MPR_Table4Results.PrintRow(3);     
-            MPR_Table4Results.PrintColumns();      
-         }         
-      }
-      private void MPR_TableGH_ManualBuild(object sender, EventArgs e)
-      {
-         List &lt;TN.Doc.TableGH&gt; listTableGH;                                             
-         listTableGH = DataIVK.TablePoverka3288.Protokol_MPR.TableGH.Where(i =&gt;! i.Point.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
-         
-         //Setup Columns width
-         int sumDynamicCols=MPR_TableGH.ColumnCount*2;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         
-         for (int w = 0; w &lt; (MPR_TableGH.ColumnCount); w++)                 
-         {
-            MPR_TableGH.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
-         
-         //Draw Fixed rows
-         for (int n = 0; n &lt; MPR_TableGH.FixedRows; n++)
-         {
-            MPR_TableGH.PrintRow(n);
-            MPR_TableGH.PrintColumns();                                             
-         }
-         
-         //Fill table with data
-         for (int n = 0; n &lt; (listTableGH.Count); n++)
-         {
-            Point_GH.Text =  listTableGH[n].Point;
-            f_j_GH.Text =  listTableGH[n].f_j;
-            K_j_GH.Text =  listTableGH[n].K_j;
-            Q_j_GH.Text =  listTableGH[n].Q_j;
-            
-            MPR_TableGH.PrintRow(3);     
-            MPR_TableGH.PrintColumns();      
-         }  
-      }
-      //// ======================== //// ======================== //// ======================== ////
-      public void  Draw_MPR_TableConclusion()
-      {                                
-         
-         // Setup Cols width    
-         MPR_TableConclusion3.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)  * Units.Millimeters;
-        
-         // Fill Table with data
-         MPR_ARM_Poverka_Result.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_Poverka_Result;
-         MPR_ARM_StaffData_fio.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_StaffData_fio;
-         MPR_DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
-            (tools.UnixTimestampToDatetime(DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_CheckDate)));               
-         PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;                         
-      }  
-      
-      //// ======================== //// ======================== //// ======================== ////
-      public void Draw_TPR_TableHeader()
-      {
-         //Setup Columns width
-         TPR_TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         TPR_ProtokolNum.Text = string.Format(&quot;П Р О Т О К О Л  № {0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_TPR.ProtokolNum);
-         
-         TPR_Place.Text = string.Format(&quot;СИКН №{0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_TPR.Place_SIKN_Name);
-         TPR_PR_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.PR_Type;
-         TPR_Place.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.PR_FactoryNumber;
-         TPR_CP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.CP_Type;
-         TPR_CP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.CP_FactoryNumber;
-         TPR_IVK_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.IVK_Type;
-         TPR_IVK_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.IVK_FactoryNumber;
-         TPR_OilType.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.Oil_Type;
-      }
-      
-                   
-      //// ======================== //// ======================== //// ======================== ////
-      private void TPR_Table1SourceData_ManualBuild(object sender, EventArgs e)
-      {
-         if (DataIVK.TablePoverka3288.Mode &gt; 3)
-         {
-            List &lt;TN.Doc.Table1TPR&gt; listTPR_Table1SourceData;
-            listTPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_TPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
-         
-            //Setup Columns width
-            int sumDynamicCols=TPR_Table1SourceData.ColumnCount;
-            float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
- 
-            for (int w = 0; w &lt; (TPR_Table1SourceData.ColumnCount); w++)                 
-            {
-               TPR_Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-            }      
-                            
-            //Draw Fixed rows
-            for (int n = 0; n &lt; TPR_Table1SourceData.FixedRows; n++)
-            {
-               TPR_Table1SourceData.PrintRow(n);
-               TPR_Table1SourceData.PrintColumns();                                             
-            }
-                                                     
-            //Fill table with data
-            for (int n = 0; n &lt; (listTPR_Table1SourceData.Count); n++)
-            {                                
-               TPR_V0.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].V0);        
-               TPR_m_D.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].m_D);        
-               TPR_m_S.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].m_S);        
-               TPR_m_E.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].m_E);        
-               TPR_Alpha_k1.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Alpha_k1);        
-               TPR_Alpha_D.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Alpha_D);        
-               TPR_Teta_Sum_0.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Teta_Sum_0);        
-               TPR_Teta_V_0.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Teta_V_0);        
-               TPR_Delta_t_PU.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Delta_t_PU);        
-               TPR_Delta_t_PR.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Delta_t_PR);        
-               TPR_delta_IVK.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].delta_IVK);        
-                                            
-               //RowSpans
-               for (int i = 0; i &lt; (TPR_Table1SourceData.ColumnCount); i++)
-               {          
-                  switch(i)
-                  {
-                     case 1:
-                     case 2:
-                     case 3:  
-                     case 4:
-                     case 5:  
-                     case 8:     
-                     case 9:     
-                     case 10:     
-                        TPR_Table1SourceData[i,3].RowSpan =  listTPR_Table1SourceData.Count;
-                        break;  
-                  }
-               }
-               TPR_Table1SourceData.PrintRow(3);     
-               TPR_Table1SourceData.PrintColumns();  
-            }     
-         }
-         else
-         {
-            DataBand_TPR_Table1SourceData.Visible=false;
-         }
-      } 
-      
-      //// ======================== //// ======================== //// ======================== ////
-      private void TPR_Table2Results_ManualBuild(object sender, EventArgs e)
-      {                
-         if (DataIVK.TablePoverka3288.Mode &gt; 3)
-         {
-            List &lt;TN.Doc.Table2&gt; listTable2Results;
-            listTable2Results = DataIVK.TablePoverka3288.Protokol_TPR.Table2.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
-
-            //Setup Columns width
-            int sumDynamicCols=TPR_Table2Results.ColumnCount;
-            float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         
-            for (int w = 0; w &lt; (TPR_Table2Results.ColumnCount); w++)                 
-            {
-               TPR_Table2Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-            }      
-         
-            //Draw Fixed rows
-            for (int n = 0; n &lt; TPR_Table2Results.FixedRows; n++)
-            {
-               TPR_Table2Results.PrintRow(n);
-               TPR_Table2Results.PrintColumns();                                             
-            }
-         
-            //Fill table with data
-            for (int n = 0; n &lt; (listTable2Results.Count); n++)
-            {
-               SerRow_2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2Results[n].Ser, listTable2Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
-               Q_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].Q_ji);        
-               T_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].T_ji);        
-               t_PU_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].t_PU_ji);        
-               P_PU_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].P_PU_ji);        
-               t_D_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].t_D_ji);        
-               Dens_PP_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].Dens_PP_ji);        
-               DensTemp_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].DensTemp_ji);        
-               DensPress_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].DensPress_ji);       
-               Beta_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].Beta_ji);        
-               t_PR_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].t_PR_ji);        
-               P_PR_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].P_PR_ji);        
-               N_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].N_ji);     
-               K_PR_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].K_PR_ji);        
-
-               TPR_Table2Results.PrintRow(3);     
-               TPR_Table2Results.PrintColumns();      
-            }        
-         }
-         else
-         {
-            DataBand_TPR_Table2Results.Visible=false;
-         
-         }
+        MPR_Table1SourceDataEnding.PrintRow(3);     
+        MPR_Table1SourceDataEnding.PrintColumns();           
       }   
-      //// ======================== //// ======================== //// ======================== ////
-      private void TPR_Table3Results_ManualBuild(object sender, EventArgs e)
-      {                   
-         if (DataIVK.TablePoverka3288.Mode &gt; 3)
-         {
-            List &lt;TN.Doc.Points&gt; listTable3Points;
-            listTable3Points = DataIVK.TablePoverka3288.Protokol_TPR.Table3.Point.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+    }
+
+    private void MPR_Table2_1Results_ManualBuild(object sender, EventArgs e)
+    {                         
+      List &lt;TN.Doc.Table2_Part1&gt; listTable2_1Results;
+      listTable2_1Results = DataIVK.TablePoverka3288.Protokol_MPR.Table2_part1.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+      string K_MF_F_ji; 
          
-            //Setup Columns width
-            int sumDynamicCols=TPR_Table3Results.ColumnCount;
-            float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         
-            for (int w = 0; w &lt; (TPR_Table3Results.ColumnCount); w++)                 
-            {
-               TPR_Table3Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-            }      
-         
-            //Draw Fixed rows
-            for (int n = 0; n &lt; TPR_Table3Results.FixedRows; n++)
-            {
-               TPR_Table3Results.PrintRow(n);
-               TPR_Table3Results.PrintColumns();                                             
-            }
-         
-            //Fill table with data
-            for (int n = 0; n &lt; (listTable3Points.Count); n++)
-            {
-               TPR_Point.Text =  listTable3Points[n].Point;//+ &quot; | &quot; + (n+1).ToString();
-               TPR_Q_j.Text=tools.GetNormalizedValue(listTable3Points[n].Q_j);        
-               TPR_K_PR_j.Text=tools.GetNormalizedValue(listTable3Points[n].K_PR_j);        
-               TPR_S_j.Text=tools.GetNormalizedValue(listTable3Points[n].S_j);        
-               TPR_n_j.Text=tools.GetNormalizedValue(listTable3Points[n].n_j);        
-               TPR_S_0_j.Text=tools.GetNormalizedValue(listTable3Points[n].S_0_j);        
-               TPR_t_095_j.Text=tools.GetNormalizedValue(listTable3Points[n].t_095_j);        
-               TPR_Epsilon_j.Text=tools.GetNormalizedValue(listTable3Points[n].Epsilon_j);  
-               TPR_Teta_t.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table3.Teta_t);        
-               TPR_Teta_Sum.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table3.Teta_Sum);
-               TPR_delta_PR_j.Text=tools.GetNormalizedValue(listTable3Points[n].delta_PR_j); 
-               TPR_delta_PR.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table3.delta_PR);        
-                                                  
-               //RowSpans
-               for (int i = 0; i &lt; (TPR_Table3Results.ColumnCount); i++)
-               {          
-                  switch(i)
-                  {
-                     case 8:     
-                     case 9:     
-                     case 11:     
-                        TPR_Table3Results[i,3].RowSpan =  listTable3Points.Count;
-                        break;  
-                  }
-               }
-               TPR_Table3Results.PrintRow(3);     
-               TPR_Table3Results.PrintColumns();      
-            }         
-         }
-         else
-         {
-            DataBand_TPR_Table3Results.Visible=false;
-         
-         }
-      }    
-      //// ======================== //// ======================== //// ======================== ////
-      public void  Draw_TPR_TableConclusion()
-      {                                
-         // Setup Cols width    
-         TPR_Conclusion_Table2.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)  * Units.Millimeters;
-        
-         // Fill Table with data
-         TPR_ARM_StaffData_fio.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.ARM_StaffData_fio;
-         TPR_DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
-            (tools.UnixTimestampToDatetime(DataIVK.TablePoverka3288.AdditionalInfo_TPR.ARM_CheckDate)));               
-         PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;                         
-      }  
-      
-      //// ======================== //// ======================== //// ======================== ////
-      //// Setup heights of the all objects on the Page
-      private void PageFooter_BeforeLayout(object sender, EventArgs e)
+      switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
-         { 
-            PageFooter.Visible = false; 
-         }
-         else
-         {
-            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         }
+        case 0:
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
+          break;  
+            
+        case 1:  
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
+          break;  
+            
+        case 2:   
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
+          break;  
+            
+        case 3:   
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
+          MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
+          break;  
       }
-   }    
+         
+      K_MF_F_ji= &quot;K_MF_F_ji_2_1_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
+         
+      //Setup Columns width
+      int sumDynamicCols=MPR_Table2_1Results.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         
+      for (int w = 0; w &lt; (MPR_Table2_1Results.ColumnCount); w++)                 
+      {
+        MPR_Table2_1Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
+         
+      //Draw Fixed rows
+      for (int n = 0; n &lt; MPR_Table2_1Results.FixedRows; n++)
+      {
+        MPR_Table2_1Results.PrintRow(n);
+        MPR_Table2_1Results.PrintColumns();                                             
+      }
+         
+      //Selecting the Сell by name (depending on the calcMode value)
+      TableCell K_MF_F_ji_2_1 = (TableCell )MPR_Table2_1Results.FindObject(K_MF_F_ji); 
+         
+      //Fill table with data
+      for (int n = 0; n &lt; (listTable2_1Results.Count); n++)
+      {
+        SerRow_2_1.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_1Results[n].Ser, listTable2_1Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
+        Q_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].Q_ji);        
+        T_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].T_ji);        
+        t_PU_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].t_PU_ji);        
+        P_PU_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].P_PU_ji);        
+        t_D_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].t_D_ji);        
+        Dens_PP_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].Dens_PP_ji);        
+        DensTemp_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].DensTemp_ji);        
+        DensPress_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].DensPress_ji);        
+        Beta_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].Beta_ji);        
+        N_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].N_ji);        
+        M_0_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].M_0_ji);        
+        M_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].M_ji);        
+        K_MF_F_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].K_MF_F_ji);        
+        f_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].f_ji);        
+
+        MPR_Table2_1Results.PrintRow(3);     
+        MPR_Table2_1Results.PrintColumns();      
+      }                                                                       
+    }                                                                          
+
+    private void MPR_Table2_2Results_ManualBuild(object sender, EventArgs e)
+    {                                                       
+      List &lt;TN.Doc.Table2_Part2&gt; listTable2_2Results;
+      listTable2_2Results=DataIVK.TablePoverka3288.Protokol_MPR.Table2_part2.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+      string K_MF_F_ji; 
+         
+      switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
+      {
+        case 0:
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
+          break;  
+            
+        case 1:  
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
+          break;  
+            
+        case 2:   
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
+          break;  
+            
+        case 3:   
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
+          break;  
+      }
+         
+      K_MF_F_ji= &quot;K_MF_F_ji_2_2_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
+         
+      //Setup Columns width
+      int sumDynamicCols=MPR_Table2_2Results.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         
+      for (int w = 0; w &lt; (MPR_Table2_2Results.ColumnCount); w++)                 
+      {
+        MPR_Table2_2Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
+         
+      //Draw Fixed rows
+      for (int n = 0; n &lt; MPR_Table2_2Results.FixedRows; n++)
+      {
+        MPR_Table2_2Results.PrintRow(n);
+        MPR_Table2_2Results.PrintColumns();                                             
+      }
+         
+      //Selecting the Сell by name (depending on the calcMode value)
+      TableCell K_MF_F_ji_2_2 = (TableCell )MPR_Table2_2Results.FindObject(K_MF_F_ji); 
+         
+      //Fill table with data
+      for (int n = 0; n &lt; (listTable2_2Results.Count); n++)
+      {
+        SerRow_2_2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_2Results[n].Ser, listTable2_2Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
+        Q_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Q_ji);        
+        T_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].T_ji);        
+        Q_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Q_PR_ji);        
+        t_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].t_PR_ji);        
+        P_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].P_PR_ji);     
+        K_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].K_PR_ji);     
+        N_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].N_PR_ji);        
+            
+        Dens_PP_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Dens_PP_ji);        
+        DensTemp_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].DensTemp_ji);        
+        DensPress_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].DensPress_ji);        
+        Beta_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Beta_ji);        
+        N_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].N_ji);        
+        M_0_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].M_0_ji);        
+        M_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].M_ji);        
+        K_MF_F_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].K_MF_F_ji);        
+        f_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].f_ji);        
+
+        MPR_Table2_2Results.PrintRow(3);     
+        MPR_Table2_2Results.PrintColumns();      
+      }                   
+    }
+      
+    private void MPR_Table3Results_ManualBuild(object sender, EventArgs e)
+    {                                                   
+      List &lt;TN.Doc.Table3MPR&gt; listTable3Results;
+      listTable3Results = DataIVK.TablePoverka3288.Protokol_MPR.Table3.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+      string K_MF_F_j; 
+         
+      switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
+      {
+        case 0:
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
+          break;  
+            
+        case 1:  
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
+          break;  
+            
+        case 2:   
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
+          break;  
+            
+        case 3:   
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
+          break;  
+      }
+         
+      K_MF_F_j= &quot;MPR_K_MF_F_j_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
+         
+      //Setup Columns width
+      int sumDynamicCols=MPR_Table3Results.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         
+      for (int w = 0; w &lt; (MPR_Table3Results.ColumnCount); w++)                 
+      {
+        MPR_Table3Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
+         
+      //Draw Fixed rows
+      for (int n = 0; n &lt; MPR_Table3Results.FixedRows; n++)
+      {
+        MPR_Table3Results.PrintRow(n);
+        MPR_Table3Results.PrintColumns();                                             
+      }
+         
+      //Selecting the Сell by name (depending on the calcMode value)
+      TableCell MPR_K_MF_F_j_3 = (TableCell )MPR_Table3Results.FindObject(K_MF_F_j); 
+         
+      //Fill table with data
+      for (int n = 0; n &lt; (listTable3Results.Count); n++)
+      {
+        MPR_Point.Text =  listTable3Results[n].Point;//+ &quot; | &quot; + (n+1).ToString();
+        MPR_Q_j.Text=tools.GetNormalizedValue(listTable3Results[n].Q_j);        
+        MPR_K_MF_F_j_3.Text=tools.GetNormalizedValue(listTable3Results[n].K_MF_F_j);        
+        MPR_n_j.Text=tools.GetNormalizedValue(listTable3Results[n].n_j);        
+        MPR_S_j.Text=tools.GetNormalizedValue(listTable3Results[n].S_j);        
+        MPR_S_0_j.Text=tools.GetNormalizedValue(listTable3Results[n].S_0_j);        
+        MPR_t_095_j.Text=tools.GetNormalizedValue(listTable3Results[n].t_095_j);        
+        MPR_Epsilon_j.Text=tools.GetNormalizedValue(listTable3Results[n].Epsilon_j);        
+        MPR_f_j.Text=tools.GetNormalizedValue(listTable3Results[n].f_j);        
+            
+        MPR_Table3Results.PrintRow(3);     
+        MPR_Table3Results.PrintColumns();      
+      }         
+    }    
+
+    private void MPR_Table4Results_ManualBuild(object sender, EventArgs e)
+    {                  
+      List &lt;TN.Doc.Table4&gt; listTable4Results;                                             
+      listTable4Results = DataIVK.TablePoverka3288.Protokol_MPR.Table4.Where(i =&gt;! i.Q_min.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Q_min) == false).ToList();
+      string K_MF_F_j; 
+         
+      switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
+      {
+        case 0:
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
+          break;  
+            
+        case 1:  
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
+          break;  
+            
+        case 2:   
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
+          break;  
+            
+        case 3:   
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
+          break;  
+      }
+         
+      K_MF_F_j= &quot;K_MF_F_ji_4_&quot; + DataIVK.TablePoverka3288.Protokol_MPR.CalcMode.ToString(); 
+         
+      //Setup Columns width
+      int sumDynamicCols=MPR_Table4Results.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         
+      for (int w = 0; w &lt; (MPR_Table4Results.ColumnCount); w++)                 
+      {
+        MPR_Table4Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
+         
+      //Draw Fixed rows
+      for (int n = 0; n &lt; MPR_Table4Results.FixedRows; n++)
+      {
+        MPR_Table4Results.PrintRow(n);
+        MPR_Table4Results.PrintColumns();                                             
+      }
+         
+      //Selecting the Сell by name (depending on the calcMode value)
+      TableCell MPR_K_MF_F_j_4 = (TableCell )MPR_Table4Results.FindObject(K_MF_F_j); 
+         
+      //Fill table with data
+      for (int n = 0; n &lt; (listTable4Results.Count); n++)
+      {
+        Q_min_4.Text =  listTable4Results[n].Q_min;
+        Q_max_4.Text =  listTable4Results[n].Q_max;
+        MPR_K_MF_F_j_4.Text=tools.GetNormalizedValue(listTable4Results[n].K_MF_F);  
+        S_0_4.Text=tools.GetNormalizedValue(listTable4Results[n].S_0);        
+        Epsilon_4.Text=tools.GetNormalizedValue(listTable4Results[n].Epsilon);
+        Teta_A_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_A);        
+        Teta_Z_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_Z);   
+        Teta_ro_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_ro);   
+        Teta_t_PU_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_t_PU);   
+        Teta_t_PR_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_t_PR);   
+        t_P_4.Text=tools.GetNormalizedValue(listTable4Results[n].t_P);   
+        Teta_Mt_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_Mt);   
+        P_P_4.Text=tools.GetNormalizedValue(listTable4Results[n].P_P);   
+        Teta_MP_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_MP);   
+        Teta_Sum_4.Text=tools.GetNormalizedValue(listTable4Results[n].Teta_Sum);   
+        delta_4.Text=tools.GetNormalizedValue(listTable4Results[n].delta);   
+            
+        MPR_Table4Results.PrintRow(3);     
+        MPR_Table4Results.PrintColumns();      
+      }         
+    }
+    
+    private void MPR_TableGH_ManualBuild(object sender, EventArgs e)
+    {
+      List &lt;TN.Doc.TableGH&gt; listTableGH;                                             
+      listTableGH = DataIVK.TablePoverka3288.Protokol_MPR.TableGH.Where(i =&gt;! i.Point.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+         
+      //Setup Columns width
+      int sumDynamicCols=MPR_TableGH.ColumnCount*2;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         
+      for (int w = 0; w &lt; (MPR_TableGH.ColumnCount); w++)                 
+      {
+        MPR_TableGH.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
+         
+      //Draw Fixed rows
+      for (int n = 0; n &lt; MPR_TableGH.FixedRows; n++)
+      {
+        MPR_TableGH.PrintRow(n);
+        MPR_TableGH.PrintColumns();                                             
+      }
+         
+      //Fill table with data
+      for (int n = 0; n &lt; (listTableGH.Count); n++)
+      {
+        Point_GH.Text =  listTableGH[n].Point;
+        f_j_GH.Text =  listTableGH[n].f_j;
+        K_j_GH.Text =  listTableGH[n].K_j;
+        Q_j_GH.Text =  listTableGH[n].Q_j;
+            
+        MPR_TableGH.PrintRow(3);     
+        MPR_TableGH.PrintColumns();      
+      }  
+    }
+
+    public void  Draw_MPR_TableConclusion()
+    {                                
+         
+      // Setup Cols width    
+      MPR_TableConclusion3.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)  * Units.Millimeters;
+        
+      // Fill Table with data
+      MPR_ARM_Poverka_Result.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_Poverka_Result;
+      MPR_ARM_StaffData_fio.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_StaffData_fio;
+      MPR_DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
+        (tools.UnixTimestampToDatetime(DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_CheckDate)));               
+      PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;                         
+    }  
+      
+    public void Draw_TPR_TableHeader()
+    {
+      //Setup Columns width
+      TPR_TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+      TPR_ProtokolNum.Text = string.Format(&quot;П Р О Т О К О Л  № {0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_TPR.ProtokolNum);
+         
+      TPR_Place.Text = string.Format(&quot;СИКН №{0}&quot;, DataIVK.TablePoverka3288.AdditionalInfo_TPR.Place_SIKN_Name);
+      TPR_PR_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.PR_Type;
+      TPR_Place.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.PR_FactoryNumber;
+      TPR_CP_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.CP_Type;
+      TPR_CP_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.CP_FactoryNumber;
+      TPR_IVK_Type.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.IVK_Type;
+      TPR_IVK_FactoryNumber.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.IVK_FactoryNumber;
+      TPR_OilType.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.Oil_Type;
+    }
+      
+    private void TPR_Table1SourceData_ManualBuild(object sender, EventArgs e)
+    {
+      if (DataIVK.TablePoverka3288.Mode &lt; 3)
+      {
+        List &lt;TN.Doc.Table1TPR&gt; listTPR_Table1SourceData;
+        listTPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_TPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
+         
+        //Setup Columns width
+        int sumDynamicCols=TPR_Table1SourceData.ColumnCount;
+        float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+ 
+        for (int w = 0; w &lt; (TPR_Table1SourceData.ColumnCount); w++)                 
+        {
+          TPR_Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+        }      
+                            
+        //Draw Fixed rows
+        for (int n = 0; n &lt; TPR_Table1SourceData.FixedRows; n++)
+        {
+          TPR_Table1SourceData.PrintRow(n);
+          TPR_Table1SourceData.PrintColumns();                                             
+        }
+                                                     
+        //Fill table with data
+        for (int n = 0; n &lt; (listTPR_Table1SourceData.Count); n++)
+        {                                
+          TPR_V0.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].V0);        
+          TPR_m_D.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].m_D);        
+          TPR_m_S.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].m_S);        
+          TPR_m_E.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].m_E);        
+          TPR_Alpha_k1.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Alpha_k1);        
+          TPR_Alpha_D.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Alpha_D);        
+          TPR_Teta_Sum_0.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Teta_Sum_0);        
+          TPR_Teta_V_0.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Teta_V_0);        
+          TPR_Delta_t_PU.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Delta_t_PU);        
+          TPR_Delta_t_PR.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].Delta_t_PR);        
+          TPR_delta_IVK.Text =  tools.GetNormalizedValue(listTPR_Table1SourceData[n].delta_IVK);        
+                                            
+          //RowSpans
+          for (int i = 0; i &lt; (TPR_Table1SourceData.ColumnCount); i++)
+          {          
+            switch(i)
+            {
+              case 1:
+              case 2:
+              case 3:  
+              case 4:
+              case 5:  
+              case 8:     
+              case 9:     
+              case 10:     
+                TPR_Table1SourceData[i,3].RowSpan =  listTPR_Table1SourceData.Count;
+                break;  
+            }
+          }
+          TPR_Table1SourceData.PrintRow(3);     
+          TPR_Table1SourceData.PrintColumns();  
+        }     
+      }
+      else
+      {
+        DataBand_TPR_Table1SourceData.Visible=false;
+      }
+    } 
+      
+    private void TPR_Table2Results_ManualBuild(object sender, EventArgs e)
+    {                
+      if (DataIVK.TablePoverka3288.Mode &lt; 3)
+      {
+        List &lt;TN.Doc.Table2&gt; listTable2Results;
+        listTable2Results = DataIVK.TablePoverka3288.Protokol_TPR.Table2.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+
+        //Setup Columns width
+        int sumDynamicCols=TPR_Table2Results.ColumnCount;
+        float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         
+        for (int w = 0; w &lt; (TPR_Table2Results.ColumnCount); w++)                 
+        {
+          TPR_Table2Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+        }      
+         
+        //Draw Fixed rows
+        for (int n = 0; n &lt; TPR_Table2Results.FixedRows; n++)
+        {
+          TPR_Table2Results.PrintRow(n);
+          TPR_Table2Results.PrintColumns();                                             
+        }
+         
+        //Fill table with data
+        for (int n = 0; n &lt; (listTable2Results.Count); n++)
+        {
+          SerRow_2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2Results[n].Ser, listTable2Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
+          Q_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].Q_ji);        
+          T_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].T_ji);        
+          t_PU_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].t_PU_ji);        
+          P_PU_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].P_PU_ji);        
+          t_D_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].t_D_ji);        
+          Dens_PP_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].Dens_PP_ji);        
+          DensTemp_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].DensTemp_ji);        
+          DensPress_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].DensPress_ji);       
+          Beta_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].Beta_ji);        
+          t_PR_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].t_PR_ji);        
+          P_PR_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].P_PR_ji);        
+          N_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].N_ji);     
+          K_PR_ji_2.Text=tools.GetNormalizedValue(listTable2Results[n].K_PR_ji);        
+
+          TPR_Table2Results.PrintRow(3);     
+          TPR_Table2Results.PrintColumns();      
+        }        
+      }
+      else
+      {
+        DataBand_TPR_Table2Results.Visible=false;
+         
+      }
+    }   
+
+    private void TPR_Table3Results_ManualBuild(object sender, EventArgs e)
+    {                   
+      if (DataIVK.TablePoverka3288.Mode &lt; 3)
+      {
+        List &lt;TN.Doc.Points&gt; listTable3Points;
+        listTable3Points = DataIVK.TablePoverka3288.Protokol_TPR.Table3.Point.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+         
+        //Setup Columns width
+        int sumDynamicCols=TPR_Table3Results.ColumnCount;
+        float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         
+        for (int w = 0; w &lt; (TPR_Table3Results.ColumnCount); w++)                 
+        {
+          TPR_Table3Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+        }      
+         
+        //Draw Fixed rows
+        for (int n = 0; n &lt; TPR_Table3Results.FixedRows; n++)
+        {
+          TPR_Table3Results.PrintRow(n);
+          TPR_Table3Results.PrintColumns();                                             
+        }
+         
+        //Fill table with data
+        for (int n = 0; n &lt; (listTable3Points.Count); n++)
+        {
+          TPR_Point.Text =  listTable3Points[n].Point;//+ &quot; | &quot; + (n+1).ToString();
+          TPR_Q_j.Text=tools.GetNormalizedValue(listTable3Points[n].Q_j);        
+          TPR_K_PR_j.Text=tools.GetNormalizedValue(listTable3Points[n].K_PR_j);        
+          TPR_S_j.Text=tools.GetNormalizedValue(listTable3Points[n].S_j);        
+          TPR_n_j.Text=tools.GetNormalizedValue(listTable3Points[n].n_j);        
+          TPR_S_0_j.Text=tools.GetNormalizedValue(listTable3Points[n].S_0_j);        
+          TPR_t_095_j.Text=tools.GetNormalizedValue(listTable3Points[n].t_095_j);        
+          TPR_Epsilon_j.Text=tools.GetNormalizedValue(listTable3Points[n].Epsilon_j);  
+          TPR_Teta_t.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table3.Teta_t);        
+          TPR_Teta_Sum.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table3.Teta_Sum);
+          TPR_delta_PR_j.Text=tools.GetNormalizedValue(listTable3Points[n].delta_PR_j); 
+          TPR_delta_PR.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table3.delta_PR);        
+                                                  
+          //RowSpans
+          for (int i = 0; i &lt; (TPR_Table3Results.ColumnCount); i++)
+          {          
+            switch(i)
+            {
+              case 8:     
+              case 9:     
+              case 11:     
+                TPR_Table3Results[i,3].RowSpan =  listTable3Points.Count;
+                break;  
+            }
+          }
+          TPR_Table3Results.PrintRow(3);     
+          TPR_Table3Results.PrintColumns();      
+        }         
+      }
+      else
+      {
+        DataBand_TPR_Table3Results.Visible=false;
+         
+      }
+    }    
+
+    public void  Draw_TPR_TableConclusion()
+    {                                
+      // Setup Cols width    
+      TPR_Conclusion_Table2.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)  * Units.Millimeters;
+        
+      // Fill Table with data
+      TPR_ARM_StaffData_fio.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.ARM_StaffData_fio;
+      TPR_DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
+        (tools.UnixTimestampToDatetime(DataIVK.TablePoverka3288.AdditionalInfo_TPR.ARM_CheckDate)));               
+      PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;                         
+    }  
+      
+    // Setup heights of the all objects on the Page
+    private void PageFooter_BeforeLayout(object sender, EventArgs e)
+    {
+      if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+      { 
+        PageFooter.Visible = false; 
+      }
+      else
+      {
+        PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+      }
+    }
+  }    
 }
 
 </ScriptText>
@@ -939,9 +929,9 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row176">
           <TableCell Name="Cell1447" Text="ПР:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1448" Text="Тип" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1448" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_PR_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="MPR_PR_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1450" Text="Зав. №" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1450" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_PR_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="MPR_PR_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row152">
@@ -961,7 +951,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBand_MPR_Table1SourceData" Top="195.54" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBand_MPR_Table1SourceData" Top="195.56" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="MPR_Table1SourceData" Top="7.56" Width="1047.01" Height="79.38" FixedRows="3" ManualBuildEvent="MPR_Table1SourceData_ManualBuild">
         <TableColumn Name="Column5" Width="78.94"/>
         <TableColumn Name="Column6" Width="78.94"/>
@@ -1038,7 +1028,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table1SourceDataEnding" Top="285.24" Width="1512" Height="94.5">
+    <DataBand Name="DataBand_MPR_Table1SourceDataEnding" Top="285.28" Width="1512" Height="94.5">
       <TableObject Name="MPR_Table1SourceDataEnding" Top="7.56" Width="1512" Height="86.94" FixedRows="3" ManualBuildEvent="MPR_Table1SourceDataEnding_ManualBuild">
         <TableColumn Name="Column244" Width="100.8"/>
         <TableColumn Name="Column245" Width="100.8"/>
@@ -1125,7 +1115,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table2_1Results" Top="382.5" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBand_MPR_Table2_1Results" Top="382.55" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="MPR_Table2_1Results" Top="7.56" Width="1512.03" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table2_1Results_ManualBuild">
         <TableColumn Name="Column158" Width="78.31"/>
         <TableColumn Name="Column159" Width="78.31"/>
@@ -1227,7 +1217,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table2_2ResultsEnding" Top="472.19" Width="1512" Height="86.94">
+    <DataBand Name="DataBand_MPR_Table2_2ResultsEnding" Top="472.27" Width="1512" Height="86.94">
       <TableObject Name="MPR_Table2_2Results" Top="7.56" Width="1512.03" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table2_2Results_ManualBuild">
         <TableColumn Name="Column219" Width="71.16"/>
         <TableColumn Name="Column228" Width="86.28"/>
@@ -1339,7 +1329,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table3Results" Top="561.89" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBand_MPR_Table3Results" Top="561.99" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="MPR_Table3Results" Top="7.56" Width="939.24" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table3Results_ManualBuild">
         <TableColumn Name="Column33" Width="81.42"/>
         <TableColumn Name="Column34" Width="81.42"/>
@@ -1411,7 +1401,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table4Results" Top="651.59" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBand_MPR_Table4Results" Top="651.71" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="MPR_Table4Results" Top="7.56" Width="1277.48" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table4Results_ManualBuild">
         <TableColumn Name="Column41" Width="68.33"/>
         <TableColumn Name="Column42" Width="68.33"/>
@@ -1518,7 +1508,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_TableGH" Top="741.29" Width="1512" Height="90.72">
+    <DataBand Name="DataBand_MPR_TableGH" Top="741.42" Width="1512" Height="90.72">
       <TableObject Name="MPR_TableGH" Top="7.56" Width="521.64" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_TableGH_ManualBuild">
         <TableColumn Name="Column327" Width="130.41"/>
         <TableColumn Name="Column328" Width="130.41"/>
@@ -1550,7 +1540,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_ReportSummary" Top="834.77" Width="1512" Height="102.06">
+    <DataBand Name="DataBand_MPR_ReportSummary" Top="834.92" Width="1512" Height="102.06">
       <TableObject Name="MPR_TableConclusion1" Top="7.56" Width="385.56" Height="37.8" GrowToBottom="true">
         <TableColumn Name="Column178" Width="215.46"/>
         <TableColumn Name="Column236" Width="170.1" AutoSize="true"/>
@@ -1588,7 +1578,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_ReportTitle" Top="939.59" Width="1512" Height="143.64">
+    <DataBand Name="DataBand_TPR_ReportTitle" Top="939.76" Width="1512" Height="143.64" StartNewPage="true" ResetPageNumber="true">
       <TableObject Name="TPR_TableHeader01" Top="7.56" Width="502.39" Height="41.58">
         <TableColumn Name="Column326" Width="502.39"/>
         <TableRow Name="Row178" Height="22.68">
@@ -1643,7 +1633,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_Table1SourceData" Top="1085.99" Width="1512" Height="86.94">
+    <DataBand Name="DataBand_TPR_Table1SourceData" Top="1086.18" Width="1512" Height="86.94">
       <TableObject Name="TPR_Table1SourceData" Top="7.56" Width="1092.96" Height="79.38" FixedRows="3" ManualBuildEvent="TPR_Table1SourceData_ManualBuild">
         <TableColumn Name="Column340" Width="97.47"/>
         <TableColumn Name="Column341" Width="97.47"/>
@@ -1710,7 +1700,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_Table2Results" Top="1175.68" Width="1512" Height="90.72">
+    <DataBand Name="DataBand_TPR_Table2Results" Top="1175.9" Width="1512" Height="90.72">
       <TableObject Name="TPR_Table2Results" Top="7.56" Width="1130.36" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TPR_Table2Results_ManualBuild">
         <TableColumn Name="Column353" Width="78.31"/>
         <TableColumn Name="Column354" Width="78.31"/>
@@ -1792,7 +1782,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_Table3Results" Top="1269.16" Width="1512" Height="94.5">
+    <DataBand Name="DataBand_TPR_Table3Results" Top="1269.39" Width="1512" Height="94.5">
       <TableObject Name="TPR_Table3Results" Top="7.56" Width="1082.88" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TPR_Table3Results_ManualBuild">
         <TableColumn Name="Column367" Width="93.39"/>
         <TableColumn Name="Column368" Width="93.39"/>
@@ -1864,7 +1854,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_ReportSummary" Top="1366.42" Width="1512" Height="71.82">
+    <DataBand Name="DataBand_TPR_ReportSummary" Top="1366.67" Width="1512" Height="71.82">
       <TableObject Name="TPR_Conclusion_Table2" Top="52.92" Width="699.41" Height="18.9">
         <TableColumn Name="Column325" Width="699.41"/>
         <TableRow Name="Row177">
@@ -1890,7 +1880,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter" Top="1441" Width="1512" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1441.27" Width="1512" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

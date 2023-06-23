@@ -160,6 +160,9 @@
     <Content Update="Cfg\CfgEditPoverka3265_UPR_PR.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="Cfg\CfgEditPoverka3288.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="Cfg\CfgPoverka3288.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
