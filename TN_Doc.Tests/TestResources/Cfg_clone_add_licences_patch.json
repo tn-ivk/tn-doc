@@ -61,12 +61,14 @@
         ],
         "Licenses": [
           {
+            "Id" : 1,
             "Use": true,
             "IdUser": 1,
             "LicensesNumber": "NumX-1243",
             "LicensesDate": "10.02.2023"
           },
           {
+            "Id" : 2,
             "Use": true,
             "IdUser": 2,
             "LicensesNumber": "NumZ-243",

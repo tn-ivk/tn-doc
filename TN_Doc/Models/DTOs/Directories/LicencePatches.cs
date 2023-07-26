@@ -12,10 +12,15 @@ namespace TN_Doc.Models.DTOs.Directories
         /// Список добавленных лицензий
         /// </summary>
         public IEnumerable<License> AddedLicenses { get; set; }
-
+        
+        /// <summary>
+        /// Список обновленных лицензий
+        /// </summary>
+        public IEnumerable<License> UpdatedLicenses { get; set; }
+        
         /// <summary>
         /// Список удаленных лицензий
         /// </summary>
-        public IEnumerable<License> DeletedLicenses { get; set; }
+        public IEnumerable<int> DeletedLicenses { get; set; }
     }
 }

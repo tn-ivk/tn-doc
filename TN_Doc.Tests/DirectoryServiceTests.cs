@@ -1,4 +1,5 @@
-﻿using TN_Doc.Models.DTOs.Directories;
+﻿using NUnit.Framework.Interfaces;
+using TN_Doc.Models.DTOs.Directories;
 using TN_Doc.Models.Services;
 using TN.DocData;
 
@@ -244,7 +245,7 @@ public class DirectoryServiceTests
     [TestCase(TestName = "#9 Патч на добавление новых лицензий.")]
     public async Task AddLicencePatchWithNormalUserIdPatchTest()
     {
-        var service = GetService("TestResources/Cfg_clone_update_user_patch.json");
+        var service = GetService("TestResources/Cfg_clone_add_licences_patch.json");
         var dict = await service.GetDirectoriesAsync();
         Assert.Multiple(() =>
         {
@@ -279,18 +280,18 @@ public class DirectoryServiceTests
             Assert.That(dictAfterPatch.Users, Is.Not.Null);
             Assert.That(dictAfterPatch.Licenses, Is.Not.Null);
             Assert.That(dictAfterPatch.UsersGroup, Is.Not.Null);
-            
+
             Assert.That(dictAfterPatch.Users.Count, Is.EqualTo(2));
             Assert.That(dictAfterPatch.UsersGroup.Count, Is.EqualTo(2));
             Assert.That(dictAfterPatch.Licenses.Count, Is.EqualTo(4));
         });
     }
-    
-    
+
+
     [TestCase(TestName = "#10 Патч на добавление новых лицензий с неизвестными пользаками.")]
     public async Task AddLicencePatchWithUnknownUserIdPatchTest()
     {
-        var service = GetService("TestResources/Cfg_clone_update_user_patch.json");
+        var service = GetService("TestResources/Cfg_clone_add_user_patch.json");
         var dict = await service.GetDirectoriesAsync();
         Assert.Multiple(() =>
         {
@@ -316,6 +317,28 @@ public class DirectoryServiceTests
             }
         };
 
+        Assert.ThrowsAsync<InvalidDataException>(async () => { await service.UpdateDictionariesAsync(patches); });
+    }
+
+    [TestCase(TestName = "#9 Патч на удаление старых лицензий.")]
+    public async Task DeleteLicencePatchPatchTest()
+    {
+        var service = GetService("TestResources/Cfg_clone_delete_lic_patch .json");
+        var dict = await service.GetDirectoriesAsync();
+        Assert.Multiple(() =>
+        {
+            Assert.That(dict, Is.Not.Null);
+            Assert.That(dict.Users, Is.Not.Null);
+            Assert.That(dict.Licenses, Is.Not.Null);
+            Assert.That(dict.UsersGroup, Is.Not.Null);
+
+            Assert.That(dict.Users.Count, Is.EqualTo(2));
+            Assert.That(dict.UsersGroup.Count, Is.EqualTo(2));
+            Assert.That(dict.Licenses.Count, Is.EqualTo(2));
+        });
+
+        var patches = new PatchDirectories() { LPatches = new LicencePatches() { DeletedLicenses = new List<int>() { 1 } } };
+
         Assert.DoesNotThrowAsync(async () => { await service.UpdateDictionariesAsync(patches); });
 
         var dictAfterPatch = await service.GetDirectoriesAsync();
@@ -325,18 +348,18 @@ public class DirectoryServiceTests
             Assert.That(dictAfterPatch.Users, Is.Not.Null);
             Assert.That(dictAfterPatch.Licenses, Is.Not.Null);
             Assert.That(dictAfterPatch.UsersGroup, Is.Not.Null);
-            
+
             Assert.That(dictAfterPatch.Users.Count, Is.EqualTo(2));
             Assert.That(dictAfterPatch.UsersGroup.Count, Is.EqualTo(2));
-            Assert.That(dictAfterPatch.Licenses.Count, Is.EqualTo(2));
+            Assert.That(dictAfterPatch.Licenses.Count, Is.EqualTo(1));
         });
     }
 
-    
-    [TestCase(TestName = "#9 Патч на добавление новых лицензий.")]
-    public async Task  DeleteLicencePatchPatchTest()
+
+    [TestCase(TestName = "#10 Патч на обновление старых лицензий довереностей.")]
+    public async Task UpdateLicencePatchTest()
     {
-        var service = GetService("TestResources/Cfg_clone_update_user_patch.json");
+        var service = GetService("TestResources/Cfg_clone_update_licences.json");
         var dict = await service.GetDirectoriesAsync();
         Assert.Multiple(() =>
         {
@@ -354,10 +377,16 @@ public class DirectoryServiceTests
         {
             LPatches = new LicencePatches()
             {
-                AddedLicenses = new List<License>()
+                UpdatedLicenses = new List<License>()
                 {
-                    new() { Use = false, IdUser = 1, LicensesDate = "10.0.2023", LicensesNumber = "1" },
-                    new() { Use = true, IdUser = 2, LicensesDate = "10.0.2023", LicensesNumber = "2 " }
+                    new()
+                    {
+                        Use = false,
+                        LicensesDate = "12.02.2019",
+                        LicensesNumber = "1",
+                        IdUser = 1,
+                        Id = 1
+                    }
                 }
             }
         };
@@ -371,83 +400,34 @@ public class DirectoryServiceTests
             Assert.That(dictAfterPatch.Users, Is.Not.Null);
             Assert.That(dictAfterPatch.Licenses, Is.Not.Null);
             Assert.That(dictAfterPatch.UsersGroup, Is.Not.Null);
-            
+
             Assert.That(dictAfterPatch.Users.Count, Is.EqualTo(2));
             Assert.That(dictAfterPatch.UsersGroup.Count, Is.EqualTo(2));
-            Assert.That(dictAfterPatch.Licenses.Count, Is.EqualTo(4));
+            Assert.That(dictAfterPatch.Licenses.Count, Is.EqualTo(2));
+        });
+
+        var lic = dictAfterPatch.Licenses.FirstOrDefault(item => item.Id == 1);
+
+        var patch = dictAfterPatch.Licenses.FirstOrDefault(item => item.Id == 1);
+        
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(lic,Is.Not.Null);
+            Assert.That(patch,Is.Not.Null);
+            Assert.That(lic!.Id,Is.EqualTo(patch!.Id));
+            Assert.That(lic!.IdUser,Is.EqualTo(patch!.IdUser));
+            Assert.That(lic!.LicensesDate,Is.EqualTo(patch!.LicensesDate));
+            Assert.That(lic!.LicensesNumber,Is.EqualTo(patch!.LicensesNumber));
         });
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     [TestCase(TestName
-        = "#x Во время применения патчей произошла ошибка. Должны быть отменены все патчи. Список словарей должен отстаться таким же как и был до применения патчей.")]
+        = "#11 Во время применения патчей произошла ошибка. Должны быть отменены все патчи. Список словарей должен отстаться таким же как и был до применения патчей.")]
     public async Task TransactionFailTest()
     {
-        var service = GetService("TestResources/Cfg_clone_add_licences_patch.json");
+        var service = GetService("TestResources/Cfg_clone_transaction_error.json");
         var dict = await service.GetDirectoriesAsync();
         Assert.Multiple(() =>
         {

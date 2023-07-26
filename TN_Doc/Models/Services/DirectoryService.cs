@@ -23,6 +23,12 @@ namespace TN_Doc.Models.Services
         private Dictionarys _cacheDirectories;
         private bool _isValidCache;
 
+        /// <summary>
+        /// Инициализация сервиса работы со словарями
+        /// </summary>
+        /// <param name="mainCfgFilePath">Путь до главной конфы приложения</param>
+        /// <param name="logger">Журнал логирования приложения</param>
+        /// <exception cref="ArgumentNullException">При отсутствие пути до главной конфигурации приложения</exception>
         public DirectoryService(string mainCfgFilePath, ILogger<DirectoryService> logger = null)
         {
             if (string.IsNullOrEmpty(mainCfgFilePath))
@@ -33,6 +39,10 @@ namespace TN_Doc.Models.Services
             _lock = new object();
         }
 
+        /// <summary>
+        /// Получение всех словарей приложения
+        /// </summary>
+        /// <returns>Список доступных справочников приложения</returns>
         public async Task<Dictionarys> GetDirectoriesAsync()
         {
             try
@@ -58,6 +68,10 @@ namespace TN_Doc.Models.Services
             }
         }
 
+        /// <summary>
+        /// Обновление словарей приложения 
+        /// </summary>
+        /// <param name="patches">Набор изменений для словарей</param>
         public async Task UpdateDictionariesAsync(PatchDirectories patches)
         {
             await Task.Run(() =>
@@ -81,6 +95,11 @@ namespace TN_Doc.Models.Services
             });
         }
 
+        /// <summary>
+        /// Применение модификаций для словаря
+        /// </summary>
+        /// <param name="patches">Набор модификаций для словарей</param>
+        /// <exception cref="InvalidDataException"> При нарушение внутренних ограничений словаря</exception>
         private void ApplyPatches(PatchDirectories patches)
         {
             if (patches == null)
@@ -94,43 +113,51 @@ namespace TN_Doc.Models.Services
             WritePatchesToJson(_cacheDirectories);
         }
 
-        [Obsolete("Не использовать. возможность редактирования групп пользователей поломает код.")]
-        private void ApplyUgPatches(UserGroupsPatches patches, Dictionarys directories)
-        {
-            if (patches == null)
-                return;
+        // [Obsolete("Не использовать. возможность редактирования групп пользователей поломает код.")]
+        // private void ApplyUgPatches(UserGroupsPatches patches, Dictionarys directories)
+        // {
+        //     if (patches == null)
+        //         return;
+        //
+        //     if (patches.DeletedUserGroups != null)
+        //     {
+        //         foreach (var patch in patches.DeletedUserGroups)
+        //             directories.UsersGroup.Remove(patch);
+        //     }
+        //
+        //     if (patches.UpdatedUserGroups != null)
+        //     {
+        //         foreach (var patch in patches.UpdatedUserGroups)
+        //         {
+        //             var item = directories.UsersGroup.FirstOrDefault(item => item.Id == patch.Id);
+        //             if (item == null)
+        //                 throw new InvalidDataException($"Группа с идентификатором {patch.Id} не обнаружена");
+        //             item.Name = patch.Name;
+        //             item.Use = patch.Use;
+        //         }
+        //     }
+        //
+        //     if (patches.AddedUserGroups != null)
+        //     {
+        //         foreach (var patch in patches.AddedUserGroups)
+        //         {
+        //             var item = directories.UsersGroup.FirstOrDefault(item => item.Id == patch.Id);
+        //             if (item != null)
+        //                 throw new InvalidDataException(
+        //                     $"Группа с идентификатором {patch.Id} обнаружена. Необходимо чтобы у группы был уникальный идентификатор");
+        //             directories.UsersGroup.Add(patch);
+        //         }
+        //     }
+        // }
 
-            if (patches.DeletedUserGroups != null)
-            {
-                foreach (var patch in patches.DeletedUserGroups)
-                    directories.UsersGroup.Remove(patch);
-            }
-
-            if (patches.UpdatedUserGroups != null)
-            {
-                foreach (var patch in patches.UpdatedUserGroups)
-                {
-                    var item = directories.UsersGroup.FirstOrDefault(item => item.Id == patch.Id);
-                    if (item == null)
-                        throw new InvalidDataException($"Группа с идентификатором {patch.Id} не обнаружена");
-                    item.Name = patch.Name;
-                    item.Use = patch.Use;
-                }
-            }
-
-            if (patches.AddedUserGroups != null)
-            {
-                foreach (var patch in patches.AddedUserGroups)
-                {
-                    var item = directories.UsersGroup.FirstOrDefault(item => item.Id == patch.Id);
-                    if (item != null)
-                        throw new InvalidDataException(
-                            $"Группа с идентификатором {patch.Id} обнаружена. Необходимо чтобы у группы был уникальный идентификатор");
-                    directories.UsersGroup.Add(patch);
-                }
-            }
-        }
-
+        /// <summary>
+        /// Применение модификаций для справочника пользователей
+        /// </summary>
+        /// <param name="patches">Набор модификаций для справочника пользователей</param>
+        /// <param name="directories">Модифицируемый словарь справочников</param>
+        /// <exception cref="InvalidDataException">Удаление: неизвестный пользователь</exception>
+        /// <exception cref="InvalidDataException">Обновление: неизвестный пользователь</exception>
+        /// <exception cref="InvalidDataException">Добавление: пользователь с данным идентификатором уже существует</exception>
         private void ApplyUPatches(UserPatches patches, Dictionarys directories)
         {
             if (patches == null)
@@ -142,7 +169,8 @@ namespace TN_Doc.Models.Services
                 {
                     var user = directories.Users.FirstOrDefault(u => u.Id == patchId);
                     if (user is null)
-                        continue;
+                        throw new InvalidDataException(
+                            $"Не удалось удалить пользователя {patchId}. Неизвестный идентификатор.");
                     directories.Users.Remove(user);
                     var licences = directories.Licenses.Where(lic => lic.IdUser == patchId);
                     foreach (var lic in licences)
@@ -180,6 +208,16 @@ namespace TN_Doc.Models.Services
             }
         }
 
+        /// <summary>
+        /// Применение патчей для словаря довереностей
+        /// </summary>
+        /// <param name="patches">Патчи для словаря</param>
+        /// <param name="directories">Модель для применения изменений</param>
+        /// <exception cref="InvalidDataException"> Удаление: неизвестный идентификатор доверености</exception>
+        /// <exception cref="InvalidDataException"> Обновление: неизвестный идентификатор доверености</exception>
+        /// <exception cref="InvalidDataException"> Обновление: неизвестный идентификатор пользователя (кроме 0)</exception>
+        /// <exception cref="InvalidDataException"> Добавление: у пользователя уже имеется такая довереность</exception>
+        /// <exception cref="InvalidDataException"> Добавление: неизвестный пользователь</exception>
         private void ApplyLPatches(LicencePatches patches, Dictionarys directories)
         {
             if (patches == null)
@@ -187,10 +225,40 @@ namespace TN_Doc.Models.Services
 
             if (patches.DeletedLicenses != null)
             {
-                foreach (var patch in patches.DeletedLicenses) 
-                    directories.Licenses.Remove(patch);
+                foreach (var patchId in patches.DeletedLicenses)
+                {
+                    var lic = directories.Licenses.FirstOrDefault(item => item.Id == patchId);
+                    if (lic is null)
+                        throw new InvalidDataException(
+                            $"Не удалось удалить довереность {patchId}. Неизвестный идентификатор.");
+                    directories.Licenses.Remove(lic);
+                }
+            }
+            
+            if (patches.UpdatedLicenses != null)
+            {
+                foreach (var patch in patches.UpdatedLicenses)
+                {
+                    var item = directories.Licenses.FirstOrDefault(item => item.Id == patch.Id);
+                    if (item == null)
+                        throw new InvalidDataException($"Довереность с идентификатором {patch.Id} не обнаружена");
+                    item.Use = patch.Use;
+                    item.LicensesNumber = patch.LicensesNumber;
+                    item.LicensesDate = patch.LicensesDate;
+
+                    if (patch.IdUser != 0)
+                    {
+                        var user = directories.Users.FirstOrDefault(user => user.Id == patch.IdUser);
+                        if (user == null)
+                            throw new InvalidDataException(
+                                $"Пользователь с идентификатором {patch.IdUser} не обнаружен. Необходимо указать идентификатор существующего пользователя или 0.");
+                    }
+                    
+                    item.IdUser = patch.IdUser;
+                }
             }
 
+            
             if (patches.AddedLicenses != null)
             {
                 foreach (var patch in patches.AddedLicenses)
@@ -198,9 +266,8 @@ namespace TN_Doc.Models.Services
                     if (patch.IdUser != 0)
                     {
                         var item = directories.Licenses.FirstOrDefault((license =>
-                            license.LicensesNumber == patch.LicensesNumber 
-                            && license.LicensesDate == patch.LicensesDate 
-                            && license.IdUser == patch.IdUser));
+                            license.LicensesNumber == patch.LicensesNumber && license.LicensesDate == patch.LicensesDate &&
+                            license.IdUser == patch.IdUser));
 
                         if (item != null)
                             throw new InvalidDataException(
@@ -211,20 +278,25 @@ namespace TN_Doc.Models.Services
                             throw new InvalidDataException(
                                 $"Пользователь с идентификатором {patch.IdUser}  не обнаружен. Необходимо указать идентификатор существующего пользователя или 0.");
                     }
+
                     directories.Licenses.Add(patch);
                 }
             }
         }
 
-        private void WritePatchesToJson(Dictionarys directories)
+        /// <summary>
+        /// Запись модифицированных словарей в JSON файл
+        /// </summary>
+        /// <param name="modifDirectories">Модифицированный список словарей</param>
+        private void WritePatchesToJson(Dictionarys modifDirectories)
         {
             var json = File.ReadAllText(_mainCfgFile.FullName);
             var jObject = JObject.Parse(json);
-            var jObjectDir = JObject.FromObject(directories);
+            var jObjectDir = JObject.FromObject(modifDirectories);
             jObject["Doc"]?["Settings"]?["Dictionarys"]?.Replace(jObjectDir);
             File.WriteAllText(_mainCfgFile.FullName, jObject.ToString(), Encoding.Default);
         }
-
+        
         /// <summary>
         /// Создание глубокой копии словарей
         /// </summary>
@@ -280,6 +352,7 @@ namespace TN_Doc.Models.Services
                 {
                     cloneDict.Licenses.Add(new License()
                     {
+                        Id = item.Id,
                         Use = item.Use,
                         IdUser = item.IdUser,
                         LicensesDate = item.LicensesDate,
@@ -295,9 +368,16 @@ namespace TN_Doc.Models.Services
             return cloneDict;
         }
 
+        /// <summary>
+        /// Создания справочника по умолчанию. Справочники создаются пустыми
+        /// </summary>
         private Dictionarys DefaultDictionarys =>
             new Dictionarys() { Licenses = new List<License>(), Users = new List<Users>(), UsersGroup = new List<UsersGroup>() };
 
+        /// <summary>
+        /// Получения справочников из файла JSON
+        /// </summary>
+        /// <returns>Справочники приложения</returns>
         private Dictionarys ExtractDictionarysToJson()
         {
             var json = File.ReadAllText(_mainCfgFile.FullName);
