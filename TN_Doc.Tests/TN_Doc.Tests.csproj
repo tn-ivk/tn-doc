@@ -30,55 +30,31 @@
       <Content Include="TestResources\Cfg_clone.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
-      <Content Include="TestResources\Cfg_clone_without_dictionaries.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <Content Update="TestResources\Cfg_clone_add_user_patch.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="TestResources\Cfg_clone_add_user_patch.json" />
-      <Content Include="TestResources\Cfg_clone_add_user_patch.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <Content Update="TestResources\Cfg_clone_delete_user_patch.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="TestResources\Cfg_clone_delete_user_patch.json" />
-      <Content Include="TestResources\Cfg_clone_delete_user_patch.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <Content Update="TestResources\Cfg_clone_update_user_patch.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="TestResources\Cfg_clone_update_user_patch.json" />
-      <Content Include="TestResources\Cfg_clone_update_user_patch.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <Content Update="TestResources\Cfg_clone_transaction_error.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="TestResources\Cfg_clone_transaction_error.json" />
-      <Content Include="TestResources\Cfg_clone_transaction_error.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <Content Update="TestResources\Cfg_clone_add_licences_patch.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="TestResources\Cfg_clone_add_licences_patch.json" />
-      <Content Include="TestResources\Cfg_clone_add_licences_patch.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <None Remove="TestResources\Cfg_clone_delete_lic_patch .json" />
-      <Content Include="TestResources\Cfg_clone_delete_lic_patch .json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <Content Update="TestResources\Cfg_clone_update_licences.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <None Remove="TestResources\Cfg_clone_update_licences.json" />
-      <Content Include="TestResources\Cfg_clone_update_licences.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
     </ItemGroup>
 
     <ItemGroup>
