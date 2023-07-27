@@ -53,6 +53,10 @@ var table = null;
 var currentId = null;
 var docTemplates = {};
 
+let appDictionaries;
+let dictFetchOptions;
+let localStorageKeys;
+
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
 (function (factory) {
@@ -71,7 +75,6 @@ var docTemplates = {};
 
 (function (datepicker) {
     "use strict";
-
     datepicker.regional.ru = {
         closeText: "Закрыть",
         prevText: "&#x3C;Пред",
@@ -98,10 +101,9 @@ var docTemplates = {};
 
 $(document).ready
 (
-        function ()
-        {
+    function () {
 
-        }
+    }
 );
 
 function InitDevices() {
@@ -171,9 +173,9 @@ function InitDocs() {
             type: "GET",
             //dataType: "json",
             data:
-            {
-                idDevice: $('#ComboboxDevice').val()
-            },
+                {
+                    idDevice: $('#ComboboxDevice').val()
+                },
             success: function (data) {
                 data.forEach((item) => {
                     $('#ComboboxDocGUID').append('<option value=' + item.id + '>' + item.name + '</option>');
@@ -205,10 +207,10 @@ function InitTemplatesDoc() {
             type: "GET",
             //dataType: "json",
             data:
-            {
-                IdDevice: $('#ComboboxDevice').val(),
-                IdDoc: $('#ComboboxDocGUID').val(),
-            },
+                {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val(),
+                },
             success: function (data) {
                 data.forEach((item) => {
                     if (item.id == id)
@@ -223,6 +225,7 @@ function InitTemplatesDoc() {
 //        SetPathTemplateDoc();
 //    });
 }
+
 function SetIdTemplateDoc() {
     $.ajax(
         {
@@ -231,13 +234,14 @@ function SetIdTemplateDoc() {
             type: "GET",
             //dataType: "json",
             data:
-            {
-                IdDevice: $('#ComboboxDevice').val(),
-                IdDoc: $('#ComboboxDocGUID').val(),
-                IdTemplateDoc: $('#ComboboxTemplateDoc').val()
-            }
+                {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val(),
+                    IdTemplateDoc: $('#ComboboxTemplateDoc').val()
+                }
         });
 }
+
 function GetIdTemplateDoc() {
     var ret = null;
 
@@ -248,12 +252,11 @@ function GetIdTemplateDoc() {
             type: "GET",
             //dataType: "json",
             data:
-            {
-                IdDevice: $('#ComboboxDevice').val(),
-                IdDoc: $('#ComboboxDocGUID').val(),
-            },
-            success: function (data)
-            {
+                {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val(),
+                },
+            success: function (data) {
                 ret = data;
             }
         });
@@ -301,10 +304,10 @@ function InitProtocolNumber() {
             url: "Home/GetListProtocolNumber",
             type: "GET",
             data:
-            {
-                IdDevice: $('#ComboboxDevice').val(),
-                IdDoc: $('#ComboboxDocGUID').val(),
-            },
+                {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val(),
+                },
             success: function (data) {
                 data.forEach((item) => {
                     $('#ComboboxProtocolNumber').append('<option value=' + item.id + '>' + item.name + '</option>');
@@ -351,20 +354,20 @@ function InitTableDocs() {
 
             ajax: function (data, callback, settings) {
                 callback
-                    (
-                        GetData()
-                    );
+                (
+                    GetData()
+                );
             },
 
             columns:
                 [
-                    { data: 'dt' },
+                    {data: 'dt'},
                     //{ data: function (data) { return moment(data.dt, "DD-MM-YYYYTHH:mm").format("DD.MM.YYYY HH:mm"); } },
-                    { data: 'description' }                    
+                    {data: 'description'}
                 ]
         });
 
-    table.on('select', function (e, dt, type, indexes) {       
+    table.on('select', function (e, dt, type, indexes) {
         if (type === 'row') {
             var id = table.rows(indexes).data().pluck('id');
             currentId = id[0];
@@ -373,16 +376,31 @@ function InitTableDocs() {
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), 1, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_OnlineReportType'), currentId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport'), true, 2, 0);
-            }
-            else {
+            } else {
                 GetDoc();
             }
         }
     });
 }
 
-function InitElement ()
-{ 
+function InitElement() {
+    dictFetchOptions = {
+        getUrl: "/direditor/getdir",
+        getMethod: "GET",
+        setUrl: "/direditor/setdir",
+        setMethod: "POST"
+    }
+    localStorageKeys = {
+        dictionariesCache: "appDict"
+    }
+
+
+    LoadAppDictionaries();
+    AddDitctionariesHandler();
+    RenderUserGroupsRowTable();
+    RenderAndAddHandlerLicencesTable();
+    RenderAndAddHandlerUserTable();
+
     InitDevices();
     InitDocs();
 
@@ -416,19 +434,17 @@ function InitElement ()
         GetDoc();
     });
 
+
 }
 
-function GetData()
-{
+function GetData() {
     var ret = null;
 
     var DTBegin = $('#DatepickerBegin').datepicker('getDate');
     var DTEnd = $('#DatepickerEnd').datepicker('getDate');
 
-    if (DTBegin == null || DTEnd == null)
-    { }
-    else
-    {
+    if (DTBegin == null || DTEnd == null) {
+    } else {
         var strDTBegin = DTBegin.getDate() + '.' + (DTBegin.getMonth() + 1) + '.' + DTBegin.getFullYear();
         var strDTEnd = DTEnd.getDate() + '.' + (DTEnd.getMonth() + 1) + '.' + DTEnd.getFullYear();
     }
@@ -441,34 +457,31 @@ function GetData()
             url: "Home/GetList",
             type: "GET",
             data:
-            {
-                IdDevice: $('#ComboboxDevice').val(),
-                IdDoc: $('#ComboboxDocGUID').val(),
-                DTBegin: strDTBegin,
-                DTEnd: strDTEnd
+                {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val(),
+                    DTBegin: strDTBegin,
+                    DTEnd: strDTEnd
+                },
+            beforeSend: function (data) {
             },
-            beforeSend: function (data) { },
-            success: function (data)
-            {
+            success: function (data) {
                 //var table = $('#example');
                 //table.data = data.tableReport;
                 //table.ajax.reload();
 
                 ret = data;
             },
-            error: function (xhr, ajaxOptions, thrownError)
-            {
-               // alert("Ошибка!");
+            error: function (xhr, ajaxOptions, thrownError) {
+                // alert("Ошибка!");
             },
-            complete: function (data)
-            {
+            complete: function (data) {
                 if ($('#ComboboxDocGUID').val() == 0 ||
                     $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
                     $('#ButtonReview').prop('disabled', true);
                     $('#ButtonEdit').prop('disabled', true);
-                }
-                else {
+                } else {
                     $('#ButtonSave').prop('disabled', false);
                     $('#ButtonReview').prop('disabled', false);
                     $('#ButtonEdit').prop('disabled', false);
@@ -476,13 +489,12 @@ function GetData()
             }
         });
 
-    var data = { "data": ret };
+    var data = {"data": ret};
 
     return data;
 }
 
-function GetDoc()
-{
+function GetDoc() {
     $('.FR').attr('src', '');
 
     //var x = 10;// Math.random() * 10;
@@ -509,8 +521,7 @@ function GetDoc()
                 id: currentId,
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
-            success: function (data)
-            {
+            success: function (data) {
                 //$('.FR').each(function () {
                 //    //#toolbar=0&view=FitH
                 //    $(this).attr('src', '/PDF/PDF.pdf');
@@ -518,7 +529,7 @@ function GetDoc()
 
                 //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&id=' + x);
                 $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
-                
+
                 //PDFObject.embed("/PDF/PDF.pdf", ".FR");                
             },
         });
@@ -550,8 +561,7 @@ function GetEditDoc() {
         });
 }
 
-function SaveDoc()
-{
+function SaveDoc() {
     document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
         $('#ComboboxDevice :selected').text(),
         $('#ComboboxDevice').val(),
@@ -589,8 +599,7 @@ function ExportDoc() {
         });
 }
 
-function GetValueCombobox()
-{
+function GetValueCombobox() {
     //var obj = $("#Combobox :selected").text();
     var obj = $('#Combobox').val()
     return obj;
@@ -635,3 +644,193 @@ function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray 
 function GetFullNameTag(tagName) {
     return PrefixTag + '.' + tagName;
 }
+
+
+/***********************************/
+
+
+/*
+* Загрузка словарей приложения. Словари поступают в формате json.
+* Сами словари хранятся в поле 'dirJsonRaw' (datas['dirJsonRawS']).
+* Словари сохраняются в объекте 'appDictionaries'.
+* В случае появления ошибки 'appDictionaries' инициализруется пустым объектом
+* ,а в консоль пишется ошибка
+*  Дополнительно словари записываются в локальное хранилище
+* */
+function LoadAppDictionaries() {
+    let dictStr = localStorage.getItem(localStorageKeys.dictionariesCache)
+
+    if (dictStr) {
+        appDictionaries = JSON.parse(dictStr);
+        return;
+    }
+
+    $.ajax({
+        async: false,
+        url: dictFetchOptions.getUrl,
+        type: dictFetchOptions.getMethod,
+        success: function (data) {
+            appDictionaries = JSON.parse(data['dirJsonRaw'])
+            localStorage.setItem(localStorageKeys.dictionariesCache, data['dirJsonRaw'])
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.error(thrownError);
+            appDictionaries = {};
+            localStorage.removeItem(localStorageKeys.dictionariesCache)
+        }
+    })
+}
+
+/*
+* Добавление обработчика событий для словарей
+*/
+function AddDitctionariesHandler() {
+
+    document.querySelector('#dictionaries-list').addEventListener('click', function (e) {
+        let element = e.target;
+        if (element.classList.contains('active')) return;
+        let elements = document.querySelectorAll('.list-group-item')
+        for (let item of elements) {
+            if (item.classList.contains('active'))
+                item.classList.remove('active');
+        }
+        element.classList.add('active');
+        document.querySelectorAll('.dir-item').forEach(function (item) {
+            if (!item.classList.contains('d-none'))
+                item.classList.add('d-none')
+        });
+        let elementId = element.dataset.type;
+        if (elementId) {
+            document.querySelector(elementId).classList.remove('d-none')
+        }
+    });
+}
+
+/*
+* Отрисовка таблицы для групп пользователей
+*/
+function RenderUserGroupsRowTable() {
+    let counter = 1;
+    let table = document.querySelector('.user-group-table');
+    for (let userGroup of appDictionaries['UsersGroup']) {
+        let row = document.createElement('tr');
+        let countTd = document.createElement('td');
+        countTd.innerText = counter.toString();
+        let idTd = document.createElement('td');
+        idTd.innerText = userGroup['Id'].toString();
+        let usedSquare = document.createElement('i')
+        usedSquare.classList.add('fa');
+        usedSquare.classList.add(userGroup['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        usedSquare.ariaHidden = true;
+        let usedTd = document.createElement('td');
+        usedTd.appendChild(usedSquare);
+        let nameTD = document.createElement('td');
+        nameTD.innerText = userGroup['Name'].toString();
+        row.appendChild(countTd);
+        row.appendChild(idTd);
+        row.appendChild(usedTd);
+        row.appendChild(nameTD);
+        table.append(row)
+        counter++;
+    }
+}
+
+/*
+* Отрисовка таблицы для довереностей.
+* Дополнительно
+*/
+function RenderAndAddHandlerLicencesTable() {
+    let counter = 1;
+    let table = document.querySelector('.licences-table');
+    for (let licences of appDictionaries['Licenses']) {
+        let row = document.createElement('tr')
+
+        let countTd = document.createElement('td');
+        countTd.innerText = counter.toString();
+        row.appendChild(countTd);
+
+        let idTd = document.createElement('td');
+        idTd.innerText = licences['Id'];
+        row.appendChild(idTd);
+
+        let usedSquare = document.createElement('i')
+        usedSquare.classList.add('fa');
+        usedSquare.classList.add(licences['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        usedSquare.ariaHidden = true;
+        let usedTd = document.createElement('td');
+        usedTd.appendChild(usedSquare);
+        row.appendChild(usedTd);
+
+        let numberTd = document.createElement('td');
+        numberTd.innerText = licences['LicensesNumber'];
+        row.appendChild(numberTd);
+
+        let dateTd = document.createElement('td');
+        dateTd.innerText = licences['LicensesDate'];
+        row.appendChild(dateTd);
+
+        table.append(row)
+        counter++;
+    }
+
+}
+
+/*
+* Отрисовка таблицы пользователей.
+*/
+function RenderAndAddHandlerUserTable() {
+    let counter = 1;
+    let table = document.querySelector('.users-table');
+    let usersGroups =appDictionaries['UsersGroup'];
+    console.log(usersGroups);
+    for (let user of appDictionaries['Users']) {
+        
+        let row = document.createElement('tr')
+
+        let countCell = document.createElement('td');
+        countCell.innerText = counter.toString();
+        row.appendChild(countCell);
+
+        let idCell = document.createElement('td');
+        idCell.innerText = user['Id'];
+        row.appendChild(idCell);
+
+        let usedSquare = document.createElement('i')
+        usedSquare.classList.add('fa');
+        usedSquare.classList.add(user['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        usedSquare.ariaHidden = true;
+        let usedCell = document.createElement('td');
+        usedCell.appendChild(usedSquare);
+        row.appendChild(usedCell);
+        
+        let groupNameCell = document.createElement('td');
+        groupNameCell.innerText = usersGroups.filter(group => group['Id'] === user['IdGroup'])[0]['Name'];
+        row.appendChild(groupNameCell);
+
+        let surnameCell = document.createElement('td');
+        surnameCell.innerText = user.F;
+        row.appendChild(surnameCell);
+
+        let nameCell = document.createElement('td');
+        nameCell.innerText = user.I;
+        row.appendChild(nameCell);
+
+        let patronymicCell = document.createElement('td');
+        patronymicCell.innerText = user.O;
+        row.appendChild(patronymicCell);
+
+        let organizationCell = document.createElement('td');
+        organizationCell.innerText = user['Factory'];
+        row.appendChild(organizationCell);
+
+        let postCell = document.createElement('td');
+        postCell.innerText = user['Post'];
+        row.appendChild(postCell);
+
+        table.append(row)
+        counter++;
+    }
+}
+
+
+/***********************************/
