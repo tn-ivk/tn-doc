@@ -1,35 +1,4 @@
-﻿//function UpdateData()
-//{
-//    $.ajax(
-//        {
-//            url: 'Home/Test',
-//            type: 'post',
-//            success:
-//                function (data)
-//                {
-//                    if (data == '1')
-//                        location.reload();
-//                },
-//            complete:
-//                function (data)
-//                {
-//                    setTimeout(UpdateData, 5000);
-//                }
-//        });
-//}
-
-//function as()
-//{
-//    alert('Проверка')
-//}
-
-//$(document).ready(function ()
-//{
-//    as();
-//    setTimeout(UpdateData, 5000);
-//});
-
-const hubConnection = new signalR.HubConnectionBuilder()
+﻿const hubConnection = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:5010/SignalRApp")
     //.WithAutomaticReconnect()
     .build();
@@ -648,7 +617,6 @@ function GetFullNameTag(tagName) {
 
 /***********************************/
 
-
 /*
 * Загрузка словарей приложения. Словари поступают в формате json.
 * Сами словари хранятся в поле 'dirJsonRaw' (datas['dirJsonRawS']).
@@ -710,86 +678,83 @@ function AddDitctionariesHandler() {
 * Отрисовка таблицы для групп пользователей
 */
 function RenderUserGroupsRowTable() {
-    let counter = 1;
     let table = document.querySelector('.user-group-table');
     for (let userGroup of appDictionaries['UsersGroup']) {
         let row = document.createElement('tr');
-        let countTd = document.createElement('td');
-        countTd.innerText = counter.toString();
+        row.classList.add('data-row')
+
         let idTd = document.createElement('td');
         idTd.innerText = userGroup['Id'].toString();
+        row.appendChild(idTd);
+
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(userGroup['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
         usedSquare.ariaHidden = true;
         let usedTd = document.createElement('td');
         usedTd.appendChild(usedSquare);
+        row.appendChild(usedTd);
+
         let nameTD = document.createElement('td');
         nameTD.innerText = userGroup['Name'].toString();
-        row.appendChild(countTd);
-        row.appendChild(idTd);
-        row.appendChild(usedTd);
         row.appendChild(nameTD);
+
         table.append(row)
-        counter++;
     }
 }
 
 /*
 * Отрисовка таблицы для довереностей.
-* Дополнительно
+* Дополнительно добавляются обработчики на кнопки
 */
 function RenderAndAddHandlerLicencesTable() {
-    let counter = 1;
     let table = document.querySelector('.licences-table');
     for (let licences of appDictionaries['Licenses']) {
         let row = document.createElement('tr')
+        row.classList.add('data-row')
 
-        let countTd = document.createElement('td');
-        countTd.innerText = counter.toString();
-        row.appendChild(countTd);
-
-        let idTd = document.createElement('td');
-        idTd.innerText = licences['Id'];
-        row.appendChild(idTd);
+        let idCell = document.createElement('td');
+        row.dataset.id = licences['Id'];
+        idCell.innerText = licences['Id'];
+        row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(licences['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
         usedSquare.ariaHidden = true;
-        let usedTd = document.createElement('td');
-        usedTd.appendChild(usedSquare);
-        row.appendChild(usedTd);
+        let usedCell = document.createElement('td');
+        usedCell.appendChild(usedSquare);
+        row.appendChild(usedCell);
 
-        let numberTd = document.createElement('td');
-        numberTd.innerText = licences['LicensesNumber'];
-        row.appendChild(numberTd);
+        let numberCell = document.createElement('td');
+        numberCell.innerText = licences['LicensesNumber'];
+        row.appendChild(numberCell);
 
-        let dateTd = document.createElement('td');
-        dateTd.innerText = licences['LicensesDate'];
-        row.appendChild(dateTd);
+        let dateCell = document.createElement('td');
+        dateCell.innerText = licences['LicensesDate'];
+        row.appendChild(dateCell);
 
+        let actionCell = document.createElement('td');
+        actionCell.appendChild(CreateEditLicensesButton('fa:fa-lock:edit-licences-btn', 'btn:btn-outline-primary:edit-licences-btn', '5px', 'Licenses'));
+        actionCell.appendChild(CreateDeleteButton('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Licenses'));
+        row.appendChild(actionCell);
         table.append(row)
-        counter++;
     }
 
 }
+
 
 /*
 * Отрисовка таблицы пользователей.
 */
 function RenderAndAddHandlerUserTable() {
-    let counter = 1;
     let table = document.querySelector('.users-table');
-    let usersGroups =appDictionaries['UsersGroup'];
+    let usersGroups = appDictionaries['UsersGroup'];
     console.log(usersGroups);
     for (let user of appDictionaries['Users']) {
-        
-        let row = document.createElement('tr')
 
-        let countCell = document.createElement('td');
-        countCell.innerText = counter.toString();
-        row.appendChild(countCell);
+        let row = document.createElement('tr')
+        row.classList.add('data-row')
 
         let idCell = document.createElement('td');
         idCell.innerText = user['Id'];
@@ -802,7 +767,7 @@ function RenderAndAddHandlerUserTable() {
         let usedCell = document.createElement('td');
         usedCell.appendChild(usedSquare);
         row.appendChild(usedCell);
-        
+
         let groupNameCell = document.createElement('td');
         groupNameCell.innerText = usersGroups.filter(group => group['Id'] === user['IdGroup'])[0]['Name'];
         row.appendChild(groupNameCell);
@@ -828,9 +793,288 @@ function RenderAndAddHandlerUserTable() {
         row.appendChild(postCell);
 
         table.append(row)
-        counter++;
     }
 }
 
+/*
+*  Создает кнопку только с рисунками.
+*  Присваивает указанные классы.
+*  Если необходимо присвоить множество классов, то их необходимо разделять  ':'
+*/
+function CreateWithOnlyImgButton(faClass, buttonClass, margin) {
+
+    let img = document.createElement('i');
+    AddClassToElement(faClass, img)
+    img.ariaHidden = true;
+    img.style.fontSize = '1.5em'
+    let btn = document.createElement('button')
+    AddClassToElement(buttonClass, btn)
+    btn.appendChild(img);
+    btn.style.margin = margin;
+    btn.style.alignSelf = 'center';
+    return btn;
+    function AddClassToElement(classes, element) {
+        if (!classes) return;
+        let elClasses = classes.split(':');
+        for (let cl of elClasses) {
+            if (!cl) continue;
+            element.classList.add(cl);
+        }
+    }
+
+}
+
+/*
+* Создание кнопки удаления из списка
+*/
+function CreateDeleteButton(faClass, buttonClass, margin, arrayName) {
+
+    let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.addEventListener('click', function (e) {
+        if (!e.target.classList.contains('delete-btn'))
+            return;
+        let rowItem = e.target.closest('tr');
+        let itemId = Number(rowItem.dataset.id);
+        if (!itemId)
+            return;
+        appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
+            return item['Id'] !== itemId;
+        })
+        rowItem.remove();
+    });
+    return btn
+}
+
+/*
+* Создание кнопки редактирования для доверенностей
+*/
+function CreateEditLicensesButton(faClass, buttonClass, margin, arrayName) {
+    let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.dataset.mode = 'stable';
+    btn.addEventListener('click', function (e) {
+        let itemBtn;
+        if (e.target.tagName === 'I') {
+            itemBtn = e.target.closest('button')
+        } else {
+            itemBtn = e.target;
+        }
+        let rowItem = itemBtn.closest('tr')
+        let itemId = Number(rowItem.dataset.id);
+        if (!itemId) return;
+        let rowMap = {
+            0: 'ignore',
+            1: 'bool',
+            2: 'text',
+            3: 'date',
+            4: 'ignore'
+        }
+        if (itemBtn.dataset.mode === 'stable') {
+            DisableClosestDeleteBtn(itemId)
+            DisableListDictionaries()
+            DisableSaveButton();
+            DisableCloseButton();
+            DisableOtherTableRows(itemId, 'licences-table');
+            ConvertStableRowToEditRow(rowItem, rowMap)
+            ChangeButtonIcon(itemBtn,'fa-unlock','fa-lock');
+            itemBtn.dataset.mode = 'edit';
+        } else if (itemBtn.dataset.mode === 'edit') {
+            ChangeButtonIcon(itemBtn,'fa-lock','fa-unlock');
+            ConvertEditRowToStableRow(rowItem, rowMap)
+            EnableClosestDeleteBtn(itemId)
+            EnableListDictionaries();
+            EnableSaveButton();
+            EnableCloseButton();
+            EnableOtherTableRows(itemId, 'licences-table');
+            itemBtn.dataset.mode = 'stable';
+        }
+    });
+    return btn
+}
+
+/*
+* Изменение иконки 
+*/
+function ChangeButtonIcon(itemBtn, newClass, oldClass) {
+    itemBtn.querySelector('i').classList.replace(oldClass, newClass);
+}
+
+/*
+* Конверитирование ячейки редактирования в ячейку стабильную 
+*/
+function ConvertEditRowToStableRow(row, rowMap) {
+    let cells = row.querySelectorAll('td');
+    for (let i = 0; i < cells.length; i++) {
+        ConvertEditCellToStableCell(cells[i], rowMap[i]);
+    }
+}
+
+/*
+* Конверитирование ячейки редактирования в ячейку стабильную 
+*/
+function ConvertEditCellToStableCell(cell, type) {
+    if (!type || !cell) return;
+    let previewNode = cell.childNodes[0];
+    switch (type) {
+        case 'bool':
+            let image = document.createElement('i');
+            image.classList.add('fa');
+            image.classList.add(previewNode.checked ? 'fa-check-square-o' : 'fa-square-o')
+            cell.replaceChild(image, cell.childNodes[0])
+            break;
+        case 'text':
+            let newTextNode = document.createTextNode(previewNode.value);
+            cell.replaceChild(newTextNode, cell.childNodes[0])
+            break;
+        case 'date':
+            let date = $('.calendar').datepicker('getDate');
+            let dayStr = date.getDate().toString();
+            let month = date.getMonth() + 1;
+            let monthStr = month < 9 ? `0${date.getMonth() + 1}` : month.toString();
+            let yearStr = date.getFullYear().toString();
+            let newDateText = document.createTextNode(dayStr + '.' + monthStr + '.' + yearStr);
+            cell.replaceChild(newDateText, cell.childNodes[0])
+            break;
+        default:
+            break
+    }
+}
+
+/*
+* Конверитирование стабильной строки в строку для редактирования
+*/
+function ConvertStableRowToEditRow(row, rowMap) {
+
+    let cells = row.querySelectorAll('td');
+    for (let i = 0; i < cells.length; i++) {
+        ConvertStableCellToEditCell(cells[i], rowMap[i])
+    }
+}
+
+/*
+* Конверитирование стабильной ячейки в ячейку для редактирования
+*/
+function ConvertStableCellToEditCell(cell, type) {
+    if (!type || !cell) return;
+    let newElement = document.createElement('input');
+    let previewNode = cell.childNodes[0];
+    switch (type) {
+        case 'bool':
+            let innerImage = cell.querySelector('i');
+            if (!innerImage)
+                return;
+            newElement.type = 'checkbox';
+            newElement.checked = innerImage.classList.contains('fa-check-square-o');
+            cell.replaceChild(newElement, cell.childNodes[0])
+            break;
+        case 'text':
+            let prText = cell.innerText;
+            newElement.type = 'text';
+            newElement.value = prText;
+            cell.replaceChild(newElement, previewNode)
+            break;
+        case 'date':
+            let prDate = new Date(moment(cell.innerText, 'DD.MM.YYYY').format())
+            newElement.classList.add('calendar');
+            cell.replaceChild(newElement, previewNode);
+            $('.calendar').datepicker({dateFormat: 'dd.mm.yy'});
+            $('.calendar').datepicker('setDate', prDate);
+            break;
+        default:
+            break
+    }
+
+
+}
+
+/*
+* Отключение  других строк
+*/
+function DisableOtherTableRows(ignoredItemId, tableClass) {
+    for (let t of document.querySelectorAll('.dir-item > .table')) {
+        if (!t.classList.contains(tableClass)) {
+            t.classList.add('disabled-item')
+            continue;
+        }
+        t.querySelectorAll('tr.data-row').forEach(row => {
+            if (Number(row.dataset.id) === ignoredItemId) return;
+            row.classList.add('disabled-item');
+        });
+
+    }
+}
+
+/*
+* Включение других строк
+*/
+function EnableOtherTableRows(ignoredItemId, tableClass) {
+    for (let t of document.querySelectorAll('.dir-item > .table')) {
+
+        if (!t.classList.contains(tableClass)) {
+            t.classList.remove('disabled-item')
+            continue;
+        }
+        t.querySelectorAll('tr.data-row').forEach(row => {
+            if (Number(row.dataset.id) === ignoredItemId) return;
+            row.classList.remove('disabled-item');
+        });
+
+    }
+}
+
+/*
+* Отключение кнопки сохранения
+*/
+function DisableSaveButton() {
+    document.querySelector('.save-btn').classList.add('disabled-item');
+}
+
+/*
+* Включение кнопки сохранения
+*/
+function EnableSaveButton() {
+    document.querySelector('.save-btn').classList.remove('disabled-item');
+}
+
+/*
+* Отключение кнопки закрытия окошка
+*/
+function DisableCloseButton() {
+    document.querySelector('.close').classList.add('disabled-item');
+}
+
+/*
+* Включение  кнопки закрытия окошка
+*/
+function EnableCloseButton() {
+    document.querySelector('.close').classList.remove('disabled-item');
+}
+
+/*
+* Отключение ближайшей кнопки удаления строки 
+*/
+function DisableListDictionaries() {
+    document.querySelector('#dictionaries-list').classList.add('disabled-item');
+}
+
+/*
+* Включение списка выбора словарей
+*/
+function EnableListDictionaries() {
+    document.querySelector('#dictionaries-list').classList.remove('disabled-item');
+}
+
+/*
+* Отключение ближайшей кнопки удаления строки 
+*/
+function DisableClosestDeleteBtn(itemId) {
+    document.querySelector('tr[data-id="' + itemId + '"] td button.delete-btn').classList.add('disabled-item');
+}
+
+/*
+* Включение ближайшей кнопки удаления строки 
+*/
+function EnableClosestDeleteBtn(itemId) {
+    document.querySelector('tr[data-id="' + itemId + '"] td button.delete-btn').classList.remove('disabled-item');
+}
 
 /***********************************/
