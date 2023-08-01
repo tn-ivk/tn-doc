@@ -1223,12 +1223,14 @@ function AddSaveButtonHandler() {
     })
 }
 
+/* Отключение активности у всех элементов у компонента редактирования справочников*/
 function DisableAllElementToDirEdit() {
     AddClassToElement('.close', 'disabled-item');
     AddClassToElement('.modal-body', 'disabled-item');
     AddClassToElement('.modal-footer','disabled-item');
 }
 
+/* Включение активности у всех элементов у компонента редактирования справочников*/
 function EnableAllElementToDirEdit() {
     RemoveClassToElement('.modal-body', 'disabled-item')
     RemoveClassToElement('.modal-footer','disabled-item');
