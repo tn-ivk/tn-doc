@@ -359,16 +359,18 @@ function InitElement() {
         setUrl: "/direditor/setdir",
         setMethod: "POST"
     }
+
     localStorageKeys = {
         dictionariesCache: "appDict"
     }
-
 
     LoadAppDictionaries();
     AddDitctionariesHandler();
     RenderUserGroupsRowTable();
     RenderAndAddHandlerLicencesTable();
     RenderAndAddHandlerUserTable();
+    AddLicHandler();
+    AddSaveButtonHandler();
 
     InitDevices();
     InitDocs();
@@ -743,14 +745,12 @@ function RenderAndAddHandlerLicencesTable() {
 
 }
 
-
 /*
 * Отрисовка таблицы пользователей.
 */
 function RenderAndAddHandlerUserTable() {
     let table = document.querySelector('.users-table');
     let usersGroups = appDictionaries['UsersGroup'];
-    console.log(usersGroups);
     for (let user of appDictionaries['Users']) {
 
         let row = document.createElement('tr')
@@ -813,6 +813,7 @@ function CreateWithOnlyImgButton(faClass, buttonClass, margin) {
     btn.style.margin = margin;
     btn.style.alignSelf = 'center';
     return btn;
+
     function AddClassToElement(classes, element) {
         if (!classes) return;
         let elClasses = classes.split(':');
@@ -861,34 +862,103 @@ function CreateEditLicensesButton(faClass, buttonClass, margin, arrayName) {
         let rowItem = itemBtn.closest('tr')
         let itemId = Number(rowItem.dataset.id);
         if (!itemId) return;
-        let rowMap = {
-            0: 'ignore',
-            1: 'bool',
-            2: 'text',
-            3: 'date',
-            4: 'ignore'
-        }
-        if (itemBtn.dataset.mode === 'stable') {
-            DisableClosestDeleteBtn(itemId)
-            DisableListDictionaries()
-            DisableSaveButton();
-            DisableCloseButton();
-            DisableOtherTableRows(itemId, 'licences-table');
-            ConvertStableRowToEditRow(rowItem, rowMap)
-            ChangeButtonIcon(itemBtn,'fa-unlock','fa-lock');
-            itemBtn.dataset.mode = 'edit';
-        } else if (itemBtn.dataset.mode === 'edit') {
-            ChangeButtonIcon(itemBtn,'fa-lock','fa-unlock');
-            ConvertEditRowToStableRow(rowItem, rowMap)
-            EnableClosestDeleteBtn(itemId)
-            EnableListDictionaries();
-            EnableSaveButton();
-            EnableCloseButton();
-            EnableOtherTableRows(itemId, 'licences-table');
-            itemBtn.dataset.mode = 'stable';
-        }
+        EditSelectedLicences(itemBtn, rowItem, itemId)
     });
     return btn
+}
+
+/*
+* Редактирование выбранной доверенности в таблице.
+* @param itemBtn - кнопка по которой нажали. Кнопка должна находиться в редактируемой строке  таблице.
+* @param rowItem - редактируемая строка в таблице.
+* @param itemId - id объекта в массиве .
+*/
+function EditSelectedLicences(itemBtn, rowItem, itemId) {
+    let rowMap = {
+        0: 'ignore',
+        1: 'bool',
+        2: 'text',
+        3: 'date',
+        4: 'ignore'
+    }
+    if (itemBtn.dataset.mode === 'stable') {
+        AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+        AddClassToElement('#dictionaries-list', 'disabled-item');
+        AddClassToElement('.save-btn', 'disabled-item');
+        AddClassToElement('.close', 'disabled-item');
+        AddClassToElement('.table-bottom-menu', 'disabled-item')
+        DisableOtherTableRows(itemId, 'licences-table');
+        ConvertStableRowToEditRow(rowItem, rowMap)
+        ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+        itemBtn.dataset.mode = 'edit';
+    } else if (itemBtn.dataset.mode === 'edit') {
+        if (!ValidateEditRow(rowItem, rowMap))
+            return;
+
+        ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
+        ConvertEditRowToStableRow(rowItem, rowMap)
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item')
+        RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
+        RemoveClassToElement('#dictionaries-list', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('.close', 'disabled-item');
+        ApplyLicenceChanges(rowItem, itemId)
+        EnableOtherTableRows(itemId, 'licences-table');
+        itemBtn.dataset.mode = 'stable';
+    }
+}
+
+/*
+* Применение изменений довереность 
+* @param rowItem - отредкатированная строка
+* @param itemId - id доверености
+*/
+function ApplyLicenceChanges(rowItem, itemId) {
+    if (!rowItem || !itemId)
+        return;
+    let objIndex = appDictionaries['Licenses'].findIndex(item => item.Id === itemId);
+    if (objIndex < 0) return;
+    let cells = rowItem.cells;
+    let updatedObject = appDictionaries['Licenses'][objIndex]
+    updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['LicensesNumber'] = cells[2].childNodes[0].textContent;
+    updatedObject['LicensesDate'] = cells[3].childNodes[0].textContent;
+}
+
+/*
+* Валидация строки таблицы
+*/
+function ValidateEditRow(row, rowMap) {
+    let cells = row.querySelectorAll('td')
+    for (let i = 0; i < cells.length; i++) {
+        ValidateEditCell(cells[i], rowMap[i]);
+    }
+    return row.querySelectorAll('td.invalid-cell-content').length === 0;
+}
+
+/*
+* Валидация значение ячеек таблицы 
+*/
+function ValidateEditCell(cell, type) {
+    if (!type || !cell)
+        return false;
+
+    if (cell.classList.contains('invalid-cell-content')) {
+        cell.classList.remove('invalid-cell-content')
+    }
+
+    switch (type) {
+        case 'text':
+            let text = cell.childNodes[0].value;
+            if (!text)
+                cell.classList.add('invalid-cell-content');
+            break;
+        case 'date':
+            let date = cell.childNodes[0].value;
+            if (!date)
+                cell.classList.add('invalid-cell-content');
+    }
+
 }
 
 /*
@@ -969,13 +1039,19 @@ function ConvertStableCellToEditCell(cell, type) {
         case 'text':
             let prText = cell.innerText;
             newElement.type = 'text';
-            newElement.value = prText;
-            cell.replaceChild(newElement, previewNode)
+            newElement.value = prText ? prText : '';
+            if (previewNode)
+                cell.replaceChild(newElement, previewNode)
+            else
+                cell.append(newElement);
             break;
         case 'date':
             let prDate = new Date(moment(cell.innerText, 'DD.MM.YYYY').format())
             newElement.classList.add('calendar');
-            cell.replaceChild(newElement, previewNode);
+            if (previewNode)
+                cell.replaceChild(newElement, previewNode)
+            else
+                cell.append(newElement);
             $('.calendar').datepicker({dateFormat: 'dd.mm.yy'});
             $('.calendar').datepicker('setDate', prDate);
             break;
@@ -990,12 +1066,13 @@ function ConvertStableCellToEditCell(cell, type) {
 * Отключение  других строк
 */
 function DisableOtherTableRows(ignoredItemId, tableClass) {
-    for (let t of document.querySelectorAll('.dir-item > .table')) {
+    for (let t of document.querySelectorAll('.dir-item >.table-container>.table-content>.table')) {
         if (!t.classList.contains(tableClass)) {
             t.classList.add('disabled-item')
             continue;
         }
         t.querySelectorAll('tr.data-row').forEach(row => {
+            console.log(Number(row.dataset.id));
             if (Number(row.dataset.id) === ignoredItemId) return;
             row.classList.add('disabled-item');
         });
@@ -1007,7 +1084,7 @@ function DisableOtherTableRows(ignoredItemId, tableClass) {
 * Включение других строк
 */
 function EnableOtherTableRows(ignoredItemId, tableClass) {
-    for (let t of document.querySelectorAll('.dir-item > .table')) {
+    for (let t of document.querySelectorAll('.dir-item >.table-container>.table-content>.table')) {
 
         if (!t.classList.contains(tableClass)) {
             t.classList.remove('disabled-item')
@@ -1022,59 +1099,140 @@ function EnableOtherTableRows(ignoredItemId, tableClass) {
 }
 
 /*
-* Отключение кнопки сохранения
+* Добавление класса элементу
 */
-function DisableSaveButton() {
-    document.querySelector('.save-btn').classList.add('disabled-item');
+function AddClassToElement(selector, className) {
+    ModificationClassToElement(selector, className, false)
 }
 
-/*
-* Включение кнопки сохранения
-*/
-function EnableSaveButton() {
-    document.querySelector('.save-btn').classList.remove('disabled-item');
+/*Удаление класса элемента*/
+function RemoveClassToElement(selector, className) {
+    ModificationClassToElement(selector, className, true)
 }
 
-/*
-* Отключение кнопки закрытия окошка
-*/
-function DisableCloseButton() {
-    document.querySelector('.close').classList.add('disabled-item');
+/*Модификация списка классов у элемета HTML */
+function ModificationClassToElement(selector, className, isRemove) {
+    if (!selector || !className)
+        return;
+    let elements = document.querySelectorAll(selector);
+    if (!elements)
+        return;
+    let classes = className.split(':');
+    elements.forEach(el => {
+        if (isRemove) {
+            for (let cl of classes) {
+                if (!cl) return;
+                if (el.classList.contains(cl))
+                    el.classList.remove(cl)
+            }
+        } else {
+            elements.forEach(el => {
+                for (let cl of classes) {
+                    if (!cl) return;
+                    if (!el.classList.contains(cl))
+                        el.classList.add(cl)
+                }
+            });
+        }
+    });
 }
 
-/*
-* Включение  кнопки закрытия окошка
-*/
-function EnableCloseButton() {
-    document.querySelector('.close').classList.remove('disabled-item');
+/*Добавление обработчика добавления довереностей*/
+function AddLicHandler() {
+    document.querySelector('.add-lic-btn').addEventListener(
+        'click',
+        function (e) {
+            let item = e.target;
+            if (e.target.tagName === "I" || e.target.tagName === "LABEL") {
+                item = e.target.closest('button');
+            }
+            let maxId = appDictionaries['Licenses'].length !== 0 ? appDictionaries['Licenses'].reduce((aid, cid) => {
+                    return aid > cid ? aid : cid;
+                })['Id']
+                : 0;
+            let currentDate = Date.now();
+            appDictionaries['Licenses'].push({
+                Id: maxId + 1,
+                Use: false,
+                IdUser: 0,
+                LicensesDate: "",
+                LicensesNumber: ""
+            })
+            ClearRowTable('.licences-table')
+            RenderAndAddHandlerLicencesTable();
+            ScrollToBottomTable(' #licences >.table-container> .table-content');
+
+            let lastRow = document.querySelector('.licences-table').lastChild;
+            let itemId = Number(lastRow.dataset.id);
+            let itemBtn = lastRow.querySelector('.edit-licences-btn');
+            if (!itemId || !itemBtn || !lastRow)
+                return;
+            EditSelectedLicences(itemBtn, lastRow, itemId)
+        }
+    );
 }
 
-/*
-* Отключение ближайшей кнопки удаления строки 
-*/
-function DisableListDictionaries() {
-    document.querySelector('#dictionaries-list').classList.add('disabled-item');
+/* Очистка таблицы по селектору контрола таблицы*/
+function ClearRowTable(tableSelector) {
+    let table = document.querySelector(tableSelector);
+    if (!table) return;
+    let dataRows = table.querySelectorAll('tr.data-row');
+    for (let index = 1; index < dataRows.length + 1; index++)
+        table.deleteRow(1)
 }
 
-/*
-* Включение списка выбора словарей
-*/
-function EnableListDictionaries() {
-    document.querySelector('#dictionaries-list').classList.remove('disabled-item');
+/*Прокрутка таблицы вниз*/
+function ScrollToBottomTable(tableSelector) {
+    if (!tableSelector)
+        return;
+    let tableController = document.querySelector(tableSelector);
+    if (!tableController)
+        return;
+    tableController.scrollTo(0, tableController.scrollHeight)
 }
 
-/*
-* Отключение ближайшей кнопки удаления строки 
-*/
-function DisableClosestDeleteBtn(itemId) {
-    document.querySelector('tr[data-id="' + itemId + '"] td button.delete-btn').classList.add('disabled-item');
+/* Добавление обработчика события*/
+function AddSaveButtonHandler() {
+    document.querySelector('.modal-footer > .save-btn').addEventListener('click', function (e) {
+        DisableAllElementToDirEdit();
+        RemoveClassToElement('.modal-footer> .btn > i','d-none')
+        AddClassToElement('.modal-footer> .btn > label','d-none')
+
+        $.ajax({
+            async: false,
+            url: dictFetchOptions.setUrl,
+            type: dictFetchOptions.setMethod,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify({
+                dirJsonRaw: JSON.stringify(appDictionaries)
+            }),
+            success: function () {
+                localStorage.setItem(localStorageKeys.dictionariesCache, JSON.stringify(appDictionaries))
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.error(thrownError)
+                appDictionaries = {};
+                localStorage.removeItem(localStorageKeys.dictionariesCache)
+            },
+            complete: function () {
+                RemoveClassToElement('.modal-footer> .btn > label','d-none')
+                AddClassToElement('.modal-footer> .btn > i','d-none')
+                EnableAllElementToDirEdit();
+            }
+        });
+    })
 }
 
-/*
-* Включение ближайшей кнопки удаления строки 
-*/
-function EnableClosestDeleteBtn(itemId) {
-    document.querySelector('tr[data-id="' + itemId + '"] td button.delete-btn').classList.remove('disabled-item');
+function DisableAllElementToDirEdit() {
+    AddClassToElement('.close', 'disabled-item');
+    AddClassToElement('.modal-body', 'disabled-item');
+    AddClassToElement('.modal-footer','disabled-item');
+}
+
+function EnableAllElementToDirEdit() {
+    RemoveClassToElement('.modal-body', 'disabled-item')
+    RemoveClassToElement('.modal-footer','disabled-item');
+    RemoveClassToElement('.close', 'disabled-item');
 }
 
 /***********************************/

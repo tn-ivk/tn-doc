@@ -110,7 +110,7 @@
             <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-3">
+                        <div class="col-2">
                             <ul class="list-group" id="dictionaries-list">
                                 <li class="list-group-item" data-type="#user-group"> Группы пользователей</li>
                                 <li class="list-group-item" data-type="#licences"> Доверености</li>
@@ -119,58 +119,83 @@
 
                         </div>
 
-                        <div class="col-9">
+                        <div class="col-10">
                             <div class="dictionaries">
 
                                 <div class="dir-item" id="not-selected">
                                     <span class="label label-primary">Справочник не выбран</span>
                                 </div>
 
-
                                 <div class="dir-item d-none" id="user-group">
-                                    <table class="user-group-table  table table-bordered inner-item-center">
-                                        <thead >
-                                        <tr class="table-secondary">
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Активен</th>
-                                            <th scope="col">Название</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
+                                    <div class="table-container">
+                                        <div class="table-content">
+                                            <table class="user-group-table  table table-bordered inner-item-center">
+                                                <thead >
+                                                <tr class="table-secondary">
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Активен</th>
+                                                    <th scope="col">Название</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="table-bottom-menu">
+                                        </div>
+                                    </div>
+
                                 </div>
 
-
                                 <div class="dir-item  d-none" id="users">
-                                    <table class="users-table table table-bordered inner-item-center">
-                                        <thead>
-                                        <tr class="table-primary">
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Активен</th>
-                                            <th scope="col">Группа</th>
-                                            <th scope="col">Фамилия</th>
-                                            <th scope="col">Имя</th>
-                                            <th scope="col">Отчество</th>
-                                            <th scope="col">Организация</th>
-                                            <th scope="col">Должность</th>
-                                            <th scope="col">Действия</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
-                                    <input type="button" class="btn btn-primary add-licences-btn"/>
+                                    <div class="table-container">
+                                        <div class="table-content">
+                                            <table class="users-table table table-bordered inner-item-center">
+                                                <thead>
+                                                <tr class="table-primary">
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Активен</th>
+                                                    <th scope="col">Группа</th>
+                                                    <th scope="col">Фамилия</th>
+                                                    <th scope="col">Имя</th>
+                                                    <th scope="col">Отчество</th>
+                                                    <th scope="col">Организация</th>
+                                                    <th scope="col">Должность</th>
+                                                    <th scope="col">Действия</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="table-bottom-menu">
+                                            <button class="btn btn-primary default-btn-size">
+                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                                <label>Добавить</label>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="dir-item  d-none" id="licences">
-                                    <table class="licences-table table table-bordered inner-item-center">
-                                        <thead>
-                                        <tr class="table-primary">
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Активен</th>
-                                            <th scope="col">Номер доверености</th>
-                                            <th scope="col">Дата окончания доверености</th>
-                                            <th scope="col">Действия</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
+                                    <div class="table-container">
+                                        <div class="table-content">
+                                            <table class="licences-table table table-bordered inner-item-center">
+                                                <thead>
+                                                <tr class="table-primary">
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Активен</th>
+                                                    <th scope="col">Номер доверености</th>
+                                                    <th scope="col">Дата окончания доверености</th>
+                                                    <th scope="col">Действия</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+
+                                        </div>
+                                        <div class="table-bottom-menu">
+                                            <button class="btn btn-primary default-btn-size add-lic-btn">
+                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                                <label>Добавить</label>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -178,8 +203,11 @@
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary save-btn">Сохранить</button>
+            <div class="modal-footer ">
+                <button type="button" class="btn btn-primary save-btn default-btn-size">
+                    <i class="fa fa-spinner fa-spin d-none" aria-hidden="true"></i>
+                    <label>Сохранить</label>
+                </button>
             </div>
         </div>
     </div>

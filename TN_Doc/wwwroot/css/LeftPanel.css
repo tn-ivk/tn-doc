@@ -93,51 +93,88 @@
 }
 
 .modal-dir-editor-width {
-    max-width: 85%;
+    max-width: 90%;
     min-width: 600px;
 }
 
 .modal-dir-editor-height {
-    max-width: 80%;
-    min-width: 600px;
+    max-height: 80%;
+    min-height: 600px;
 }
 
 .dir-item {
-    margin:  0 auto;
-    overflow-y: auto;
+    height: 600px;
 }
 
 .user-group-table,
 .licences-table,
-.users-table{
+.users-table {
     position: relative;
     width: 100%;
     height: 100%;
 }
 
-.inner-item-center{
+.inner-item-center {
     text-align: center;
 }
 
-.btn-image{
+.btn-image {
     width: 100%;
     height: 100%;
 }
 
 .disabled-item {
-    pointer-events:none;
-    opacity:0.6;
+    pointer-events: none;
+    opacity: 0.6;
 }
 
-.save-btn{
-    
+.save-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
 }
 
-.data-row{
-    
+.data-row {
+
 }
 
+.dictionaries {
+    /*position: relative;*/
+    /*height: 100px;*/
+}
 
+.invalid-cell-content {
+    outline: 2px solid red;
+    outline-offset: -2px;
+    /*border: 1px solid red;*/
+}
+
+.table-container {
+    display: block;
+    height: 100%;
+}
+
+.table-content {
+    max-height: 90%;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.table-bottom-menu {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+
+.default-btn-size {
+    height: 40px;
+    width: 115px;
+}
+
+.add-lic-btn {
+
+}
 
 /*.bExport {
     background: url(Pictures/export.png) no-repeat 3px 1px;    
