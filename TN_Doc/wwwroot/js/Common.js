@@ -370,6 +370,7 @@ function InitElement() {
     RenderAndAddHandlerLicencesTable();
     RenderAndAddHandlerUserTable();
     AddLicHandler();
+    AddUserHandler();
     AddSaveButtonHandler();
 
     InitDevices();
@@ -738,12 +739,13 @@ function RenderAndAddHandlerLicencesTable() {
 
         let actionCell = document.createElement('td');
         actionCell.appendChild(CreateEditLicensesButton('fa:fa-lock:edit-licences-btn', 'btn:btn-outline-primary:edit-licences-btn', '5px', 'Licenses'));
-        actionCell.appendChild(CreateDeleteButton('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Licenses'));
+        actionCell.appendChild(CreateDeleteLicenseBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Licenses'));
         row.appendChild(actionCell);
         table.append(row)
     }
 
 }
+
 
 /*
 * Отрисовка таблицы пользователей.
@@ -751,6 +753,8 @@ function RenderAndAddHandlerLicencesTable() {
 function RenderAndAddHandlerUserTable() {
     let table = document.querySelector('.users-table');
     let usersGroups = appDictionaries['UsersGroup'];
+    let licences = appDictionaries['Licenses'];
+    console.log(licences)
     for (let user of appDictionaries['Users']) {
 
         let row = document.createElement('tr')
@@ -758,6 +762,7 @@ function RenderAndAddHandlerUserTable() {
 
         let idCell = document.createElement('td');
         idCell.innerText = user['Id'];
+        row.dataset.id = user['Id'];
         row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
@@ -791,6 +796,23 @@ function RenderAndAddHandlerUserTable() {
         let postCell = document.createElement('td');
         postCell.innerText = user['Post'];
         row.appendChild(postCell);
+
+        let licCell = document.createElement('td');
+        let licItem = licences.filter(item => item.IdUser === user['Id'])[0];
+        console.log(licItem);
+        if (licItem) {
+            licCell.innerText = `[${licItem['Id']}] ${licItem['LicensesNumber']}`;
+            licCell.dataset.licId = licItem['Id'];
+        } else {
+            licCell.innerText = 'Доверенность не выбрана';
+            licCell.dataset.licId = 0;
+        }
+        row.appendChild(licCell);
+
+        let actionCell = document.createElement('td');
+        actionCell.appendChild(CreateEditUsersButton('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-user-btn', '5px'));
+        actionCell.appendChild(CreateDeleteUserBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Users'));
+        row.appendChild(actionCell);
 
         table.append(row)
     }
@@ -828,23 +850,60 @@ function CreateWithOnlyImgButton(faClass, buttonClass, margin) {
 /*
 * Создание кнопки удаления из списка
 */
-function CreateDeleteButton(faClass, buttonClass, margin, arrayName) {
+// function CreateDeleteButton(faClass, buttonClass, margin, arrayName) {
+//
+//     let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
+//     btn.addEventListener('click', function (e) {
+//         if (!e.target.classList.contains('delete-btn'))
+//             return;
+//         let rowItem = e.target.closest('tr');
+//         let itemId = Number(rowItem.dataset.id);
+//         if (!itemId)
+//             return;
+//         appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
+//             return item['Id'] !== itemId;
+//         })
+//         rowItem.remove();
+//     });
+//     return btn
+// }
 
+function CreateDeleteUserBtn(faClass, buttonClass, margin, arrayName) {
     let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
     btn.addEventListener('click', function (e) {
-        if (!e.target.classList.contains('delete-btn'))
-            return;
-        let rowItem = e.target.closest('tr');
-        let itemId = Number(rowItem.dataset.id);
-        if (!itemId)
-            return;
-        appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
-            return item['Id'] !== itemId;
-        })
-        rowItem.remove();
+        DeleteSelectedRowHandler(e, 'Users');
+        let user_id = Number(e.target.closest('.data-row').dataset.id);
+        let lic = appDictionaries['Licenses'].filter(item => item['IdUser'] === user_id)[0];
+        if (lic)
+            lic['IdUser'] = 0;
     });
     return btn
 }
+
+
+function CreateDeleteLicenseBtn(faClass, buttonClass, margin, arrayName) {
+    let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.addEventListener('click', function (e) {
+        DeleteSelectedRowHandler(e, 'Licenses');
+        ClearRowTable('.users-table')
+        RenderAndAddHandlerUserTable();
+    });
+    return btn
+}
+
+function DeleteSelectedRowHandler(e, arrayName) {
+    if (!e.target.classList.contains('delete-btn'))
+        return;
+    let rowItem = e.target.closest('tr');
+    let itemId = Number(rowItem.dataset.id);
+    if (!itemId)
+        return;
+    appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
+        return item['Id'] !== itemId;
+    })
+    rowItem.remove();
+}
+
 
 /*
 * Создание кнопки редактирования для доверенностей
@@ -867,11 +926,77 @@ function CreateEditLicensesButton(faClass, buttonClass, margin, arrayName) {
     return btn
 }
 
+function CreateEditUsersButton(faClass, buttonClass, margin) {
+    let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.dataset.mode = 'stable';
+    btn.addEventListener('click', function (e) {
+        let itemBtn;
+        if (e.target.tagName === 'I') {
+            itemBtn = e.target.closest('button')
+        } else {
+            itemBtn = e.target;
+        }
+        let rowItem = itemBtn.closest('tr')
+        let itemId = Number(rowItem.dataset.id);
+        if (!itemId) return;
+        EditSelectedUser(itemBtn, rowItem, itemId)
+    });
+    return btn
+}
+
 /*
 * Редактирование выбранной доверенности в таблице.
 * @param itemBtn - кнопка по которой нажали. Кнопка должна находиться в редактируемой строке  таблице.
 * @param rowItem - редактируемая строка в таблице.
-* @param itemId - id объекта в массиве .
+* @param itemId - id объекта в массиве.
+*/
+function EditSelectedUser(itemBtn, rowItem, itemId) {
+    let rowMap = {
+        0: 'ignore',
+        1: 'bool',
+        2: 'combobox-ug',
+        3: 'text',
+        4: 'text',
+        5: 'text',
+        6: 'text',
+        7: 'text',
+        8: 'combobox-lic',
+        9: 'ignore'
+    }
+
+    if (itemBtn.dataset.mode === 'stable') {
+        AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+        AddClassToElement('#dictionaries-list', 'disabled-item');
+        AddClassToElement('.save-btn', 'disabled-item');
+        AddClassToElement('.close', 'disabled-item');
+        AddClassToElement('.table-bottom-menu', 'disabled-item')
+        DisableOtherTableRows(itemId, 'users-table');
+        ConvertStableRowToEditRow(rowItem, rowMap)
+        ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+        itemBtn.dataset.mode = 'edit';
+    } else if (itemBtn.dataset.mode === 'edit') {
+        if (!ValidateEditRow(rowItem, rowMap))
+            return;
+
+        ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
+        ConvertEditRowToStableRow(rowItem, rowMap)
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item')
+        RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
+        RemoveClassToElement('#dictionaries-list', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('.close', 'disabled-item');
+        ApplyUserChanges(rowItem, itemId)
+        EnableOtherTableRows(itemId, 'users-table');
+        itemBtn.dataset.mode = 'stable';
+    }
+}
+
+
+/*
+* Редактирование выбранной доверенности в таблице.
+* @param itemBtn - кнопка по которой нажали. Кнопка должна находиться в редактируемой строке  таблице.
+* @param rowItem - редактируемая строка в таблице.
+* @param itemId - id объекта в массиве.
 */
 function EditSelectedLicences(itemBtn, rowItem, itemId) {
     let rowMap = {
@@ -894,7 +1019,6 @@ function EditSelectedLicences(itemBtn, rowItem, itemId) {
     } else if (itemBtn.dataset.mode === 'edit') {
         if (!ValidateEditRow(rowItem, rowMap))
             return;
-
         ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
         ConvertEditRowToStableRow(rowItem, rowMap)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
@@ -905,11 +1029,13 @@ function EditSelectedLicences(itemBtn, rowItem, itemId) {
         ApplyLicenceChanges(rowItem, itemId)
         EnableOtherTableRows(itemId, 'licences-table');
         itemBtn.dataset.mode = 'stable';
+        ClearRowTable('.users-table')
+        RenderAndAddHandlerUserTable();
     }
 }
 
 /*
-* Применение изменений довереность 
+* Применение изменений доверенность 
 * @param rowItem - отредкатированная строка
 * @param itemId - id доверености
 */
@@ -924,6 +1050,34 @@ function ApplyLicenceChanges(rowItem, itemId) {
     updatedObject['LicensesNumber'] = cells[2].childNodes[0].textContent;
     updatedObject['LicensesDate'] = cells[3].childNodes[0].textContent;
 }
+
+
+/*
+* Применение изменений пользовательского справочника 
+* @param rowItem - отредкатированная строка
+* @param itemId - id доверености
+*/
+function ApplyUserChanges(rowItem, itemId) {
+    if (!rowItem || !itemId)
+        return;
+    let objIndex = appDictionaries['Users'].findIndex(item => item.Id === itemId);
+    if (objIndex < 0) return;
+    let cells = rowItem.cells;
+    let updatedObject = appDictionaries['Users'][objIndex]
+    updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['IdGroup'] = appDictionaries['UsersGroup'].filter(item => item['Name'] === cells[2].childNodes[0].textContent)[0]['Id'];
+    updatedObject['F'] = cells[3].childNodes[0].textContent;
+    updatedObject['I'] = cells[4].childNodes[0].textContent;
+    updatedObject['O'] = cells[5].childNodes[0].textContent;
+    updatedObject['Factory'] = cells[6].childNodes[0].textContent;
+    updatedObject['Post'] = cells[7].childNodes[0].textContent;
+
+    let lic = appDictionaries['Licenses'].filter(item => item['Id'] === Number(cells[8].dataset.licId))[0];
+    if (!lic)
+        return;
+    lic['IdUser'] = updatedObject['Id'];
+}
+
 
 /*
 * Валидация строки таблицы
@@ -973,15 +1127,18 @@ function ChangeButtonIcon(itemBtn, newClass, oldClass) {
 */
 function ConvertEditRowToStableRow(row, rowMap) {
     let cells = row.querySelectorAll('td');
+    let usersGroupArray = appDictionaries['UsersGroup'];
+    let licensesArray = appDictionaries['Licenses'];
+    let userId = Number(row.dataset.id);
     for (let i = 0; i < cells.length; i++) {
-        ConvertEditCellToStableCell(cells[i], rowMap[i]);
+        ConvertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, userId);
     }
 }
 
 /*
 * Конверитирование ячейки редактирования в ячейку стабильную 
 */
-function ConvertEditCellToStableCell(cell, type) {
+function ConvertEditCellToStableCell(cell, type, usersGroupArray, licensesArray, userId) {
     if (!type || !cell) return;
     let previewNode = cell.childNodes[0];
     switch (type) {
@@ -1004,8 +1161,25 @@ function ConvertEditCellToStableCell(cell, type) {
             let newDateText = document.createTextNode(dayStr + '.' + monthStr + '.' + yearStr);
             cell.replaceChild(newDateText, cell.childNodes[0])
             break;
-        default:
-            break
+        case 'combobox-ug':
+            let groupId = Number(previewNode.value);
+            let userGroup = usersGroupArray.filter(item => item['Id'] === groupId)[0];
+            let userGroupElement = document.createTextNode(userGroup['Name']);
+            cell.replaceChild(userGroupElement, cell.childNodes[0])
+            break;
+        case 'combobox-lic':
+            let licId = Number(previewNode.value);
+            let license = licensesArray.filter(item => item['Id'] === licId)[0];
+            if (license) {
+                let licenseElement = document.createTextNode(`[${license['Id']}] ${license['LicensesNumber']}`);
+                cell.replaceChild(licenseElement, cell.childNodes[0])
+                cell.dataset.licId = String(licId);
+            } else {
+                let licenseElement = document.createTextNode('Доверенность не выбрана');
+                cell.replaceChild(licenseElement, cell.childNodes[0])
+                cell.dataset.licId = String(licId);
+            }
+            break;
     }
 }
 
@@ -1055,6 +1229,43 @@ function ConvertStableCellToEditCell(cell, type) {
             $('.calendar').datepicker({dateFormat: 'dd.mm.yy'});
             $('.calendar').datepicker('setDate', prDate);
             break;
+        case 'combobox-ug':
+            let cbElement = document.createElement('select');
+            let counter = 0;
+            for (let i = 0; i < appDictionaries['UsersGroup'].length; i++) {
+                let opt = document.createElement('option');
+                opt.setAttribute('value', appDictionaries['UsersGroup'][i]['Id']);
+                opt.append(appDictionaries['UsersGroup'][i]['Name']);
+                cbElement.append(opt);
+                if (opt.textContent === previewNode.textContent) {
+                    cbElement.selectedIndex = counter;
+                }
+                counter++;
+            }
+            if (previewNode)
+                cell.replaceChild(cbElement, previewNode)
+            else
+                cell.append(cbElement);
+            break;
+        case 'combobox-lic':
+            let cbElementLic = document.createElement('select');
+            let licenses = appDictionaries['Licenses'];
+            let counterLic = 0;
+            for (let i = 0; i < licenses.length; i++) {
+                let opt = document.createElement('option');
+                opt.setAttribute('value', licenses[i]['Id']);
+                opt.append(`${licenses[i]['Id']} - ${licenses[i]['LicensesNumber']} - ${licenses[i]['LicensesDate']}`);
+                cbElementLic.append(opt);
+                if (Number(cell.dataset.licId) === licenses[i]['Id']) {
+                    cbElementLic.selectedIndex = counterLic;
+                }
+                counterLic++;
+            }
+            if (previewNode)
+                cell.replaceChild(cbElementLic, previewNode)
+            else
+                cell.append(cbElementLic);
+            break;
         default:
             break
     }
@@ -1072,7 +1283,6 @@ function DisableOtherTableRows(ignoredItemId, tableClass) {
             continue;
         }
         t.querySelectorAll('tr.data-row').forEach(row => {
-            console.log(Number(row.dataset.id));
             if (Number(row.dataset.id) === ignoredItemId) return;
             row.classList.add('disabled-item');
         });
@@ -1150,7 +1360,6 @@ function AddLicHandler() {
                     return aid > cid ? aid : cid;
                 })['Id']
                 : 0;
-            let currentDate = Date.now();
             appDictionaries['Licenses'].push({
                 Id: maxId + 1,
                 Use: false,
@@ -1165,12 +1374,46 @@ function AddLicHandler() {
             let lastRow = document.querySelector('.licences-table').lastChild;
             let itemId = Number(lastRow.dataset.id);
             let itemBtn = lastRow.querySelector('.edit-licences-btn');
+            console.log(itemBtn)
             if (!itemId || !itemBtn || !lastRow)
                 return;
             EditSelectedLicences(itemBtn, lastRow, itemId)
         }
     );
 }
+
+function AddUserHandler() {
+    document.querySelector('.add-user-btn').addEventListener(
+        'click',
+        function (e) {
+            let maxId = appDictionaries['Users'].length !== 0 ? appDictionaries['Users'].reduce((aid, cid) => {
+                    return aid > cid ? aid : cid;
+                })['Id']
+                : 0;
+            appDictionaries['Users'].push({
+                Use: false,
+                Id: maxId + 1,
+                IdGroup: 1,
+                F: "",
+                I: "",
+                O: "",
+                Factory: "",
+                Post: ""
+            })
+            ClearRowTable('.users-table')
+            RenderAndAddHandlerUserTable();
+            ScrollToBottomTable(' #users >.table-container> .table-content');
+
+            let lastRow = document.querySelector('.users-table').lastChild;
+            let itemId = Number(lastRow.dataset.id);
+            let itemBtn = lastRow.querySelector('.edit-user-btn');
+            if (!itemId || !itemBtn || !lastRow)
+                return;
+            EditSelectedUser(itemBtn, lastRow, itemId)
+        }
+    );
+}
+
 
 /* Очистка таблицы по селектору контрола таблицы*/
 function ClearRowTable(tableSelector) {
@@ -1195,8 +1438,8 @@ function ScrollToBottomTable(tableSelector) {
 function AddSaveButtonHandler() {
     document.querySelector('.modal-footer > .save-btn').addEventListener('click', function (e) {
         DisableAllElementToDirEdit();
-        RemoveClassToElement('.modal-footer> .btn > i','d-none')
-        AddClassToElement('.modal-footer> .btn > label','d-none')
+        RemoveClassToElement('.modal-footer> .btn > i', 'd-none')
+        AddClassToElement('.modal-footer> .btn > label', 'd-none')
 
         $.ajax({
             async: false,
@@ -1215,8 +1458,8 @@ function AddSaveButtonHandler() {
                 localStorage.removeItem(localStorageKeys.dictionariesCache)
             },
             complete: function () {
-                RemoveClassToElement('.modal-footer> .btn > label','d-none')
-                AddClassToElement('.modal-footer> .btn > i','d-none')
+                RemoveClassToElement('.modal-footer> .btn > label', 'd-none')
+                AddClassToElement('.modal-footer> .btn > i', 'd-none')
                 EnableAllElementToDirEdit();
             }
         });
@@ -1227,13 +1470,13 @@ function AddSaveButtonHandler() {
 function DisableAllElementToDirEdit() {
     AddClassToElement('.close', 'disabled-item');
     AddClassToElement('.modal-body', 'disabled-item');
-    AddClassToElement('.modal-footer','disabled-item');
+    AddClassToElement('.modal-footer', 'disabled-item');
 }
 
 /* Включение активности у всех элементов у компонента редактирования справочников*/
 function EnableAllElementToDirEdit() {
     RemoveClassToElement('.modal-body', 'disabled-item')
-    RemoveClassToElement('.modal-footer','disabled-item');
+    RemoveClassToElement('.modal-footer', 'disabled-item');
     RemoveClassToElement('.close', 'disabled-item');
 }
 
