@@ -688,6 +688,7 @@ function RenderUserGroupsRowTable() {
 
         let idTd = document.createElement('td');
         idTd.innerText = userGroup['Id'].toString();
+        VerticalCenteringCell(idTd)
         row.appendChild(idTd);
 
         let usedSquare = document.createElement('i')
@@ -696,10 +697,12 @@ function RenderUserGroupsRowTable() {
         usedSquare.ariaHidden = true;
         let usedTd = document.createElement('td');
         usedTd.appendChild(usedSquare);
+        VerticalCenteringCell(usedTd)
         row.appendChild(usedTd);
 
         let nameTD = document.createElement('td');
         nameTD.innerText = userGroup['Name'].toString();
+        VerticalCenteringCell(nameTD)
         row.appendChild(nameTD);
 
         table.append(row)
@@ -719,6 +722,7 @@ function RenderAndAddHandlerLicencesTable() {
         let idCell = document.createElement('td');
         row.dataset.id = licences['Id'];
         idCell.innerText = licences['Id'];
+        VerticalCenteringCell(idCell);
         row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
@@ -727,19 +731,28 @@ function RenderAndAddHandlerLicencesTable() {
         usedSquare.ariaHidden = true;
         let usedCell = document.createElement('td');
         usedCell.appendChild(usedSquare);
+        VerticalCenteringCell(usedCell);
         row.appendChild(usedCell);
 
         let numberCell = document.createElement('td');
         numberCell.innerText = licences['LicensesNumber'];
+        VerticalCenteringCell(numberCell);
         row.appendChild(numberCell);
 
         let dateCell = document.createElement('td');
         dateCell.innerText = licences['LicensesDate'];
+        VerticalCenteringCell(dateCell);
         row.appendChild(dateCell);
-
+        
+        let editDivElement = document.createElement('div');
+        editDivElement.appendChild(CreateEditLicensesButton('fa:fa-lock:edit-licences-btn', 'btn:btn-outline-primary:edit-licences-btn', '5px', 'Licenses'))
+       
+        let deleteDivElement = document.createElement('div');
+        deleteDivElement.appendChild(CreateDeleteLicenseBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Licenses'))
+        
         let actionCell = document.createElement('td');
-        actionCell.appendChild(CreateEditLicensesButton('fa:fa-lock:edit-licences-btn', 'btn:btn-outline-primary:edit-licences-btn', '5px', 'Licenses'));
-        actionCell.appendChild(CreateDeleteLicenseBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Licenses'));
+        actionCell.appendChild(editDivElement);
+        actionCell.appendChild(deleteDivElement);
         row.appendChild(actionCell);
         table.append(row)
     }
@@ -754,7 +767,6 @@ function RenderAndAddHandlerUserTable() {
     let table = document.querySelector('.users-table');
     let usersGroups = appDictionaries['UsersGroup'];
     let licences = appDictionaries['Licenses'];
-    console.log(licences)
     for (let user of appDictionaries['Users']) {
 
         let row = document.createElement('tr')
@@ -763,6 +775,7 @@ function RenderAndAddHandlerUserTable() {
         let idCell = document.createElement('td');
         idCell.innerText = user['Id'];
         row.dataset.id = user['Id'];
+        VerticalCenteringCell(idCell);
         row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
@@ -771,35 +784,42 @@ function RenderAndAddHandlerUserTable() {
         usedSquare.ariaHidden = true;
         let usedCell = document.createElement('td');
         usedCell.appendChild(usedSquare);
+        VerticalCenteringCell(usedCell);
         row.appendChild(usedCell);
 
         let groupNameCell = document.createElement('td');
         groupNameCell.innerText = usersGroups.filter(group => group['Id'] === user['IdGroup'])[0]['Name'];
+        VerticalCenteringCell(groupNameCell);
         row.appendChild(groupNameCell);
 
         let surnameCell = document.createElement('td');
         surnameCell.innerText = user.F;
+        VerticalCenteringCell(surnameCell);
         row.appendChild(surnameCell);
 
         let nameCell = document.createElement('td');
         nameCell.innerText = user.I;
+        VerticalCenteringCell(nameCell);
         row.appendChild(nameCell);
 
         let patronymicCell = document.createElement('td');
         patronymicCell.innerText = user.O;
+        VerticalCenteringCell(patronymicCell);
         row.appendChild(patronymicCell);
 
         let organizationCell = document.createElement('td');
         organizationCell.innerText = user['Factory'];
+        VerticalCenteringCell(organizationCell);
         row.appendChild(organizationCell);
 
         let postCell = document.createElement('td');
         postCell.innerText = user['Post'];
+        VerticalCenteringCell(postCell);
         row.appendChild(postCell);
 
         let licCell = document.createElement('td');
+        VerticalCenteringCell(licCell);
         let licItem = licences.filter(item => item.IdUser === user['Id'])[0];
-        console.log(licItem);
         if (licItem) {
             licCell.innerText = `[${licItem['Id']}] ${licItem['LicensesNumber']}`;
             licCell.dataset.licId = licItem['Id'];
@@ -809,13 +829,26 @@ function RenderAndAddHandlerUserTable() {
         }
         row.appendChild(licCell);
 
-        let actionCell = document.createElement('td');
-        actionCell.appendChild(CreateEditUsersButton('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-user-btn', '5px'));
-        actionCell.appendChild(CreateDeleteUserBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Users'));
-        row.appendChild(actionCell);
 
+        let editDivElement = document.createElement('div');
+        editDivElement.appendChild(CreateEditUsersButton('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-user-btn', '5px'))
+
+        let deleteDivElement = document.createElement('div');
+        deleteDivElement.appendChild(CreateDeleteUserBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Users'))
+
+        let actionCell = document.createElement('td');
+        actionCell.appendChild(editDivElement);
+        actionCell.appendChild(deleteDivElement);
+        
+        row.appendChild(actionCell);
         table.append(row)
     }
+    
+
+}
+
+function  VerticalCenteringCell(cell){
+    cell.classList.add('align-middle')
 }
 
 /*
@@ -848,27 +881,9 @@ function CreateWithOnlyImgButton(faClass, buttonClass, margin) {
 }
 
 /*
-* Создание кнопки удаления из списка
-*/
-// function CreateDeleteButton(faClass, buttonClass, margin, arrayName) {
-//
-//     let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
-//     btn.addEventListener('click', function (e) {
-//         if (!e.target.classList.contains('delete-btn'))
-//             return;
-//         let rowItem = e.target.closest('tr');
-//         let itemId = Number(rowItem.dataset.id);
-//         if (!itemId)
-//             return;
-//         appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
-//             return item['Id'] !== itemId;
-//         })
-//         rowItem.remove();
-//     });
-//     return btn
-// }
-
-function CreateDeleteUserBtn(faClass, buttonClass, margin, arrayName) {
+ *  Создание кнопки удаления пользователя
+ */
+function CreateDeleteUserBtn(faClass, buttonClass, margin) {
     let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
     btn.addEventListener('click', function (e) {
         DeleteSelectedRowHandler(e, 'Users');
@@ -880,8 +895,10 @@ function CreateDeleteUserBtn(faClass, buttonClass, margin, arrayName) {
     return btn
 }
 
-
-function CreateDeleteLicenseBtn(faClass, buttonClass, margin, arrayName) {
+/*
+ *  Создание кнопки удаление доверенности
+ */
+function CreateDeleteLicenseBtn(faClass, buttonClass, margin) {
     let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
     btn.addEventListener('click', function (e) {
         DeleteSelectedRowHandler(e, 'Licenses');
@@ -891,6 +908,9 @@ function CreateDeleteLicenseBtn(faClass, buttonClass, margin, arrayName) {
     return btn
 }
 
+/*
+ * Удаление строки в таблицы
+ */
 function DeleteSelectedRowHandler(e, arrayName) {
     if (!e.target.classList.contains('delete-btn'))
         return;
@@ -1374,7 +1394,6 @@ function AddLicHandler() {
             let lastRow = document.querySelector('.licences-table').lastChild;
             let itemId = Number(lastRow.dataset.id);
             let itemBtn = lastRow.querySelector('.edit-licences-btn');
-            console.log(itemBtn)
             if (!itemId || !itemBtn || !lastRow)
                 return;
             EditSelectedLicences(itemBtn, lastRow, itemId)

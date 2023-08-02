@@ -96,12 +96,12 @@
 </div>
 
 
-<div class="modal fade" id="modal-window" tabindex="-1" role="dialog">
+<div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-dir-editor-width" role="document">
         <div class="modal-content modal-dir-editor-height">
 
             <div class="modal-header">
-                <h5 class="modal-title">Редактирование справочников</h5>
+                <h5 class="modal-title">Справочники</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -112,7 +112,7 @@
                     <div class="row">
                         <div class="col-2">
                             <ul class="list-group" id="dictionaries-list">
-                                <li class="list-group-item" data-type="#user-group"> Группы пользователей</li>
+                                <li class="list-group-item active" data-type="#user-group"> Группы пользователей</li>
                                 <li class="list-group-item" data-type="#licences"> Доверенности</li>
                                 <li class="list-group-item" data-type="#users"> Пользователи</li>
                             </ul>
@@ -121,12 +121,7 @@
 
                         <div class="col-10">
                             <div class="dictionaries">
-
-                                <div class="dir-item" id="not-selected">
-                                    <span class="label label-primary">Справочник не выбран</span>
-                                </div>
-
-                                <div class="dir-item d-none" id="user-group">
+                                <div class="dir-item" id="user-group">
                                     <div class="table-container">
                                         <div class="table-content">
                                             <table class="user-group-table  table table-bordered inner-item-center">
@@ -182,8 +177,8 @@
                                                 <tr class="table-primary">
                                                     <th scope="col">ID</th>
                                                     <th scope="col">Активен</th>
-                                                    <th scope="col">Номер доверености</th>
-                                                    <th scope="col">Дата окончания доверености</th>
+                                                    <th scope="col">Номер доверенности</th>
+                                                    <th scope="col">Дата доверенности</th>
                                                     <th scope="col">Действия</th>
                                                 </tr>
                                                 </thead>
@@ -213,10 +208,7 @@
         </div>
     </div>
 </div>
-
-
 <script>   
         InitElement();
 </script>
-
 </body>
