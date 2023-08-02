@@ -61,7 +61,7 @@ namespace TN_Doc.Models.Services
         /// <summary>
         /// Установка нового значения словарей в формате JSON на сервере. Перезаписывается конфигурация приложения
         /// </summary>
-        /// <param name="json">Новый формат JSON</param>
+        /// <param name="json">Новый JSON словарей</param>
         public async Task SetDirectoriesFromJson(string json)
         {
             await Task.Run(() =>
@@ -79,7 +79,7 @@ namespace TN_Doc.Models.Services
         /// <summary>
         /// Запись новых справочников в конфигурацию приложения
         /// </summary>
-        /// <param name="modifJson">Модифицированный JSON/param>
+        /// <param name="modifJson">Модифицированный JSON для записи в файл</param>
         private void WritePatchesToJson(string modifJson)
         {
             var json = File.ReadAllText(_mainCfgFile.FullName);
