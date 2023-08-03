@@ -146,7 +146,7 @@
     },
     {
       "Id": 16,
-      "Use": false,
+      "Use": true,
       "Edit": true,
       "Key": "Contract",
       "Type": "text",
@@ -226,7 +226,7 @@
     },
     {
       "Id": 26,
-      "Use": false,
+      "Use": true,
       "Edit": true,
       "Key": "Declaration",
       "Type": "text",
