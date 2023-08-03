@@ -34,10 +34,9 @@
 
                 document.getElementById("Delive_Factory").value = user[0].Factory;
                 document.getElementById("Delive_FIO").value = user[0].FIO;
+                //document.getElementById("Delive_IOF").value = user[0].IOF;
                 document.getElementById("Delive_Lic_Date").value = license[0].LicensesDate;
                 document.getElementById("Delive_Lic_Number").value = license[0].LicensesNumber;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
             else if (selectObject.name == "Receive_IOF") {
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
@@ -45,10 +44,9 @@
 
                 document.getElementById("Receive_Factory").value = user[0].Factory;
                 document.getElementById("Receive_FIO").value = user[0].FIO;
+                //document.getElementById("Receive_IOF").value = user[0].IOF;
                 document.getElementById("Receive_Lic_Date").value = license[0].LicensesDate;
                 document.getElementById("Receive_Lic_Number").value = license[0].LicensesNumber;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
         }
     </script>
