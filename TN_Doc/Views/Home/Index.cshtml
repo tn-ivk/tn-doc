@@ -61,29 +61,45 @@
         </tr>
         </thead>
 
-        <tbody>
-        <tr>
-            <td>dt</td>
-            <td>description</td>
-        </tr>
-        </tbody>
+            <tbody>
+                <tr>
+                    <td>dt</td>
+                    <td>description</td>
+                </tr>
+            </tbody>        
+        
+            @*<tfoot>
+                <tr>
+                    <th>id</th>
+                    <th>strBegin</th>
 
-    </table>
-</div>
-<div class="Doc">
-    <table>
-        <tr>
-            <td align="left">
-                <select id="ComboboxTemplateDoc">Форма документа</select>
-                <select id="ComboboxProtocolNumber">Номер протокола</select>
-            </td>
+                </tr>
+            </tfoot>*@
+        </table> 
+    </div>
 
-            <td align="right">
-                <select id="ComboboxExportFormat">Экспорт</select>
-                <input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
-                <select id="ComboboxPrinterName">Принтер</select>
-                <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
-            </td>
+    <div class="Doc">
+        <table>
+            <tr>
+
+@*                <td align="left"><select id="ComboboxTemplateDoc">Форма документа</select></td>
+                <td align="left"><select id="ComboboxProtocolNumber">Номер протокола</select></td>
+                <td align="right"><select id="ComboboxExportFormat">Экспорт</select></td>
+                <td align="right"><input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()"></td>
+                <td align="right"><select id="ComboboxPrinterName">Принтер</select></td>
+                <td align="right"><input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()"></td>*@
+
+                <td align="left">
+                    <select id="ComboboxTemplateDoc">Форма документа</select>
+                    <select id="ComboboxProtocolNumber">Номер протокола</select>
+                </td>
+                
+                <td align="right">
+                    <select id="ComboboxExportFormat">Экспорт</select>
+                    <input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
+                    <select id="ComboboxPrinterName">Принтер</select>
+                    <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
+                </td>
 
 
         </tr>

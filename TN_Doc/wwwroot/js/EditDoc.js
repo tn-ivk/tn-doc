@@ -27,9 +27,12 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
             param = {};
             param["Key"] = $(this).attr('data-key');
             param["Tag"] = $(this).attr('data-tag');
-
-            if ($(this)[0].nodeName == "SELECT")
-                param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
+            if ($(this)[0].nodeName == "SELECT") {
+                if ($(this)[0].selectedIndex == -1)
+                    param["Value"] = "";
+                else
+                    param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
+            }
             else if ($(this)[0].nodeName == "INPUT")
                 param["Value"] = $(this).val();
 

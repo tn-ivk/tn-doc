@@ -93,41 +93,6 @@ namespace TN_Doc.Controllers
             //LoadDocsModules(PathToDocumentFile);
         }
 
-/*
-        private void LoadDocsModules(string path)
-        {
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Report.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Passport.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Act.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Jornal.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_PP_Areom.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_PW.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_PV.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_PP.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_MI2816.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Poverka2816.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_PR_PU.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_PR_PR.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/KMH_MPR_MPR.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Poverka3380.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Poverka3287.dll");
-            LoadDocsModule(Directory.GetCurrentDirectory() + "/Dll" + "/Poverka3265_PR_PU.dll");            
-        }
-        private void LoadDocsModule(string path)
-        {
-            Assembly assembly = Assembly.LoadFrom(path);
-
-            var docs = assembly.GetTypes().Where(x => x.BaseType.Name == "DocGeneral");
-
-            TN.DocData.Device device = CfgApp.Devices.Single(x => x.Use && x.GuidDevice == IdDevice.IVK1);
-
-            foreach (var item in docs)
-            {
-                Docs.Add((TN.Doc.DocGeneral)assembly.CreateInstance(item.FullName, false, BindingFlags.Default, null, new object[] { options, Path.Combine(Directory.GetCurrentDirectory()), device }, null, null));
-            }
-        }
-*/
-
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
         {
             deviceCfg = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
@@ -304,13 +269,18 @@ namespace TN_Doc.Controllers
             return doc.GetList(UTBegin, UTEnd);
         }
 
-        public Microsoft.AspNetCore.Html.HtmlString GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
+        public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
             //var pathTemplateDoc = Directory.GetCurrentDirectory() +
             //    GetPathTemplateDoc(IdDevice, IdDoc, GetIdTemplateDoc(IdDevice, IdDoc));
 
-            FR.Report.Load(doc.GetPathTemplateFile());
+            string pathTemplateFile = doc.GetPathTemplateFile();
+            
+            if (string.IsNullOrEmpty(pathTemplateFile))
+                return false;
+
+            FR.Report.Load(pathTemplateFile);
 
             if (IdDoc == IdDoc.KMH_PP_Areom)
                 FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
@@ -326,28 +296,6 @@ namespace TN_Doc.Controllers
             else
                 FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id));
 
-            //FR.EnableMargins = true;
-            //FR.Mode = WebReportMode.Preview;
-            //FR.SinglePage = false;
-            //FR.Toolbar = new ToolbarSettings()
-            //{
-            //    Show = true,
-            //    ShowPrevButton = true,
-            //    ShowPrint = true,
-            //    ShowOnDialogPage = true,
-            //    ShowRefreshButton = false,
-            //    ShowZoomButton = false,
-            //    ShowFirstButton = false,
-            //    ShowLastButton = true,
-            //    ShowNextButton = true,
-
-            //    Position = Positions.Left
-            //};
-
-            //FR.Width = "100%";
-            ////FR.Height = "auto";
-            //FR.Height = "100%";
-
             FR.Report.Prepare();
 
             FastReport.Export.Pdf.PDFExport pdfExport = new FastReport.Export.Pdf.PDFExport();
@@ -360,16 +308,13 @@ namespace TN_Doc.Controllers
             //pdfExport.HideMenubar = true;
             //pdfExport.HideToolbar = true;
             //pdfExport.HideWindowUI= true;
-            
-            //MemoryStream strm = new MemoryStream();
 
             FR.Report.Export(pdfExport, Directory.GetCurrentDirectory() + "/wwwroot/PDF/PDF.pdf");
 
             pdfExport.Dispose();
             FR.Report.Dispose();
-            
-            Microsoft.AspNetCore.Html.HtmlString html = new Microsoft.AspNetCore.Html.HtmlString("");
-            return html;// FR.Render().Result;        
+
+            return true;     
         }
 
         public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)

@@ -6,7 +6,7 @@
     "Settings": {
       "General": {
         "ObjType": 1,
-        "NefType": 1,
+        "NefType": 2,
         "NumberDensitometers": 1,
         "NumberViscometers": 1,
         "NumberWatermetrs": 1,
@@ -29,92 +29,173 @@
           {
             "Use": true,
             "Id": 1,
-            "IdGroup": 1,
-            "F": "Гущина",
-            "I": "Марина",
-            "O": "Валерьевна",
-            "Factory": "АО «Газпромнефть-ННГ»",
-            "Post": "Лаборант"
+            "IdGroup": 3,
+            "F": "Деревяшкин",
+            "I": "А",
+            "O": "А",
+            "Factory": "ПАО АНК «Башнефть»",
+            "Post": ""
           },
           {
             "Use": true,
             "Id": 2,
-            "IdGroup": 1,
-            "F": "Кильматова",
-            "I": "Гульнара",
-            "O": "Зуфаровна",
-            "Factory": "АО «Газпромнефть-ННГ»",
-            "Post": "Лаборант"
+            "IdGroup": 3,
+            "F": "Козленко",
+            "I": "К",
+            "O": "Ю",
+            "Factory": "ПАО АНК «Башнефть»",
+            "Post": ""
           },
           {
             "Use": true,
             "Id": 3,
-            "IdGroup": 1,
-            "F": "Ошвинцева",
-            "I": "Екатерина",
-            "O": "Геннадьевна",
-            "Factory": "АО «Газпромнефть-ННГ»",
-            "Post": "Лаборант"
+            "IdGroup": 3,
+            "F": "Шарапов",
+            "I": "К",
+            "O": "А",
+            "Factory": "ПАО АНК «Башнефть»",
+            "Post": ""
           },
           {
             "Use": true,
             "Id": 4,
-            "IdGroup": 2,
-            "F": "Ковалев",
-            "I": "Вячеслав",
-            "O": "Викторович",
-            "Factory": "АО «Газпромнефть-ННГ»",
-            "Post": "Начальник ЦППН №1"
+            "IdGroup": 3,
+            "F": "Родионова",
+            "I": "И",
+            "O": "Ю",
+            "Factory": "ПАО «Сургутнефтегаз»",
+            "Post": ""
           },
           {
             "Use": true,
             "Id": 5,
-            "IdGroup": 2,
-            "F": "Мухаметшин",
-            "I": "Кабир",
-            "O": "Фиргатович",
-            "Factory": "АО «Газпромнефть-ННГ»",
-            "Post": "РН по подготовке нефти Восток"
+            "IdGroup": 3,
+            "F": "Кузьмина",
+            "I": "С",
+            "O": "М",
+            "Factory": "ПАО «Сургутнефтегаз»",
+            "Post": ""
           },
           {
             "Use": true,
             "Id": 6,
-            "IdGroup": 2,
-            "F": "Черный",
-            "I": "Евгений",
-            "O": "Дмитриевич",
-            "Factory": "АО «Газпромнефть-ННГ»",
-            "Post": "Руковадитель ПП по ПСН и ППД"
+            "IdGroup": 3,
+            "F": "Родионова",
+            "I": "И",
+            "O": "Ю",
+            "Factory": "АО «Казтрансойл»",
+            "Post": ""
           },
           {
             "Use": true,
             "Id": 7,
             "IdGroup": 3,
-            "F": "Коняева",
-            "I": "Ирэна",
-            "O": "Анатольевна",
-            "Factory": "АО «Транснефть-Сибирь»",
-            "Post": "Оператор товарный"
+            "F": "Кузьмина",
+            "I": "С",
+            "O": "М",
+            "Factory": "АО «АО «Казтрансойл»",
+            "Post": ""
           },
+
           {
             "Use": true,
             "Id": 8,
-            "IdGroup": 3,
-            "F": "Данилюк",
-            "I": "Елена",
-            "O": "Юрьевна",
-            "Factory": "АО «Транснефть-Сибирь»",
-            "Post": "Оператор товарный"
+            "IdGroup": 2,
+            "F": "Платошин",
+            "I": "А",
+            "O": "В",
+            "Factory": "",
+            "Post": ""
           },
           {
             "Use": true,
             "Id": 9,
-            "IdGroup": 3,
-            "F": "Личманова",
-            "I": "Полина",
-            "O": "Борисовна",
-            "Factory": "АО «Транснефть-Сибирь»",
-            "Post": "Оператор товарный"
+            "IdGroup": 2,
+            "F": "Коптев",
+            "I": "А",
+            "O": "В",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 10,
+            "IdGroup": 2,
+            "F": "Чингалаев",
+            "I": "А",
+            "O": "С",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 11,
+            "IdGroup": 1,
+            "F": "Тринк",
+            "I": "Т",
+            "O": "С",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 12,
+            "IdGroup": 1,
+            "F": "Козлова",
+            "I": "Т",
+            "O": "И",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 13,
+            "IdGroup": 1,
+            "F": "Маркова",
+            "I": "Е",
+            "O": "В",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 14,
+            "IdGroup": 1,
+            "F": "Федорова",
+            "I": "И",
+            "O": "В",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 15,
+            "IdGroup": 1,
+            "F": "Кононова",
+            "I": "М",
+            "O": "В",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 16,
+            "IdGroup": 1,
+            "F": "Волокитина",
+            "I": "О",
+            "O": "З",
+            "Factory": "",
+            "Post": ""
+          },
+          {
+            "Use": true,
+            "Id": 17,
+            "IdGroup": 1,
+            "F": "Бурханова",
+            "I": "С",
+            "O": "В",
+            "Factory": "",
+            "Post": ""
           }
         ],
         "UsersGroup": [
@@ -144,64 +225,70 @@
             "Id": 1,
             "Use": true,
             "IdUser": 1,
-            "LicensesNumber": "NumX-1243",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "ДОВ/8/126/21",
+            "LicensesDate": "01.08.2021"
           },
           {
             "Id": 2,
             "Use": true,
             "IdUser": 2,
-            "LicensesNumber": "NumZ-243",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "ДОВ/8/126/21",
+            "LicensesDate": "01.08.2021"
           },
           {
             "Id": 3,
             "Use": true,
             "IdUser": 3,
-            "LicensesNumber": "NumB-52437",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "ДОВ/8/126/21",
+            "LicensesDate": "01.08.2021"
           },
           {
             "Id": 4,
             "Use": true,
             "IdUser": 4,
-            "LicensesNumber": "NumQB-4243",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "644-Д",
+            "LicensesDate": "01.01.2023"
           },
           {
             "Id": 5,
             "Use": true,
             "IdUser": 5,
-            "LicensesNumber": "NumV-147",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "645-Д",
+            "LicensesDate": "01.01.2023"
           },
           {
             "Id": 6,
             "Use": true,
             "IdUser": 6,
-            "LicensesNumber": "NumS-177",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "1/2021",
+            "LicensesDate": "25.01.2021"
           },
           {
             "Id": 7,
             "Use": true,
             "IdUser": 7,
-            "LicensesNumber": "NumS-177",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "1/2021",
+            "LicensesDate": "25.01.2021"
           },
           {
             "Id": 8,
             "Use": true,
             "IdUser": 8,
-            "LicensesNumber": "NumS-177",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "20-27/479-22",
+            "LicensesDate": "12.12.2022"
           },
           {
             "Id": 9,
             "Use": true,
             "IdUser": 9,
-            "LicensesNumber": "NumS-177",
-            "LicensesDate": "10.02.2023"
+            "LicensesNumber": "20-27/482-22",
+            "LicensesDate": "12.12.2022"
+          },
+          {
+            "Use": true,
+            "IdUser": 10,
+            "LicensesNumber": "20-27/480-22",
+            "LicensesDate": "12.12.2022"
           }
         ]
       }
