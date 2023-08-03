@@ -9,55 +9,57 @@
     ViewData["Title"] = "Модуль - документы";
 }
 <body>
+<div class="Device">
+    <div class="top-menu">
+        <div class="menu-item">
+            <table border="0" cellpadding="5">
+                <tr>
+                    <td>
+                        <label for="ComboboxDevice">Устройство:</label>
+                        <select id="ComboboxDevice"></select>
+                        <br>
+                        <label for="ComboboxDocGUID">Документ:</label>
+                        <select id="ComboboxDocGUID"></select>
+                    </td>
+                    <td>
+                        <label for="DatepickerBegin">Дата начала:</label>
+                        <input id="DatepickerBegin"/>
+                        <br>
+                        <label for="DatepickerEnd">Дата окончания:</label>
+                        <input id="DatepickerEnd"/>
+                    </td>
+                    <td>
+                        <input id="ButtonGetData" type="button" value="Получить данные" onclick="table.ajax.reload()">
+                        <br>
+                        <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
+                    </td>
+                    <td>
+                        <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
+                        <br>
+                        <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
+                    </td>
+                </tr>
+            </table>
+        </div>
 
-    <div class="Device">
-        <table border="0" cellpadding="5">
-            <tr>
-                <td>
-                    <label for="ComboboxDevice">Устройство:</label>
-                    <select id="ComboboxDevice"></select>
-                    <br>
-                    <label for="ComboboxDocGUID">Документ:</label>
-                    <select id="ComboboxDocGUID"></select>
-                </td>
-                <td>
-                    <label for="DatepickerBegin">Дата начала:</label>
-                    <input id="DatepickerBegin"/>
-                    <br>
-                    <label for="DatepickerEnd">Дата окончания:</label>
-                    <input id="DatepickerEnd"/>
-                </td>
-                <td>
-                    @*<a name="ButtonGetData">Получить данные</a>*@
-                    <input id="ButtonGetData" type="button" value="Получить данные" onclick="table.ajax.reload()">
-                    <br>
-                    @*<a id="ButtonSave" name="ButtonSave">Сохранить</a>*@
-                    <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
-                </td>
-                <td>
-                    @*<a id="ButtonReview" name="ButtonReview">Просмотр</a>*@
-                    <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
-                    <br>
-                    @*<a id="ButtonEdit" name="ButtonEdit">Редактирование</a>*@
-                    <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
-                </td>
-                @*<td>
-                    <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
-                    <br>
-                    <input id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
-                </td>*@
-            </tr>
-        </table>       
+        <div class="menu-item">
+            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#modal-window">
+                <i class="fa fa-book big-icon" aria-hidden="true"></i>
+            </button>
+        </div>
+
     </div>
 
-    <div class="Table">        
-        <table id="DataTable" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Дата, время</th>
-                    <th>Описание</th>
-                </tr>
-            </thead>
+</div>
+
+<div class="Table">
+    <table id="DataTable" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>Дата, время</th>
+            <th>Описание</th>
+        </tr>
+        </thead>
 
             <tbody>
                 <tr>
@@ -100,21 +102,129 @@
                 </td>
 
 
+        </tr>
+        <tr>
+            <td colspan="6">
+                <iframe name=print_frame class="FR" src=""></iframe>
+            </td>
+        </tr>
+    </table>
+</div>
 
 
-            </tr>
-            <tr>
-                <td colspan="6">
-                    <iframe name=print_frame class="FR" src=""></iframe>
-  
-@*                    <div class="FR" src=""></div>
-*@                </td>
-            </tr>
-        </table>
+<div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dir-editor-width" role="document">
+        <div class="modal-content modal-dir-editor-height">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Справочники</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-2">
+                            <ul class="list-group" id="dictionaries-list">
+                                <li class="list-group-item active" data-type="#user-group"> Группы пользователей</li>
+                                <li class="list-group-item" data-type="#licences"> Доверенности</li>
+                                <li class="list-group-item" data-type="#users"> Пользователи</li>
+                            </ul>
+
+                        </div>
+
+                        <div class="col-10">
+                            <div class="dictionaries">
+                                <div class="dir-item" id="user-group">
+                                    <div class="table-container">
+                                        <div class="table-content">
+                                            <table class="user-group-table  table table-bordered inner-item-center">
+                                                <thead >
+                                                <tr class="table-secondary">
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Активен</th>
+                                                    <th scope="col">Название</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="table-bottom-menu">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="dir-item  d-none" id="users">
+                                    <div class="table-container">
+                                        <div class="table-content">
+                                            <table class="users-table table table-bordered inner-item-center">
+                                                <thead>
+                                                <tr class="table-primary">
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Активен</th>
+                                                    <th scope="col">Группа</th>
+                                                    <th scope="col">Фамилия</th>
+                                                    <th scope="col">Имя</th>
+                                                    <th scope="col">Отчество</th>
+                                                    <th scope="col">Организация</th>
+                                                    <th scope="col">Должность</th>
+                                                    <th scope="col">Доверенность</th>
+                                                    <th scope="col">Действия</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="table-bottom-menu">
+                                            <button class="btn btn-primary default-btn-size add-user-btn">
+                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                                <label>Добавить</label>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="dir-item  d-none" id="licences">
+                                    <div class="table-container">
+                                        <div class="table-content">
+                                            <table class="licences-table table table-bordered inner-item-center">
+                                                <thead>
+                                                <tr class="table-primary">
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Активен</th>
+                                                    <th scope="col">Номер доверенности</th>
+                                                    <th scope="col">Дата доверенности</th>
+                                                    <th scope="col">Действия</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+
+                                        </div>
+                                        <div class="table-bottom-menu">
+                                            <button class="btn btn-primary default-btn-size add-lic-btn">
+                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                                <label>Добавить</label>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary save-btn default-btn-size">
+                    <i class="fa fa-spinner fa-spin d-none" aria-hidden="true"></i>
+                    <label>Сохранить</label>
+                </button>
+            </div>
+        </div>
     </div>
-
-    <script>   
+</div>
+<script>   
         InitElement();
-    </script>
-
+</script>
 </body>

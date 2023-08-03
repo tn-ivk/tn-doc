@@ -6,26 +6,29 @@
     top: 100px;
     width: 355px;
     height: 825px;
-    float: left;                /* Обтекание справа */
-    border: 1px solid #333;     /* Параметры рамки вокруг */
-                                /* padding: 5px;  Поля вокруг текста */
-                                /* margin: 10px 10px 20px 5px;  Значения отступов */
+    float: left; /* Обтекание справа */
+    border: 1px solid #333; /* Параметры рамки вокруг */
+    /* padding: 5px;  Поля вокруг текста */
+    /* margin: 10px 10px 20px 5px;  Значения отступов */
 }
+
 .Table div {
-                                /* min-height: 400px; */
-    padding: 2px;               /* Поля вокруг ссылок */
+    /* min-height: 400px; */
+    padding: 2px; /* Поля вокруг ссылок */
 }
+
 .Table a {
-    display: block;             /* Отображать ссылку как блок */
-    padding: 2px;               /* Поля вокруг ссылок */
-    margin: 1px;                /* Отступы вокруг */
-    font-size: 0.9em;           /* Размер текста */
-    text-decoration: none;      /* Убираем подчеркивание текста */
+    display: block; /* Отображать ссылку как блок */
+    padding: 2px; /* Поля вокруг ссылок */
+    margin: 1px; /* Отступы вокруг */
+    font-size: 0.9em; /* Размер текста */
+    text-decoration: none; /* Убираем подчеркивание текста */
 }
+
 .Table a:hover {
-    background: #faf3d2;        /* Цвет фона */
+    background: #faf3d2; /* Цвет фона */
     border: 1px dashed #634f36; /* Добавление пунктирной рамки */
-    margin: 0;                  /* Убираем поля */
+    margin: 0; /* Убираем поля */
 }
 
 /*
@@ -70,8 +73,118 @@
     position: absolute;
     left: 20px;
     top: 10px;
-    width: 1800px;
+    width: 100%;
     height: 20px;
+}
+
+/***************************************************/
+.top-menu {
+    display: flex;
+    justify-content: space-between;
+}
+
+.menu-item {
+    align-self: center;
+    margin: 10px 30px 10px 10px
+}
+
+.big-icon {
+    font-size: 50px;
+}
+
+.modal-dir-editor-width {
+    max-width: 90%;
+    min-width: 600px;
+}
+
+.modal-dir-editor-height {
+    max-height: 80%;
+    min-height: 600px;
+}
+
+.dir-item {
+    height: 600px;
+}
+
+#not-selected {
+    text-align: center;
+    height: 100px;
+    width: 200px;
+    border-radius: 5%;
+}
+
+.user-group-table,
+.licences-table,
+.users-table {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.inner-item-center {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.btn-image {
+    width: 100%;
+    height: 100%;
+}
+
+.disabled-item {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.save-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+}
+
+.data-row {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.dictionaries {
+}
+
+.invalid-cell-content {
+    outline: 2px solid red;
+    outline-offset: -2px;
+    /*border: 1px solid red;*/
+}
+
+.table-container {
+    display: block;
+    height: 100%;
+}
+
+.table-content {
+    max-height: 90%;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.table-bottom-menu {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+
+.default-btn-size {
+    height: 40px;
+    width: 115px;
+}
+
+.add-lic-btn {
+
+}
+
+.add-user-btn {
+
 }
 
 /*.bExport {
@@ -86,27 +199,30 @@
 
 /*.bExport:hover {*/
 /*    background: url(../Pictures/export_wite.png) no-repeat;
-*/    /*background-size: contain;
-    background-color: #555555;
-    color: white;
+*/
+/*background-size: contain;
+background-color: #555555;
+color: white;
 }
 
 .bExport {*/
 /*    background: url(../Pictures/export_black.png) no-repeat;
-*/    /*background-size: contain;
-    background-color: white;
-    border: 1px solid #555555;
-    color: black;
-    padding: 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;*/
+*/
+/*background-size: contain;
+background-color: white;
+border: 1px solid #555555;
+color: black;
+padding: 10px;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+font-size: 16px;
+display: block;
+margin-left: auto;
+margin-right: auto;*/
 /*    margin: 4px 2px;
-*/    /*transition-duration: 0.6s;
-    cursor: pointer;
+*/
+/*transition-duration: 0.6s;
+cursor: pointer;
 }*/
 

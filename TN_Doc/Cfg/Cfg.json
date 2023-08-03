@@ -222,54 +222,63 @@
         ],
         "Licenses": [
           {
+            "Id": 1,
             "Use": true,
             "IdUser": 1,
             "LicensesNumber": "ДОВ/8/126/21",
             "LicensesDate": "01.08.2021"
           },
           {
+            "Id": 2,
             "Use": true,
             "IdUser": 2,
             "LicensesNumber": "ДОВ/8/126/21",
             "LicensesDate": "01.08.2021"
           },
           {
+            "Id": 3,
             "Use": true,
             "IdUser": 3,
             "LicensesNumber": "ДОВ/8/126/21",
             "LicensesDate": "01.08.2021"
           },
           {
+            "Id": 4,
             "Use": true,
             "IdUser": 4,
             "LicensesNumber": "644-Д",
             "LicensesDate": "01.01.2023"
           },
           {
+            "Id": 5,
             "Use": true,
             "IdUser": 5,
             "LicensesNumber": "645-Д",
             "LicensesDate": "01.01.2023"
           },
           {
+            "Id": 6,
             "Use": true,
             "IdUser": 6,
             "LicensesNumber": "1/2021",
             "LicensesDate": "25.01.2021"
           },
           {
+            "Id": 7,
             "Use": true,
             "IdUser": 7,
             "LicensesNumber": "1/2021",
             "LicensesDate": "25.01.2021"
           },
           {
+            "Id": 8,
             "Use": true,
             "IdUser": 8,
             "LicensesNumber": "20-27/479-22",
             "LicensesDate": "12.12.2022"
           },
           {
+            "Id": 9,
             "Use": true,
             "IdUser": 9,
             "LicensesNumber": "20-27/482-22",

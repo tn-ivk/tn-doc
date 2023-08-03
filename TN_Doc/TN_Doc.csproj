@@ -458,6 +458,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\css\font-awesome\" />
     <Folder Include="wwwroot\PDF\" />
   </ItemGroup>
 
