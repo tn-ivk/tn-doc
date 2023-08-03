@@ -998,9 +998,12 @@ function EditSelectedUser(itemBtn, rowItem, itemId) {
         ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
+        rowMap[6]="ignore";
+        rowMap[7]="ignore";
         if (!ValidateEditRow(rowItem, rowMap))
             return;
-
+        rowMap[6]="text";
+        rowMap[7]="text";
         ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
         ConvertEditRowToStableRow(rowItem, rowMap)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
@@ -1092,9 +1095,22 @@ function ApplyUserChanges(rowItem, itemId) {
     updatedObject['F'] = cells[3].childNodes[0].textContent;
     updatedObject['I'] = cells[4].childNodes[0].textContent;
     updatedObject['O'] = cells[5].childNodes[0].textContent;
-    updatedObject['Factory'] = cells[6].childNodes[0].textContent;
-    updatedObject['Post'] = cells[7].childNodes[0].textContent;
+    
+    let fact =cells[6].childNodes[0].textContent;
+    if (!fact) {
+        updatedObject['Factory'] = "";
+    } else {
+        updatedObject['Factory'] = fact;
+    }
 
+    let post =cells[7].childNodes[0].textContent;
+    if (!post) {
+        updatedObject['Post'] = "";
+    } else {
+        updatedObject['Post'] = post;
+    }
+    
+    
     let lic = appDictionaries['Licenses'].filter(item => item['Id'] === Number(cells[8].dataset.licId))[0];
     if (!lic)
         return;
