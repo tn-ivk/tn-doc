@@ -463,6 +463,7 @@ function GetData()
             complete: function (data)
             {
                 if ($('#ComboboxDocGUID').val() == 0 ||
+                    $('#ComboboxDocGUID').val() == 3 ||
                     $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
                     $('#ButtonReview').prop('disabled', true);
@@ -517,7 +518,9 @@ function GetDoc()
                 //});
 
                 //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&id=' + x);
-                $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
+
+                if (data)
+                    $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
                 
                 //PDFObject.embed("/PDF/PDF.pdf", ".FR");                
             },

@@ -10,150 +10,14 @@
     },
     {
       "Id": 2,
-      "Use": false,
-      "Edit": false,
-      "Key": "LineName",
-      "Type": "text",
-      "Name": "Линия"
-    },
-    {
-      "Id": 3,
-      "Use": false,
-      "Edit": false,
-      "Key": "Place_PSP",
-      "Type": "text",
-      "Name": "Место проведения поверки"
-    },
-    {
-      "Id": 4,
-      "Use": false,
-      "Edit": false,
-      "Key": "Place_Factory",
-      "Type": "text",
-      "Name": "Наименование организации"
-    },
-    {
-      "Id": 5,
-      "Use": false,
-      "Edit": false,
-      "Key": "Place_SIKN_Name",
-      "Type": "text",
-      "Name": "Наименование СИКН"
-    },
-    {
-      "Id": 6,
-      "Use": false,
-      "Edit": false,
-      "Key": "MPR_Sensor_Type",
-      "Type": "text",
-      "Name": "СРМ: Тип датчика"
-    },
-    {
-      "Id": 7,
-      "Use": false,
-      "Edit": false,
-      "Key": "MPR_Sensor_FactoryNumber",
-      "Type": "text",
-      "Name": "СРМ: Заводской № датчика"
-    },
-    {
-      "Id": 8,
-      "Use": false,
-      "Edit": false,
-      "Key": "MPR_PEP_Type",
-      "Type": "text",
-      "Name": "СРМ: Тип преобразователя"
-    },
-    {
-      "Id": 9,
-      "Use": false,
-      "Edit": false,
-      "Key": "MPR_PEP_FactoryNumber",
-      "Type": "text",
-      "Name": "СРМ: Заводской № преобразователя"
-    },
-    {
-      "Id": 10,
-      "Use": false,
-      "Edit": false,
-      "Key": "CP_Type",
-      "Type": "text",
-      "Name": "КП: Тип"
-    },
-    {
-      "Id": 11,
-      "Use": false,
-      "Edit": false,
-      "Key": "CP_FactoryNumber",
-      "Type": "text",
-      "Name": "КП: Заводской №"
-    },
-    {
-      "Id": 12,
-      "Use": false,
-      "Edit": false,
-      "Key": "PP_Type",
-      "Type": "text",
-      "Name": "ПП: Тип"
-    },
-    {
-      "Id": 13,
-      "Use": false,
-      "Edit": false,
-      "Key": "PP_FactoryNumber",
-      "Type": "text",
-      "Name": "ПП: Заводской №"
-    },
-    {
-      "Id": 14,
-      "Use": false,
-      "Edit": false,
-      "Key": "PR_Type",
-      "Type": "text",
-      "Name": "ПР: Тип"
-    },
-    {
-      "Id": 15,
-      "Use": false,
-      "Edit": false,
-      "Key": "PR_FactoryNumber",
-      "Type": "text",
-      "Name": "ПР: Заводской №"
-    },
-    {
-      "Id": 16,
-      "Use": false,
-      "Edit": false,
-      "Key": "IVK_Type",
-      "Type": "text",
-      "Name": "ИВК: Тип"
-    },
-    {
-      "Id": 17,
-      "Use": false,
-      "Edit": false,
-      "Key": "IVK_FactoryNumber",
-      "Type": "text",
-      "Name": "ИВК: Заводской №"
-    },
-    {
-      "Id": 18,
-      "Use": false,
-      "Edit": false,
-      "Key": "Oil_Type",
-      "Type": "text",
-      "Name": "Рабочая жидкость"
-    },
-    {
-      "Id": 19,
       "Use": true,
       "Edit": true,
-      "Key": "ARM_Poverka_Result",
+      "Key": "ARM_Poverka_Result_MPR",
       "Type": "list",
       "Name": "Поверка СРМ с помощью КП, ПП и ПР: СРМ к дальнейшей эксплуатации"
     },
     {
-      "Id": 20,
+      "Id": 3,
       "Use": true,
       "Edit": true,
       "Key": "ARM_StaffData_fio_MPR",
@@ -161,7 +25,7 @@
       "Name": "Поверка СРМ с помощью КП, ПП и ПР: И.О. Фамилия"
     },
     {
-      "Id": 21,
+      "Id": 4,
       "Use": true,
       "Edit": true,
       "Key": "ProtokolNum_TPR",
@@ -169,7 +33,7 @@
       "Name": "Определение коэффициента преобразования ПР с помощью КП: Номер протокола"
     },
     {
-      "Id": 22,
+      "Id": 5,
       "Use": true,
       "Edit": true,
       "Key": "ARM_StaffData_fio_TPR",

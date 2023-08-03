@@ -941,8 +941,8 @@ namespace FastReport
       </TableObject>
     </DataBand>
     <ReportSummaryBand Name="ReportSummary" Top="894.4" Width="718.2" Height="102.06" CanShrink="true">
-      <TableObject Name="TableConclusion1" Top="7.56" Width="385.56" Height="37.8" GrowToBottom="true">
-        <TableColumn Name="Column178" Width="215.46"/>
+      <TableObject Name="TableConclusion1" Top="7.56" Width="405.56" Height="37.8" GrowToBottom="true">
+        <TableColumn Name="Column178" Width="235.46"/>
         <TableColumn Name="Column236" Width="170.1" AutoSize="true"/>
         <TableRow Name="Row136">
           <TableCell Name="Cell959" Text="Заключение: СРМ к дальнейшей эксплуатации" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>

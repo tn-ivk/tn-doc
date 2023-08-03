@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Class\DocPassport.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="appsettings.json" />
   </ItemGroup>
 
@@ -54,10 +58,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="Cfg\Cfg.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -70,6 +70,9 @@
     <Content Update="Cfg\CfgApp.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="Cfg\CfgEditActNP.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="Cfg\CfgEditAct.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -80,6 +83,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgEditKMH_PP.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_UZR_PU.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgEditPoverka2816.json">
@@ -101,6 +107,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgEditKMH3312_UPR_PR.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH3288_MPR_TPR.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditPoverka3272.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgJornal.json">
@@ -266,16 +278,31 @@
     <None Update="Doc\01_Report_2023-02-10_Release_version_%28Ust-Luga%29.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Doc\02_KMH_PP_MI_3532-2015_Release_version_TDV.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\02_KMH_PP_MI_3532-2015_Release_version.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\03_KMH_PP_Areom_MI_3532-2015_TDV.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\03_KMH_PP_Areom_MI_3532-2015.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Doc\04_TableKMH_PW_TDV.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\04_TableKMH_PW.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Doc\05_TableKMH_PV_TDV.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\05_TableKMH_PV.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\06_KMH_MI2816_Release_Version_TDV.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\06_KMH_MI2816_Release_Version.frx">
@@ -284,7 +311,19 @@
     <None Update="Doc\07_KMH_PR_PR_%28TPR%29_Release_Version.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Doc\08_DocKMH_UZR_PU_(TPR).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\08_DocKMH_PR_PU_%28TPR%29.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\25_DocMeasurementJornal_NP.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\_ActParty.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Act_NP_MI3275-2016(B).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\Passport\Passport.frx">
@@ -420,6 +459,10 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\PDF\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
   </ItemGroup>
 
   <ItemGroup>

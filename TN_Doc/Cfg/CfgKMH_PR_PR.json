@@ -5,13 +5,13 @@
     "Settings": {
       "General": {
         "ObjType": 1,
-        "NefType": 1,
+        "NefType": 2,
         "NumberDensitometers": 1,
         "NumberViscometers": 1,
         "NumberWatermetrs": 1,
         "PageSettings": {
-          "PaperWidth": 297,
-          "PaperHeight": 210,
+          "PaperWidth": 210,
+          "PaperHeight": 297,
           "TopMargin": 10,
           "BottomMargin": 10,
           "LeftMargin": 10,

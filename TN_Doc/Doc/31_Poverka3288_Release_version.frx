@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3288.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/21/2023 17:54:40" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3288.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/24/2023 16:59:29" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -32,7 +32,7 @@ namespace FastReport
     TN.Doc.DictionarysDoc Dictionarys;
     TN.Doc.DataIVKDoc DataIVK;
       
-    List &lt;TN.Doc.Table1MPR&gt; listMPR_Table1SourceData;
+    //List &lt;TN.Doc.Table1MPR&gt; listMPR_Table1SourceData;
 
     private void Page_StartPage(object sender, EventArgs e)
     {
@@ -69,8 +69,9 @@ namespace FastReport
       Page.RightMargin = General.PageSettings.RightMargin;
                                                                 
       //// ==== Get Data from classes
-      listMPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_MPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
+      //listMPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_MPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
     
+      
       // Запуск отрисовки таблиц на странице отчета
       Draw_MPR_TableHeader();    
       Draw_MPR_TableConclusion();
@@ -124,7 +125,6 @@ namespace FastReport
               
     private void MPR_Table1SourceData_ManualBuild(object sender, EventArgs e)
     {
-         
       //Setup Columns width
       int sumDynamicCols=MPR_Table1SourceData.ColumnCount;
       float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
@@ -140,7 +140,25 @@ namespace FastReport
         MPR_Table1SourceData.PrintRow(n);
         MPR_Table1SourceData.PrintColumns();                                             
       }
-                                                     
+      
+      MPR_V0.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].V0);        
+      MPR_m_D.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].m_D);        
+      MPR_m_S.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].m_S);        
+      MPR_m_E.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].m_E);        
+      MPR_Alpha_k1.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Alpha_k1);        
+      MPR_Alpha_D.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Alpha_D);        
+      MPR_Teta_Sum_0.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Teta_Sum_0);        
+      MPR_Teta_V_0.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Teta_V_0);      
+      MPR_Delta_t_PU.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Delta_t_PU);        
+      MPR_Delta_t_PP.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Delta_t_PP);        
+      MPR_Delta_PP.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Delta_PP);        
+      MPR_Delta_t_PR.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Delta_t_PR);        
+      MPR_delta_PR.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].delta_PR);       
+      
+      MPR_Table1SourceData.PrintRow(3);     
+      MPR_Table1SourceData.PrintColumns();
+      
+      /*
       //Fill table with data
       for (int n = 0; n &lt; (listMPR_Table1SourceData.Count); n++)
       {
@@ -181,11 +199,12 @@ namespace FastReport
         }
         MPR_Table1SourceData.PrintRow(3);     
         MPR_Table1SourceData.PrintColumns();  
-      }                                                    
+      }   
+      */                                                 
     }
       
     private void MPR_Table1SourceDataEnding_ManualBuild(object sender, EventArgs e)
-    {               
+    {  
       string MPR_K_M_MF; 
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
@@ -229,8 +248,23 @@ namespace FastReport
       }
         
       //Selecting the Сell by name (depending on the calcMode value)
-      TableCell MPR_K_M_MF_ust = (TableCell )MPR_Table1SourceDataEnding.FindObject(MPR_K_M_MF); 
+      TableCell MPR_K_M_MF_ust = (TableCell)MPR_Table1SourceDataEnding.FindObject(MPR_K_M_MF); 
          
+      MPR_delta_IVK_PU.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].delta_IVK_PU);        
+      MPR_delta_IVK_PR.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].delta_IVK_PR); 
+      MPR_K_PM_ust.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].K_PM_ust); 
+      MPR_K_M_MF_ust.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].K_M_MF_ust);        
+      MPR_Q_M_max.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Q_M_max);        
+      MPR_ZS.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].ZS);        
+      MPR_delta_t_dop.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].delta_t_dop);        
+      MPR_Q_nom.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].Q_nom);        
+      MPR_t_min.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].t_min);        
+      MPR_t_max.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].t_max);        
+      MPR_delta_P_dop.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].delta_P_dop);        
+      MPR_P_min.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].P_min);        
+      MPR_P_max.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table1[0].P_max);        
+      
+      /*
       //Fill table with data
       for (int n = 0; n &lt; (listMPR_Table1SourceData.Count); n++)
       {
@@ -250,52 +284,57 @@ namespace FastReport
         MPR_P_min.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].P_min);        
         MPR_P_max.Text=tools.GetNormalizedValue(listMPR_Table1SourceData[n].P_max);        
                                             
-            /* TEMP 
-            //RowSpans
-            for (int i = 0; i &lt; (MPR_Table1SourceDataEnding.ColumnCount); i++)
-            {          
-               switch(i)
-               {
-                  case 2:
-                  case 3:  
-                  case 4:   
-                     MPR_Table1SourceDataEnding[i,3].RowSpan =  listMPR_Table1SourceData.Count;
-                     break;  
-               }
-            }*/
-            
-        MPR_Table1SourceDataEnding.PrintRow(3);     
-        MPR_Table1SourceDataEnding.PrintColumns();           
-      }   
+        //TEMP 
+        //RowSpans
+        //for (int i = 0; i &lt; (MPR_Table1SourceDataEnding.ColumnCount); i++)
+        //{          
+        //   switch(i)
+        //   {
+        //      case 2:
+        //      case 3:  
+        //      case 4:   
+        //         MPR_Table1SourceDataEnding[i,3].RowSpan =  listMPR_Table1SourceData.Count;
+        //         break;  
+        //   }
+        //}
+      } */
+      
+      MPR_Table1SourceDataEnding.PrintRow(3);     
+      MPR_Table1SourceDataEnding.PrintColumns();  
     }
 
     private void MPR_Table2_1Results_ManualBuild(object sender, EventArgs e)
-    {                         
+    {    
+      
       List &lt;TN.Doc.Table2_Part1&gt; listTable2_1Results;
-      listTable2_1Results = DataIVK.TablePoverka3288.Protokol_MPR.Table2_part1.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+      listTable2_1Results = DataIVK.TablePoverka3288.Protokol_MPR.Table2_part1.Where(i =&gt; i.Activated == 1).ToList();
+      
+      if (listTable2_1Results.Count == 0)
+        listTable2_1Results.Add(DataIVK.TablePoverka3288.Protokol_MPR.Table2_part1.First());
+
       string K_MF_F_ji; 
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 0:
+        case 1:
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
           break;  
             
-        case 1:  
+        case 2:  
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
           break;  
             
-        case 2:   
+        case 3: 
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
           break;  
             
-        case 3:   
+        case 4:
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
@@ -322,7 +361,7 @@ namespace FastReport
          
       //Selecting the Сell by name (depending on the calcMode value)
       TableCell K_MF_F_ji_2_1 = (TableCell )MPR_Table2_1Results.FindObject(K_MF_F_ji); 
-         
+      
       //Fill table with data
       for (int n = 0; n &lt; (listTable2_1Results.Count); n++)
       {
@@ -338,42 +377,46 @@ namespace FastReport
         Beta_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].Beta_ji);        
         N_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].N_ji);        
         M_0_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].M_0_ji);        
-        M_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].M_ji);        
+        M_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].M_ji);       
         K_MF_F_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].K_MF_F_ji);        
         f_ji_2_1.Text=tools.GetNormalizedValue(listTable2_1Results[n].f_ji);        
 
         MPR_Table2_1Results.PrintRow(3);     
         MPR_Table2_1Results.PrintColumns();      
-      }                                                                       
+      }  
     }                                                                          
 
     private void MPR_Table2_2Results_ManualBuild(object sender, EventArgs e)
-    {                                                       
-      List &lt;TN.Doc.Table2_Part2&gt; listTable2_2Results;
-      listTable2_2Results=DataIVK.TablePoverka3288.Protokol_MPR.Table2_part2.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+    {
+      List &lt;TN.Doc.Table2_Part2&gt; listTable2_2Results = new List &lt;TN.Doc.Table2_Part2&gt;();
+      listTable2_2Results=DataIVK.TablePoverka3288.Protokol_MPR.Table2_part2.Where(i =&gt; i.Activated == 1).ToList();
+      
+      if (listTable2_2Results.Count == 0)
+        listTable2_2Results.Add(DataIVK.TablePoverka3288.Protokol_MPR.Table2_part2.First());
+      
       string K_MF_F_ji; 
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 0:
+        case 1:
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
           break;  
             
-        case 1:  
+        case 2:  
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
-          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
-          break;  
-            
-        case 2:   
-          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
-          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
           break;  
             
         case 3:   
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
+          break;  
+            
+        case 4:   
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
@@ -404,7 +447,7 @@ namespace FastReport
       //Fill table with data
       for (int n = 0; n &lt; (listTable2_2Results.Count); n++)
       {
-        SerRow_2_2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_2Results[n].Ser, listTable2_2Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
+        SerRow_2_2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_2Results[n].Ser, listTable2_2Results[n].Row);
         Q_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Q_ji);        
         T_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].T_ji);        
         Q_PR_ji_2_2.Text=tools.GetNormalizedValue(listTable2_2Results[n].Q_PR_ji);        
@@ -425,36 +468,40 @@ namespace FastReport
 
         MPR_Table2_2Results.PrintRow(3);     
         MPR_Table2_2Results.PrintColumns();      
-      }                   
+      } 
     }
       
     private void MPR_Table3Results_ManualBuild(object sender, EventArgs e)
-    {                                                   
+    {   
       List &lt;TN.Doc.Table3MPR&gt; listTable3Results;
-      listTable3Results = DataIVK.TablePoverka3288.Protokol_MPR.Table3.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+      listTable3Results = DataIVK.TablePoverka3288.Protokol_MPR.Table3.Where(i =&gt; i.Activated == 1).ToList();
+      
+      if (listTable3Results.Count == 0)
+        listTable3Results.Add(DataIVK.TablePoverka3288.Protokol_MPR.Table3.First());
+      
       string K_MF_F_j; 
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 0:
+        case 1:
           MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
           break;  
             
-        case 1:  
+        case 2:  
           MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
-          MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
-          break;  
-            
-        case 2:   
-          MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
-          MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
           break;  
             
         case 3:   
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
+          break;  
+            
+        case 4:   
           MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
@@ -497,36 +544,36 @@ namespace FastReport
             
         MPR_Table3Results.PrintRow(3);     
         MPR_Table3Results.PrintColumns();      
-      }         
+      }
     }    
 
     private void MPR_Table4Results_ManualBuild(object sender, EventArgs e)
-    {                  
-      List &lt;TN.Doc.Table4&gt; listTable4Results;                                             
-      listTable4Results = DataIVK.TablePoverka3288.Protokol_MPR.Table4.Where(i =&gt;! i.Q_min.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Q_min) == false).ToList();
+    {
+      //List &lt;TN.Doc.Table4&gt; listTable4Results;                                             
+      //listTable4Results = DataIVK.TablePoverka3288.Protokol_MPR.Table4.Where(i =&gt;! i.Q_min.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Q_min) == false).ToList();
       string K_MF_F_j; 
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 0:
+        case 1:
           MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
           break;  
             
-        case 1:  
+        case 2:  
           MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
-          MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
-          break;  
-            
-        case 2:   
-          MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
-          MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
           break;  
             
         case 3:   
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
+          break;  
+            
+        case 4:   
           MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
@@ -555,6 +602,28 @@ namespace FastReport
       TableCell MPR_K_MF_F_j_4 = (TableCell )MPR_Table4Results.FindObject(K_MF_F_j); 
          
       //Fill table with data
+      
+      Q_min_4.Text =  DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Q_min;
+      Q_max_4.Text =  DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Q_max;
+      MPR_K_MF_F_j_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].K_MF_F);  
+      S_0_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].S_0);        
+      Epsilon_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Epsilon);
+      Teta_A_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_A);        
+      Teta_Z_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_Z);   
+      Teta_ro_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_ro);   
+      Teta_t_PU_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_t_PU);   
+      Teta_t_PR_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_t_PR);   
+      t_P_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].t_P);   
+      Teta_Mt_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_Mt);   
+      P_P_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].P_P);   
+      Teta_MP_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_MP);   
+      Teta_Sum_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].Teta_Sum);   
+      delta_4.Text=tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_MPR.Table4[0].delta);   
+
+      MPR_Table4Results.PrintRow(3);     
+      MPR_Table4Results.PrintColumns();        
+      
+      /*
       for (int n = 0; n &lt; (listTable4Results.Count); n++)
       {
         Q_min_4.Text =  listTable4Results[n].Q_min;
@@ -576,13 +645,16 @@ namespace FastReport
             
         MPR_Table4Results.PrintRow(3);     
         MPR_Table4Results.PrintColumns();      
-      }         
+      }
+      */
     }
     
     private void MPR_TableGH_ManualBuild(object sender, EventArgs e)
     {
       List &lt;TN.Doc.TableGH&gt; listTableGH;                                             
-      listTableGH = DataIVK.TablePoverka3288.Protokol_MPR.TableGH.Where(i =&gt;! i.Point.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      listTableGH = DataIVK.TablePoverka3288.Protokol_MPR.TableGH.Where(i =&gt; !i.Point.Contains(&quot;-&quot;)).ToList();
+      if (listTableGH.Count == 0)
+        listTableGH.Add(DataIVK.TablePoverka3288.Protokol_MPR.TableGH.First());        
          
       //Setup Columns width
       int sumDynamicCols=MPR_TableGH.ColumnCount*2;
@@ -610,12 +682,11 @@ namespace FastReport
             
         MPR_TableGH.PrintRow(3);     
         MPR_TableGH.PrintColumns();      
-      }  
+      } 
     }
 
     public void  Draw_MPR_TableConclusion()
-    {                                
-         
+    {     
       // Setup Cols width    
       MPR_TableConclusion3.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)  * Units.Millimeters;
         
@@ -624,9 +695,13 @@ namespace FastReport
       MPR_ARM_StaffData_fio.Text = DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_StaffData_fio;
       MPR_DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
         (tools.UnixTimestampToDatetime(DataIVK.TablePoverka3288.AdditionalInfo_MPR.ARM_CheckDate)));               
-      PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;                         
+      PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
     }  
       
+    /////////////////////////////
+    //TPR_TableHeader
+    /////////////////////////////  
+    
     public void Draw_TPR_TableHeader()
     {
       //Setup Columns width
@@ -647,8 +722,8 @@ namespace FastReport
     {
       if (DataIVK.TablePoverka3288.Mode &lt; 3)
       {
-        List &lt;TN.Doc.Table1TPR&gt; listTPR_Table1SourceData;
-        listTPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_TPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
+        //List &lt;TN.Doc.Table1TPR&gt; listTPR_Table1SourceData;
+        //listTPR_Table1SourceData = DataIVK.TablePoverka3288.Protokol_TPR.Table1.Where(i =&gt; i.DetName.Length &gt; 1 &amp; String.IsNullOrEmpty(i.DetName) == false).ToList();
          
         //Setup Columns width
         int sumDynamicCols=TPR_Table1SourceData.ColumnCount;
@@ -665,7 +740,20 @@ namespace FastReport
           TPR_Table1SourceData.PrintRow(n);
           TPR_Table1SourceData.PrintColumns();                                             
         }
-                                                     
+         
+        TPR_V0.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].V0);        
+        TPR_m_D.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].m_D);        
+        TPR_m_S.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].m_S);        
+        TPR_m_E.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].m_E);        
+        TPR_Alpha_k1.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].Alpha_k1);        
+        TPR_Alpha_D.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].Alpha_D);        
+        TPR_Teta_Sum_0.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].Teta_Sum_0);        
+        TPR_Teta_V_0.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].Teta_V_0);        
+        TPR_Delta_t_PU.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].Delta_t_PU);        
+        TPR_Delta_t_PR.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].Delta_t_PR);        
+        TPR_delta_IVK.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka3288.Protokol_TPR.Table1[0].delta_IVK);        
+        
+        /*
         //Fill table with data
         for (int n = 0; n &lt; (listTPR_Table1SourceData.Count); n++)
         {                                
@@ -697,10 +785,12 @@ namespace FastReport
                 TPR_Table1SourceData[i,3].RowSpan =  listTPR_Table1SourceData.Count;
                 break;  
             }
-          }
-          TPR_Table1SourceData.PrintRow(3);     
-          TPR_Table1SourceData.PrintColumns();  
-        }     
+          }          
+        }
+        */
+      
+        TPR_Table1SourceData.PrintRow(3);     
+        TPR_Table1SourceData.PrintColumns();  
       }
       else
       {
@@ -709,12 +799,15 @@ namespace FastReport
     } 
       
     private void TPR_Table2Results_ManualBuild(object sender, EventArgs e)
-    {                
+    { 
       if (DataIVK.TablePoverka3288.Mode &lt; 3)
       {
-        List &lt;TN.Doc.Table2&gt; listTable2Results;
-        listTable2Results = DataIVK.TablePoverka3288.Protokol_TPR.Table2.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
+        List &lt;TN.Doc.Table2&gt; listTable2Results = new List &lt;TN.Doc.Table2&gt;();
+        listTable2Results = DataIVK.TablePoverka3288.Protokol_TPR.Table2.Where(i =&gt; i.Activated == 1).ToList();
 
+        if (listTable2Results.Count == 0)
+          listTable2Results.Add(DataIVK.TablePoverka3288.Protokol_TPR.Table2.First());          
+        
         //Setup Columns width
         int sumDynamicCols=TPR_Table2Results.ColumnCount;
         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
@@ -755,18 +848,20 @@ namespace FastReport
       }
       else
       {
-        DataBand_TPR_Table2Results.Visible=false;
-         
+        DataBand_TPR_Table2Results.Visible=false;         
       }
     }   
 
     private void TPR_Table3Results_ManualBuild(object sender, EventArgs e)
-    {                   
+    {
       if (DataIVK.TablePoverka3288.Mode &lt; 3)
       {
         List &lt;TN.Doc.Points&gt; listTable3Points;
-        listTable3Points = DataIVK.TablePoverka3288.Protokol_TPR.Table3.Point.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
-         
+        listTable3Points = DataIVK.TablePoverka3288.Protokol_TPR.Table3.Point.Where(i =&gt; i.Activated == 1).ToList();
+        
+        if (listTable3Points.Count == 0)
+          listTable3Points.Add(DataIVK.TablePoverka3288.Protokol_TPR.Table3.Point.First());          
+       
         //Setup Columns width
         int sumDynamicCols=TPR_Table3Results.ColumnCount;
         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
@@ -823,7 +918,7 @@ namespace FastReport
     }    
 
     public void  Draw_TPR_TableConclusion()
-    {                                
+    { 
       // Setup Cols width    
       TPR_Conclusion_Table2.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)  * Units.Millimeters;
         
@@ -831,7 +926,7 @@ namespace FastReport
       TPR_ARM_StaffData_fio.Text = DataIVK.TablePoverka3288.AdditionalInfo_TPR.ARM_StaffData_fio;
       TPR_DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
         (tools.UnixTimestampToDatetime(DataIVK.TablePoverka3288.AdditionalInfo_TPR.ARM_CheckDate)));               
-      PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;                         
+      PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters; 
     }  
       
     // Setup heights of the all objects on the Page
@@ -866,7 +961,7 @@ namespace FastReport
           <TableCell Name="MPR_ProtokolNum" Text="MPR_ProtokolNum" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row111">
-          <TableCell Name="Cell811" Text="поверки СРМ с помощью КП, ПП и ПР по МИ 3288-2010" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell811" Text="поверки СРМ с помощью КП, ПП и ПР&amp;nbsp;по МИ 3288-2010" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
       <TableObject Name="MPR_TableHeader02" Top="41.58" Width="714.42" Height="18.9">
@@ -942,16 +1037,16 @@ namespace FastReport
           <TableCell Name="MPR_IVK_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="MPR_IVK_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="MPR_TableHeader05" Top="173.88" Width="264.6" Height="18.9">
-        <TableColumn Name="Column200" Width="94.5"/>
-        <TableColumn Name="Column201" Width="170.1" AutoSize="true"/>
+      <TableObject Name="MPR_TableHeader05" Top="173.88" Width="394.91" Height="18.9">
+        <TableColumn Name="Column200" Width="93.53"/>
+        <TableColumn Name="Column201" Width="301.38" AutoSize="true"/>
         <TableRow Name="Row158">
           <TableCell Name="Cell1180" Text="Рабочая жидкость" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_OilType" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="MPR_OilType" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_OilType" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="MPR_OilType" Padding="0, 0, 0, 0" VertAlign="Bottom" WordWrap="false" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBand_MPR_Table1SourceData" Top="195.56" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBand_MPR_Table1SourceData" Top="195.48" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="MPR_Table1SourceData" Top="7.56" Width="1047.01" Height="79.38" FixedRows="3" ManualBuildEvent="MPR_Table1SourceData_ManualBuild">
         <TableColumn Name="Column5" Width="78.94"/>
         <TableColumn Name="Column6" Width="78.94"/>
@@ -1011,7 +1106,7 @@ namespace FastReport
           <TableCell Name="Cell1465" Border.Lines="All" Text="12" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1473" Border.Lines="All" Text="13" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
-        <TableRow Name="baseRowTableSourceData" Height="15.12">
+        <TableRow Name="baseRowTableSourceData" Height="15.12" AutoSize="true">
           <TableCell Name="MPR_V0" Border.Lines="All" Text="MPR_V0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_m_D" Border.Lines="All" Text="MPR_m_D" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_m_S" Border.Lines="All" Text="MPR_m_S" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -1028,7 +1123,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table1SourceDataEnding" Top="285.28" Width="1512" Height="94.5">
+    <DataBand Name="DataBand_MPR_Table1SourceDataEnding" Top="285.13" Width="1512" Height="94.5">
       <TableObject Name="MPR_Table1SourceDataEnding" Top="7.56" Width="1512" Height="86.94" FixedRows="3" ManualBuildEvent="MPR_Table1SourceDataEnding_ManualBuild">
         <TableColumn Name="Column244" Width="100.8"/>
         <TableColumn Name="Column245" Width="100.8"/>
@@ -1115,7 +1210,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table2_1Results" Top="382.55" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBand_MPR_Table2_1Results" Top="382.33" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="MPR_Table2_1Results" Top="7.56" Width="1512.03" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table2_1Results_ManualBuild">
         <TableColumn Name="Column158" Width="78.31"/>
         <TableColumn Name="Column159" Width="78.31"/>
@@ -1209,15 +1304,15 @@ namespace FastReport
           <TableCell Name="N_ji_2_1" Border.Lines="All" Text="N_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_0_ji_2_1" Border.Lines="All" Text="M_0_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_ji_2_1" Border.Lines="All" Text="M_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="K_MF_F_ji_2_1_0" Border.Lines="All" Text="K_MF_F_ji_2_1_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_1_1" Border.Lines="All" Text="K_MF_F_ji_2_1_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_1_2" Border.Lines="All" Text="K_MF_F_ji_2_1_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_1_3" Border.Lines="All" Text="K_MF_F_ji_2_1_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_MF_F_ji_2_1_4" Border.Lines="All" Text="K_MF_F_ji_2_1_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="f_ji_2_1" Border.Lines="All" Text="f_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table2_2ResultsEnding" Top="472.27" Width="1512" Height="86.94">
+    <DataBand Name="DataBand_MPR_Table2_2ResultsEnding" Top="471.97" Width="1512" Height="86.94">
       <TableObject Name="MPR_Table2_2Results" Top="7.56" Width="1512.03" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table2_2Results_ManualBuild">
         <TableColumn Name="Column219" Width="71.16"/>
         <TableColumn Name="Column228" Width="86.28"/>
@@ -1321,15 +1416,15 @@ namespace FastReport
           <TableCell Name="N_ji_2_2" Border.Lines="All" Text="N_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_0_ji_2_2" Border.Lines="All" Text="M_0_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_ji_2_2" Border.Lines="All" Text="M_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="K_MF_F_ji_2_2_0" Border.Lines="All" Text="K_MF_F_ji_2_2_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_2_1" Border.Lines="All" Text="K_MF_F_ji_2_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_2_2" Border.Lines="All" Text="K_MF_F_ji_2_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_2_3" Border.Lines="All" Text="K_MF_F_ji_2_2_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_MF_F_ji_2_2_4" Border.Lines="All" Text="K_MF_F_ji_2_2_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="f_ji_2_2" Border.Lines="All" Text="f_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table3Results" Top="561.99" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBand_MPR_Table3Results" Top="561.61" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="MPR_Table3Results" Top="7.56" Width="939.24" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table3Results_ManualBuild">
         <TableColumn Name="Column33" Width="81.42"/>
         <TableColumn Name="Column34" Width="81.42"/>
@@ -1388,10 +1483,10 @@ namespace FastReport
         <TableRow Name="baseRowTable3Results" Height="15.12">
           <TableCell Name="MPR_Point" Border.Lines="All" Text="MPR_Point" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_Q_j" Border.Lines="All" Text="MPR_Q_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_K_MF_F_j_0" Border.Lines="All" Text="MPR_K_MF_F_j_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_K_MF_F_j_1" Border.Lines="All" Text="MPR_K_MF_F_j_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_K_MF_F_j_2" Border.Lines="All" Text="MPR_K_MF_F_j_2" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_K_MF_F_j_3" Border.Lines="All" Text="MPR_K_MF_F_j_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_K_MF_F_j_2" Border.Lines="All" Text="MPR_K_MF_F_j_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_K_MF_F_j_3" Border.Lines="All" Text="MPR_K_MF_F_j_3" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_K_MF_F_j_4" Border.Lines="All" Text="MPR_K_MF_F_j_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_n_j" Border.Lines="All" Text="MPR_n_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_S_j" Border.Lines="All" Text="MPR_S_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_S_0_j" Border.Lines="All" Text="MPR_S_0_j" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -1401,7 +1496,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_Table4Results" Top="651.71" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBand_MPR_Table4Results" Top="651.26" Width="1512" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="MPR_Table4Results" Top="7.56" Width="1277.48" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_Table4Results_ManualBuild">
         <TableColumn Name="Column41" Width="68.33"/>
         <TableColumn Name="Column42" Width="68.33"/>
@@ -1488,10 +1583,10 @@ namespace FastReport
         <TableRow Name="baseRowTable4Results" Height="15.12">
           <TableCell Name="Q_min_4" Border.Lines="All" Text="Q_min_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Q_max_4" Border.Lines="All" Text="Q_max_4" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="K_MF_F_ji_4_0" Border.Lines="All" Text="K_MF_F_ji_4_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_4_1" Border.Lines="All" Text="K_MF_F_ji_4_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_4_2" Border.Lines="All" Text="K_MF_F_ji_4_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_4_3" Border.Lines="All" Text="K_MF_F_ji_4_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_MF_F_ji_4_4" Border.Lines="All" Text="K_MF_F_ji_4_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="S_0_4" Border.Lines="All" Text="S_0_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Epsilon_4" Border.Lines="All" Text="Epsilon_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Teta_A_4" Border.Lines="All" Text="Teta_A_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -1508,7 +1603,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_TableGH" Top="741.42" Width="1512" Height="90.72">
+    <DataBand Name="DataBand_MPR_TableGH" Top="740.9" Width="1512" Height="90.72">
       <TableObject Name="MPR_TableGH" Top="7.56" Width="521.64" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="MPR_TableGH_ManualBuild">
         <TableColumn Name="Column327" Width="130.41"/>
         <TableColumn Name="Column328" Width="130.41"/>
@@ -1540,7 +1635,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_MPR_ReportSummary" Top="834.92" Width="1512" Height="102.06">
+    <DataBand Name="DataBand_MPR_ReportSummary" Top="834.32" Width="1512" Height="102.06">
       <TableObject Name="MPR_TableConclusion1" Top="7.56" Width="385.56" Height="37.8" GrowToBottom="true">
         <TableColumn Name="Column178" Width="215.46"/>
         <TableColumn Name="Column236" Width="170.1" AutoSize="true"/>
@@ -1578,7 +1673,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_ReportTitle" Top="939.76" Width="1512" Height="143.64" StartNewPage="true" ResetPageNumber="true">
+    <DataBand Name="DataBand_TPR_ReportTitle" Top="939.08" Width="1512" Height="143.64" StartNewPage="true" ResetPageNumber="true">
       <TableObject Name="TPR_TableHeader01" Top="7.56" Width="502.39" Height="41.58">
         <TableColumn Name="Column326" Width="502.39"/>
         <TableRow Name="Row178" Height="22.68">
@@ -1633,7 +1728,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_Table1SourceData" Top="1086.18" Width="1512" Height="86.94">
+    <DataBand Name="DataBand_TPR_Table1SourceData" Top="1085.43" Width="1512" Height="86.94">
       <TableObject Name="TPR_Table1SourceData" Top="7.56" Width="1092.96" Height="79.38" FixedRows="3" ManualBuildEvent="TPR_Table1SourceData_ManualBuild">
         <TableColumn Name="Column340" Width="97.47"/>
         <TableColumn Name="Column341" Width="97.47"/>
@@ -1700,7 +1795,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_Table2Results" Top="1175.9" Width="1512" Height="90.72">
+    <DataBand Name="DataBand_TPR_Table2Results" Top="1175.07" Width="1512" Height="90.72">
       <TableObject Name="TPR_Table2Results" Top="7.56" Width="1130.36" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TPR_Table2Results_ManualBuild">
         <TableColumn Name="Column353" Width="78.31"/>
         <TableColumn Name="Column354" Width="78.31"/>
@@ -1782,7 +1877,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_Table3Results" Top="1269.39" Width="1512" Height="94.5">
+    <DataBand Name="DataBand_TPR_Table3Results" Top="1268.49" Width="1512" Height="94.5">
       <TableObject Name="TPR_Table3Results" Top="7.56" Width="1082.88" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TPR_Table3Results_ManualBuild">
         <TableColumn Name="Column367" Width="93.39"/>
         <TableColumn Name="Column368" Width="93.39"/>
@@ -1854,7 +1949,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBand_TPR_ReportSummary" Top="1366.67" Width="1512" Height="71.82">
+    <DataBand Name="DataBand_TPR_ReportSummary" Top="1365.7" Width="1512" Height="71.82">
       <TableObject Name="TPR_Conclusion_Table2" Top="52.92" Width="699.41" Height="18.9">
         <TableColumn Name="Column325" Width="699.41"/>
         <TableRow Name="Row177">
@@ -1880,7 +1975,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <PageFooterBand Name="PageFooter" Top="1441.27" Width="1512" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1440.22" Width="1512" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

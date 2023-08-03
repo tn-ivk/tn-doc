@@ -5,7 +5,7 @@
     "Settings": {
       "General": {
         "ObjType": 1,
-        "NefType": 1,
+        "NefType": 2,
         "NumberDensitometers": 1,
         "NumberViscometers": 1,
         "NumberWatermetrs": 1,

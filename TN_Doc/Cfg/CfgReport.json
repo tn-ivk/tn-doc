@@ -25,6 +25,7 @@
         "NameIVK": "ИВК-1"
       },
       "Data": {
+        "ShowInvalidValues": true,
         "TableBIK": {
           "Visible": true,
           "Parameters": [

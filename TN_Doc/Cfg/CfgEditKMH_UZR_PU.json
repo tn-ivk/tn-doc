@@ -1,4 +1,4 @@
-{
+﻿{
   "AdditionalInfo": [
     {
       "Id": 1,
@@ -12,15 +12,7 @@
       "Id": 2,
       "Use": true,
       "Edit": false,
-      "Key": "LineName",
-      "Type": "text",
-      "Name": "Линия"
-    },
-    {
-      "Id": 2,
-      "Use": true,
-      "Edit": false,
-      "Key": "Place_PSP",
+      "Key": "Place",
       "Type": "text",
       "Name": "Место проведения КМХ"
     },
@@ -28,97 +20,97 @@
       "Id": 3,
       "Use": true,
       "Edit": false,
-      "Key": "Place_Factory",
+      "Key": "Place_SIKN",
       "Type": "text",
-      "Name": "Заводской №"
+      "Name": "СИКН №"
     },
     {
       "Id": 4,
       "Use": true,
       "Edit": false,
-      "Key": "Place_SIKN_Name",
+      "Key": "Place_Factory",
       "Type": "text",
-      "Name": "Место проведения КМХ"
+      "Name": "Наименование организации"
     },
     {
       "Id": 5,
       "Use": true,
       "Edit": false,
-      "Key": "MPR_Type",
+      "Key": "PR_Name",
       "Type": "text",
-      "Name": "ПР: Тип"
+      "Name": "УЗР: Линия"
     },
     {
       "Id": 6,
       "Use": true,
       "Edit": false,
-      "Key": "MPR_FactoryNum",
+      "Key": "PR_Type",
       "Type": "text",
-      "Name": "ПР: Заводской №"
+      "Name": "УЗР: Тип"
     },
     {
       "Id": 7,
       "Use": true,
       "Edit": false,
-      "Key": "MPR_CTRL_Type",
+      "Key": "PR_FactoryNumber",
       "Type": "text",
-      "Name": "Контрольный ПР: Тип"
+      "Name": "УЗР: Заводской №"
     },
     {
       "Id": 8,
       "Use": true,
       "Edit": false,
-      "Key": "MPR_CTRL_Factory",
+      "Key": "PU_Type",
       "Type": "text",
-      "Name": "Контрольный ПР: Заводской №"
+      "Name": "ПУ: Тип"
     },
     {
       "Id": 9,
       "Use": true,
       "Edit": false,
-      "Key": "MPR_CTRL_CheckDate",
+      "Key": "PU_FactoryNumber",
       "Type": "text",
-      "Name": "Контрольный ПР: Дата поверки"
-    },
-    {
-      "Id": 9,
-      "Use": true,
-      "Edit": true,
-      "Key": "ARM_KMH_Result",
-      "Type": "list",
-      "Name": "Заключение"
+      "Name": "ПУ: Заводской №"
     },
     {
       "Id": 10,
       "Use": true,
-      "Edit": true,
-      "Key": "ServiceStaffData",
+      "Edit": false,
+      "Key": "PU_CheckDate",
       "Type": "text",
-      "Name": "От сервисной организации ФИО"
+      "Name": "Дата поверки ПУ"
     },
     {
       "Id": 11,
       "Use": true,
       "Edit": true,
-      "Key": "DeliveryStaffData",
+      "Key": "ServiceStaffData",
       "Type": "text",
-      "Name": "От сдающей стороны ФИО"
+      "Name": "Сервисная организация (должность, фамилия, инициалы)"
     },
     {
       "Id": 12,
       "Use": true,
       "Edit": true,
-      "Key": "RecievingStaffData",
+      "Key": "DeliveryStaffData",
       "Type": "text",
-      "Name": "От принимающей стороны ФИО"
+      "Name": "Сдающая сторона (должность, фамилия, инициалы)"
     },
     {
       "Id": 13,
-      "Use": false,
+      "Use": true,
       "Edit": true,
-      "Key": "ARM_CheckDate",
+      "Key": "RecievingStaffData",
+      "Type": "text",
+      "Name": "Принимающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_KMH_Result",
       "Type": "list",
-      "Name": ""
+      "Name": "Заключение"
     }
   ]
 }
