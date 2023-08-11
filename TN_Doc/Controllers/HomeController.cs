@@ -66,8 +66,6 @@ namespace TN_Doc.Controllers
         {
             _logger = logger;
 
-            //dbIVK = context;
-            //dbDoc = context;
             options = context;
 
             modelReport = new ModelReport();
@@ -77,20 +75,11 @@ namespace TN_Doc.Controllers
             reportsPath = Directory.GetCurrentDirectory();
 
             InitApp();
-
-            //InitDocReport();
-            //InitDocPassport();
         }
         
         private void InitApp()
         {
-            //Если документ задействован, добавляем в List
-            //cfgFileRW.LoadCfg<DocReport>(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", $"CfgReport.json"), ref doc);
-            //var doc = DOCS.Single<Root>(x => x.Doc.GUID == GUIDDOC.Report);
-
             cfgFileRW.LoadCfg<CfgApp>(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", $"CfgApp.json"), ref CfgApp);
-
-            //LoadDocsModules(PathToDocumentFile);
         }
 
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
@@ -252,8 +241,9 @@ namespace TN_Doc.Controllers
             if (data.DTEnd != null)
                 DTEnd = DateTime.Parse(data.DTEnd);
 
-            UTBegin = new DateTimeOffset(DTBegin).ToUnixTimeSeconds();
-            UTEnd = new DateTimeOffset(DTEnd).ToUnixTimeSeconds();
+            UTBegin = new DateTimeOffset(DTBegin, TimeSpan.Zero).ToUnixTimeSeconds();
+            UTEnd = new DateTimeOffset(DTEnd, TimeSpan.Zero).ToUnixTimeSeconds();
+            UTEnd++;
 
             var doc = LoadDocsModule(data.IdDevice, data.IdDoc);
 

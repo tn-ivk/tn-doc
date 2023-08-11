@@ -12,6 +12,8 @@ hubConnection.on("Receive", function (deviceName, tagName, tagValue) {
 });
 hubConnection.start();
 
+//DataTable.datetime('DD.MM.YYYY HH:mm');
+
 var PrefixTag = "IVK_TN_01";
 
 var CurrentDeviceName;
@@ -307,7 +309,8 @@ function InitDatepickerEnd() {
     $('#DatepickerEnd').datepicker("setDate", dtEnd);
 }
 
-function InitTableDocs() {
+function InitTableDocs() {    
+
     table = $('#DataTable').DataTable(
         {
             select: true,
@@ -323,9 +326,9 @@ function InitTableDocs() {
 
             ajax: function (data, callback, settings) {
                 callback
-                (
-                    GetData()
-                );
+                    (
+                        GetData()
+                    );
             },
 
             columns:
@@ -345,7 +348,8 @@ function InitTableDocs() {
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), 1, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_OnlineReportType'), currentId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport'), true, 2, 0);
-            } else {
+            }
+            else {
                 GetDoc();
             }
         }
@@ -470,19 +474,6 @@ function GetData() {
 function GetDoc() {
     $('.FR').attr('src', '');
 
-    //var x = 10;// Math.random() * 10;
-
-    //var PDFObject = new PDFObject({
-    //    url: '/PDF/PDF.pdf',
-    //    pdfOpenParams: {
-    //        view: 'Fit',
-    //        scrollbars: '0',
-    //        toolbar: '0',
-    //        statusbar: '0',
-    //        navpanes: '0'
-    //    }
-    //});
-
     $.ajax(
         {
             async: true,
@@ -511,9 +502,6 @@ function GetDoc() {
 }
 
 function GetEditDoc() {
-    //var device = GuidDevice: $('#ComboboxDevice').val();
-    //var guidDoc = GuidDoc: $('#ComboboxDocGUID').val();
-    //var id = table.rows(indexes).data().pluck('id');
 
     $.ajax(
         {

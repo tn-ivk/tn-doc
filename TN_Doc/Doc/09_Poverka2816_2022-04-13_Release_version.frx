@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/12/2023 14:58:48" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/08/2023 09:56:33" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;         
-using System.Windows.Forms;          //TODO delete?
 using System.Drawing;
 using System.Data;
 using System.IO;
@@ -24,148 +23,152 @@ using TN.DocData;
    
 namespace FastReport
 {
-   public class ReportScript
-   {
-      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
-      TN.Doc.Doc doc; // данные из входного параметра
-      TN.DocData.General General;
-      TN.Doc.HeaderDoc Header;
-      TN.Doc.DataDoc SettingsData;
-      TN.Doc.FooterDoc Footer;
-      TN.Doc.DictionarysDoc Dictionarys;
-      TN.Doc.DataIVKDoc DataIVK; 
+  public class ReportScript
+  {
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+    TN.Doc.Doc doc; // данные из входного параметра
+    TN.DocData.General General;
+    TN.Doc.HeaderDoc Header;
+    TN.Doc.DataDoc SettingsData;
+    TN.Doc.FooterDoc Footer;
+    TN.Doc.DictionarysDoc Dictionarys;
+    TN.Doc.DataIVKDoc DataIVK; 
     
-      List &lt;TN.Doc.Table1&gt; listMeasures;
-      List &lt;TN.Doc.KoefsSolartron&gt; listKoefsSolartron;
-      List &lt;TN.Doc.KoefsSarasota&gt; listKoefsSarasota;
+    List &lt;TN.Doc.Table1&gt; listMeasures;
+    List &lt;TN.Doc.KoefsSolartron&gt; listKoefsSolartron;
+    List &lt;TN.Doc.KoefsSarasota&gt; listKoefsSarasota;
       
-      float sumAllObjectsHeights=0;
-      float sumTableRowsHeights =0;
-      float tempRepSumHeight =0;
-      int NefType;
-      int protocolNumber;        
+    float sumAllObjectsHeights=0;
+    float sumTableRowsHeights =0;
+    float tempRepSumHeight =0;
+    int NefType;
+    int protocolNumber;        
     
-      private void Page_StartPage(object sender, EventArgs e)
-      {               
-         //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/09_TablePoverka2816/DocPoverka2816.json&quot;))
-         //{
-            // Read the stream as a string
-         //   Report.SetParameterValue(&quot;Protocol&quot;, sr.ReadToEnd());
-         //}
+    private void Page_StartPage(object sender, EventArgs e)
+    {               
+      //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/09_TablePoverka2816/DocPoverka2816.json&quot;))
+      //{
+      // Read the stream as a string
+      //   Report.SetParameterValue(&quot;Protocol&quot;, sr.ReadToEnd());
+      //}
          
-         //// Десериализация данных (формат json) из входного параметра - Json                         
-         string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
-         Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-         settings.TypeNameHandling = TypeNameHandling.All;
+      //// Десериализация данных (формат json) из входного параметра - Json                         
+      string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+      Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+      settings.TypeNameHandling = TypeNameHandling.All;
          
-         doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
-         General = (TN.DocData.General) doc.Doc.Settings.General;
-         Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
-         SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
-         Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
-         Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
-         DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
+      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
+      General = (TN.DocData.General) doc.Doc.Settings.General;
+      Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
+      SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
+      Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
+      Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
+      DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
       
-         NefType = General.NefType;
+      NefType = General.NefType;
          
-         //// === Настройки страницы 
-         // Ширина и высота (в мм)
+      //// === Настройки страницы 
+      // Ширина и высота (в мм)
          
-         Page.PaperHeight = General.PageSettings.PaperHeight;
-         Page.PaperWidth = General.PageSettings.PaperWidth;
-         //Page.Border.Lines = BorderLines.All;
+      Page.PaperHeight = General.PageSettings.PaperHeight;
+      Page.PaperWidth = General.PageSettings.PaperWidth;
+      //Page.Border.Lines = BorderLines.All;
          
-         // Поля/отступы от краёв (в мм)
-         Page.TopMargin = General.PageSettings.TopMargin;
-         Page.BottomMargin = General.PageSettings.BottomMargin;
-         Page.LeftMargin = General.PageSettings.LeftMargin;
-         Page.RightMargin = General.PageSettings.RightMargin;
+      // Поля/отступы от краёв (в мм)
+      Page.TopMargin = General.PageSettings.TopMargin;
+      Page.BottomMargin = General.PageSettings.BottomMargin;
+      Page.LeftMargin = General.PageSettings.LeftMargin;
+      Page.RightMargin = General.PageSettings.RightMargin;
          
-         //Definition for which device create the protocol
-         protocolNumber = General.ProtocolNumber;
+      //Definition for which device create the protocol
+      protocolNumber = General.ProtocolNumber;
       
-         // Load Data from classes
+      switch (protocolNumber)
+      {
+        case 2:
+          listMeasures = DataIVK.TablePoverka2816.Protokol.PP2_Table1.Where(i =&gt; ! i.t_PP.Contains(&quot;-&quot;) &amp; ! i.t_PP.Contains(&quot;-&quot;)).ToList(); 
+          break;
+        default:
           listMeasures = DataIVK.TablePoverka2816.Protokol.PP1_Table1.Where(i =&gt; ! i.t_PP.Contains(&quot;-&quot;) &amp; ! i.t_PP.Contains(&quot;-&quot;)).ToList(); 
-         
-         // Запуск отрисовки таблиц на странице отчета
-         DrawTableHeader();
-         DrawTableConclusion();
-      }
+          break;
+      }   
       
-//// ======================== //// ======================== //// ======================== ////
-      public void DrawTableHeader()
-      {
-         // Setup Columns
-         float widthDynamicCols=Page.PaperWidth-Page.LeftMargin-Page.RightMargin;  
-         TableHeader.Columns[0].Width = widthDynamicCols*Units.Millimeters;
+      // Запуск отрисовки таблиц на странице отчета
+      DrawTableHeader();
+      DrawTableConclusion();
+    }
+      
+    public void DrawTableHeader()
+    {
+      // Setup Columns
+      float widthDynamicCols=Page.PaperWidth-Page.LeftMargin-Page.RightMargin;  
+      TableHeader.Columns[0].Width = widthDynamicCols*Units.Millimeters;
          
-          switch (protocolNumber)
-          {
-            case 2:
-              Protokol_Number.Text = &quot;&lt;b&gt;П Р О Т О К О Л № &lt;u&gt;&quot; + DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Protokol_Number;
-              Type_of_converter.Text = &quot;Тип преобразователя: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Type_of_converter;
-              Factory_number.Text = &quot;Заводской номер: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Factory_number;
-              SIKN_Factory.Text = &quot;Владелец: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_Factory;
-              SIKN_PSP.Text = &quot;Место поверки: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_PSP;
-              Environment_temperature.Text = &quot;Температура окружающего воздуха при взвешивании пикнометров: &lt;u&gt;&quot; +  
-                DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Environment_temperature + &quot; &lt;/u&gt;&lt;sup&gt;0&lt;/sup&gt;С&quot;;
-              Atmosphere_pressure.Text = &quot;Атмосферное давление: &lt;u&gt;&quot; +  
-                DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Atmosphere_pressure + &quot; &lt;/u&gt;мм рт. ст.&quot;;          
-            break;
-            default:
-              Protokol_Number.Text = &quot;&lt;b&gt;П Р О Т О К О Л № &lt;u&gt;&quot; + DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Protokol_Number;
-              Type_of_converter.Text = &quot;Тип преобразователя: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Type_of_converter;
-              Factory_number.Text = &quot;Заводской номер: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Factory_number;
-              SIKN_Factory.Text = &quot;Владелец: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_Factory;
-              SIKN_PSP.Text = &quot;Место поверки: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_PSP;
-              Environment_temperature.Text = &quot;Температура окружающего воздуха при взвешивании пикнометров: &lt;u&gt;&quot; +  
-                DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Environment_temperature + &quot; &lt;/u&gt;&lt;sup&gt;0&lt;/sup&gt;С&quot;;
-              Atmosphere_pressure.Text = &quot;Атмосферное давление: &lt;u&gt;&quot; +  
-                DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Atmosphere_pressure + &quot; &lt;/u&gt;мм рт. ст.&quot;;          
-            break;
-          }         
-      }
+      switch (protocolNumber)
+      {
+        case 2:
+          Protokol_Number.Text = &quot;&lt;b&gt;П Р О Т О К О Л № &lt;u&gt;&quot; + DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Protokol_Number;
+          Type_of_converter.Text = &quot;Тип преобразователя: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Type_of_converter;
+          Factory_number.Text = &quot;Заводской номер: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Factory_number;
+          SIKN_Factory.Text = &quot;Владелец: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_Factory;
+          SIKN_PSP.Text = &quot;Место поверки: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.SIKN_PSP;
+          Environment_temperature.Text = &quot;Температура окружающего воздуха при взвешивании пикнометров: &lt;u&gt;&quot; +  
+            DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Environment_temperature + &quot; &lt;/u&gt;&lt;sup&gt;0&lt;/sup&gt;С&quot;;
+          Atmosphere_pressure.Text = &quot;Атмосферное давление: &lt;u&gt;&quot; +  
+            DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Atmosphere_pressure + &quot; &lt;/u&gt;мм рт. ст.&quot;;          
+          break;
+        default:
+          Protokol_Number.Text = &quot;&lt;b&gt;П Р О Т О К О Л № &lt;u&gt;&quot; + DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Protokol_Number;
+          Type_of_converter.Text = &quot;Тип преобразователя: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Type_of_converter;
+          Factory_number.Text = &quot;Заводской номер: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Factory_number;
+          SIKN_Factory.Text = &quot;Владелец: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_Factory;
+          SIKN_PSP.Text = &quot;Место поверки: &lt;u&gt;&quot; +  DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.SIKN_PSP;
+          Environment_temperature.Text = &quot;Температура окружающего воздуха при взвешивании пикнометров: &lt;u&gt;&quot; +  
+            DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Environment_temperature + &quot; &lt;/u&gt;&lt;sup&gt;0&lt;/sup&gt;С&quot;;
+          Atmosphere_pressure.Text = &quot;Атмосферное давление: &lt;u&gt;&quot; +  
+            DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Atmosphere_pressure + &quot; &lt;/u&gt;мм рт. ст.&quot;;          
+          break;
+      }         
+    }
                
-//// ======================== //// ======================== //// ======================== ////
-      private void TableResults_ManualBuild(object sender, EventArgs e)
+    private void TableResults_ManualBuild(object sender, EventArgs e)
+    {
+      var rand = new Random();
+      TableResultsHeader.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters; 
+         
+      // Setup Columns
+      int sumDynamicCols=TableResults.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+      for (int w = 0; w &lt; (TableResults.ColumnCount); w++)                 
       {
-         var rand = new Random();
-         TableResultsHeader.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters; 
-         
-         // Setup Columns
-         int sumDynamicCols=TableResults.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         for (int w = 0; w &lt; (TableResults.ColumnCount); w++)                 
-         {
-            TableResults.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }
-         
-         //Draw Fixed rows
-         for (int n = 0; n &lt; TableResults.FixedRows; n++)
-         {
-            TableResults.PrintRow(n);
-            TableResults.PrintColumns();                                             
-         }
-
-         //Fill table with data
-         for (int n = 0; n &lt; (listMeasures.Count); n++)
-         {
-            t_PP.Text = tools.GetNormalizedValue(listMeasures[n].t_PP);  
-            t_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].t_Pycn);
-            P_PP.Text = tools.GetNormalizedValue(listMeasures[n].P_PP);
-            P_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].P_Pycn);
-            Dens_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].Dens_Pycn);
-            Dens_Pycn_Normalized.Text = tools.GetNormalizedValue(listMeasures[n].Dens_Pycn_Normalized);
-            Period.Text = tools.GetNormalizedValue(listMeasures[n].Period);
-            Dens_PP.Text = tools.GetNormalizedValue(listMeasures[n].Dens_PP);
-            Delta.Text = tools.GetNormalizedValue(listMeasures[n].Delta);
-         
-            TableResults.PrintRow(TableResults.FixedRows);     
-            TableResults.PrintColumns();  
-         }  
+        TableResults.Columns[w].Width = widthDynamicCol * Units.Millimeters;
       }
+         
+      //Draw Fixed rows
+      for (int n = 0; n &lt; TableResults.FixedRows; n++)
+      {
+        TableResults.PrintRow(n);
+        TableResults.PrintColumns();                                             
+      }
+
+      //Fill table with data
+      for (int n = 0; n &lt; (listMeasures.Count); n++)
+      {
+        t_PP.Text = tools.GetNormalizedValue(listMeasures[n].t_PP);  
+        t_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].t_Pycn);
+        P_PP.Text = tools.GetNormalizedValue(listMeasures[n].P_PP);
+        P_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].P_Pycn);
+        Dens_Pycn.Text = tools.GetNormalizedValue(listMeasures[n].Dens_Pycn);
+        Dens_Pycn_Normalized.Text = tools.GetNormalizedValue(listMeasures[n].Dens_Pycn_Normalized);
+        Period.Text = tools.GetNormalizedValue(listMeasures[n].Period);
+        Dens_PP.Text = tools.GetNormalizedValue(listMeasures[n].Dens_PP);
+        Delta.Text = tools.GetNormalizedValue(listMeasures[n].Delta);
+         
+        TableResults.PrintRow(TableResults.FixedRows);     
+        TableResults.PrintColumns();  
+      }  
+    }
   
-//// ======================== //// ======================== //// ======================== ////
     public void  DrawTableConclusion()
     { 
       int isUsedKoefsSolartron;
@@ -253,20 +256,19 @@ namespace FastReport
           break;      
       }  
     }
-      //// ======================== //// ======================== //// ======================== ////
 
-      private void PageFooter_BeforeLayout(object sender, EventArgs e)
-      {
-         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
-         { 
-            PageFooter.Visible = false; 
-         }
-         else
-         {
-            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         }
+    private void PageFooter_BeforeLayout(object sender, EventArgs e)
+    {
+      if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+      { 
+        PageFooter.Visible = false; 
       }
-   }    
+      else
+      {
+        PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+      }
+    }
+  }    
 }
 
 </ScriptText>
@@ -311,7 +313,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableResults" Top="176.66" Width="1047.06" Height="124.74" CanBreak="true">
+    <DataBand Name="DataBandTableResults" Top="176.58" Width="1047.06" Height="124.74" CanBreak="true">
       <TableObject Name="TableResults" Top="26.46" Width="981.12" Height="98.28" FixedRows="3" ManualBuildEvent="TableResults_ManualBuild">
         <TableColumn Name="Column151" Width="103.74"/>
         <TableColumn Name="Column152" Width="103.74"/>
@@ -369,7 +371,7 @@ namespace FastReport
       </TableObject>
       <TextObject Name="TableResultsHeader" Top="7.56" Width="652.05" Height="18.9" Text="Определение метрологических характеристик" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="304.18" Width="1047.06" Height="86.94" CanGrow="true" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="304.03" Width="1047.06" Height="86.94" CanGrow="true" CanShrink="true">
       <TableObject Name="TableConclusion" Top="7.56" Width="699.41" Height="79.38">
         <TableColumn Name="Column144" Width="699.41"/>
         <TableRow Name="Row127" Height="26.46" AutoSize="true">
@@ -383,7 +385,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="393.89" Width="1047.06" Height="22.68" CanGrow="true" CanShrink="true" CanBreak="true" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="393.67" Width="1047.06" Height="22.68" CanGrow="true" CanShrink="true" CanBreak="true" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.9"/>
     </PageFooterBand>
   </ReportPage>

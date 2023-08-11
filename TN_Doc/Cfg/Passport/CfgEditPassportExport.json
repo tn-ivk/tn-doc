@@ -2,11 +2,51 @@
   "Metods": [
     {
       "Use": true,
+      "IdParameter": 3,
+      "Name": "ФР.1.29.2020.36270",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 3,
+	"Name": "ФР.1.31.2017.27252",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 3,
+	"Name": "ФР.1.31.2017.27250",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+      "Use": true,
       "IdParameter": 4,
       "Name": "ФР.1.29.2020.36270",
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 4,
+	"Name": "ФР.1.31.2017.27252",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 4,
+	"Name": "ФР.1.31.2017.27250",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
     },
     {
       "Use": true,
@@ -15,6 +55,22 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 5,
+	"Name": "ФР.1.31.2017.27252",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 5,
+	"Name": "ФР.1.31.2017.27250",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
     },
     {
       "Use": true,
@@ -140,7 +196,7 @@
       "Id": 3,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
-      "Use": false,
+      "Use": true,
       "Edit": true
     },
     {

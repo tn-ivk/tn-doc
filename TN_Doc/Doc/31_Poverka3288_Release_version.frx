@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3288.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/24/2023 16:59:29" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3288.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/08/2023 11:40:14" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -306,7 +306,7 @@ namespace FastReport
     private void MPR_Table2_1Results_ManualBuild(object sender, EventArgs e)
     {    
       
-      List &lt;TN.Doc.Table2_Part1&gt; listTable2_1Results;
+      List &lt;TN.Doc.Table2_Part1&gt; listTable2_1Results = new List &lt;TN.Doc.Table2_Part1&gt;();;
       listTable2_1Results = DataIVK.TablePoverka3288.Protokol_MPR.Table2_part1.Where(i =&gt; i.Activated == 1).ToList();
       
       if (listTable2_1Results.Count == 0)
@@ -316,25 +316,25 @@ namespace FastReport
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 1:
+        case 0:
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
           break;  
             
-        case 2:  
+        case 1:  
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
           break;  
             
-        case 3: 
+        case 2: 
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode3);
           break;  
             
-        case 4:
+        case 3:
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode0);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode1);
           MPR_Table2_1Results.Columns.Remove(tab2_1_CalcMode2);
@@ -398,25 +398,25 @@ namespace FastReport
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 1:
+        case 0:
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
           break;  
             
-        case 2:  
+        case 1:  
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
+          break;  
+            
+        case 2:   
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
+          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
           break;  
             
         case 3:   
-          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
-          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
-          MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode3);
-          break;  
-            
-        case 4:   
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode0);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode1);
           MPR_Table2_2Results.Columns.Remove(tab2_2_CalcMode2);
@@ -483,25 +483,25 @@ namespace FastReport
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 1:
+        case 0:
           MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
           break;  
             
-        case 2:  
+        case 1:  
           MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
+          break;  
+            
+        case 2:   
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
+          MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
           break;  
             
         case 3:   
-          MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
-          MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
-          MPR_Table3Results.Columns.Remove(tab3_CalcMode3);
-          break;  
-            
-        case 4:   
           MPR_Table3Results.Columns.Remove(tab3_CalcMode0);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode1);
           MPR_Table3Results.Columns.Remove(tab3_CalcMode2);
@@ -555,25 +555,25 @@ namespace FastReport
          
       switch(DataIVK.TablePoverka3288.Protokol_MPR.CalcMode)
       {
-        case 1:
+        case 0:
           MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
           break;  
             
-        case 2:  
+        case 1:  
           MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
+          break;  
+            
+        case 2:   
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
+          MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
           break;  
             
         case 3:   
-          MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
-          MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
-          MPR_Table4Results.Columns.Remove(tab4_CalcMode3);
-          break;  
-            
-        case 4:   
           MPR_Table4Results.Columns.Remove(tab4_CalcMode0);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode1);
           MPR_Table4Results.Columns.Remove(tab4_CalcMode2);
@@ -1195,9 +1195,9 @@ namespace FastReport
           <TableCell Name="MPR_delta_IVK_PU" Border.Lines="All" Text="MPR_delta_IVK_PU" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_delta_IVK_PR" Border.Lines="All" Text="MPR_delta_IVK_PR" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_K_PM_ust" Border.Lines="All" Text="MPR_K_PM_ust" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_tab1_K_M_MF_ust0" Border.Lines="All" Text="MPR_tab1_K_M_MF_ust1" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_tab1_K_M_MF_ust1" Border.Lines="All" Text="MPR_tab1_K_M_MF_ust2" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_tab1_K_M_MF_ust2" Border.Lines="All" Text="MPR_tab1_K_M_MF_ust3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_tab1_K_M_MF_ust0" Border.Lines="All" Text="MPR_tab1_K_M_MF_ust0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_tab1_K_M_MF_ust1" Border.Lines="All" Text="MPR_tab1_K_M_MF_ust1" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_tab1_K_M_MF_ust2" Border.Lines="All" Text="MPR_tab1_K_M_MF_ust2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_Q_M_max" Border.Lines="All" Text="MPR_Q_M_max" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_ZS" Border.Lines="All" Text="MPR_ZS" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_delta_t_dop" Border.Lines="All" Text="MPR_delta_t_dop" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -1304,10 +1304,10 @@ namespace FastReport
           <TableCell Name="N_ji_2_1" Border.Lines="All" Text="N_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_0_ji_2_1" Border.Lines="All" Text="M_0_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_ji_2_1" Border.Lines="All" Text="M_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_MF_F_ji_2_1_0" Border.Lines="All" Text="K_MF_F_ji_2_1_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_1_1" Border.Lines="All" Text="K_MF_F_ji_2_1_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_1_2" Border.Lines="All" Text="K_MF_F_ji_2_1_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_1_3" Border.Lines="All" Text="K_MF_F_ji_2_1_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="K_MF_F_ji_2_1_4" Border.Lines="All" Text="K_MF_F_ji_2_1_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="f_ji_2_1" Border.Lines="All" Text="f_ji_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
@@ -1416,10 +1416,10 @@ namespace FastReport
           <TableCell Name="N_ji_2_2" Border.Lines="All" Text="N_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_0_ji_2_2" Border.Lines="All" Text="M_0_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="M_ji_2_2" Border.Lines="All" Text="M_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_MF_F_ji_2_2_0" Border.Lines="All" Text="K_MF_F_ji_2_2_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_2_1" Border.Lines="All" Text="K_MF_F_ji_2_2_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_2_2" Border.Lines="All" Text="K_MF_F_ji_2_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_2_2_3" Border.Lines="All" Text="K_MF_F_ji_2_2_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="K_MF_F_ji_2_2_4" Border.Lines="All" Text="K_MF_F_ji_2_2_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="f_ji_2_2" Border.Lines="All" Text="f_ji_2_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
@@ -1483,10 +1483,10 @@ namespace FastReport
         <TableRow Name="baseRowTable3Results" Height="15.12">
           <TableCell Name="MPR_Point" Border.Lines="All" Text="MPR_Point" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_Q_j" Border.Lines="All" Text="MPR_Q_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_K_MF_F_j_0" Border.Lines="All" Text="MPR_K_MF_F_j_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_K_MF_F_j_1" Border.Lines="All" Text="MPR_K_MF_F_j_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_K_MF_F_j_2" Border.Lines="All" Text="MPR_K_MF_F_j_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_K_MF_F_j_3" Border.Lines="All" Text="MPR_K_MF_F_j_3" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="MPR_K_MF_F_j_4" Border.Lines="All" Text="MPR_K_MF_F_j_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_K_MF_F_j_2" Border.Lines="All" Text="MPR_K_MF_F_j_2" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="MPR_K_MF_F_j_3" Border.Lines="All" Text="MPR_K_MF_F_j_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_n_j" Border.Lines="All" Text="MPR_n_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_S_j" Border.Lines="All" Text="MPR_S_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="MPR_S_0_j" Border.Lines="All" Text="MPR_S_0_j" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -1583,10 +1583,10 @@ namespace FastReport
         <TableRow Name="baseRowTable4Results" Height="15.12">
           <TableCell Name="Q_min_4" Border.Lines="All" Text="Q_min_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Q_max_4" Border.Lines="All" Text="Q_max_4" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_MF_F_ji_4_0" Border.Lines="All" Text="K_MF_F_ji_4_0" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_4_1" Border.Lines="All" Text="K_MF_F_ji_4_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_4_2" Border.Lines="All" Text="K_MF_F_ji_4_2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="K_MF_F_ji_4_3" Border.Lines="All" Text="K_MF_F_ji_4_3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="K_MF_F_ji_4_4" Border.Lines="All" Text="K_MF_F_ji_4_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="S_0_4" Border.Lines="All" Text="S_0_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Epsilon_4" Border.Lines="All" Text="Epsilon_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Teta_A_4" Border.Lines="All" Text="Teta_A_4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>

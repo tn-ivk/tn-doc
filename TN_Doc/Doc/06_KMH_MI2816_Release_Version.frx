@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/27/2023 09:51:12" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/08/2023 12:41:48" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -236,15 +236,23 @@ namespace FastReport
       
     public void  DrawTableResults()
     {
-         
-      //Lists of the classes properties names
       var listTable1ParamsNames = typeof(TN.Doc.Table1).GetProperties().Select(x=&gt;x.Name).ToList();
       var listTable1_1ParamsNames = typeof(TN.Doc.Table1_1).GetProperties().Select(x=&gt;x.Name).ToList();
          
-      //Dictionaries of the classes properties names &amp; values
-      var dictTable1Params =  typeof(TN.Doc.Table1)
-        .GetProperties()
-      .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1[0] , null));
+      Dictionary&lt;string, string&gt; dictTable1Params;
+      switch (protocolNumber)
+      {
+        case 2:
+          dictTable1Params =  typeof(TN.Doc.Table1)
+            .GetProperties()
+            .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1[1] , null));
+          break;
+        default:
+          dictTable1Params =  typeof(TN.Doc.Table1)
+            .GetProperties()
+            .ToDictionary(prop =&gt; prop.Name, prop =&gt; (string)prop.GetValue(DataIVK.TableKMH_MI2816.Protokol.Table1[0] , null));
+          break;
+      }            
          
       var dictTable1_1Pic1Params =  typeof(TN.Doc.Table1_1)
         .GetProperties()
@@ -256,7 +264,7 @@ namespace FastReport
          
       //// Fill table with the data
       //object TempValue = &quot;not found&quot;;
-      string TempValue = &quot;&quot;;//not found
+      string TempValue = &quot;&quot;;
       for (int j = 0; j &lt; (TableResults.RowCount); j++)                 
       {
         for (int i = 0; i &lt; (TableResults.ColumnCount); i++)                 
@@ -268,7 +276,6 @@ namespace FastReport
             case 2:   
             case 3:
               dictTable1Params.TryGetValue(listTable1ParamsNames[i], out TempValue);                     
-              //tools.GetPropertyValue(dictTable1Params, listTable1ParamsNames[i], ref TempValue);
               TableResults[i,3].Text = tools.GetNormalizedValue(TempValue.ToString());   
               break;
             case 5:   
@@ -293,7 +300,6 @@ namespace FastReport
             case 10:   
             case 11:
               dictTable1Params.TryGetValue(listTable1ParamsNames[i-5], out TempValue);
-              //tools.GetPropertyValue(dictTable1Params, listTable1ParamsNames[i-5], ref TempValue);
               TableResults[i,3].Text = tools.GetNormalizedValue(TempValue.ToString());
               break;
           }

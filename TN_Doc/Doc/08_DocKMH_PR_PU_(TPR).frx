@@ -90,10 +90,11 @@ namespace FastReport
       }
 
       // Fill table with data   
-      PR_Type.Text = string.Format(&quot;Тип ПР: &lt;u&gt;{0}&lt;/u&gt; Заводской №: &lt;u&gt;{1}&lt;/u&gt; &lt;br&gt;Место проведения КМХ: &lt;u&gt;{2}&lt;/u&gt; (СИКН, НГДУ, ПСП)&quot;, 
+      PR_Type.Text = string.Format(&quot;Тип ПР: &lt;u&gt;{0}&lt;/u&gt; Заводской №: &lt;u&gt;{1}&lt;/u&gt; &lt;br&gt;Место проведения КМХ: СИКН №{3} &lt;u&gt;{2}&lt;/u&gt; (СИКН, НГДУ, ПСП)&quot;, 
         DataIVK.TableKMH_PR_PU.AdditionalInfo.PR_Type, 
         DataIVK.TableKMH_PR_PU.AdditionalInfo.PR_FactoryNumber,
-        DataIVK.TableKMH_PR_PU.AdditionalInfo.Place); 
+        DataIVK.TableKMH_PR_PU.AdditionalInfo.Place,
+	DataIVK.TableKMH_PR_PU.AdditionalInfo.Place_SIKN); 
             
       PU_Type.Text = string.Format(&quot;Тип ПУ: &lt;u&gt;{0}&lt;/u&gt; Заводской №: &lt;u&gt;{1}&lt;/u&gt; Дата поверки ПУ: &lt;u&gt;{2}&lt;br&gt;&lt;/u&gt;{4} &lt;u&gt;{3}&quot;,
         DataIVK.TableKMH_PR_PU.AdditionalInfo.PU_Type,

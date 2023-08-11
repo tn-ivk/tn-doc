@@ -88,8 +88,9 @@ namespace FastReport
       // Fill table with data   
       PR_Type_Oper.Text = &quot;Тип ПР &lt;u&gt;  &quot; + DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_Type_Oper;
       PR_FactoryNumber_Oper.Text = &quot;Заводской № &lt;u&gt;&quot; +  DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_FactoryNumber_Oper;
-      Place.Text = string.Format(&quot;Место проведения КМХ &lt;u&gt;{0}&lt;/u&gt; (СИКН, НГДУ, ПСП)&quot;, 
-        DataIVK.TableKMH_PR_PR.AdditionalInfo.Place); 
+      Place.Text = string.Format(&quot;Место проведения КМХ: СИКН №{1} &lt;u&gt;{0}&lt;/u&gt; (СИКН, НГДУ, ПСП)&quot;, 
+        DataIVK.TableKMH_PR_PR.AdditionalInfo.Place,
+	DataIVK.TableKMH_PR_PR.AdditionalInfo.Place_SIKN_Name); 
          
       PR_Type_Ctrl.Text = &quot;Тип контрольного ПР &lt;u&gt;  &quot; + DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_Type_Ctrl;
       PR_FactoryNumber_Ctrl.Text = &quot;Заводской № &lt;u&gt;&quot; +  DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_FactoryNumber_Ctrl;
