@@ -14,6 +14,8 @@ hubConnection.start();
 
 //DataTable.datetime('DD.MM.YYYY HH:mm');
 
+var IsUsedElis = true;
+
 var PrefixTag = "IVK_TN_01";
 
 var CurrentDeviceName;
@@ -108,6 +110,21 @@ function InitDevices() {
             },
         });
 
+    $.ajax(
+        {
+            async: false,
+            url: "Home/IsUsedElis",
+            type: "GET",
+            //dataType: "json",
+            data:
+            {
+                idDevice: $('#ComboboxDevice').val()
+            },
+            success: function (data) {
+                IsUsedElis = data;
+            },
+        });
+
     $('#ComboboxDevice').change(function () {
         CurrentDeviceName = $("#ComboboxDevice :selected").text();
         CurrentDeviceId = $('#ComboboxDevice').val()
@@ -123,6 +140,21 @@ function InitDevices() {
                         PrefixTag = "IVK_TN_01";
                     else
                         PrefixTag = "IVK_TN_02";
+                },
+            });
+
+        $.ajax(
+            {
+                async: false,
+                url: "Home/IsUsedElis",
+                type: "GET",
+                //dataType: "json",
+                data:
+                {
+                    idDevice: $('#ComboboxDevice').val()
+                },
+                success: function (data) {
+                    IsUsedElis = data;
                 },
             });
 
@@ -458,11 +490,18 @@ function GetData() {
                     $('#ButtonSave').prop('disabled', true);
                     $('#ButtonReview').prop('disabled', true);
                     $('#ButtonEdit').prop('disabled', true);
-                } else {
+                }
+                else {
                     $('#ButtonSave').prop('disabled', false);
                     $('#ButtonReview').prop('disabled', false);
                     $('#ButtonEdit').prop('disabled', false);
                 }
+
+                if ($('#ComboboxDocGUID').val() == 1) {                    
+                    $('#ButtonElis').prop('hidden', !IsUsedElis); 
+                }
+                else
+                    $('#ButtonElis').prop('hidden', true);
             }
         });
 
@@ -579,7 +618,6 @@ function GetValueCombobox() {
             success: function (data) {
             },
         });
-
 }
 
 function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray = 3) {
@@ -609,7 +647,84 @@ function GetFullNameTag(tagName) {
 }
 
 
-/***********************************/
+//Получить данные из ЕЛИС
+function GetaElisData() {
+
+    var clientToken = GetGuid();
+
+    if (clientToken == "") {
+
+        var SiknNumber = 
+
+            clientToken = RegistrationClient(SiknNumber);
+    }
+
+    $.ajax(
+        {
+            async: false,
+            url: "http://localhost:5050/api/tspd/getqp",
+            type: "POST",
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json',
+            headers: {
+                "client-token": clientToken
+            },
+            data: JSON.stringify({
+                startPeriod: "2023-08-14T09:14:49.345Z",
+                endPeriod: "2023-08-14T09:14:49.345Z"
+            }),
+            success: function (data) {
+
+            },
+            error: function (data) {
+
+                $('#info').text(data.statusText);
+
+                //Устройство не зарегистрировано
+                if (data.responseJSON.code == 309) {
+                    
+                }
+            }
+        });
+}
+
+//Зарегистрировать устройство для ЕЛИС
+function RegistrationClient(nameDevice) {
+
+    $.ajax(
+        {
+            async: false,
+            url: "http://localhost:5050/api/client/signin",
+            type: "POST",
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json',            
+            data: JSON.stringify({
+                siknNumber: nameDevice
+            }),
+            success: function (data) {
+
+            },
+            error: function (data) {
+
+            }
+        });
+}
+
+//Получить GUID для устройства
+function GetElisCurrentGuidForDevice() {
+
+}
+
+//Получить GUID для устройства
+function GetGuid() {
+
+}
+
+//Сохранить GUID для устройства
+function SetGuid() {
+
+}
+
 
 /*
 * Загрузка словарей приложения. Словари поступают в формате json.
@@ -750,7 +865,6 @@ function RenderAndAddHandlerLicencesTable() {
 
 }
 
-
 /*
 * Отрисовка таблицы пользователей.
 */
@@ -838,7 +952,7 @@ function RenderAndAddHandlerUserTable() {
 
 }
 
-function  VerticalCenteringCell(cell){
+function VerticalCenteringCell(cell){
     cell.classList.add('align-middle')
 }
 

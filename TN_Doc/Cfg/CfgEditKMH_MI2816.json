@@ -131,7 +131,7 @@
     },
     {
       "Id": 17,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Picn2.P16",
       "Type": "text",
@@ -147,7 +147,7 @@
     },
     {
       "Id": 19,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Picn2.P18",
       "Type": "text",
@@ -155,7 +155,7 @@
     },
     {
       "Id": 20,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Picn2.P19",
       "Type": "text",
@@ -163,7 +163,7 @@
     },
     {
       "Id": 21,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Picn2.P110",
       "Type": "text",

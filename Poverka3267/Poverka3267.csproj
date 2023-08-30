@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;C:\publish\TN_Doc\Dll\$(TargetName).dll&quot;;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;C:\publish\Dll\$(TargetName).dll&quot;;" />
+  </Target>
+
+</Project>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/20/2023 11:45:55" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/29/2023 12:27:02" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -20,240 +20,220 @@ using TN.DocData;
 
 namespace FastReport
 {
-   public class ReportScript
-   {
-      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();      
-      TN.Doc.Doc doc;
-      TN.Doc.DataIVKDoc DataIVK;
-      TN.Doc.HeaderDoc Header;
-      TN.Doc.DataDoc SettingsData;
-      TN.Doc.FooterDoc Footer;
-      TN.Doc.DictionarysDoc Dictionarys;
+  public class ReportScript
+  {
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();      
+    TN.Doc.Doc doc;
+    TN.Doc.DataIVKDoc DataIVK;
+    TN.Doc.HeaderDoc Header;
+    TN.Doc.DataDoc SettingsData;
+    TN.Doc.FooterDoc Footer;
+    TN.Doc.DictionarysDoc Dictionarys;
     
-      string tempDate;
-      string actDate;
+    DateTime Begin;
+     
+    private void Page_StartPage(object sender, EventArgs e)
+    {
+      //using (var sr = new StreamReader(&quot;C:/SVN/FastReport/Входящие данные от Алексея (классы и json)/11_Act/DocAct.json&quot;))
+      //{                                                                                          
+      // Read the stream as a string
+      //   Report.SetParameterValue(&quot;Act&quot;, sr.ReadToEnd());
+      //}
+      //// Десериализация данных (формат json) из входного параметра - Json    
       
-      #region Collecting the Act date from few input parameters
-      public string CollectingDate (string tempDay, string tempMonth, string tempYear, out string tempDate)
+      string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+      Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+      settings.TypeNameHandling = TypeNameHandling.All;         
+         
+      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
+      DataIVK = (TN.Doc.DataIVKDoc)doc.Doc.DataIVK;
+      Header = (TN.Doc.HeaderDoc)doc.Doc.Settings.Header;
+      SettingsData = (TN.Doc.DataDoc)doc.Doc.Settings.Data;
+      Footer = (TN.Doc.FooterDoc)doc.Doc.Settings.Footer;
+      Dictionarys = (TN.Doc.DictionarysDoc)doc.Doc.Settings.Dictionarys;      
+      
+      //// === Настройки страницы 
+      // Ширина и высота (в мм)
+      Page.PaperHeight = doc.Doc.Settings.General.PageSettings.PaperHeight;
+      Page.PaperWidth= doc.Doc.Settings.General.PageSettings.PaperWidth;
+      //Page.Border.Lines = BorderLines.All;
+         
+      // Поля/отступы от краёв (в мм)
+      Page.TopMargin=doc.Doc.Settings.General.PageSettings.TopMargin;
+      Page.BottomMargin=doc.Doc.Settings.General.PageSettings.BottomMargin;
+      Page.LeftMargin=doc.Doc.Settings.General.PageSettings.LeftMargin;
+      Page.RightMargin=doc.Doc.Settings.General.PageSettings.RightMargin;
+       
+      Begin =  tools.UnixTimestampToDatetime((long)DataIVK.TableResultActAndPassport.Begin);
+      
+      // Запуск отрисовки таблиц на странице отчета
+      DrawTableHeader();
+      //DrawTableTotal();
+      DrawTableSigners();
+    }
+      
+    public void DrawTableHeader()
+    {            
+      ActNumberAndDate.Text = string.Format(&quot;Акт приема-сдачи нефти №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г. (сдача по СИКН)&quot;,  
+        DataIVK.TableResultActAndPassport.AdditionalInfo.ActNumber,
+        Begin);     
+      
+      DelivePoint.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.DelivePoint; 
+      Factory.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Factory; 
+      SIKN_Number.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.SIKN_Number; 
+      Delive_FIO.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_FIO; 
+      Delive_Lic_Date.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_Lic_Date; 
+      Delive_Lic_Number.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_Lic_Number; 
+         
+      Receive_FIO.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_FIO; 
+      Receive_Lic_Date.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_Lic_Date; 
+      Receive_Lic_Number.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_Lic_Number; 
+         
+      // DelivePoint
+    }
+      
+    private void TableAct_ManualBuild(object sender, EventArgs e)
+    {
+      List&lt;TN.Doc.Act&gt; listShiftsData;
+      listShiftsData = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act.Where(i =&gt; ! i.Vol_LastShift.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Vol_LastShift) == false).ToList();
+         
+      if (Engine.FinalPass == true)
       {
-         tempDay = (tempDay.Length == 1) ? (&quot;0&quot;+tempDay) : (tempDay);
-         tempMonth = (tempMonth.Length == 1) ? (&quot;0&quot;+tempMonth) : (tempMonth);
-         tempDate=  string.Format(&quot;{0}.{1}.{2} г.&quot;,tempDay, tempMonth, tempYear); 
-         return tempDate;
-      }
-      #endregion
-      
-      private void Page_StartPage(object sender, EventArgs e)
-      {
-         //using (var sr = new StreamReader(&quot;C:/SVN/FastReport/Входящие данные от Алексея (классы и json)/11_Act/DocAct.json&quot;))
-         //{                                                                                          
-            // Read the stream as a string
-         //   Report.SetParameterValue(&quot;Act&quot;, sr.ReadToEnd());
-         //}
-         //// Десериализация данных (формат json) из входного параметра - Json                         
-         string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
-         Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-         settings.TypeNameHandling = TypeNameHandling.All;         
-         
-         doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
-         DataIVK = (TN.Doc.DataIVKDoc)doc.Doc.DataIVK;
-         Header = (TN.Doc.HeaderDoc)doc.Doc.Settings.Header;
-         SettingsData = (TN.Doc.DataDoc)doc.Doc.Settings.Data;
-         Footer = (TN.Doc.FooterDoc)doc.Doc.Settings.Footer;
-         Dictionarys = (TN.Doc.DictionarysDoc)doc.Doc.Settings.Dictionarys;      
-      
-         //// === Настройки страницы 
-         // Ширина и высота (в мм)
-         Page.PaperHeight = doc.Doc.Settings.General.PageSettings.PaperHeight;
-         Page.PaperWidth= doc.Doc.Settings.General.PageSettings.PaperWidth;
-         //Page.Border.Lines = BorderLines.All;
-         
-         // Поля/отступы от краёв (в мм)
-         Page.TopMargin=doc.Doc.Settings.General.PageSettings.TopMargin;
-         Page.BottomMargin=doc.Doc.Settings.General.PageSettings.BottomMargin;
-         Page.LeftMargin=doc.Doc.Settings.General.PageSettings.LeftMargin;
-         Page.RightMargin=doc.Doc.Settings.General.PageSettings.RightMargin;
-         
-         actDate =  CollectingDate(
-            DataIVK.TableResultActAndPassport.Day.ToString(),
-            DataIVK.TableResultActAndPassport.Month.ToString(),
-            DataIVK.TableResultActAndPassport.Year.ToString(),
-            out tempDate);
-         
-         // Запуск отрисовки таблиц на странице отчета
-         DrawTableHeader();
-         //DrawTableTotal();
-         DrawTableSigners();
-      }
-      
-      //// ======================== //// ======================== //// ======================== ////
-      public void DrawTableHeader()
-      {             
-         ActNumberAndDate.Text = string.Format(&quot;Акт приема-сдачи нефти №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1}&lt;/u&gt; г. (сдача по СИКН)&quot;,  
-            DataIVK.TableResultActAndPassport.AdditionalInfo.ActNumber,
-            actDate);
-      
-         DelivePoint.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.DelivePoint; 
-         Factory.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Factory; 
-         SIKN_Number.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.SIKN_Number; 
-         Delive_FIO.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_FIO; 
-         Delive_Lic_Date.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_Lic_Date; 
-         Delive_Lic_Number.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_Lic_Number; 
-         
-         Receive_FIO.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_FIO; 
-         Receive_Lic_Date.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_Lic_Date; 
-         Receive_Lic_Number.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_Lic_Number; 
-         
-        // DelivePoint
-      }
-      
-    //// ======================== //// ======================== //// ======================== ////      
-      private void TableAct_ManualBuild(object sender, EventArgs e)
-      {
-         List&lt;TN.Doc.Act&gt; listShiftsData;
-         listShiftsData = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act.Where(i =&gt; ! i.Vol_LastShift.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Vol_LastShift) == false).ToList();
-         
-         if (Engine.FinalPass == true)
-         {
-            // Calculate Dynamic Columns width
-            float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin-
-               (TableAct.Columns[0].Width/Units.Millimeters)-
-               (TableAct.Columns[1].Width/Units.Millimeters))
-               /(listShiftsData.Count);         
+        // Calculate Dynamic Columns width
+        float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin-
+          (TableAct.Columns[0].Width/Units.Millimeters)-
+          (TableAct.Columns[1].Width/Units.Millimeters))
+          /(listShiftsData.Count);         
 
-            ////=== Insert Columns for Volumes  (V0) &amp; fill them headers with text
-            for (int i=0; i &lt;(listShiftsData.Count-1) ; i++)
-            {
-               TableColumn column = new TableColumn();  
-               TableAct.Columns.Add(column);
+        ////=== Insert Columns for Volumes  (V0) &amp; fill them headers with text
+        for (int i=0; i &lt;(listShiftsData.Count-1) ; i++)
+        {
+          TableColumn column = new TableColumn();  
+          TableAct.Columns.Add(column);
                
-               for (int j=0;j&lt;TableAct.RowCount;j++)
-               {
-                  TableAct[(TableAct.ColumnCount-1),j].AssignAll(TableAct[(TableAct.ColumnCount-2),j]);
-               }
-            }
+          for (int j=0;j&lt;TableAct.RowCount;j++)
+          {
+            TableAct[(TableAct.ColumnCount-1),j].AssignAll(TableAct[(TableAct.ColumnCount-2),j]);
+          }
+        }
             
-            // Setup Dynamic Columns Width
-            for (int i = 2; i &lt; (TableAct.ColumnCount); i++)                 
-            {
-               TableAct.Columns[i].Width = widthDynamicCols*Units.Millimeters;
-            }
+        // Setup Dynamic Columns Width
+        for (int i = 2; i &lt; (TableAct.ColumnCount); i++)                 
+        {
+          TableAct.Columns[i].Width = widthDynamicCols*Units.Millimeters;
+        }
             
-            // Span Columns
-            TableAct[2,0].ColSpan=TableAct.ColumnCount;
+        // Span Columns
+        TableAct[2,0].ColSpan=TableAct.ColumnCount;
             
-            // Fill TableAct with data
+        // Fill TableAct with data
             
-            for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
-            {
-               for (int j=1;j&lt;TableAct.RowCount;j++)
-               {
-                  TableAct[(2+i),1].Text = actDate;
-                  TableAct[(2+i),2].Text = string.Format(&quot;Смена № {0}&quot;,( i+1));            
-                  TableAct[(2+i),4].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
-                  TableAct[(2+i),5].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
-                  TableAct[(2+i),7].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
-                  TableAct[(2+i),8].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
-                  TableAct[(2+i),10].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
-                  TableAct[(2+i),11].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
-                  TableAct[(2+i),12].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
-                  TableAct[(2+i),13].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
-                  TableAct[(2+i),14].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
-                  TableAct[(2+i),15].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
-                  TableAct[(2+i),16].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
-                  TableAct[(2+i),17].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
-                  TableAct[(2+i),19].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
-                  TableAct[(2+i),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
-                  TableAct[(2+i),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
-                  TableAct[(2+i),22].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
-                  TableAct[(2+i),23].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
-                  TableAct[(2+i),24].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
-                  TableAct[(2+i),25].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
-               }
-            }
-         }
-         
-         //Draw rows
-         for (int n = 0; n &lt; TableAct.RowCount; n++)
-         {
-            TableAct.PrintRow(n);
-            TableAct.PrintColumns();                                             
-         }
+        for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
+        {
+          for (int j=1;j&lt;TableAct.RowCount;j++)
+          {
+            TableAct[(2+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
+            TableAct[(2+i),2].Text = string.Format(&quot;Смена № {0}&quot;,( i+1));            
+            TableAct[(2+i),4].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
+            TableAct[(2+i),5].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
+            TableAct[(2+i),7].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
+            TableAct[(2+i),8].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
+            TableAct[(2+i),10].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
+            TableAct[(2+i),11].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
+            TableAct[(2+i),12].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
+            TableAct[(2+i),13].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
+            TableAct[(2+i),14].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
+            TableAct[(2+i),15].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
+            TableAct[(2+i),16].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
+            TableAct[(2+i),17].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
+            TableAct[(2+i),19].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
+            TableAct[(2+i),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
+            TableAct[(2+i),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
+            TableAct[(2+i),22].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
+            TableAct[(2+i),23].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
+            TableAct[(2+i),24].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
+            TableAct[(2+i),25].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
+          }
+        }
       }
-      
-//// ======================== //// ======================== //// ======================== ////            
-      private void TableFootnote_ManualBuild(object sender, EventArgs e)
-      {
-         // Setup Last Column width
-         TableFootnote.Columns[2].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin-
-            (TableFootnote.Columns[0].Width/Units.Millimeters)-
-            (TableFootnote.Columns[1].Width/Units.Millimeters))*Units.Millimeters;
          
-         //Draw TableFootnote
-         for (int n = 0; n &lt; TableFootnote.RowCount; n++)
-         {
-            TableFootnote.PrintRow(n);
-            TableFootnote.PrintColumns();                                             
-         }       
+      //Draw rows
+      for (int n = 0; n &lt; TableAct.RowCount; n++)
+      {
+        TableAct.PrintRow(n);
+        TableAct.PrintColumns();                                             
       }
+    }
       
-//// ======================== //// ======================== //// ======================== ////      
-      private void TableAdditionlInfo_ManualBuild(object sender, EventArgs e)
+    private void TableFootnote_ManualBuild(object sender, EventArgs e)
+    {
+      // Setup Last Column width
+      TableFootnote.Columns[2].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin-
+        (TableFootnote.Columns[0].Width/Units.Millimeters)-
+        (TableFootnote.Columns[1].Width/Units.Millimeters))*Units.Millimeters;
+         
+      //Draw TableFootnote
+      for (int n = 0; n &lt; TableFootnote.RowCount; n++)
       {
-         // Setup Last Column width
-         TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+        TableFootnote.PrintRow(n);
+        TableFootnote.PrintColumns();                                             
+      }       
+    }
+      
+    private void TableAdditionlInfo_ManualBuild(object sender, EventArgs e)
+    {
+      // Setup Last Column width
+      TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
          
-         WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt;&quot;, 
-            DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart);
+      WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt;&quot;, 
+        DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart);
          
-         //Draw static Rows
-         TableAdditionlInfo.PrintRow(0);
-         TableAdditionlInfo.PrintColumns();                                             
+      //Draw static Rows
+      TableAdditionlInfo.PrintRow(0);
+      TableAdditionlInfo.PrintColumns();                                             
          
-         //Fill &amp; Draw dynamic Rows
-         List &lt;string&gt; listGostIndex51858;
-         listGostIndex51858=DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.GostIndex51858.Where
-         (i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      //Fill &amp; Draw dynamic Rows
+      List &lt;string&gt; listGostIndex51858;
+      listGostIndex51858=DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.GostIndex51858.Where
+      (i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
          
-         for (int n = 0; n &lt; listGostIndex51858.Count; n++)
-         {
-            GostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  listGostIndex51858[n]);
-            TableAdditionlInfo.PrintRow(1);
-            TableAdditionlInfo.PrintColumns();                                             
-         }
+      for (int n = 0; n &lt; listGostIndex51858.Count; n++)
+      {
+        GostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  listGostIndex51858[n]);
+        TableAdditionlInfo.PrintRow(1);
+        TableAdditionlInfo.PrintColumns();                                             
       }
+    }
       
-//// ======================== //// ======================== //// ======================== ////
-      public void  DrawTableSigners()
+    public void  DrawTableSigners()
+    {
+      if (Page.PaperWidth == 297)
       {
-         if (Page.PaperWidth == 297)
-         {
-            if (Engine.FinalPass == true)
-            {  
-               for (int n = 0; n &lt; TableSigners.ColumnCount; n++)
-               {
-                  TableSigners.Columns[n].Width=(TableSigners.Columns[n].Width*(float)1.455);//*Units.Millimeters;
-               }       
-            }
-         }
-         
-         Delive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_IOF; 
-         Receive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_IOF; 
-      }  
-      
-//// ======================== //// ======================== //// ======================== ////
-      private void PageFooter_BeforeLayout(object sender, EventArgs e)
-      {
-         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
-         { 
-            PageFooter.Visible = false; 
-         }
-         else
-         {
-            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         }
+        if (Engine.FinalPass == true)
+        {  
+          for (int n = 0; n &lt; TableSigners.ColumnCount; n++)
+          {
+            TableSigners.Columns[n].Width=(TableSigners.Columns[n].Width*(float)1.455);//*Units.Millimeters;
+          }       
+        }
       }
-   }    
+         
+      Delive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_IOF; 
+      Receive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_IOF; 
+    }  
+      
+    private void PageFooter_BeforeLayout(object sender, EventArgs e)
+    {
+      if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+      { 
+        PageFooter.Visible = false; 
+      }
+      else
+      {
+        PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+      }
+    }
+  }    
 }
 
 </ScriptText>

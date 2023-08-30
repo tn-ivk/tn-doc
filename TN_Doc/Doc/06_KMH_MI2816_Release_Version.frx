@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/08/2023 12:41:48" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/23/2023 09:43:10" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -127,16 +127,16 @@ namespace FastReport
       {
         for (int i = 0; i &lt; 11; i++)
         {
-          listPicn1Params.Add(&quot;&quot;);   //No data from IVK
-          listPicn2Params.Add(&quot;&quot;);   //No data from IVK
+          listPicn1Params.Add(&quot;&quot;);
+          listPicn2Params.Add(&quot;&quot;);
         }
         for (int i = 0; i &lt; 5; i++)
         {
-          listWeigherParams.Add(&quot;&quot;); //No data from IVK
-          listTempParams.Add(&quot;&quot;);    //No data from IVK
-          listPressParams.Add(&quot;&quot;);   //No data from IVK
+          listWeigherParams.Add(&quot;&quot;);
+          listTempParams.Add(&quot;&quot;);
+          listPressParams.Add(&quot;&quot;);
         }
-        delta_Picn = &quot;&quot;;              //No data from IVK
+        delta_Picn = &quot;&quot;;            
       }
       else
       {                                                                                    
@@ -163,10 +163,11 @@ namespace FastReport
         if (i==2) TableSourceData[2,i+5].Text = listPicn1Params[i];          
         else TableSourceData[2,i+5].Text = tools.GetNormalizedValue(listPicn1Params[i]);      
       }
-      //PicnInit1_V.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].V;
-      //PicnInit1_FP.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].FP;
-      //PicnInit1_Ft.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].Ft;
-      //PicnInit1_t0.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].t0;
+      
+      //PicnInit1_V.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].V.ToString();
+      //PicnInit1_FP.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].FP.ToString();
+      //PicnInit1_Ft.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].Ft.ToString();
+      //PicnInit1_t0.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[0].t0.ToString();
       
       // Column 4, rows for Section 1         
       for (int i = 0; i &lt; listPicn2Params.Count; i++)
@@ -174,10 +175,11 @@ namespace FastReport
         if (i==2) TableSourceData[3,i+5].Text = listPicn2Params[i];
         else TableSourceData[3,i+5].Text = tools.GetNormalizedValue(listPicn2Params[i]);        
       }
-      //PicnInit2_V.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].V;
-      //PicnInit2_FP.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].FP;
-      //PicnInit2_Ft.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].Ft;
-      //PicnInit2_t0.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].t0;
+      
+      //PicnInit2_V.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].V.ToString();
+      //PicnInit2_FP.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].FP.ToString();
+      //PicnInit2_Ft.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].Ft.ToString();
+      //PicnInit2_t0.Text = DataIVK.TableKMH_MI2816.AdditionalInfo.PP1_AdditionalInfo.PicnInit[1].t0.ToString();
       
       // Column 3, rows for Section 2
       for (int i = 0; i &lt; listWeigherParams.Count; i++)
@@ -323,16 +325,10 @@ namespace FastReport
          
       if (DataIVK.TableKMH_MI2816.ARMData ==null)
       {
-        arm_KMH_Result=&quot;&quot;;//No data from IVK
-        /*
-        serviceStaffData =&quot;No data from IVK&quot;;
-        deliveryStaffData =&quot;No data from IVK&quot;;
-        recievingStaffData =&quot;No data from IVK&quot;;
-        */
+        arm_KMH_Result=&quot;&quot;;
       }
       else
       {
-        
         switch (protocolNumber)
         {
           case 2:

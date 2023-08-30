@@ -152,7 +152,6 @@ namespace TN_Doc.Controllers
             return list;
         }
 
-
         public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {
             CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
@@ -173,6 +172,30 @@ namespace TN_Doc.Controllers
                             .Docs.Single(x => x.IdDoc == IdDoc)
                             .TemplateDocs.Single(x => x.Id == IdTemplateDoc).PathToDocTemplateFile;
         }
+
+
+
+        public bool IsUsedElis(int IdDevice)
+        {
+            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+
+            if (device.Elis == null)
+                if (CfgApp.Elis == null) return false;
+                else return CfgApp.Elis.Use;
+            else return device.Elis.Use;
+        }
+
+        public string GetClientToken(int IdDevice)
+        {
+            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+
+            if (device.Elis == null)
+                if (CfgApp.Elis == null) return string.Empty;
+                else return CfgApp.Elis.ClientToken;
+            else return device.Elis.ClientToken;
+        }
+
+
 
         public IActionResult Index()
         {

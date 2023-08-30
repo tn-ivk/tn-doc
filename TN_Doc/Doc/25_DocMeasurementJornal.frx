@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/30/2022 16:14:29" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/29/2023 15:16:02" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -20,206 +20,204 @@ using TN.DocData;
 
 namespace FastReport
 {
-   public class ReportScript
-   {
-      #region Method for filling the TableJournal with data
-      public int FillTableWithData (int tempCounter, string date, List &lt;TN.Doc.Rows&gt; listTableJournal, out int tempCounterOut)
-      {
-         for (int j=0; j&lt;listTableJournal.Count; j++)                                                                                                                    
-         {                                                                            
-            Num.Text = tempCounter.ToString();
-            Date.Text= date;                                       
-            if (listTableJournal[j].strBegin.Length==19 &amp; listTableJournal[j].strEnd.Length==19 )
-            {
-               strBegin.Text = (listTableJournal[j].strBegin.Remove(16)).Remove(0,11);                               
-               strEnd.Text = (listTableJournal[j].strEnd.Remove(16)).Remove(0,11);             
-            }
-            else
-            {
-               strBegin.Text = &quot;No timestamp!&quot;;                                             
-               strEnd.Text = &quot;No timestamp!&quot;;                                                                                                                                            
-            }
-            BeginVol.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].BeginVol);                                     
-            EndVol.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].EndVol);                 
-            BeginMass.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].BeginMass);                
-            EndMass.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].EndMass);           
-            Vol.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Vol);                        
-            Mass.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Mass);                  
-            Temp.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Temp);                    
-            DensTemp.Text = tools.GetNormalizedValue(listTableJournal[j].BIK[0].DensTemp);   
-            Press.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Press);                     
-            DensPress.Text = tools.GetNormalizedValue(listTableJournal[j].BIK[0].DensPress);     
-            Dens.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Dens);           
-            DensBIK.Text = tools.GetNormalizedValue(listTableJournal[j].BIK[0].Dens);
+  public class ReportScript
+  {
+    #region Method for filling the TableJournal with data
+    public int FillTableWithData (int tempCounter, string date, List &lt;TN.Doc.Rows&gt; listTableJournal, out int tempCounterOut)
+    {
+      for (int j=0; j&lt;listTableJournal.Count; j++)                                                                                                                    
+      {                                                                            
+        Num.Text = tempCounter.ToString();
+        Date.Text= date;                                       
+        if (listTableJournal[j].strBegin.Length==19 &amp; listTableJournal[j].strEnd.Length==19)
+        {
+          strBegin.Text = (listTableJournal[j].strBegin.Remove(16)).Remove(0,11);                               
+          strEnd.Text = (listTableJournal[j].strEnd.Remove(16)).Remove(0,11);             
+        }
+        else
+        {
+          strBegin.Text = &quot;&quot;;                                             
+          strEnd.Text = &quot;&quot;;                                                                                                                                            
+        }
+        BeginVol.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].BeginVol);                                     
+        EndVol.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].EndVol);                 
+        BeginMass.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].BeginMass);                
+        EndMass.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].EndMass);           
+        Vol.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Vol);                        
+        Mass.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Mass);                  
+        Temp.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Temp);                    
+        DensTemp.Text = tools.GetNormalizedValue(listTableJournal[j].BIK[0].DensTemp);   
+        Press.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Press);                     
+        DensPress.Text = tools.GetNormalizedValue(listTableJournal[j].BIK[0].DensPress);     
+        Dens.Text = tools.GetNormalizedValue(listTableJournal[j].SIKN[0].Dens);           
+        DensBIK.Text = tools.GetNormalizedValue(listTableJournal[j].BIK[0].Dens);
             
-            TableJournal.PrintRow(5);                                                                                                                                                                       
-            TableJournal.PrintColumns();          
-            tempCounter++;
-         }                     
-         tempCounterOut=tempCounter;
-         return tempCounterOut;            
-      }   
-      #endregion
+        TableJournal.PrintRow(5);                                                                                                                                                                       
+        TableJournal.PrintColumns();          
+        tempCounter++;
+      }                     
+      tempCounterOut=tempCounter;
+      return tempCounterOut;            
+    }   
+    #endregion
       
-      TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
       
-      TN.Doc.Doc doc; // данные из входного параметра      
+    TN.Doc.Doc doc; // данные из входного параметра      
       
-      TN.Doc.DataIVKDoc DataIVK;
-      TN.Doc.HeaderDoc Header;
-      TN.Doc.DataDoc SettingsData;
-      TN.Doc.FooterDoc Footer;
-      TN.Doc.DictionarysDoc Dictionarys;
+    TN.Doc.DataIVKDoc DataIVK;
+    TN.Doc.HeaderDoc Header;
+    TN.Doc.DataDoc SettingsData;
+    TN.Doc.FooterDoc Footer;
+    TN.Doc.DictionarysDoc Dictionarys;
     
-      private void Page_StartPage(object sender, EventArgs e)
-      {
-         //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/25_TableMeasurementJornal/DocMeasurementJornal.json&quot;))
-         //{
-            // Read the stream as a string
-         //   Report.SetParameterValue(&quot;Journal&quot;, sr.ReadToEnd());
-         //}
-         //// Десериализация данных (формат json) из входного параметра - Json                         
-         string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
-         Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-         settings.TypeNameHandling = TypeNameHandling.All;
-         doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
+    private void Page_StartPage(object sender, EventArgs e)
+    {
+      //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/25_TableMeasurementJornal/DocMeasurementJornal.json&quot;))
+      //{
+      // Read the stream as a string
+      //   Report.SetParameterValue(&quot;Journal&quot;, sr.ReadToEnd());
+      //}
+      //// Десериализация данных (формат json) из входного параметра - Json                         
+      string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
+      Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+      settings.TypeNameHandling = TypeNameHandling.All;
+      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
          
-         DataIVK = (TN.Doc.DataIVKDoc)doc.Doc.DataIVK;
-         Header = (TN.Doc.HeaderDoc)doc.Doc.Settings.Header;
-         SettingsData = (TN.Doc.DataDoc)doc.Doc.Settings.Data;
-         Footer = (TN.Doc.FooterDoc)doc.Doc.Settings.Footer;
-         Dictionarys = (TN.Doc.DictionarysDoc)doc.Doc.Settings.Dictionarys;
+      DataIVK = (TN.Doc.DataIVKDoc)doc.Doc.DataIVK;
+      Header = (TN.Doc.HeaderDoc)doc.Doc.Settings.Header;
+      SettingsData = (TN.Doc.DataDoc)doc.Doc.Settings.Data;
+      Footer = (TN.Doc.FooterDoc)doc.Doc.Settings.Footer;
+      Dictionarys = (TN.Doc.DictionarysDoc)doc.Doc.Settings.Dictionarys;
 
       //// === Настройки страницы 
-         // Ширина и высота (в мм)
-         Page.PaperHeight = doc.Doc.Settings.General.PageSettings.PaperHeight;
-         Page.PaperWidth= doc.Doc.Settings.General.PageSettings.PaperWidth;
-         //Page.Border.Lines = BorderLines.All;
+      // Ширина и высота (в мм)
+      Page.PaperHeight = doc.Doc.Settings.General.PageSettings.PaperHeight;
+      Page.PaperWidth= doc.Doc.Settings.General.PageSettings.PaperWidth;
+      //Page.Border.Lines = BorderLines.All;
          
-         // Поля/отступы от краёв (в мм)
-         Page.TopMargin=doc.Doc.Settings.General.PageSettings.TopMargin;
-         Page.BottomMargin=doc.Doc.Settings.General.PageSettings.BottomMargin;
-         Page.LeftMargin=doc.Doc.Settings.General.PageSettings.LeftMargin;
-         Page.RightMargin=doc.Doc.Settings.General.PageSettings.RightMargin;
+      // Поля/отступы от краёв (в мм)
+      Page.TopMargin=doc.Doc.Settings.General.PageSettings.TopMargin;
+      Page.BottomMargin=doc.Doc.Settings.General.PageSettings.BottomMargin;
+      Page.LeftMargin=doc.Doc.Settings.General.PageSettings.LeftMargin;
+      Page.RightMargin=doc.Doc.Settings.General.PageSettings.RightMargin;
          
-         // Запуск отрисовки таблиц на странице отчета
-         DrawTableHeader();
-         //DrawTableTotal();
-         DrawTableSigners();
-      }
-      
-      //// ======================== //// ======================== //// ======================== ////
-      public void DrawTableHeader()
-      {                                             
-         SIKN_Name.Text = DataIVK.TableMeasurementJornal.AdditionalInfo.SIKN_Name; 
-         Factory.Text = DataIVK.TableMeasurementJornal.AdditionalInfo.Factory; 
-      }
-      //// ======================== //// ======================== //// ======================== ////      
-      private void TableJournal_ManualBuild(object sender, EventArgs e)
-      {
-         List &lt;TN.Doc.Rows&gt; listTableJournal2h;
-         List &lt;TN.Doc.Rows&gt; listTableJournalShifts;
-         List &lt;TN.Doc.Rows&gt; listTableJournalDay;
-         
-         listTableJournal2h =DataIVK.TableMeasurementJornal.Data.Rows.Where(i =&gt; i.Used == 1).ToList();            
-         listTableJournalShifts =DataIVK.TableMeasurementJornal.Data.Rows.Where(i =&gt; i.Used == 2).ToList();            
-         listTableJournalDay =DataIVK.TableMeasurementJornal.Data.Rows.Where(i =&gt; i.Used == 3).ToList();            
-        
-         // Setup Columns width
-         float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin-(TableJournal.Columns[0].Width/Units.Millimeters))/(TableJournal.ColumnCount-1);         
-         for (int i = 1; i &lt; (TableJournal.ColumnCount); i++)                 
-         {
-            TableJournal.Columns[i].Width = widthDynamicCols*Units.Millimeters;
-         }
-           
-         //Draw Fixed rows
-         for (int n = 0; n &lt; TableJournal.FixedRows; n++)
-         {
-            TableJournal.PrintRow(n);
-            TableJournal.PrintColumns();                                             
-         }       
-         
-         //Fill the table with data
-         string journalDate = string.Format(&quot;{0}.{1}.{2} г.&quot;,  
-            DataIVK.TableMeasurementJornal.Day,
-            DataIVK.TableMeasurementJornal.Month,
-            DataIVK.TableMeasurementJornal.Year);
+      // Запуск отрисовки таблиц на странице отчета
+      DrawTableHeader();
+      //DrawTableTotal();
+      DrawTableSigners();
+    }
 
-         int tempCounter =1; 
-         int tempCounterOut=0;
+    public void DrawTableHeader()
+    {                                             
+      SIKN_Name.Text = DataIVK.TableMeasurementJornal.AdditionalInfo.SIKN_Name; 
+      Factory.Text = DataIVK.TableMeasurementJornal.AdditionalInfo.Factory; 
+    }
+
+    private void TableJournal_ManualBuild(object sender, EventArgs e)
+    {
+      List &lt;TN.Doc.Rows&gt; listTableJournal2h;
+      List &lt;TN.Doc.Rows&gt; listTableJournalShifts;
+      List &lt;TN.Doc.Rows&gt; listTableJournalDay;
          
-         FillTableWithData(tempCounter, journalDate, listTableJournal2h, out tempCounterOut); // fill data for 2hour 
-         FillTableWithData(tempCounterOut, journalDate, listTableJournalShifts,  out tempCounterOut); // fill data for shifts 
-         FillTableWithData(tempCounterOut, journalDate, listTableJournalDay,  out tempCounterOut); // fill data for 24 hours 
-      }
-      
-      //// ======================== //// ======================== //// ======================== ////            
-      private void TableTotal_ManualBuild(object sender, EventArgs e)
+      listTableJournal2h =DataIVK.TableMeasurementJornal.Data.Rows.Where(i =&gt; i.Used == 1).ToList();            
+      listTableJournalShifts =DataIVK.TableMeasurementJornal.Data.Rows.Where(i =&gt; i.Used == 2).ToList();            
+      listTableJournalDay =DataIVK.TableMeasurementJornal.Data.Rows.Where(i =&gt; i.Used == 3).ToList();            
+        
+      // Setup Columns width
+      float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin-(TableJournal.Columns[0].Width/Units.Millimeters))/(TableJournal.ColumnCount-1);         
+      for (int i = 1; i &lt; (TableJournal.ColumnCount); i++)                 
       {
-         List&lt;string&gt; listShiftsData;
-         listShiftsData =DataIVK.TableMeasurementJornal.Data.Shift.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+        TableJournal.Columns[i].Width = widthDynamicCols*Units.Millimeters;
+      }
+           
+      //Draw Fixed rows
+      for (int n = 0; n &lt; TableJournal.FixedRows; n++)
+      {
+        TableJournal.PrintRow(n);
+        TableJournal.PrintColumns();                                             
+      }       
          
-         for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
-         {
-            switch(listShiftsData.Count)
-            {
-               case 0:
-                  Total.Text=&quot;No data for Shifts!&quot;;
-                  break;
-               case 1:
-                  Total.Text=string.Format(&quot;Итого масса брутто нефти за смену: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]));
-                  break;
-               default:
-                  Total.Text=string.Format(&quot;Итого масса брутто нефти за смену №{1}: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]),(i+1));
-                   break;
-            }
-            TableTotal.PrintRow(0);                                                                                                                                                                       
-            TableTotal.PrintColumns();          
-          }
-         Total.Text=string.Format(&quot;Итого масса брутто нефти за сутки: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(DataIVK.TableMeasurementJornal.Data.Day));
-         TableTotal.PrintRow(0);                                                                                                                                                                       
-         TableTotal.PrintColumns();          
-      }
+      //Fill the table with data
+      //string journalDate = string.Format(&quot;{0}.{1}.{2} г.&quot;,  
+      //  DataIVK.TableMeasurementJornal.Day,
+      //  DataIVK.TableMeasurementJornal.Month,
+      //  DataIVK.TableMeasurementJornal.Year);
+
+      string journalDate = new DateTime(DataIVK.TableMeasurementJornal.Year, DataIVK.TableMeasurementJornal.Month, DataIVK.TableMeasurementJornal.Day).ToString(&quot;dd.MM.yyyy&quot;);
       
-//// ======================== //// ======================== //// ======================== ////
-      public void  DrawTableSigners()
-      {
-         Dictionary&lt;string,string&gt; dictSignersFIO = new Dictionary&lt;string,string&gt; ();         
+      int tempCounter =1; 
+      int tempCounterOut=0;
          
-         if (DataIVK.TableMeasurementJornal.DataARM == null)
-         {   
-            dictSignersFIO.Add(&quot;DeliveryFIO1&quot;, &quot;&quot;);
-            dictSignersFIO.Add(&quot;ReceiveFIO1&quot;, &quot;&quot;);
-            dictSignersFIO.Add(&quot;DeliveryFIO2&quot;, &quot;&quot;);
-            dictSignersFIO.Add(&quot;ReceiveFIO2&quot;, &quot;&quot;);
-         }
-         else
-         {
-            PropertyInfo[] props =  DataIVK.TableMeasurementJornal.DataARM.GetType().GetProperties();
-            foreach (var prop in props)
-            {
-               dictSignersFIO.Add(prop.Name, prop.GetValue(DataIVK.TableMeasurementJornal.DataARM, null).ToString());
-            }
-         }
-         DeliveryFIO1.Text =dictSignersFIO[&quot;DeliveryFIO1&quot;];
-         ReceiveFIO1.Text =dictSignersFIO[&quot;ReceiveFIO1&quot;];
-         DeliveryFIO2.Text =dictSignersFIO[&quot;DeliveryFIO2&quot;];
-         ReceiveFIO2.Text =dictSignersFIO[&quot;ReceiveFIO2&quot;];       
-      }  
+      FillTableWithData(tempCounter, journalDate, listTableJournal2h, out tempCounterOut); // fill data for 2hour 
+      FillTableWithData(tempCounterOut, journalDate, listTableJournalShifts,  out tempCounterOut); // fill data for shifts 
+      FillTableWithData(tempCounterOut, journalDate, listTableJournalDay,  out tempCounterOut); // fill data for 24 hours 
+    }
       
-//// ======================== //// ======================== //// ======================== ////
-      private void PageFooter_BeforeLayout(object sender, EventArgs e)
+    private void TableTotal_ManualBuild(object sender, EventArgs e)
+    {
+      List&lt;string&gt; listShiftsData;
+      listShiftsData =DataIVK.TableMeasurementJornal.Data.Shift.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+         
+      for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
       {
-         if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
-         { 
-            PageFooter.Visible = false; 
-         }
-         else
-         {
-            PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         }
+        switch(listShiftsData.Count)
+        {
+          case 0:
+            Total.Text=&quot;&quot;;
+            break;
+          case 1:
+            Total.Text=string.Format(&quot;Итого масса брутто нефти за смену: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]));
+            break;
+          default:
+            Total.Text=string.Format(&quot;Итого масса брутто нефти за смену №{1}: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]),(i+1));
+            break;
+        }
+        TableTotal.PrintRow(0);                                                                                                                                                                       
+        TableTotal.PrintColumns();          
       }
-   }    
+      Total.Text=string.Format(&quot;Итого масса брутто нефти за сутки: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(DataIVK.TableMeasurementJornal.Data.Day));
+      TableTotal.PrintRow(0);                                                                                                                                                                       
+      TableTotal.PrintColumns();          
+    }
+      
+    public void  DrawTableSigners()
+    {
+      Dictionary&lt;string,string&gt; dictSignersFIO = new Dictionary&lt;string,string&gt; ();         
+         
+      if (DataIVK.TableMeasurementJornal.DataARM == null)
+      {   
+        dictSignersFIO.Add(&quot;DeliveryFIO1&quot;, &quot;&quot;);
+        dictSignersFIO.Add(&quot;ReceiveFIO1&quot;, &quot;&quot;);
+        dictSignersFIO.Add(&quot;DeliveryFIO2&quot;, &quot;&quot;);
+        dictSignersFIO.Add(&quot;ReceiveFIO2&quot;, &quot;&quot;);
+      }
+      else
+      {
+        PropertyInfo[] props =  DataIVK.TableMeasurementJornal.DataARM.GetType().GetProperties();
+        foreach (var prop in props)
+        {
+          dictSignersFIO.Add(prop.Name, prop.GetValue(DataIVK.TableMeasurementJornal.DataARM, null).ToString());
+        }
+      }
+      DeliveryFIO1.Text =dictSignersFIO[&quot;DeliveryFIO1&quot;];
+      ReceiveFIO1.Text =dictSignersFIO[&quot;ReceiveFIO1&quot;];
+      DeliveryFIO2.Text =dictSignersFIO[&quot;DeliveryFIO2&quot;];
+      ReceiveFIO2.Text =dictSignersFIO[&quot;ReceiveFIO2&quot;];       
+    }  
+      
+    private void PageFooter_BeforeLayout(object sender, EventArgs e)
+    {
+      if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
+      { 
+        PageFooter.Visible = false; 
+      }
+      else
+      {
+        PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
+      }
+    }
+  }    
 }
 
 </ScriptText>
@@ -254,7 +252,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableJournal" Top="60.03" Width="1047.06" Height="151.22">
+    <DataBand Name="DataBandTableJournal" Top="59.4" Width="1047.06" Height="151.22">
       <TableObject Name="TableJournal" Width="1047.06" Height="151.22" FixedRows="5" ManualBuildEvent="TableJournal_ManualBuild">
         <TableColumn Name="Column122" Width="30.24"/>
         <TableColumn Name="Column123" Width="64.26"/>
@@ -382,7 +380,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableTotal" Top="214.59" Width="1047.06" Height="23.63" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableTotal" Top="213.33" Width="1047.06" Height="23.63" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableTotal" Top="7.56" Width="718.2" Height="16.07" ManualBuildEvent="TableTotal_ManualBuild">
         <TableColumn Name="Column138" Width="718.2"/>
         <TableRow Name="Row106" Height="16.07">
@@ -390,7 +388,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="241.55" Width="1047.06" Height="153.09" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="239.66" Width="1047.06" Height="153.09" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="11.34" Width="1041.39" Height="94.5">
         <TableColumn Name="Column52" Width="94.5"/>
         <TableColumn Name="Column51" Width="5.67"/>
@@ -476,7 +474,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="397.97" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="395.45" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

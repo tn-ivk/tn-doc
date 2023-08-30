@@ -36,7 +36,7 @@
                     <td>
                         <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
                         <br>
-                        <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
+                        <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">                      
                     </td>
                 </tr>
             </table>
@@ -83,7 +83,7 @@
         <table>
             <tr>
 
-@*                <td align="left"><select id="ComboboxTemplateDoc">Форма документа</select></td>
+@*              <td align="left"><select id="ComboboxTemplateDoc">Форма документа</select></td>
                 <td align="left"><select id="ComboboxProtocolNumber">Номер протокола</select></td>
                 <td align="right"><select id="ComboboxExportFormat">Экспорт</select></td>
                 <td align="right"><input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()"></td>
@@ -96,10 +96,19 @@
                 </td>
                 
                 <td align="right">
+
+@*                    <input id="ButtonElis" type="button" value="Получить данные из ЕЛИС" onclick="GetDataElis()" hidden>
+*@
+                    <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis">
+                        Получить данные из ЕЛИС
+                    </button>
+
+
                     <select id="ComboboxExportFormat">Экспорт</select>
                     <input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
                     <select id="ComboboxPrinterName">Принтер</select>
                     <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
+
                 </td>
 
 
@@ -113,7 +122,7 @@
 </div>
 
 
-<div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
+    <div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-dir-editor-width" role="document">
         <div class="modal-content modal-dir-editor-height">
 
@@ -225,6 +234,70 @@
         </div>
     </div>
 </div>
+
+
+
+
+@*    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+
+@*    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>*@
+
+
+    <div class="modal fade" id="elis" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Получение данных из ЕЛИС</h5>                    
+                    
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                    <h6 class="modal-title" id="info"></h6>
+
+                    <br />
+
+                    <button type="button" class="btn btn-primary" onclick="GetaElisData()">Запросить данные</button>
+                   
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary">Вставить</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
 <script>   
         InitElement();
 </script>

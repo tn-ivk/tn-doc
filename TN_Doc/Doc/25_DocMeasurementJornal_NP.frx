@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/27/2023 08:59:03" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/29/2023 15:15:59" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -101,11 +101,13 @@ namespace FastReport
       }       
          
       //Fill the table with data
-      string journalDate = string.Format(&quot;{0}.{1}.{2}г.&quot;,  
-        DataIVK.TableMeasurementJornal.Day,
-        DataIVK.TableMeasurementJornal.Month,
-        DataIVK.TableMeasurementJornal.Year);
+      //string journalDate = string.Format(&quot;{0}.{1}.{2}г.&quot;,  
+      //  DataIVK.TableMeasurementJornal.Day,
+      //  DataIVK.TableMeasurementJornal.Month,
+      //  DataIVK.TableMeasurementJornal.Year);
 
+      string journalDate = new DateTime(DataIVK.TableMeasurementJornal.Year, DataIVK.TableMeasurementJornal.Month, DataIVK.TableMeasurementJornal.Day).ToString(&quot;dd.MM.yyyy&quot;);
+      
       int tempCounter =1; 
       int tempCounterOut=0;
          

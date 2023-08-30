@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/25/2023 17:11:44" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/11/2023 15:49:00" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -86,13 +86,13 @@ namespace FastReport
       }
          
       // Fill table with data   
-      PR_Type_Oper.Text = &quot;Тип ПР &lt;u&gt;  &quot; + DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_Type_Oper;
+      PR_Type_Oper.Text = &quot;Тип ПР &quot; + DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_Type_Oper;
       PR_FactoryNumber_Oper.Text = &quot;Заводской № &lt;u&gt;&quot; +  DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_FactoryNumber_Oper;
       Place.Text = string.Format(&quot;Место проведения КМХ: СИКН №{1} &lt;u&gt;{0}&lt;/u&gt; (СИКН, НГДУ, ПСП)&quot;, 
         DataIVK.TableKMH_PR_PR.AdditionalInfo.Place,
 	DataIVK.TableKMH_PR_PR.AdditionalInfo.Place_SIKN_Name); 
          
-      PR_Type_Ctrl.Text = &quot;Тип контрольного ПР &lt;u&gt;  &quot; + DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_Type_Ctrl;
+      PR_Type_Ctrl.Text = &quot;Тип контрольного ПР &quot; + DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_Type_Ctrl;
       PR_FactoryNumber_Ctrl.Text = &quot;Заводской № &lt;u&gt;&quot; +  DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_FactoryNumber_Ctrl;
       PR_CheckDate_Ctrl.Text = &quot;Дата поверки &lt;u&gt;&quot; +  DataIVK.TableKMH_PR_PR.AdditionalInfo.PR_CheckDate_Ctrl;
       Visc.Text = $&quot;{oilName} &lt;u&gt;&quot; +
@@ -308,8 +308,8 @@ namespace FastReport
           <TableCell Name="Cell2" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row2" AutoSize="true">
-          <TableCell Name="PR_Type_Oper" Border.Lines="Left, Right, Top" Text="PR_Type_Oper" Padding="2, 3, 2, 0" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="PR_Type_Ctrl" Border.Lines="Right, Top" Text="PR_Type_Ctrl" Padding="2, 3, 2, 0" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="PR_Type_Oper" Border.Lines="Left, Right, Top" Text="PR_Type_Oper" Padding="2, 3, 2, 0" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="PR_Type_Ctrl" Border.Lines="Right, Top" Text="PR_Type_Ctrl" Padding="2, 3, 2, 0" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row127" AutoSize="true">
           <TableCell Name="PR_FactoryNumber_Oper" Border.Lines="Left, Right" Text="PR_FactoryNumber_Oper" Padding="2, 3, 2, 0" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -465,10 +465,10 @@ namespace FastReport
       <TextObject Name="Prim" Top="7.56" Width="926.1" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="false" Text="Prim" HorzAlign="Justify" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
     </DataBand>
     <ReportSummaryBand Name="ReportSummary" Top="411.49" Width="1047.06" Height="206.01" CanShrink="true">
-      <TableObject Name="TableConclusion" Top="7.56" Width="926.1" Height="198.45" FixedColumns="2">
+      <TableObject Name="TableConclusion" Top="7.56" Width="708.75" Height="198.45" FixedColumns="2">
         <TableColumn Name="Column13" Width="151.2"/>
-        <TableColumn Name="Column14" Width="500.85"/>
-        <TableColumn Name="Column16" Width="274.05" AutoSize="true"/>
+        <TableColumn Name="Column14" Width="349.65"/>
+        <TableColumn Name="Column16" Width="207.9" AutoSize="true"/>
         <TableRow Name="Row14" Height="28.35" AutoSize="true">
           <TableCell Name="Conclusion" Text="Conclusion" Padding="2, 3, 2, 3" HorzAlign="Justify" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="3"/>
           <TableCell Name="Cell60" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>

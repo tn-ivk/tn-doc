@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/21/2023 10:39:42" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/17/2023 17:29:59" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -90,7 +90,7 @@ namespace FastReport
       
     public void DrawTableHeader()
     {             
-      ActNumberAndDate.Text = string.Format(&quot;Акт приема-сдачи нефтепродукта №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1}&lt;/u&gt; г. (сдача по СИКН)&quot;,  
+      ActNumberAndDate.Text = string.Format(&quot;Акт приема-сдачи нефтепродукта №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1}&lt;/u&gt; (сдача по СИКН)&quot;,  
         DataIVK.TableResultActAndPassport.AdditionalInfo.ActNumber,
         actDate);
       
