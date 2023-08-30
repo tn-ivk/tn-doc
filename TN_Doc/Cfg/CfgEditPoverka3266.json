@@ -1,0 +1,109 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place",
+      "Type": "text",
+      "Name": "?Place?"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN",
+      "Type": "text",
+      "Name": "?Place_SIKN?"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "?Place_Factory?"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Type",
+      "Type": "text",
+      "Name": "?PR_Type?"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_FactoryNumber",
+      "Type": "text",
+      "Name": "?PR_FactoryNumber?"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_LineNumber",
+      "Type": "text",
+      "Name": "?PR_LineNumber?"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Type",
+      "Type": "text",
+      "Name": "?PU_Type?"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_FactoryNumber",
+      "Type": "text",
+      "Name": "?PU_FactoryNumber?"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "IVK_Type",
+      "Type": "text",
+      "Name": "?IVK_Type?"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": false,
+      "Key": "IVK_FactoryNumber",
+      "Type": "text",
+      "Name": "?IVK_FactoryNumber?"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "ProtokolNum",
+      "Type": "text",
+      "Name": "?ProtokolNum?"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "?ARM_Poverka_Result?"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "StaffData",
+      "Type": "text",
+      "Name": "?StaffData?"
+    }
+  ]
+}
+
