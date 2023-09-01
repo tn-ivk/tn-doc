@@ -860,7 +860,7 @@
       ],
       "DBConnectionStrings": [
         {
-          "Use": true,
+          "Use": false,
           "GuidDevice": 0,
           "Server": "192.168.12.101",
           "Userid": "user",

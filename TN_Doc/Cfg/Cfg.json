@@ -285,6 +285,7 @@
             "LicensesDate": "12.12.2022"
           },
           {
+            "Id": 10,
             "Use": true,
             "IdUser": 10,
             "LicensesNumber": "20-27/480-22",

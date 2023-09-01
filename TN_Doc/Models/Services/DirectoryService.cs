@@ -10,13 +10,15 @@ namespace TN_Doc.Models.Services
     /// <summary>
     /// Сервис взаимодействия со справочниками
     /// </summary>
-    public sealed class DirectoryService
+    public sealed class DirectoryService : IDisposable
     {
         private readonly FileInfo _mainCfgFile;
         private readonly object _lock;
         private string _cacheDirectoriesJson;
         private bool _isValidCache;
-        
+        private FileSystemWatcher _fileWatcher;
+
+
         /// <summary>
         /// Инициализация сервиса работы со словарями
         /// </summary>
@@ -27,18 +29,43 @@ namespace TN_Doc.Models.Services
         {
             if (string.IsNullOrEmpty(mainCfgFilePath))
                 throw new ArgumentNullException(nameof(mainCfgFilePath), "Отсутствует путь главной конфигурации");
-            _mainCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory,mainCfgFilePath));
+            _mainCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, mainCfgFilePath));
             FileNotFoundThrowExceptionHelper(_mainCfgFile);
             _cacheDirectoriesJson = null;
             _lock = new object();
+            _fileWatcher = CreateCfgFileWatcher();
         }
-        
+
+        /// <summary>
+        /// Создание наблюдателя за файлом конифгурации
+        /// </summary>
+        /// <returns>Возвращает  наблюдателя за файлом конифгурации со словарями</returns>
+        /// <remarks>
+        /// На перезапись файла вешается событие инвалидации кеша
+        /// </remarks>
+        private FileSystemWatcher CreateCfgFileWatcher()
+        {
+            var fileWatcher = new FileSystemWatcher(_mainCfgFile.DirectoryName!, _mainCfgFile.Name);
+            fileWatcher.IncludeSubdirectories = false;
+            fileWatcher.NotifyFilter = NotifyFilters.LastWrite;
+            fileWatcher.EnableRaisingEvents = true;
+            fileWatcher.Changed += InvalidateCache;
+            return fileWatcher;
+        }
+
+        /// <summary>
+        /// Событие инвалидация кеша
+        /// </summary>
+        /// <param name="sender">Источник сообщения</param>
+        /// <param name="e"></param>
+        private void InvalidateCache(object sender, FileSystemEventArgs e) => _isValidCache = false;
+
         /// <summary>
         /// Получения доступных словарей в формате JSON
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidDataException">При отсутствие словарей на сервере</exception>
-        public  async Task<string> GetDirectoriesJson()
+        public async Task<string> GetDirectoriesJson()
         {
             return await Task.Run(() =>
             {
@@ -51,13 +78,14 @@ namespace TN_Doc.Models.Services
                     var json = File.ReadAllText(_mainCfgFile.FullName);
                     var jObject = JObject.Parse(json);
                     _cacheDirectoriesJson = jObject["Doc"]?["Settings"]?["Dictionarys"]?.ToString();
+                    _isValidCache = true;
                     if (string.IsNullOrEmpty(_cacheDirectoriesJson))
                         throw new InvalidDataException(message: "Отсутствует данные по справочникам (json is null)");
-                    return (string)_cacheDirectoriesJson?.Clone()??string.Empty;
+                    return (string)_cacheDirectoriesJson?.Clone() ?? string.Empty;
                 }
             });
         }
-        
+
         /// <summary>
         /// Установка нового значения словарей в формате JSON на сервере. Перезаписывается конфигурация приложения
         /// </summary>
@@ -75,7 +103,7 @@ namespace TN_Doc.Models.Services
                 }
             });
         }
-        
+
         /// <summary>
         /// Запись новых справочников в конфигурацию приложения
         /// </summary>
@@ -88,7 +116,6 @@ namespace TN_Doc.Models.Services
             jObject["Doc"]?["Settings"]?["Dictionarys"]?.Replace(jObjectDir);
             File.WriteAllText(_mainCfgFile.FullName, jObject.ToString(), Encoding.Default);
         }
-        
 
         /// <summary>
         /// Вспомогательный метод проверки наличия конфигурационного файла
@@ -99,6 +126,15 @@ namespace TN_Doc.Models.Services
         {
             if (!info.Exists)
                 throw new FileNotFoundException($"Отсутствует файл с главной конфигурацией: {info.FullName}");
+        }
+
+        /// <summary>
+        /// Очистка ресурсов сервиса
+        /// </summary>
+        public void Dispose()
+        {
+            _fileWatcher.Changed -= InvalidateCache;
+            _fileWatcher.Dispose();
         }
     }
 }
