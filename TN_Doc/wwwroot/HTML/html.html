@@ -5,72 +5,59 @@
     <title></title>
 
     <style>
-        td, th {
-            font-size: 70%; /* Размер шрифта в процентах */
-            padding: 2px; /* Поля вокруг содержимого таблицы */
-            border: 0.5px solid black; /* Параметры рамки */
+        td, th 
+        {
+            font-size: 70%;             /* Размер шрифта в процентах */
+            padding: 2px;               /* Поля вокруг содержимого таблицы */
+            border: 0.5px solid black;  /* Параметры рамки */
         }
 
-        Edit {
-            border-collapse: collapse; /* Убираем двойные линии между ячейками */
+        Edit 
+        {
+            border-collapse: collapse;  /* Убираем двойные линии между ячейками */
         }
     </style>
 
-    <!--<script type="text/javascript">
-        function myFunction(selectObject) {
-            var users = [];
+    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/js/EditDoc.js"></script>
 
-            //Наполнить users данными
 
-            if (selectObject.name == "Laboratory_IOF") {
-                var user = users.filter(users => users["Id"] == $(selectObject).val());
-                document.getElementById("Laboratory_Post").value = user[0].Post;
-                document.getElementById("Laboratory_Factory").value = user[0].Factory;
+    <script id="ElementChangeEventHandling" type="text/javascript">
 
-            }
-            else if (selectObject.name == "Delive_IOF") {
-                var user = users.filter(users => users["Id"] == $(selectObject).val());
+        var dictionaries;
+
+        function funcOnLoad() {
+            dictionaries = GetUsers();
+        }
+
+        function UserChangeEvent(selectObject)
+        {
+            if (selectObject.name == "Delive_IOF")
+            {
+                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Delive_Post").value = user[0].Post;
                 document.getElementById("Delive_Factory").value = user[0].Factory;
 
                 //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
-            else if (selectObject.name == "Receive_IOF") {
-                var user = users.filter(users => users["Id"] == $(selectObject).val());
+            else if (selectObject.name == "Receive_IOF")
+            {
+                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Receive_Post").value = user[0].Post;
                 document.getElementById("Receive_Factory").value = user[0].Factory;
 
                 //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
         }
-    </script>-->
+    </script>
 
 </head>
-<body>
+<body onload="funcOnLoad()">
 
     <table id="AdditionalInfo">
         <tbody>
 
-        <tr><td>Пункт приема сдачи нефти</td><td><input id="DelivePoint" data-edit="1" data-key="DelivePoint" data-tag="AdditionalInfo" type="number" value=""></td></tr><tr><td>Номер аттестата аккредитации</td><td><input id="AccrSertifNumber" data-edit="1" data-key="AccrSertifNumber" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>Лаборатория предприятия</td><td><input id="Laboratory" data-edit="1" data-key="Laboratory" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>СИКН №</td><td><input id="SIKN_Number" data-edit="1" data-key="SIKN_Number" data-tag="AdditionalInfo" type="text" value="914"></td></tr><tr><td>Представитель испытательной лаборатории (должность)</td><td><input id="Laboratory_Post" data-edit="1" data-key="Laboratory_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель испытательной лаборатории (предприятие)</td><td><input id="Laboratory_Factory" data-edit="1" data-key="Laboratory_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель испытательной лаборатории (ИОФ)</td><td><select name="Laboratory_IOF" data-edit="1" data-key="Laboratory_IOF" data-tag="AdditionalInfo" onchange="myFunction(this)"><option value="1">Гущина М.В.</option><option value="2">Кильматова Г.З.</option><option value="3">Ошвинцева Е.Г.</option></select></td></tr><tr><td>Представитель сдающей стороны (должность)</td><td><input id="Delive_Post" data-edit="1" data-key="Delive_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель сдающей стороны (предприятие)</td><td><input id="Delive_Factory" data-edit="1" data-key="Delive_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель сдающей стороны (ИОФ)</td><td><select name="Delive_IOF" data-edit="1" data-key="Delive_IOF" data-tag="AdditionalInfo" onchange="myFunction(this)"><option value="4">Ковалев В.В.</option><option value="5">Мухаметшин К.Ф.</option><option value="6">Черный Е.Д.</option></select></td></tr><tr><td>Представитель принимающей стороны (должность)</td><td><input id="Receive_Post" data-edit="1" data-key="Receive_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель принимающей стороны (предприятие)</td><td><input id="Receive_Factory" data-edit="1" data-key="Receive_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель принимающей стороны (ИОФ)</td><td><select name="Receive_IOF" data-edit="1" data-key="Receive_IOF" data-tag="AdditionalInfo" onchange="myFunction(this)"><option value="7">Коняева И.А.</option><option value="8">Данилюк Е.Ю.</option><option value="9">Личманова П.Б.</option></select></td></tr><tr><td>Дата и время отбора пробы (начало)</td><td><input id="PassportPeriodDT.Begin" data-edit="1" data-key="PassportPeriodDT.Begin" data-tag="AdditionalInfo" type="datetime-local" value="2022-10-12T00:00:00"></td></tr><tr><td>Дата и время отбора пробы (окончание)</td><td><input id="PassportPeriodDT.End" data-edit="1" data-key="PassportPeriodDT.End" data-tag="AdditionalInfo" type="datetime-local" value="2022-10-12T12:00:00"></td></tr><tr><td>Название танкера</td><td><input id="TankerName" data-edit="1" data-key="TankerName" data-tag="AdditionalInfo" type="text" value=""></td></tr></tbody>
-    </table>
-
-    <table id="Edit">
-        <thead>
-            <tr>
-                <th> Н </th>
-                <th> Наименование показателя </th>
-                <th> Метод испытаний </th>
-                <th> Измерение ИВК </th>
-                <th> Измерение ХАЛ </th>
-                <th> Результат </th>
-            </tr>
-        </thead>
-        
-        <tbody>
-        
-        <tr><td>1</td><td>Температура нефти при условиях измерений объема, °C</td><td><select data-edit="1" data-key="TempCorrection" data-tag="Metod" name="cb1"><option value="0">1_ФР.1.29.2014.16854</option><option value="1">1_ФР.2.29.2014.16854</option><option value="2">1_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="TempCorrection" data-tag="Value" type="text" name="tb1"></td><td>-</td></tr><tr><td>2</td><td>Давление нефти при условиях измерений объема, МПа</td><td><select data-edit="1" data-key="PressCorrection" data-tag="Metod" name="cb2"><option value="0">2_ФР.1.29.2014.16854</option><option value="1">2_ФР.2.29.2014.16854</option><option value="2">2_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="PressCorrection" data-tag="Value" type="text" name="tb2"></td><td>-</td></tr><tr><td>3</td><td>Плотность нефти при температуре и давлении
-в условиях измерений объема, кг/м³</td><td><select data-edit="1" data-key="DensCorrection" data-tag="Metod" name="cb3"><option value="0">3_ФР.1.29.2014.16854</option><option value="1">3_ФР.2.29.2014.16854</option><option value="2">3_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="DensCorrection" data-tag="Value" type="text" name="tb3"></td><td>-</td></tr><tr><td>4</td><td>Плотность нефти при 20 °C, кг/м³</td><td><select data-edit="1" data-key="Dens20Correction" data-tag="Metod" name="cb4"><option value="0">4_ФР.1.29.2014.16854</option><option value="1">4_ФР.2.29.2014.16854</option><option value="2">4_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Dens20Correction" data-tag="Value" type="text" name="tb4"></td><td>-</td></tr><tr><td>5</td><td>Плотность нефти при 15 °C, кг/м³</td><td><select data-edit="1" data-key="Dens15Correction" data-tag="Metod" name="cb5"><option value="0">5_ФР.1.29.2014.16854</option><option value="1">5_ФР.2.29.2014.16854</option><option value="2">5_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Dens15Correction" data-tag="Value" type="text" name="tb5"></td><td>-</td></tr><tr><td>6</td><td>Массовая доля воды, %</td><td><select data-edit="1" data-key="MassWaterFracCorrection" data-tag="Metod" name="cb6"><option value="0">6_ФР.1.29.2014.16854</option><option value="1">6_ФР.2.29.2014.16854</option><option value="2">6_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="MassWaterFracCorrection" data-tag="Value" type="text" name="tb6"></td><td>-</td></tr><tr><td>7</td><td>Массовая концентрация хлористых солей, мг/дм³</td><td><select data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Metod" name="cb7"><option value="0">7_ФР.1.29.2014.16854</option><option value="1">7_ФР.2.29.2014.16854</option><option value="2">7_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Value" type="text" name="tb7"></td><td>-</td></tr><tr><td>8</td><td>Массовая концентрация хлористых солей, %</td><td><select data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Metod" name="cb8"><option value="0">8_ФР.1.29.2014.16854</option><option value="1">8_ФР.2.29.2014.16854</option><option value="2">8_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Value" type="text" name="tb8"></td><td>-</td></tr><tr><td>9</td><td>Массовая доля механических примесей, %</td><td><select data-edit="1" data-key="Impurity" data-tag="Metod" name="cb9"><option value="0">9_ФР.1.29.2014.16854</option><option value="1">9_ФР.2.29.2014.16854</option><option value="2">9_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Impurity" data-tag="Value" type="text" name="tb9"></td><td>-</td></tr><tr><td>10</td><td>Массовая доля серы, %</td><td><select data-edit="1" data-key="SulfurCorrection" data-tag="Metod" name="cb10"><option value="0">10_ФР.1.29.2014.16854</option><option value="1">10_ФР.2.29.2014.16854</option><option value="2">10_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="SulfurCorrection" data-tag="Value" type="text" name="tb10"></td><td>-</td></tr><tr><td>11</td><td>Давление насыщенных паров, кПа</td><td><select data-edit="1" data-key="DNP.kPa" data-tag="Metod" name="cb11"><option value="0">11_ФР.1.29.2014.16854</option><option value="1">11_ФР.2.29.2014.16854</option><option value="2">11_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="DNP.kPa" data-tag="Value" type="text" name="tb11"></td><td>-</td></tr><tr><td>12</td><td>Давление насыщенных паров, мм рт. ст.</td><td><select data-edit="1" data-key="DNP.mercury_mm" data-tag="Metod" name="cb12"><option value="0">12_ФР.1.29.2014.16854</option><option value="1">12_ФР.2.29.2014.16854</option><option value="2">12_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="DNP.mercury_mm" data-tag="Value" type="text" name="tb12"></td><td>-</td></tr><tr><td>13</td><td>Выход фракций, %:    при температуре до 200 °С</td><td><select data-edit="1" data-key="Yield_fraction_200" data-tag="Metod" name="cb13"><option value="0">13_ФР.1.29.2014.16854</option><option value="1">13_ФР.2.29.2014.16854</option><option value="2">13_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Yield_fraction_200" data-tag="Value" type="text" name="tb13"></td><td>-</td></tr><tr><td>14</td><td>Выход фракций, %:    при температуре до 300 °С</td><td><select data-edit="1" data-key="Yield_fraction_300" data-tag="Metod" name="cb14"><option value="0">14_ФР.1.29.2014.16854</option><option value="1">14_ФР.2.29.2014.16854</option><option value="2">14_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Yield_fraction_300" data-tag="Value" type="text" name="tb14"></td><td>-</td></tr><tr><td>15</td><td>Выход фракций: при температуре до 350 °С, %</td><td><select data-edit="1" data-key="Yield_fraction_350" data-tag="Metod" name="cb15"><option value="0">15_ФР.1.29.2014.16854</option><option value="1">15_ФР.2.29.2014.16854</option><option value="2">15_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Yield_fraction_350" data-tag="Value" type="text" name="tb15"></td><td>-</td></tr><tr><td>16</td><td>Массовая доля парафина, %</td><td><select data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Metod" name="cb16"><option value="0">16_ФР.1.29.2014.16854</option><option value="1">16_ФР.2.29.2014.16854</option><option value="2">16_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Value" type="text" name="tb16"></td><td>-</td></tr><tr><td>17</td><td>Массовая доля сероводорода, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Metod" name="cb17"><option value="0">17_ФР.1.29.2014.16854</option><option value="1">17_ФР.2.29.2014.16854</option><option value="2">17_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Value" type="text" name="tb17"></td><td>-</td></tr><tr><td>18</td><td>Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Metod" name="cb18"><option value="0">18_ФР.1.29.2014.16854</option><option value="1">18_ФР.2.29.2014.16854</option><option value="2">18_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Value" type="text" name="tb18"></td><td>-</td></tr><tr><td>19</td><td>Массовая доля органических хлоридов во фракции, выкипающей до
-температуры 204 °С, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Metod" name="cb19"><option value="0">19_ФР.1.29.2014.16854</option><option value="1">19_ФР.2.29.2014.16854</option><option value="2">19_ФР.3.29.2014.16854</option></select></td><td></td><td><input data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Value" type="text" name="tb19"></td><td>-</td></tr></tbody>     
+        <tr><td>Место проведения поверки</td><td><input id="Place" data-edit="1" data-key="Place" data-tag="AdditionalInfo" type="text" value="Омская ЛПДС" disabled="disabled"></td></tr><tr><td>Пункт приема сдачи нефти</td><td><input id="Place_SIKN" data-edit="1" data-key="Place_SIKN" data-tag="AdditionalInfo" type="text" value="722" disabled="disabled"></td></tr><tr><td>Наименование организации</td><td><input id="Place_Factory" data-edit="1" data-key="Place_Factory" data-tag="AdditionalInfo" type="text" value="АО «Транснефть - Западная Сибирь»" disabled="disabled"></td></tr><tr><td>ЭПР: Тип</td><td><input id="PR_Type" data-edit="1" data-key="PR_Type" data-tag="AdditionalInfo" type="text" value="FE404" disabled="disabled"></td></tr><tr><td>ЭПР: Заводской №</td><td><input id="PR_FactoryNumber" data-edit="1" data-key="PR_FactoryNumber" data-tag="AdditionalInfo" type="text" value="100104" disabled="disabled"></td></tr><tr><td>ЭПР: номер линии</td><td><input id="PR_LineNumber" data-edit="1" data-key="PR_LineNumber" data-tag="AdditionalInfo" type="text" value="ИЛ №4" disabled="disabled"></td></tr><tr><td>ПУ: Тип</td><td><input id="PU_Type" data-edit="1" data-key="PU_Type" data-tag="AdditionalInfo" type="text" value="-" disabled="disabled"></td></tr><tr><td>ПУ: Заводской №</td><td><input id="PU_FactoryNumber" data-edit="1" data-key="PU_FactoryNumber" data-tag="AdditionalInfo" type="text" value="" disabled="disabled"></td></tr><tr><td>ИВК: Тип</td><td><input id="IVK_Type" data-edit="1" data-key="IVK_Type" data-tag="AdditionalInfo" type="text" value="ТН-01" disabled="disabled"></td></tr><tr><td>ИВК: Заводской №</td><td><input id="IVK_FactoryNumber" data-edit="1" data-key="IVK_FactoryNumber" data-tag="AdditionalInfo" type="text" value="23-040.012.1" disabled="disabled"></td></tr><tr><td>Номер протокола</td><td><input id="ProtokolNum" data-edit="1" data-key="ProtokolNum" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>Заключение: ЭПР к дальнейшей эксплуатации</td><td><select name="ARM_Poverka_Result" data-edit="1" data-key="ARM_Poverka_Result" data-tag="AdditionalInfo"><option value="" selected=""></option><option value="годен">годен</option><option value="не годен">не годен</option></select></td></tr><tr><td>И.О. Фамилия</td><td><input id="StaffData" data-edit="1" data-key="StaffData" data-tag="AdditionalInfo" type="text" value=""></td></tr></tbody>
     </table>
 
 </body>

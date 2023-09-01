@@ -6,7 +6,7 @@
       "Edit": false,
       "Key": "Place",
       "Type": "text",
-      "Name": "?Place?"
+      "Name": "Место проведения поверки"
     },
     {
       "Id": 2,
@@ -14,7 +14,7 @@
       "Edit": false,
       "Key": "Place_SIKN",
       "Type": "text",
-      "Name": "?Place_SIKN?"
+      "Name": "Пункт приема сдачи нефти"
     },
     {
       "Id": 3,
@@ -22,7 +22,7 @@
       "Edit": false,
       "Key": "Place_Factory",
       "Type": "text",
-      "Name": "?Place_Factory?"
+      "Name": "Наименование организации"
     },
     {
       "Id": 4,
@@ -30,7 +30,7 @@
       "Edit": false,
       "Key": "PR_Type",
       "Type": "text",
-      "Name": "?PR_Type?"
+      "Name": "ЭПР: Тип"
     },
     {
       "Id": 5,
@@ -38,7 +38,7 @@
       "Edit": false,
       "Key": "PR_FactoryNumber",
       "Type": "text",
-      "Name": "?PR_FactoryNumber?"
+      "Name": "ЭПР: Заводской №"
     },
     {
       "Id": 6,
@@ -46,7 +46,7 @@
       "Edit": false,
       "Key": "PR_LineNumber",
       "Type": "text",
-      "Name": "?PR_LineNumber?"
+      "Name": "ЭПР: номер линии"
     },
     {
       "Id": 7,
@@ -54,7 +54,7 @@
       "Edit": false,
       "Key": "PU_Type",
       "Type": "text",
-      "Name": "?PU_Type?"
+      "Name": "ПУ: Тип"
     },
     {
       "Id": 8,
@@ -62,7 +62,7 @@
       "Edit": false,
       "Key": "PU_FactoryNumber",
       "Type": "text",
-      "Name": "?PU_FactoryNumber?"
+      "Name": "ПУ: Заводской №"
     },
     {
       "Id": 9,
@@ -70,7 +70,7 @@
       "Edit": false,
       "Key": "IVK_Type",
       "Type": "text",
-      "Name": "?IVK_Type?"
+      "Name": "ИВК: Тип"
     },
     {
       "Id": 10,
@@ -78,7 +78,7 @@
       "Edit": false,
       "Key": "IVK_FactoryNumber",
       "Type": "text",
-      "Name": "?IVK_FactoryNumber?"
+      "Name": "ИВК: Заводской №"
     },
     {
       "Id": 11,
@@ -86,7 +86,7 @@
       "Edit": true,
       "Key": "ProtokolNum",
       "Type": "text",
-      "Name": "?ProtokolNum?"
+      "Name": "Номер протокола"
     },
     {
       "Id": 12,
@@ -94,7 +94,7 @@
       "Edit": true,
       "Key": "ARM_Poverka_Result",
       "Type": "list",
-      "Name": "?ARM_Poverka_Result?"
+      "Name": "Заключение: ЭПР к дальнейшей эксплуатации"
     },
     {
       "Id": 13,
@@ -102,7 +102,7 @@
       "Edit": true,
       "Key": "StaffData",
       "Type": "text",
-      "Name": "?StaffData?"
+      "Name": "И.О. Фамилия"
     }
   ]
 }
