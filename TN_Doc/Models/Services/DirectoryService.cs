@@ -51,6 +51,7 @@ namespace TN_Doc.Models.Services
                     var json = File.ReadAllText(_mainCfgFile.FullName);
                     var jObject = JObject.Parse(json);
                     _cacheDirectoriesJson = jObject["Doc"]?["Settings"]?["Dictionarys"]?.ToString();
+                    _isValidCache = true;
                     if (string.IsNullOrEmpty(_cacheDirectoriesJson))
                         throw new InvalidDataException(message: "Отсутствует данные по справочникам (json is null)");
                     return (string)_cacheDirectoriesJson?.Clone()??string.Empty;

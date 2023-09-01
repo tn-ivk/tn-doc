@@ -28,7 +28,6 @@ var docTemplates = {};
 
 let appDictionaries;
 let dictFetchOptions;
-let localStorageKeys;
 
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
@@ -395,11 +394,7 @@ function InitElement() {
         setUrl: "/direditor/setdir",
         setMethod: "POST"
     }
-
-    localStorageKeys = {
-        dictionariesCache: "appDict"
-    }
-
+    
     LoadAppDictionaries();
     AddDitctionariesHandler();
     RenderUserGroupsRowTable();
@@ -735,25 +730,16 @@ function SetGuid() {
 *  Дополнительно словари записываются в локальное хранилище
 * */
 function LoadAppDictionaries() {
-    let dictStr = localStorage.getItem(localStorageKeys.dictionariesCache)
-
-    if (dictStr) {
-        appDictionaries = JSON.parse(dictStr);
-        return;
-    }
-
     $.ajax({
         async: false,
         url: dictFetchOptions.getUrl,
         type: dictFetchOptions.getMethod,
         success: function (data) {
             appDictionaries = JSON.parse(data['dirJsonRaw'])
-            localStorage.setItem(localStorageKeys.dictionariesCache, data['dirJsonRaw'])
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.error(thrownError);
             appDictionaries = {};
-            localStorage.removeItem(localStorageKeys.dictionariesCache)
         }
     })
 }
@@ -1590,12 +1576,10 @@ function AddSaveButtonHandler() {
                 dirJsonRaw: JSON.stringify(appDictionaries)
             }),
             success: function () {
-                localStorage.setItem(localStorageKeys.dictionariesCache, JSON.stringify(appDictionaries))
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 console.error(thrownError)
                 appDictionaries = {};
-                localStorage.removeItem(localStorageKeys.dictionariesCache)
             },
             complete: function () {
                 RemoveClassToElement('.modal-footer> .btn > label', 'd-none')
