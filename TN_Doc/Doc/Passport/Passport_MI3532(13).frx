@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/20/2023 14:00:14" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/01/2023 15:17:48" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using FastReport;
 using FastReport.Data;
@@ -97,13 +97,13 @@ namespace FastReport
       else
       RowMass_fraction_of_hydrogen_sulfide[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_hydrogen_sulfide&quot;]}&quot;;  
       
-      if (float.TryParse(JResult[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;].ToString().Replace('.',','), out result) &amp;&amp; result &lt; float.Parse(&quot;2,0&quot;))
-        RowMass_fraction_of_methyl_and_ethyl_mercaptan[3].Text = $&quot;менее 2&quot;;
+      if (float.TryParse(JResult[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;].ToString().Replace('.',','), out result) &amp;&amp; result &lt; float.Parse(&quot;4,0&quot;))
+        RowMass_fraction_of_methyl_and_ethyl_mercaptan[3].Text = $&quot;менее 4&quot;;
       else
         RowMass_fraction_of_methyl_and_ethyl_mercaptan[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;]}&quot;;  
 
-      if (float.TryParse(JResult[&quot;Mass_fraction_of_organic_chlorides&quot;].ToString().Replace('.',','), out result) &amp;&amp; result &lt; float.Parse(&quot;5,0&quot;))
-        RowMass_fraction_of_organic_chlorides[3].Text = $&quot;менее 5,0&quot;;
+      if (float.TryParse(JResult[&quot;Mass_fraction_of_organic_chlorides&quot;].ToString().Replace('.',','), out result) &amp;&amp; result &lt; float.Parse(&quot;0,0&quot;))
+        RowMass_fraction_of_organic_chlorides[3].Text = $&quot;менее 0,0&quot;;
       else
       RowMass_fraction_of_organic_chlorides[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_organic_chlorides&quot;]}&quot;;       
       
@@ -203,8 +203,8 @@ namespace FastReport
         <TableRow Name="RowTempResult" Height="17.39" AutoSize="true">
           <TableCell Name="Num" Border.Lines="All" Text="1" Padding="0, 0, 4, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="NameParameter" Border.Lines="All" Text="Температура нефти при условиях измерений объема, °C" Padding="3, 1, 2, 1" VertAlign="Center" Font="Arial, 10pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Method" Border.Lines="All" Padding="0, 1, 0, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Result" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Method" Border.Lines="All" Padding="0, 1, 0, 1" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" FontWidthRatio="0.85"/>
+          <TableCell Name="Result" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="RowPressResult" Height="17.39" AutoSize="true">
           <TableCell Name="Cell1543" Border.Lines="All" Text="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>

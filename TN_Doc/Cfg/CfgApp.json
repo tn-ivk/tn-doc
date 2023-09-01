@@ -99,6 +99,14 @@
               "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
               "PathToDocTemplateFile": "",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
+            },
+            {
+              "Use": true,
+              "Id": 7,
+              "Name": "Паспорт (МИ 3532-2015 Приложение 15)",
+              "Description": "Форма паспорта качества для поставки нефти на экспорт",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15).frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15).json"
             }
           ]
         },

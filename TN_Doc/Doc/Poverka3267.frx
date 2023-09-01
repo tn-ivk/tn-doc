@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/29/2023 12:39:59" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/30/2023 14:55:39" ReportInfo.CreatorVersion="2021.4.4.0">
   <ScriptText>using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -582,7 +582,7 @@ namespace FastReport
         <TableColumn Name="Column92" Width="68.04"/>
         <TableColumn Name="Column93" Width="68.04"/>
         <TableRow Name="Row138" Height="15.12">
-          <TableCell Name="Cell971" Text="Таблица 4 - Результаты поверки в поддиапазонах" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" ColSpan="10"/>
+          <TableCell Name="Cell971" Text="Таблица 4 - Результаты поверки в рабочем диапазоне" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" ColSpan="10"/>
           <TableCell Name="Cell972" Font="Arial, 10pt"/>
           <TableCell Name="Cell973" Font="Arial, 10pt"/>
           <TableCell Name="Cell974" Font="Arial, 10pt"/>

@@ -323,110 +323,117 @@
     {
       "Id": 1,
       "Use": true,
+      "Key": "ProtokolNumAct",
+      "Type": "text",
+      "Name": "К акту приема-сдачи нефти №"
+    },
+    {
+      "Id": 2,
+      "Use": true,
       "Key": "DelivePoint",
       "Type": "text",
       "Name": "Пункт приема сдачи нефти"
     },
     {
-      "Id": 2,
+      "Id": 3,
       "Use": true,
       "Key": "AccrSertifNumber",
       "Type": "text",
       "Name": "Номер аттестата аккредитации"
     },
     {
-      "Id": 3,
+      "Id": 4,
       "Use": true,
       "Key": "Laboratory",
       "Type": "text",
       "Name": "Лаборатория предприятия"
     },
     {
-      "Id": 4,
+      "Id": 5,
       "Use": true,
       "Key": "SIKN_Number",
       "Type": "text",
       "Name": "СИКН №"
     },
     {
-      "Id": 5,
+      "Id": 6,
       "Use": true,
       "Key": "Laboratory_Post",
       "Type": "text",
       "Name": "Представитель испытательной лаборатории (должность)"
     },
     {
-      "Id": 6,
+      "Id": 7,
       "Use": true,
       "Key": "Laboratory_Factory",
       "Type": "text",
       "Name": "Представитель испытательной лаборатории (предприятие)"
     },
     {
-      "Id": 7,
+      "Id": 8,
       "Use": true,
       "Key": "Laboratory_IOF",
       "Type": "list",
       "Name": "Представитель испытательной лаборатории (ИОФ)"
     },
     {
-      "Id": 8,
+      "Id": 9,
       "Use": true,
       "Key": "Delive_Post",
       "Type": "text",
       "Name": "Представитель сдающей стороны (должность)"
     },
     {
-      "Id": 9,
+      "Id": 10,
       "Use": true,
       "Key": "Delive_Factory",
       "Type": "text",
       "Name": "Представитель сдающей стороны (предприятие)"
     },
     {
-      "Id": 10,
+      "Id": 11,
       "Use": true,
       "Key": "Delive_IOF",
       "Type": "list",
       "Name": "Представитель сдающей стороны (ИОФ)"
     },
     {
-      "Id": 11,
+      "Id": 12,
       "Use": true,
       "Key": "Receive_Post",
       "Type": "text",
       "Name": "Представитель принимающей стороны (должность)"
     },
     {
-      "Id": 12,
+      "Id": 13,
       "Use": true,
       "Key": "Receive_Factory",
       "Type": "text",
       "Name": "Представитель принимающей стороны (предприятие)"
     },
     {
-      "Id": 13,
+      "Id": 14,
       "Use": true,
       "Key": "Receive_IOF",
       "Type": "list",
       "Name": "Представитель принимающей стороны (ИОФ)"
     },
     {
-      "Id": 14,
+      "Id": 15,
       "Use": true,
       "Key": "PassportPeriodDT.Begin",
       "Type": "datetime-local",
       "Name": "Дата и время отбора пробы (начало)"
     },
     {
-      "Id": 15,
+      "Id": 16,
       "Use": true,
       "Key": "PassportPeriodDT.End",
       "Type": "datetime-local",
       "Name": "Дата и время отбора пробы (окончание)"
     },
     {
-      "Id": 16,
+      "Id": 17,
       "Use": true,
       "Key": "TankerName",
       "Type": "text",

@@ -325,6 +325,9 @@
     <None Update="Doc\08_DocKMH_PR_PU_%28TPR%29.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Doc\Passport\Passport_MI3532(15).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\Poverka3267.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
