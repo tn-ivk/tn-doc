@@ -30,17 +30,23 @@ namespace TN_Doc.Controllers
                     CreateNoWindow = true
                 }
             };
+            try
+            {
+                process.Start();
+                process.WaitForExit();
 
-            process.Start();
-            process.WaitForExit();
+                var resultOutput = process.StandardOutput.ReadToEnd();
 
-            var resultOutput = process.StandardOutput.ReadToEnd();
+                foreach (var item in resultOutput.Split('\n'))
+                    if (!string.IsNullOrEmpty(item))
+                        printers.Add(item);
 
-            foreach (var item in resultOutput.Split('\n'))
-                if (!string.IsNullOrEmpty(item))
-                    printers.Add(item);
-
-            return printers;
+                return printers;
+            }
+            catch (Exception e)
+            {
+                return new List<string>();
+            }
         }
 
         public void PrintDoc(string printerName)
@@ -64,7 +70,8 @@ namespace TN_Doc.Controllers
                     {
                         UseShellExecute = false,
                         WindowStyle = ProcessWindowStyle.Hidden,
-                        Arguments = $"-H localhost -P  {printerName} -ol {Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot", "PDF", $"PDF.pdf")}",
+                        Arguments
+                            = $"-H localhost -P  {printerName} -ol {Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot", "PDF", $"PDF.pdf")}",
                         FileName = "lpr",
                         CreateNoWindow = true
                     }
@@ -73,8 +80,7 @@ namespace TN_Doc.Controllers
                 process.WaitForExit();
 
                 //_logger.LogInformation(process.StandardOutput.ReadToEnd());
-               // _logger.LogInformation(process.StandardError.ReadToEnd());
-
+                // _logger.LogInformation(process.StandardError.ReadToEnd());
             }
         }
     }

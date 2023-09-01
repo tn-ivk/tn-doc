@@ -836,6 +836,26 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3267.json"
             }
           ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 34,
+          "Name": "Поверка МИ 3266 - 2010",
+          "Description": "",
+          "PathToDocDll": "/Dll/Poverka3266.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverka_MI3266(A).json",
+          "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка МИ 3266 - 2010",
+              "Description": "Протокол поверки ЭПР с помощью ПР по МИ 3266-2010 (Приложение А)",
+              "PathToDocTemplateFile": "/Doc/Poverka_MI3266(A).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json"
+            }
+          ]
         }
       ],
       "DBConnectionStrings": [
@@ -1695,9 +1715,28 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3267.json"
             }
           ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 34,
+          "Name": "Поверка МИ 3266 - 2010",
+          "Description": "",
+          "PathToDocDll": "/Dll/Poverka3266.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverka_MI3266(A).json",
+          "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка МИ 3266 - 2010",
+              "Description": "Протокол поверки ЭПР с помощью ПР по МИ 3266-2010 (Приложение А)",
+              "PathToDocTemplateFile": "/Doc/Poverka_MI3266(A).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json"
+            }
+          ]
         }
       ],
-
       "DBConnectionStrings": [
         {
           "Use": true,

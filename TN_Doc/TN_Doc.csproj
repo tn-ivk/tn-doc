@@ -10,6 +10,9 @@
     <Content Remove="wwwroot\lib\jquery-ui\**" />
     <EmbeddedResource Remove="wwwroot\lib\jquery-ui\**" />
     <None Remove="wwwroot\lib\jquery-ui\**" />
+    <None Update="Doc\Poverka_MI3266(A).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
