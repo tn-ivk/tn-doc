@@ -28,7 +28,6 @@ var docTemplates = {};
 
 let appDictionaries;
 let dictFetchOptions;
-let localStorageKeys;
 
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
@@ -395,11 +394,7 @@ function InitElement() {
         setUrl: "/direditor/setdir",
         setMethod: "POST"
     }
-
-    localStorageKeys = {
-        dictionariesCache: "appDict"
-    }
-
+    
     LoadAppDictionaries();
     AddDitctionariesHandler();
     RenderUserGroupsRowTable();
@@ -735,25 +730,16 @@ function SetGuid() {
 *  Дополнительно словари записываются в локальное хранилище
 * */
 function LoadAppDictionaries() {
-    let dictStr = localStorage.getItem(localStorageKeys.dictionariesCache)
-
-    if (dictStr) {
-        appDictionaries = JSON.parse(dictStr);
-        return;
-    }
-
     $.ajax({
         async: false,
         url: dictFetchOptions.getUrl,
         type: dictFetchOptions.getMethod,
         success: function (data) {
             appDictionaries = JSON.parse(data['dirJsonRaw'])
-            localStorage.setItem(localStorageKeys.dictionariesCache, data['dirJsonRaw'])
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.error(thrownError);
             appDictionaries = {};
-            localStorage.removeItem(localStorageKeys.dictionariesCache)
         }
     })
 }
@@ -1390,8 +1376,13 @@ function ConvertStableCellToEditCell(cell, type) {
             break;
         case 'combobox-lic':
             let cbElementLic = document.createElement('select');
-            let licenses = appDictionaries['Licenses'];
+            let licenses = appDictionaries['Licenses']; 
             let counterLic = 0;
+            
+            let optDefault = document.createElement('option');
+            optDefault.setAttribute('value', "0");
+            optDefault.append(`0 - Доверенность не выбрана`);
+            cbElementLic.append(optDefault);
             for (let i = 0; i < licenses.length; i++) {
                 let opt = document.createElement('option');
                 opt.setAttribute('value', licenses[i]['Id']);
@@ -1574,6 +1565,14 @@ function ScrollToBottomTable(tableSelector) {
     tableController.scrollTo(0, tableController.scrollHeight)
 }
 
+/*Перерендеринг таблиц пользователей и доверенностей*/
+function  ReRenderTable(){
+    ClearRowTable('.users-table');
+    ClearRowTable('.licences-table');
+    RenderAndAddHandlerLicencesTable();
+    RenderAndAddHandlerUserTable();
+}
+
 /* Добавление обработчика события*/
 function AddSaveButtonHandler() {
     document.querySelector('.modal-footer > .save-btn').addEventListener('click', function (e) {
@@ -1590,12 +1589,11 @@ function AddSaveButtonHandler() {
                 dirJsonRaw: JSON.stringify(appDictionaries)
             }),
             success: function () {
-                localStorage.setItem(localStorageKeys.dictionariesCache, JSON.stringify(appDictionaries))
+                ReRenderTable();
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 console.error(thrownError)
                 appDictionaries = {};
-                localStorage.removeItem(localStorageKeys.dictionariesCache)
             },
             complete: function () {
                 RemoveClassToElement('.modal-footer> .btn > label', 'd-none')
