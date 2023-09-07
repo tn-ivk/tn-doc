@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using TN_Doc.Models.Services;
+using TN_Doc.Extensions;
 using TN.Doc;
 
 namespace TN_Doc
@@ -22,19 +20,11 @@ namespace TN_Doc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton((provider) =>
-            {
-                var cfgPath = Configuration.GetValue<string>("CfgAppPath");
-                var logger = provider.GetRequiredService<ILogger<DirectoryService>>();
-                return new DirectoryService(cfgPath, logger);
-            });
-
+            services.AddDirectoryService(Configuration);
+            services.AddPrinters();
+            services.AddPrinterService();
             services.AddControllersWithViews();
-
-            //services.AddDbContext<DBIVK>(options => options.UseMySql(Configuration.GetConnectionString("IVK"), MySqlServerVersion.LatestSupportedServerVersion));
-            //services.AddDbContext<DocGeneral>(options => options.UseMySql(Configuration.GetConnectionString("IVK"), MySqlServerVersion.LatestSupportedServerVersion));
             services.AddDbContext<DocGeneral>();
-            //services.AddDbContext<DocGeneral>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), MySqlServerVersion.LatestSupportedServerVersion));
         }
 
         // This method gets called by the runtime. Use this method to configure
@@ -51,16 +41,9 @@ namespace TN_Doc
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseFastReport();
-
             app.UseRouting();
-
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");

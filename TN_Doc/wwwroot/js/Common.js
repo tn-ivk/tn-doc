@@ -272,6 +272,7 @@ function InitPrinterName() {
         {
             async: false,
             url: "Print/GetListPrinters",
+            accept:"application/json",
             type: "GET",
             success: function (data) {
                 data.forEach((item) => {
