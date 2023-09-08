@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TN_Doc.Models.Printer;
 
 namespace TN_Doc.Models.Services
@@ -28,6 +29,6 @@ namespace TN_Doc.Models.Services
         /// Печать документа на конкретном принтере
         /// </summary>
         /// <param name="printerName">Список доступных принтеров</param>
-        public void PrintDoc(string printerName) => _printer.PrintDoc(printerName);
+        public async Task PrintDocAsync(string printerName) => await _printer.PrintDocAsync(printerName);
     }
 }

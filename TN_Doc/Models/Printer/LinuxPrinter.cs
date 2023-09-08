@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace TN_Doc.Models.Printer
 {
@@ -27,7 +28,7 @@ namespace TN_Doc.Models.Printer
             process.StartInfo.CreateNoWindow = true;
             process.Start();
             process.WaitForExit();
-            foreach (var item in process.StandardOutput.ReadToEnd().Split('\n',StringSplitOptions.RemoveEmptyEntries))
+            foreach (var item in process.StandardOutput.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries))
                 yield return item;
         }
 
@@ -35,21 +36,24 @@ namespace TN_Doc.Models.Printer
         /// Печать сформированного отчёта на заданном принтере
         /// </summary>
         /// <param name="printerName">Название принтера</param>
-        public override void PrintDoc(string printerName)
+        public override Task PrintDocAsync(string printerName)
         {
-            var printersName = GetAvailablePrinters();
-            if (!printersName.Contains(printerName))
-                return;
-            var consoleStr = $"-H localhost -P  {printerName} -ol {Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf")}";
-            Console.WriteLine(consoleStr);
-            using var process = new Process();
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.StartInfo.Arguments = consoleStr;
-            process.StartInfo.FileName = "lpr";
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            process.WaitForExit();
+            return Task.Run(() =>
+            {
+                var printersName = GetAvailablePrinters();
+                if (!printersName.Contains(printerName))
+                    return;
+                var consoleStr = $"-H localhost -P  {printerName} -ol {Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf")}";
+                Console.WriteLine(consoleStr);
+                using var process = new Process();
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.StartInfo.Arguments = consoleStr;
+                process.StartInfo.FileName = "lpr";
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                process.WaitForExit();
+            });
         }
     }
 }

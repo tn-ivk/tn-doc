@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using TN_Doc.Models.Services;
 
 namespace TN_Doc.Controllers
@@ -20,12 +21,7 @@ namespace TN_Doc.Controllers
     public class PrintController : ControllerBase
     {
         private readonly PrinterService _service;
-
-        /* printer service
-            printerHelper________
-            |                    |
-            WindowsPrinterHelper |
-                  LinuxPrinterHelper*/
+        
         /// <summary>
         /// Инициализация контроллера
         /// </summary>
@@ -46,10 +42,10 @@ namespace TN_Doc.Controllers
         /// </summary>
         /// <param name="printerName">Наименование принтера для печати</param>
         [HttpGet]
-        public void PrintDoc(string printerName)
+        public async Task<IActionResult> PrintDoc(string printerName)
         {
-            _service.PrintDoc(printerName);
-            Ok();
+            await _service.PrintDocAsync(printerName);
+            return Ok();
         }
 
         #region old_code
