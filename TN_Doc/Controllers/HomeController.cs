@@ -173,10 +173,10 @@ namespace TN_Doc.Controllers
                             .TemplateDocs.Single(x => x.Id == IdTemplateDoc).PathToDocTemplateFile;
         }
 
-
-
         public bool IsUsedElis(int IdDevice)
         {
+            
+
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
@@ -185,17 +185,53 @@ namespace TN_Doc.Controllers
             else return device.Elis.Use;
         }
 
+        public string GetSiknNumber(int IdDevice)
+        {
+            string siknNumber = string.Empty;
+            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+
+            if (device.Elis == null)
+                if (CfgApp.Elis == null) siknNumber = string.Empty;
+                else siknNumber = CfgApp.Elis.SiknNumber;
+            else siknNumber = device.Elis.SiknNumber;
+
+            return siknNumber;
+        }
+
         public string GetClientToken(int IdDevice)
+        {
+            string clientToken = string.Empty;
+            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+
+            if (device.Elis == null)
+                if (CfgApp.Elis == null) clientToken = string.Empty;
+                else clientToken = CfgApp.Elis.ClientToken;
+            else clientToken = device.Elis.ClientToken;
+
+            return clientToken;
+        }
+
+        public bool SetClientToken(int IdDevice, string clientToken)
         {
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
-                if (CfgApp.Elis == null) return string.Empty;
-                else return CfgApp.Elis.ClientToken;
-            else return device.Elis.ClientToken;
+                if (CfgApp.Elis == null)
+                    return false;
+                else 
+                    CfgApp.Elis.ClientToken = clientToken;
+            else 
+                device.Elis.ClientToken = clientToken;
+
+            cfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
+
+            return true;
         }
 
-
+        public string GetElisData()
+        {
+                return "";
+        }
 
         public IActionResult Index()
         {

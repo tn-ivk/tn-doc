@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/01/2023 15:36:44" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/06/2023 11:10:11" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using FastReport;
 using FastReport.Data;
@@ -145,9 +145,9 @@ namespace FastReport
   </Styles>
   <Dictionary>
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
-    <Parameter Name="JsonDoc" DataType="System.String"/>
+    <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
-  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" FirstPageSource="15" OtherPagesSource="15" LastPageSource="15" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage" FinishPageEvent="Page_FinishPage">
+  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage" FinishPageEvent="Page_FinishPage" LastPageSource="15" FirstPageSource="15">
     <ReportTitleBand Name="ReportTitle" Width="718.2" Height="171.99" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableHeader" Width="717.82" Height="171.99">
         <TableColumn Name="Column01" Width="325.89"/>
@@ -190,7 +190,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="174.69" Width="718.2" Height="480.06" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="175.99" Width="718.2" Height="480.06" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="470.61" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="434.7"/>
@@ -204,97 +204,97 @@ namespace FastReport
         </TableRow>
         <TableRow Name="RowTempResult" Height="30.24" AutoSize="true">
           <TableCell Name="Num" Border.Lines="All" Text="1." Padding="0, 0, 4, 0" HorzAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="NameParameter" Border.Lines="All" Text="&lt;b&gt;Температура нефти при условиях измерений объема, °C&lt;/b&gt;&#13;&#10;&lt;i&gt;Temperature of oil volume measuring, °С&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="NameParameter" Border.Lines="All" Text="&lt;b&gt;Температура нефти при условиях измерений объема, °C&lt;/b&gt;&lt;br&gt;&lt;i&gt;Temperature of oil volume measuring, °С&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Method" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
           <TableCell Name="Result" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="RowPressResult" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1543" Border.Lines="All" Text="2." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1544" Border.Lines="All" Text="&lt;b&gt;Давление нефти при условиях измерений объема, МПа&lt;/b&gt;&#13;&#10;&lt;i&gt;Pressure of oil volume measuring, Mpa&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1544" Border.Lines="All" Text="&lt;b&gt;Давление нефти при условиях измерений объема, МПа&lt;/b&gt;&lt;br&gt;&lt;i&gt;Pressure of oil volume measuring, Mpa&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1545" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1546" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowDensResult" Height="60.48" AutoSize="true">
           <TableCell Name="Cell1547" Border.Lines="All" Text="3." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1548" Border.Lines="All" Text="&lt;b&gt;Плотность нефти при температуре и давлении в&#13;&#10;условиях измерений объема, кг/м³&lt;/b&gt;&#13;&#10;&lt;i&gt;Density at the temperature and pressure of oil volume&#13;&#10;measuring, kg/m³&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1548" Border.Lines="All" Text="&lt;b&gt;Плотность нефти при температуре и давлении в&lt;br&gt;условиях измерений объема, кг/м³&lt;/b&gt;&lt;br&gt;&lt;i&gt;Density at the temperature and pressure of oil volume&lt;br&gt;measuring, kg/m³&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1549" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1550" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowDens20Result" Height="15.12" AutoSize="true">
           <TableCell Name="Cell1551" Border.Lines="All" Text="4." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1552" Border.Lines="All" Text="&lt;b&gt;Плотность нефти при 20 °C, кг/м³&lt;/b&gt;	&lt;i&gt;Density at 20 °C, Kg/m³&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1552" Border.Lines="All" Text="&lt;b&gt;Плотность нефти при 20 °C, кг/м&lt;sup&gt;3&lt;/sup&gt;&lt;/b&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;i&gt;Density at 20 °C, Kg/m³&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1553" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1554" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowDens15Result" Height="15.12" AutoSize="true">
           <TableCell Name="Cell1555" Border.Lines="All" Text="5." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1556" Border.Lines="All" Text="&lt;b&gt;Плотность нефти при 15 °C, кг/м³&lt;/b&gt;	&lt;i&gt;Density at 15 °C, Kg/m³&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1556" Border.Lines="All" Text="&lt;b&gt;Плотность нефти при 15 °C, кг/м&lt;sup&gt;3&lt;/sup&gt;&lt;/b&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;i&gt;Density at 15 °C, Kg/m³&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1557" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1558" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowMassWaterFracResult" Height="15.12" AutoSize="true">
           <TableCell Name="Cell1559" Border.Lines="All" Text="6." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1560" Border.Lines="All" Text="&lt;b&gt;Массовая доля воды, %&lt;/b&gt;		&lt;i&gt;Water content, mass %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1560" Border.Lines="All" Text="&lt;b&gt;Массовая доля воды, %&lt;/b&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;i&gt;Water content, mass %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1561" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1562" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowChloride_Salts" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1563" Border.Lines="All" Text="7." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1564" Border.Lines="All" Text="&lt;b&gt;Массовая концентрация хлористых солей, мг/дм³ (%)&lt;/b&gt;&#13;&#10;&lt;i&gt;Chloride salt content, mgr/dm³ (%)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1564" Border.Lines="All" Text="&lt;b&gt;Массовая концентрация хлористых солей, мг/дм³ (%)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Chloride salt content, mgr/dm³ (%)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1565" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1566" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowImpurity" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1567" Border.Lines="All" Text="8." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1568" Border.Lines="All" Text="&lt;b&gt;Массовая доля механических примесей, %&lt;/b&gt;&#13;&#10;&lt;i&gt;Mechanical admixtures, %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1568" Border.Lines="All" Text="&lt;b&gt;Массовая доля механических примесей, %&lt;/b&gt;&lt;br&gt;&lt;i&gt;Mechanical admixtures, %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1569" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1570" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowSulfurResult" Height="15.12" AutoSize="true">
           <TableCell Name="Cell1571" Border.Lines="All" Text="9." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1572" Border.Lines="All" Text="&lt;b&gt;Массовая доля серы, %&lt;/b&gt;		&lt;i&gt;Sulphur, mass %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1572" Border.Lines="All" Text="&lt;b&gt;Массовая доля серы, %&lt;/b&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;i&gt;Sulphur, mass %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1573" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1574" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowDNP" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1575" Border.Lines="All" Text="10." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1576" Border.Lines="All" Text="&lt;b&gt;Давление насыщенных паров, кПа (мм рт. ст.)&lt;/b&gt;&#13;&#10;&lt;i&gt;Vapor pressure, kPa (mm Hg)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1576" Border.Lines="All" Text="&lt;b&gt;Давление насыщенных паров, кПа (мм рт. ст.)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Vapor pressure, kPa (mm Hg)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1577" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1578" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowYield_fraction" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1579" Border.Lines="All" Text="11." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1580" Border.Lines="All" Text="&lt;b&gt;Выход фракций, %:	при температуре до&lt;/b&gt; (at Т up to) &lt;b&gt;200 °С&lt;/b&gt;&#13;&#10;&lt;i&gt;Distillation:&lt;/i&gt;		&lt;b&gt;при температуре до&lt;/b&gt; (at Т up to) &lt;b&gt;300 °С&lt;/b&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1580" Border.Lines="All" Text="&lt;b&gt;Выход фракций, %:	при температуре до&lt;/b&gt; (at Т up to) &lt;b&gt;200 °С&lt;/b&gt;&lt;br&gt;&lt;i&gt;Distillation:&lt;/i&gt;		&lt;b&gt;при температуре до&lt;/b&gt; (at Т up to) &lt;b&gt;300 °С&lt;/b&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1581" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1582" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowMass_fraction_of_paraffin" Height="15.12" AutoSize="true">
           <TableCell Name="Cell1583" Border.Lines="All" Text="12." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1584" Border.Lines="All" Text="&lt;b&gt;Массовая доля парафина, %&lt;/b&gt;	&lt;i&gt;Paraffin content, mass %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1584" Border.Lines="All" Text="&lt;b&gt;Массовая доля парафина, %&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/b&gt;&lt;i&gt;Paraffin content, mass %&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1585" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1586" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowMass_fraction_of_hydrogen_sulfide" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1587" Border.Lines="All" Text="13." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1588" Border.Lines="All" Text="&lt;b&gt;Массовая доля сероводорода, млнˉ¹ (ppm)&lt;/b&gt;&#13;&#10;&lt;i&gt;Hydrogen sulfide content, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1588" Border.Lines="All" Text="&lt;b&gt;Массовая доля сероводорода, млнˉ¹ (ppm)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Hydrogen sulfide content, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1589" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1590" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowMass_fraction_of_methyl_and_ethyl_mercaptan" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1591" Border.Lines="All" Text="14." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1592" Border.Lines="All" Text="&lt;b&gt;Массовая доля метил-и этилмеркаптанов в сумме, млнˉ¹ (ppm)&lt;/b&gt;&#13;&#10;&lt;i&gt;Total methyl-ethyl mercaptans, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1592" Border.Lines="All" Text="&lt;b&gt;Массовая доля метил-и этилмеркаптанов в сумме, млнˉ¹ (ppm)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Total methyl-ethyl mercaptans, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1593" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1594" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="RowMass_fraction_of_organic_chlorides" Height="45.36" AutoSize="true">
           <TableCell Name="Cell1595" Border.Lines="All" Text="15." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1596" Border.Lines="All" Text="&lt;b&gt;Массовая доля органических хлоридов во фракции,&#13;&#10;выкипающей до температуры 204 °С, млнˉ¹ (ppm)&lt;/b&gt;&#13;&#10;&lt;i&gt;Organic chloride content in oil distilled at T up to 204 °С, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1596" Border.Lines="All" Text="&lt;b&gt;Массовая доля органических хлоридов во фракции,&lt;br&gt;выкипающей до температуры 204 °С, млнˉ¹ (ppm)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Organic chloride content in oil distilled at T up to 204 °С, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1597" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1598" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="657.46" Width="718.2" Height="391.23" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="660.05" Width="718.2" Height="391.23" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="381.78">
         <TableColumn Name="Column29" Width="245.7"/>
         <TableColumn Name="Column31" Width="202.23"/>

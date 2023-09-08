@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastReport.Web" Version="2021.4.4" />
+    <PackageReference Include="FastReport.Web" Version="2023.2.30" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.4" />
@@ -361,15 +361,6 @@
     <None Update="Doc\Passport\Passport_MI3532%2814%29.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\Passport_GOSTR50.2.040(I).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport_MI3532(13).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport_MI3532(14).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Doc\__10_Poverka3287_AnnexA_Release_version.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -377,9 +368,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\_21_Poverka3272_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport_GOSTR50.2.040%28G%29.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\_08_DocKMH_PR_PU_(TPR).frx">
@@ -463,13 +451,7 @@
     <None Update="Doc\33_TableKMH3272_MPR_TPR_Release_version.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\PassportExport.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Doc\ActParty.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
