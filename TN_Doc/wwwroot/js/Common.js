@@ -276,7 +276,9 @@ function InitPrinterName() {
             type: "GET",
             success: function (data) {
                 data.forEach((item) => {
-                    $('#ComboboxPrinterName').append('<option value=' + item + '>' + item + '</option>');
+                    console.log(item+ "->"+  item.replaceAll(" ","_"))
+                    
+                    $('#ComboboxPrinterName').append('<option value=' + item.replaceAll(" ","_") + '>' + item + '</option>');
                 });
             }
         });
@@ -574,7 +576,7 @@ function PrintDoc() {
             url: "Print/PrintDoc",
             type: "GET",
             data: {
-                printerName: $('#ComboboxPrinterName').val()
+                printerName: $('#ComboboxPrinterName').val().replaceAll("_"," "),
             }
         });
 }

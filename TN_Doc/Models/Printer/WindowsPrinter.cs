@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
+using PDFtoPrinter;
 
 namespace TN_Doc.Models.Printer
 {
@@ -19,7 +21,8 @@ namespace TN_Doc.Models.Printer
 
         public override void PrintDoc(string printerName)
         {
-            throw new System.NotImplementedException();
+            var printer = new PDFtoPrinterPrinter();
+            printer.Print(new PrintingOptions(printerName, Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf")));
         }
     }
 }
