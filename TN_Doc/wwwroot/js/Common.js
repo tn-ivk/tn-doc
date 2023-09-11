@@ -82,8 +82,8 @@ function InitDevices() {
     $.ajax(
         {
             async: false,
-            url: "Home/GetListDevices",
-            type: "GET",
+            url: 'Home/GetListDevices',
+            type: 'GET',
             //dataType: "json",
             success: function (data) {
                 data.forEach((item) => {
@@ -171,8 +171,8 @@ function InitDocs() {
     $.ajax(
         {
             async: false,
-            url: "Home/GetListDocs",
-            type: "GET",
+            url: 'Home/GetListDocs',
+            type: 'GET',
             //dataType: "json",
             data:
                 {
@@ -205,8 +205,8 @@ function InitTemplatesDoc() {
     $.ajax(
         {
             async: false,
-            url: "Home/GetTemplatesDoc",
-            type: "GET",
+            url: 'Home/GetTemplatesDoc',
+            type: 'GET',
             //dataType: "json",
             data:
                 {
@@ -232,8 +232,8 @@ function SetIdTemplateDoc() {
     $.ajax(
         {
             async: false,
-            url: "Home/SetIdTemplateDoc",
-            type: "GET",
+            url: 'Home/SetIdTemplateDoc',
+            type: 'GET',
             //dataType: "json",
             data:
                 {
@@ -250,8 +250,8 @@ function GetIdTemplateDoc() {
     $.ajax(
         {
             async: false,
-            url: "Home/GetIdTemplateDoc",
-            type: "GET",
+            url: 'Home/GetIdTemplateDoc',
+            type: 'GET',
             //dataType: "json",
             data:
                 {
@@ -290,8 +290,8 @@ function InitExportFormat() {
     $.ajax(
         {
             async: false,
-            url: "Export/GetListFormats",
-            type: "GET",
+            url: 'Export/GetListFormats',
+            type: 'GET',
             success: function (data) {
                 data.forEach((item) => {
                     $('#ComboboxExportFormat').append('<option value=' + item + '>' + item + '</option>');
@@ -306,8 +306,8 @@ function InitProtocolNumber() {
     $.ajax(
         {
             async: false,
-            url: "Home/GetListProtocolNumber",
-            type: "GET",
+            url: 'Home/GetListProtocolNumber',
+            type: 'GET',
             data:
                 {
                     IdDevice: $('#ComboboxDevice').val(),
@@ -329,7 +329,7 @@ function InitDatepickerBegin() {
         {
             dateFormat: 'dd.mm.yy'
         });
-    $('#DatepickerBegin').datepicker("setDate", dtBegin);
+    $('#DatepickerBegin').datepicker('setDate', dtBegin);
 }
 
 function InitDatepickerEnd() {
@@ -340,7 +340,7 @@ function InitDatepickerEnd() {
         {
             dateFormat: 'dd.mm.yy'
         });
-    $('#DatepickerEnd').datepicker("setDate", dtEnd);
+    $('#DatepickerEnd').datepicker('setDate', dtEnd);
 }
 
 function InitTableDocs() {    
@@ -353,8 +353,8 @@ function InitTableDocs() {
             paging: false,
 
             oLanguage: {
-                sSearch: "Поиск",
-                sEmptyTable: "Отсутствуют данные в таблице"
+                sSearch: 'Поиск',
+                sEmptyTable: 'Отсутствуют данные в таблице'
             },
             info: false,
 
@@ -392,10 +392,10 @@ function InitTableDocs() {
 
 function InitElement() {
     dictFetchOptions = {
-        getUrl: "/direditor/getdir",
-        getMethod: "GET",
-        setUrl: "/direditor/setdir",
-        setMethod: "POST"
+        getUrl: '/direditor/getdir',
+        getMethod: 'GET',
+        setUrl: '/direditor/setdir',
+        setMethod: 'POST'
     }
     
     LoadAppDictionaries();
@@ -460,8 +460,8 @@ function GetData() {
     $.ajax(
         {
             async: false,
-            url: "Home/GetList",
-            type: "GET",
+            url: 'Home/GetList',
+            type: 'GET',
             data:
                 {
                     IdDevice: $('#ComboboxDevice').val(),
@@ -503,7 +503,7 @@ function GetData() {
             }
         });
 
-    var data = {"data": ret};
+    var data = {'data': ret};
 
     return data;
 }
@@ -514,8 +514,8 @@ function GetDoc() {
     $.ajax(
         {
             async: true,
-            url: "Home/GetDoc",
-            type: "GET",
+            url: 'Home/GetDoc',
+            type: 'GET',
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
@@ -543,8 +543,8 @@ function GetEditDoc() {
     $.ajax(
         {
             async: false,
-            url: "Home/GetDocEdit",
-            type: "GET",
+            url: 'Home/GetDocEdit',
+            type: 'GET',
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
@@ -573,8 +573,8 @@ function SaveDoc() {
 function PrintDoc() {
     $.ajax(
         {
-            url: "Print/PrintDoc",
-            type: "GET",
+            url: 'Print/PrintDoc',
+            type: 'GET',
             data: {
                 printerName: $('#ComboboxPrinterName').val().replaceAll("_"," "),
             }
@@ -584,8 +584,8 @@ function PrintDoc() {
 function ExportDoc() {
     $.ajax(
         {
-            url: "Home/ExportDoc",
-            type: "GET",
+            url: 'Home/ExportDoc',
+            type: 'GET',
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
@@ -606,8 +606,8 @@ function GetValueCombobox() {
 
     $.ajax(
         {
-            url: "Home/SaveDoc",
-            type: "POST",
+            url: 'Home/SaveDoc',
+            type: 'POST',
             dataType: 'json',
             data: {
                 IdDoc: $('#ComboboxDocGUID').val(),
@@ -619,21 +619,21 @@ function GetValueCombobox() {
 }
 
 function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray = 3) {
-    var url = "http://localhost:5010/api/Values/";
+    var url = 'http://localhost:5010/api/Values/';
     var result;
     $.ajax(
         {
             async: false,
             url: url,
-            type: "PUT",
+            type: 'PUT',
             contentType: 'application/json; charset=UTF-8',
             data: JSON.stringify(
                 {
-                    "DeviceName": GuidDevice,
-                    "NameTag": tagName,
-                    "ValueTag": valueTag,
-                    "NamespaceIndex": namespaceIndex,
-                    "IndexArray": indexArray
+                    'DeviceName': GuidDevice,
+                    'NameTag': tagName,
+                    'ValueTag': valueTag,
+                    'NamespaceIndex': namespaceIndex,
+                    'IndexArray': indexArray
                 })
         });
 
@@ -646,30 +646,33 @@ function GetFullNameTag(tagName) {
 
 
 //Получить данные из ЕЛИС
-function GetaElisData() {
+function GetElisData() {
 
-    var clientToken = GetGuid();
+    var clientToken = GetClientToken(CurrentDeviceId);
 
-    if (clientToken == "") {
+    if (clientToken == '') {
 
-        var SiknNumber = 
+        var SiknNumber = GetSiknNumber(CurrentDeviceId);
 
+        if (SiknNumber == '')
+            return;
+        else
             clientToken = RegistrationClient(SiknNumber);
     }
 
     $.ajax(
         {
             async: false,
-            url: "http://localhost:5050/api/tspd/getqp",
-            type: "POST",
+            url: 'http://localhost:5050/api/tspd/getqp',
+            type: 'POST',
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',
             headers: {
-                "client-token": clientToken
+                'client-token': clientToken
             },
             data: JSON.stringify({
-                startPeriod: "2023-08-14T09:14:49.345Z",
-                endPeriod: "2023-08-14T09:14:49.345Z"
+                startPeriod: '2023-08-14T09:14:49.345Z',
+                endPeriod: '2023-08-14T09:14:49.345Z'
             }),
             success: function (data) {
 
@@ -678,9 +681,9 @@ function GetaElisData() {
 
                 $('#info').text(data.statusText);
 
-                //Устройство не зарегистрировано
-                if (data.responseJSON.code == 309) {
-                    
+                //Неавторизованный пользователь
+                if (data.status == 401) {
+                    RegistrationClient('ИВК-1');
                 }
             }
         });
@@ -692,8 +695,8 @@ function RegistrationClient(nameDevice) {
     $.ajax(
         {
             async: false,
-            url: "http://localhost:5050/api/client/signin",
-            type: "POST",
+            url: 'http://localhost:5050/api/client/signin',
+            type: 'POST',
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',            
             data: JSON.stringify({
@@ -708,20 +711,72 @@ function RegistrationClient(nameDevice) {
         });
 }
 
-//Получить GUID для устройства
+//Зарегистрация устройства для взаимодействия с ТСПД
 function GetElisCurrentGuidForDevice() {
 
 }
 
-//Получить GUID для устройства
-function GetGuid() {
+//
+function GetSiknNumber(idDevice) {
+    $.ajax(
+        {
+            async: false,
+            url: 'Home/GetSiknNumber',
+            type: 'POST',
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json',
+            data: JSON.stringify({
+                IdDevice: idDevice
+            }),
+            success: function (data) {
 
+            },
+            error: function (data) {
+
+            }
+        });
+}
+
+//Получить GUID для устройства
+function GetClientToken(idDevice) {
+    $.ajax(
+        {
+            async: false,
+            url: 'Home/GetClientToken',
+            type: 'GET',
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json',
+            data: JSON.stringify({
+                IdDevice: idDevice
+            }),
+            success: function (data) {
+
+            },
+            //error: function (data) {
+
+            //}
+        });
 }
 
 //Сохранить GUID для устройства
-function SetGuid() {
+function SetClientToken() {
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
