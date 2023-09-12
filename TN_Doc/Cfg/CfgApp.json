@@ -898,7 +898,7 @@
           "IdDoc": 0,
           "Name": "Отчеты",
           "Description": "",
-          "PathToDocDll": "/Dll/Report.dll",
+          "PathToDocDll": "/Dll/Report.dll", 
           "PathToDocConfigFile": "/Cfg/CfgReport.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
