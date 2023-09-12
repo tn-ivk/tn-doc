@@ -410,11 +410,11 @@ namespace TN_Doc.Controllers
         {
             return DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
         }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        //
+        // public IActionResult Privacy()
+        // {
+        //     return View();
+        // }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 

@@ -31,6 +31,7 @@ namespace TN_Doc.Controllers
         /// Получения всех справочник
         /// </summary>
         /// <returns>Список доступных справочников в приложение</returns>
+        /// <returns>200 - словарь приложения</returns>
         [HttpGet]
         [Route("GetDir")]
         public async Task<IActionResult> GetDirAsync() => Ok(new DirEditDTO() { DirJsonRaw = await _service.GetDirectoriesJson() });
