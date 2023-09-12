@@ -7,3 +7,6 @@
 [submodule "tn_toolsfastreport"]
 	path = tn_toolsfastreport
 	url = http://192.168.100.100/orpovy/ivk/tn_toolsfastreport.git
+[submodule "winprutil"]
+	path = winprutil
+	url = http://192.168.100.100/orpovy/ivk/winprutil.git

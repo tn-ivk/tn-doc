@@ -836,11 +836,11 @@
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
+              "Description": "Протокол поверки ПР с помощью ЭПР по МИ 3267-2010 (Приложение А)",
+              "PathToDocTemplateFile": "/Doc/Poverka3267.frx",
               "Use": true,
               "Id": 0,
               "Name": "Поверка МИ3267",
-              "Description": "Протокол поверки ПР с помощью ЭПР по МИ 3267-2010 (Приложение А)",
-              "PathToDocTemplateFile": "/Doc/Poverka3267.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3267.json"
             }
           ]
@@ -870,7 +870,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.12.101",
+          "Server": "192.168.20.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
