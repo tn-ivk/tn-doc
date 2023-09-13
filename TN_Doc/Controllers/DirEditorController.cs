@@ -25,7 +25,7 @@ namespace TN_Doc.Controllers
         /// <exception cref="ArgumentNullException">При отсутствие сервиса взаимодействия со справочниками</exception>
         public DirEditorController(DirectoryService service) =>
             _service = service ??
-                       throw new ArgumentNullException(nameof(service), "Отсутствует сервис для работы со правочниками");
+                       throw new ArgumentNullException(nameof(service), @"Отсутствует сервис для работы со правочниками");
 
         /// <summary>
         /// Получения всех справочник

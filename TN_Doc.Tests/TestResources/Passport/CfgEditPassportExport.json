@@ -1,175 +1,180 @@
 ﻿{
   "Methods": [
-    { //Температура нефти при условиях измерений объема, °C
-      "Id":1,
-      "Use": true,
-      "IdParameter": 1,
-      "Name": "ФР.1.29.2014.16943",
-      "LimitValueActivate": false,
-      "LimitValue": 0.0,
-      "LimitValueString": ""
-    },
-    { //Давление нефти при условиях измерений объема, МПа
-      "Id":2,
-      "Use": true,
-      "IdParameter": 2,
-      "Name": "ФР.1.29.2014.16943",
-      "LimitValueActivate": false,
-      "LimitValue": 0.0,
-      "LimitValueString": ""
-    },
-    { //Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³
-      "Id":3,
+    {
       "Use": true,
       "IdParameter": 3,
-      "Name": "ФР.1.29.2014.16943",
+      "Name": "ФР.1.29.2020.36270",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Плотность нефти при 20 °C, кг/м³
-      "Id":4,
+    {
+	"Use": true,
+	"IdParameter": 3,
+	"Name": "ФР.1.31.2017.27252",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 3,
+	"Name": "ФР.1.31.2017.27250",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
       "Use": true,
       "IdParameter": 4,
-      "Name": "ФР.1.29.2014.16943",
+      "Name": "ФР.1.29.2020.36270",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
-      "LimitValueString": "0"
-    },
-    { //Плотность нефти при 15 °C, кг/м³
-      "Id":5,
-      "Use": true,
-      "IdParameter": 5,
-      "Name": "ФР.1.29.2014.16943",
-      "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Массовая доля воды, %
-      "Id":6,
+    {
+	"Use": true,
+	"IdParameter": 4,
+	"Name": "ФР.1.31.2017.27252",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 4,
+	"Name": "ФР.1.31.2017.27250",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+      "Use": true,
+      "IdParameter": 5,
+      "Name": "ФР.1.29.2020.36270",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 5,
+	"Name": "ФР.1.31.2017.27252",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
+	"Use": true,
+	"IdParameter": 5,
+	"Name": "ФР.1.31.2017.27250",
+	"LimitValueActivate": false,
+	"LimitValue": 0,
+	"LimitValueString": ""
+    },
+    {
       "Use": true,
       "IdParameter": 6,
       "Name": "ГОСТ 2477-2014",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Массовая концентрация хлористых солей, мг/дм³
-      "Id":7,
+    {
       "Use": true,
       "IdParameter": 7,
-      "Name": "ГОСТ 21534-2021, метод А, часть 1",
+      "Name": "ГОСТ 21534-2021,<br>метод А, часть 1",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Массовая концентрация хлористых солей, %
-      "Id":8,
+    {
       "Use": true,
       "IdParameter": 8,
-      "Name": "ГОСТ 21534-2021, метод А, часть 1",
+      "Name": "ГОСТ 21534-2021,<br>метод А, часть 1",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Массовая доля механических примесей, %
-      "Id":9,
+    {
       "Use": true,
       "IdParameter": 9,
       "Name": "ГОСТ 6370-83",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Массовая доля серы, %
-      "Id":10,
+    {
       "Use": true,
       "IdParameter": 10,
       "Name": "ГОСТ Р 51947-2002",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Давление насыщенных паров, кПа
-      "Id":11,
+    {
       "Use": true,
       "IdParameter": 11,
       "Name": "ГОСТ 1756-2000",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Давление насыщенных паров, мм рт. ст.
-      "Id":12,
+    {
       "Use": true,
       "IdParameter": 12,
       "Name": "ГОСТ 1756-2000",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Выход фракций, %:    при температуре до 200 °С
-      "Id":13,
+    {
       "Use": true,
       "IdParameter": 13,
-      "Name": "ГОСТ 2177-99, метод Б",
+      "Name": "ГОСТ 2177-99,<br>метод Б",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Выход фракций, %:    при температуре до 300 °С
-      "Id":14,
+    {
       "Use": true,
       "IdParameter": 14,
-      "Name": "ГОСТ 2177-99, метод Б",
+      "Name": "ГОСТ 2177-99,<br>метод Б",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Выход фракций: при температуре до 350 °С, %
-      "Id":15,
-      "Use": true,
-      "IdParameter": 15,
-      "Name": "ГОСТ 2177-99, метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0.0,
-      "LimitValueString": ""
-    },
-    { //Массовая доля парафина, %
-      "Id":16,
+    {
       "Use": true,
       "IdParameter": 16,
-      "Name": "ГОСТ 11851-85, метод Б",
+      "Name": "ГОСТ 11851-85,<br>метод А",
       "LimitValueActivate": false,
-      "LimitValue": 0.0,
+      "LimitValue": 0,
       "LimitValueString": ""
     },
-    { //Массовая доля сероводорода, млнˉ¹ (ppm)
-      "Id":17,
+    {
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ Р 50802-2021",
-      "LimitValueActivate": true,
-      "LimitValue": 2.0,
-      "LimitValueString": "менее 2"
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
-    { //Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)
-      "Id":18,
+    {
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ Р 50802-2021",
-      "LimitValueActivate": true,
-      "LimitValue": 4.0,
-      "LimitValueString": "менее 4.0"
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
-    { //Массовая доля органических хлоридов во фракции, выкипающей до\nтемпературы 204 °С, млнˉ¹ (ppm)
-      "Id":19,
+    {
       "Use": true,
       "IdParameter": 19,
-      "Name": "ГОСТ Р 52247-2021, метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0.0,
-      "LimitValueString": ""
+      "Name": "ASTM D4929-22,<br>процедура С",
+      "LimitValueActivate": true,
+      "LimitValue": 5.0,
+      "LimitValueString": "менее 5.0"
     }
   ],
   "Parameters": [
@@ -177,14 +182,14 @@
       "Id": 1,
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
-      "Use": true,
+      "Use": false,
       "Edit": true
     },
     {
       "Id": 2,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
-      "Use": true,
+      "Use": false,
       "Edit": true
     },
     {
@@ -198,7 +203,7 @@
       "Id": 4,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
-      "Use": false,
+      "Use": true,
       "Edit": true
     },
     {
@@ -275,7 +280,7 @@
       "Id": 15,
       "Key": "Yield_fraction_350",
       "Name": "Выход фракций: при температуре до 350 °С, %",
-      "Use": true,
+      "Use": false,
       "Edit": true
     },
     {
@@ -349,23 +354,23 @@
     {
       "Id": 2,
       "Use": true,
-      "Key": "AccrSertifNumber",
+      "Key": "ExportPermit",
       "Type": "text",
-      "Name": "Номер аттестата аккредитации"
+      "Name": "Разрешение на вывоз"
     },
     {
       "Id": 3,
       "Use": true,
-      "Key": "Laboratory",
+      "Key": "Sample",
       "Type": "text",
-      "Name": "Лаборатория предприятия"
+      "Name": "Проба"
     },
     {
       "Id": 4,
       "Use": true,
-      "Key": "SIKN_Number",
+      "Key": "TankerName",
       "Type": "text",
-      "Name": "СИКН №"
+      "Name": "Название танкера"
     },
     {
       "Id": 5,
@@ -387,69 +392,6 @@
       "Key": "Laboratory_IOF",
       "Type": "list",
       "Name": "Представитель испытательной лаборатории (ИОФ)"
-    },
-    {
-      "Id": 8,
-      "Use": true,
-      "Key": "Delive_Post",
-      "Type": "text",
-      "Name": "Представитель сдающей стороны (должность)"
-    },
-    {
-      "Id": 9,
-      "Use": true,
-      "Key": "Delive_Factory",
-      "Type": "text",
-      "Name": "Представитель сдающей стороны (предприятие)"
-    },
-    {
-      "Id": 10,
-      "Use": true,
-      "Key": "Delive_IOF",
-      "Type": "list",
-      "Name": "Представитель сдающей стороны (ИОФ)"
-    },
-    {
-      "Id": 11,
-      "Use": true,
-      "Key": "Receive_Post",
-      "Type": "text",
-      "Name": "Представитель принимающей стороны (должность)"
-    },
-    {
-      "Id": 12,
-      "Use": true,
-      "Key": "Receive_Factory",
-      "Type": "text",
-      "Name": "Представитель принимающей стороны (предприятие)"
-    },
-    {
-      "Id": 13,
-      "Use": true,
-      "Key": "Receive_IOF",
-      "Type": "list",
-      "Name": "Представитель принимающей стороны (ИОФ)"
-    },
-    {
-      "Id": 14,
-      "Use": true,
-      "Key": "PassportPeriodDT.Begin",
-      "Type": "datetime-local",
-      "Name": "Дата и время отбора пробы (начало)"
-    },
-    {
-      "Id": 15,
-      "Use": true,
-      "Key": "PassportPeriodDT.End",
-      "Type": "datetime-local",
-      "Name": "Дата и время отбора пробы (окончание)"
-    },
-    {
-      "Id": 16,
-      "Use": true,
-      "Key": "TankerName",
-      "Type": "text",
-      "Name": "Название танкера"
     }
   ]
 }

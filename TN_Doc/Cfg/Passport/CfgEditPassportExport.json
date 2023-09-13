@@ -1,6 +1,7 @@
 ﻿{
-  "Metods": [
+  "Methods": [
     {
+      "Id": 1,
       "Use": true,
       "IdParameter": 3,
       "Name": "ФР.1.29.2020.36270",
@@ -9,22 +10,25 @@
       "LimitValueString": ""
     },
     {
-	"Use": true,
-	"IdParameter": 3,
-	"Name": "ФР.1.31.2017.27252",
-	"LimitValueActivate": false,
-	"LimitValue": 0,
-	"LimitValueString": ""
+      "Id": 2,
+      "Use": true,
+      "IdParameter": 3,
+      "Name": "ФР.1.31.2017.27252",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
     {
-	"Use": true,
-	"IdParameter": 3,
-	"Name": "ФР.1.31.2017.27250",
-	"LimitValueActivate": false,
-	"LimitValue": 0,
-	"LimitValueString": ""
+      "Id": 3,
+      "Use": true,
+      "IdParameter": 3,
+      "Name": "ФР.1.31.2017.27250",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
     {
+      "Id":4,
       "Use": true,
       "IdParameter": 4,
       "Name": "ФР.1.29.2020.36270",
@@ -33,22 +37,25 @@
       "LimitValueString": ""
     },
     {
-	"Use": true,
-	"IdParameter": 4,
-	"Name": "ФР.1.31.2017.27252",
-	"LimitValueActivate": false,
-	"LimitValue": 0,
-	"LimitValueString": ""
+      "Id":5,
+      "Use": true,
+      "IdParameter": 4,
+      "Name": "ФР.1.31.2017.27252",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
     {
-	"Use": true,
-	"IdParameter": 4,
-	"Name": "ФР.1.31.2017.27250",
-	"LimitValueActivate": false,
-	"LimitValue": 0,
-	"LimitValueString": ""
+      "Id":6,
+      "Use": true,
+      "IdParameter": 4,
+      "Name": "ФР.1.31.2017.27250",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
     {
+      "Id":7,
       "Use": true,
       "IdParameter": 5,
       "Name": "ФР.1.29.2020.36270",
@@ -57,22 +64,25 @@
       "LimitValueString": ""
     },
     {
-	"Use": true,
-	"IdParameter": 5,
-	"Name": "ФР.1.31.2017.27252",
-	"LimitValueActivate": false,
-	"LimitValue": 0,
-	"LimitValueString": ""
+      "Id":8,
+      "Use": true,
+      "IdParameter": 5,
+      "Name": "ФР.1.31.2017.27252",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
     {
-	"Use": true,
-	"IdParameter": 5,
-	"Name": "ФР.1.31.2017.27250",
-	"LimitValueActivate": false,
-	"LimitValue": 0,
-	"LimitValueString": ""
+      "Id":9,
+      "Use": true,
+      "IdParameter": 5,
+      "Name": "ФР.1.31.2017.27250",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": ""
     },
     {
+      "Id":10,
       "Use": true,
       "IdParameter": 6,
       "Name": "ГОСТ 2477-2014",
@@ -81,6 +91,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":11,
       "Use": true,
       "IdParameter": 7,
       "Name": "ГОСТ 21534-2021,<br>метод А, часть 1",
@@ -89,6 +100,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":12,
       "Use": true,
       "IdParameter": 8,
       "Name": "ГОСТ 21534-2021,<br>метод А, часть 1",
@@ -97,6 +109,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":13,
       "Use": true,
       "IdParameter": 9,
       "Name": "ГОСТ 6370-83",
@@ -105,6 +118,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":14,
       "Use": true,
       "IdParameter": 10,
       "Name": "ГОСТ Р 51947-2002",
@@ -113,6 +127,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":15,
       "Use": true,
       "IdParameter": 11,
       "Name": "ГОСТ 1756-2000",
@@ -121,6 +136,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":16,
       "Use": true,
       "IdParameter": 12,
       "Name": "ГОСТ 1756-2000",
@@ -129,6 +145,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":17,
       "Use": true,
       "IdParameter": 13,
       "Name": "ГОСТ 2177-99,<br>метод Б",
@@ -137,6 +154,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":18,
       "Use": true,
       "IdParameter": 14,
       "Name": "ГОСТ 2177-99,<br>метод Б",
@@ -145,6 +163,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":19,
       "Use": true,
       "IdParameter": 16,
       "Name": "ГОСТ 11851-85,<br>метод А",
@@ -153,6 +172,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":20,
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ Р 50802-2021",
@@ -161,6 +181,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":21,
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ Р 50802-2021",
@@ -169,6 +190,7 @@
       "LimitValueString": ""
     },
     {
+      "Id":22,
       "Use": true,
       "IdParameter": 19,
       "Name": "ASTM D4929-22,<br>процедура С",

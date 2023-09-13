@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NUnit.Framework.Interfaces;
 using TN_Doc.Models.Services;
 using TN.DocData;
 
@@ -7,9 +8,9 @@ namespace TN_Doc.Tests;
 [TestFixture(TestName = "Тесты для проверки работы сервиса работы со словарями")]
 public class DirectoryServiceTests
 {
-    private DirectoryService GetService(string path) => new(path);
+    private DirectoryService GetService(string path) => new(path,"Cfg_clone_main.json","TestResources");
 
-    private DirectoryService GetGoodService() => GetService("TestResources/Cfg_clone.json");
+    private DirectoryService GetGoodService() => GetService("Cfg_clone.json");
 
     [TestCase(TestName = "#1 Проверка инциализации с корректными данными. Без генерации исключения.")]
     public void SuccessfulInitializeTest() =>
@@ -89,5 +90,16 @@ public class DirectoryServiceTests
         var nuser =dict.Users.FirstOrDefault(item=> item.Id== 100);
         Assert.That(nuser,Is.Not.Null);
     }
+    
+    [TestCase(TestName = "#6 Получение конфигураций по паспортам качества")]
+    public async Task GetQPCfgTest()
+    {
+        var service = GetGoodService();
+        var result = await service.GetQualityPassportConfigs();
+        Assert.That(result,Is.Not.Null);
+    }
+    
+    
+    
     
 }
