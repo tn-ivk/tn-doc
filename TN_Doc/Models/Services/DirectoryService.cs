@@ -19,6 +19,7 @@ namespace TN_Doc.Models.Services
         private FileSystemWatcher _fileWatcher;
         private readonly FileInfo _mainCfgFile;
         private readonly FileInfo _mainAppCfgFile;
+
         // ReSharper disable once NotAccessedField.Local
         private readonly ILogger<DirectoryService> _logger;
 
@@ -76,7 +77,7 @@ namespace TN_Doc.Models.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidDataException">При отсутствие словарей на сервере</exception>
-        public async Task<string> GetDirectoriesJson()
+        public async Task<string> GetDirectoriesJsonAsync()
         {
             return await Task.Run(() =>
             {
@@ -101,7 +102,7 @@ namespace TN_Doc.Models.Services
         /// Установка нового значения словарей в формате JSON на сервере. Перезаписывается конфигурация приложения
         /// </summary>
         /// <param name="json">Новый JSON словарей</param>
-        public async Task SetDirectoriesFromJson(string json)
+        public async Task SetDirectoriesFromJsonAsync(string json)
         {
             await Task.Run(() =>
             {
@@ -116,45 +117,28 @@ namespace TN_Doc.Models.Services
         }
 
         /// <summary>
+        /// Установка патча Паспортов качества 
+        /// </summary>
+        /// <param name="json">Json который необходимо применить</param>
+        public async Task SetQpConfigFromJsonAsync(string json)
+        {
+            await Task.Run(() =>
+            {
+                var modifJson = json;
+                lock (_lock)
+                {
+                    WritePatchesQpToJson(modifJson);
+                }
+
+            });
+        }
+        
+        /// <summary>
         /// Получение конфигурации паспортов качества продуктов
         /// </summary>
         /// <returns>Конфигурации/справочников по паспортам качества</returns>
-        public async Task<string> GetQualityPassportConfigs()
-        {
-            return await Task.Run(() =>
-            {
-                var deviceJson = ExtractDevicePassport();
-                var resultArr = new JArray();
-                var resultJo = new JObject(new JProperty("root", resultArr));
-                foreach (var device in deviceJson["root"]!)
-                {
-                    var passArr = new JArray();
-                    var nDevice = new JObject(new JProperty("DeviceName", device["DeviceName"]), new JProperty("Passports", passArr));
-                    foreach (var pass in device["Passports"]!)
-                    {
-                        try
-                        {
-                            // var passFile = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), pass["EditConfigFilePath"]!.ToString()));
-                            var passFile = new FileInfo(Directory.GetCurrentDirectory() + pass["EditConfigFilePath"]!);
-                            FileNotFoundThrowExceptionHelper(passFile);
-                            var fullPassCfgJson = JObject.Parse(File.ReadAllText(passFile.FullName));
-                            var passJo = new JObject(new JProperty("File", pass["EditConfigFilePath"]),
-                                new JProperty("Methods", fullPassCfgJson["Methods"]), new JProperty("Parameters", fullPassCfgJson["Parameters"]));
-                            passArr.Add(passJo);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-                    }
-
-                    resultArr.Add(nDevice);
-                }
-                return Task.FromResult(resultJo.ToString());
-            });
-        }
-
-
+        public Task<string> GetQualityPassportConfigs() => Task.Run(() => ExtractQPMethodAndParameters(ExtractPassportNameForDeviceCfg()).ToString());
+        
         /// <summary>
         /// Запись новых справочников в конфигурацию приложения
         /// </summary>
@@ -169,6 +153,25 @@ namespace TN_Doc.Models.Services
         }
 
         /// <summary>
+        ///  Запись патча паспортов качества
+        /// </summary>
+        /// <param name="modifQpJson">Модифицированный Json паспортов качества</param>
+        /// <exception cref="FileNotFoundException">Гененерируется при отсутствие файла</exception>
+        private void WritePatchesQpToJson(string modifQpJson)
+        {
+            var modifJo = JObject.Parse(modifQpJson);
+            foreach (var qpi in modifJo["QpsInfo"]!)
+            {
+                var fileInfo = new FileInfo(Directory.GetCurrentDirectory() + qpi["EditConfigFilePath"]!);
+                FileNotFoundThrowExceptionHelper(fileInfo);
+                var jObject = JObject.Parse(File.ReadAllText(fileInfo.FullName));
+                jObject["Methods"]!.Replace(qpi["Methods"]!);
+                jObject["Parameters"]!.Replace(qpi["Parameters"]!);
+                File.WriteAllText(fileInfo.FullName, jObject.ToString(), Encoding.Default);
+            }
+        }
+        
+        /// <summary>
         /// Вспомогательный метод проверки наличия конфигурационного файла
         /// </summary>
         /// <param name="info">Информация о файле</param>
@@ -180,37 +183,52 @@ namespace TN_Doc.Models.Services
         }
 
         /// <summary>
+        /// Извлечение данных параметров и методов для каждого паспорта
+        /// </summary>
+        /// <param name="qpsInfo">Информация о девайсах</param>
+        /// <returns>Инфомация о всех паспортах качества для каждого продукта</returns>
+        private JObject ExtractQPMethodAndParameters(JObject qpsInfo)
+        {
+
+            foreach (var qps in qpsInfo["QpsInfo"])
+            {
+                var cfgFile = new FileInfo(Directory.GetCurrentDirectory() + qps["EditConfigFilePath"]!);
+                FileNotFoundThrowExceptionHelper(cfgFile);
+                var fullPassCfgJson = JObject.Parse(File.ReadAllText(cfgFile.FullName));
+                qps["Methods"] = fullPassCfgJson["Methods"];
+                qps["Parameters"] = fullPassCfgJson["Parameters"];
+            }
+            return qpsInfo;
+        }
+
+        /// <summary>
         ///  Получение информации о паспортах на девайсах
         /// </summary>
         /// <returns>JObject с информацией об используемых паспортах на них</returns>
         /// <exception cref="FileNotFoundException">При отсутствие файла с информацией о девайсах</exception>
-        private JObject ExtractDevicePassport()
+        private JObject ExtractPassportNameForDeviceCfg()
         {
             FileNotFoundThrowExceptionHelper(_mainAppCfgFile);
             var cfgAppJson = JObject.Parse(File.ReadAllText(_mainAppCfgFile.FullName));
+            var passports = new JArray();
             var resultJo = new JObject();
-            var deviceArr = new JArray();
-            resultJo.Add("root", deviceArr);
+            resultJo.Add("QpsInfo", passports);
             foreach (var deviceJson in cfgAppJson["Devices"]!)
             {
-                var deviceJo = new JObject { new JProperty("DeviceName", deviceJson["Name"]) };
-
                 foreach (var doc in deviceJson["Docs"]!.Where(item => item["Name"].ToString() == "Паспорта"))
                 {
-                    var passportArr = new JArray();
-
                     foreach (var d in doc["TemplateDocs"]!.Where(item => item["Use"].ToObject<bool>()))
                     {
-                        passportArr.Add(new JObject(new JProperty("EditConfigFilePath", d["PathToDocEditConfigFile"]),
-                            new JProperty("Name", d["Name"])));
+                        if(passports.Any(passItem => passItem["EditConfigFilePath"].ToString() == d["PathToDocEditConfigFile"]!.ToString()))
+                            continue;
+                        passports.Add(
+                            new JObject(
+                                new JProperty("EditConfigFilePath",d["PathToDocEditConfigFile"]),
+                                new JProperty("Name", d["Name"]))
+                            );
                     }
-
-                    deviceJo.Add("Passports", passportArr);
                 }
-
-                deviceArr.Add(deviceJo);
             }
-
             return resultJo;
         }
 
