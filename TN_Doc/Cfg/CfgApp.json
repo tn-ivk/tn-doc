@@ -1,3 +1,4 @@
+﻿
 {
   "Devices": [
     {
@@ -118,7 +119,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": true,
@@ -143,6 +144,14 @@
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
               "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+            },
+            {
+              "Use": true,
+              "Id": 3,
+              "Name": "Акт приема - сдачи нефти ТЕСТ",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             }
           ]
         },
@@ -773,7 +782,8 @@
               "Id": 0,
               "Name": "КМХ МИ 3272-2010",
               "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
-              "PathToDocTemplateFile": ""
+              "PathToDocTemplateFile": "",
+              "PathToDocEditConfigFile": null
             }
           ]
         },
@@ -836,11 +846,11 @@
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
-              "Description": "Протокол поверки ПР с помощью ЭПР по МИ 3267-2010 (Приложение А)",
-              "PathToDocTemplateFile": "/Doc/Poverka3267.frx",
               "Use": true,
               "Id": 0,
               "Name": "Поверка МИ3267",
+              "Description": "Протокол поверки ПР с помощью ЭПР по МИ 3267-2010 (Приложение А)",
+              "PathToDocTemplateFile": "/Doc/Poverka3267.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3267.json"
             }
           ]
@@ -885,7 +895,8 @@
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
-      ]
+      ],
+      "Elis": null
     },
     {
       "Use": false,
@@ -1022,6 +1033,14 @@
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
               "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+            },
+            {
+              "Use": true,
+              "Id": 3,
+              "Name": "Акт приема - сдачи нефти",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             }
           ]
         },
@@ -1652,7 +1671,8 @@
               "Id": 0,
               "Name": "КМХ МИ 3272-2010",
               "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
-              "PathToDocTemplateFile": ""
+              "PathToDocTemplateFile": "",
+              "PathToDocEditConfigFile": null
             }
           ]
         },
@@ -1764,7 +1784,8 @@
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
-      ]
+      ],
+      "Elis": null
     }
   ],
   "PrintSettings": {
