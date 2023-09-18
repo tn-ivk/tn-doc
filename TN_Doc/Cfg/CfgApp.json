@@ -400,7 +400,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -880,7 +880,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.20.101",
+          "Server": "192.168.10.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1289,7 +1289,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
