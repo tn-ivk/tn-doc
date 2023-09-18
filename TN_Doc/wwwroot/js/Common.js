@@ -1383,11 +1383,8 @@ function ConvertEditRowToStableRow(row, rowMap) {
     let cells = row.querySelectorAll('td');
     let usersGroupArray = appDictionaries['UsersGroup'];
     let licensesArray = appDictionaries['Licenses'];
-    console.log(qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Methods']);
     let qpMethodsArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Methods'];
     let qpParametersArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Parameters'];
-
-    let userId = Number(row.dataset.id);
     for (let i = 0; i < cells.length; i++) {
         ConvertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, qpMethodsArray, qpParametersArray);
     }
@@ -1452,8 +1449,10 @@ function ConvertEditCellToStableCell(cell, type, usersGroupArray, licensesArray,
             }
             break;
         case 'number':
-            let newNumNode = document.createTextNode(Intl.NumberFormat('ru').format(previewNode.value));
+            let newNumNode = document.createTextNode(previewNode.value.replaceAll('.',','));
+            console.log(newNumNode)
             cell.replaceChild(newNumNode, cell.childNodes[0])
+            console.log(cell)
             break;
         default:
             break
@@ -1567,17 +1566,25 @@ function ConvertStableCellToEditCell(cell, type) {
                 }
                 counterParams++;
             }
-            if (previewNode)
-                cell.replaceChild(cbEl, previewNode)
-            else
-                cell.append(cbEl);
+            for(let item of cell.childNodes){
+                item.remove();
+            }
+            
+            for(let br of cell.querySelectorAll('br'))
+                br.remove();
+            cell.appendChild(cbEl);
             break;
         case 'number':
             let prNumber = cell.innerText;
+            console.log(prNumber);
             newElement.type = 'number';
-            newElement.value = prNumber ? prNumber : '0,0';
-            if (previewNode)
+            console.log(prNumber.replaceAll(',','.'));
+            newElement.value = prNumber ? Number.parseFloat(prNumber.replaceAll(',','.')): '0.0';
+            console.log(newElement);
+            if (previewNode){
                 cell.replaceChild(newElement, previewNode)
+                console.log(newElement);
+            }
             else
                 cell.append(newElement);
             break;
@@ -1904,7 +1911,7 @@ function RenderQpConfigsMethodsTable(counter, qps, baseDiv) {
         let row = document.createElement('tr');
         row.classList.add('data-row');
         let idCell = document.createElement('td');
-        idCell.innerHTML = method['Id'];
+        idCell.innerText = method['Id'];
         row.dataset.id = method['Id'];
         VerticalCenteringText(idCell);
         row.appendChild(idCell);
@@ -1917,14 +1924,14 @@ function RenderQpConfigsMethodsTable(counter, qps, baseDiv) {
         VerticalCenteringText(usedTd)
         row.appendChild(usedTd);
         let methodName = document.createElement('td');
-        methodName.innerHTML = method['Name'];
+        methodName.innerText = method['Name'];
         VerticalCenteringText(methodName);
         row.appendChild(methodName);
         let paramsArray = qps["Parameters"];
         let param = paramsArray.filter(item => item["Id"] === method["IdParameter"])[0];
         let paramCell = document.createElement('td')
         VerticalCenteringText(paramCell)
-        paramCell.innerHTML = param ? param["Name"] : " - ";
+        paramCell.innerText = param ? param["Name"] : " - ";
         paramCell.dataset.paramId = param ? param["Id"] : 0;
         row.appendChild(paramCell);
         let limitActive = document.createElement('i')
@@ -1936,11 +1943,11 @@ function RenderQpConfigsMethodsTable(counter, qps, baseDiv) {
         VerticalCenteringText(limitActiveCell)
         row.appendChild(limitActiveCell);
         let LimitValueCell = document.createElement('td');
-        LimitValueCell.innerHTML = method['LimitValue'];
+        LimitValueCell.innerText = method['LimitValue'];
         VerticalCenteringText(LimitValueCell);
         row.appendChild(LimitValueCell);
         let LimitValueStringCell = document.createElement('td');
-        LimitValueStringCell.innerHTML = !method['LimitValueString'] ? '-' : method['LimitValueString'];
+        LimitValueStringCell.innerText = !method['LimitValueString'] ? '-' : method['LimitValueString'];
         VerticalCenteringText(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
         let actionCell = document.createElement('td');

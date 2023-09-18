@@ -871,7 +871,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.20.101",
+          "Server": "192.168.10.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1752,14 +1752,14 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.27.102",
+          "Server": "192.168.10.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": true,
+          "Use": false,
           "GuidDevice": 1,
           "Server": "192.168.27.202",
           "Userid": "user",
