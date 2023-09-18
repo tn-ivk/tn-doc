@@ -400,6 +400,8 @@ function InitElement() {
 
 
     /*init dir editor component script*/
+
+
     AddTabsSelectorHandler();
 
     LoadAppDictionaries();
@@ -770,6 +772,79 @@ function SetClientToken() {
 
 }
 
+
+/**********************************************/
+/*************Хелперы*************************/
+/**********************************************/
+
+/*
+    Создание заголовков таблицы <br/>
+    Входные параметры: <br/>
+    @param headerText - заголовок столбца 
+*/
+function _createTableColumnHeader(headerText) {
+    let el = _createElementWithOptions('th', {scope: "col", textContent: headerText});
+    VerticalCenteringText(el);
+    return el;
+}
+
+/*
+    Создание элемента html c инициализацией  параметров<br/>
+    Входные переменные:<br/>
+    @param tag - тег, создаваемого html элемента <br/>
+    @param options - объекта параметров, который необходимо инициализировать при созданмие
+
+*/
+function _createElementWithOptions(tag, options) {
+    return Object.assign(document.createElement(tag), options)
+}
+
+
+/*
+* Добавление класса элементу
+*/
+function AddClassToElement(selector, className) {
+    _modificateElementClasses(selector, className, false)
+}
+
+/*Удаление класса элемента*/
+function RemoveClassToElement(selector, className) {
+    _modificateElementClasses(selector, className, true)
+}
+
+
+/*Модификация списка классов у элемета HTML */
+function _modificateElementClasses(selector, className, isRemove) {
+    if (!selector || !className)
+        return;
+    let elements = document.querySelectorAll(selector);
+    if (!elements)
+        return;
+    let classes = className.split(':');
+    elements.forEach(el => {
+        if (isRemove) {
+            for (let cl of classes) {
+                if (!cl) return;
+                if (el.classList.contains(cl))
+                    el.classList.remove(cl)
+            }
+        } else {
+            elements.forEach(el => {
+                for (let cl of classes) {
+                    if (!cl) return;
+                    if (!el.classList.contains(cl))
+                        el.classList.add(cl)
+                }
+            });
+        }
+    });
+}
+
+/**********************************************/
+/*************Хелперы*************************/
+/**********************************************/
+
+
 /*
 * Загрузка словарей приложения. Словари поступают в формате json.
 * Сами словари хранятся в поле 'dirJsonRaw' (datas['dirJsonRawS']).
@@ -829,7 +904,7 @@ function RenderUserGroupsRowTable() {
 
         let idTd = document.createElement('td');
         idTd.innerText = userGroup['Id'].toString();
-        VerticalCenteringCell(idTd)
+        VerticalCenteringText(idTd)
         row.appendChild(idTd);
 
         let usedSquare = document.createElement('i')
@@ -838,12 +913,12 @@ function RenderUserGroupsRowTable() {
         usedSquare.ariaHidden = true;
         let usedTd = document.createElement('td');
         usedTd.appendChild(usedSquare);
-        VerticalCenteringCell(usedTd)
+        VerticalCenteringText(usedTd)
         row.appendChild(usedTd);
 
         let nameTD = document.createElement('td');
         nameTD.innerText = userGroup['Name'].toString();
-        VerticalCenteringCell(nameTD)
+        VerticalCenteringText(nameTD)
         row.appendChild(nameTD);
 
         table.append(row)
@@ -863,7 +938,7 @@ function RenderAndAddHandlerLicencesTable() {
         let idCell = document.createElement('td');
         row.dataset.id = licences['Id'];
         idCell.innerText = licences['Id'];
-        VerticalCenteringCell(idCell);
+        VerticalCenteringText(idCell);
         row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
@@ -872,17 +947,17 @@ function RenderAndAddHandlerLicencesTable() {
         usedSquare.ariaHidden = true;
         let usedCell = document.createElement('td');
         usedCell.appendChild(usedSquare);
-        VerticalCenteringCell(usedCell);
+        VerticalCenteringText(usedCell);
         row.appendChild(usedCell);
 
         let numberCell = document.createElement('td');
         numberCell.innerText = licences['LicensesNumber'];
-        VerticalCenteringCell(numberCell);
+        VerticalCenteringText(numberCell);
         row.appendChild(numberCell);
 
         let dateCell = document.createElement('td');
         dateCell.innerText = licences['LicensesDate'];
-        VerticalCenteringCell(dateCell);
+        VerticalCenteringText(dateCell);
         row.appendChild(dateCell);
 
         let editDivElement = document.createElement('div');
@@ -915,7 +990,7 @@ function RenderAndAddHandlerUserTable() {
         let idCell = document.createElement('td');
         idCell.innerText = user['Id'];
         row.dataset.id = user['Id'];
-        VerticalCenteringCell(idCell);
+        VerticalCenteringText(idCell);
         row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
@@ -924,41 +999,41 @@ function RenderAndAddHandlerUserTable() {
         usedSquare.ariaHidden = true;
         let usedCell = document.createElement('td');
         usedCell.appendChild(usedSquare);
-        VerticalCenteringCell(usedCell);
+        VerticalCenteringText(usedCell);
         row.appendChild(usedCell);
 
         let groupNameCell = document.createElement('td');
         groupNameCell.innerText = usersGroups.filter(group => group['Id'] === user['IdGroup'])[0]['Name'];
-        VerticalCenteringCell(groupNameCell);
+        VerticalCenteringText(groupNameCell);
         row.appendChild(groupNameCell);
 
         let surnameCell = document.createElement('td');
         surnameCell.innerText = user.F;
-        VerticalCenteringCell(surnameCell);
+        VerticalCenteringText(surnameCell);
         row.appendChild(surnameCell);
 
         let nameCell = document.createElement('td');
         nameCell.innerText = user.I;
-        VerticalCenteringCell(nameCell);
+        VerticalCenteringText(nameCell);
         row.appendChild(nameCell);
 
         let patronymicCell = document.createElement('td');
         patronymicCell.innerText = user.O;
-        VerticalCenteringCell(patronymicCell);
+        VerticalCenteringText(patronymicCell);
         row.appendChild(patronymicCell);
 
         let organizationCell = document.createElement('td');
         organizationCell.innerText = user['Factory'];
-        VerticalCenteringCell(organizationCell);
+        VerticalCenteringText(organizationCell);
         row.appendChild(organizationCell);
 
         let postCell = document.createElement('td');
         postCell.innerText = user['Post'];
-        VerticalCenteringCell(postCell);
+        VerticalCenteringText(postCell);
         row.appendChild(postCell);
 
         let licCell = document.createElement('td');
-        VerticalCenteringCell(licCell);
+        VerticalCenteringText(licCell);
         let licItem = licences.filter(item => item.IdUser === user['Id'])[0];
         if (licItem) {
             licCell.innerText = `[${licItem['Id']}] ${licItem['LicensesNumber']}`;
@@ -987,7 +1062,7 @@ function RenderAndAddHandlerUserTable() {
 
 }
 
-function VerticalCenteringCell(cell) {
+function VerticalCenteringText(cell) {
     cell.classList.add('align-middle')
 }
 
@@ -1181,7 +1256,7 @@ function EditSelectedLicences(itemBtn, rowItem, itemId) {
         AddClassToElement('.modal-header', 'disabled-item')
         DisableOtherTableRows(itemId, 'licences-table');
         ConvertStableRowToEditRow(rowItem, rowMap)
-        ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock'); 
+        ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
         if (!ValidateEditRow(rowItem, rowMap))
@@ -1308,16 +1383,20 @@ function ConvertEditRowToStableRow(row, rowMap) {
     let cells = row.querySelectorAll('td');
     let usersGroupArray = appDictionaries['UsersGroup'];
     let licensesArray = appDictionaries['Licenses'];
+    console.log(qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Methods']);
+    let qpMethodsArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Methods'];
+    let qpParametersArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Parameters'];
+
     let userId = Number(row.dataset.id);
     for (let i = 0; i < cells.length; i++) {
-        ConvertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, userId);
+        ConvertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, qpMethodsArray, qpParametersArray);
     }
 }
 
 /*
 * Конверитирование ячейки редактирования в ячейку стабильную 
 */
-function ConvertEditCellToStableCell(cell, type, usersGroupArray, licensesArray, userId) {
+function ConvertEditCellToStableCell(cell, type, usersGroupArray, licensesArray, methodsArray, parametersArray) {
     if (!type || !cell) return;
     let previewNode = cell.childNodes[0];
     switch (type) {
@@ -1359,6 +1438,25 @@ function ConvertEditCellToStableCell(cell, type, usersGroupArray, licensesArray,
                 cell.dataset.licId = String(licId);
             }
             break;
+        case 'combobox-params':
+            let paramId = Number(previewNode.value);
+            let parameter = parametersArray.filter(item => item["Id"] === paramId)[0];
+            if (parameter) {
+                let paramNameNode = document.createTextNode(parameter['Name'])
+                cell.replaceChild(paramNameNode, cell.childNodes[0])
+                cell.dataset.paramId = String(paramId);
+            } else {
+                let paramNameNode = document.createTextNode('Параметр не выбран');
+                cell.replaceChild(paramNameNode, cell.childNodes[0])
+                cell.dataset.paramId = String(paramId);
+            }
+            break;
+        case 'number':
+            let newNumNode = document.createTextNode(Intl.NumberFormat('ru').format(previewNode.value));
+            cell.replaceChild(newNumNode, cell.childNodes[0])
+            break;
+        default:
+            break
     }
 }
 
@@ -1450,6 +1548,39 @@ function ConvertStableCellToEditCell(cell, type) {
             else
                 cell.append(cbElementLic);
             break;
+        case 'combobox-params':
+            let qpId = Number(cell.closest('table').dataset.qpId);
+            let params = qpCfgsDictionaries['QpsInfo'][qpId]['Parameters'];
+            let counterParams = 1;
+            let cbEl = document.createElement('select');
+            let optDef = document.createElement('option');
+            optDef.setAttribute('value', "0");
+            optDef.append(`Параметр не выбран`);
+            cbEl.appendChild(optDef);
+            for (let param of params) {
+                let opt = document.createElement('option');
+                opt.setAttribute('value', param['Id']);
+                opt.append(param['Name']);
+                cbEl.appendChild(opt);
+                if (Number(cell.dataset.paramId) === param['Id']) {
+                    cbEl.selectedIndex = counterParams;
+                }
+                counterParams++;
+            }
+            if (previewNode)
+                cell.replaceChild(cbEl, previewNode)
+            else
+                cell.append(cbEl);
+            break;
+        case 'number':
+            let prNumber = cell.innerText;
+            newElement.type = 'number';
+            newElement.value = prNumber ? prNumber : '0,0';
+            if (previewNode)
+                cell.replaceChild(newElement, previewNode)
+            else
+                cell.append(newElement);
+            break;
         default:
             break
     }
@@ -1492,44 +1623,6 @@ function EnableOtherTableRows(ignoredItemId, tableClass) {
     }
 }
 
-/*
-* Добавление класса элементу
-*/
-function AddClassToElement(selector, className) {
-    ModificationClassToElement(selector, className, false)
-}
-
-/*Удаление класса элемента*/
-function RemoveClassToElement(selector, className) {
-    ModificationClassToElement(selector, className, true)
-}
-
-/*Модификация списка классов у элемета HTML */
-function ModificationClassToElement(selector, className, isRemove) {
-    if (!selector || !className)
-        return;
-    let elements = document.querySelectorAll(selector);
-    if (!elements)
-        return;
-    let classes = className.split(':');
-    elements.forEach(el => {
-        if (isRemove) {
-            for (let cl of classes) {
-                if (!cl) return;
-                if (el.classList.contains(cl))
-                    el.classList.remove(cl)
-            }
-        } else {
-            elements.forEach(el => {
-                for (let cl of classes) {
-                    if (!cl) return;
-                    if (!el.classList.contains(cl))
-                        el.classList.add(cl)
-                }
-            });
-        }
-    });
-}
 
 /*Добавление обработчика добавления довереностей*/
 function AddLicHandler() {
@@ -1655,6 +1748,7 @@ function AddSaveButtonHandler() {
     })
 }
 
+
 /* Отключение активности у всех элементов у компонента редактирования справочников*/
 function DisableAllElementToDirEdit() {
     AddClassToElement('.close', 'disabled-item');
@@ -1730,11 +1824,8 @@ function RenderQpConfigs() {
         liItem.dataset.target = "#qpId" + counter;
         qpList.append(liItem)
         let mainBaseDiv = RenderMainDivForQpTables(counter);
-        let baseMethodDiv = RenderBaseDivForQpTables(mainBaseDiv);
-        RenderQpConfigsMethodsTable(counter, qp, baseMethodDiv)
-        let baseParamDiv = RenderBaseDivForQpTables(mainBaseDiv);
-        RenderQpConfigsParametersTable(qp, counter, baseParamDiv)
-
+        RenderQpConfigsMethodsTable(counter, qp, mainBaseDiv)
+        //todo: повесить обработчки на ul  а не на каждую li
         liItem.addEventListener("click", function (e) {
             let element = e.target;
 
@@ -1786,223 +1877,227 @@ function RenderMainDivForQpTables(id) {
 }
 
 /*
-* Рендеринг базового дива для таблицы паспортов 
-*/
-function RenderBaseDivForQpTables(parentDiv) {
-    // let tbContainerDiv50 = document.createElement('div');
-    // tbContainerDiv50.classList.add('table-container-part-50ph');
-    // parentDiv.appendChild(tbContainerDiv50);
-    return parentDiv;
-}
-
-
-/*
 * Рендеринг методов паспортов качества 
 */
 function RenderQpConfigsMethodsTable(counter, qps, baseDiv) {
     let methodsTable = document.createElement('table');
     methodsTable.classList.add('table', 'table-bordered', 'inner-item-center', 'qp-method-table');
+    methodsTable.dataset.qpId = counter;
     baseDiv.appendChild(methodsTable);
-
-
     let tbMethodsHead = document.createElement('thead');
     methodsTable.appendChild(tbMethodsHead);
-
     let hRow = document.createElement('tr');
-    hRow.classList.add('table-primary')
+    hRow.classList.add('table-primary');
     tbMethodsHead.appendChild(hRow);
-
-    let thId = document.createElement('th');
-    thId.scope = "col";
-    thId.textContent = "ID";
-    hRow.appendChild(thId);
-
-    let thActive = document.createElement('th');
-    thActive.scope = "col";
-    thActive.textContent = "Активен";
-    hRow.appendChild(thActive);
-
-    let thMethodName = document.createElement('th');
-    thMethodName.scope = "col";
-    thMethodName.textContent = "Метод";
-    hRow.appendChild(thMethodName);
-
-    let thParam = document.createElement('th');
-    thParam.scope = "col";
-    thParam.textContent = "Параметр";
-    hRow.appendChild(thParam);
-
-
-    let thActiveMinValue = document.createElement('th');
-    thActiveMinValue.scope = "col";
-    thActiveMinValue.textContent = "Контроль мин. значения";
-    hRow.appendChild(thActiveMinValue);
-
-
-    let thMinValue = document.createElement('th');
-    thMinValue.scope = "col";
-    thMinValue.textContent = "Мин. значение";
-    hRow.appendChild(thMinValue);
-
-    let thMessage = document.createElement('th');
-    thMessage.scope = "col";
-    thMessage.textContent = "Сообщение";
-    hRow.appendChild(thMessage);
-
+    hRow.appendChild(_createTableColumnHeader("ID"));
+    hRow.appendChild(_createTableColumnHeader("Активен"));
+    hRow.appendChild(_createTableColumnHeader("Метод"));
+    hRow.appendChild(_createTableColumnHeader("Параметр"));
+    hRow.appendChild(_createTableColumnHeader("Контроль мин. значения"));
+    hRow.appendChild(_createTableColumnHeader("Мин. значение"));
+    hRow.appendChild(_createTableColumnHeader("Сообщение"));
+    hRow.appendChild(_createTableColumnHeader("Действия"));
     let methods = qps["Methods"];
-    console.log(qps)
     if (!methods)
         return;
     for (let method of methods) {
         let row = document.createElement('tr');
-
+        row.classList.add('data-row');
         let idCell = document.createElement('td');
         idCell.innerHTML = method['Id'];
-        VerticalCenteringCell(idCell);
+        row.dataset.id = method['Id'];
+        VerticalCenteringText(idCell);
         row.appendChild(idCell);
-
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(method['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
         usedSquare.ariaHidden = true;
         let usedTd = document.createElement('td');
         usedTd.appendChild(usedSquare);
-        VerticalCenteringCell(usedTd)
+        VerticalCenteringText(usedTd)
         row.appendChild(usedTd);
-
         let methodName = document.createElement('td');
         methodName.innerHTML = method['Name'];
-        VerticalCenteringCell(methodName);
+        VerticalCenteringText(methodName);
         row.appendChild(methodName);
-
         let paramsArray = qps["Parameters"];
-        let paramName = paramsArray.filter(item => item["Id"] === method["IdParameter"])[0]["Name"];
-        if (!paramName)
-            paramName = '-';
+        let param = paramsArray.filter(item => item["Id"] === method["IdParameter"])[0];
         let paramCell = document.createElement('td')
-        VerticalCenteringCell(paramCell)
-        paramCell.innerHTML = paramName;
+        VerticalCenteringText(paramCell)
+        paramCell.innerHTML = param ? param["Name"] : " - ";
+        paramCell.dataset.paramId = param ? param["Id"] : 0;
         row.appendChild(paramCell);
-
         let limitActive = document.createElement('i')
         limitActive.classList.add('fa');
         limitActive.classList.add(method['LimitValueActive'] === true ? 'fa-check-square-o' : 'fa-square-o');
         limitActive.ariaHidden = true;
         let limitActiveCell = document.createElement('td');
         limitActiveCell.appendChild(limitActive);
-        VerticalCenteringCell(limitActiveCell)
+        VerticalCenteringText(limitActiveCell)
         row.appendChild(limitActiveCell);
-
         let LimitValueCell = document.createElement('td');
         LimitValueCell.innerHTML = method['LimitValue'];
-        VerticalCenteringCell(LimitValueCell);
+        VerticalCenteringText(LimitValueCell);
         row.appendChild(LimitValueCell);
-
         let LimitValueStringCell = document.createElement('td');
         LimitValueStringCell.innerHTML = !method['LimitValueString'] ? '-' : method['LimitValueString'];
-        VerticalCenteringCell(LimitValueStringCell);
+        VerticalCenteringText(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
-
+        let actionCell = document.createElement('td');
+        actionCell.appendChild(_createEditQpMethodsBtn('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-methods-btn', '5px'));
+        actionCell.appendChild(_createDeleteQpMethodsBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px'));
+        VerticalCenteringText(actionCell);
+        row.appendChild(actionCell)
         methodsTable.appendChild(row);
     }
-
 }
 
 
 /*
-* Рендеринг параметров паспортов качества 
+    Создание кнопки удаления методов из паспортов качества
 */
-function RenderQpConfigsParametersTable(qps, counter, baseDiv) {
+function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
+    let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.addEventListener('click', _deleteQpMethodsBtnHandler)
+    let div = document.createElement('div')
+    div.appendChild(btn);
+    return div;
+}
 
-    let paramsTable = document.createElement('table');
-    paramsTable.classList.add('table', 'table-bordered', 'inner-item-center', 'qp-method-table');
-    baseDiv.appendChild(paramsTable);
-
-    let tbParamsHead = document.createElement('thead');
-    paramsTable.appendChild(tbParamsHead);
-
-    let hRow = document.createElement('tr');
-    hRow.classList.add('table-primary')
-    tbParamsHead.appendChild(hRow);
-
-    let thId = document.createElement('th');
-    thId.scope = "col";
-    thId.innerHTML = "ID";
-    hRow.appendChild(thId);
-
-
-    let thActive = document.createElement('th');
-    thActive.scope = "col";
-    thActive.innerHTML = "Активен";
-    hRow.appendChild(thActive);
-
-    let thKeyParam = document.createElement('th');
-    thKeyParam.scope = "col";
-    thKeyParam.innerHTML = "Ключ параметра";
-    hRow.appendChild(thKeyParam);
-
-    let thParamName = document.createElement('th');
-    thParamName.scope = "col";
-    thParamName.innerHTML = "Название параметра";
-    hRow.appendChild(thParamName);
-
-    let thAction = document.createElement('th');
-    thAction.scope = "col";
-    thAction.innerHTML = "Действия";
-    hRow.appendChild(thAction);
+/*
+    Создание кнопки редактирования методов
+*/
+function _createEditQpMethodsBtn(faClass, buttonClass, margin) {
+    let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.dataset.mode = 'stable';
+    let div = document.createElement('div');
+    btn.addEventListener('click', _editQpMethodBtnHandler)
+    div.appendChild(btn);
+    return div;
+}
 
 
-    let params = qps["Parameters"];
-    if (!params)
-        return;
-    for (let param of params) {
-        let row = document.createElement('tr');
-        row.classList.add('data-row');
+/*
+    Обработчик событий удаления  метода паспорта качества из таблицы.
+    @param event - возникшее событие.
+*/
+function _deleteQpMethodsBtnHandler(event) {
+    let row = event.target.closest('tr');
+    if (!row) return;
+    let table = row.closest('table');
+    if (!table) return;
+    let qpId = Number(table.dataset.qpId);
+    qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries["QpsInfo"][qpId]['Methods'].filter(function (item) {
+        return item["Id"] !== Number(row.dataset.id);
+    });
+    row.remove();
+}
 
-        let idCell = document.createElement('td');
-        idCell.innerHTML = param['Id'];
-        VerticalCenteringCell(idCell);
-        row.dataset.id = param['Id'];
-        row.appendChild(idCell);
+/*
+    Обработчик событий редактирования метода паспорта качества из таблицы.
+    @param event - возникшее событие.
+*/
+function _editQpMethodBtnHandler(event) {
+    let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
+    let row = item.closest('tr');
+    let rowMap = {
+        0: 'ignore',
+        1: 'bool',
+        2: 'text',
+        3: 'combobox-params',
+        4: 'bool',
+        5: 'number',
+        6: 'text',
+        7: 'ignore'
+    }
 
-
-        let usedSquare = document.createElement('i')
-        usedSquare.classList.add('fa');
-        usedSquare.classList.add(param['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
-        usedSquare.ariaHidden = true;
-        let usedTd = document.createElement('td');
-        usedTd.appendChild(usedSquare);
-        VerticalCenteringCell(usedTd)
-        row.appendChild(usedTd);
-
-        let keyCell = document.createElement('td');
-        keyCell.innerHTML = param['Key'];
-        VerticalCenteringCell(keyCell);
-        row.appendChild(keyCell);
-
-        let nameCell = document.createElement('td');
-        nameCell.innerHTML = param['Name'];
-        VerticalCenteringCell(nameCell);
-        row.appendChild(nameCell);
-
-        let editDivElement = document.createElement('div');
-        editDivElement.appendChild(CreateEditParamsButton(
-            'fa:fa-lock:edit-licences-btn',
-            'btn:btn-outline-primary:edit-licences-btn',
-            '5px'
-        ));
-        let actionCell = document.createElement('td');
-        actionCell.appendChild(editDivElement);
-        row.appendChild(actionCell);
-        paramsTable.appendChild(row);
+    if (item.dataset.mode === 'stable') {
+        ChangeButtonIcon(item, 'fa-unlock', 'fa-lock');
+        AddClassToElement('#qp-list', 'disabled-item');
+        AddClassToElement('.modal-header', 'disabled-item');
+        AddClassToElement('.save-btn', 'disabled-item');
+        AddClassToElement('row', 'disabled-item');
+        AddClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
+        _disableOtherRowsInTable(item.closest('table'), Number(row.dataset.id));
+        ConvertStableRowToEditRow(row, rowMap);
+        item.dataset.mode = 'edit';
+    } else {
+        if (!ValidateEditRow(row, rowMap))
+            return;
+        ConvertEditRowToStableRow(row, rowMap)
+        ChangeButtonIcon(item, 'fa-lock', 'fa-unlock');
+        RemoveClassToElement('#qp-list', 'disabled-item');
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
+        _enableOtherRowsInTable(item.closest('table'), Number(item.closest('tr').dataset.id));
+        _applyQpMethodsChanged(row,Number(row.dataset.id),Number (item.closest('table').dataset.qpId));
+        item.dataset.mode = 'stable';
     }
 }
 
-//
-// /*
-// * Создание кнопки редактирования для доверенностей
-// */
-// function CreateEditLicensesButton(faClass, buttonClass, margin) {
+function _applyQpMethodsChanged(rowItem, itemId, qpId) {
+    // console.log(rowItem)
+    // console.log(itemId)
+    // console.log(qpId)
+    //
+    // // if(rowItem ==)
+    // // if (!rowItem || !itemId || !qpId) {
+    // //     console.log(rowItem)
+    // //     console.log(itemId)
+    // //     console.log(qpId)
+    // //     return;
+    // // }
+    //    
+    //
+    // console.log('start')
+    //
+    // let methodIndex=qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].findIndex(item => item['Id'] === itemId);
+    // if(methodIndex<0) 
+    //     return;
+    // let cells = rowItem.cells;
+    // let updatedObject = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"][methodIndex];
+    //
+    // updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
+    // updatedObject['Name'] = cells[2].childNodes[0].textContent;
+    // updatedObject['IdParameter'] =  qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"]=cells[3].childNodes[0].textContent)[0]['Id'];
+    // updatedObject['LimitValueActivate'] = cells[4].childNodes[0].classList.contains('fa-check-square-o');
+    // updatedObject['LimitValue'] = Number( cells[5].childNodes[0].textContent);
+    //
+    // let msg = cells[5].childNodes[0].textContent;
+    // if(!msg){
+    //     updatedObject['LimitValueString'] = '-'
+    // }else{
+    //     updatedObject['LimitValueString'] =msg;
+    // }
+}
+
+
+
+function _disableOtherRowsInTable(table, ignoredId) {
+    if (!table) return;
+    for (let row of table.querySelectorAll('tr')) {
+        let rowId = Number(row.dataset.id);
+        if (ignoredId === rowId)
+            continue;
+        if (!row.classList.contains('disabled-item'))
+            row.classList.add('disabled-item');
+    }
+}
+
+function _enableOtherRowsInTable(table, ignoredId) {
+    if (!table) return;
+    for (let row of table.querySelectorAll('tr')) {
+        let rowId = Number(row.dataset.id);
+        if (ignoredId === rowId)
+            continue;
+        if (row.classList.contains('disabled-item'))
+            row.classList.remove('disabled-item');
+    }
+}
+
+
+// function CreateEditUsersButton(faClass, buttonClass, margin) {
 //     let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
 //     btn.dataset.mode = 'stable';
 //     btn.addEventListener('click', function (e) {
@@ -2015,85 +2110,60 @@ function RenderQpConfigsParametersTable(qps, counter, baseDiv) {
 //         let rowItem = itemBtn.closest('tr')
 //         let itemId = Number(rowItem.dataset.id);
 //         if (!itemId) return;
-//         EditSelectedLicences(itemBtn, rowItem, itemId)
+//         EditSelectedUser(itemBtn, rowItem, itemId)
 //     });
 //     return btn
 // }
 
+/*
+* Редактирование выбранной доверенности в таблице.
+* @param itemBtn - кнопка по которой нажали. Кнопка должна находиться в редактируемой строке  таблице.
+* @param rowItem - редактируемая строка в таблице.
+* @param itemId - id объекта в массиве.
+*/
+// function EditSelectedUser(itemBtn, rowItem, itemId) {
+//     let rowMap = {
+//         0: 'ignore',
+//         1: 'bool',
+//         2: 'combobox-ug',
+//         3: 'text',
+//         4: 'text',
+//         5: 'text',
+//         6: 'text',
+//         7: 'text',
+//         8: 'combobox-lic',
+//         9: 'ignore'
+//     }
+//
+//     if (itemBtn.dataset.mode === 'stable') {
+//         AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+//         AddClassToElement('#dictionaries-list', 'disabled-item');
+//         AddClassToElement('.save-btn', 'disabled-item');
+//         AddClassToElement('.close', 'disabled-item');
+//         AddClassToElement('.table-bottom-menu', 'disabled-item')
+//         AddClassToElement('.modal-header', 'disabled-item')
+//         DisableOtherTableRows(itemId, 'users-table');
+//         ConvertStableRowToEditRow(rowItem, rowMap)
+//         ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+//         itemBtn.dataset.mode = 'edit';
+//     } else if (itemBtn.dataset.mode === 'edit') {
+//         rowMap[6] = "ignore";
+//         rowMap[7] = "ignore";
+//         if (!ValidateEditRow(rowItem, rowMap))
+//             return;
+//         rowMap[6] = "text";
+//         rowMap[7] = "text";
+//         ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
+//         ConvertEditRowToStableRow(rowItem, rowMap)
+//         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
+//         RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
+//         RemoveClassToElement('#dictionaries-list', 'disabled-item');
+//         RemoveClassToElement('.save-btn', 'disabled-item');
+//         RemoveClassToElement('.close', 'disabled-item');
+//         RemoveClassToElement('.modal-header', 'disabled-item')
+//         ApplyUserChanges(rowItem, itemId)
+//         EnableOtherTableRows(itemId, 'users-table');
+//         itemBtn.dataset.mode = 'stable';
+//     }
+// }
 
-function CreateEditParamsButton(faClass, buttonClass, margin) {
-    let btn = CreateWithOnlyImgButton(faClass, buttonClass, margin);
-    btn.dataset.mode = 'stable';
-    btn.addEventListener('click', function (e) {
-        let itemBtn;
-        if (e.target.tagName === 'I') {
-            itemBtn = e.target.closest('button')
-        } else {
-            itemBtn = e.target;
-        }
-        let rowItem = itemBtn.closest('tr')
-        let itemId = Number(rowItem.dataset.id);
-        console.log(rowItem)
-        if (!itemId)
-            return;
-        EditSelectedParameters(itemBtn, rowItem, itemId)
-    });
-    return btn;
-}
-
-
-function EditSelectedParameters(itemBtn, rowItem, itemId) {
-    let rowMap = {
-        0: 'ignore',
-        1: 'bool',
-        2: 'ignore',
-        3: 'text'
-    }
-    if(itemBtn.dataset.mode === 'stable'){
-        AddClassToElement('#qp-list','disabled-item');
-        AddClassToElement('.modal-header','disabled-item');
-        AddClassToElement('.save-btn', 'disabled-item');
-        AddClassToElement('.close', 'disabled-item');
-        AddClassToElement('.table-bottom-menu', 'disabled-item');
-        itemBtn.dataset.mode = 'edit';
-    } else {
-        RemoveClassToElement('#qp-list','disabled-item';
-        RemoveClassToElement('.modal-header','disabled-item');
-        RemoveClassToElement('.save-btn', 'disabled-item');
-        RemoveClassToElement('.close', 'disabled-item');
-        RemoveClassToElement('.table-bottom-menu', 'disabled-item');
-        
-        
-        
-        itemBtn.dataset.mode = 'stable';
-    }
-    // if (itemBtn.dataset.mode === 'stable') {
-    //     AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
-    //     AddClassToElement('#dictionaries-list', 'disabled-item');
-    //     AddClassToElement('.save-btn', 'disabled-item');
-    //     AddClassToElement('.close', 'disabled-item');
-    //     AddClassToElement('.table-bottom-menu', 'disabled-item')
-    //     DisableOtherTableRows(itemId, 'licences-table');
-    //     ConvertStableRowToEditRow(rowItem, rowMap)
-    //     ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
-    //     itemBtn.dataset.mode = 'edit';
-    // } else if (itemBtn.dataset.mode === 'edit') {
-    //     if (!ValidateEditRow(rowItem, rowMap))
-    //         return;
-    //     ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-    //     ConvertEditRowToStableRow(rowItem, rowMap)
-    //     RemoveClassToElement('.table-bottom-menu', 'disabled-item')
-    //     RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
-    //     RemoveClassToElement('#dictionaries-list', 'disabled-item');
-    //     RemoveClassToElement('.save-btn', 'disabled-item');
-    //     RemoveClassToElement('.close', 'disabled-item');
-    //     ApplyLicenceChanges(rowItem, itemId)
-    //     EnableOtherTableRows(itemId, 'licences-table');
-    //     itemBtn.dataset.mode = 'stable';
-    //     ClearRowTable('.users-table')
-    //     RenderAndAddHandlerUserTable();
-    // }
-}
-
-
-/***********************************/
