@@ -1365,6 +1365,12 @@ function ValidateEditCell(cell, type) {
             let date = cell.childNodes[0].value;
             if (!date)
                 cell.classList.add('invalid-cell-content');
+            break;
+        case 'number':
+            let num = cell.childNodes[0].value;
+            if (!num)
+                cell.classList.add('invalid-cell-content');
+            break;
     }
 
 }
