@@ -1449,7 +1449,7 @@ function ConvertEditCellToStableCell(cell, type, usersGroupArray, licensesArray,
             }
             break;
         case 'number':
-            let newNumNode = document.createTextNode(previewNode.value.replaceAll('.',','));
+            let newNumNode = document.createTextNode(previewNode.value.replaceAll('.', ','));
             console.log(newNumNode)
             cell.replaceChild(newNumNode, cell.childNodes[0])
             console.log(cell)
@@ -1566,11 +1566,11 @@ function ConvertStableCellToEditCell(cell, type) {
                 }
                 counterParams++;
             }
-            for(let item of cell.childNodes){
+            for (let item of cell.childNodes) {
                 item.remove();
             }
-            
-            for(let br of cell.querySelectorAll('br'))
+
+            for (let br of cell.querySelectorAll('br'))
                 br.remove();
             cell.appendChild(cbEl);
             break;
@@ -1578,14 +1578,13 @@ function ConvertStableCellToEditCell(cell, type) {
             let prNumber = cell.innerText;
             console.log(prNumber);
             newElement.type = 'number';
-            console.log(prNumber.replaceAll(',','.'));
-            newElement.value = prNumber ? Number.parseFloat(prNumber.replaceAll(',','.')): '0.0';
+            console.log(prNumber.replaceAll(',', '.'));
+            newElement.value = prNumber ? Number.parseFloat(prNumber.replaceAll(',', '.')) : '0.0';
             console.log(newElement);
-            if (previewNode){
+            if (previewNode) {
                 cell.replaceChild(newElement, previewNode)
                 console.log(newElement);
-            }
-            else
+            } else
                 cell.append(newElement);
             break;
         default:
@@ -2038,47 +2037,45 @@ function _editQpMethodBtnHandler(event) {
         RemoveClassToElement('.save-btn', 'disabled-item');
         RemoveClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
         _enableOtherRowsInTable(item.closest('table'), Number(item.closest('tr').dataset.id));
-        _applyQpMethodsChanged(row,Number(row.dataset.id),Number (item.closest('table').dataset.qpId));
+        _applyQpMethodsChanged(row, Number(row.dataset.id), Number(item.closest('table').dataset.qpId));
         item.dataset.mode = 'stable';
     }
 }
 
 function _applyQpMethodsChanged(rowItem, itemId, qpId) {
-    // console.log(rowItem)
-    // console.log(itemId)
-    // console.log(qpId)
-    //
-    // // if(rowItem ==)
-    // // if (!rowItem || !itemId || !qpId) {
-    // //     console.log(rowItem)
-    // //     console.log(itemId)
-    // //     console.log(qpId)
-    // //     return;
-    // // }
-    //    
-    //
-    // console.log('start')
-    //
-    // let methodIndex=qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].findIndex(item => item['Id'] === itemId);
-    // if(methodIndex<0) 
-    //     return;
-    // let cells = rowItem.cells;
-    // let updatedObject = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"][methodIndex];
-    //
-    // updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
-    // updatedObject['Name'] = cells[2].childNodes[0].textContent;
-    // updatedObject['IdParameter'] =  qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"]=cells[3].childNodes[0].textContent)[0]['Id'];
-    // updatedObject['LimitValueActivate'] = cells[4].childNodes[0].classList.contains('fa-check-square-o');
-    // updatedObject['LimitValue'] = Number( cells[5].childNodes[0].textContent);
-    //
-    // let msg = cells[5].childNodes[0].textContent;
-    // if(!msg){
-    //     updatedObject['LimitValueString'] = '-'
-    // }else{
-    //     updatedObject['LimitValueString'] =msg;
-    // }
-}
+    console.log(rowItem)
+    console.log(itemId)
+    console.log(qpId)
 
+
+    if (!rowItem || !itemId)
+        return;
+    
+    if (qpId === undefined)
+        return;
+
+
+    console.log('start')
+
+    let methodIndex = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].findIndex(item => item['Id'] === itemId);
+    if (methodIndex < 0)
+        return;
+    let cells = rowItem.cells;
+    let updatedObject = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"][methodIndex];
+
+    updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['Name'] = cells[2].childNodes[0].textContent;
+    updatedObject['IdParameter'] = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[3].childNodes[0].textContent)[0]['Id'];
+    updatedObject['LimitValueActivate'] = cells[4].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['LimitValue'] = Number.parseFloat(cells[5].childNodes[0].textContent.replaceAll(',','.'));
+
+    let msg = cells[6].childNodes[0].textContent;
+    if (!msg) {
+        updatedObject['LimitValueString'] = '-'
+    } else {
+        updatedObject['LimitValueString'] = msg;
+    }
+}
 
 
 function _disableOtherRowsInTable(table, ignoredId) {
