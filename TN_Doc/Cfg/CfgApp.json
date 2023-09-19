@@ -118,7 +118,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": true,
@@ -143,6 +143,14 @@
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
               "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+            },
+            {
+              "Use": true,
+              "Id": 3,
+              "Name": "Акт приема - сдачи нефти ТЕСТ",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             }
           ]
         },
@@ -391,7 +399,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -1024,6 +1032,14 @@
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
               "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+            },
+            {
+              "Use": true,
+              "Id": 3,
+              "Name": "Акт приема - сдачи нефти",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             }
           ]
         },
@@ -1070,6 +1086,7 @@
               "Id": 0,
               "Name": "Поверка МИ3287 (рабочего ПР)",
               "Description": "Протокол поверки ПР с помощью ПУ по МИ 3287-2010 (Приложение А)",
+              "PathToDocTemplateFile": "/Doc/10_Poverka3287_AnnexA_Release_version.frx",
               "PathToDocTemplateFile": "/Doc/10_Poverka3287_AnnexA_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3287.json"
             },
@@ -1272,7 +1289,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",

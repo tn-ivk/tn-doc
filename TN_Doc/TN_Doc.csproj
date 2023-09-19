@@ -16,6 +16,10 @@
     <None Update="prutils\winprutil.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Remove="Doc\ActParty_MI3532(19).frx" />
+    <Content Include="Doc\ActParty_MI3532(19).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
