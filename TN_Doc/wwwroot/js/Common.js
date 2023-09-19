@@ -1219,7 +1219,7 @@ function EditSelectedUser(itemBtn, rowItem, itemId) {
         rowMap[6] = "text";
         rowMap[7] = "text";
         ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-        ConvertEditRowToStableRow(rowItem, rowMap,false)
+        ConvertEditRowToStableRow(rowItem, rowMap, false)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
         RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
@@ -1262,7 +1262,7 @@ function EditSelectedLicences(itemBtn, rowItem, itemId) {
         if (!ValidateEditRow(rowItem, rowMap))
             return;
         ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-        ConvertEditRowToStableRow(rowItem, rowMap,false)
+        ConvertEditRowToStableRow(rowItem, rowMap, false)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
         RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
@@ -1739,28 +1739,45 @@ function AddSaveButtonHandler() {
         DisableAllElementToDirEdit();
         RemoveClassToElement('.modal-footer> .btn > i', 'd-none')
         AddClassToElement('.modal-footer> .btn > label', 'd-none')
+        try {
+            $.ajax({
+                async: false,
+                url: dictFetchOptions.setUrlDir,
+                type: dictFetchOptions.setMethod,
+                contentType: 'application/json; charset=UTF-8',
+                data: JSON.stringify({
+                    dirJsonRaw: JSON.stringify(appDictionaries)
+                }),
+                success: function () {
+                    ReRenderTable();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.error(thrownError)
+                    appDictionaries = {};
+                },
+            });
 
-        $.ajax({
-            async: false,
-            url: dictFetchOptions.setUrlDir,
-            type: dictFetchOptions.setMethod,
-            contentType: 'application/json; charset=UTF-8',
-            data: JSON.stringify({
-                dirJsonRaw: JSON.stringify(appDictionaries)
-            }),
-            success: function () {
-                ReRenderTable();
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                console.error(thrownError)
-                appDictionaries = {};
-            },
-            complete: function () {
-                RemoveClassToElement('.modal-footer> .btn > label', 'd-none')
-                AddClassToElement('.modal-footer> .btn > i', 'd-none')
-                EnableAllElementToDirEdit();
-            }
-        });
+            $.ajax({
+                async: false,
+                url: dictFetchOptions.setQpCfg,
+                type: dictFetchOptions.setMethod,
+                contentType: 'application/json; charset=UTF-8',
+                data: JSON.stringify({
+                    qpCfgJsonRaw: JSON.stringify(qpCfgsDictionaries)
+                }),
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.error(thrownError)
+                    qpCfgsDictionaries = {};
+                },
+
+            });
+        } 
+        finally
+        {
+            RemoveClassToElement('.modal-footer> .btn > label', 'd-none')
+            AddClassToElement('.modal-footer> .btn > i', 'd-none')
+            EnableAllElementToDirEdit();
+        }
     })
 }
 
@@ -2040,7 +2057,7 @@ function _editQpMethodBtnHandler(event) {
     } else {
         if (!ValidateEditRow(row, rowMap))
             return;
-        ConvertEditRowToStableRow(row, rowMap,true)
+        ConvertEditRowToStableRow(row, rowMap, true)
         ChangeButtonIcon(item, 'fa-lock', 'fa-unlock');
         RemoveClassToElement('#qp-list', 'disabled-item');
         RemoveClassToElement('.modal-header', 'disabled-item');

@@ -165,7 +165,7 @@ namespace TN_Doc.Models.Services
                 var fileInfo = new FileInfo(Directory.GetCurrentDirectory() + qpi["EditConfigFilePath"]!);
                 FileNotFoundThrowExceptionHelper(fileInfo);
                 var jObject = JObject.Parse(File.ReadAllText(fileInfo.FullName));
-                jObject["Methods"]!.Replace(qpi["Methods"]!);
+                jObject["Methods"]!.Replace(qpi["Methods"]!);1
                 jObject["Parameters"]!.Replace(qpi["Parameters"]!);
                 File.WriteAllText(fileInfo.FullName, jObject.ToString(), Encoding.Default);
             }
