@@ -1219,7 +1219,7 @@ function EditSelectedUser(itemBtn, rowItem, itemId) {
         rowMap[6] = "text";
         rowMap[7] = "text";
         ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-        ConvertEditRowToStableRow(rowItem, rowMap)
+        ConvertEditRowToStableRow(rowItem, rowMap,false)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
         RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
@@ -1262,7 +1262,7 @@ function EditSelectedLicences(itemBtn, rowItem, itemId) {
         if (!ValidateEditRow(rowItem, rowMap))
             return;
         ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-        ConvertEditRowToStableRow(rowItem, rowMap)
+        ConvertEditRowToStableRow(rowItem, rowMap,false)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
         RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
@@ -1385,12 +1385,16 @@ function ChangeButtonIcon(itemBtn, newClass, oldClass) {
 /*
 * Конверитирование ячейки редактирования в ячейку стабильную 
 */
-function ConvertEditRowToStableRow(row, rowMap) {
+function ConvertEditRowToStableRow(row, rowMap, isPassportTable) {
     let cells = row.querySelectorAll('td');
     let usersGroupArray = appDictionaries['UsersGroup'];
     let licensesArray = appDictionaries['Licenses'];
-    let qpMethodsArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Methods'];
-    let qpParametersArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Parameters'];
+    let qpMethodsArray;
+    let qpParametersArray;
+    if (isPassportTable) {
+        qpMethodsArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Methods'];
+        qpParametersArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Parameters'];
+    }
     for (let i = 0; i < cells.length; i++) {
         ConvertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, qpMethodsArray, qpParametersArray);
     }
@@ -2036,7 +2040,7 @@ function _editQpMethodBtnHandler(event) {
     } else {
         if (!ValidateEditRow(row, rowMap))
             return;
-        ConvertEditRowToStableRow(row, rowMap)
+        ConvertEditRowToStableRow(row, rowMap,true)
         ChangeButtonIcon(item, 'fa-lock', 'fa-unlock');
         RemoveClassToElement('#qp-list', 'disabled-item');
         RemoveClassToElement('.modal-header', 'disabled-item');
@@ -2049,31 +2053,26 @@ function _editQpMethodBtnHandler(event) {
 }
 
 function _applyQpMethodsChanged(rowItem, itemId, qpId) {
-    console.log(rowItem)
-    console.log(itemId)
-    console.log(qpId)
-
-
     if (!rowItem || !itemId)
         return;
-    
     if (qpId === undefined)
         return;
-
-
-    console.log('start')
-
     let methodIndex = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].findIndex(item => item['Id'] === itemId);
     if (methodIndex < 0)
         return;
     let cells = rowItem.cells;
     let updatedObject = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"][methodIndex];
-
     updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
     updatedObject['Name'] = cells[2].childNodes[0].textContent;
-    updatedObject['IdParameter'] = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[3].childNodes[0].textContent)[0]['Id'];
+    let parameter = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[3].childNodes[0].textContent)[0];
+    if (parameter) {
+        updatedObject['IdParameter'] = parameter['Id'];
+    } else {
+        updatedObject['IdParameter'] = 0;
+    }
+
     updatedObject['LimitValueActivate'] = cells[4].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['LimitValue'] = Number.parseFloat(cells[5].childNodes[0].textContent.replaceAll(',','.'));
+    updatedObject['LimitValue'] = Number.parseFloat(cells[5].childNodes[0].textContent.replaceAll(',', '.'));
 
     let msg = cells[6].childNodes[0].textContent;
     if (!msg) {
