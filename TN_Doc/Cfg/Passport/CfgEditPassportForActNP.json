@@ -3,9 +3,9 @@
     {
       "Id": 2,
       "Use": true,
-      "IdParameter": 8,
+      "IdParameter": 13,
       "Name": "asdasd",
-      "LimitValueActivate": true,
+      "LimitValueActivate": false,
       "LimitValue": 123123,
       "LimitValueString": "asdasd"
     }
