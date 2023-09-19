@@ -32,12 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Doc\03_KMH_PP_Areom_MI_3532-2015_2022-04-05_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

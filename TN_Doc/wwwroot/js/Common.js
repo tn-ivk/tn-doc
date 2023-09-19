@@ -1460,9 +1460,7 @@ function ConvertEditCellToStableCell(cell, type, usersGroupArray, licensesArray,
             break;
         case 'number':
             let newNumNode = document.createTextNode(previewNode.value.replaceAll('.', ','));
-            console.log(newNumNode)
             cell.replaceChild(newNumNode, cell.childNodes[0])
-            console.log(cell)
             break;
         default:
             break
@@ -1586,14 +1584,10 @@ function ConvertStableCellToEditCell(cell, type) {
             break;
         case 'number':
             let prNumber = cell.innerText;
-            console.log(prNumber);
             newElement.type = 'number';
-            console.log(prNumber.replaceAll(',', '.'));
             newElement.value = prNumber ? Number.parseFloat(prNumber.replaceAll(',', '.')) : '0.0';
-            console.log(newElement);
             if (previewNode) {
                 cell.replaceChild(newElement, previewNode)
-                console.log(newElement);
             } else
                 cell.append(newElement);
             break;
@@ -1735,10 +1729,10 @@ function ReRenderTable() {
 
 /* Добавление обработчика события*/
 function AddSaveButtonHandler() {
-    document.querySelector('.modal-footer > .save-btn').addEventListener('click', function (e) {
+    document.querySelector('.modal-header > .close-menu > .save-btn').addEventListener('click', function (e) {
         DisableAllElementToDirEdit();
-        RemoveClassToElement('.modal-footer> .btn > i', 'd-none')
-        AddClassToElement('.modal-footer> .btn > label', 'd-none')
+        RemoveClassToElement('.modal-header>.close-menu >.btn > i > .fa-spin', 'd-none')
+        AddClassToElement('.modal-header>.close-menu >.btn > i > .fa-flooppy', 'd-none')
         try {
             $.ajax({
                 async: false,
@@ -1771,11 +1765,9 @@ function AddSaveButtonHandler() {
                 },
 
             });
-        } 
-        finally
-        {
-            RemoveClassToElement('.modal-footer> .btn > label', 'd-none')
-            AddClassToElement('.modal-footer> .btn > i', 'd-none')
+        } finally {
+            RemoveClassToElement('.modal-header>.close-menu> .btn > i > .fa-flooppy', 'd-none')
+            AddClassToElement('.modal-header>.close-menu> .btn >  i > .fa-spin', 'd-none')
             EnableAllElementToDirEdit();
         }
     })
@@ -1786,14 +1778,14 @@ function AddSaveButtonHandler() {
 function DisableAllElementToDirEdit() {
     AddClassToElement('.close', 'disabled-item');
     AddClassToElement('.modal-body', 'disabled-item');
-    AddClassToElement('.modal-footer', 'disabled-item');
+    // AddClassToElement('.modal-footer', 'disabled-item');
     AddClassToElement('.modal-header', 'disabled-item');
 }
 
 /* Включение активности у всех элементов у компонента редактирования справочников*/
 function EnableAllElementToDirEdit() {
     RemoveClassToElement('.modal-body', 'disabled-item')
-    RemoveClassToElement('.modal-footer', 'disabled-item');
+    // RemoveClassToElement('.modal-footer', 'disabled-item');
     RemoveClassToElement('.close', 'disabled-item');
     RemoveClassToElement('.modal-header', 'disabled-item');
 }
@@ -1858,6 +1850,7 @@ function RenderQpConfigs() {
         qpList.append(liItem)
         let mainBaseDiv = RenderMainDivForQpTables(counter);
         RenderQpConfigsMethodsTable(counter, qp, mainBaseDiv)
+
         //todo: повесить обработчки на ul  а не на каждую li
         liItem.addEventListener("click", function (e) {
             let element = e.target;
@@ -1906,8 +1899,91 @@ function RenderMainDivForQpTables(id) {
     let tbScrollDiv = document.createElement('div');
     tbScrollDiv.classList.add('table-content');
     tbContainerDiv.appendChild(tbScrollDiv)
+    tbContainerDiv.appendChild(_addBtnToAddQp(id));
     return tbScrollDiv;
 }
+
+
+function _addBtnToAddQp(qpId) {
+    let btnDiv = document.createElement('div');
+    btnDiv.classList.add('table-bottom-menu');
+
+    let btn = document.createElement('button');
+    btn.classList.add('btn', 'btn-primary', 'default-btn-size', 'add-qp-btn');
+    btn.dataset.qpId = qpId
+    btnDiv.appendChild(btn);
+
+
+    btn.addEventListener('click', function (event) {
+        let item = event.target;
+        if (event.target.tagName === "I" || event.target.tagName === "LABEL") {
+            item = event.target.closest('button');
+        }
+        let qpId = item.dataset.qpId;
+        let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0
+            ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
+                return accumId > curId ? accumId : curId;
+            }) ['Id'] : 1;
+        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
+            Id: maxId + 1,
+            Use: false,
+            IdParameter: 0,
+            Name: '',
+            LimitValueActivate: false,
+            LimitValue: 0,
+            LimitValueString: ''
+        });
+
+        _clearQpsConfig();
+        RenderQpConfigs();
+
+        for (let liItem of document.querySelectorAll('#qp-list>li')) {
+            if (liItem.classList.contains('active')) {
+                liItem.classList.remove('active');
+            }
+        }
+
+        for (let qpDirItem of document.querySelectorAll('.qp-dir-item')) {
+            if (!qpDirItem.classList.contains('d-none')) {
+                qpDirItem.classList.add('d-none');
+            }
+        }
+
+        let li = document.querySelector('li[data-target="' + '#qpId' + item.dataset.qpId + '"]');
+        li.classList.add('active');
+        document.querySelector(li.dataset.target).classList.remove('d-none');
+
+        console.log(li.dataset.target + '> .table-container > .table-content > table');
+        ScrollToBottomTable(li.dataset.target + ' > .table-container > .table-content');
+        _editQpMethod(
+            document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild,
+            document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild.querySelector('.edit-methods-btn')
+        )
+    });
+    
+    let img = document.createElement('i');
+    img.classList.add('fa', 'fa-plus');
+    img.ariaHidden = 'true';
+    btn.appendChild(img);
+    let lbl = document.createElement('label');
+    lbl.appendChild(document.createTextNode(' Добавить'));
+    btn.appendChild(lbl);
+    return btnDiv;
+}
+
+
+/*
+    Очистка экрана отобрадения методов паспортов качества
+*/
+function _clearQpsConfig() {
+    for (let child of document.querySelectorAll('#qp-list>li')) {
+        child.remove();
+    }
+    for (let child of document.querySelectorAll('.qp-dir-item')) {
+        child.remove();
+    }
+}
+
 
 /*
 * Рендеринг методов паспортов качества 
@@ -2033,6 +2109,11 @@ function _deleteQpMethodsBtnHandler(event) {
 function _editQpMethodBtnHandler(event) {
     let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
     let row = item.closest('tr');
+    _editQpMethod(row, item);
+}
+
+
+function _editQpMethod(row, itemBtn,) {
     let rowMap = {
         0: 'ignore',
         1: 'bool',
@@ -2044,28 +2125,28 @@ function _editQpMethodBtnHandler(event) {
         7: 'ignore'
     }
 
-    if (item.dataset.mode === 'stable') {
-        ChangeButtonIcon(item, 'fa-unlock', 'fa-lock');
+    if (itemBtn.dataset.mode === 'stable') {
+        ChangeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
         AddClassToElement('#qp-list', 'disabled-item');
         AddClassToElement('.modal-header', 'disabled-item');
         AddClassToElement('.save-btn', 'disabled-item');
         AddClassToElement('row', 'disabled-item');
         AddClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
-        _disableOtherRowsInTable(item.closest('table'), Number(row.dataset.id));
+        _disableOtherRowsInTable(itemBtn.closest('table'), Number(row.dataset.id));
         ConvertStableRowToEditRow(row, rowMap);
-        item.dataset.mode = 'edit';
+        itemBtn.dataset.mode = 'edit';
     } else {
         if (!ValidateEditRow(row, rowMap))
             return;
         ConvertEditRowToStableRow(row, rowMap, true)
-        ChangeButtonIcon(item, 'fa-lock', 'fa-unlock');
+        ChangeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
         RemoveClassToElement('#qp-list', 'disabled-item');
         RemoveClassToElement('.modal-header', 'disabled-item');
         RemoveClassToElement('.save-btn', 'disabled-item');
         RemoveClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
-        _enableOtherRowsInTable(item.closest('table'), Number(item.closest('tr').dataset.id));
-        _applyQpMethodsChanged(row, Number(row.dataset.id), Number(item.closest('table').dataset.qpId));
-        item.dataset.mode = 'stable';
+        _enableOtherRowsInTable(itemBtn.closest('table'), Number(itemBtn.closest('tr').dataset.id));
+        _applyQpMethodsChanged(row, Number(row.dataset.id), Number(itemBtn.closest('table').dataset.qpId));
+        itemBtn.dataset.mode = 'stable';
     }
 }
 

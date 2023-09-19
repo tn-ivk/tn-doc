@@ -1,4 +1,4 @@
-﻿{
+{
   "Methods": [
     {
       "Id": 1,
@@ -28,7 +28,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":4,
+      "Id": 4,
       "Use": true,
       "IdParameter": 4,
       "Name": "ФР.1.29.2020.36270",
@@ -37,7 +37,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":5,
+      "Id": 5,
       "Use": true,
       "IdParameter": 4,
       "Name": "ФР.1.31.2017.27252",
@@ -46,7 +46,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":6,
+      "Id": 6,
       "Use": true,
       "IdParameter": 4,
       "Name": "ФР.1.31.2017.27250",
@@ -55,7 +55,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":7,
+      "Id": 7,
       "Use": true,
       "IdParameter": 5,
       "Name": "ФР.1.29.2020.36270",
@@ -64,7 +64,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":8,
+      "Id": 8,
       "Use": true,
       "IdParameter": 5,
       "Name": "ФР.1.31.2017.27252",
@@ -73,7 +73,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":9,
+      "Id": 9,
       "Use": true,
       "IdParameter": 5,
       "Name": "ФР.1.31.2017.27250",
@@ -82,7 +82,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":10,
+      "Id": 10,
       "Use": true,
       "IdParameter": 6,
       "Name": "ГОСТ 2477-2014",
@@ -91,7 +91,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":11,
+      "Id": 11,
       "Use": true,
       "IdParameter": 7,
       "Name": "ГОСТ 21534-2021,<br>метод А, часть 1",
@@ -100,7 +100,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":12,
+      "Id": 12,
       "Use": true,
       "IdParameter": 8,
       "Name": "ГОСТ 21534-2021,<br>метод А, часть 1",
@@ -109,7 +109,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":13,
+      "Id": 13,
       "Use": true,
       "IdParameter": 9,
       "Name": "ГОСТ 6370-83",
@@ -118,7 +118,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":14,
+      "Id": 14,
       "Use": true,
       "IdParameter": 10,
       "Name": "ГОСТ Р 51947-2002",
@@ -127,7 +127,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":15,
+      "Id": 15,
       "Use": true,
       "IdParameter": 11,
       "Name": "ГОСТ 1756-2000",
@@ -136,7 +136,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":16,
+      "Id": 16,
       "Use": true,
       "IdParameter": 12,
       "Name": "ГОСТ 1756-2000",
@@ -145,7 +145,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":17,
+      "Id": 17,
       "Use": true,
       "IdParameter": 13,
       "Name": "ГОСТ 2177-99,<br>метод Б",
@@ -154,7 +154,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":18,
+      "Id": 18,
       "Use": true,
       "IdParameter": 14,
       "Name": "ГОСТ 2177-99,<br>метод Б",
@@ -163,7 +163,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":19,
+      "Id": 19,
       "Use": true,
       "IdParameter": 16,
       "Name": "ГОСТ 11851-85,<br>метод А",
@@ -172,7 +172,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":20,
+      "Id": 20,
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ Р 50802-2021",
@@ -181,7 +181,7 @@
       "LimitValueString": ""
     },
     {
-      "Id":21,
+      "Id": 21,
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ Р 50802-2021",
@@ -190,13 +190,22 @@
       "LimitValueString": ""
     },
     {
-      "Id":22,
+      "Id": 22,
       "Use": true,
       "IdParameter": 19,
       "Name": "ASTM D4929-22,<br>процедура С",
       "LimitValueActivate": true,
-      "LimitValue": 5.0,
+      "LimitValue": 5,
       "LimitValueString": "менее 5.0"
+    },
+    {
+      "Id": 23,
+      "Use": true,
+      "IdParameter": 0,
+      "Name": "ТЕСТ- гост",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
     }
   ],
   "Parameters": [
@@ -334,30 +343,6 @@
       "Edit": true
     }
   ],
-  /*
-<input type="button">
-<input type="checkbox">
-<input type="color">
-<input type="date">
-<input type="datetime-local">
-<input type="email">
-<input type="file">
-<input type="hidden">
-<input type="image">
-<input type="month">
-<input type="number">
-<input type="password">
-<input type="radio">
-<input type="range">
-<input type="reset">
-<input type="search">
-<input type="submit">
-<input type="tel">
-<input type="text">
-<input type="time">
-<input type="url">
-<input type="week">
-  */
   "AdditionalInfo": [
     {
       "Id": 0,
