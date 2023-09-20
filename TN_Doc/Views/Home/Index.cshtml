@@ -1,11 +1,4 @@
-﻿@using System.Data
-@using FastReport.Web;
-@*@model TN_Doc.Models.Home.ModelReport*@
-@*@model TN.DocData.CfgApp*@
-
-@*@model (string dt1, string dt2)*@
-
-@{
+﻿@{
     ViewData["Title"] = "Модуль - документы";
 }
 <body>
@@ -36,17 +29,14 @@
                     <td>
                         <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
                         <br>
-                        <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">                      
+                        <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
                     </td>
                 </tr>
             </table>
         </div>
 
         <div class="menu-item">
-               <button data-toggle="modal" data-target="#modal-window">Справочники</button>
-            @* <button class="btn btn-outline-primary" data-toggle="modal" data-target="#modal-window"> *@
-            @*     <i class="fa fa-book big-icon" aria-hidden="true"></i> *@
-            @* </button> *@
+            <button data-toggle="modal" data-target="#modal-window">Справочники</button>
         </div>
 
     </div>
@@ -61,57 +51,31 @@
             <th>Описание</th>
         </tr>
         </thead>
+        <tbody>
+        <tr>
+            <td>dt</td>
+            <td>description</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
-            <tbody>
-                <tr>
-                    <td>dt</td>
-                    <td>description</td>
-                </tr>
-            </tbody>        
-        
-            @*<tfoot>
-                <tr>
-                    <th>id</th>
-                    <th>strBegin</th>
-
-                </tr>
-            </tfoot>*@
-        </table> 
-    </div>
-
-    <div class="Doc">
-        <table>
-            <tr>
-
-@*              <td align="left"><select id="ComboboxTemplateDoc">Форма документа</select></td>
-                <td align="left"><select id="ComboboxProtocolNumber">Номер протокола</select></td>
-                <td align="right"><select id="ComboboxExportFormat">Экспорт</select></td>
-                <td align="right"><input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()"></td>
-                <td align="right"><select id="ComboboxPrinterName">Принтер</select></td>
-                <td align="right"><input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()"></td>*@
-
-                <td align="left">
-                    <select id="ComboboxTemplateDoc">Форма документа</select>
-                    <select id="ComboboxProtocolNumber">Номер протокола</select>
-                </td>
-                
-                <td align="right">
-
-@*                    <input id="ButtonElis" type="button" value="Получить данные из ЕЛИС" onclick="GetDataElis()" hidden>
-*@
-                    <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis">
-                        Получить данные из ЕЛИС
-                    </button>
-
-
-                    <select id="ComboboxExportFormat">Экспорт</select>
-                    <input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
-                    <select id="ComboboxPrinterName">Принтер</select>
-                    <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
-
-                </td>
-
-
+<div class="Doc">
+    <table>
+        <tr>
+            <td align="left">
+                <select id="ComboboxTemplateDoc">Форма документа</select>
+                <select id="ComboboxProtocolNumber">Номер протокола</select>
+            </td>
+            <td align="right">
+                <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis">
+                    Получить данные из ЕЛИС
+                </button>
+                <select id="ComboboxExportFormat">Экспорт</select>
+                <input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
+                <select id="ComboboxPrinterName">Принтер</select>
+                <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
+            </td>
         </tr>
         <tr>
             <td colspan="6">
@@ -119,33 +83,47 @@
             </td>
         </tr>
     </table>
+
 </div>
-
-
-    <div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
+<div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-dir-editor-width" role="document">
         <div class="modal-content modal-dir-editor-height">
-
             <div class="modal-header">
-                <h5 class="modal-title">Справочники</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                
+                <ul class="nav nav-pills nav-fill tabs-selector">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-type="#main-dir-page" type="button">Персонал</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-type="#qp-dir-page" type="button">Методы испытаний</a>
+                    </li>
+                </ul>
+
+
+                <div class="close-menu" aria-label="Close">
+                    <button type="button" class="btn btn-outline-success save-btn close-menu-item">
+                        <i class="fa fa-spinner fa-spin d-none" aria-hidden="true"></i>
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary close-menu-item" data-dismiss="modal">
+                        <i class="fa  fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+
             </div>
 
             <div class="modal-body">
                 <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-2">
+                    <div class="row tab-item" id="main-dir-page">
+                        <div class="col-3">
                             <ul class="list-group" id="dictionaries-list">
                                 <li class="list-group-item active" data-type="#user-group"> Группы пользователей</li>
                                 <li class="list-group-item" data-type="#licences"> Доверенности</li>
                                 <li class="list-group-item" data-type="#users"> Пользователи</li>
                             </ul>
-
                         </div>
-
-                        <div class="col-10">
+                        <div class="col-9">
                             <div class="dictionaries">
                                 <div class="dir-item" id="user-group">
                                     <div class="table-container">
@@ -221,80 +199,49 @@
                                 </div>
                             </div>
                         </div>
+
+                    </div>
+                    <div class="tab-item row d-none" id="qp-dir-page">
+                        <div class="col-3">
+                            <ul class="list-group" id="qp-list">
+                            </ul>
+                        </div>
+                        <div class="col-9">
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary save-btn default-btn-size">
-                    <i class="fa fa-spinner fa-spin d-none" aria-hidden="true"></i>
-                    <label>Сохранить</label>
-                </button>
             </div>
         </div>
     </div>
 </div>
 
 
+<div class="modal fade" id="elis" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Получение данных из ЕЛИС</h5>
 
-
-@*    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        </div>
-    </div>*@
+            <div class="modal-body">
 
+                <h6 class="modal-title" id="info"></h6>
 
-@*    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>Holy guacamole!</strong> You should check in on some of those fields below.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>*@
+                <br/>
 
+                <button type="button" class="btn btn-primary" onclick="GetElisData()">Запросить данные</button>
 
-    <div class="modal fade" id="elis" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Получение данных из ЕЛИС</h5>                    
-                    
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    
-                    <h6 class="modal-title" id="info"></h6>
-
-                    <br />
-
-                    <button type="button" class="btn btn-primary" onclick="GetElisData()">Запросить данные</button>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary">Вставить</button>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-primary">Вставить</button>
             </div>
         </div>
     </div>
-
-
+</div>
 
 
 <script>   

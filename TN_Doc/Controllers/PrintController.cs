@@ -28,7 +28,7 @@ namespace TN_Doc.Controllers
         /// <param name="printService">Сервис взаимодействия с принтерами</param>
         /// <exception cref="ArgumentNullException">При отсутствие с сервиса взаимодейтсвия с принтерами</exception>
         public PrintController(PrinterService printService) =>
-            _service = printService ?? throw new ArgumentNullException(nameof(printService), "Отсутствует сервис взаимодействия с принтером");
+            _service = printService ?? throw new ArgumentNullException(nameof(printService), @"Отсутствует сервис взаимодействия с принтером");
 
         /// <summary>
         /// Получение доступных принтеров в системе

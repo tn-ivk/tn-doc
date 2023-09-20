@@ -358,7 +358,7 @@ namespace FastReport
       </TableObject>
     </DataBand>
     <DataBand Name="DataBandTableResults" Top="238.36" Width="1047.06" Height="130.41" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableResults" Top="7.56" Width="879.41" Height="122.85" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TableResults_ManualBuild">
+      <TableObject Name="TableResults" Top="7.56" Width="926.66" Height="122.85" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TableResults_ManualBuild">
         <TableColumn Name="Column146" Width="56.56"/>
         <TableColumn Name="Column147" Width="58.81"/>
         <TableColumn Name="Column148" Width="65.21"/>

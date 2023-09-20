@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -12,28 +13,39 @@ namespace TN_Doc.Models.Services
     /// </summary>
     public sealed class DirectoryService : IDisposable
     {
-        private readonly FileInfo _mainCfgFile;
         private readonly object _lock;
         private string _cacheDirectoriesJson;
         private bool _isValidCache;
         private FileSystemWatcher _fileWatcher;
+        private readonly FileInfo _mainCfgFile;
+        private readonly FileInfo _mainAppCfgFile;
 
+        // ReSharper disable once NotAccessedField.Local
+        private readonly ILogger<DirectoryService> _logger;
 
         /// <summary>
         /// Инициализация сервиса работы со словарями
         /// </summary>
-        /// <param name="mainCfgFilePath">Путь до главной конфы приложения</param>
+        /// <param name="mainCfgFile">Путь до конфы приложения</param>
+        /// <param name="mainAppCfgFile">Путь до главной конфы приложения</param>
+        /// <param name="dirName">Название папки с конфигурациями</param>
         /// <param name="logger">Журнал логирования приложения</param>
         /// <exception cref="ArgumentNullException">При отсутствие пути до главной конфигурации приложения</exception>
-        public DirectoryService(string mainCfgFilePath, ILogger<DirectoryService> logger = null)
+        public DirectoryService(string mainCfgFile, string mainAppCfgFile, string dirName, ILogger<DirectoryService> logger = null)
         {
-            if (string.IsNullOrEmpty(mainCfgFilePath))
-                throw new ArgumentNullException(nameof(mainCfgFilePath), "Отсутствует путь главной конфигурации");
-            _mainCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, mainCfgFilePath));
+            if (string.IsNullOrEmpty(mainCfgFile))
+                throw new ArgumentNullException(nameof(mainCfgFile), @"Отсутствует путь главной конфигурации");
+            if (string.IsNullOrEmpty(mainAppCfgFile))
+                throw new ArgumentNullException(nameof(mainAppCfgFile), @"Отсутствует путь главной конфигурации приложения");
+
+            _mainCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, dirName, mainCfgFile));
+            _mainAppCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, dirName, mainAppCfgFile));
             FileNotFoundThrowExceptionHelper(_mainCfgFile);
+            FileNotFoundThrowExceptionHelper(_mainAppCfgFile);
             _cacheDirectoriesJson = null;
             _lock = new object();
             _fileWatcher = CreateCfgFileWatcher();
+            _logger = logger;
         }
 
         /// <summary>
@@ -65,7 +77,7 @@ namespace TN_Doc.Models.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidDataException">При отсутствие словарей на сервере</exception>
-        public async Task<string> GetDirectoriesJson()
+        public async Task<string> GetDirectoriesJsonAsync()
         {
             return await Task.Run(() =>
             {
@@ -90,7 +102,7 @@ namespace TN_Doc.Models.Services
         /// Установка нового значения словарей в формате JSON на сервере. Перезаписывается конфигурация приложения
         /// </summary>
         /// <param name="json">Новый JSON словарей</param>
-        public async Task SetDirectoriesFromJson(string json)
+        public async Task SetDirectoriesFromJsonAsync(string json)
         {
             await Task.Run(() =>
             {
@@ -105,6 +117,29 @@ namespace TN_Doc.Models.Services
         }
 
         /// <summary>
+        /// Установка патча Паспортов качества 
+        /// </summary>
+        /// <param name="json">Json который необходимо применить</param>
+        public async Task SetQpConfigFromJsonAsync(string json)
+        {
+            await Task.Run(() =>
+            {
+                var modifJson = json;
+                lock (_lock)
+                {
+                    WritePatchesQpToJson(modifJson);
+                }
+
+            });
+        }
+        
+        /// <summary>
+        /// Получение конфигурации паспортов качества продуктов
+        /// </summary>
+        /// <returns>Конфигурации/справочников по паспортам качества</returns>
+        public Task<string> GetQualityPassportConfigs() => Task.Run(() => ExtractQPMethodAndParameters(ExtractPassportNameForDeviceCfg()).ToString());
+        
+        /// <summary>
         /// Запись новых справочников в конфигурацию приложения
         /// </summary>
         /// <param name="modifJson">Модифицированный JSON для записи в файл</param>
@@ -118,6 +153,25 @@ namespace TN_Doc.Models.Services
         }
 
         /// <summary>
+        ///  Запись патча паспортов качества
+        /// </summary>
+        /// <param name="modifQpJson">Модифицированный Json паспортов качества</param>
+        /// <exception cref="FileNotFoundException">Гененерируется при отсутствие файла</exception>
+        private void WritePatchesQpToJson(string modifQpJson)
+        {
+            var modifJo = JObject.Parse(modifQpJson);
+            foreach (var qpi in modifJo["QpsInfo"]!)
+            {
+                var fileInfo = new FileInfo(Directory.GetCurrentDirectory() + qpi["EditConfigFilePath"]!);
+                FileNotFoundThrowExceptionHelper(fileInfo);
+                var jObject = JObject.Parse(File.ReadAllText(fileInfo.FullName));
+                jObject["Methods"]!.Replace(qpi["Methods"]!);
+                jObject["Parameters"]!.Replace(qpi["Parameters"]!);
+                File.WriteAllText(fileInfo.FullName, jObject.ToString(), Encoding.Default);
+            }
+        }
+        
+        /// <summary>
         /// Вспомогательный метод проверки наличия конфигурационного файла
         /// </summary>
         /// <param name="info">Информация о файле</param>
@@ -126,6 +180,56 @@ namespace TN_Doc.Models.Services
         {
             if (!info.Exists)
                 throw new FileNotFoundException($"Отсутствует файл с главной конфигурацией: {info.FullName}");
+        }
+
+        /// <summary>
+        /// Извлечение данных параметров и методов для каждого паспорта
+        /// </summary>
+        /// <param name="qpsInfo">Информация о девайсах</param>
+        /// <returns>Инфомация о всех паспортах качества для каждого продукта</returns>
+        private JObject ExtractQPMethodAndParameters(JObject qpsInfo)
+        {
+
+            foreach (var qps in qpsInfo["QpsInfo"])
+            {
+                var cfgFile = new FileInfo(Directory.GetCurrentDirectory() + qps["EditConfigFilePath"]!);
+                FileNotFoundThrowExceptionHelper(cfgFile);
+                var fullPassCfgJson = JObject.Parse(File.ReadAllText(cfgFile.FullName));
+                qps["Methods"] = fullPassCfgJson["Methods"];
+                qps["Parameters"] = fullPassCfgJson["Parameters"];
+            }
+            return qpsInfo;
+        }
+
+        /// <summary>
+        ///  Получение информации о паспортах на девайсах
+        /// </summary>
+        /// <returns>JObject с информацией об используемых паспортах на них</returns>
+        /// <exception cref="FileNotFoundException">При отсутствие файла с информацией о девайсах</exception>
+        private JObject ExtractPassportNameForDeviceCfg()
+        {
+            FileNotFoundThrowExceptionHelper(_mainAppCfgFile);
+            var cfgAppJson = JObject.Parse(File.ReadAllText(_mainAppCfgFile.FullName));
+            var passports = new JArray();
+            var resultJo = new JObject();
+            resultJo.Add("QpsInfo", passports);
+            foreach (var deviceJson in cfgAppJson["Devices"]!)
+            {
+                foreach (var doc in deviceJson["Docs"]!.Where(item => item["Name"].ToString() == "Паспорта"))
+                {
+                    foreach (var d in doc["TemplateDocs"]!.Where(item => item["Use"].ToObject<bool>()))
+                    {
+                        if(passports.Any(passItem => passItem["EditConfigFilePath"].ToString() == d["PathToDocEditConfigFile"]!.ToString()))
+                            continue;
+                        passports.Add(
+                            new JObject(
+                                new JProperty("EditConfigFilePath",d["PathToDocEditConfigFile"]),
+                                new JProperty("Name", d["Name"]))
+                            );
+                    }
+                }
+            }
+            return resultJo;
         }
 
         /// <summary>

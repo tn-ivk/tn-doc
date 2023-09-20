@@ -5,22 +5,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-
 using TN_Doc.Models;
 using TN_Doc.Models.Home;
 using FastReport.Web;
 using System.IO;
 using System.Threading;
-
 using System.Text;
-
 using Newtonsoft.Json;
 using System.Collections;
 using Newtonsoft.Json.Linq;
-using System.Data;
-using TN_Doc.Class;
-
-using System.Drawing.Printing;
 using TN.Doc;
 using TN.DocData;
 
@@ -417,11 +410,11 @@ namespace TN_Doc.Controllers
         {
             return DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
         }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        //
+        // public IActionResult Privacy()
+        // {
+        //     return View();
+        // }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 

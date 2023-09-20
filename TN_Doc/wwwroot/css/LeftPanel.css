@@ -99,11 +99,12 @@
 
 .modal-dir-editor-height {
     max-height: 80%;
-    min-height: 600px;
+    min-height: 800px;
 }
 
+.qp-dir-item,
 .dir-item {
-    height: 600px;
+    height: 750px;
 }
 
 #not-selected {
@@ -115,7 +116,10 @@
 
 .user-group-table,
 .licences-table,
-.users-table {
+.users-table,
+.qp-method-table,
+.qp-params-table
+{
     position: relative;
     width: 100%;
     height: 100%;
@@ -137,10 +141,10 @@
 }
 
 .save-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 16px;
+  
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
 }
 
 .data-row {
@@ -161,6 +165,17 @@
     display: block;
     height: 100%;
 }
+
+.two-table-container {
+    display: flex;
+    height: 100%;
+}
+
+.table-container-part-50ph{
+    height: 50%;
+    overflow-y: auto;
+}
+
 
 .table-content {
     max-height: 90%;
@@ -187,42 +202,13 @@
 
 }
 
-/*.bExport {
-    background: url(Pictures/export.png) no-repeat 3px 1px;    
-}*/
-
-/*.bExport {
-    background-color: white;
-    color: black;
-    border: 2px solid #555555;
-}*/
-
-/*.bExport:hover {*/
-/*    background: url(../Pictures/export_wite.png) no-repeat;
-*/
-/*background-size: contain;
-background-color: #555555;
-color: white;
+.close-menu-item{
+    border-color: transparent;
+    font-size: 1.5rem;
+    margin: 2px 0px 2px 0px;
 }
 
-.bExport {*/
-/*    background: url(../Pictures/export_black.png) no-repeat;
-*/
-/*background-size: contain;
-background-color: white;
-border: 1px solid #555555;
-color: black;
-padding: 10px;
-text-align: center;
-text-decoration: none;
-display: inline-block;
-font-size: 16px;
-display: block;
-margin-left: auto;
-margin-right: auto;*/
-/*    margin: 4px 2px;
-*/
-/*transition-duration: 0.6s;
-cursor: pointer;
-}*/
-
+.close-menu{
+    display: flex;
+    justify-content: space-between;
+}

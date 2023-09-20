@@ -20,15 +20,12 @@ namespace TN_Doc.Extensions
         {
             if (IsWindows)
             {
-                Console.WriteLine("used windows printer");
                 services.AddTransient<AbsPrinter>((item)=>new WindowsPrinter());
             }
             else
             {
-                Console.WriteLine("used linux printer");
                 services.AddTransient<AbsPrinter>((item)=>new LinuxPrinter());
             }
-          
         }
 
         /// <summary>
@@ -46,9 +43,11 @@ namespace TN_Doc.Extensions
         {
             services.AddSingleton((provider) =>
             {
-                var cfgPath = cfg.GetValue<string>("CfgAppPath");
+                var cfgDirName = cfg.GetValue<string>("CfgDirPath");
+                var cfgPath = cfg.GetValue<string>("RelCfgName");
+                var cfgAppPath = cfg.GetValue<string>("RelCfgAppName");
                 var logger = provider.GetRequiredService<ILogger<DirectoryService>>();
-                return new DirectoryService(cfgPath, logger);
+                return new DirectoryService(cfgPath,cfgAppPath,cfgDirName, logger);
             });
         }
         
