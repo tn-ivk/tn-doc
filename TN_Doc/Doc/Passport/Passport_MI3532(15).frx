@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/06/2023 11:10:11" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/11/2023 10:24:37" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using FastReport;
 using FastReport.Data;
@@ -78,35 +78,35 @@ namespace FastReport
     private void DrawTablePassport()
     {
       //Заполняем колонку результат испытаний
-      RowTempResult[3].Text = $&quot;{JResult[&quot;TempResult&quot;]}&quot;; 
-      RowPressResult[3].Text = $&quot;{JResult[&quot;PressResult&quot;]}&quot;;
-      RowDensResult[3].Text = $&quot;{JResult[&quot;DensResult&quot;]}&quot;;
-      RowDens20Result[3].Text = $&quot;{JResult[&quot;Dens20Result&quot;]}&quot;;
-      RowDens15Result[3].Text = $&quot;{JResult[&quot;Dens15Result&quot;]}&quot;;
-      RowMassWaterFracResult[3].Text = $&quot;{JResult[&quot;MassWaterFracResult&quot;]}&quot;;
-      RowChloride_Salts[3].Text = $&quot;{JResult[&quot;Chloride_Salts&quot;][&quot;Concentration&quot;]} ({JResult[&quot;Chloride_Salts&quot;][&quot;MassFraction&quot;]})&quot;;
-      RowImpurity[3].Text = $&quot;{JResult[&quot;Impurity&quot;]}&quot;;
-      RowSulfurResult[3].Text = $&quot;{JResult[&quot;SulfurResult&quot;]}&quot;;
-      RowDNP[3].Text = $&quot;{JResult[&quot;DNP&quot;][&quot;kPa&quot;]} ({JResult[&quot;DNP&quot;][&quot;mercury_mm&quot;]})&quot;;
-      RowYield_fraction[3].Text = $&quot;{JResult[&quot;Yield_fraction_200&quot;]}\n{JResult[&quot;Yield_fraction_300&quot;]}\n{JResult[&quot;Yield_fraction_350&quot;]}&quot;;
-      RowMass_fraction_of_paraffin[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_paraffin&quot;]}&quot;;
+      RowTempResult[3].Text = $&quot;{JResult[&quot;TempResult&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowPressResult[3].Text = $&quot;{JResult[&quot;PressResult&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowDensResult[3].Text = $&quot;{JResult[&quot;DensResult&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowDens20Result[3].Text = $&quot;{JResult[&quot;Dens20Result&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowDens15Result[3].Text = $&quot;{JResult[&quot;Dens15Result&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowMassWaterFracResult[3].Text = $&quot;{JResult[&quot;MassWaterFracResult&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowChloride_Salts[3].Text = $&quot;{JResult[&quot;Chloride_Salts&quot;][&quot;Concentration&quot;]} ({JResult[&quot;Chloride_Salts&quot;][&quot;MassFraction&quot;]})&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowImpurity[3].Text = $&quot;{JResult[&quot;Impurity&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowSulfurResult[3].Text = $&quot;{JResult[&quot;SulfurResult&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowDNP[3].Text = $&quot;{JResult[&quot;DNP&quot;][&quot;kPa&quot;]} ({JResult[&quot;DNP&quot;][&quot;mercury_mm&quot;]})&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowYield_fraction[3].Text = $&quot;{JResult[&quot;Yield_fraction_200&quot;]}\n{JResult[&quot;Yield_fraction_300&quot;]}\n{JResult[&quot;Yield_fraction_350&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
+      RowMass_fraction_of_paraffin[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_paraffin&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
 
       float result;                          
       
       if (float.TryParse(JResult[&quot;Mass_fraction_of_hydrogen_sulfide&quot;].ToString().Replace('.',','), out result) &amp;&amp; result &lt; float.Parse(&quot;2,0&quot;))
         RowMass_fraction_of_hydrogen_sulfide[3].Text = $&quot;менее 2&quot;;
       else
-      RowMass_fraction_of_hydrogen_sulfide[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_hydrogen_sulfide&quot;]}&quot;;  
+      RowMass_fraction_of_hydrogen_sulfide[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_hydrogen_sulfide&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);
       
       if (float.TryParse(JResult[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;].ToString().Replace('.',','), out result) &amp;&amp; result &lt; float.Parse(&quot;4,0&quot;))
         RowMass_fraction_of_methyl_and_ethyl_mercaptan[3].Text = $&quot;менее 4&quot;;
       else
-        RowMass_fraction_of_methyl_and_ethyl_mercaptan[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;]}&quot;;  
+        RowMass_fraction_of_methyl_and_ethyl_mercaptan[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;); 
 
       
       if (float.TryParse(JResult[&quot;Mass_fraction_of_organic_chlorides&quot;].ToString().Replace('.',','), out result) &amp;&amp; result &lt; float.Parse(&quot;0,0&quot;))
         RowMass_fraction_of_organic_chlorides[3].Text = $&quot;менее 0,0&quot;;
-      else RowMass_fraction_of_organic_chlorides[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_organic_chlorides&quot;]}&quot;;       
+      else RowMass_fraction_of_organic_chlorides[3].Text = $&quot;{JResult[&quot;Mass_fraction_of_organic_chlorides&quot;]}&quot;.Replace(&quot;.&quot;, &quot;,&quot;);    
       
       //Заполняем колонку метод испытаний
       RowTempResult[2].Text = $&quot;{JMethod[&quot;TempResult&quot;][&quot;Desc&quot;]}&quot;; 

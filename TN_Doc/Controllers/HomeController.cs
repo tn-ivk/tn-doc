@@ -44,7 +44,7 @@ namespace TN_Doc.Controllers
 
         private DocGeneral dbDoc;
 
-        private ModelReport modelReport;      
+        private ModelReport modelReport;
 
         private WebReport FR;
 
@@ -69,7 +69,7 @@ namespace TN_Doc.Controllers
 
             InitApp();
         }
-        
+
         private void InitApp()
         {
             cfgFileRW.LoadCfg<CfgApp>(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", $"CfgApp.json"), ref CfgApp);
@@ -85,12 +85,12 @@ namespace TN_Doc.Controllers
             var doc = assembly.GetTypes().Single(x => x.BaseType.Name == "DocGeneral");
 
             return (DocGeneral)assembly.CreateInstance(
-                doc.FullName, 
-                false, 
-                BindingFlags.Default, 
-                null, 
-                new object[] { options, Path.Combine(Directory.GetCurrentDirectory()), deviceCfg }, 
-                null, 
+                doc.FullName,
+                false,
+                BindingFlags.Default,
+                null,
+                new object[] { options, Path.Combine(Directory.GetCurrentDirectory()), deviceCfg },
+                null,
                 null);
         }
 
@@ -102,7 +102,7 @@ namespace TN_Doc.Controllers
         public List<ListItem> GetListDevices()
         {
             List<ListItem> devices = CfgApp.Devices.Where(x => x.Use)
-                                                   .Select(u => new ListItem() { Id = u.IdDevice, Name = u.Name}).ToList();
+                                                   .Select(u => new ListItem() { Id = u.IdDevice, Name = u.Name }).ToList();
 
             string rez = System.Text.Json.JsonSerializer.Serialize(devices);
 
@@ -112,7 +112,7 @@ namespace TN_Doc.Controllers
         public string GetNameDBForDevice(int IdDevice)
         {
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-            return device.DBConnectionStrings.First(x=> x.Use).Database;
+            return device.DBConnectionStrings.First(x => x.Use).Database;
         }
 
         public List<ListItem> GetListDocs(int IdDevice)
@@ -136,8 +136,8 @@ namespace TN_Doc.Controllers
             //var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             //var doc = device.Docs.Single(x => x.IdDoc == idDoc);
 
-            List<ListItem> list = new List<ListItem>() 
-            { 
+            List<ListItem> list = new List<ListItem>()
+            {
                 new ListItem() { Id = 1, Name = "Протокол 1" },
                 new ListItem() { Id = 2, Name = "Протокол 2" }
             };
@@ -166,10 +166,13 @@ namespace TN_Doc.Controllers
                             .TemplateDocs.Single(x => x.Id == IdTemplateDoc).PathToDocTemplateFile;
         }
 
+        /// <summary>
+        /// Проверяем использовать ЕЛИС или нет.
+        /// </summary>
+        /// <param name="IdDevice"></param>
+        /// <returns></returns>
         public bool IsUsedElis(int IdDevice)
         {
-            
-
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
@@ -178,17 +181,32 @@ namespace TN_Doc.Controllers
             else return device.Elis.Use;
         }
 
-        public string GetSiknNumber(int IdDevice)
+        /// <summary>
+        /// Получить данные для регистрации устройства в ЕЛИС.
+        /// </summary>
+        /// <param name="IdDevice"></param>
+        /// <returns></returns>
+        
+        public Dictionary<string, string> GetDataForRegistrationDeviceInELIS(int IdDevice)
         {
-            string siknNumber = string.Empty;
+            //Dictionary<string, string> retData;
+            
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
-                if (CfgApp.Elis == null) siknNumber = string.Empty;
-                else siknNumber = CfgApp.Elis.SiknNumber;
-            else siknNumber = device.Elis.SiknNumber;
+                if (CfgApp.Elis == null) { }
+                else return new Dictionary<string, string> () { 
+                    { "ostKey", CfgApp.Elis.OstKey }, 
+                    { "siknKey", CfgApp.Elis.SiknKey }, 
+                    { "clientName", CfgApp.Elis.ClientName } 
+                };
+            else return new Dictionary<string, string>() { 
+                { "ostKey", device.Elis.OstKey }, 
+                { "siknKey", device.Elis.SiknKey }, 
+                { "clientName", device.Elis.ClientName } 
+            };
 
-            return siknNumber;
+            return null;
         }
 
         public string GetClientToken(int IdDevice)
@@ -410,7 +428,7 @@ namespace TN_Doc.Controllers
         {
             return DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
         }
-        //
+
         // public IActionResult Privacy()
         // {
         //     return View();

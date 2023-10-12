@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/17/2023 16:10:14" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/11/2023 10:49:57" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -337,7 +337,7 @@ namespace FastReport
       DeliveryStaffDescription.Text =&quot;&lt;i&gt;От сдающей стороны:&quot;;
       RecievingStaffDescription.Text =&quot;&lt;i&gt;От принимающей стороны:&quot;;                                              
       
-      string result = DataIVK.TableKMH_PR_PU.AdditionalInfo.ARM_KMH_Result == &quot;годен&quot; ? &quot;ПР   годен к дальнейшей эксплуатации&quot; : &quot;ПР   не годен и подлежит внеочередной поверке&quot;;
+      string result = DataIVK.TableKMH_PR_PU.AdditionalInfo.ARM_KMH_Result == &quot;годен&quot; ? &quot;П Р   годен к дальнейшей эксплуатации&quot; : &quot;П Р   не годен и подлежит внеочередной поверке&quot;;
       Conclusion.Text =string.Format(&quot;&lt;b&gt;3. Заключение: δ &lt;sub&gt;mах &lt;/sub&gt; = {0}%. {1}&quot;,                                                     
         tools.GetNormalizedValue(DataIVK.TableKMH_PR_PU.Protokol.Delta_KMH_Max),                                        
         result);                                                 
@@ -368,7 +368,7 @@ namespace FastReport
   </Styles>
   <Dictionary>
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
-    <Parameter Name="JsonDoc" DataType="System.String"/>
+    <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
   <ReportPage Name="Page" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
     <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="98.28" CanGrow="true" CanShrink="true" CanBreak="true">
@@ -385,7 +385,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableSourceData" Top="100.98" Width="1047.06" Height="136.08" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableSourceData" Top="102.28" Width="1047.06" Height="136.08" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSourceData" Top="7.56" Width="567" Height="128.52">
         <TableColumn Name="Column3TemplateTableSourceData" Width="75.6"/>
         <TableColumn Name="Column6" Width="75.6"/>
@@ -441,7 +441,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableResults" Top="239.77" Width="1047.06" Height="120.96" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableResults" Top="242.36" Width="1047.06" Height="120.96" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableResults" Top="7.56" Width="910.91" Height="113.4" GrowToBottom="true" FixedRows="4" FixedColumns="2" ManualBuildEvent="TableResults_ManualBuild">
         <TableColumn Name="Column146" Width="94.06"/>
         <TableColumn Name="Column147" Width="75.37"/>
@@ -539,7 +539,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="363.43" Width="1047.06" Height="206.01" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="367.32" Width="1047.06" Height="206.01" CanShrink="true">
       <TableObject Name="TableConclusion" Top="7.56" Width="850.5" Height="198.45" FixedColumns="2">
         <TableColumn Name="Column13" Width="151.2"/>
         <TableColumn Name="Column14" Width="425.25"/>
@@ -596,7 +596,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="572.14" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="577.33" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

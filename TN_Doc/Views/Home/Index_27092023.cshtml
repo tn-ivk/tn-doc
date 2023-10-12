@@ -2,124 +2,91 @@
     ViewData["Title"] = "Модуль - документы";
 }
 <body>
-    <div class="cont">
-            <table class="mainTable">
+<div class="Device">
+    <div class="top-menu">
+        <div class="menu-item">
+            <table border="0" cellpadding="5">
                 <tr>
-                    <td class="topPanel" colspan="2" align="right">
-                        @*<div class="menu-item">*@
-                            <button data-toggle="modal" data-target="#modal-window">Справочники</button>
-                        @*</div>*@
+                    <td>
+                        <label for="ComboboxDevice">Устройство:</label>
+                        <select id="ComboboxDevice"></select>
+                        <br>
+                        <label for="ComboboxDocGUID">Документ:</label>
+                        <select id="ComboboxDocGUID"></select>
                     </td>
-                </tr>
-                <tr>
-                    <td class="leftPanel">
-                        <table class="filterTable">
-                            <tr>
-                                <td height="25" width="150">
-                                    Устройство:
-                                </td>
-                                <td height="25">
-                                    <select class="filterSelect" id="ComboboxDevice"></select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td height="25">
-                                    Документ:
-                                </td>
-                                <td height="25">
-                                    <select class="filterSelect" id="ComboboxDocGUID"></select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td height="25">
-                                    Дата начала:
-                                </td>
-                                <td height="25">
-                                    <input class="filterDatepicker" id="DatepickerBegin" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td height="25">
-                                    Дата окончания:
-                                </td>
-                                <td height="25">
-                                    <input class="filterDatepicker" id="DatepickerEnd" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td height="25" colspan="2" align="right">
-                                    <input class="filterButton" id="ButtonGetData" type="button" value="Получить данные"
-                                           onclick="table.ajax.reload()">
-                                </td>
-                            </tr>
-                            <tr>
-                            <td colspan="2" valign="top">
-                                <table id="DataTable" class="display compact" style="width: 100%; height: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th height="25">Дата, время</th>
-                                                <th>Описание</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td height="25">dt</td>
-                                                <td>description</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
+                    <td>
+                        <label for="DatepickerBegin">Дата начала:</label>
+                        <input id="DatepickerBegin"/>
+                        <br>
+                        <label for="DatepickerEnd">Дата окончания:</label>
+                        <input id="DatepickerEnd"/>
                     </td>
-                    <td class="rightPanel">
-                        <table class="docTable">
-                            <tr>
-                                <td height="25" width="250">
-                                    <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
-                                    <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
-                                </td>
-                            <td id="viewPanel">
-                                    <table width="100%" height="100%" style="border: 1px none rgb(248, 2, 2)">
-                                        <td align="left" style="border: 1px none rgb(248, 2, 2)">
-                                            <select id="ComboboxTemplateDoc">Форма документа</select>
-                                            <select id="ComboboxProtocolNumber">Номер протокола</select>
-                                        </td>
-                                        <td align="right" style="border: 1px none rgb(248, 2, 2)">
-                                            <select id="ComboboxExportFormat">Экспорт</select>
-                                            <input class="bExport" id="ButtonExport" type="button" value="Экспорт"
-                                                   onclick="ExportDoc()">
-                                            <select id="ComboboxPrinterName">Принтер</select>
-                                            <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
-                                        </td>
-                                    </table>
-                                </td>
-                            <td id="editPanel" align="right" hidden>
-@*                                <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis" hidden>
-                                        Получить данные из ЕЛИС
-                                    </button>*@
-                                <button id="ButtonElis" type="button" data-toggle="modal" data-target="#elis" hidden>
-                                    Получить данные из ЕЛИС
-                                </button>
-                                    <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3">
-                                    <iframe name=print_frame class="FR" src=""></iframe>
-                                </td>
-                            </tr>
-                        </table>
+                    <td>
+                        <input id="ButtonGetData" type="button" value="Получить данные" onclick="table.ajax.reload()">
+                        <br>
+                        <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
+                    </td>
+                    <td>
+                        <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
+                        <br>
+                        <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
                     </td>
                 </tr>
             </table>
+        </div>
+
+        <div class="menu-item">
+            <button data-toggle="modal" data-target="#modal-window">Справочники</button>
+        </div>
+
     </div>
 
+</div>
 
+<div class="Table">
+    <table id="DataTable" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>Дата, время</th>
+            <th>Описание</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>dt</td>
+            <td>description</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
+<div class="Doc">
+    <table>
+        <tr>
+            <td align="left">
+                <select id="ComboboxTemplateDoc">Форма документа</select>
+                <select id="ComboboxProtocolNumber">Номер протокола</select>
+            </td>
+            <td align="right">
+                <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis">
+                    Получить данные из ЕЛИС
+                </button>
+                <select id="ComboboxExportFormat">Экспорт</select>
+                <input class="bExport" id="ButtonExport" type="button" value="Экспорт" onclick="ExportDoc()">
+                <select id="ComboboxPrinterName">Принтер</select>
+                <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <iframe name=print_frame class="FR" src=""></iframe>
+            </td>
+        </tr>
+    </table>
 
+</div>
 
-@*todo: вынести в отдельный  html*@
+//todo: вынести в отдельный  html
 <div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-dir-editor-width" role="document">
         <div class="modal-content modal-dir-editor-height">
@@ -267,30 +234,17 @@
 
                 <button type="button" class="btn btn-primary" onclick="GetElisData()">Запросить данные</button>
 
-                    <div class="list-group" id="listPassports">
-                       @* <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
-                            Cras justo odio
-                        </button>
-                        <button type="button" class="list-group-item list-group-item-action">Dapibus ac facilisis in</button>
-                        <button type="button" class="list-group-item list-group-item-action">Morbi leo risus</button>
-                        <button type="button" class="list-group-item list-group-item-action">Porta ac consectetur ac</button>
-                        <button type="button" class="list-group-item list-group-item-action" disabled>Vestibulum at eros</button>*@
-                    </div>                 
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary" onclick="FillPassportDataElis()">Применить</button>
+                <button type="button" class="btn btn-primary">Вставить</button>
             </div>
         </div>
     </div>
 </div>
 
 
-<script>
-
-
-
+<script>   
         InitElement();
 </script>
 </body>

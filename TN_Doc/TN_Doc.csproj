@@ -10,6 +10,9 @@
     <Content Remove="wwwroot\lib\jquery-ui\**" />
     <EmbeddedResource Remove="wwwroot\lib\jquery-ui\**" />
     <None Remove="wwwroot\lib\jquery-ui\**" />
+    <None Update="Doc\Act_N_GOSTR50.2.040(G).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\Poverka_MI3266(A).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -271,6 +274,10 @@
     <Content Update="Cfg\CfgReport.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="Views\Home\Index_27092023.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="wwwroot\HTML\DocEditAct.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -383,7 +390,7 @@
     <None Update="Doc\17_Poverka1974_(Ust-Luga).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\Act.frx">
+    <None Update="Doc\Act_N_MI3532(18).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\_13_Poverka3151_2022-05-11_Release-version.frx">

@@ -69,6 +69,254 @@ var docTemplates = {};
     return datepicker.regional.ru;
 });
 
+var languageDataTable = {
+    "processing": "Подождите...",
+    "search": "Поиск:",
+    "lengthMenu": "Показать _MENU_ записей",
+    "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+    "infoEmpty": "Записи с 0 до 0 из 0 записей",
+    "infoFiltered": "(отфильтровано из _MAX_ записей)",
+    "loadingRecords": "Загрузка записей...",
+    "zeroRecords": "Записи отсутствуют.",
+    "emptyTable": "В таблице отсутствуют данные",
+    "paginate": {
+        "first": "Первая",
+        "previous": "Предыдущая",
+        "next": "Следующая",
+        "last": "Последняя"
+    },
+    "aria": {
+        "sortAscending": ": активировать для сортировки столбца по возрастанию",
+        "sortDescending": ": активировать для сортировки столбца по убыванию"
+    },
+    "select": {
+        "rows": {
+            "_": "Выбрано записей: %d",
+            "1": "Выбрана одна запись"
+        },
+        "cells": {
+            "_": "Выбрано %d ячеек",
+            "1": "Выбрана 1 ячейка "
+        },
+        "columns": {
+            "1": "Выбран 1 столбец ",
+            "_": "Выбрано %d столбцов "
+        }
+    },
+    "searchBuilder": {
+        "conditions": {
+            "string": {
+                "startsWith": "Начинается с",
+                "contains": "Содержит",
+                "empty": "Пусто",
+                "endsWith": "Заканчивается на",
+                "equals": "Равно",
+                "not": "Не",
+                "notEmpty": "Не пусто",
+                "notContains": "Не содержит",
+                "notStartsWith": "Не начинается на",
+                "notEndsWith": "Не заканчивается на"
+            },
+            "date": {
+                "after": "После",
+                "before": "До",
+                "between": "Между",
+                "empty": "Пусто",
+                "equals": "Равно",
+                "not": "Не",
+                "notBetween": "Не между",
+                "notEmpty": "Не пусто"
+            },
+            "number": {
+                "empty": "Пусто",
+                "equals": "Равно",
+                "gt": "Больше чем",
+                "gte": "Больше, чем равно",
+                "lt": "Меньше чем",
+                "lte": "Меньше, чем равно",
+                "not": "Не",
+                "notEmpty": "Не пусто",
+                "between": "Между",
+                "notBetween": "Не между ними"
+            },
+            "array": {
+                "equals": "Равно",
+                "empty": "Пусто",
+                "contains": "Содержит",
+                "not": "Не равно",
+                "notEmpty": "Не пусто",
+                "without": "Без"
+            }
+        },
+        "data": "Данные",
+        "deleteTitle": "Удалить условие фильтрации",
+        "logicAnd": "И",
+        "logicOr": "Или",
+        "title": {
+            "0": "Конструктор поиска",
+            "_": "Конструктор поиска (%d)"
+        },
+        "value": "Значение",
+        "add": "Добавить условие",
+        "button": {
+            "0": "Конструктор поиска",
+            "_": "Конструктор поиска (%d)"
+        },
+        "clearAll": "Очистить всё",
+        "condition": "Условие",
+        "leftTitle": "Превосходные критерии",
+        "rightTitle": "Критерии отступа"
+    },
+    "searchPanes": {
+        "clearMessage": "Очистить всё",
+        "collapse": {
+            "0": "Панели поиска",
+            "_": "Панели поиска (%d)"
+        },
+        "count": "{total}",
+        "countFiltered": "{shown} ({total})",
+        "emptyPanes": "Нет панелей поиска",
+        "loadMessage": "Загрузка панелей поиска",
+        "title": "Фильтры активны - %d",
+        "showMessage": "Показать все",
+        "collapseMessage": "Скрыть все"
+    },
+    "buttons": {
+        "pdf": "PDF",
+        "print": "Печать",
+        "collection": "Коллекция <span class=\"ui-button-icon-primary ui-icon ui-icon-triangle-1-s\"><\/span>",
+        "colvis": "Видимость столбцов",
+        "colvisRestore": "Восстановить видимость",
+        "copy": "Копировать",
+        "copyTitle": "Скопировать в буфер обмена",
+        "csv": "CSV",
+        "excel": "Excel",
+        "pageLength": {
+            "-1": "Показать все строки",
+            "_": "Показать %d строк",
+            "1": "Показать 1 строку"
+        },
+        "removeState": "Удалить",
+        "renameState": "Переименовать",
+        "copySuccess": {
+            "1": "Строка скопирована в буфер обмена",
+            "_": "Скопировано %d строк в буфер обмена"
+        },
+        "createState": "Создать состояние",
+        "removeAllStates": "Удалить все состояния",
+        "savedStates": "Сохраненные состояния",
+        "stateRestore": "Состояние %d",
+        "updateState": "Обновить",
+        "copyKeys": "Нажмите ctrl  или u2318 + C, чтобы скопировать данные таблицы в буфер обмена.  Для отмены, щелкните по сообщению или нажмите escape."
+    },
+    "decimal": ".",
+    "infoThousands": ",",
+    "autoFill": {
+        "cancel": "Отменить",
+        "fill": "Заполнить все ячейки <i>%d<i><\/i><\/i>",
+        "fillHorizontal": "Заполнить ячейки по горизонтали",
+        "fillVertical": "Заполнить ячейки по вертикали",
+        "info": "Информация"
+    },
+    "datetime": {
+        "previous": "Предыдущий",
+        "next": "Следующий",
+        "hours": "Часы",
+        "minutes": "Минуты",
+        "seconds": "Секунды",
+        "unknown": "Неизвестный",
+        "amPm": [
+            "AM",
+            "PM"
+        ],
+        "months": {
+            "0": "Январь",
+            "1": "Февраль",
+            "10": "Ноябрь",
+            "11": "Декабрь",
+            "2": "Март",
+            "3": "Апрель",
+            "4": "Май",
+            "5": "Июнь",
+            "6": "Июль",
+            "7": "Август",
+            "8": "Сентябрь",
+            "9": "Октябрь"
+        },
+        "weekdays": [
+            "Вс",
+            "Пн",
+            "Вт",
+            "Ср",
+            "Чт",
+            "Пт",
+            "Сб"
+        ]
+    },
+    "editor": {
+        "close": "Закрыть",
+        "create": {
+            "button": "Новый",
+            "title": "Создать новую запись",
+            "submit": "Создать"
+        },
+        "edit": {
+            "button": "Изменить",
+            "title": "Изменить запись",
+            "submit": "Изменить"
+        },
+        "remove": {
+            "button": "Удалить",
+            "title": "Удалить",
+            "submit": "Удалить",
+            "confirm": {
+                "_": "Вы точно хотите удалить %d строк?",
+                "1": "Вы точно хотите удалить 1 строку?"
+            }
+        },
+        "multi": {
+            "restore": "Отменить изменения",
+            "title": "Несколько значений",
+            "info": "Выбранные элементы содержат разные значения для этого входа. Чтобы отредактировать и установить для всех элементов этого ввода одинаковое значение, нажмите или коснитесь здесь, в противном случае они сохранят свои индивидуальные значения.",
+            "noMulti": "Это поле должно редактироваться отдельно, а не как часть группы"
+        },
+        "error": {
+            "system": "Возникла системная ошибка (<a target=\"\\\" rel=\"nofollow\" href=\"\\\">Подробнее<\/a>)."
+        }
+    },
+    "searchPlaceholder": "Что ищете?",
+    "stateRestore": {
+        "creationModal": {
+            "button": "Создать",
+            "search": "Поиск",
+            "columns": {
+                "search": "Поиск по столбцам",
+                "visible": "Видимость столбцов"
+            },
+            "name": "Имя:",
+            "order": "Сортировка",
+            "paging": "Страницы",
+            "scroller": "Позиция прокрутки",
+            "searchBuilder": "Редактор поиска",
+            "select": "Выделение",
+            "title": "Создать новое состояние",
+            "toggleLabel": "Включает:"
+        },
+        "removeJoiner": "и",
+        "removeSubmit": "Удалить",
+        "renameButton": "Переименовать",
+        "duplicateError": "Состояние с таким именем уже существует.",
+        "emptyError": "Имя не может быть пустым.",
+        "emptyStates": "Нет сохраненных состояний",
+        "removeConfirm": "Вы уверены, что хотите удалить %s?",
+        "removeError": "Не удалось удалить состояние.",
+        "removeTitle": "Удалить состояние",
+        "renameLabel": "Новое имя для %s:",
+        "renameTitle": "Переименовать состояние"
+    },
+    "thousands": " "
+};
+
 $(document).ready
 (
     function () {
@@ -269,12 +517,11 @@ function InitPrinterName() {
     $.ajax(
         {
             async: false,
-            url: "Print/GetListPrinters",
-            accept: "application/json",
-            type: "GET",
+            url: 'Print/GetListPrinters',
+            type: 'GET',
             success: function (data) {
                 data.forEach((item) => {
-                    $('#ComboboxPrinterName').append('<option value=' + item.replaceAll(" ", "_") + '>' + item + '</option>');
+                    $('#ComboboxPrinterName').append('<option value=' + item + '>' + item + '</option>');
                 });
             }
         });
@@ -344,29 +591,39 @@ function InitTableDocs() {
     table = $('#DataTable').DataTable(
         {
             select: true,
-            scrollY: 600,
+            scrollY: '60vh',
             scrollCollapse: true,
             paging: false,
 
-            oLanguage: {
-                sSearch: 'Поиск',
-                sEmptyTable: 'Отсутствуют данные в таблице'
-            },
             info: false,
+            ordering: false,
+
+            language: languageDataTable,
+            //oLanguage: languageDataTable
+            //{
+            //    sSearch: 'Поиск',
+            //    sEmptyTable: 'Отсутствуют данные в таблице'
+            //}
+            //,
 
             ajax: function (data, callback, settings) {
                 callback
-                (
-                    GetData()
-                );
+                    (
+                        GetData()
+                    );
             },
 
             columns:
                 [
-                    {data: 'dt'},
+                    { data: 'dt' },
                     //{ data: function (data) { return moment(data.dt, "DD-MM-YYYYTHH:mm").format("DD.MM.YYYY HH:mm"); } },
-                    {data: 'description'}
-                ]
+                    { data: 'description' }
+                ],
+        //    columnDefs: [
+        //        {
+        //            targets: 0,
+        //            render: DataTable.render.date()
+        //        }]
         });
 
     table.on('select', function (e, dt, type, indexes) {
@@ -508,7 +765,8 @@ function GetDoc() {
                 if (data)
                     $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
 
-                //PDFObject.embed("/PDF/PDF.pdf", ".FR");                
+                $('#viewPanel').prop('hidden', false);
+                $('#editPanel').prop('hidden', true);
             },
         });
 }
@@ -529,9 +787,11 @@ function GetEditDoc() {
                 $('.FR').each(function () {
                     $(this).attr('src', '/HTML/html.html');
                 });
-                //$('.FR').html(data);
 
-                //alert(data);
+
+
+                $('#viewPanel').prop('hidden', true);
+                $('#editPanel').prop('hidden', false);
             }
         });
 }
@@ -551,7 +811,7 @@ function PrintDoc() {
             url: 'Print/PrintDoc',
             type: 'GET',
             data: {
-                printerName: $('#ComboboxPrinterName').val().replaceAll("_", " "),
+                printerName: $('#ComboboxPrinterName').val()
             }
         });
 }
@@ -623,16 +883,20 @@ function GetFullNameTag(tagName) {
 //Получить данные из ЕЛИС
 function GetElisData() {
 
+    var dataELIS;
+
     var clientToken = GetClientToken(CurrentDeviceId);
 
-    if (clientToken == '') {
+    if (clientToken == undefined) {
 
-        var SiknNumber = GetSiknNumber(CurrentDeviceId);
+        var regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
 
-        if (SiknNumber == '')
+        if (regData == '')
             return;
-        else
-            clientToken = RegistrationClient(SiknNumber);
+        else {
+            clientToken = RegistrationClient(regData);
+
+        }
     }
 
     $.ajax(
@@ -643,13 +907,15 @@ function GetElisData() {
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',
             headers: {
-                'client-token': clientToken
+                "client-token": clientToken.clientToken
             },
             data: JSON.stringify({
                 startPeriod: '2023-08-14T09:14:49.345Z',
                 endPeriod: '2023-08-14T09:14:49.345Z'
             }),
             success: function (data) {
+                //отрисовываем таблицу с паспортами
+                dataELIS = data;
 
             },
             error: function (data) {
@@ -662,10 +928,15 @@ function GetElisData() {
                 }
             }
         });
+
+    
+    DrawTablePassports(dataELIS);
 }
 
 //Зарегистрировать устройство для ЕЛИС
-function RegistrationClient(nameDevice) {
+function RegistrationClient(regData) {
+
+    var clientToken = null;
 
     $.ajax(
         {
@@ -674,16 +945,22 @@ function RegistrationClient(nameDevice) {
             type: 'POST',
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',
-            data: JSON.stringify({
-                siknNumber: nameDevice
-            }),
+            data: JSON.stringify(regData),
+            //    JSON.stringify({
+            //    ostKey: nameDevice,
+            //    siknKey: '',
+            //    clientName: ''
+            //}),
             success: function (data) {
 
+                clientToken = data;
             },
             error: function (data) {
 
             }
         });
+
+    return clientToken;
 }
 
 //Зарегистрация устройства для взаимодействия с ТСПД
@@ -691,12 +968,15 @@ function GetElisCurrentGuidForDevice() {
 
 }
 
-//
-function GetSiknNumber(idDevice) {
+//Получить данные для регистрации устройства в ЕЛИС.
+function GetDataForRegistrationDeviceInELIS(idDevice) {
+
+    var regData = null;
+
     $.ajax(
         {
             async: false,
-            url: 'Home/GetSiknNumber',
+            url: 'Home/GetDataForRegistrationDeviceInELIS',
             type: 'POST',
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',
@@ -705,11 +985,15 @@ function GetSiknNumber(idDevice) {
             }),
             success: function (data) {
 
+                regData = data;
+              
             },
             error: function (data) {
 
             }
         });
+
+    return regData;
 }
 
 //Получить GUID для устройства
@@ -736,4 +1020,99 @@ function GetClientToken(idDevice) {
 //Сохранить GUID для устройства
 function SetClientToken() {
 
+}
+
+function DrawTablePassports(dataELIS) {
+    let element = document.querySelector('#listPassports');
+    $('#listPassports').empty();
+
+    dataELIS.passports.forEach(function (item, i, arr) {
+        //alert(i + ": " + item + " (массив:" + arr + ")");
+        let li = document.createElement('button');
+        li.className = 'list-group-item list-group-item-action';
+        li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
+                        <b>Лаборатория:</b> <small>${item.labName}</small><br>
+                        <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
+
+        li.dataPassport = item;
+
+        li.addEventListener('click', function (e) {
+
+            let elmnt = e.target;
+
+            sessionStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
+            localStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
+            //elmnt.dataPassport
+
+            //if (elmnt.classList.contains('active')) elmnt.classList.remove('active');
+            //else elmnt.classList.add('active');
+
+            let elmnts = document.querySelectorAll('.list-group-item')
+            elmnts.forEach(function (item, i, arr) {
+
+                if (item.classList.contains('active'))
+                    item.classList.remove('active');
+                
+            })
+            
+            elmnt.classList.add('active');
+        });
+
+        element.append(li);
+    });
+}
+
+function SetDataLocalStorage() {
+
+}
+
+
+function FillPassportDataElis() { 
+
+
+
+
+    let dataPassport = JSON.parse(localStorage.dataPassport);
+
+    let iframe = document.querySelector('.FR');    
+    let elmnts = iframe.contentWindow.document.querySelectorAll('.elis-data')
+
+    elmnts.forEach(function (item, i, arr) {
+
+        
+
+        if (!dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
+            return;
+
+        if (item.nodeName == 'INPUT') {
+            let value = dataPassport.parameters[item.dataset.keyelis].value;
+            item.value = value;
+        }
+        if (item.nodeName == 'SELECT') {
+
+            item.contains = function (value) {
+                for (var i = 0, l = this.options.length; i < l; i++) {
+                    if (this.options[i].text == value) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            let testMethodName = dataPassport.parameters[item.dataset.keyelis].testMethodName;
+
+            //Проверяем наличие метода в списке, если нет, добавляем.
+            if (!item.contains(testMethodName)) {
+
+                let newOption = new Option(testMethodName, testMethodName);
+                item.append(newOption);
+                //newOption.selected = true;
+            }
+
+            item.value = testMethodName;
+            //for (let i = 0; i < item.length; i++) {
+            //    if (item[i].value === testMethodName) item[i].selected = true;
+            //}
+        }
+    });
 }
