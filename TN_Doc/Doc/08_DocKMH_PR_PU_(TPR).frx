@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/11/2023 10:49:57" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/13/2023 14:39:25" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -118,8 +118,11 @@ namespace FastReport
       
     private void DrawTableSourceData()
     {
-      listDetectors = DataIVK.TableKMH_PR_PU.Protokol.Table1.DetName.Where(i =&gt; ! i.Contains(&quot;-&quot;) | i.Length  &gt; 1).ToList();
-      List &lt;string&gt; sumPointsQ =DataIVK.TableKMH_PR_PU.Protokol.Table1.Q.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; i.Length  &gt; 0).ToList();
+      //listDetectors = DataIVK.TableKMH_PR_PU.Protokol.Table1.DetName.Where(i =&gt; ! i.Contains(&quot;-&quot;) | i.Length  &gt; 1).ToList();
+      //List &lt;string&gt; sumPointsQ =DataIVK.TableKMH_PR_PU.Protokol.Table1.Q.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; i.Length  &gt; 0).ToList();
+      
+      listDetectors = DataIVK.TableKMH_PR_PU.Protokol.Table1.DetName.Where(i =&gt; i != &quot;-&quot;).ToList();
+      List &lt;string&gt; sumPointsQ =DataIVK.TableKMH_PR_PU.Protokol.Table1.Q.Where(i =&gt; i != &quot;-&quot;).ToList();
       
       if (listDetectors.Count == 0)
         return;

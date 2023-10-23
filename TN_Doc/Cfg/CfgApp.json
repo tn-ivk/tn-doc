@@ -887,7 +887,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.101",
+          "Server": "192.168.8.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",

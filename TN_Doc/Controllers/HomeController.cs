@@ -195,21 +195,21 @@ namespace TN_Doc.Controllers
 
             if (device.Elis == null)
                 if (CfgApp.Elis == null) { }
-                else return new Dictionary<string, string> () { 
-                    { "ostKey", CfgApp.Elis.OstKey }, 
-                    { "siknKey", CfgApp.Elis.SiknKey }, 
-                    { "clientName", CfgApp.Elis.ClientName } 
+                else return new Dictionary<string, string>() {
+                    { "ostKey", CfgApp.Elis.OstKey },
+                    { "siknKey", CfgApp.Elis.SiknKey },
+                    { "clientName", CfgApp.Elis.ClientName }
                 };
-            else return new Dictionary<string, string>() { 
-                { "ostKey", device.Elis.OstKey }, 
-                { "siknKey", device.Elis.SiknKey }, 
-                { "clientName", device.Elis.ClientName } 
+            else return new Dictionary<string, string>() {
+                { "ostKey", device.Elis.OstKey },
+                { "siknKey", device.Elis.SiknKey },
+                { "clientName", device.Elis.ClientName }
             };
 
             return null;
         }
 
-        public string GetClientToken(int IdDevice)
+        public Dictionary<string, string> GetClientToken(int IdDevice)
         {
             string clientToken = string.Empty;
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
@@ -219,7 +219,9 @@ namespace TN_Doc.Controllers
                 else clientToken = CfgApp.Elis.ClientToken;
             else clientToken = device.Elis.ClientToken;
 
-            return clientToken;
+            return String.IsNullOrEmpty(clientToken) ? 
+                new Dictionary<string, string>() { { "clientToken", null } } : 
+                new Dictionary<string, string>() { { "clientToken", clientToken } };
         }
 
         public bool SetClientToken(int IdDevice, string clientToken)
@@ -423,6 +425,16 @@ namespace TN_Doc.Controllers
 
             doc.SaveDoc(data);
         }
+
+        public PeriodDocument GetPeriodDocument(int IdDevice, IdDoc IdDoc, int id)
+        {
+            var doc = LoadDocsModule(IdDevice, IdDoc);
+
+            doc.GetPeriodDocument(id);
+
+            return doc.GetPeriodDocument(id);
+        }
+
 
         public string GetListUsers()
         {

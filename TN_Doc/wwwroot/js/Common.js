@@ -805,6 +805,29 @@ function SaveDoc() {
         PrefixTag);
 }
 
+function GetPeriodDocument() {
+
+    var ret = null;
+
+    $.ajax(
+        {
+            async: false,
+            url: 'Home/GetPeriodDocument',
+            type: 'GET',
+            data: {
+                IdDevice: $('#ComboboxDevice').val(),
+                IdDoc: $('#ComboboxDocGUID').val(),
+                id: currentId
+            },
+            success: function (data) {
+                ret = data;                
+            }
+        });
+
+    return ret;
+}
+
+
 function PrintDoc() {
     $.ajax(
         {
@@ -893,15 +916,17 @@ function GetElisData() {
 
         if (regData == '')
             return;
-        else {
+        else
             clientToken = RegistrationClient(regData);
-
-        }
     }
+
+    var periodDocument = GetPeriodDocument();
+
+    StateButtonGetElisData(true);
 
     $.ajax(
         {
-            async: false,
+            async: true,
             url: 'http://localhost:5050/api/tspd/getqp',
             type: 'POST',
             contentType: 'application/json; charset=UTF-8',
@@ -909,28 +934,34 @@ function GetElisData() {
             headers: {
                 "client-token": clientToken.clientToken
             },
-            data: JSON.stringify({
-                startPeriod: '2023-08-14T09:14:49.345Z',
-                endPeriod: '2023-08-14T09:14:49.345Z'
-            }),
+            data:
+                //JSON.stringify({
+                //startPeriod: '2023-08-14T09:14:49.345Z',
+                //endPeriod: '2023-08-14T09:14:49.345Z'
+                //}),
+
+                JSON.stringify({
+                    startPeriod: moment(periodDocument.begin * 1000).utc().format(),
+                    endPeriod: moment(periodDocument.end * 1000).utc().format()
+                }),
+
             success: function (data) {
                 //отрисовываем таблицу с паспортами
                 dataELIS = data;
-
             },
             error: function (data) {
-
                 $('#info').text(data.statusText);
 
                 //Неавторизованный пользователь
                 if (data.status == 401) {
                     RegistrationClient('ИВК-1');
                 }
+            },
+            complete: function (data) {
+                StateButtonGetElisData(false);
+                DrawTablePassports(dataELIS); 
             }
-        });
-
-    
-    DrawTablePassports(dataELIS);
+        });    
 }
 
 //Зарегистрировать устройство для ЕЛИС
@@ -998,6 +1029,9 @@ function GetDataForRegistrationDeviceInELIS(idDevice) {
 
 //Получить GUID для устройства
 function GetClientToken(idDevice) {
+
+    var clientToken = null;
+
     $.ajax(
         {
             async: false,
@@ -1009,12 +1043,16 @@ function GetClientToken(idDevice) {
                 IdDevice: idDevice
             }),
             success: function (data) {
+                clientToken = data.clientToken;
+            },
+            error: function (data) {
 
             },
-            //error: function (data) {
-
-            //}
+            complete: function (data) {
+            }
         });
+
+    return clientToken;
 }
 
 //Сохранить GUID для устройства
@@ -1066,20 +1104,14 @@ function SetDataLocalStorage() {
 
 }
 
-
 function FillPassportDataElis() { 
-
-
-
 
     let dataPassport = JSON.parse(localStorage.dataPassport);
 
     let iframe = document.querySelector('.FR');    
     let elmnts = iframe.contentWindow.document.querySelectorAll('.elis-data')
 
-    elmnts.forEach(function (item, i, arr) {
-
-        
+    elmnts.forEach(function (item, i, arr) {        
 
         if (!dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
             return;
@@ -1115,4 +1147,21 @@ function FillPassportDataElis() {
             //}
         }
     });
+
+    $('#listPassports').empty();
+}
+
+//Состояние кнопки "Запросить данные"
+function StateButtonGetElisData(state) {
+
+    if (state) {
+        $("#buttonDataRequest").prop("disabled", true);
+        $("#spinnerDataRequest").prop("hidden", false);
+        $("#textDataRequest")[0].innerText = "Идет запрос...";        
+    }
+    else {
+        $("#buttonDataRequest").prop("disabled", false);
+        $("#spinnerDataRequest").prop("hidden", true);
+        $("#textDataRequest")[0].innerText = "Запросить данные"; 
+    }
 }

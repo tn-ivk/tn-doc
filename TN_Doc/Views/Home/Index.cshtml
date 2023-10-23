@@ -258,39 +258,31 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+
             </div>
             <div class="modal-body">
 
                 <h6 class="modal-title" id="info"></h6>
 
                 <br/>
+                    <button id="buttonDataRequest" type="button" class="btn btn-primary" onclick="GetElisData()">
+                        <span id="spinnerDataRequest" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+                        <span id="textDataRequest" class="visually-hidden">Запросить данные</span>
+                    </button>
 
-                <button type="button" class="btn btn-primary" onclick="GetElisData()">Запросить данные</button>
-
-                    <div class="list-group" id="listPassports">
-                       @* <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
-                            Cras justo odio
-                        </button>
-                        <button type="button" class="list-group-item list-group-item-action">Dapibus ac facilisis in</button>
-                        <button type="button" class="list-group-item list-group-item-action">Morbi leo risus</button>
-                        <button type="button" class="list-group-item list-group-item-action">Porta ac consectetur ac</button>
-                        <button type="button" class="list-group-item list-group-item-action" disabled>Vestibulum at eros</button>*@
-                    </div>                 
-
+                    <div id="listPassports" class="list-group">
+                      
+                    </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary" onclick="FillPassportDataElis()">Применить</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="FillPassportDataElis()">Применить</button>
             </div>
         </div>
     </div>
 </div>
 
-
 <script>
-
-
-
         InitElement();
 </script>
 </body>
