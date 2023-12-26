@@ -44,7 +44,7 @@ namespace TN_Doc
             
             
             app.UseStaticFiles();
-            app.UseFastReport();
+            //app.UseFastReport();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

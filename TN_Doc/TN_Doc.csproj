@@ -10,6 +10,18 @@
     <Content Remove="wwwroot\lib\jquery-ui\**" />
     <EmbeddedResource Remove="wwwroot\lib\jquery-ui\**" />
     <None Remove="wwwroot\lib\jquery-ui\**" />
+    <None Update="Doc\Act_N_GOSTR50.2.040(G)_ShiftTime.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_PR_PU_GOSTR8.1011-2022%28U2%29.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\_Act_N_MI3532(18).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\_Act_N_GOSTR50.2.040(G).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\Act_N_GOSTR50.2.040(G).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -58,10 +70,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastReport.Web" Version="2023.2.30" />
+    <PackageReference Include="FastReport.Web.Skia" Version="2023.3.7" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="7.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.4" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -345,9 +359,6 @@
     <None Update="Doc\25_DocMeasurementJornal_NP.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\_ActParty.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Doc\Act_NP_MI3275-2016(B).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -369,18 +380,6 @@
     <None Update="Doc\Passport\Passport_MI3532%2814%29.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\__10_Poverka3287_AnnexA_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_10_Poverka3287_AnnexA_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_21_Poverka3272_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_08_DocKMH_PR_PU_(TPR).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Doc\09_Poverka2816_2022-04-13_Release_version.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -392,9 +391,6 @@
     </None>
     <None Update="Doc\Act_N_MI3532(18).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_13_Poverka3151_2022-05-11_Release-version.frx">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Doc\13_Poverka3151_2022-05-11_Release-version.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -465,6 +461,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Doc\KMH_PR_PU\" />
     <Folder Include="wwwroot\css\font-awesome\" />
     <Folder Include="wwwroot\PDF\" />
   </ItemGroup>

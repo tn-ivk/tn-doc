@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/28/2023 13:55:43" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/21/2023 18:27:27" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using FastReport;
 using FastReport.Data;
@@ -70,7 +70,7 @@ namespace FastReport
       }      
       else
       {
-        DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy&quot;)} г. с {SamplingPeriodBegin.ToString(&quot;HH:mm&quot;)} до {SamplingPeriodEnd.ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;)}&quot;;
+        DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy&quot;)} {SamplingPeriodBegin.ToString(&quot;HH:mm&quot;)}-{SamplingPeriodEnd.ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;)}&quot;;
       }
     }
              

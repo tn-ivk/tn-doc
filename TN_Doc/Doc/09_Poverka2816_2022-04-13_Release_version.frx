@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/08/2023 09:56:33" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/03/2023 10:24:37" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -172,86 +172,37 @@ namespace FastReport
     public void  DrawTableConclusion()
     { 
       int isUsedKoefsSolartron;
+      string gh;
       
       switch (protocolNumber)
       {
         case 2:
-          // Setup Cols width
+
           TableConclusion.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin) * Units.Millimeters;
-                  
-          //// ===  Fill with grad coefficients
-          // Select coefficients for output 
-          isUsedKoefsSolartron= DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.KoefsSolartron.IsUsed;
-               
-            
-          if (isUsedKoefsSolartron == 1)
-          {
-            //var listPicn1Params = typeof(Root.Picn1).GetProperties().Select(x=&gt;x.GetValue(protocol.Doc.DataIVK.TableKMH_MI2816.ARMData.Picn1 , null)).ToList();
-            Type KoefsSolartron = typeof(TN.Doc.KoefsSolartron);
-            PropertyInfo[] props =  KoefsSolartron.GetProperties();
-            List &lt;String&gt; listKoefsSolartronValues  = new List&lt;string&gt;(props.Length-1);
-            for (int i=1; i&lt;props.Length; i++)
-            {
-              listKoefsSolartronValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.KoefsSolartron, null).ToString());
-            }
-            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSolartronValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Koefs_CheckDate);
-          }
+          
+          gh = GH(DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo);
+          if (string.IsNullOrEmpty(gh))
+            GradKoefs.Text = &quot;&quot;;
           else
-          {
-            Type KoefsSarasota = typeof(TN.Doc.KoefsSarasota);
-            PropertyInfo[] props =  KoefsSarasota.GetProperties();
-               
-            List &lt;String&gt; listKoefsSarasotaValues  = new List&lt;string&gt;();
-            for (int i=1; i&lt;props.Length; i++)
-            {
-              //MessageBox.Show(props[i].GetValue(protocol.Doc.DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSarasota, null).ToString());  
-              listKoefsSarasotaValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.KoefsSarasota, null).ToString());
-            }
-            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSarasotaValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Koefs_CheckDate);; 
-          }
-          //Fill table with data
+            GradKoefs.Text = string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, gh, DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.Koefs_CheckDate);
+          
           StaffData.Text =string.Format(&quot;Должность, подпись, И.О. Фамилия лица, проводившего поверку: &lt;u&gt;                                                                                 &lt;/u&gt; &lt;u&gt;                           &lt;/u&gt; &lt;u&gt;{0}&quot;,
-            DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.StaffData);
+          DataIVK.TablePoverka2816.AdditionalInfo.PP2_AdditionalInfo.StaffData);
           DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;, tools.UnixTimestampToDatetime(DataIVK.TablePoverka2816.DateTimeLong));          
           break;
         
         default:
-          // Setup Cols width
+
           TableConclusion.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin) * Units.Millimeters;
-                  
-          //// ===  Fill with grad coefficients
-          // Select coefficients for output 
-          isUsedKoefsSolartron= DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSolartron.IsUsed;
-               
-            
-          if (isUsedKoefsSolartron == 1)
-          {
-            //var listPicn1Params = typeof(Root.Picn1).GetProperties().Select(x=&gt;x.GetValue(protocol.Doc.DataIVK.TableKMH_MI2816.ARMData.Picn1 , null)).ToList();
-            Type KoefsSolartron = typeof(TN.Doc.KoefsSolartron);
-            PropertyInfo[] props =  KoefsSolartron.GetProperties();
-            List &lt;String&gt; listKoefsSolartronValues  = new List&lt;string&gt;(props.Length-1);
-            for (int i=1; i&lt;props.Length; i++)
-            {
-              listKoefsSolartronValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSolartron, null).ToString());
-            }
-            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSolartronValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Koefs_CheckDate);
-          }
+          
+          gh = GH(DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo);
+          if (string.IsNullOrEmpty(gh))
+            GradKoefs.Text = &quot;&quot;;
           else
-          {
-            Type KoefsSarasota = typeof(TN.Doc.KoefsSarasota);
-            PropertyInfo[] props =  KoefsSarasota.GetProperties();
-               
-            List &lt;String&gt; listKoefsSarasotaValues  = new List&lt;string&gt;();
-            for (int i=1; i&lt;props.Length; i++)
-            {
-              //MessageBox.Show(props[i].GetValue(protocol.Doc.DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSarasota, null).ToString());  
-              listKoefsSarasotaValues.Add(props[i].GetValue(DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.KoefsSarasota, null).ToString());
-            }
-            GradKoefs.Text =string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, String.Join(&quot;, &quot;, listKoefsSarasotaValues.ToArray()),DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Koefs_CheckDate);; 
-          }
-          //Fill table with data
+            GradKoefs.Text = string.Format(&quot;Градуировочные коэффициенты: &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1}&quot;, gh, DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.Koefs_CheckDate);
+          
           StaffData.Text =string.Format(&quot;Должность, подпись, И.О. Фамилия лица, проводившего поверку: &lt;u&gt;                                                                                 &lt;/u&gt; &lt;u&gt;                           &lt;/u&gt; &lt;u&gt;{0}&quot;,
-            DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.StaffData);
+          DataIVK.TablePoverka2816.AdditionalInfo.PP1_AdditionalInfo.StaffData);
           DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;, tools.UnixTimestampToDatetime(DataIVK.TablePoverka2816.DateTimeLong));          
           break;      
       }  
@@ -268,6 +219,69 @@ namespace FastReport
         PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
       }
     }
+    
+    private string GH (TN.Doc.PP_AdditionalInfo additionalInfo)
+    {
+      //GH коэффициенты
+
+      string GH1_1 = &quot;&quot;, GH1_2 = &quot;&quot;;
+      if (additionalInfo.KoefsSolartron.IsUsed == 1)
+      {
+        string[] GH = { &quot;K0 = &quot;, &quot; K1 = &quot;, &quot; K2 = &quot;, &quot; K18 = &quot;, &quot; K19 = &quot;, &quot; K20A = &quot;, &quot; K20B = &quot;, &quot; K21A = &quot;, &quot; K21B = &quot; };
+
+        GH[0] += additionalInfo.KoefsSolartron.K0 + &quot;,&quot;;
+        GH[1] += additionalInfo.KoefsSolartron.K1 + &quot;,&quot;;
+        GH[2] += additionalInfo.KoefsSolartron.K2 + &quot;,&quot;;
+        GH[3] += additionalInfo.KoefsSolartron.K18 + &quot;,&quot;;
+        GH[4] += additionalInfo.KoefsSolartron.K19 + &quot;,&quot;;
+        GH[5] += additionalInfo.KoefsSolartron.K20A + &quot;,&quot;;
+        GH[6] += additionalInfo.KoefsSolartron.K20B + &quot;,&quot;;
+        GH[7] += additionalInfo.KoefsSolartron.K21A + &quot;,&quot;;
+        GH[8] += additionalInfo.KoefsSolartron.K21B + &quot;.&quot;;       
+        
+        int i = 0;
+        do
+        {
+          GH1_1 += GH[i];
+          i++;
+        } while (GH1_1.Length &lt; 125 &amp;&amp; i &lt; 9);
+
+        while (i &lt; 9)
+        {
+          GH1_2 += GH[i];
+          i++;
+        }
+      }
+      else if (additionalInfo.KoefsSarasota.IsUsed == 1)
+      {
+        string[] GH = { &quot;D0 = &quot;, &quot; T0 = &quot;, &quot; TEMPCO = &quot;, &quot; Tcal = &quot;, &quot; PRESCO = &quot;, &quot; Pcal = &quot;, &quot; K = &quot;, &quot; Patm = &quot; };
+
+        GH[0] += additionalInfo.KoefsSarasota.D0 + &quot;,&quot;;
+        GH[1] += additionalInfo.KoefsSarasota.T0 + &quot;,&quot;;
+        GH[2] += additionalInfo.KoefsSarasota.TEMPCO + &quot;,&quot;;
+        GH[3] += additionalInfo.KoefsSarasota.Tcal + &quot;,&quot;;
+        GH[4] += additionalInfo.KoefsSarasota.PRESCO + &quot;,&quot;;
+        GH[5] += additionalInfo.KoefsSarasota.Pcal + &quot;,&quot;;
+        GH[6] += additionalInfo.KoefsSarasota.K + &quot;,&quot;;
+        GH[7] += additionalInfo.KoefsSarasota.Patm + &quot;.&quot;;        
+        
+        int i = 0;
+        do
+        {
+          GH1_1 += GH[i];
+          i++;
+        } while (GH1_1.Length &lt; 125 &amp;&amp; i &lt; 8);
+
+        while (i &lt; 8)
+        {
+          GH1_2 += GH[i];
+          i++;
+        }
+      }
+      else return string.Empty;
+      
+      return String.Join(&quot;, &quot;, GH1_1 + GH1_2);
+    }
   }    
 }
 
@@ -278,7 +292,7 @@ namespace FastReport
   </Styles>
   <Dictionary>
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
-    <Parameter Name="JsonDoc" DataType="System.String"/>
+    <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
   <ReportPage Name="Page" Landscape="true" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
     <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="173.88" CanGrow="true" CanShrink="true" CanBreak="true">
@@ -313,7 +327,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableResults" Top="176.58" Width="1047.06" Height="124.74" CanBreak="true">
+    <DataBand Name="DataBandTableResults" Top="177.88" Width="1047.06" Height="124.74" CanBreak="true">
       <TableObject Name="TableResults" Top="26.46" Width="981.12" Height="98.28" FixedRows="3" ManualBuildEvent="TableResults_ManualBuild">
         <TableColumn Name="Column151" Width="103.74"/>
         <TableColumn Name="Column152" Width="103.74"/>
@@ -371,7 +385,7 @@ namespace FastReport
       </TableObject>
       <TextObject Name="TableResultsHeader" Top="7.56" Width="652.05" Height="18.9" Text="Определение метрологических характеристик" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="304.03" Width="1047.06" Height="86.94" CanGrow="true" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="306.62" Width="1047.06" Height="86.94" CanGrow="true" CanShrink="true">
       <TableObject Name="TableConclusion" Top="7.56" Width="699.41" Height="79.38">
         <TableColumn Name="Column144" Width="699.41"/>
         <TableRow Name="Row127" Height="26.46" AutoSize="true">
@@ -385,7 +399,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="393.67" Width="1047.06" Height="22.68" CanGrow="true" CanShrink="true" CanBreak="true" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="397.56" Width="1047.06" Height="22.68" CanGrow="true" CanShrink="true" CanBreak="true" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.9"/>
     </PageFooterBand>
   </ReportPage>

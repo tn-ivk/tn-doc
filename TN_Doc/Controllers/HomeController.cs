@@ -155,9 +155,23 @@ namespace TN_Doc.Controllers
         }
         public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
         {
-            return CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+            int lastUsedTemplateId = CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                 .Docs.Single(x => x.IdDoc == IdDoc)
                 .LastUsedTemplateId;
+
+            var usedTemplateDocs = CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+                .Docs.Single(x => x.IdDoc == IdDoc)
+                .TemplateDocs
+                .Where(x => x.Use);
+
+            if (usedTemplateDocs.Where(x => x.Id == lastUsedTemplateId).Count() > 0)
+                return lastUsedTemplateId;
+            else
+            {
+                int id = usedTemplateDocs.First().Id;
+                SetIdTemplateDoc(IdDevice, IdDoc, id);
+                return id;
+            }
         }
         public string GetPathTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {

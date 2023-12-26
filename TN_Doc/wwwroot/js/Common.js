@@ -21,11 +21,9 @@ var PrefixTag = "IVK_TN_01";
 var CurrentDeviceName;
 var CurrentDeviceId;
 
-
 var table = null;
 var currentId = null;
 var docTemplates = {};
-
 
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
@@ -788,8 +786,6 @@ function GetEditDoc() {
                     $(this).attr('src', '/HTML/html.html');
                 });
 
-
-
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
             }
@@ -826,7 +822,6 @@ function GetPeriodDocument() {
 
     return ret;
 }
-
 
 function PrintDoc() {
     $.ajax(
@@ -902,7 +897,6 @@ function GetFullNameTag(tagName) {
     return PrefixTag + '.' + tagName;
 }
 
-
 //Получить данные из ЕЛИС
 function GetElisData() {
 
@@ -941,8 +935,8 @@ function GetElisData() {
                 //}),
 
                 JSON.stringify({
-                    startPeriod: moment(periodDocument.begin * 1000).utc().format(),
-                    endPeriod: moment(periodDocument.end * 1000).utc().format()
+                    startPeriod: moment(periodDocument.begin * 1000).format(),
+                    endPeriod: moment(periodDocument.end * 1000).format()
                 }),
 
             success: function (data) {
@@ -1060,6 +1054,7 @@ function SetClientToken() {
 
 }
 
+
 function DrawTablePassports(dataELIS) {
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
@@ -1100,9 +1095,11 @@ function DrawTablePassports(dataELIS) {
     });
 }
 
+
 function SetDataLocalStorage() {
 
 }
+
 
 function FillPassportDataElis() { 
 
@@ -1146,9 +1143,7 @@ function FillPassportDataElis() {
             //    if (item[i].value === testMethodName) item[i].selected = true;
             //}
         }
-    });
-
-    $('#listPassports').empty();
+    });  
 }
 
 //Состояние кнопки "Запросить данные"
@@ -1164,4 +1159,9 @@ function StateButtonGetElisData(state) {
         $("#spinnerDataRequest").prop("hidden", true);
         $("#textDataRequest")[0].innerText = "Запросить данные"; 
     }
+}
+
+function ButtonElis() {
+    $('#listPassports').empty();
+    localStorage.removeItem('dataPassport');
 }

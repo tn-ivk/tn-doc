@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/08/2023 17:16:02" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/25/2023 10:24:30" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -89,8 +89,8 @@ namespace FastReport
         TableHeader.Columns[i].Width = widthDynamicCols*Units.Millimeters;
       }
 
-      ProtocolType.Text = string.Format(&quot;Протокол № &lt;u&gt;{0}&lt;/u&gt; &lt;br&gt;контроля MX рабочего УЗР   по поверочной установке&quot;,
-        DataIVK.TableKMH_PR_PU.AdditionalInfo.ProtokolNum); 
+      ProtocolNumber.Text = string.Format(&quot;Протокол № &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableKMH_PR_PU.AdditionalInfo.ProtokolNum);
+      ProtocolType.Text = string.Format(&quot;контроля MX рабочего УЗР по поверочной установке&quot;, DataIVK.TableKMH_PR_PU.AdditionalInfo.ProtokolNum); 
       
       // Fill table with data   
       PR_Type.Text = string.Format(&quot;Тип УЗР: &lt;u&gt;{0}&lt;/u&gt; Зав. №: &lt;u&gt;{1}&lt;/u&gt; &lt;br&gt;Место проведения КМХ: &lt;u&gt;{2}&lt;/u&gt; (СИКН, НГДУ, ПСП) Линия № &lt;u&gt;{3}&lt;/u&gt;&quot;, 
@@ -372,15 +372,19 @@ namespace FastReport
   </Styles>
   <Dictionary>
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
-    <Parameter Name="JsonDoc" DataType="System.String"/>
+    <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
   <ReportPage Name="Page" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
-    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="98.28" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableHeader" Width="850.5" Height="90.72" CanBreak="false">
+    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableHeader" Width="850.5" Height="86.94" CanBreak="false">
         <TableColumn Name="Column1" Width="359.1"/>
         <TableColumn Name="Column2" Width="491.4"/>
-        <TableRow Name="Row1" Height="41.58" AutoSize="true">
-          <TableCell Name="ProtocolType" Text="ProtocolType" Padding="2, 1, 2, 6" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
+        <TableRow Name="Row131">
+          <TableCell Name="ProtocolNumber" Text="ProtocolNumber" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell925" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row1" AutoSize="true">
+          <TableCell Name="ProtocolType" Text="ProtocolType" Padding="2, 1, 2, 6" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
           <TableCell Name="Cell2" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row2" Height="49.14" AutoSize="true">
@@ -389,7 +393,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableSourceData" Top="100.98" Width="1047.06" Height="136.08" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableSourceData" Top="90.94" Width="1047.06" Height="136.08" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSourceData" Top="7.56" Width="567" Height="128.52">
         <TableColumn Name="Column3TemplateTableSourceData" Width="75.6"/>
         <TableColumn Name="Column6" Width="75.6"/>
@@ -445,7 +449,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableResults" Top="239.77" Width="1047.06" Height="120.96" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableResults" Top="231.02" Width="1047.06" Height="120.96" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableResults" Top="7.56" Width="910.91" Height="113.4" GrowToBottom="true" FixedRows="4" FixedColumns="2" ManualBuildEvent="TableResults_ManualBuild">
         <TableColumn Name="Column146" Width="94.06"/>
         <TableColumn Name="Column147" Width="75.37"/>
@@ -543,7 +547,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="363.43" Width="1047.06" Height="206.01" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="355.98" Width="1047.06" Height="206.01" CanShrink="true">
       <TableObject Name="TableConclusion" Top="7.56" Width="907.2" Height="198.45" FixedColumns="2">
         <TableColumn Name="Column13" Width="170.1"/>
         <TableColumn Name="Column14" Width="444.15"/>
@@ -600,7 +604,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="572.14" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="565.99" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

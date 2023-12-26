@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/25/2023 12:23:13" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/22/2023 09:10:19" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -157,26 +157,28 @@ namespace FastReport
     private void TableTotal_ManualBuild(object sender, EventArgs e)
     {
       List&lt;string&gt; listShiftsData;
-      listShiftsData =DataIVK.TableMeasurementJornal.Data.Shift.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listShiftsData = DataIVK.TableMeasurementJornal.Data.Shift.Select(x =&gt; x == &quot;&quot; ? &quot;-&quot; : x).ToList();;
          
-      for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
+      for (int i = 0; i &lt; DataIVK.TableMeasurementJornal.AdditionalInfo.ShiftNum; i++)                 
       {
-        switch(listShiftsData.Count)
+        switch(DataIVK.TableMeasurementJornal.AdditionalInfo.ShiftNum)
         {
           case 0:
             Total.Text=&quot;&quot;;
             break;
           case 1:
-            Total.Text=string.Format(&quot;Итого масса брутто нефти за смену: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]));
+            Total.Text=string.Format(&quot;Итого масса брутто нефти за смену &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]));
             break;
           default:
-            Total.Text=string.Format(&quot;Итого масса брутто нефти за смену №{1}: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]),(i+1));
+            Total.Text=string.Format(&quot;Итого масса брутто нефти за смену №{1} &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(listShiftsData[i]), i+1);
             break;
         }
         TableTotal.PrintRow(0);                                                                                                                                                                       
         TableTotal.PrintColumns();          
       }
-      Total.Text=string.Format(&quot;Итого масса брутто нефти за сутки: &lt;u&gt;{0}&lt;/u&gt; т.&quot;, tools.GetNormalizedValue(DataIVK.TableMeasurementJornal.Data.Day));
+      
+      Total.Text=string.Format(&quot;Итого масса брутто нефти за сутки &lt;u&gt;{0}&lt;/u&gt; т.&quot;, DataIVK.TableMeasurementJornal.Data.Day != &quot;&quot; ? tools.GetNormalizedValue(DataIVK.TableMeasurementJornal.Data.Day) : &quot;-&quot;);
+      
       TableTotal.PrintRow(0);                                                                                                                                                                       
       TableTotal.PrintColumns();          
     }
@@ -252,7 +254,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableJournal" Top="60.7" Width="1047.06" Height="151.22">
+    <DataBand Name="DataBandTableJournal" Top="58.92" Width="1047.06" Height="151.22">
       <TableObject Name="TableJournal" Width="1047.06" Height="151.22" FixedRows="5" ManualBuildEvent="TableJournal_ManualBuild">
         <TableColumn Name="Column122" Width="30.24"/>
         <TableColumn Name="Column123" Width="64.26"/>
@@ -289,7 +291,7 @@ namespace FastReport
           <TableCell Name="Cell1495" Padding="0, 0, 0, 0" Font="Arial, 10pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row102" Height="52.92">
-          <TableCell Name="Cell1170" Border.Lines="All" Text="№№&lt;br&gt;пп" Padding="0, 0, 3, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="3"/>
+          <TableCell Name="Cell1170" Border.Lines="All" Text="№&lt;br&gt;пп" Padding="0, 0, 3, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="3"/>
           <TableCell Name="Cell1171" Border.Lines="All" Text="Дата" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="3"/>
           <TableCell Name="Cell1172" Border.Lines="All" Text="Время, ч. мин." Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
           <TableCell Name="Cell1173" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -380,7 +382,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableTotal" Top="215.92" Width="1047.06" Height="23.63" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableTotal" Top="212.36" Width="1047.06" Height="23.63" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableTotal" Top="7.56" Width="718.2" Height="16.07" ManualBuildEvent="TableTotal_ManualBuild">
         <TableColumn Name="Column138" Width="718.2"/>
         <TableRow Name="Row106" Height="16.07">
@@ -388,7 +390,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="243.55" Width="1047.06" Height="153.09" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="238.22" Width="1047.06" Height="153.09" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="11.34" Width="1041.39" Height="94.5">
         <TableColumn Name="Column52" Width="94.5"/>
         <TableColumn Name="Column51" Width="5.67"/>
@@ -415,7 +417,7 @@ namespace FastReport
           <TableCell Name="Cell1169" Padding="0, 0, 0, 0" Font="Arial, 8pt" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row70" Height="26.46">
-          <TableCell Name="Cell625" Text="Смену сдал:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" FirstTabOffset="18.9" TextRenderType="HtmlTags" ParagraphOffset="18.9"/>
+          <TableCell Name="Cell625" Text="Смену сдал" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" FirstTabOffset="18.9" TextRenderType="HtmlTags" ParagraphOffset="18.9"/>
           <TableCell Name="Cell623" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell621" Border.Lines="Bottom" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell613" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -474,7 +476,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="400.64" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="393.53" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

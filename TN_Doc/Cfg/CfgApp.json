@@ -118,7 +118,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 4,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
               "Use": true,
@@ -137,7 +137,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "Акт для нефтепродукта",
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
@@ -158,6 +158,14 @@
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
               "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+            },
+            {
+              "Use": true,
+              "Id": 5,
+              "Name": "Акт для валовых объемов нефти (ShiftTime)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             }
           ]
@@ -270,6 +278,14 @@
               "Name": "КМХ УЗР по ПУ (ТПР)",
               "Description": "Протокол контроля МХ рабочего УЗР по поверочной установке. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.5)",
               "PathToDocTemplateFile": "/Doc/08_DocKMH_UZR_PU_(TPR).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_UZR_PU.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПР по ПУ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода с поверочными установками. ГОСТ Р 8.1011-2022 (Приложение У.2)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PR_PU_GOSTR8.1011-2022(U2).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_UZR_PU.json"
             }
           ]
@@ -547,7 +563,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 19,
           "Name": "КМХ МИ3265 ПР РСУ по ПР ОСУ",
           "Description": "",
@@ -887,7 +903,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.8.101",
+          "Server": "localhost",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",

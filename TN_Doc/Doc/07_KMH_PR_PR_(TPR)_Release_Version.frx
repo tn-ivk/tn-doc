@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/18/2023 15:50:29" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/26/2023 11:24:56" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -304,7 +304,7 @@ namespace FastReport
         <TableColumn Name="Column1" Width="481.95"/>
         <TableColumn Name="Column2" Width="444.15"/>
         <TableRow Name="Row1" Height="32.13">
-          <TableCell Name="Cell1" Text="Протокол контроля МХ рабочего ПР   по контрольному ПР" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="Cell1" Text="Протокол контроля МХ рабочего ПР по контрольному ПР" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
           <TableCell Name="Cell2" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row2" AutoSize="true">
@@ -325,7 +325,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableSourceData" Top="119.18" Width="1047.06" Height="117.18" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableSourceData" Top="121.18" Width="1047.06" Height="117.18" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSourceData" Top="7.56" Width="226.8" Height="109.62">
         <TableColumn Name="Column120" Width="75.6"/>
         <TableColumn Name="Column121" Width="75.6"/>
@@ -357,8 +357,8 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableResults" Top="238.36" Width="1047.06" Height="130.41" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableResults" Top="7.56" Width="926.66" Height="122.85" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TableResults_ManualBuild">
+    <DataBand Name="DataBandTableResults" Top="242.36" Width="1047.06" Height="130.41" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableResults" Top="7.56" Width="879.41" Height="122.85" GrowToBottom="true" FixedRows="3" ManualBuildEvent="TableResults_ManualBuild">
         <TableColumn Name="Column146" Width="56.56"/>
         <TableColumn Name="Column147" Width="58.81"/>
         <TableColumn Name="Column148" Width="65.21"/>
@@ -392,13 +392,13 @@ namespace FastReport
           <TableCell Name="Cell932" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row35" Height="32.13">
-          <TableCell Name="Cell378" Border.Lines="All" Text="№&#13;&#10;поддиапа&#13;&#10;зона" Padding="0, 0, 2, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
-          <TableCell Name="Cell379" Border.Lines="All" Text="№&#13;&#10;измерения" Padding="0, 0, 2, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell378" Border.Lines="All" Text="№&#13;&#10;поддиап&#13;&#10;азона" Padding="0, 0, 2, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" RowSpan="2"/>
+          <TableCell Name="Cell379" Border.Lines="All" Text="№&#13;&#10;измерения" Padding="0, 0, 2, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" RowSpan="2"/>
           <TableCell Name="Cell380" Border.Lines="All" Text="Расход" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="2"/>
           <TableCell Name="Cell381" Border.Lines="All" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell382" Border.Lines="All" Text="П&lt;sub&gt;&lt;/sub&gt;Р&lt;br/&gt;контрольный" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell382" Border.Lines="All" Text="ПР&#13;&#10;контрольный" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="2"/>
           <TableCell Name="Cell383" Border.Lines="All" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell384" Border.Lines="All" Text="П&lt;sub&gt;&lt;/sub&gt;Р&lt;br/&gt;рабочий" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell384" Border.Lines="All" Text="ПР&#13;&#10;рабочий" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="2"/>
           <TableCell Name="Cell540" Border.Lines="All" Padding="0, 2, 0, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell543" Border.Lines="All" Text="&lt;i&gt;k&lt;sub&gt; tpij" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
           <TableCell Name="Cell914" Border.Lines="All" Text="&lt;i&gt;N&lt;sub&gt; kij &lt;/i&gt;&lt;/sub&gt;,&#13;&#10;имп" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
@@ -461,10 +461,10 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandPrim" Top="370.77" Width="1047.06" Height="35.91" CanGrow="true" CanShrink="true" CanBreak="true" BeforeLayoutEvent="DataBandPrim_BeforeLayout">
+    <DataBand Name="DataBandPrim" Top="376.77" Width="1047.06" Height="35.91" CanGrow="true" CanShrink="true" CanBreak="true" BeforeLayoutEvent="DataBandPrim_BeforeLayout">
       <TextObject Name="Prim" Top="7.56" Width="926.1" Height="28.35" CanGrow="true" CanShrink="true" CanBreak="false" Text="Prim" HorzAlign="Justify" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="408.68" Width="1047.06" Height="206.01" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="416.68" Width="1047.06" Height="206.01" CanShrink="true">
       <TableObject Name="TableConclusion" Top="7.56" Width="708.75" Height="198.45" FixedColumns="2">
         <TableColumn Name="Column13" Width="151.2"/>
         <TableColumn Name="Column14" Width="349.65"/>
@@ -521,7 +521,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="616.69" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="626.69" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
