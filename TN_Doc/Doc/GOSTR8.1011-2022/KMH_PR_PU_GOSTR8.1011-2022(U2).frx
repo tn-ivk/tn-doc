@@ -16,6 +16,7 @@ using FastReport.Table;
 using FastReport.Utils;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using TN.DocData;
 
 namespace FastReport
 {
@@ -25,13 +26,29 @@ namespace FastReport
     JToken JSettings;
     JToken JTableKMH_PR_PU;
     JToken JProtokol;
-    JToken JAdditionalInfo;    
-    
+    JToken JAdditionalInfo;
+
     int TypeTPU = 2;
     
     string ErrorValue = &quot;Ошибка&quot;; //&quot;Нет ошибки&quot;
     Color  ErrorColor = Color.LightCoral;
     
+    
+/*  TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
+    TN.Doc.Doc doc; // данные из входного параметра
+    TN.DocData.General General;
+    TN.Doc.HeaderDoc Header;
+    TN.Doc.DataDoc SettingsData;
+    TN.Doc.FooterDoc Footer;
+    TN.Doc.DictionarysDoc Dictionarys;
+    TN.Doc.DataIVKDoc DataIVK;
+    
+    List &lt;string&gt; listDetectors;
+    int tempCounter;
+    int tempColNum;
+    
+    string oilName;
+*/     
     private void Page_StartPage(object sender, EventArgs e)
     {
       JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
@@ -40,36 +57,39 @@ namespace FastReport
       JProtokol = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TableKMH_PR_PU&quot;][&quot;Protokol&quot;];
       JAdditionalInfo = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TableKMH_PR_PU&quot;][&quot;AdditionalInfo&quot;];
       
+      //Настройки страницы 
+      //Ширина и высота (в мм)
       Page.PaperHeight = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperHeight&quot;];
       Page.PaperWidth = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperWidth&quot;];
          
+      //Поля/отступы от краёв (в мм)
       Page.TopMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;TopMargin&quot;];
       Page.BottomMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;BottomMargin&quot;];
       Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
       Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
-      
+ 
       TypeTPU = (int)JSettings[&quot;Data&quot;][&quot;TypeTPU&quot;];
-      
+         
       FillReportTitle();
       FillReportSummary();
     }
-     
+         
     private void FillReportTitle()
     {
       PR_Type.Text = $&quot;Тип СИ объемного расхода &lt;u&gt;{JAdditionalInfo[&quot;PR_Type&quot;].ToString()}&lt;/u&gt;&quot;;
       PR_FactoryNumber.Text = $&quot;Заводской номер &lt;u&gt;{JAdditionalInfo[&quot;PR_FactoryNumber&quot;].ToString()}&lt;/u&gt;&quot;;      
       DeltaPr.Text = $&quot;Пределы допускаемой относительной погрешности, % &lt;u&gt;{JProtokol[&quot;DeltaPr&quot;].ToString().Replace('.',',')}&lt;/u&gt;&quot;;      
-      
+         
       string placeSiknName = String.IsNullOrEmpty(JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString()) ?
       $&quot;СИКН/СИКНП &lt;u&gt;{JAdditionalInfo[&quot;Place_SIKN&quot;].ToString()}&lt;/u&gt;&quot; :
       $&quot;{JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString()} &lt;u&gt;{JAdditionalInfo[&quot;Place_SIKN&quot;].ToString()}&lt;/u&gt;&quot;;                    
       Place_SIKN.Text = placeSiknName;
-      
+         
       string placePspName = String.IsNullOrEmpty(JSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString()) ?
       $&quot;ПСП &lt;u&gt;{JAdditionalInfo[&quot;Place&quot;].ToString()}&lt;/u&gt;&quot; :
       $&quot;{JSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString()} &lt;u&gt;{JAdditionalInfo[&quot;Place&quot;].ToString()}&lt;/u&gt;&quot;;      
       Place.Text = placePspName;      
-      
+         
       //Place_SIKN.Text = $&quot;СИКН/СИКНП &lt;u&gt;{JAdditionalInfo[&quot;Place_SIKN&quot;].ToString()}&lt;/u&gt;&quot;;
       //Place.Text = $&quot;ПСП &lt;u&gt;{JAdditionalInfo[&quot;Place&quot;].ToString()}&lt;/u&gt;&quot;;
       
@@ -79,9 +99,9 @@ namespace FastReport
       PU_CheckDate.Text = $&quot;Дата поверки &lt;u&gt;{JAdditionalInfo[&quot;PU_CheckDate&quot;].ToString()}&lt;/u&gt;&quot;;
       Visc.Text = $&quot;Вязкость нефти/нефтепродуктов при КМХ, мм&lt;sup&gt;2&lt;/sup&gt;/с (сСт) &lt;u&gt;{JProtokol[&quot;Visc&quot;].ToString().Replace('.',',')}&lt;/u&gt;&quot;;
     }
-    
+      
     private void Table1_ManualBuild(object sender, EventArgs e)
-    {     
+    {       
       if (Engine.FinalPass == true)
       {
         JToken jsonTable1 = JTableKMH_PR_PU[&quot;Protokol&quot;][&quot;Table1&quot;]; 
@@ -95,26 +115,26 @@ namespace FastReport
         for (int i = 1; i &lt; listV0.Count; i++)
         {
           Table1.Columns.Insert(TColumn_Table1_V0.Index+1, new TableColumn());
-          
+                      
           foreach(TableRow row in Table1.Rows)
             row[TColumn_Table1_V0.Index+1].AssignAll(row[TColumn_Table1_V0.Index]);
-        }  
+          }
         Table1_V0_Header.ColSpan = Table1_Alpha_t.Index + 1;
-        
+                        
         for (int i = 1; i &lt; Q0.Count; i++)
         {
           Table1.Columns.Insert(TColumn_Table1_Q.Index+1, new TableColumn());
           
           foreach(TableRow row in Table1.Rows)
             row[TColumn_Table1_Q.Index+1].AssignAll(row[TColumn_Table1_Q.Index]);
-        }         
+        }
         Table1_Q_Header.ColSpan = Q0.Count;
         
-      
+        
         float widthColumn=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/Table1.Columns.Count;                  
         for (int i = 0; i &lt; Table1.ColumnCount; i++)                 
           Table1.Columns[i].Width = widthColumn * Units.Millimeters;
-
+        
         for (int i = 0; i &lt; listV0.Count; i++)
         {           
           if (TypeTPU == 1) //При прямом ходе поршня
@@ -123,90 +143,90 @@ namespace FastReport
             Table1_RowHeader[i].Text = $&quot;Объем калиброванного участка&lt;br&gt;при прямом и обратном ходе&lt;br&gt;поршня, приведенный к рабо-&lt;br&gt;чим условиям, V&lt;sub&gt;ij({DetName[i]})&lt;/sub&gt;, м&lt;sup&gt;3&lt;/sup&gt;&quot;;
           else
             Table1_RowHeader[i].Text = $&quot;Объем калиброванного участка&lt;br&gt;при прямом и обратном ходе&lt;br&gt;поршня, приведенный к рабо-&lt;br&gt;чим условиям, V&lt;sub&gt;ij({DetName[i]})&lt;/sub&gt;, м&lt;sup&gt;3&lt;/sup&gt;&quot;;
-          
+        
           Table1_RowData[i].Text = listV0[i].Replace('.',',');
-        }
-
+      }
+      
         m_D.Text = jsonTable1[&quot;m_D&quot;].ToString().Replace('.',',');
         m_S.Text = jsonTable1[&quot;m_S&quot;].ToString().Replace('.',',');
         m_E.Text = jsonTable1[&quot;m_E&quot;].ToString().Replace('.',',');
         Alpha_t.Text = jsonTable1[&quot;Alpha_t&quot;].ToString().Replace('.',',');
-
+      
         for (int i = 0; i &lt; Q0.Count; i++)
         {
           Table1_RowHeader[TColumn_Table1_Q.Index+i].Text = $&quot;Q&lt;sub&gt;{i+1}&lt;/sub&gt;/f/ν&lt;sub&gt;{i+1}&lt;/sub&gt;&quot;;
           Table1_RowData[TColumn_Table1_Q.Index+i].Text = Q0[i].Replace('.',',');
-        }
-
+      }
+    
         Alpha_D.Text = jsonTable1[&quot;Alpha_D&quot;].ToString().Replace('.',',');  
       }
-      
+
       Cell938.Text = $&quot;Характеристики&lt;br&gt;рабочей жидкости &lt;sup&gt;1)&lt;/sup&gt;&quot;;
-      
+            
       PrintTable(Table1);                  
-    }        
-    
+    }
+               
     private void Table2_ManualBuild(object sender, EventArgs e)
     {
       if (Engine.FinalPass == true)
-      { 
+      {       
         JToken jsonTable1 = JTableKMH_PR_PU[&quot;Protokol&quot;][&quot;Table1&quot;]; 
         JToken jsonTable2 = JTableKMH_PR_PU[&quot;Protokol&quot;][&quot;Table2&quot;][&quot;Obj&quot;];
         JToken jsonTable2_1 = JTableKMH_PR_PU[&quot;Protokol&quot;][&quot;Table2_1&quot;][&quot;Obj&quot;];
-        
+      
         List&lt;JToken&gt; listTable2 = jsonTable2.Where(x=&gt;x[&quot;Ser&quot;].ToString()!=&quot;-&quot; &amp;&amp; x[&quot;Ser&quot;].ToString()!=&quot;&quot;).ToList();
         List&lt;JToken&gt; listTable2_1 = jsonTable2_1.Where(x=&gt;x[&quot;Point&quot;].ToString()!=&quot;-&quot; &amp;&amp; x[&quot;Point&quot;].ToString()!=&quot;&quot;).ToList();         
         List&lt;string&gt; listSerTable2 = listTable2.Select(x =&gt; x[&quot;Ser&quot;].ToString()).Distinct().ToList();
-        
+      
         List&lt;string&gt; DetName = jsonTable1[&quot;DetName&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
         List&lt;string&gt; listV0 = jsonTable1[&quot;V0&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
       
         for (int i=1; i&lt;listV0.Count; i++)
-        {
+      {
           Table2.Columns.Insert(TColumn_Table2_V0.Index+1, new TableColumn());
-         
+                      
           foreach(TableRow row in Table2.Rows)
             row[TColumn_Table2_V0.Index+1].AssignAll(row[TColumn_Table2_V0.Index]);
-          
+                        
           //Table2_RowData[TColumn_Table2_V0.Index+1].Name = $&quot;V{i.ToString()}&quot;;
           //Table2_RowData[TColumn_Table2_V0.Index+1].Text = $&quot;V{i.ToString()}&quot;;
         }
-         
+            
         float widthColumn=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/Table2.Columns.Count;                  
         for (int i = 0; i &lt; Table2.ColumnCount; i++)                 
           Table2.Columns[i].Width = widthColumn * Units.Millimeters;
-       
+               
         for (int i = 0; i &lt; listV0.Count; i++)
-        {
+          {
           if (TypeTPU == 1) //При прямом ходе поршня
             Table2_RowHeader[TColumn_Table2_V0.Index+i].Text = $&quot;Объем калибро-&lt;br&gt;ванного участка&lt;br&gt;при прямом ходе&lt;br&gt;поршня V&lt;sub&gt;конij({DetName[i]})&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;&quot;;
           else if (TypeTPU == 2)//При прямом и обратном ходе поршня
             Table2_RowHeader[TColumn_Table2_V0.Index+i].Text = $&quot;Объем калибро-&lt;br&gt;ванного участка&lt;br&gt;при прямом и об-&lt;br&gt;ратном ходе порш-&lt;br&gt;ня V&lt;sub&gt;конij({DetName[i]})&lt;/sub&gt;, м&lt;sup&gt;3&lt;/sup&gt;&quot;;
           else
             Table2_RowHeader[TColumn_Table2_V0.Index+i].Text = $&quot;Объем калибро-&lt;br&gt;ванного участка&lt;br&gt;при прямом и об-&lt;br&gt;ратном ходе порш-&lt;br&gt;ня V&lt;sub&gt;конij({DetName[i]})&lt;/sub&gt;, м&lt;sup&gt;3&lt;/sup&gt;&quot;;
-        }
-        
+          }
+               
         for(int i = 0; i &lt; listTable2_1.Count; i++)
         {
           List&lt;JToken&gt; SerTable2 = jsonTable2.Where(x=&gt;x[&quot;Ser&quot;].ToString()==listSerTable2[i]).ToList();          
           List&lt;TableRow&gt; rows = new List&lt;TableRow&gt;();
-
+            
           for (int j = 0; j &lt; SerTable2.Count; j++)
-          { 
+        {
             if (j==0)
             {
               Ser.RowSpan = SerTable2.Count;
               K_j.RowSpan = SerTable2.Count;
               K_rasch_j.RowSpan = SerTable2.Count;
               Delta_j.RowSpan = SerTable2.Count;
-            }
+        }
             else 
-            {
+        {
               Ser.RowSpan = 1;
               K_j.RowSpan = 1;
               K_rasch_j.RowSpan = 1;
               Delta_j.RowSpan = 1;
-            }
+        } 
             
             Ser.Text = SerTable2[j][&quot;Ser&quot;].ToString().Replace('.',',');
             Row.Text = SerTable2[j][&quot;Row&quot;].ToString().Replace('.',',');
@@ -218,26 +238,26 @@ namespace FastReport
             P_PR_ji.Text = SerTable2[j][&quot;P_PR_ji&quot;].ToString().Replace('.',',');
             //t_cm_ji.Text = SerTable2[j][&quot;t_cm_ji&quot;].ToString().Replace('.',',');
             k_tp_ji.Text = SerTable2[j][&quot;k_tp_ji&quot;].ToString().Replace('.',',');
-            
+         
             for (int z = 0; z &lt; DetName.Count; z++)
-            {
+        {
               if (DetName[z] == SerTable2[j][&quot;Det&quot;].ToString())
                 Table2[TColumn_Table2_V0.Index + z, Table2_RowData.Index].Text = SerTable2[j][&quot;V_ji&quot;].ToString().Replace('.',',');
               else
                 Table2[TColumn_Table2_V0.Index + z, Table2_RowData.Index].Text = &quot;-&quot;;
-            }
-            
+        }     
+        
             //int indexOffset = DetName.IndexOf(SerTable2[j][&quot;Det&quot;].ToString()); 
             //Table2[TColumn_Table2_V0.Index + indexOffset, Table2_RowData.Index].Text = SerTable2[j][&quot;V_ji&quot;].ToString().Replace('.',',');
             //V_ji.Text = SerTable2[j][&quot;V_ji&quot;].ToString().Replace('.',',');
-            
+                                        
             N_ji.Text = SerTable2[j][&quot;N_ji&quot;].ToString().Replace('.',',');
             K_ji.Text = SerTable2[j][&quot;K_ji&quot;].ToString().Replace('.',',');    
-          
+            
             K_j.Text = listTable2_1[i][&quot;K_j&quot;].ToString().Replace('.',',');
             K_rasch_j.Text = listTable2_1[i][&quot;K_rasch_j&quot;].ToString().Replace('.',',');
             Delta_j.Text = listTable2_1[i][&quot;Delta_j&quot;].ToString().Replace('.',',');            
-           
+            
             TableRow row = new TableRow();
             row.AssignAll(Table2_RowData);
             row.Visible=true;
@@ -251,47 +271,58 @@ namespace FastReport
           Table2.Rows.AddRange(rows.ToArray());
         }
       }
-      
+         
       MI.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;MI&quot;].ToString();
       
       PrintTable(Table2);
-    }     
-    
+      } 
+         
     private void FillReportSummary()
-    {
+      {
       Report.SetParameterValue(&quot;Delta_KMH_Max&quot;, JProtokol[&quot;Delta_KMH_Max&quot;].ToString().Replace('.',','));
       Report.SetParameterValue(&quot;ARM_KMH_Result&quot;, JAdditionalInfo[&quot;ARM_KMH_Result&quot;].ToString() == &quot;годен&quot; ? &quot;годно&quot; : &quot;не годно&quot;);
-      
+               
       DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTableKMH_PR_PU[&quot;DateTimeLong&quot;]);
       Report.SetParameterValue(&quot;DateKMH&quot;, date.ToString(&quot;dd.MM.yyyy&quot;));
       
-      
+      // Fill cells with data
+      int sumPointMeasures =0;
+      int numRowForSpan = 0;
+      tempCounter = 0;
+      for (int z = 0; z &lt; (listTab2_1Points.Count); z++)  
+      {
+        
       //if ((bool)JARMData[&quot;GostBinary&quot;][&quot;OperatingStaffDataIsDelivery&quot;])
       //{
       //}       
-      
+        
       ServiceStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Company&quot;].ToString();
       ServiceStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Post&quot;].ToString();
       ServiceStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;FIO&quot;].ToString();
-      
+          
       OperatingStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Company&quot;].ToString();
       OperatingStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Post&quot;].ToString();
       OperatingStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;FIO&quot;].ToString();
-      
+                  
       DeliveryOrRecievingStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Company&quot;].ToString();
       DeliveryOrRecievingStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Post&quot;].ToString();
       DeliveryOrRecievingStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;FIO&quot;].ToString();
     }
-    
+                  
     private void PrintTable(TableObject table)
-    {
+          {
       for (int i=0;i&lt;table.RowCount;i++)
-      {       
+            {
         table.PrintRow(i);
         table.PrintColumns();
-      }    
-    }
-    
+            }
+            else
+            {
+              TableResults[(9 + i),4].Text=&quot;-&quot;;
+            }
+          }       
+          #endregion 
+                  
     private void ControlTableSKO_ManualBuild(object sender, EventArgs e)
     {
       if (Engine.FinalPass == true)
@@ -299,44 +330,47 @@ namespace FastReport
         JToken jsonTable1 = JTableKMH_PR_PU[&quot;Protokol&quot;][&quot;Table1&quot;]; 
         JToken jsonTable2 = JTableKMH_PR_PU[&quot;Protokol&quot;][&quot;Table2&quot;][&quot;Obj&quot;];
         JToken jsonTable2_1 = JTableKMH_PR_PU[&quot;Protokol&quot;][&quot;Table2_1&quot;][&quot;Obj&quot;];
-        
+                  
         List&lt;JToken&gt; listTable2 = jsonTable2.Where(x=&gt;x[&quot;Ser&quot;].ToString()!=&quot;-&quot; &amp;&amp; x[&quot;Ser&quot;].ToString()!=&quot;&quot;).ToList();
         List&lt;JToken&gt; listTable2_1 = jsonTable2_1.Where(x=&gt;x[&quot;Point&quot;].ToString()!=&quot;-&quot; &amp;&amp; x[&quot;Point&quot;].ToString()!=&quot;&quot;).ToList();         
         List&lt;string&gt; listSerTable2 = listTable2.Select(x =&gt; x[&quot;Ser&quot;].ToString()).Distinct().ToList();
-        
+                  
         List&lt;string&gt; DetName = jsonTable1[&quot;DetName&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
         List&lt;string&gt; listV0 = jsonTable1[&quot;V0&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
-      
+        
         for(int i = 0; i &lt; listTable2_1.Count; i++)
         {
           List&lt;JToken&gt; SerTable2 = jsonTable2.Where(x=&gt;x[&quot;Ser&quot;].ToString()==listSerTable2[i]).ToList();          
           List&lt;TableRow&gt; rows = new List&lt;TableRow&gt;();
-
+        
           for (int j = 0; j &lt; SerTable2.Count; j++)
-          { 
+      {  
             if (j == 0)
             {
               ControlTableSKO_Ser.RowSpan = SerTable2.Count;
               ControlTableSKO_K_j.RowSpan = SerTable2.Count;
               ControlTableSKO_K_rasch_j.RowSpan = SerTable2.Count;
               ControlTableSKO_SKO_j.RowSpan = SerTable2.Count;
-            }
-            else 
-            {
+      }
+      else
+      {
               ControlTableSKO_Ser.RowSpan = 1;
               ControlTableSKO_K_j.RowSpan = 1;
               ControlTableSKO_K_rasch_j.RowSpan = 1;
               ControlTableSKO_SKO_j.RowSpan = 1;
-            }
-            
+      }
+      #endregion  
+*/ 
+    }
+
             ControlTableSKO_Ser.Text = SerTable2[j][&quot;Ser&quot;].ToString().Replace('.',',');
             ControlTableSKO_Row.Text = SerTable2[j][&quot;Row&quot;].ToString().Replace('.',',');
             ControlTableSKO_Q_ji.Text = SerTable2[j][&quot;Q_ji&quot;].ToString().Replace('.',',');
-            
+      
             ControlTableSKO_K_j.Text = listTable2_1[i][&quot;K_j&quot;].ToString().Replace('.',','); 
             ControlTableSKO_K_rasch_j.Text = listTable2_1[i][&quot;K_rasch_j&quot;].ToString().Replace('.',',');            
             ControlTableSKO_SKO_j.Text = listTable2_1[i][&quot;SKO_j&quot;].ToString().Replace('.',',');
-
+         
             if ((string)listTable2_1[i][&quot;SKO_j_ERROR&quot;] == ErrorValue)
               ControlTableSKO_SKO_j.FillColor = ErrorColor;
 
@@ -344,12 +378,15 @@ namespace FastReport
             row.AssignAll(ControlTableSKO_RowData);
             row.Visible = true;
             rows.Add(row);         
-          }
+    }  
           ControlTableSKO.Rows.AddRange(rows.ToArray());
-        }
+      }
+      else
+      {
+        PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
       }
       PrintTable(ControlTableSKO);
-    }     
+    }
   }    
 }
 
@@ -359,6 +396,17 @@ namespace FastReport
     <Style Name="Arial_Reg_8" Font="Arial, 8pt"/>
   </Styles>
   <Dictionary>
+    <JsonDataSourceConnection Name="Protokol" ConnectionString="rijcmlq2+PJxoIT7htBT4hAqKdGgEy403kXPVGU58PXF1t1OAAdS8VGnaFMmOr7GeABxsWrN8S2YgUUbB/dU/CaNYhwmw==">
+      <JsonTableDataSource Name="DS_Table1" DataType="FastReport.Utils.Json.JsonArray" PropName="JSON" Enabled="true" TableName="Table1">
+        <Column Name="V0" DataType="System.String" PropName="Column" Calculated="true" Expression=""/>
+        <Column Name="m_D" DataType="System.String" PropName="Column1" Calculated="true" Expression=""/>
+        <Column Name="m_S" DataType="System.String" PropName="Column2" Calculated="true" Expression=""/>
+        <Column Name="m_E" DataType="System.String" PropName="Column" Calculated="true" Expression=""/>
+        <Column Name="Alpha_t" DataType="System.String" PropName="Column1" Calculated="true" Expression=""/>
+        <Column Name="Alpha_D" DataType="System.String" PropName="Column2" Calculated="true" Expression=""/>
+        <Column Name="Q" DataType="System.String" PropName="Column3" Calculated="true" Expression=""/>
+      </JsonTableDataSource>
+    </JsonDataSourceConnection>
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
     <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
     <Parameter Name="ARM_KMH_Result" DataType="System.String" AsString=""/>
@@ -559,12 +607,12 @@ namespace FastReport
           <TableRow Name="Row140">
             <TableCell Name="Cell1059" Text="Расчеты проведены в соответствии с" Font="Arial, 10pt"/>
             <TableCell Name="MI" Border.Lines="Bottom" Font="Arial, 10pt"/>
-          </TableRow>
+        </TableRow>
           <TableRow Name="Row141">
             <TableCell Name="Cell1064" Font="Arial, 10pt"/>
             <TableCell Name="Cell1065" Text="наименование документа, в соответствии с которым проведены расчеты" HorzAlign="Center" Font="Arial, 8pt"/>
-          </TableRow>
-        </TableObject>
+        </TableRow>
+      </TableObject>
       </DataFooterBand>
     </DataBand>
     <ReportSummaryBand Name="ReportSummary" Top="700.4" Width="1047.06" Height="359.1" CanShrink="true">

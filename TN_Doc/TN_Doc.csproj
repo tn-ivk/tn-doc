@@ -564,6 +564,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Doc\KMH_PR_PU\" />
     <Folder Include="wwwroot\css\font-awesome\" />
     <Folder Include="wwwroot\PDF\" />
   </ItemGroup>

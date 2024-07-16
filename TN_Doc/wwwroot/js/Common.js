@@ -1187,6 +1187,7 @@ function DrawTablePassports(dataELIS) {
 function SetDataLocalStorage() {}
 
 
+
 function FillPassportDataElis() { 
 
     let dataPassport = JSON.parse(localStorage.dataPassport);

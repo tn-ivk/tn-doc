@@ -12,57 +12,57 @@ using Newtonsoft.Json.Linq;
 
 namespace FastReport
 {
-  public class ReportScript
-  {
-    JToken JDoc;
-    JToken JSettings;
-    JToken JTablePassport;
-    JToken JResult;
-    JToken JMethod;
-    JToken JAdditionalData;
+   public class ReportScript
+   {
+      JToken JDoc;
+      JToken JSettings;
+      JToken JTablePassport;
+      JToken JResult;
+      JToken JMethod;
+      JToken JAdditionalData;
     JToken JDataARM;
       
-    private void Page_StartPage(object sender, EventArgs e)
-    {
-      JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
-      JSettings = JDoc[&quot;Doc&quot;][&quot;Settings&quot;];
-      JTablePassport = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;];
-      JAdditionalData = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;AdditionalData&quot;];
-      JResult = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;PassportResult&quot;];
-      JMethod = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;TableActAndPassport&quot;][&quot;Passport&quot;];
+      private void Page_StartPage(object sender, EventArgs e)
+      {
+        JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
+        JSettings = JDoc[&quot;Doc&quot;][&quot;Settings&quot;];
+        JTablePassport = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;];
+        JAdditionalData = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;AdditionalData&quot;];
+        JResult = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;PassportResult&quot;];
+        JMethod = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;TableActAndPassport&quot;][&quot;Passport&quot;];    
       JDataARM = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;DataARM&quot;];    
       
-      //Настройки страницы 
-      //Ширина и высота (в мм)
-      Page.PaperHeight = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperHeight&quot;];
-      Page.PaperWidth = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperWidth&quot;];
+        //Настройки страницы 
+        //Ширина и высота (в мм)
+        Page.PaperHeight = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperHeight&quot;];
+        Page.PaperWidth = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperWidth&quot;];
          
-      //Поля/отступы от краёв (в мм)
-      Page.TopMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;TopMargin&quot;];
-      Page.BottomMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;BottomMargin&quot;];
-      Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
-      Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
+        //Поля/отступы от краёв (в мм)
+        Page.TopMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;TopMargin&quot;];
+        Page.BottomMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;BottomMargin&quot;];
+        Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
+        Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
          
-      //Запуск отрисовки таблиц на странице отчета
-      DrawTableHeader();
-      DrawTablePassport();
-      DrawTableSigners();
-    }
+        //Запуск отрисовки таблиц на странице отчета
+        DrawTableHeader();
+        DrawTablePassport();
+        DrawTableSigners();
+      }
       
-    public void DrawTableHeader()
-    {         
-      DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;Begin&quot;]);
-      DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;End&quot;]);
+      public void DrawTableHeader()
+      {         
+        DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;Begin&quot;]);
+        DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;End&quot;]);
          
-      DateTime SamplingPeriodBegin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;Begin&quot;]);
-      DateTime SamplingPeriodEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;End&quot;]);
+        DateTime SamplingPeriodBegin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;Begin&quot;]);
+        DateTime SamplingPeriodEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;End&quot;]);
       
-      NumberAndDatePassport.Text = string.Format(&quot;№ &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г.&quot;, JResult[&quot;PassportId&quot;], Begin.ToShortDateString());
-      DelivePoint.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]}&quot;;
-      Laboratory.Text = $&quot;{JAdditionalData[&quot;Laboratory&quot;]}&quot;;
-      AccrSertifNumber.Text = $&quot;{JAdditionalData[&quot;AccrSertifNumber&quot;]}&quot;;
-      SIKN_Number.Text = $&quot;{JAdditionalData[&quot;SIKN_Number&quot;]}&quot;;
-      Reservoir.Text = &quot;&quot;;
+        NumberAndDatePassport.Text = string.Format(&quot;№ &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г.&quot;, JResult[&quot;PassportId&quot;], Begin.ToShortDateString());
+        DelivePoint.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]}&quot;;
+        Laboratory.Text = $&quot;{JAdditionalData[&quot;Laboratory&quot;]}&quot;;
+        AccrSertifNumber.Text = $&quot;{JAdditionalData[&quot;AccrSertifNumber&quot;]}&quot;;
+        SIKN_Number.Text = $&quot;{JAdditionalData[&quot;SIKN_Number&quot;]}&quot;;
+        Reservoir.Text = &quot;&quot;;
       
       //DateTimeSampling.Text = string.Format(&quot;{0:dd.MM.yyyy} г. с {1:HH:mm} до {2:HH:mm}&quot;, SamplingPeriodBegin, SamplingPeriodBegin, SamplingPeriodEnd);
       
@@ -77,20 +77,20 @@ namespace FastReport
       }
     }
              
-    private void DrawTablePassport()
-    {
+      private void DrawTablePassport()
+      {
       string result, secondResult;
       JToken metod, secondMetod;
       JToken metods = JDataARM[&quot;LabInfo&quot;];
-      
+
       metod = GetMetod(metods, &quot;TempCorrection&quot;);
       result = $&quot;{JResult[&quot;TempResult&quot;]}&quot;;
       RowTempResult[3].Text = metod == null ? result : GetResult(metod, result);
-
+      
       metod = GetMetod(metods, &quot;PressCorrection&quot;);
       result = $&quot;{JResult[&quot;PressResult&quot;]}&quot;;
       RowPressResult[3].Text = metod == null ? result : GetResult(metod, result);
-
+      
       metod = GetMetod(metods, &quot;DensCorrection&quot;);
       result = $&quot;{JResult[&quot;DensResult&quot;]}&quot;;
       RowDensResult[3].Text = metod == null ? result : GetResult(metod, result);
@@ -98,7 +98,7 @@ namespace FastReport
       metod = GetMetod(metods, &quot;Dens20Correction&quot;);
       result = $&quot;{JResult[&quot;Dens20Result&quot;]}&quot;;
       RowDens20Result[3].Text = metod == null ? result : GetResult(metod, result);
-
+      
       metod = GetMetod(metods, &quot;Dens15Correction&quot;);
       result = $&quot;{JResult[&quot;Dens15Result&quot;]}&quot;;
       RowDens15Result[3].Text = metod == null ? result : GetResult(metod, result);
@@ -139,21 +139,21 @@ namespace FastReport
       result = $&quot;{JResult[&quot;Mass_fraction_of_organic_chlorides&quot;]}&quot;;
       RowMass_fraction_of_organic_chlorides[3].Text = metod == null ? result : GetResult(metod, result);
      
-      //Заполняем колонку метод испытаний
-      RowTempResult[2].Text = $&quot;{JMethod[&quot;TempResult&quot;][&quot;Desc&quot;]}&quot;; 
-      RowPressResult[2].Text = $&quot;{JMethod[&quot;PressResult&quot;][&quot;Desc&quot;]}&quot;;
-      RowDensResult[2].Text = $&quot;{JMethod[&quot;DensResult&quot;][&quot;Desc&quot;]}&quot;;
-      RowDens20Result[2].Text = $&quot;{JMethod[&quot;Dens20Result&quot;][&quot;Desc&quot;]}&quot;;
-      RowDens15Result[2].Text = $&quot;{JMethod[&quot;Dens15Result&quot;][&quot;Desc&quot;]}&quot;;
-      RowMassWaterFracResult[2].Text = $&quot;{JMethod[&quot;MassWaterFracResult&quot;][&quot;Desc&quot;]}&quot;;       
-      RowChloride_Salts[2].Text = $&quot;{JMethod[&quot;Chloride_Salts&quot;][&quot;Concentration&quot;][&quot;Desc&quot;]}&quot;;       
-      RowImpurity[2].Text = $&quot;{JMethod[&quot;Impurity&quot;][&quot;Desc&quot;]}&quot;;
-      RowSulfurResult[2].Text = $&quot;{JMethod[&quot;SulfurResult&quot;][&quot;Desc&quot;]}&quot;;
-      RowDNP[2].Text = $&quot;{JMethod[&quot;DNP&quot;][&quot;kPa&quot;][&quot;Desc&quot;]}&quot;;
-      RowMass_fraction_of_hydrogen_sulfide[2].Text = $&quot;{JMethod[&quot;Mass_fraction_of_hydrogen_sulfide&quot;][&quot;Desc&quot;]}&quot;;
-      RowMass_fraction_of_methyl_and_ethyl_mercaptan[2].Text = $&quot;{JMethod[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;][&quot;Desc&quot;]}&quot;;
-      RowMass_fraction_of_organic_chlorides[2].Text = $&quot;{JMethod[&quot;Mass_fraction_of_organic_chlorides&quot;][&quot;Desc&quot;]}&quot;;         
-    }      
+        //Заполняем колонку метод испытаний
+        RowTempResult[2].Text = $&quot;{JMethod[&quot;TempResult&quot;][&quot;Desc&quot;]}&quot;; 
+        RowPressResult[2].Text = $&quot;{JMethod[&quot;PressResult&quot;][&quot;Desc&quot;]}&quot;;
+        RowDensResult[2].Text = $&quot;{JMethod[&quot;DensResult&quot;][&quot;Desc&quot;]}&quot;;
+        RowDens20Result[2].Text = $&quot;{JMethod[&quot;Dens20Result&quot;][&quot;Desc&quot;]}&quot;;
+        RowDens15Result[2].Text = $&quot;{JMethod[&quot;Dens15Result&quot;][&quot;Desc&quot;]}&quot;;
+        RowMassWaterFracResult[2].Text = $&quot;{JMethod[&quot;MassWaterFracResult&quot;][&quot;Desc&quot;]}&quot;;       
+        RowChloride_Salts[2].Text = $&quot;{JMethod[&quot;Chloride_Salts&quot;][&quot;Concentration&quot;][&quot;Desc&quot;]}&quot;;       
+        RowImpurity[2].Text = $&quot;{JMethod[&quot;Impurity&quot;][&quot;Desc&quot;]}&quot;;
+        RowSulfurResult[2].Text = $&quot;{JMethod[&quot;SulfurResult&quot;][&quot;Desc&quot;]}&quot;;
+        RowDNP[2].Text = $&quot;{JMethod[&quot;DNP&quot;][&quot;kPa&quot;][&quot;Desc&quot;]}&quot;;
+        RowMass_fraction_of_hydrogen_sulfide[2].Text = $&quot;{JMethod[&quot;Mass_fraction_of_hydrogen_sulfide&quot;][&quot;Desc&quot;]}&quot;;
+        RowMass_fraction_of_methyl_and_ethyl_mercaptan[2].Text = $&quot;{JMethod[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;][&quot;Desc&quot;]}&quot;;
+        RowMass_fraction_of_organic_chlorides[2].Text = $&quot;{JMethod[&quot;Mass_fraction_of_organic_chlorides&quot;][&quot;Desc&quot;]}&quot;;      
+      }      
      
     private static JToken GetMetod(JToken metods, string parameterKey) =&gt; metods.FirstOrDefault(x =&gt; x[&quot;ParameterKey&quot;].ToString() == parameterKey);
 
@@ -173,18 +173,18 @@ namespace FastReport
       return result;
     }
     
-    public void  DrawTableSigners()
-    {
-      GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858 &lt;u&gt;{0}&quot;, JResult[&quot;GostIndexResult&quot;].ToString().Replace('X','-'));
-      Laboratory_IOF.Text = $&quot;{JAdditionalData[&quot;Laboratory_IOF&quot;]}&quot;;
-      Delive_Post.Text = $&quot;{JAdditionalData[&quot;Delive_Post&quot;]}&quot;;
-      Delive_Factory.Text = $&quot;{JAdditionalData[&quot;Delive_Factory&quot;]}&quot;;
-      Delive_IOF.Text = $&quot;{JAdditionalData[&quot;Delive_IOF&quot;]}&quot;;
-      Receive_Post.Text = $&quot;{JAdditionalData[&quot;Receive_Post&quot;]}&quot;;
-      Receive_Factory.Text = $&quot;{JAdditionalData[&quot;Receive_Factory&quot;]}&quot;;
-      Receive_IOF.Text = $&quot;{JAdditionalData[&quot;Receive_IOF&quot;]}&quot;;
-    } 
-  }    
+      public void  DrawTableSigners()
+      {
+        GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858 &lt;u&gt;{0}&quot;, JResult[&quot;GostIndexResult&quot;].ToString().Replace('X','-'));
+        Laboratory_IOF.Text = $&quot;{JAdditionalData[&quot;Laboratory_IOF&quot;]}&quot;;
+        Delive_Post.Text = $&quot;{JAdditionalData[&quot;Delive_Post&quot;]}&quot;;
+        Delive_Factory.Text = $&quot;{JAdditionalData[&quot;Delive_Factory&quot;]}&quot;;
+        Delive_IOF.Text = $&quot;{JAdditionalData[&quot;Delive_IOF&quot;]}&quot;;
+        Receive_Post.Text = $&quot;{JAdditionalData[&quot;Receive_Post&quot;]}&quot;;
+        Receive_Factory.Text = $&quot;{JAdditionalData[&quot;Receive_Factory&quot;]}&quot;;
+        Receive_IOF.Text = $&quot;{JAdditionalData[&quot;Receive_IOF&quot;]}&quot;;
+      } 
+   }    
 }</ScriptText>
   <Styles>
     <Style Name="Arial_Bold_9" Font="Arial, 9pt, style=Bold"/>

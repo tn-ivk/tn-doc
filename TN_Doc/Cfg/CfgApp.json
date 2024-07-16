@@ -173,7 +173,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "Акт для нефтепродукта",
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
