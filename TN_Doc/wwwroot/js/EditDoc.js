@@ -31,7 +31,13 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 if ($(this)[0].selectedIndex == -1)
                     param["Value"] = "";
                 else
-                    param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
+                    //param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
+                    /////////
+                    if ($(this).attr('data-tag') == 'Metod')
+                        param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].dataset.metod;
+                    else
+                        param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
+                    /////////
             }
             else if ($(this)[0].nodeName == "INPUT")
                 param["Value"] = $(this).val();
@@ -65,6 +71,61 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
     if (DocGUID == 1)
         WriteTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassport', PrefixTag), true, 2, 0);
 }
+
+function SaveDocPassport(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
+    var params = [];
+    var result = {};
+    //var metods = [];
+    //var values = [];
+
+    $("select, input").each(function () {
+        if ($(this).attr('data-edit') == "1") {
+            param = {};
+            param["Key"] = $(this).attr('data-key');
+            param["Tag"] = $(this).attr('data-tag');
+            if ($(this)[0].nodeName == "SELECT") {
+                if ($(this)[0].selectedIndex == -1)
+                    param["Value"] = "";
+                else {
+                    if ($(this).attr('data-tag') == 'Metod')
+                        param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].dataset.metod;
+                    else
+                        param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
+                }
+            }
+            else if ($(this)[0].nodeName == "INPUT")
+                param["Value"] = $(this).val();
+
+            params.push(param);
+        }
+    });
+
+    result["DocID"] = IdDoc;
+    result["values"] = params;
+
+    $.ajax(
+        {
+            async: false,
+            url: "http://localhost:5000/Home/SaveDoc",
+            type: "POST",
+            dataType: 'json',
+            data: {
+                IdDevice: GuidDevice,
+                IdDoc: DocGUID,
+                data: JSON.stringify(result)
+            },
+            success: function (data) {
+
+            },
+            error: function (data) {
+
+            }
+        });
+
+    if (DocGUID == 1)
+        WriteTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassport', PrefixTag), true, 2, 0);
+}
+
 
 function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray = 3) {
     var url = "http://localhost:5010/api/Values/";

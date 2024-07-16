@@ -21,10 +21,11 @@
         "ProtocolNumber": 1
       },
       "Header": {
-        "FieldSIKN": "����"
+        "FieldSIKN": "",
+        "FieldPSP": ""
       },
       "Data": {
-
+        "TypeTPU": 2
       },
       "Footer": {
 

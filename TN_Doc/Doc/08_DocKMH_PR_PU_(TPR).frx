@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/13/2023 14:39:25" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/24/2023 09:31:08" ReportInfo.CreatorVersion="2023.2.0.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -80,7 +80,7 @@ namespace FastReport
       
     public void DrawTableHeader()
     {
-      oilName = General.NefType == 1 ? &quot;Вязкость нефти при КМХ, сСт:&quot; : &quot;Вязкость нефтепродукта при КМХ, сСт:&quot;;
+      oilName = General.NefType == 1 ? &quot;Вязкость нефти при КМХ,　сСт:&quot; : &quot;Вязкость нефтепродукта при КМХ, сСт:&quot;;
       
       // Setup Columns
       float widthDynamicCols=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/TableHeader.ColumnCount;         
@@ -94,7 +94,7 @@ namespace FastReport
         DataIVK.TableKMH_PR_PU.AdditionalInfo.PR_Type, 
         DataIVK.TableKMH_PR_PU.AdditionalInfo.PR_FactoryNumber,
         DataIVK.TableKMH_PR_PU.AdditionalInfo.Place,
-	DataIVK.TableKMH_PR_PU.AdditionalInfo.Place_SIKN); 
+        DataIVK.TableKMH_PR_PU.AdditionalInfo.Place_SIKN); 
             
       PU_Type.Text = string.Format(&quot;Тип ПУ: &lt;u&gt;{0}&lt;/u&gt; Заводской №: &lt;u&gt;{1}&lt;/u&gt; Дата поверки ПУ: &lt;u&gt;{2}&lt;br&gt;&lt;/u&gt;{4} &lt;u&gt;{3}&quot;,
         DataIVK.TableKMH_PR_PU.AdditionalInfo.PU_Type,
@@ -214,7 +214,7 @@ namespace FastReport
     private void TableResults_ManualBuild(object sender, EventArgs e)
     {
       if (Engine.FirstPass == true)
-      {
+      {                
         tempCounter =  listDetectors.Count;
         //tempColNum = listDetectors.Count+6;
         tempColNum = 9;
@@ -251,14 +251,18 @@ namespace FastReport
                
       var listTab2Measures = DataIVK.TableKMH_PR_PU.Protokol.Table2.Obj.Where(i =&gt;  i.Ser != &quot;-&quot; &amp; String.IsNullOrEmpty(i.Ser) == false).ToList();
       var listTab2_1Points = DataIVK.TableKMH_PR_PU.Protokol.Table2_1.Obj.Where(i =&gt;  i.Point != &quot;-&quot; &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
-
+      var listDistSer = listTab2Measures.Select(x =&gt; x.Ser).Distinct().ToList();
+      
       // Fill cells with data
       int sumPointMeasures =0;
       int numRowForSpan = 0;
       tempCounter = 0;
       for (int z = 0; z &lt; (listTab2_1Points.Count); z++)  
       {
-        sumPointMeasures = listTab2Measures.Count(i =&gt; i.Ser == (z+1).ToString());
+        
+        //sumPointMeasures = listTab2Measures.Count(i =&gt; i.Ser == (z+1).ToString()); 
+        sumPointMeasures = listTab2Measures.Count(i =&gt; i.Ser == listDistSer[z].ToString()); 
+        
         for (int j = 0; j &lt; sumPointMeasures; j++)                    
         {
           #region //Span Rows
@@ -269,6 +273,7 @@ namespace FastReport
           TableResults[(13+listDetectors.Count),4].RowSpan =  sumPointMeasures;
           //numRowForSpan=numRowForSpan+sumPointMeasures;                
           #endregion
+          
           Ser.Text=listTab2Measures[j+tempCounter].Ser;   
           Row.Text=listTab2Measures[j+tempCounter].Row;
           Q_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].Q_ji);
@@ -305,6 +310,8 @@ namespace FastReport
           TableResults.PrintColumns();
                   
         }
+        
+        
         tempCounter=tempCounter+sumPointMeasures;   
                
         Ser.RowSpan=1;
@@ -340,7 +347,7 @@ namespace FastReport
       DeliveryStaffDescription.Text =&quot;&lt;i&gt;От сдающей стороны:&quot;;
       RecievingStaffDescription.Text =&quot;&lt;i&gt;От принимающей стороны:&quot;;                                              
       
-      string result = DataIVK.TableKMH_PR_PU.AdditionalInfo.ARM_KMH_Result == &quot;годен&quot; ? &quot;П Р   годен к дальнейшей эксплуатации&quot; : &quot;П Р   не годен и подлежит внеочередной поверке&quot;;
+      string result = DataIVK.TableKMH_PR_PU.AdditionalInfo.ARM_KMH_Result == &quot;годен&quot; ? &quot;ПР　годен к дальнейшей эксплуатации&quot; : &quot;ПР　не годен и подлежит внеочередной поверке&quot;;
       Conclusion.Text =string.Format(&quot;&lt;b&gt;3. Заключение: δ &lt;sub&gt;mах &lt;/sub&gt; = {0}%. {1}&quot;,                                                     
         tools.GetNormalizedValue(DataIVK.TableKMH_PR_PU.Protokol.Delta_KMH_Max),                                        
         result);                                                 
@@ -379,7 +386,7 @@ namespace FastReport
         <TableColumn Name="Column1" Width="359.1"/>
         <TableColumn Name="Column2" Width="491.4"/>
         <TableRow Name="Row1" Height="41.58" AutoSize="true">
-          <TableCell Name="ProtocolType" Text="Протокол контроля MX ПР   по поверочной установке" Padding="2, 1, 2, 6" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="ProtocolType" Text="Протокол контроля MX ПР по поверочной установке" Padding="2, 1, 2, 6" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
           <TableCell Name="Cell2" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row2" Height="49.14" AutoSize="true">

@@ -38,8 +38,8 @@ namespace TN_Doc.Models.Services
             if (string.IsNullOrEmpty(mainAppCfgFile))
                 throw new ArgumentNullException(nameof(mainAppCfgFile), @"Отсутствует путь главной конфигурации приложения");
 
-            _mainCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, dirName, mainCfgFile));
-            _mainAppCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, dirName, mainAppCfgFile));
+            _mainCfgFile = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), dirName, mainCfgFile));
+            _mainAppCfgFile = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), dirName, mainAppCfgFile));
             FileNotFoundThrowExceptionHelper(_mainCfgFile);
             FileNotFoundThrowExceptionHelper(_mainAppCfgFile);
             _cacheDirectoriesJson = null;
@@ -145,9 +145,9 @@ namespace TN_Doc.Models.Services
         /// <param name="modifJson">Модифицированный JSON для записи в файл</param>
         private void WritePatchesToJson(string modifJson)
         {
-            var json = File.ReadAllText(_mainCfgFile.FullName);
-            var jObject = JObject.Parse(json);
-            var jObjectDir = JObject.Parse(modifJson);
+            string json = File.ReadAllText(_mainCfgFile.FullName);
+            JObject jObject = JObject.Parse(json);
+            JObject jObjectDir = JObject.Parse(modifJson);
             jObject["Doc"]?["Settings"]?["Dictionarys"]?.Replace(jObjectDir);
             File.WriteAllText(_mainCfgFile.FullName, jObject.ToString(), Encoding.Default);
         }
@@ -159,12 +159,12 @@ namespace TN_Doc.Models.Services
         /// <exception cref="FileNotFoundException">Гененерируется при отсутствие файла</exception>
         private void WritePatchesQpToJson(string modifQpJson)
         {
-            var modifJo = JObject.Parse(modifQpJson);
-            foreach (var qpi in modifJo["QpsInfo"]!)
+            JObject modifJo = JObject.Parse(modifQpJson);
+            foreach (JToken qpi in modifJo["QpsInfo"]!)
             {
-                var fileInfo = new FileInfo(Directory.GetCurrentDirectory() + qpi["EditConfigFilePath"]!);
+                FileInfo fileInfo = new(Directory.GetCurrentDirectory() + qpi["EditConfigFilePath"]!);
                 FileNotFoundThrowExceptionHelper(fileInfo);
-                var jObject = JObject.Parse(File.ReadAllText(fileInfo.FullName));
+                JObject jObject = JObject.Parse(File.ReadAllText(fileInfo.FullName));
                 jObject["Methods"]!.Replace(qpi["Methods"]!);
                 jObject["Parameters"]!.Replace(qpi["Parameters"]!);
                 File.WriteAllText(fileInfo.FullName, jObject.ToString(), Encoding.Default);
@@ -190,11 +190,11 @@ namespace TN_Doc.Models.Services
         private JObject ExtractQPMethodAndParameters(JObject qpsInfo)
         {
 
-            foreach (var qps in qpsInfo["QpsInfo"])
+            foreach (JToken qps in qpsInfo["QpsInfo"])
             {
-                var cfgFile = new FileInfo(Directory.GetCurrentDirectory() + qps["EditConfigFilePath"]!);
+                FileInfo cfgFile = new FileInfo(Directory.GetCurrentDirectory()+ qps["EditConfigFilePath"]!);
                 FileNotFoundThrowExceptionHelper(cfgFile);
-                var fullPassCfgJson = JObject.Parse(File.ReadAllText(cfgFile.FullName));
+                JObject fullPassCfgJson = JObject.Parse(File.ReadAllText(cfgFile.FullName));
                 qps["Methods"] = fullPassCfgJson["Methods"];
                 qps["Parameters"] = fullPassCfgJson["Parameters"];
             }

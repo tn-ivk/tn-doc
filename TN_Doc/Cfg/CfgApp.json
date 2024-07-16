@@ -36,21 +36,49 @@
         },
         {
           "Use": true,
+          "IdDoc": 32,
+          "Name": "Отчеты (незавершенные)",
+          "Description": "",
+          "PathToDocDll": "/Dll/Report.dll",
+          "PathToDocConfigFile": "/Cfg/CfgReport.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Отчеты",
+              "Description": "",
+              "PathToDocTemplateFile": "/Doc/01_Report_2022-05-05_Release_version.frx",
+              "PathToDocEditConfigFile": ""
+            },
+            {
+              "Use": false,
+              "Id": 1,
+              "Name": "Отчеты (Усть -Луга)",
+              "Description": "",
+              "PathToDocTemplateFile": "/Doc/01_Report_2023-02-10_Release_version_(Ust-Luga).frx",
+              "PathToDocEditConfigFile": ""
+            }
+          ]
+        },
+        {
+          "Use": true,
           "IdDoc": 1,
           "Name": "Паспорта",
           "Description": "",
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 5,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
               "Id": 0,
-              "Name": "Паспорт качества",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/Passport/Passport.frx",
-              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport.json"
+              "Name": "Паспорт для нефтепродукта",
+              "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
+              "PathToDocTemplateFile": "",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
             },
             {
               "Use": false,
@@ -61,23 +89,23 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
+              "Name": "Паспорт (ГОСТ Р50.2.040 Приложение Ж)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 3,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение И)",
+              "Name": "Паспорт (ГОСТ Р50.2.040 Приложение И)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение И)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(I).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 4,
               "Name": "Паспорт (МИ 3532-2015 Приложение 13)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 13)",
@@ -85,7 +113,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 5,
               "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
@@ -95,18 +123,26 @@
             {
               "Use": false,
               "Id": 6,
-              "Name": "Паспорт для нефтепродукта",
-              "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
-              "PathToDocTemplateFile": "",
-              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
-            },
-            {
-              "Use": false,
-              "Id": 7,
               "Name": "Паспорт (МИ 3532-2015 Приложение 15)",
               "Description": "Форма паспорта качества для поставки нефти на экспорт",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15).json"
+            },
+            {
+              "Use": false,
+              "Id": 7,
+              "Name": "Паспорт (ТР ЕАЭС)",
+              "Description": "Форма паспорта нефти по ТР ЕАЭС 045.2017",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_EAC.frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_EAC.json"
+            },
+            {
+              "Use": false,
+              "Id": 8,
+              "Name": "石油品质报告 (МИ 3532-2015 Приложение 15)",
+              "Description": "石油品质报告 Форма паспорта качества для поставки нефти на экспорт. МИ 3532-2015 (Приложение 15)",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15)_China.frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
             }
           ]
         },
@@ -118,10 +154,10 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 4,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
@@ -129,7 +165,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Акт для партий нефти",
               "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
@@ -145,7 +181,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 3,
               "Name": "Акт приема - сдачи нефти ",
               "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
@@ -153,11 +189,19 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 4,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
               "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+            },
+            {
+              "Use": true,
+              "Id": 5,
+              "Name": "Акт для валовых объемов нефти",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             }
           ]
@@ -191,7 +235,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 4,
           "Name": "Поверка МИ3287",
           "Description": "",
@@ -226,10 +270,10 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ Лаб. СИ",
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
@@ -243,23 +287,31 @@
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
               "PathToDocTemplateFile": "/Doc/03_KMH_PP_Areom_MI_3532-2015_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ Лаб. СИ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по лабораторным или переносным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.3)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PP_Areom_GOSTR8.1011-2022(F3).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom_GostBinary.json"
             }
           ]
         },
         {
           "Use": true,
           "IdDoc": 6,
-          "Name": "КМХ ПР по ПУ (ТПР)",
+          "Name": "КМХ ПР по ПУ",
           "Description": "",
           "PathToDocDll": "/Dll/KMH_PR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PU.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
-              "Name": "КМХ ПР по ПУ (ТПР)",
+              "Name": "КМХ ПР по ПУ",
               "Description": "Протокол контроля МХ ПР по поверочной установке. МИ 3532-2015 (Приложение 5)",
               "PathToDocTemplateFile": "/Doc/08_DocKMH_PR_PU_(TPR).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json"
@@ -267,10 +319,18 @@
             {
               "Use": false,
               "Id": 1,
-              "Name": "КМХ УЗР по ПУ (ТПР)",
+              "Name": "КМХ УЗР по ПУ",
               "Description": "Протокол контроля МХ рабочего УЗР по поверочной установке. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.5)",
               "PathToDocTemplateFile": "/Doc/08_DocKMH_UZR_PU_(TPR).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_UZR_PU.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПР по ПУ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода с поверочными установками. ГОСТ Р 8.1011-2022 (Приложение У.2)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PR_PU_GOSTR8.1011-2022(U2).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU_GostBinary.json"
             }
           ]
         },
@@ -282,10 +342,10 @@
           "PathToDocDll": "/Dll/KMH_PW.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PW.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВл",
               "Description": "Протокол КМХ методом сличений показаний ПВл с результатом измерений массовой (обЪемной) доли воды лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.14 (Г.15))",
@@ -299,6 +359,14 @@
               "Description": "Протокол КМХ методом сличений показаний ПВл с результатом измерений массовой (обЪемной) доли воды лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.14 (Г.15))",
               "PathToDocTemplateFile": "/Doc/04_TableKMH_PW_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПВл (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик поточных средств измерений объемной доли воды в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PW_GOSTR8.1011-2022(C).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW_GostBinary.json"
             }
           ]
         },
@@ -310,10 +378,10 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВз",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -327,6 +395,14 @@
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
               "PathToDocTemplateFile": "/Doc/05_TableKMH_PV_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПВз (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик поточных средств измерений вязкости в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PV_GOSTR8.1011-2022(C).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV_GostBinary.json"
             }
           ]
         },
@@ -338,12 +414,12 @@
           "PathToDocDll": "/Dll/KMH_PP.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
-              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП",
+              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (МИ 3532-2015)",
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
               "PathToDocTemplateFile": "/Doc/02_KMH_PP_MI_3532-2015_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
@@ -355,6 +431,14 @@
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
               "PathToDocTemplateFile": "/Doc/02_KMH_PP_MI_3532-2015_Release_version_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по поточным эталонам единицы плотности, рабочих поточных СИ плотности по резервным поточным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.1)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PP_GOSTR8.1011-2022(F1).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_GostBinary.json"
             }
           ]
         },
@@ -366,10 +450,10 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ РАБ ПП по МИ 2816",
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
@@ -383,6 +467,14 @@
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
               "PathToDocTemplateFile": "/Doc/06_KMH_MI2816_Release_Version_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ РАБ ПП по МИ 2816 (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по переносным эталонам единицы плотности (пикнометрам). ГОСТ Р 8.1011-2022 (Приложение Ф.2)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MI2816_GOSTR8.1011-2022(F2).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816_GostBinary.json"
             }
           ]
         },
@@ -423,11 +515,19 @@
               "Description": "Протокол контроля МХ рабочего ПР по контрольному ПР. МИ 3532-2015 (Приложение 6)",
               "PathToDocTemplateFile": "/Doc/07_KMH_PR_PR_(TPR)_Release_Version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ ПР по ПР (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода и контрольно-резервными средствами измерений, эталонами единицы объемного расхода. ГОСТ Р 8.1011-2022 (Приложение У.1)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PR_PR_GOSTR8.1011-2022(U1).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR_GostBinary.json"
             }
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 13,
           "Name": "КМХ МПР по МПР",
           "Description": "",
@@ -443,11 +543,19 @@
               "Description": "Протокол контроля МХ рабочего массового ПР по контрольному массовому ПР. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.2)",
               "PathToDocTemplateFile": "/Doc/22_KMH_MPR_MPR_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_MPR.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ МПР по МПР (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных СИ массового расхода по контрольно-резервным СИ расхода, эталонам единицы массового расхода. ГОСТ Р 8.1011-2022 (Приложение У.5)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MPR_MPR_GOSTR8.1011-2022(U5).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_MPR_GostBinary.json"
             }
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 14,
           "Name": "Поверка МИ 3380",
           "Description": "",
@@ -461,7 +569,7 @@
               "Id": 0,
               "Name": "Поверка МИ 3380",
               "Description": "Протокол поверки преобразователя объемного расхода по МИ 3380-2012 (Приложение А)",
-              "PathToDocTemplateFile": "/Doc/14_Poverka3380_2022-05-13_Release-version.frx",
+              "PathToDocTemplateFile": "/Doc/Poverka3380/Poverka3380.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3380.json"
             }
           ]
@@ -547,7 +655,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 19,
           "Name": "КМХ МИ3265 ПР РСУ по ПР ОСУ",
           "Description": "",
@@ -665,7 +773,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka1974.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Поверка МИ 1974-2004 (Усть-Луга)",
               "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
@@ -695,7 +803,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 26,
           "Name": "КМХ рабочего МПР по ПУ",
           "Description": "",
@@ -711,6 +819,14 @@
               "Description": "Протокол КМХ рабочего массового ПР по поверочной установке. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.3)",
               "PathToDocTemplateFile": "/Doc/23_KMH_MPR_PU_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_PU.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ рабочего МПР по ПУ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных СИ массового расхода по поверочным установкам.  ГОСТ Р 8.1011-2022 (Приложение У.6)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MPR_PU_GOSTR8.1011-2022(U6).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_PU_GostBinary.json"
             }
           ]
         },
@@ -815,34 +931,6 @@
           ]
         },
         {
-          "Use": true,
-          "IdDoc": 32,
-          "Name": "Отчеты (незавершенные)",
-          "Description": "",
-          "PathToDocDll": "/Dll/Report.dll",
-          "PathToDocConfigFile": "/Cfg/CfgReport.json",
-          "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
-          "TemplateDocs": [
-            {
-              "Use": true,
-              "Id": 0,
-              "Name": "Отчеты",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/01_Report_2022-05-05_Release_version.frx",
-              "PathToDocEditConfigFile": ""
-            },
-            {
-              "Use": false,
-              "Id": 1,
-              "Name": "Отчеты (Усть -Луга)",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/01_Report_2023-02-10_Release_version_(Ust-Luga).frx",
-              "PathToDocEditConfigFile": ""
-            }
-          ]
-        },
-        {
           "Use": false,
           "IdDoc": 33,
           "Name": "Поверка МИ3267",
@@ -887,23 +975,32 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.8.101",
+          "Server": "192.168.233.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": false,
+          "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.10.201",
+          "Server": "192.168.233.201",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
       ],
-      "Elis": null
+      "Elis": null,
+      "UsedSI": {
+        "UsedPR": true,
+        "UsedPP": true,
+        "UsedPVL": true,
+        "UsedPVS": true,
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
+      }
     },
     {
       "Use": true,
@@ -941,21 +1038,49 @@
         },
         {
           "Use": true,
+          "IdDoc": 32,
+          "Name": "Отчеты (незавершенные)",
+          "Description": "",
+          "PathToDocDll": "/Dll/Report.dll",
+          "PathToDocConfigFile": "/Cfg/CfgReport.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Отчеты",
+              "Description": "",
+              "PathToDocTemplateFile": "/Doc/01_Report_2022-05-05_Release_version.frx",
+              "PathToDocEditConfigFile": ""
+            },
+            {
+              "Use": false,
+              "Id": 1,
+              "Name": "Отчеты (Усть -Луга)",
+              "Description": "",
+              "PathToDocTemplateFile": "/Doc/01_Report_2023-02-10_Release_version_(Ust-Luga).frx",
+              "PathToDocEditConfigFile": ""
+            }
+          ]
+        },
+        {
+          "Use": true,
           "IdDoc": 1,
           "Name": "Паспорта",
           "Description": "",
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 4,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
               "Id": 0,
-              "Name": "Паспорт качества",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/Passport/Passport.frx",
-              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport.json"
+              "Name": "Паспорт для нефтепродукта",
+              "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
+              "PathToDocTemplateFile": "",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
             },
             {
               "Use": false,
@@ -966,7 +1091,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
@@ -974,7 +1099,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 3,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение И)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение И)",
@@ -982,7 +1107,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 4,
               "Name": "Паспорт (МИ 3532-2015 Приложение 13)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 13)",
@@ -990,7 +1115,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 5,
               "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
@@ -1000,18 +1125,18 @@
             {
               "Use": false,
               "Id": 6,
-              "Name": "Паспорт для нефтепродукта",
-              "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
-              "PathToDocTemplateFile": "",
-              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
-            },
-            {
-              "Use": false,
-              "Id": 7,
               "Name": "Паспорт (МИ 3532-2015 Приложение 15)",
               "Description": "Форма паспорта качества для поставки нефти на экспорт",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15).json"
+            },
+            {
+              "Use": false,
+              "Id": 7,
+              "Name": "Паспорт (ТР ЕАЭС)",
+              "Description": "Форма паспорта нефти по ТР ЕАЭС 045.2017",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_EAC.frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_EAC.json"
             }
           ]
         },
@@ -1023,18 +1148,18 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
-              "PathToDocTemplateFile": "/Doc/Act.frx",
+              "PathToDocTemplateFile": "/Doc/Act_N_MI3532(18).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Акт для партий нефти",
               "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
@@ -1050,12 +1175,28 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 3,
               "Name": "Акт приема - сдачи нефти ",
               "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
               "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+            },
+            {
+              "Use": false,
+              "Id": 4,
+              "Name": "Акт для валовых объемов нефти",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+            },
+            {
+              "Use": true,
+              "Id": 5,
+              "Name": "Акт для валовых объемов нефти",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             }
           ]
         },
@@ -1088,7 +1229,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 4,
           "Name": "Поверка МИ3287",
           "Description": "",
@@ -1123,10 +1264,10 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ Лаб. СИ",
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
@@ -1140,23 +1281,31 @@
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
               "PathToDocTemplateFile": "/Doc/03_KMH_PP_Areom_MI_3532-2015_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ Лаб. СИ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по лабораторным или переносным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.3)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PP_Areom_GOSTR8.1011-2022(F3).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom_GostBinary.json"
             }
           ]
         },
         {
           "Use": true,
           "IdDoc": 6,
-          "Name": "КМХ ПР по ПУ (ТПР)",
+          "Name": "КМХ ПР по ПУ",
           "Description": "",
           "PathToDocDll": "/Dll/KMH_PR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PU.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
-              "Name": "КМХ ПР по ПУ (ТПР)",
+              "Name": "КМХ ПР по ПУ",
               "Description": "Протокол контроля МХ ПР по поверочной установке. МИ 3532-2015 (Приложение 5)",
               "PathToDocTemplateFile": "/Doc/08_DocKMH_PR_PU_(TPR).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json"
@@ -1164,10 +1313,18 @@
             {
               "Use": false,
               "Id": 1,
-              "Name": "КМХ УЗР по ПУ (ТПР)",
+              "Name": "КМХ УЗР по ПУ",
               "Description": "Протокол контроля МХ рабочего УЗР по поверочной установке. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.5)",
               "PathToDocTemplateFile": "/Doc/08_DocKMH_UZR_PU_(TPR).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_UZR_PU.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПР по ПУ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода с поверочными установками. ГОСТ Р 8.1011-2022 (Приложение У.2)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PR_PU_GOSTR8.1011-2022(U2).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU_GostBinary.json"
             }
           ]
         },
@@ -1179,10 +1336,10 @@
           "PathToDocDll": "/Dll/KMH_PW.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PW.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВл",
               "Description": "Протокол КМХ методом сличений показаний ПВл с результатом измерений массовой (обЪемной) доли воды лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.14 (Г.15))",
@@ -1196,6 +1353,14 @@
               "Description": "Протокол КМХ методом сличений показаний ПВл с результатом измерений массовой (обЪемной) доли воды лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.14 (Г.15))",
               "PathToDocTemplateFile": "/Doc/04_TableKMH_PW_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПВл (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик поточных средств измерений объемной доли воды в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PW_GOSTR8.1011-2022(C).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW_GostBinary.json"
             }
           ]
         },
@@ -1207,10 +1372,10 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВз",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -1224,6 +1389,14 @@
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
               "PathToDocTemplateFile": "/Doc/05_TableKMH_PV_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПВз (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик поточных средств измерений вязкости в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PV_GOSTR8.1011-2022(C).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV_GostBinary.json"
             }
           ]
         },
@@ -1235,12 +1408,12 @@
           "PathToDocDll": "/Dll/KMH_PP.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
-              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП",
+              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (МИ 3532-2015)",
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
               "PathToDocTemplateFile": "/Doc/02_KMH_PP_MI_3532-2015_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
@@ -1252,6 +1425,14 @@
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
               "PathToDocTemplateFile": "/Doc/02_KMH_PP_MI_3532-2015_Release_version_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по поточным эталонам единицы плотности, рабочих поточных СИ плотности по резервным поточным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.1)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PP_GOSTR8.1011-2022(F1).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_GostBinary.json"
             }
           ]
         },
@@ -1263,10 +1444,10 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ РАБ ПП по МИ 2816",
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
@@ -1280,6 +1461,14 @@
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
               "PathToDocTemplateFile": "/Doc/06_KMH_MI2816_Release_Version_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ РАБ ПП по МИ 2816 (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по переносным эталонам единицы плотности (пикнометрам). ГОСТ Р 8.1011-2022 (Приложение Ф.2)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MI2816_GOSTR8.1011-2022(F2).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816_GostBinary.json"
             }
           ]
         },
@@ -1320,11 +1509,19 @@
               "Description": "Протокол контроля МХ рабочего ПР по контрольному ПР. МИ 3532-2015 (Приложение 6)",
               "PathToDocTemplateFile": "/Doc/07_KMH_PR_PR_(TPR)_Release_Version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ ПР по ПР (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода и контрольно-резервными средствами измерений, эталонами единицы объемного расхода. ГОСТ Р 8.1011-2022 (Приложение У.1)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PR_PR_GOSTR8.1011-2022(U1).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR_GostBinary.json"
             }
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 13,
           "Name": "КМХ МПР по МПР",
           "Description": "",
@@ -1340,11 +1537,19 @@
               "Description": "Протокол контроля МХ рабочего массового ПР по контрольному массовому ПР. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.2)",
               "PathToDocTemplateFile": "/Doc/22_KMH_MPR_MPR_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_MPR.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ МПР по МПР (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных СИ массового расхода по контрольно-резервным СИ расхода, эталонам единицы массового расхода. ГОСТ Р 8.1011-2022 (Приложение У.5)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MPR_MPR_GOSTR8.1011-2022(U5).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_MPR_GostBinary.json"
             }
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 14,
           "Name": "Поверка МИ 3380",
           "Description": "",
@@ -1358,7 +1563,7 @@
               "Id": 0,
               "Name": "Поверка МИ 3380",
               "Description": "Протокол поверки преобразователя объемного расхода по МИ 3380-2012 (Приложение А)",
-              "PathToDocTemplateFile": "/Doc/14_Poverka3380_2022-05-13_Release-version.frx",
+              "PathToDocTemplateFile": "/Doc/Poverka3380/Poverka3380.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3380.json"
             }
           ]
@@ -1562,7 +1767,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka1974.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Поверка МИ 1974-2004 (Усть-Луга)",
               "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
@@ -1592,7 +1797,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 26,
           "Name": "КМХ рабочего МПР по ПУ",
           "Description": "",
@@ -1608,6 +1813,14 @@
               "Description": "Протокол КМХ рабочего массового ПР по поверочной установке. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.3)",
               "PathToDocTemplateFile": "/Doc/23_KMH_MPR_PU_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_PU.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ рабочего МПР по ПУ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных СИ массового расхода по поверочным установкам.  ГОСТ Р 8.1011-2022 (Приложение У.6)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MPR_PU_GOSTR8.1011-2022(U6).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_PU_GostBinary.json"
             }
           ]
         },
@@ -1712,34 +1925,6 @@
           ]
         },
         {
-          "Use": true,
-          "IdDoc": 32,
-          "Name": "Отчеты (незавершенные)",
-          "Description": "",
-          "PathToDocDll": "/Dll/Report.dll",
-          "PathToDocConfigFile": "/Cfg/CfgReport.json",
-          "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
-          "TemplateDocs": [
-            {
-              "Use": true,
-              "Id": 0,
-              "Name": "Отчеты",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/01_Report_2022-05-05_Release_version.frx",
-              "PathToDocEditConfigFile": ""
-            },
-            {
-              "Use": false,
-              "Id": 1,
-              "Name": "Отчеты (Усть -Луга)",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/01_Report_2023-02-10_Release_version_(Ust-Luga).frx",
-              "PathToDocEditConfigFile": ""
-            }
-          ]
-        },
-        {
           "Use": false,
           "IdDoc": 33,
           "Name": "Поверка МИ3267",
@@ -1784,28 +1969,37 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.10.102",
+          "Server": "192.168.233.102",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": false,
+          "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.10.202",
+          "Server": "192.168.233.202",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
       ],
-      "Elis": null
+      "Elis": null,
+      "UsedSI": {
+        "UsedPR": true,
+        "UsedPP": true,
+        "UsedPVL": true,
+        "UsedPVS": true,
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
+      }
     },
     {
-      "Use": true,
+      "Use": false,
       "IdDevice": 2,
-      "Name": "ИВК РСУ",
+      "Name": "ИВК-РСУ",
       "Description": "",
       "Docs": [
         {
@@ -1838,21 +2032,49 @@
         },
         {
           "Use": true,
+          "IdDoc": 32,
+          "Name": "Отчеты (незавершенные)",
+          "Description": "",
+          "PathToDocDll": "/Dll/Report.dll",
+          "PathToDocConfigFile": "/Cfg/CfgReport.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Отчеты",
+              "Description": "",
+              "PathToDocTemplateFile": "/Doc/01_Report_2022-05-05_Release_version.frx",
+              "PathToDocEditConfigFile": ""
+            },
+            {
+              "Use": false,
+              "Id": 1,
+              "Name": "Отчеты (Усть -Луга)",
+              "Description": "",
+              "PathToDocTemplateFile": "/Doc/01_Report_2023-02-10_Release_version_(Ust-Luga).frx",
+              "PathToDocEditConfigFile": ""
+            }
+          ]
+        },
+        {
+          "Use": true,
           "IdDoc": 1,
           "Name": "Паспорта",
           "Description": "",
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 4,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
               "Id": 0,
-              "Name": "Паспорт качества",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/Passport/Passport.frx",
-              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport.json"
+              "Name": "Паспорт для нефтепродукта",
+              "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
+              "PathToDocTemplateFile": "",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
             },
             {
               "Use": false,
@@ -1863,7 +2085,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
@@ -1871,7 +2093,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 3,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение И)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение И)",
@@ -1879,7 +2101,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 4,
               "Name": "Паспорт (МИ 3532-2015 Приложение 13)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 13)",
@@ -1887,7 +2109,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 5,
               "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
@@ -1897,18 +2119,18 @@
             {
               "Use": false,
               "Id": 6,
-              "Name": "Паспорт для нефтепродукта",
-              "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
-              "PathToDocTemplateFile": "",
-              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
-            },
-            {
-              "Use": false,
-              "Id": 7,
               "Name": "Паспорт (МИ 3532-2015 Приложение 15)",
               "Description": "Форма паспорта качества для поставки нефти на экспорт",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15).json"
+            },
+            {
+              "Use": false,
+              "Id": 7,
+              "Name": "Паспорт (ТР ЕАЭС)",
+              "Description": "Форма паспорта нефти по ТР ЕАЭС 045.2017",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_EAC.frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_EAC.json"
             }
           ]
         },
@@ -1920,18 +2142,18 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
-              "PathToDocTemplateFile": "/Doc/Act.frx",
+              "PathToDocTemplateFile": "/Doc/Act_N_MI3532(18).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Акт для партий нефти",
               "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
@@ -1945,6 +2167,30 @@
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
               "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+            },
+            {
+              "Use": false,
+              "Id": 3,
+              "Name": "Акт приема - сдачи нефти ",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+            },
+            {
+              "Use": false,
+              "Id": 4,
+              "Name": "Акт для валовых объемов нефти",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+            },
+            {
+              "Use": true,
+              "Id": 5,
+              "Name": "Акт для валовых объемов нефти",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             }
           ]
         },
@@ -1977,7 +2223,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 4,
           "Name": "Поверка МИ3287",
           "Description": "",
@@ -2012,10 +2258,10 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ Лаб. СИ",
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
@@ -2029,23 +2275,31 @@
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
               "PathToDocTemplateFile": "/Doc/03_KMH_PP_Areom_MI_3532-2015_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ Лаб. СИ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по лабораторным или переносным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.3)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PP_Areom_GOSTR8.1011-2022(F3).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom_GostBinary.json"
             }
           ]
         },
         {
           "Use": true,
           "IdDoc": 6,
-          "Name": "КМХ ПР по ПУ (ТПР)",
+          "Name": "КМХ ПР по ПУ",
           "Description": "",
           "PathToDocDll": "/Dll/KMH_PR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PU.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
-              "Name": "КМХ ПР по ПУ (ТПР)",
+              "Name": "КМХ ПР по ПУ",
               "Description": "Протокол контроля МХ ПР по поверочной установке. МИ 3532-2015 (Приложение 5)",
               "PathToDocTemplateFile": "/Doc/08_DocKMH_PR_PU_(TPR).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json"
@@ -2053,10 +2307,18 @@
             {
               "Use": false,
               "Id": 1,
-              "Name": "КМХ УЗР по ПУ (ТПР)",
+              "Name": "КМХ УЗР по ПУ",
               "Description": "Протокол контроля МХ рабочего УЗР по поверочной установке. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.5)",
               "PathToDocTemplateFile": "/Doc/08_DocKMH_UZR_PU_(TPR).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_UZR_PU.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПР по ПУ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода с поверочными установками. ГОСТ Р 8.1011-2022 (Приложение У.2)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PR_PU_GOSTR8.1011-2022(U2).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU_GostBinary.json"
             }
           ]
         },
@@ -2068,10 +2330,10 @@
           "PathToDocDll": "/Dll/KMH_PW.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PW.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВл",
               "Description": "Протокол КМХ методом сличений показаний ПВл с результатом измерений массовой (обЪемной) доли воды лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.14 (Г.15))",
@@ -2085,6 +2347,14 @@
               "Description": "Протокол КМХ методом сличений показаний ПВл с результатом измерений массовой (обЪемной) доли воды лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.14 (Г.15))",
               "PathToDocTemplateFile": "/Doc/04_TableKMH_PW_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПВл (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик поточных средств измерений объемной доли воды в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PW_GOSTR8.1011-2022(C).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW_GostBinary.json"
             }
           ]
         },
@@ -2096,10 +2366,10 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВз",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -2113,6 +2383,14 @@
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
               "PathToDocTemplateFile": "/Doc/05_TableKMH_PV_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ ПВз (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик поточных средств измерений вязкости в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PV_GOSTR8.1011-2022(C).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV_GostBinary.json"
             }
           ]
         },
@@ -2124,12 +2402,12 @@
           "PathToDocDll": "/Dll/KMH_PP.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
-              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП",
+              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (МИ 3532-2015)",
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
               "PathToDocTemplateFile": "/Doc/02_KMH_PP_MI_3532-2015_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
@@ -2141,6 +2419,14 @@
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
               "PathToDocTemplateFile": "/Doc/02_KMH_PP_MI_3532-2015_Release_version_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по поточным эталонам единицы плотности, рабочих поточных СИ плотности по резервным поточным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.1)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PP_GOSTR8.1011-2022(F1).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_GostBinary.json"
             }
           ]
         },
@@ -2152,10 +2438,10 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ РАБ ПП по МИ 2816",
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
@@ -2169,6 +2455,14 @@
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
               "PathToDocTemplateFile": "/Doc/06_KMH_MI2816_Release_Version_TDV.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json"
+            },
+            {
+              "Use": true,
+              "Id": 2,
+              "Name": "КМХ РАБ ПП по МИ 2816 (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по переносным эталонам единицы плотности (пикнометрам). ГОСТ Р 8.1011-2022 (Приложение Ф.2)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MI2816_GOSTR8.1011-2022(F2).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816_GostBinary.json"
             }
           ]
         },
@@ -2209,11 +2503,19 @@
               "Description": "Протокол контроля МХ рабочего ПР по контрольному ПР. МИ 3532-2015 (Приложение 6)",
               "PathToDocTemplateFile": "/Doc/07_KMH_PR_PR_(TPR)_Release_Version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ ПР по ПР (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода и контрольно-резервными средствами измерений, эталонами единицы объемного расхода. ГОСТ Р 8.1011-2022 (Приложение У.1)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_PR_PR_GOSTR8.1011-2022(U1).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR_GostBinary.json"
             }
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 13,
           "Name": "КМХ МПР по МПР",
           "Description": "",
@@ -2229,6 +2531,14 @@
               "Description": "Протокол контроля МХ рабочего массового ПР по контрольному массовому ПР. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.2)",
               "PathToDocTemplateFile": "/Doc/22_KMH_MPR_MPR_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_MPR.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ МПР по МПР (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных СИ массового расхода по контрольно-резервным СИ расхода, эталонам единицы массового расхода. ГОСТ Р 8.1011-2022 (Приложение У.5)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MPR_MPR_GOSTR8.1011-2022(U5).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_MPR_GostBinary.json"
             }
           ]
         },
@@ -2247,7 +2557,7 @@
               "Id": 0,
               "Name": "Поверка МИ 3380",
               "Description": "Протокол поверки преобразователя объемного расхода по МИ 3380-2012 (Приложение А)",
-              "PathToDocTemplateFile": "/Doc/14_Poverka3380_2022-05-13_Release-version.frx",
+              "PathToDocTemplateFile": "/Doc/Poverka3380/Poverka3380.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka3380.json"
             }
           ]
@@ -2273,7 +2583,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 16,
           "Name": "Поверка МИ3265 УПР с помощью ПУ",
           "Description": "",
@@ -2293,7 +2603,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 17,
           "Name": "Поверка МИ3265 УПР с помощью ПУ и ПР",
           "Description": "",
@@ -2451,7 +2761,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka1974.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Поверка МИ 1974-2004 (Усть-Луга)",
               "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
@@ -2481,7 +2791,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 26,
           "Name": "КМХ рабочего МПР по ПУ",
           "Description": "",
@@ -2497,6 +2807,14 @@
               "Description": "Протокол КМХ рабочего массового ПР по поверочной установке. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.3)",
               "PathToDocTemplateFile": "/Doc/23_KMH_MPR_PU_Release_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_PU.json"
+            },
+            {
+              "Use": true,
+              "Id": 1,
+              "Name": "КМХ рабочего МПР по ПУ (ГОСТ Р 8.1011-2022)",
+              "Description": "Протокол контроля метрологических характеристик рабочих, резервных СИ массового расхода по поверочным установкам.  ГОСТ Р 8.1011-2022 (Приложение У.6)",
+              "PathToDocTemplateFile": "/Doc/GOSTR8.1011-2022/KMH_MPR_PU_GOSTR8.1011-2022(U6).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MPR_PU_GostBinary.json"
             }
           ]
         },
@@ -2601,34 +2919,6 @@
           ]
         },
         {
-          "Use": true,
-          "IdDoc": 32,
-          "Name": "Отчеты (незавершенные)",
-          "Description": "",
-          "PathToDocDll": "/Dll/Report.dll",
-          "PathToDocConfigFile": "/Cfg/CfgReport.json",
-          "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
-          "TemplateDocs": [
-            {
-              "Use": true,
-              "Id": 0,
-              "Name": "Отчеты",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/01_Report_2022-05-05_Release_version.frx",
-              "PathToDocEditConfigFile": ""
-            },
-            {
-              "Use": false,
-              "Id": 1,
-              "Name": "Отчеты (Усть -Луга)",
-              "Description": "",
-              "PathToDocTemplateFile": "/Doc/01_Report_2023-02-10_Release_version_(Ust-Luga).frx",
-              "PathToDocEditConfigFile": ""
-            }
-          ]
-        },
-        {
           "Use": false,
           "IdDoc": 33,
           "Name": "Поверка МИ3267",
@@ -2649,7 +2939,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 34,
           "Name": "Поверка МИ 3266 - 2010",
           "Description": "",
@@ -2673,23 +2963,32 @@
         {
           "Use": true,
           "GuidDevice": 2,
-          "Server": "192.168.10.103",
+          "Server": "192.168.233.103",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": false,
+          "Use": true,
           "GuidDevice": 2,
-          "Server": "192.168.10.203",
+          "Server": "192.168.233.203",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
       ],
-      "Elis": null
+      "Elis": null,
+      "UsedSI": {
+        "UsedPR": true,
+        "UsedPP": true,
+        "UsedPVL": true,
+        "UsedPVS": true,
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
+      }
     }
   ],
   "PrintSettings": {
@@ -2699,10 +2998,11 @@
     "Path": "/archive/cpa.reports"
   },
   "Elis": {
-    "Use": true,
+    "Use": false,
     "ostKey": "ostKey",
     "siknKey": "siknKey",
     "clientName": "clientName",
     "ClientToken": ""
-  }
+  },
+  "UseSecurityFeatures": true
 }

@@ -4,15 +4,27 @@
     .build();
 
 hubConnection.on("Receive", function (deviceName, tagName, tagValue) {
+
     if (deviceName == CurrentDeviceName) {
 
         if (tagName == GetFullNameTag('ARM.ARM_OnlineReportCounter'))
             GetDoc();
     }
+    else if (deviceName == 'ARM') {
+        ApplicationSecurity(tagName, tagValue);
+    }
+
 });
 hubConnection.start();
 
-//DataTable.datetime('DD.MM.YYYY HH:mm');
+window.onmessage = function (event) {
+    if (event.data == 'ButtonSaveOn') {
+        $("#ButtonSave").prop("disabled", false);
+    }
+    else if (event.data == 'ButtonSaveOff') {
+        $("#ButtonSave").prop("disabled", true);
+    }
+};
 
 var IsUsedElis = true;
 
@@ -21,11 +33,9 @@ var PrefixTag = "IVK_TN_01";
 var CurrentDeviceName;
 var CurrentDeviceId;
 
-
 var table = null;
 var currentId = null;
 var docTemplates = {};
-
 
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
@@ -370,6 +380,46 @@ function InitDevices() {
             },
         });
 
+    $.ajax(
+        {
+            async: false,
+            url: "Home/IsUsedSecurity",
+            type: "GET",
+            //dataType: "json",
+            data:
+            {
+            },
+            success: function (data) {
+                if (data) {
+
+                    let ShowEditAndSave = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.ShowEditAndSave', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.ShowEditAndSave', ShowEditAndSave);
+
+                    let AllowEditAndSave = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.AllowEditAndSave', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.AllowEditAndSave', AllowEditAndSave);
+
+                    let ShowPrint = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.ShowPrint', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.ShowPrint', ShowPrint);
+
+                    let AllowPrint = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.AllowPrint', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.AllowPrint', AllowPrint);
+
+                    let ShowExport = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.ShowExport', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.ShowExport', ShowExport);
+
+                    let AllowExport = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.AllowExport', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.AllowExport', AllowExport);
+
+                    let ShowEditDictionaries = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.ShowEditDictionaries', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.ShowEditDictionaries', ShowEditDictionaries);
+
+                    let AllowEditDictionaries = ReadTagCacheARM(DeviceName = 'ARM', 'root.ARM.Reports.AllowEditDictionaries', namespaceIndex = 1, indexArray = 0);
+                    ApplicationSecurity('root.ARM.Reports.AllowEditDictionaries', AllowEditDictionaries);
+                }
+            }
+        });
+
+
     $('#ComboboxDevice').change(function () {
         CurrentDeviceName = $("#ComboboxDevice :selected").text();
         CurrentDeviceId = $('#ComboboxDevice').val()
@@ -521,7 +571,10 @@ function InitPrinterName() {
             type: 'GET',
             success: function (data) {
                 data.forEach((item) => {
-                    $('#ComboboxPrinterName').append('<option value=' + item + '>' + item + '</option>');
+                    let opt=document.createElement("option");
+                    opt.value = item;
+                    opt.appendChild(document.createTextNode(item));
+                    document.querySelector('#ComboboxPrinterName').appendChild(opt);
                 });
             }
         });
@@ -632,10 +685,22 @@ function InitTableDocs() {
             currentId = id[0];
 
             if ($('#ComboboxDocGUID').val() == 32) {
-                WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), 1, 2, 0);
+
+                let BIKId = 1;
+                let DirId = 0;               
+
+                table.rows(indexes).data().pluck('advancedProperties')[0].forEach((item) =>
+                {
+                    if (item.key == 'BIKId') BIKId = item.value;
+                    else if (item.key == 'DirId') DirId = item.value;
+                });
+
+                WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), BIKId, 2, 0);
+                WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_DirId'), DirId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_OnlineReportType'), currentId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport'), true, 2, 0);
-            } else {
+            }
+            else {
                 GetDoc();
             }
         }
@@ -788,8 +853,6 @@ function GetEditDoc() {
                     $(this).attr('src', '/HTML/html.html');
                 });
 
-
-
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
             }
@@ -826,7 +889,6 @@ function GetPeriodDocument() {
 
     return ret;
 }
-
 
 function PrintDoc() {
     $.ajax(
@@ -898,10 +960,30 @@ function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray 
     return result;
 }
 
+function ReadTagCacheARM(DeviceName = 'ARM', tagName, namespaceIndex = 1, indexArray = 0) {
+
+    var url = "http://localhost:5010/api/OPCClientCache/";
+    var result;
+    $.ajax(
+        {
+            async: false,
+            url: url + DeviceName + '/' + tagName + '/' + namespaceIndex + '/' + indexArray,
+            type: "Get",
+            //dataType: 'json',
+            //data: {
+            //    nameTag: "ARM.ARM_OnlineReportCounter"
+            //},
+            success: function (data) {
+                result = data;
+            },
+        });
+
+    return result;
+}
+
 function GetFullNameTag(tagName) {
     return PrefixTag + '.' + tagName;
 }
-
 
 //Получить данные из ЕЛИС
 function GetElisData() {
@@ -941,8 +1023,8 @@ function GetElisData() {
                 //}),
 
                 JSON.stringify({
-                    startPeriod: moment(periodDocument.begin * 1000).utc().format(),
-                    endPeriod: moment(periodDocument.end * 1000).utc().format()
+                    startPeriod: moment(periodDocument.begin * 1000).format(),
+                    endPeriod: moment(periodDocument.end * 1000).format()
                 }),
 
             success: function (data) {
@@ -1060,6 +1142,7 @@ function SetClientToken() {
 
 }
 
+
 function DrawTablePassports(dataELIS) {
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
@@ -1100,14 +1183,13 @@ function DrawTablePassports(dataELIS) {
     });
 }
 
-function SetDataLocalStorage() {
 
-}
+function SetDataLocalStorage() {}
+
 
 function FillPassportDataElis() { 
 
     let dataPassport = JSON.parse(localStorage.dataPassport);
-
     let iframe = document.querySelector('.FR');    
     let elmnts = iframe.contentWindow.document.querySelectorAll('.elis-data')
 
@@ -1146,9 +1228,7 @@ function FillPassportDataElis() {
             //    if (item[i].value === testMethodName) item[i].selected = true;
             //}
         }
-    });
-
-    $('#listPassports').empty();
+    });  
 }
 
 //Состояние кнопки "Запросить данные"
@@ -1164,4 +1244,37 @@ function StateButtonGetElisData(state) {
         $("#spinnerDataRequest").prop("hidden", true);
         $("#textDataRequest")[0].innerText = "Запросить данные"; 
     }
+}
+
+function ButtonElis() {
+    $('#listPassports').empty();
+    localStorage.removeItem('dataPassport');
+}
+
+function ApplicationSecurity(tagName, tagValue) {
+
+    if (tagName == 'root.ARM.Reports.ShowEditAndSave')
+        $("#ButtonEdit").prop("hidden", !tagValue);
+    else if (tagName == 'root.ARM.Reports.AllowEditAndSave')
+        $("#ButtonEdit").prop("disabled", !tagValue);
+    else if (tagName == 'root.ARM.Reports.ShowPrint') {
+        $("#ComboboxPrinterName").prop("hidden", !tagValue);
+        $("#ButtonPrint").prop("hidden", !tagValue);
+    }
+    else if (tagName == 'root.ARM.Reports.AllowPrint') {
+        $("#ComboboxPrinterName").prop("disabled", !tagValue);
+        $("#ButtonPrint").prop("disabled", !tagValue);
+    }
+    else if (tagName == 'root.ARM.Reports.ShowExport') {
+        $("#ComboboxExportFormat").prop("hidden", !tagValue);
+        $("#ButtonExport").prop("hidden", !tagValue);
+    }
+    else if (tagName == 'root.ARM.Reports.AllowExport') {
+        $("#ComboboxExportFormat").prop("disabled", !tagValue);
+        $("#ButtonExport").prop("disabled", !tagValue);
+    }
+    else if (tagName == 'root.ARM.Reports.ShowEditDictionaries')
+        $("#ButtonDictionaries").prop("hidden", !tagValue);
+    else if (tagName == 'root.ARM.Reports.AllowEditDictionaries')
+        $("#ButtonDictionaries").prop("disabled", !tagValue);
 }

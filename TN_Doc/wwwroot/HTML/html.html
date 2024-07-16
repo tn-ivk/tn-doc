@@ -1,18 +1,36 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title></title>
 
     <style>
-        td, th {
-            font-size: 70%; /* Размер шрифта в процентах */
-            padding: 2px; /* Поля вокруг содержимого таблицы */
-            border: 0.5px solid black; /* Параметры рамки */
+        /*chrome*/
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /*mozilla*/
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        td,
+        th {
+            font-size: 70%;
+            /* Размер шрифта в процентах */
+            padding: 2px;
+            /* Поля вокруг содержимого таблицы */
+            border: 0.5px solid black;
+            /* Параметры рамки */
         }
 
         Edit {
-            border-collapse: collapse; /* Убираем двойные линии между ячейками */
+            border-collapse: collapse;
+            /* Убираем двойные линии между ячейками */
         }
     </style>
 
@@ -55,15 +73,126 @@
     </script>
 
 </head>
+
 <body onload="funcOnLoad()">
 
     <menu type="toolbar">
-        
+
     </menu>
 
     <table id="AdditionalInfo">
         <tbody>
-        <tr><td>Номер паспорта</td><td><input id="Passport.PassportID" data-edit="1" data-key="Passport.PassportID" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>К акту приема-сдачи нефти №</td><td><input id="ProtokolNumAct" data-edit="1" data-key="ProtokolNumAct" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>Пункт приема сдачи нефти</td><td><input id="DelivePoint" data-edit="1" data-key="DelivePoint" data-tag="AdditionalInfo" type="text" value="1"></td></tr><tr><td>Номер аттестата аккредитации</td><td><input id="AccrSertifNumber" data-edit="1" data-key="AccrSertifNumber" data-tag="AdditionalInfo" type="text" value="РУ 123/РЖ45"></td></tr><tr><td>Лаборатория предприятия</td><td><input id="Laboratory" data-edit="1" data-key="Laboratory" data-tag="AdditionalInfo" type="text" value="2"></td></tr><tr><td>СИКН №</td><td><input id="SIKN_Number" data-edit="1" data-key="SIKN_Number" data-tag="AdditionalInfo" type="text" value="428"></td></tr><tr><td>Представитель испытательной лаборатории (должность)</td><td><input id="Laboratory_Post" data-edit="1" data-key="Laboratory_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель испытательной лаборатории (предприятие)</td><td><input id="Laboratory_Factory" data-edit="1" data-key="Laboratory_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель испытательной лаборатории (ИОФ)</td><td><select name="Laboratory_IOF" data-edit="1" data-key="Laboratory_IOF" data-tag="AdditionalInfo" onchange="UserChangeEvent(this)"><option value="11">Т.С. Тринк</option><option value="12">Т.И. Козлова</option><option value="13">Е.В. Маркова</option><option value="14">И.В. Федорова</option><option value="15">М.В. Кононова</option><option value="16">О.З. Волокитина</option><option value="17">С.В. Бурханова</option></select></td></tr><tr><td>Представитель сдающей стороны (должность)</td><td><input id="Delive_Post" data-edit="1" data-key="Delive_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель сдающей стороны (предприятие)</td><td><input id="Delive_Factory" data-edit="1" data-key="Delive_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель сдающей стороны (ИОФ)</td><td><select name="Delive_IOF" data-edit="1" data-key="Delive_IOF" data-tag="AdditionalInfo" onchange="UserChangeEvent(this)"><option value="8">А.В. Платошин</option><option value="9">А.В. Коптев</option><option value="10">А.С. Чингалаев</option></select></td></tr><tr><td>Представитель принимающей стороны (должность)</td><td><input id="Receive_Post" data-edit="1" data-key="Receive_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель принимающей стороны (предприятие)</td><td><input id="Receive_Factory" data-edit="1" data-key="Receive_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель принимающей стороны (ИОФ)</td><td><select name="Receive_IOF" data-edit="1" data-key="Receive_IOF" data-tag="AdditionalInfo" onchange="UserChangeEvent(this)"><option value="1">А.А. Деревяшкин</option><option value="2">К.Ю. Козленко</option><option value="3">К.А. Шарапов</option><option value="4">И.Ю. Родионова</option><option value="5">С.М. Кузьмина</option><option value="6">И.Ю. Родионова</option><option value="7">С.М. Кузьмина</option></select></td></tr><tr><td>Дата и время отбора пробы (начало)</td><td><input id="PassportPeriodDT.Begin" data-edit="1" data-key="PassportPeriodDT.Begin" data-tag="AdditionalInfo" type="datetime-local" value="2023-09-01T00:00:00"></td></tr><tr><td>Дата и время отбора пробы (окончание)</td><td><input id="PassportPeriodDT.End" data-edit="1" data-key="PassportPeriodDT.End" data-tag="AdditionalInfo" type="datetime-local" value="2023-09-02T00:00:00"></td></tr><tr><td>Название танкера</td><td><input id="TankerName" data-edit="1" data-key="TankerName" data-tag="AdditionalInfo" type="text" value=""></td></tr></tbody>
+            <tr>
+                <td>Номер паспорта</td>
+                <td><input id="Passport.PassportID" data-edit="1" data-key="Passport.PassportID"
+                        data-tag="AdditionalInfo" type="text" value=""></td>
+            </tr>
+            <tr>
+                <td>К акту приема-сдачи нефти №</td>
+                <td><input id="ProtokolNumAct" data-edit="1" data-key="ProtokolNumAct" data-tag="AdditionalInfo"
+                        type="text" value=""></td>
+            </tr>
+            <tr>
+                <td>Пункт приема сдачи нефти</td>
+                <td><input id="DelivePoint" data-edit="1" data-key="DelivePoint" data-tag="AdditionalInfo" type="text"
+                        value="1"></td>
+            </tr>
+            <tr>
+                <td>Номер аттестата аккредитации</td>
+                <td><input id="AccrSertifNumber" data-edit="1" data-key="AccrSertifNumber" data-tag="AdditionalInfo"
+                        type="text" value="РУ 123/РЖ45"></td>
+            </tr>
+            <tr>
+                <td>Лаборатория предприятия</td>
+                <td><input id="Laboratory" data-edit="1" data-key="Laboratory" data-tag="AdditionalInfo" type="text"
+                        value="2"></td>
+            </tr>
+            <tr>
+                <td>СИКН №</td>
+                <td><input id="SIKN_Number" data-edit="1" data-key="SIKN_Number" data-tag="AdditionalInfo" type="text"
+                        value="428"></td>
+            </tr>
+            <tr>
+                <td>Представитель испытательной лаборатории (должность)</td>
+                <td><input id="Laboratory_Post" data-edit="1" data-key="Laboratory_Post" data-tag="AdditionalInfo"
+                        type="text" value="-"></td>
+            </tr>
+            <tr>
+                <td>Представитель испытательной лаборатории (предприятие)</td>
+                <td><input id="Laboratory_Factory" data-edit="1" data-key="Laboratory_Factory" data-tag="AdditionalInfo"
+                        type="text" value="-"></td>
+            </tr>
+            <tr>
+                <td>Представитель испытательной лаборатории (ИОФ)</td>
+                <td><select name="Laboratory_IOF" data-edit="1" data-key="Laboratory_IOF" data-tag="AdditionalInfo"
+                        onchange="UserChangeEvent(this)">
+                        <option value="11">Т.С. Тринк</option>
+                        <option value="12">Т.И. Козлова</option>
+                        <option value="13">Е.В. Маркова</option>
+                        <option value="14">И.В. Федорова</option>
+                        <option value="15">М.В. Кононова</option>
+                        <option value="16">О.З. Волокитина</option>
+                        <option value="17">С.В. Бурханова</option>
+                    </select></td>
+            </tr>
+            <tr>
+                <td>Представитель сдающей стороны (должность)</td>
+                <td><input id="Delive_Post" data-edit="1" data-key="Delive_Post" data-tag="AdditionalInfo" type="text"
+                        value="-"></td>
+            </tr>
+            <tr>
+                <td>Представитель сдающей стороны (предприятие)</td>
+                <td><input id="Delive_Factory" data-edit="1" data-key="Delive_Factory" data-tag="AdditionalInfo"
+                        type="text" value="-"></td>
+            </tr>
+            <tr>
+                <td>Представитель сдающей стороны (ИОФ)</td>
+                <td><select name="Delive_IOF" data-edit="1" data-key="Delive_IOF" data-tag="AdditionalInfo"
+                        onchange="UserChangeEvent(this)">
+                        <option value="8">А.В. Платошин</option>
+                        <option value="9">А.В. Коптев</option>
+                        <option value="10">А.С. Чингалаев</option>
+                    </select></td>
+            </tr>
+            <tr>
+                <td>Представитель принимающей стороны (должность)</td>
+                <td><input id="Receive_Post" data-edit="1" data-key="Receive_Post" data-tag="AdditionalInfo" type="text"
+                        value="-"></td>
+            </tr>
+            <tr>
+                <td>Представитель принимающей стороны (предприятие)</td>
+                <td><input id="Receive_Factory" data-edit="1" data-key="Receive_Factory" data-tag="AdditionalInfo"
+                        type="text" value="-"></td>
+            </tr>
+            <tr>
+                <td>Представитель принимающей стороны (ИОФ)</td>
+                <td><select name="Receive_IOF" data-edit="1" data-key="Receive_IOF" data-tag="AdditionalInfo"
+                        onchange="UserChangeEvent(this)">
+                        <option value="1">А.А. Деревяшкин</option>
+                        <option value="2">К.Ю. Козленко</option>
+                        <option value="3">К.А. Шарапов</option>
+                        <option value="4">И.Ю. Родионова</option>
+                        <option value="5">С.М. Кузьмина</option>
+                        <option value="6">И.Ю. Родионова</option>
+                        <option value="7">С.М. Кузьмина</option>
+                    </select></td>
+            </tr>
+            <tr>
+                <td>Дата и время отбора пробы (начало)</td>
+                <td><input id="PassportPeriodDT.Begin" data-edit="1" data-key="PassportPeriodDT.Begin"
+                        data-tag="AdditionalInfo" type="datetime-local" value="2023-09-01T00:00:00"></td>
+            </tr>
+            <tr>
+                <td>Дата и время отбора пробы (окончание)</td>
+                <td><input id="PassportPeriodDT.End" data-edit="1" data-key="PassportPeriodDT.End"
+                        data-tag="AdditionalInfo" type="datetime-local" value="2023-09-02T00:00:00"></td>
+            </tr>
+            <tr>
+                <td>Название танкера</td>
+                <td><input id="TankerName" data-edit="1" data-key="TankerName" data-tag="AdditionalInfo" type="text"
+                        value=""></td>
+            </tr>
+        </tbody>
     </table>
 
     <table id="Edit">
@@ -79,10 +208,221 @@
         </thead>
 
         <tbody>
-        <tr><td>1</td><td>Температура нефти при условиях измерений объема, °C</td><td><select data-edit="1" data-key="TempCorrection" data-tag="Methods" name="cb1"><option value="0">ФР.1.29.2014.16943</option></select></td><td>0</td><td><input data-edit="1" data-key="TempCorrection" data-tag="Value" type="number" step="any" name="tb1" value=""></td><td>-</td></tr><tr><td>2</td><td>Давление нефти при условиях измерений объема, МПа</td><td><select data-edit="1" data-key="PressCorrection" data-tag="Methods" name="cb2"><option value="0">ФР.1.29.2014.16943</option></select></td><td>0</td><td><input data-edit="1" data-key="PressCorrection" data-tag="Value" type="number" step="any" name="tb2" value=""></td><td>-</td></tr><tr><td>3</td><td>Плотность нефти при температуре и давлении
-в условиях измерений объема, кг/м³</td><td><select data-edit="1" data-key="DensCorrection" data-tag="Methods" name="cb3"><option value="0">ФР.1.29.2014.16943</option></select></td><td>0</td><td><input data-edit="1" data-key="DensCorrection" data-tag="Value" type="number" step="any" name="tb3" value=""></td><td>-</td></tr><tr><td>4</td><td>Плотность нефти при 20 °C, кг/м³</td><td><select data-edit="1" data-key="Dens20Correction" data-tag="Methods" name="cb4"><option value="0">ФР.1.29.2014.16943</option></select></td><td>0</td><td><input data-edit="1" data-key="Dens20Correction" data-tag="Value" type="number" step="any" name="tb4" value=""></td><td>-</td></tr><tr><td>5</td><td>Плотность нефти при 15 °C, кг/м³</td><td><select data-edit="1" data-key="Dens15Correction" data-tag="Methods" name="cb5"><option value="0">ФР.1.29.2014.16943</option></select></td><td>0</td><td><input data-edit="1" data-key="Dens15Correction" data-tag="Value" type="number" step="any" name="tb5" value=""></td><td>-</td></tr><tr><td>6</td><td>Массовая доля воды, %</td><td><select data-edit="1" data-key="MassWaterFracCorrection" data-tag="Methods" name="cb6"><option value="0">ГОСТ 2477-2014</option></select></td><td>0</td><td><input data-edit="1" data-key="MassWaterFracCorrection" data-tag="Value" type="number" step="any" name="tb6" value=""></td><td>-</td></tr><tr><td>7</td><td>Массовая концентрация хлористых солей, мг/дм³</td><td><select data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Methods" name="cb7"><option value="0">ГОСТ 21534-2021, метод А, часть 1</option></select></td><td>-</td><td><input data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Value" type="number" step="any" name="tb7" value=""></td><td>-</td></tr><tr><td>8</td><td>Массовая концентрация хлористых солей, %</td><td><select data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Methods" name="cb8"><option value="0">ГОСТ 21534-2021, метод А, часть 1</option></select></td><td>-</td><td><input data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Value" type="number" step="any" name="tb8" value=""></td><td>-</td></tr><tr><td>9</td><td>Массовая доля механических примесей, %</td><td><select data-edit="1" data-key="Impurity" data-tag="Methods" name="cb9"><option value="0">ГОСТ 6370-83</option></select></td><td>-</td><td><input data-edit="1" data-key="Impurity" data-tag="Value" type="number" step="any" name="tb9" value=""></td><td>-</td></tr><tr><td>10</td><td>Массовая доля серы, %</td><td><select data-edit="1" data-key="SulfurCorrection" data-tag="Methods" name="cb10"><option value="0">ГОСТ Р 51947-2002</option></select></td><td>0</td><td><input data-edit="1" data-key="SulfurCorrection" data-tag="Value" type="number" step="any" name="tb10" value=""></td><td>-</td></tr><tr><td>11</td><td>Давление насыщенных паров, кПа</td><td><select data-edit="1" data-key="DNP.kPa" data-tag="Methods" name="cb11"><option value="0">ГОСТ 1756-2000</option></select></td><td>-</td><td><input data-edit="1" data-key="DNP.kPa" data-tag="Value" type="number" step="any" name="tb11" value=""></td><td>-</td></tr><tr><td>12</td><td>Давление насыщенных паров, мм рт. ст.</td><td><select data-edit="1" data-key="DNP.mercury_mm" data-tag="Methods" name="cb12"><option value="0">ГОСТ 1756-2000</option></select></td><td>-</td><td><input data-edit="1" data-key="DNP.mercury_mm" data-tag="Value" type="number" step="any" name="tb12" value=""></td><td>-</td></tr><tr><td>13</td><td>Выход фракций, %:    при температуре до 200 °С</td><td><select data-edit="1" data-key="Yield_fraction_200" data-tag="Methods" name="cb13"><option value="0">ГОСТ 2177-99, метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Yield_fraction_200" data-tag="Value" type="number" step="any" name="tb13" value=""></td><td>-</td></tr><tr><td>14</td><td>Выход фракций, %:    при температуре до 300 °С</td><td><select data-edit="1" data-key="Yield_fraction_300" data-tag="Methods" name="cb14"><option value="0">ГОСТ 2177-99, метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Yield_fraction_300" data-tag="Value" type="number" step="any" name="tb14" value=""></td><td>-</td></tr><tr><td>15</td><td>Выход фракций: при температуре до 350 °С, %</td><td><select data-edit="1" data-key="Yield_fraction_350" data-tag="Methods" name="cb15"><option value="0">ГОСТ 2177-99, метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Yield_fraction_350" data-tag="Value" type="number" step="any" name="tb15" value=""></td><td>-</td></tr><tr><td>16</td><td>Массовая доля парафина, %</td><td><select data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Methods" name="cb16"><option value="0">ГОСТ 11851-85, метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Value" type="number" step="any" name="tb16" value=""></td><td>-</td></tr><tr><td>17</td><td>Массовая доля сероводорода, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Methods" name="cb17"><option value="0">ГОСТ Р 50802-2021</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Value" type="number" step="any" name="tb17" value=""></td><td>-</td></tr><tr><td>18</td><td>Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Methods" name="cb18"><option value="0">ГОСТ Р 50802-2021</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Value" type="number" step="any" name="tb18" value=""></td><td>-</td></tr><tr><td>19</td><td>Массовая доля органических хлоридов во фракции, выкипающей до
-температуры 204 °С, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Methods" name="cb19"><option value="0">ГОСТ Р 52247-2021, метод А</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Value" type="number" step="any" name="tb19" value=""></td><td>-</td></tr></tbody>
+            <tr>
+                <td>1</td>
+                <td>Температура нефти при условиях измерений объема, °C</td>
+                <td><select data-edit="1" data-key="TempCorrection" data-tag="Methods" name="cb1">
+                        <option value="0">ФР.1.29.2014.16943</option>
+                    </select></td>
+                <td>0</td>
+                <td><input data-edit="1" data-key="TempCorrection" data-tag="Value" type="number" step="any" name="tb1"
+                        value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Давление нефти при условиях измерений объема, МПа</td>
+                <td><select data-edit="1" data-key="PressCorrection" data-tag="Methods" name="cb2">
+                        <option value="0">ФР.1.29.2014.16943</option>
+                    </select></td>
+                <td>0</td>
+                <td><input data-edit="1" data-key="PressCorrection" data-tag="Value" type="number" step="any" name="tb2"
+                        value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Плотность нефти при температуре и давлении
+                    в условиях измерений объема, кг/м³</td>
+                <td><select data-edit="1" data-key="DensCorrection" data-tag="Methods" name="cb3">
+                        <option value="0">ФР.1.29.2014.16943</option>
+                    </select></td>
+                <td>0</td>
+                <td><input data-edit="1" data-key="DensCorrection" data-tag="Value" type="number" step="any" name="tb3"
+                        value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Плотность нефти при 20 °C, кг/м³</td>
+                <td><select data-edit="1" data-key="Dens20Correction" data-tag="Methods" name="cb4">
+                        <option value="0">ФР.1.29.2014.16943</option>
+                    </select></td>
+                <td>0</td>
+                <td><input data-edit="1" data-key="Dens20Correction" data-tag="Value" type="number" step="any"
+                        name="tb4" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Плотность нефти при 15 °C, кг/м³</td>
+                <td><select data-edit="1" data-key="Dens15Correction" data-tag="Methods" name="cb5">
+                        <option value="0">ФР.1.29.2014.16943</option>
+                    </select></td>
+                <td>0</td>
+                <td><input data-edit="1" data-key="Dens15Correction" data-tag="Value" type="number" step="any"
+                        name="tb5" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Массовая доля воды, %</td>
+                <td><select data-edit="1" data-key="MassWaterFracCorrection" data-tag="Methods" name="cb6">
+                        <option value="0">ГОСТ 2477-2014</option>
+                    </select></td>
+                <td>0</td>
+                <td><input data-edit="1" data-key="MassWaterFracCorrection" data-tag="Value" type="number" step="any"
+                        name="tb6" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Массовая концентрация хлористых солей, мг/дм³</td>
+                <td><select data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Methods" name="cb7">
+                        <option value="0">ГОСТ 21534-2021, метод А, часть 1</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Value" type="number"
+                        step="any" name="tb7" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Массовая концентрация хлористых солей, %</td>
+                <td><select data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Methods" name="cb8">
+                        <option value="0">ГОСТ 21534-2021, метод А, часть 1</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Value" type="number"
+                        step="any" name="tb8" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Массовая доля механических примесей, %</td>
+                <td><select data-edit="1" data-key="Impurity" data-tag="Methods" name="cb9">
+                        <option value="0">ГОСТ 6370-83</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Impurity" data-tag="Value" type="number" step="any" name="tb9"
+                        value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Массовая доля серы, %</td>
+                <td><select data-edit="1" data-key="SulfurCorrection" data-tag="Methods" name="cb10">
+                        <option value="0">ГОСТ Р 51947-2002</option>
+                    </select></td>
+                <td>0</td>
+                <td><input data-edit="1" data-key="SulfurCorrection" data-tag="Value" type="number" step="any"
+                        name="tb10" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>Давление насыщенных паров, кПа</td>
+                <td><select data-edit="1" data-key="DNP.kPa" data-tag="Methods" name="cb11">
+                        <option value="0">ГОСТ 1756-2000</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="DNP.kPa" data-tag="Value" type="number" step="any" name="tb11"
+                        value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>Давление насыщенных паров, мм рт. ст.</td>
+                <td><select data-edit="1" data-key="DNP.mercury_mm" data-tag="Methods" name="cb12">
+                        <option value="0">ГОСТ 1756-2000</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="DNP.mercury_mm" data-tag="Value" type="number" step="any" name="tb12"
+                        value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>Выход фракций, %: при температуре до 200 °С</td>
+                <td><select data-edit="1" data-key="Yield_fraction_200" data-tag="Methods" name="cb13">
+                        <option value="0">ГОСТ 2177-99, метод Б</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Yield_fraction_200" data-tag="Value" type="number" step="any"
+                        name="tb13" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>Выход фракций, %: при температуре до 300 °С</td>
+                <td><select data-edit="1" data-key="Yield_fraction_300" data-tag="Methods" name="cb14">
+                        <option value="0">ГОСТ 2177-99, метод Б</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Yield_fraction_300" data-tag="Value" type="number" step="any"
+                        name="tb14" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>Выход фракций: при температуре до 350 °С, %</td>
+                <td><select data-edit="1" data-key="Yield_fraction_350" data-tag="Methods" name="cb15">
+                        <option value="0">ГОСТ 2177-99, метод Б</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Yield_fraction_350" data-tag="Value" type="number" step="any"
+                        name="tb15" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>Массовая доля парафина, %</td>
+                <td><select data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Methods" name="cb16">
+                        <option value="0">ГОСТ 11851-85, метод Б</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Value" type="number" step="any"
+                        name="tb16" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>17</td>
+                <td>Массовая доля сероводорода, млнˉ¹ (ppm)</td>
+                <td><select data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Methods" name="cb17">
+                        <option value="0">ГОСТ Р 50802-2021</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Value" type="number"
+                        step="any" name="tb17" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>18</td>
+                <td>Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)</td>
+                <td><select data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Methods"
+                        name="cb18">
+                        <option value="0">ГОСТ Р 50802-2021</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Value"
+                        type="number" step="any" name="tb18" value=""></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>19</td>
+                <td>Массовая доля органических хлоридов во фракции, выкипающей до
+                    температуры 204 °С, млнˉ¹ (ppm)</td>
+                <td><select data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Methods" name="cb19">
+                        <option value="0">ГОСТ Р 52247-2021, метод А</option>
+                    </select></td>
+                <td>-</td>
+                <td><input data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Value" type="number"
+                        step="any" name="tb19" value=""></td>
+                <td>-</td>
+            </tr>
+        </tbody>
     </table>
 
 </body>
+
 </html>

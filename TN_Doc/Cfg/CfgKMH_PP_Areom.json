@@ -21,8 +21,8 @@
         "ProtocolNumber": 1
       },
       "Header": {
-        "FieldSIKN": "СИКН&nbsp;№&nbsp;",
-        "FieldPSP": "ПСП (НСП)&nbsp;"
+        "FieldSIKN": "СИКН",
+        "FieldPSP": "ПСП (НСП)"
       },
       "Data": {
 

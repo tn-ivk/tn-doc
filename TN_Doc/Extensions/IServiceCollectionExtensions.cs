@@ -12,6 +12,12 @@ namespace TN_Doc.Extensions
     /// </summary>
     public static class ServiceCollectionExtensions
     {
+/// <summary>
+		/// Конфигурирование директории проекта. Директория проекта выставляется в папку c исполняемым файлом
+		/// </summary>
+		/// <param name="_">Коллекция сервисов</param>
+		public static void ConfigAppDirectory(this IServiceCollection _) => Environment.CurrentDirectory = AppContext.BaseDirectory;
+
         /// <summary>
         /// Добавление принтеров для печати докумнетов
         /// </summary>
@@ -20,11 +26,11 @@ namespace TN_Doc.Extensions
         {
             if (IsWindows)
             {
-                services.AddTransient<AbsPrinter>((item)=>new WindowsPrinter());
+                services.AddTransient<AbsPrinter>((_) => new WindowsPrinter());
             }
             else
             {
-                services.AddTransient<AbsPrinter>((item)=>new LinuxPrinter());
+                services.AddTransient<AbsPrinter>((_) => new LinuxPrinter());
             }
         }
 
@@ -39,15 +45,15 @@ namespace TN_Doc.Extensions
         /// </summary>
         /// <param name="services">Коллекция сервисов</param>
         /// <param name="cfg">Провайдер конфигурации приложения</param>
-        public static void AddDirectoryService(this IServiceCollection services,IConfiguration cfg)
+        public static void AddDirectoryService(this IServiceCollection services, IConfiguration cfg)
         {
             services.AddSingleton((provider) =>
             {
-                var cfgDirName = cfg.GetValue<string>("CfgDirPath");
-                var cfgPath = cfg.GetValue<string>("RelCfgName");
-                var cfgAppPath = cfg.GetValue<string>("RelCfgAppName");
-                var logger = provider.GetRequiredService<ILogger<DirectoryService>>();
-                return new DirectoryService(cfgPath,cfgAppPath,cfgDirName, logger);
+                string cfgDirName = cfg.GetValue<string>("CfgDirPath");
+                string cfgPath = cfg.GetValue<string>("RelCfgName");
+                string cfgAppPath = cfg.GetValue<string>("RelCfgAppName");
+                ILogger<DirectoryService> logger = provider.GetRequiredService<ILogger<DirectoryService>>();
+                return new DirectoryService(cfgPath, cfgAppPath, cfgDirName, logger);
             });
         }
         
@@ -57,7 +63,8 @@ namespace TN_Doc.Extensions
         /// <returns>
         /// Возвращает true - если система развертывания Windows
         /// </returns>
-        private static bool IsWindows => Environment.OSVersion.Platform != PlatformID.Unix && Environment.OSVersion.Platform != PlatformID.MacOSX;
+        private static bool IsWindows => Environment.OSVersion.Platform != PlatformID.Unix &&
+		                                 Environment.OSVersion.Platform != PlatformID.MacOSX;
     }
     
   

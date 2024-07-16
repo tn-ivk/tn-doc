@@ -23,14 +23,6 @@ namespace TN_Doc.Controllers
     public class HomeController : Controller
     {
         private CfgApp CfgApp;
-        private List<RequestListDocs> ReportIncompleteListDoc = new List<RequestListDocs>()
-        {
-            new RequestListDocs(){ Id = 1, DT = "Незавершенный", Description = "отчет за 2ч"},
-            new RequestListDocs(){ Id = 2, DT = "Незавершенный", Description = "отчет за см"},
-            new RequestListDocs(){ Id = 3, DT = "Незавершенный", Description = "отчет за сут"},
-            new RequestListDocs(){ Id = 4, DT = "Незавершенный", Description = "отчет за м"},
-            new RequestListDocs(){ Id = 5, DT = "Незавершенный", Description = "отчет за ТКО"}
-        };
 
         string PathToDocumentFile = "";
 
@@ -102,7 +94,7 @@ namespace TN_Doc.Controllers
         public List<ListItem> GetListDevices()
         {
             List<ListItem> devices = CfgApp.Devices.Where(x => x.Use)
-                                                   .Select(u => new ListItem() { Id = u.IdDevice, Name = u.Name }).ToList();
+                .Select(u => new ListItem() { Id = u.IdDevice, Name = u.Name }).ToList();
 
             string rez = System.Text.Json.JsonSerializer.Serialize(devices);
 
@@ -119,7 +111,7 @@ namespace TN_Doc.Controllers
         {
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             List<ListItem> list = device.Docs.Where(x => x.Use)
-                                             .Select(u => new ListItem() { Id = (int)u.IdDoc, Name = u.Name }).ToList();
+                .Select(u => new ListItem() { Id = (int)u.IdDoc, Name = u.Name }).ToList();
             return list;
         }
 
@@ -155,9 +147,23 @@ namespace TN_Doc.Controllers
         }
         public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
         {
-            return CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+            int lastUsedTemplateId = CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                 .Docs.Single(x => x.IdDoc == IdDoc)
                 .LastUsedTemplateId;
+
+            var usedTemplateDocs = CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+                .Docs.Single(x => x.IdDoc == IdDoc)
+                .TemplateDocs
+                .Where(x => x.Use);
+
+            if (usedTemplateDocs.Where(x => x.Id == lastUsedTemplateId).Count() > 0)
+                return lastUsedTemplateId;
+            else
+            {
+                int id = usedTemplateDocs.First().Id;
+                SetIdTemplateDoc(IdDevice, IdDoc, id);
+                return id;
+            }
         }
         public string GetPathTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {
@@ -165,6 +171,10 @@ namespace TN_Doc.Controllers
                             .Docs.Single(x => x.IdDoc == IdDoc)
                             .TemplateDocs.Single(x => x.Id == IdTemplateDoc).PathToDocTemplateFile;
         }
+
+
+        public bool IsUsedSecurity() => CfgApp.UseSecurityFeatures;
+
 
         /// <summary>
         /// Проверяем использовать ЕЛИС или нет.
@@ -194,17 +204,23 @@ namespace TN_Doc.Controllers
             var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
-                if (CfgApp.Elis == null) { }
-                else return new Dictionary<string, string>() {
-                    { "ostKey", CfgApp.Elis.OstKey },
-                    { "siknKey", CfgApp.Elis.SiknKey },
-                    { "clientName", CfgApp.Elis.ClientName }
+                if (CfgApp.Elis == null)
+                {                    
+                }
+                else 
+                    return new Dictionary<string, string>()
+                    {
+                        { "ostKey", CfgApp.Elis.OstKey },
+                        { "siknKey", CfgApp.Elis.SiknKey },
+                        { "clientName", CfgApp.Elis.ClientName }
+                    };
+            else
+                return new Dictionary<string, string>()
+                {
+                    { "ostKey", device.Elis.OstKey },
+                    { "siknKey", device.Elis.SiknKey },
+                    { "clientName", device.Elis.ClientName }
                 };
-            else return new Dictionary<string, string>() {
-                { "ostKey", device.Elis.OstKey },
-                { "siknKey", device.Elis.SiknKey },
-                { "clientName", device.Elis.ClientName }
-            };
 
             return null;
         }
@@ -219,9 +235,9 @@ namespace TN_Doc.Controllers
                 else clientToken = CfgApp.Elis.ClientToken;
             else clientToken = device.Elis.ClientToken;
 
-            return String.IsNullOrEmpty(clientToken) ? 
-                new Dictionary<string, string>() { { "clientToken", null } } : 
-                new Dictionary<string, string>() { { "clientToken", clientToken } };
+            return String.IsNullOrEmpty(clientToken)
+                ? new Dictionary<string, string>() { { "clientToken", null } }
+                : new Dictionary<string, string>() { { "clientToken", clientToken } };
         }
 
         public bool SetClientToken(int IdDevice, string clientToken)
@@ -261,7 +277,7 @@ namespace TN_Doc.Controllers
                 { 
                     Show = false, 
                     ShowRefreshButton = false, 
-                    ShowFirstButton=false 
+                    ShowFirstButton = false 
                 };
                 //modelReport.FR.ToolbarHeight = 300;
 
@@ -273,7 +289,6 @@ namespace TN_Doc.Controllers
             }
             catch (Exception ex)
             {
-
             }
 
             //(string, string) tuple = new("string 1", "string 2");
@@ -298,11 +313,6 @@ namespace TN_Doc.Controllers
 
         public List<RequestListDocs> GetList(data data)
         {
-            if (data.IdDoc == IdDoc.ReportIncomplete)
-                return ReportIncompleteListDoc;
-
-            List<ListDoc> docs = new List<ListDoc>();
-
             DateTime DTBegin = new();
             DateTime DTEnd = new();
 
@@ -319,16 +329,10 @@ namespace TN_Doc.Controllers
 
             var doc = LoadDocsModule(data.IdDevice, data.IdDoc);
 
-            //var doc = Docs.Single(x => x.IdDoc == data.IdDoc);
-
-            //DocGeneral.CurrentCfgDevice = CfgApp.Devices.Single(x => x.Use && x.GuidDevice == data.GuidDevice);
-            //List <RequestListDocs> docsList = doc.GetList(UTBegin, UTEnd);
-            //foreach (var item in docsList)
-            //    item.DT = item.DT.Replace('.', '/');
-
-            //return docsList;
-
-            return doc.GetList(UTBegin, UTEnd);
+            if (data.IdDoc == IdDoc.ReportIncomplete)
+                return doc.GetList();
+            else
+                return doc.GetList(UTBegin, UTEnd);
         }
 
         public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
@@ -559,7 +563,8 @@ namespace TN_Doc.Controllers
         {
             if (File.Exists(path))
             {
-                using (StreamReader file = new StreamReader(File.Open(path, FileMode.Open), Encoding.UTF8))
+                //using (StreamReader file = new StreamReader(File.Open(path, FileMode.Open), Encoding.UTF8))
+                using (StreamReader file = new StreamReader(File.OpenRead(path), Encoding.UTF8))
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     st = (T)serializer.Deserialize(file, typeof(T));
@@ -571,4 +576,3 @@ namespace TN_Doc.Controllers
         }
     }
 }
-

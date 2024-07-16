@@ -5,6 +5,18 @@
     <title></title>
 
     <style>
+        /*chrome*/
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /*mozilla*/
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
         td, th 
         {
             font-size: 70%;             /* Размер шрифта в процентах */

@@ -17,7 +17,7 @@ namespace TN_Doc.Models.Printer
         /// Получение списка доступных принтеров в системе
         /// </summary>
         /// <returns>Список доступных принтеров в системе</returns>
-        public override IEnumerable<string> GetAvailablePrinters() => PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
+        public override IEnumerable<string> GetAvailablePrinters() => new List<string>() { "" };
 
 
         /// <summary>

@@ -1,0 +1,226 @@
+﻿{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_PSP",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN_Name",
+      "Type": "text",
+      "Name": "СИКН №"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "Laboratory_Name",
+      "Type": "text",
+      "Name": "Принадлежность"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "LAB_Type",
+      "Type": "text",
+      "Name": "ЛВ: Тип"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "LAB_ManufNum",
+      "Type": "text",
+      "Name": "ЛВ: Заводской №"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "LAB_CheckDate",
+      "Type": "text",
+      "Name": "ЛВ: Дата последней поверки"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": true,
+      "Key": "PV1_AddInfo.ProtokolNum",
+      "Type": "text",
+      "Name": "ПВ1: Номер протокола"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PV1_AddInfo.PV_Type",
+      "Type": "text",
+      "Name": "ПВ1: Тип"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": false,
+      "Key": "PV1_AddInfo.PV_ManufNum",
+      "Type": "text",
+      "Name": "ПВ1: Заводской №"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": false,
+      "Key": "PV1_AddInfo.PV_CheckDate",
+      "Type": "text",
+      "Name": "ПВ1: Дата последней поверки"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "PV1_AddInfo.ARM_KMH_Result",
+      "Type": "list",
+      "Name": "ПВ1: Заключение"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "PV2_AddInfo.ProtokolNum",
+      "Type": "text",
+      "Name": "ПВ2: Номер протокола"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": false,
+      "Key": "PV2_AddInfo.PV_Type",
+      "Type": "text",
+      "Name": "ПВ2: Тип"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": false,
+      "Key": "PV2_AddInfo.PV_ManufNum",
+      "Type": "text",
+      "Name": "ПВ2: Заводской №"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": false,
+      "Key": "PV2_AddInfo.PV_CheckDate",
+      "Type": "text",
+      "Name": "ПВ2: Дата последней поверки"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": true,
+      "Key": "PV2_AddInfo.ARM_KMH_Result",
+      "Type": "list",
+      "Name": "ПВ2: Заключение"
+    },
+
+
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.MI",
+      "Type": "text",
+      "Name": "Наименование документа, в соответствии с которым проведены расчеты"
+    },
+
+    {
+      "Id": 19,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.ServiceStaffData.Company",
+      "Type": "text",
+      "Name": "Сервисная организация (организация)"
+    },
+    {
+      "Id": 20,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.ServiceStaffData.Post",
+      "Type": "text",
+      "Name": "Сервисная организация (должность)"
+    },
+
+    {
+      "Id": 21,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.ServiceStaffData.FIO",
+      "Type": "text",
+      "Name": "Сервисная организация (И.О. Фамилия)"
+    },
+
+    {
+      "Id": 22,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.OperatingStaffData.Company",
+      "Type": "text",
+      "Name": "Эксплуатирующая организация (организация)"
+    },
+    {
+      "Id": 23,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.OperatingStaffData.Post",
+      "Type": "text",
+      "Name": "Эксплуатирующая организация (должность)"
+    },
+    {
+      "Id": 24,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.OperatingStaffData.FIO",
+      "Type": "text",
+      "Name": "Эксплуатирующая организация (И.О. Фамилия)"
+    },
+
+    {
+      "Id": 25,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.DeliveryOrRecievingStaffData.Company",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона (организация)"
+    },
+    {
+      "Id": 26,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.DeliveryOrRecievingStaffData.Post",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона (должность)"
+    },
+    {
+      "Id": 27,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.DeliveryOrRecievingStaffData.FIO",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона (И.О. Фамилия)"
+    }
+  ]
+}

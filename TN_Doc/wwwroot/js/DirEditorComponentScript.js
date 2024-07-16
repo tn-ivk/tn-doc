@@ -1,11 +1,14 @@
 ﻿let appDictionaries;
 let qpCfgsDictionaries
 let dictFetchOptions;
+let hashCodeLoadedCodeDict;
+let hashCodeLoadedQpConfigs;
+
 
 /*
     Инициализация компонента "Редактора справочника"
 */
-function InitDirEditorComponent(){
+function InitDirEditorComponent() {
 
     dictFetchOptions = {
         getUrlDir: '/direditor/getdir',
@@ -19,16 +22,25 @@ function InitDirEditorComponent(){
     _addTabsSelectorHandler();
     _loadAppDictionaries();
     _loadQPConfigsDictionaries();
+    _renderAppDictionaries();
+    _renderQpConfigs();
+    _addSaveButtonHandler();
+    _addCloseButtonWindowHandler();
+    /*end*/
+}
+
+/**
+ *  Рендеринг таблицы с "Персонал"
+ * */
+function _renderAppDictionaries() {
     _addDitctionariesHandler();
     _renderUserGroupsRowTable();
     _renderAndAddHandlerLicencesTable();
     _renderAndAddHandlerUserTable();
     _addLicHandler();
     _addUserHandler();
-    _addSaveButtonHandler();
-    _renderQpConfigs();
-    /*end*/
 }
+
 
 /*
     Загрузка словарей приложения. Словари поступают в формате json.
@@ -40,15 +52,12 @@ function InitDirEditorComponent(){
 */
 function _loadAppDictionaries() {
     $.ajax({
-        async: false,
-        url: dictFetchOptions.getUrlDir,
-        type: dictFetchOptions.getMethod,
-        success: function (data) {
+        async: false, url: dictFetchOptions.getUrlDir, type: dictFetchOptions.getMethod, success: function (data) {
             appDictionaries = JSON.parse(data['dirJsonRaw'])
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.error(thrownError);
+            hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries)
+        }, error: function (xhr, ajaxOptions, thrownError) {
             appDictionaries = {};
+            hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries)
         }
     })
 }
@@ -61,15 +70,13 @@ function _addDitctionariesHandler() {
     document.querySelector('#dictionaries-list').addEventListener('click', function (e) {
         let element = e.target;
         if (element.classList.contains('active')) return;
-        let elements = document.querySelectorAll('.list-group-item')
+        let elements = document.querySelectorAll('#dictionaries-list>.list-group-item')
         for (let item of elements) {
-            if (item.classList.contains('active'))
-                item.classList.remove('active');
+            if (item.classList.contains('active')) item.classList.remove('active');
         }
         element.classList.add('active');
         document.querySelectorAll('.dir-item').forEach(function (item) {
-            if (!item.classList.contains('d-none'))
-                item.classList.add('d-none')
+            if (!item.classList.contains('d-none')) item.classList.add('d-none')
         });
         let elementId = element.dataset.type;
         if (elementId) {
@@ -86,24 +93,18 @@ function _renderUserGroupsRowTable() {
     for (let userGroup of appDictionaries['UsersGroup']) {
         let row = document.createElement('tr');
         row.classList.add('data-row')
-
-        let idTd = document.createElement('td');
-        idTd.innerText = userGroup['Id'].toString();
-        _verticalCenteringText(idTd)
-        row.appendChild(idTd);
-
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(userGroup['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
         usedSquare.ariaHidden = true;
         let usedTd = document.createElement('td');
         usedTd.appendChild(usedSquare);
-        _verticalCenteringText(usedTd)
+        _addCellStyle(usedTd)
         row.appendChild(usedTd);
 
         let nameTD = document.createElement('td');
         nameTD.innerText = userGroup['Name'].toString();
-        _verticalCenteringText(nameTD)
+        _addCellStyle(nameTD)
         row.appendChild(nameTD);
 
         table.append(row)
@@ -118,13 +119,9 @@ function _renderAndAddHandlerLicencesTable() {
     let table = document.querySelector('.licences-table');
     for (let licences of appDictionaries['Licenses']) {
         let row = document.createElement('tr')
-        row.classList.add('data-row')
 
-        let idCell = document.createElement('td');
+        row.classList.add('data-row')
         row.dataset.id = licences['Id'];
-        idCell.innerText = licences['Id'];
-        _verticalCenteringText(idCell);
-        row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
@@ -132,17 +129,17 @@ function _renderAndAddHandlerLicencesTable() {
         usedSquare.ariaHidden = true;
         let usedCell = document.createElement('td');
         usedCell.appendChild(usedSquare);
-        _verticalCenteringText(usedCell);
+        _addCellStyle(usedCell);
         row.appendChild(usedCell);
 
         let numberCell = document.createElement('td');
         numberCell.innerText = licences['LicensesNumber'];
-        _verticalCenteringText(numberCell);
+        _addCellStyle(numberCell);
         row.appendChild(numberCell);
 
         let dateCell = document.createElement('td');
         dateCell.innerText = licences['LicensesDate'];
-        _verticalCenteringText(dateCell);
+        _addCellStyle(dateCell);
         row.appendChild(dateCell);
 
         let editDivElement = document.createElement('div');
@@ -171,12 +168,7 @@ function _renderAndAddHandlerUserTable() {
 
         let row = document.createElement('tr')
         row.classList.add('data-row')
-
-        let idCell = document.createElement('td');
-        idCell.innerText = user['Id'];
         row.dataset.id = user['Id'];
-        _verticalCenteringText(idCell);
-        row.appendChild(idCell);
 
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
@@ -184,44 +176,46 @@ function _renderAndAddHandlerUserTable() {
         usedSquare.ariaHidden = true;
         let usedCell = document.createElement('td');
         usedCell.appendChild(usedSquare);
-        _verticalCenteringText(usedCell);
+        _addCellStyle(usedCell);
         row.appendChild(usedCell);
 
         let groupNameCell = document.createElement('td');
         groupNameCell.innerText = usersGroups.filter(group => group['Id'] === user['IdGroup'])[0]['Name'];
-        _verticalCenteringText(groupNameCell);
+        _addCellStyle(groupNameCell);
         row.appendChild(groupNameCell);
 
         let surnameCell = document.createElement('td');
         surnameCell.innerText = user.F;
-        _verticalCenteringText(surnameCell);
+        _addCellStyle(surnameCell);
         row.appendChild(surnameCell);
 
         let nameCell = document.createElement('td');
         nameCell.innerText = user.I;
-        _verticalCenteringText(nameCell);
+        _addCellStyle(nameCell);
         row.appendChild(nameCell);
 
         let patronymicCell = document.createElement('td');
         patronymicCell.innerText = user.O;
-        _verticalCenteringText(patronymicCell);
+        _addCellStyle(patronymicCell);
         row.appendChild(patronymicCell);
 
         let organizationCell = document.createElement('td');
         organizationCell.innerText = user['Factory'];
-        _verticalCenteringText(organizationCell);
+        _addCellStyle(organizationCell);
         row.appendChild(organizationCell);
 
         let postCell = document.createElement('td');
         postCell.innerText = user['Post'];
-        _verticalCenteringText(postCell);
+        _addCellStyle(postCell);
         row.appendChild(postCell);
 
         let licCell = document.createElement('td');
-        _verticalCenteringText(licCell);
-        let licItem = licences.filter(item => item.IdUser === user['Id'])[0];
+        _addCellStyle(licCell);
+
+        let licItem = licences.filter(lic => lic['Id'] === user['LicId'])[0];
+
         if (licItem) {
-            licCell.innerText = `[${licItem['Id']}] ${licItem['LicensesNumber']}`;
+            licCell.innerText = `${licItem['LicensesNumber']}`;
             licCell.dataset.licId = licItem['Id'];
         } else {
             licCell.innerText = 'Доверенность не выбрана';
@@ -249,7 +243,7 @@ function _renderAndAddHandlerUserTable() {
     Центрирование текста внутри компонента
     @param cell - компонент  внутри которого центрируем текст (ячейка таблицы)
 */
-function _verticalCenteringText(cell) {
+function _addCellStyle(cell) {
     cell.classList.add('align-middle')
 }
 
@@ -263,10 +257,6 @@ function _createDeleteUserBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.addEventListener('click', function (e) {
         _deleteSelectedRowHandler(e, 'Users');
-        let user_id = Number(e.target.closest('.data-row').dataset.id);
-        let lic = appDictionaries['Licenses'].filter(item => item['IdUser'] === user_id)[0];
-        if (lic)
-            lic['IdUser'] = 0;
     });
     return btn
 }
@@ -280,6 +270,7 @@ function _createDeleteUserBtn(faClass, buttonClass, margin) {
 function _createDeleteLicenseBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.addEventListener('click', function (e) {
+        _cleatUserLicId(e)
         _deleteSelectedRowHandler(e, 'Licenses');
         _clearRowTable('.users-table')
         _renderAndAddHandlerUserTable();
@@ -288,23 +279,35 @@ function _createDeleteLicenseBtn(faClass, buttonClass, margin) {
 }
 
 /*
+    Очистка пользователей при удаление  доверености. У пользователь у которым была выдана
+    удаляемая довереность, скидывается
+    @param e - событие удаления
+*/
+function _cleatUserLicId(e) {
+    if (!e.target.classList.contains('delete-btn')) return;
+    let rowItem = e.target.closest('tr');
+    let licId = Number(rowItem.dataset.id);
+    if (!licId) return;
+    for (let usr of appDictionaries['Users'].filter(user => user['LicId'] === licId)) {
+        usr['LicId'] = 0;
+    }
+}
+
+/*
     Удаление строки в таблицы
     @param e - событие удаления
     @param arrayName - имя массива для удаления
 */
 function _deleteSelectedRowHandler(e, arrayName) {
-    if (!e.target.classList.contains('delete-btn'))
-        return;
+    if (!e.target.classList.contains('delete-btn')) return;
     let rowItem = e.target.closest('tr');
     let itemId = Number(rowItem.dataset.id);
-    if (!itemId)
-        return;
+    if (!itemId) return;
     appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
         return item['Id'] !== itemId;
     })
     rowItem.remove();
 }
-
 
 /*
     Создание кнопки редактирования для доверенностей
@@ -362,16 +365,7 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
 */
 function _editSelectedUser(itemBtn, rowItem, itemId) {
     let rowMap = {
-        0: 'ignore',
-        1: 'bool',
-        2: 'combobox-ug',
-        3: 'text',
-        4: 'text',
-        5: 'text',
-        6: 'text',
-        7: 'text',
-        8: 'combobox-lic',
-        9: 'ignore'
+        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable') {
@@ -386,12 +380,11 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
+        rowMap[5] = "ignore";
         rowMap[6] = "ignore";
-        rowMap[7] = "ignore";
-        if (!_validateEditRow(rowItem, rowMap))
-            return;
+        if (!_validateEditRow(rowItem, rowMap)) return;
+        rowMap[5] = "text";
         rowMap[6] = "text";
-        rowMap[7] = "text";
         _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
         _convertEditRowToStableRow(rowItem, rowMap, false)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
@@ -415,11 +408,7 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
 */
 function _editSelectedLicences(itemBtn, rowItem, itemId) {
     let rowMap = {
-        0: 'ignore',
-        1: 'bool',
-        2: 'text',
-        3: 'date',
-        4: 'ignore'
+        0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
     }
     if (itemBtn.dataset.mode === 'stable') {
         AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
@@ -433,8 +422,7 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
         _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
-        if (!_validateEditRow(rowItem, rowMap))
-            return;
+        if (!_validateEditRow(rowItem, rowMap)) return;
         _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
         _convertEditRowToStableRow(rowItem, rowMap, false)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
@@ -457,15 +445,14 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
     @param itemId - id доверености
 */
 function _applyLicenceChanges(rowItem, itemId) {
-    if (!rowItem || !itemId)
-        return;
+    if (!rowItem || !itemId) return;
     let objIndex = appDictionaries['Licenses'].findIndex(item => item.Id === itemId);
     if (objIndex < 0) return;
     let cells = rowItem.cells;
     let updatedObject = appDictionaries['Licenses'][objIndex]
-    updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['LicensesNumber'] = cells[2].childNodes[0].textContent;
-    updatedObject['LicensesDate'] = cells[3].childNodes[0].textContent;
+    updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['LicensesNumber'] = cells[1].childNodes[0].textContent;
+    updatedObject['LicensesDate'] = cells[2].childNodes[0].textContent;
 }
 
 /*
@@ -474,37 +461,32 @@ function _applyLicenceChanges(rowItem, itemId) {
     @param itemId - id доверености
 */
 function _applyUserChanges(rowItem, itemId) {
-    if (!rowItem || !itemId)
-        return;
+    if (!rowItem || !itemId) return;
     let objIndex = appDictionaries['Users'].findIndex(item => item.Id === itemId);
     if (objIndex < 0) return;
     let cells = rowItem.cells;
     let updatedObject = appDictionaries['Users'][objIndex]
-    updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['IdGroup'] = appDictionaries['UsersGroup'].filter(item => item['Name'] === cells[2].childNodes[0].textContent)[0]['Id'];
-    updatedObject['F'] = cells[3].childNodes[0].textContent;
-    updatedObject['I'] = cells[4].childNodes[0].textContent;
-    updatedObject['O'] = cells[5].childNodes[0].textContent;
+    updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['IdGroup'] = appDictionaries['UsersGroup'].filter(item => item['Name'] === cells[1].childNodes[0].textContent)[0]['Id'];
+    updatedObject['F'] = cells[2].childNodes[0].textContent;
+    updatedObject['I'] = cells[3].childNodes[0].textContent;
+    updatedObject['O'] = cells[4].childNodes[0].textContent;
+    updatedObject['LicId'] = Number(cells[7].dataset.licId);
 
-    let fact = cells[6].childNodes[0].textContent;
+    let fact = cells[5].childNodes[0].textContent;
     if (!fact) {
         updatedObject['Factory'] = "";
     } else {
         updatedObject['Factory'] = fact;
     }
 
-    let post = cells[7].childNodes[0].textContent;
+    let post = cells[6].childNodes[0].textContent;
     if (!post) {
         updatedObject['Post'] = "";
     } else {
         updatedObject['Post'] = post;
     }
 
-
-    let lic = appDictionaries['Licenses'].filter(item => item['Id'] === Number(cells[8].dataset.licId))[0];
-    if (!lic)
-        return;
-    lic['IdUser'] = updatedObject['Id'];
 }
 
 /*
@@ -522,8 +504,7 @@ function _validateEditRow(row, rowMap) {
    Валидация значение ячеек таблицы 
 */
 function _validateEditCell(cell, type) {
-    if (!type || !cell)
-        return false;
+    if (!type || !cell) return false;
 
     if (cell.classList.contains('invalid-cell-content')) {
         cell.classList.remove('invalid-cell-content')
@@ -532,18 +513,15 @@ function _validateEditCell(cell, type) {
     switch (type) {
         case 'text':
             let text = cell.childNodes[0].value;
-            if (!text)
-                cell.classList.add('invalid-cell-content');
+            if (!text) cell.classList.add('invalid-cell-content');
             break;
         case 'date':
             let date = cell.childNodes[0].value;
-            if (!date)
-                cell.classList.add('invalid-cell-content');
+            if (!date) cell.classList.add('invalid-cell-content');
             break;
         case 'number':
             let num = cell.childNodes[0].value;
-            if (!num)
-                cell.classList.add('invalid-cell-content');
+            if (!num) cell.classList.add('invalid-cell-content');
             break;
     }
 
@@ -612,7 +590,7 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
             let licId = Number(previewNode.value);
             let license = licensesArray.filter(item => item['Id'] === licId)[0];
             if (license) {
-                let licenseElement = document.createTextNode(`[${license['Id']}] ${license['LicensesNumber']}`);
+                let licenseElement = document.createTextNode(`${license['LicensesNumber']}`);
                 cell.replaceChild(licenseElement, cell.childNodes[0])
                 cell.dataset.licId = String(licId);
             } else {
@@ -668,8 +646,7 @@ function _convertStableCellToEditCell(cell, type) {
     switch (type) {
         case 'bool':
             let innerImage = cell.querySelector('i');
-            if (!innerImage)
-                return;
+            if (!innerImage) return;
             newElement.type = 'checkbox';
             newElement.checked = innerImage.classList.contains('fa-check-square-o');
             cell.replaceChild(newElement, cell.childNodes[0])
@@ -678,18 +655,14 @@ function _convertStableCellToEditCell(cell, type) {
             let prText = cell.innerText;
             newElement.type = 'text';
             newElement.value = prText ? prText : '';
-            if (previewNode)
-                cell.replaceChild(newElement, previewNode)
-            else
-                cell.append(newElement);
+            if (previewNode) cell.replaceChild(newElement, previewNode)
+            else cell.append(newElement);
             break;
         case 'date':
             let prDate = new Date(moment(cell.innerText, 'DD.MM.YYYY').format())
             newElement.classList.add('calendar');
-            if (previewNode)
-                cell.replaceChild(newElement, previewNode)
-            else
-                cell.append(newElement);
+            if (previewNode) cell.replaceChild(newElement, previewNode)
+            else cell.append(newElement);
             $('.calendar').datepicker({dateFormat: 'dd.mm.yy'});
             $('.calendar').datepicker('setDate', prDate);
             break;
@@ -706,10 +679,8 @@ function _convertStableCellToEditCell(cell, type) {
                 }
                 counter++;
             }
-            if (previewNode)
-                cell.replaceChild(cbElement, previewNode)
-            else
-                cell.append(cbElement);
+            if (previewNode) cell.replaceChild(cbElement, previewNode)
+            else cell.append(cbElement);
             break;
         case 'combobox-lic':
             let cbElementLic = document.createElement('select');
@@ -718,22 +689,21 @@ function _convertStableCellToEditCell(cell, type) {
 
             let optDefault = document.createElement('option');
             optDefault.setAttribute('value', "0");
-            optDefault.append(`0 - Доверенность не выбрана`);
+            optDefault.append(`Доверенность не выбрана`);
             cbElementLic.append(optDefault);
             for (let i = 0; i < licenses.length; i++) {
                 let opt = document.createElement('option');
                 opt.setAttribute('value', licenses[i]['Id']);
-                opt.append(`${licenses[i]['Id']} - ${licenses[i]['LicensesNumber']} - ${licenses[i]['LicensesDate']}`);
+                opt.append(`${licenses[i]['LicensesNumber']} - ${licenses[i]['LicensesDate']}`);
                 cbElementLic.append(opt);
+                counterLic++;
                 if (Number(cell.dataset.licId) === licenses[i]['Id']) {
                     cbElementLic.selectedIndex = counterLic;
                 }
-                counterLic++;
+
             }
-            if (previewNode)
-                cell.replaceChild(cbElementLic, previewNode)
-            else
-                cell.append(cbElementLic);
+            if (previewNode) cell.replaceChild(cbElementLic, previewNode)
+            else cell.append(cbElementLic);
             break;
         case 'combobox-params':
             let qpId = Number(cell.closest('table').dataset.qpId);
@@ -758,8 +728,7 @@ function _convertStableCellToEditCell(cell, type) {
                 item.remove();
             }
 
-            for (let br of cell.querySelectorAll('br'))
-                br.remove();
+            for (let br of cell.querySelectorAll('br')) br.remove();
             cell.appendChild(cbEl);
             break;
         case 'number':
@@ -768,8 +737,7 @@ function _convertStableCellToEditCell(cell, type) {
             newElement.value = prNumber ? Number.parseFloat(prNumber.replaceAll(',', '.')) : '0.0';
             if (previewNode) {
                 cell.replaceChild(newElement, previewNode)
-            } else
-                cell.append(newElement);
+            } else cell.append(newElement);
             break;
         default:
             break
@@ -821,120 +789,164 @@ function _enableOtherTableRows(ignoredItemId, tableClass) {
     Добавление обработчика добавления довереностей
 */
 function _addLicHandler() {
-    document.querySelector('.add-lic-btn').addEventListener(
-        'click',
-        function (e) {
-            let item = e.target;
-            if (e.target.tagName === "I" || e.target.tagName === "LABEL") {
-                item = e.target.closest('button');
-            }
-            let maxId = appDictionaries['Licenses'].length !== 0 ? appDictionaries['Licenses'].reduce((aid, cid) => {
-                    return aid > cid ? aid : cid;
-                })['Id']
-                : 0;
-            appDictionaries['Licenses'].push({
-                Id: maxId + 1,
-                Use: false,
-                IdUser: 0,
-                LicensesDate: "",
-                LicensesNumber: ""
-            })
-            _clearRowTable('.licences-table')
-            _renderAndAddHandlerLicencesTable();
-            _scrollToBottomTable(' #licences >.table-container> .table-content');
-
-            let lastRow = document.querySelector('.licences-table').lastChild;
-            let itemId = Number(lastRow.dataset.id);
-            let itemBtn = lastRow.querySelector('.edit-licences-btn');
-            if (!itemId || !itemBtn || !lastRow)
-                return;
-            _editSelectedLicences(itemBtn, lastRow, itemId)
+    document.querySelector('.add-lic-btn').addEventListener('click', function (e) {
+        let item = e.target;
+        if (e.target.tagName === "I" || e.target.tagName === "LABEL") {
+            item = e.target.closest('button');
         }
-    );
+        let maxId = appDictionaries['Licenses'].length !== 0 ? appDictionaries['Licenses'].reduce((aid, cid) => {
+            return aid > cid ? aid : cid;
+        })['Id'] : 0;
+        appDictionaries['Licenses'].push({
+            Id: maxId + 1, Use: false, LicensesDate: "", LicensesNumber: ""
+        })
+        _clearRowTable('.licences-table')
+        _renderAndAddHandlerLicencesTable();
+        _scrollToBottomTable(' #licences >.table-container> .table-content');
+
+        let lastRow = document.querySelector('.licences-table').lastChild;
+        let itemId = Number(lastRow.dataset.id);
+        let itemBtn = lastRow.querySelector('.edit-licences-btn');
+        if (!itemId || !itemBtn || !lastRow) return;
+        _editSelectedLicences(itemBtn, lastRow, itemId)
+    });
 }
 
 /*
     Добавление обработчика добавления пользователя
 */
 function _addUserHandler() {
-    document.querySelector('.add-user-btn').addEventListener(
-        'click',
-        function () {
-            let maxId = appDictionaries['Users'].length !== 0 ? appDictionaries['Users'].reduce((aid, cid) => {
-                    return aid > cid ? aid : cid;
-                })['Id']
-                : 0;
-            appDictionaries['Users'].push({
-                Use: false,
-                Id: maxId + 1,
-                IdGroup: 1,
-                F: "",
-                I: "",
-                O: "",
-                Factory: "",
-                Post: ""
-            })
-            _clearRowTable('.users-table')
-            _renderAndAddHandlerUserTable();
-            _scrollToBottomTable(' #users >.table-container> .table-content');
+    document.querySelector('.add-user-btn').addEventListener('click', function () {
+        let maxId = appDictionaries['Users'].length !== 0 ? appDictionaries['Users'].reduce((aid, cid) => {
+            return aid > cid ? aid : cid;
+        })['Id'] : 0;
+        appDictionaries['Users'].push({
+            Use: false, Id: maxId + 1, IdGroup: 1, F: "", I: "", O: "", Factory: "", Post: ""
+        })
+        _clearRowTable('.users-table')
+        _renderAndAddHandlerUserTable();
+        _scrollToBottomTable(' #users >.table-container> .table-content');
 
-            let lastRow = document.querySelector('.users-table').lastChild;
-            let itemId = Number(lastRow.dataset.id);
-            let itemBtn = lastRow.querySelector('.edit-user-btn');
-            if (!itemId || !itemBtn || !lastRow)
-                return;
-            _editSelectedUser(itemBtn, lastRow, itemId)
-        }
-    );
+        let lastRow = document.querySelector('.users-table').lastChild;
+        let itemId = Number(lastRow.dataset.id);
+        let itemBtn = lastRow.querySelector('.edit-user-btn');
+        if (!itemId || !itemBtn || !lastRow) return;
+        _editSelectedUser(itemBtn, lastRow, itemId)
+    });
 }
 
-/* 
-    Добавление обработчика события сохранения данных
-*/
+/**
+ *  Детектирования изменений конфигурации проекта
+ * @param {object} appDictionaries - словарь конфигурации;
+ * @param {object} qpCfgsDictionaries  - конфигурация параметров паспортов качества;
+ * @param {number} oldHashCodeAppDict -  последний известный хэш код конфигурации словаря;
+ * @param {number} oldHashCodeQpsConfig - последний известный хэш код конфигурации параметров паспортов;
+ * @return {boolean} - Возвращает true, если конфигурации были изменены с последнего момента сохранения/загрузки, в других случаях false;
+ * @private
+ * */
+function _detectConfigsChanges(appDictionaries, qpCfgsDictionaries, oldHashCodeAppDict
+    , oldHashCodeQpsConfig) {
+    let curHashCodeAppDict = GetObjectHashCode(appDictionaries);
+    let curHashCodeQpsConfig = GetObjectHashCode(qpCfgsDictionaries);
+    return (curHashCodeAppDict !== oldHashCodeAppDict) || (curHashCodeQpsConfig !== oldHashCodeQpsConfig);
+}
+
+/**
+ * Проверка намерения сохраниться. Выскакиевает окно с подтверждением.
+ * @return {Promise<boolean>}
+ * @desc Если пользователь ответил отрицательно, то вернется false и таблица перередерится со старыми значениями.
+ * @desc Если пользователь ответил утвердительно, то  вернется truе и таблица сохранится измененые значения.
+ * @private
+ */
+async function _checkIntentSaving() {
+    if (_detectConfigsChanges(appDictionaries, qpCfgsDictionaries, hashCodeLoadedCodeDict, hashCodeLoadedQpConfigs)) {
+        let needSaveChanges = await confirm('Cохранить изменения?', {
+            'title': 'Сохранение', 'yesBtnName': 'Да', 'noBtnName': 'Нет','iconClass': "fa fa-exclamation-circle text-primary"
+        });
+        if (!needSaveChanges) {
+            _loadAppDictionaries();
+            _loadQPConfigsDictionaries();
+            _reRenderUserAndLicTable();
+            _clearQpsConfig();
+            _renderQpConfigs();
+            return false;
+        }
+        return true;
+
+    } else {
+        return false;
+    }
+}
+
+/**
+ *  Проверка намерения закрыть окно. Выскакиевает окно с подтверждением..
+ * @return {Promise<boolean>}
+ * @desc Если пользователь ответил отрицательно, то вернется false и таблица перередерится со старыми значениями.
+ * @desc Если пользователь ответил утвердительно, то  вернется truе и таблица сохранится измененые значения.
+ * @private
+ */
+async function _checkIntentClose() {
+    if (_detectConfigsChanges(appDictionaries, qpCfgsDictionaries, hashCodeLoadedCodeDict, hashCodeLoadedQpConfigs)) {
+        let needSave = await confirm('Хотите сохранить изменения?', {
+            'title': 'Изменения не сохранены', 'yesBtnName': 'Сохранить', 'noBtnName': 'Не сохранять',
+            'iconClass': "fa fa-exclamation-circle text-danger"
+        });
+
+        if (!needSave) {
+            _loadAppDictionaries();
+            _loadQPConfigsDictionaries();
+            _reRenderUserAndLicTable();
+            _clearQpsConfig();
+            _renderQpConfigs();
+            return false;
+        }
+        return true;
+
+    } else {
+        return false;
+    }
+}
+
+
+/**
+ * Добавление обработчика событий закрытие модального окна справочника
+ * @desc Перед закрытие происходит проверка на  необходимость сохранение данных.
+ * @desc Если изменения были не сохранены, то выпадет окно с предложением сохранить.
+ * @desc Если пользователь ответил отрицательно, то изменения не сохраются и окно закрывается.
+ * @desc Если пользователь ответил положительно, то изменения сохраняется.
+ * @desc После этого окно всегда закрывается.
+ * @private
+ */
+function _addCloseButtonWindowHandler() {
+    $('.modal-header .close-menu .close-modal-wnd-btn').on('click', async function (e) {
+        if (await _checkIntentClose()) {
+            _saveQpAndDict();
+        }
+    });
+}
+
+
+/**
+ * Добавление обработчика события сохранения данных
+ * @private
+ */
 function _addSaveButtonHandler() {
     document.querySelector('.modal-header > .close-menu > .save-btn')
-        .addEventListener('click', function () {
-        _disableAllElementToDirEdit();
-        RemoveClassToElement('.modal-header>.close-menu >.btn > i > .fa-spin', 'd-none')
-        AddClassToElement('.modal-header>.close-menu >.btn > i > .fa-flooppy', 'd-none')
-        try {
-            $.ajax({
-                async: false,
-                url: dictFetchOptions.setUrlDir,
-                type: dictFetchOptions.setMethod,
-                contentType: 'application/json; charset=UTF-8',
-                data: JSON.stringify({
-                    dirJsonRaw: JSON.stringify(appDictionaries)
-                }),
-                success: function () {
-                    _reRenderUserAndLicTable();
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    console.error(thrownError)
-                    appDictionaries = {};
-                },
-            });
-
-            $.ajax({
-                async: false,
-                url: dictFetchOptions.setQpCfg,
-                type: dictFetchOptions.setMethod,
-                contentType: 'application/json; charset=UTF-8',
-                data: JSON.stringify({
-                    qpCfgJsonRaw: JSON.stringify(qpCfgsDictionaries)
-                }),
-                error: function (xhr, ajaxOptions, thrownError) {
-                    console.error(thrownError)
-                    qpCfgsDictionaries = {};
-                },
-
-            });
-        } finally {
-            RemoveClassToElement('.modal-header>.close-menu> .btn > i > .fa-flooppy', 'd-none')
-            AddClassToElement('.modal-header>.close-menu> .btn >  i > .fa-spin', 'd-none')
-            _enableAllElementToDirEdit();
-        }
-    })
+        .addEventListener('click', async function () {
+            if (!await _checkIntentSaving()) {
+                return;
+            }
+            _disableAllElementToDirEdit();
+            RemoveClassToElement('.modal-header>.close-menu >.btn > i > .fa-spin', 'd-none')
+            AddClassToElement('.modal-header>.close-menu >.btn > i > .fa-flooppy', 'd-none')
+            try {
+                _saveQpAndDict();
+            } finally {
+                RemoveClassToElement('.modal-header>.close-menu> .btn > i > .fa-flooppy', 'd-none')
+                AddClassToElement('.modal-header>.close-menu> .btn >  i > .fa-spin', 'd-none')
+                _enableAllElementToDirEdit();
+            }
+        })
 }
 
 /*QP*/
@@ -945,15 +957,12 @@ function _addSaveButtonHandler() {
 */
 function _loadQPConfigsDictionaries() {
     $.ajax({
-        async: false,
-        url: dictFetchOptions.getQpCfg,
-        type: dictFetchOptions.getMethod,
-        success: function (data) {
-            qpCfgsDictionaries = JSON.parse(data['qpCfgJsonRaw'])
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.error(thrownError);
+        async: false, url: dictFetchOptions.getQpCfg, type: dictFetchOptions.getMethod, success: function (data) {
+            qpCfgsDictionaries = JSON.parse(data['qpCfgJsonRaw']);
+            hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+        }, error: function (xhr, ajaxOptions, thrownError) {
             appDictionaries = {};
+            hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
         }
     })
 }
@@ -965,8 +974,7 @@ function _loadQPConfigsDictionaries() {
 function _addTabsSelectorHandler() {
     document.querySelector(".tabs-selector").addEventListener('click', function (e) {
         let element = e.target;
-        if (element.classList.contains("active"))
-            return;
+        if (element.classList.contains("active")) return;
         for (let aItem of document.querySelectorAll("a.nav-link")) {
             if (aItem.classList.contains('active')) {
                 aItem.classList.remove('active');
@@ -985,9 +993,10 @@ function _addTabsSelectorHandler() {
     });
 }
 
-/*
-    Отрисовка паспортов качества 
-*/
+/**
+ * Отрисовка паспортов качества
+ * @private
+ */
 function _renderQpConfigs() {
     let qpList = document.querySelector('#qp-list');
     let counter = 0;
@@ -1001,19 +1010,15 @@ function _renderQpConfigs() {
         _renderQpConfigsMethodsTable(counter, qp, mainBaseDiv)
         liItem.addEventListener("click", function (e) {
             let element = e.target;
-            if (element.classList.contains('active'))
-                return
+            if (element.classList.contains('active')) return
             for (let item of document.querySelectorAll('.qp-dir-item')) {
-                if (!item.classList.contains('d-none'))
-                    item.classList.add('d-none');
+                if (!item.classList.contains('d-none')) item.classList.add('d-none');
             }
             let elem = document.querySelector(element.dataset.target);
-            if (elem)
-                elem.classList.remove('d-none');
+            if (elem) elem.classList.remove('d-none');
 
             for (let el of document.querySelectorAll('#qp-list>.list-group-item')) {
-                if (el.classList.contains('active'))
-                    el.classList.remove('active');
+                if (el.classList.contains('active')) el.classList.remove('active');
             }
             element.classList.add('active');
         });
@@ -1023,6 +1028,45 @@ function _renderQpConfigs() {
         }
         counter += 1;
     }
+}
+
+/**
+ * Сохранение словарей и паспортов качества на сервере
+ * @private
+ */
+function _saveQpAndDict() {
+    $.ajax({
+        async: false,
+        url: dictFetchOptions.setUrlDir,
+        type: dictFetchOptions.setMethod,
+        contentType: 'application/json; charset=UTF-8',
+        data: JSON.stringify({
+            dirJsonRaw: JSON.stringify(appDictionaries)
+        }),
+        success: function () {
+            _reRenderUserAndLicTable();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            appDictionaries = {};
+        },
+    });
+
+    $.ajax({
+        async: false,
+        url: dictFetchOptions.setQpCfg,
+        type: dictFetchOptions.setMethod,
+        contentType: 'application/json; charset=UTF-8',
+        data: JSON.stringify({
+            qpCfgJsonRaw: JSON.stringify(qpCfgsDictionaries)
+        }),
+        error: function (xhr, ajaxOptions, thrownError) {
+            qpCfgsDictionaries = {};
+
+        },
+
+    });
+    hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+    hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
 }
 
 /*
@@ -1068,18 +1112,11 @@ function _addBtnToAddQp(qpId) {
             item = event.target.closest('button');
         }
         let qpId = item.dataset.qpId;
-        let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0
-            ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
-                return accumId > curId ? accumId : curId;
-            }) ['Id'] : 1;
+        let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0 ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
+            return accumId > curId ? accumId : curId;
+        }) ['Id'] : 1;
         qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
-            Id: maxId + 1,
-            Use: false,
-            IdParameter: 0,
-            Name: '',
-            LimitValueActivate: false,
-            LimitValue: 0,
-            LimitValueString: ''
+            Id: maxId + 1, Use: false, IdParameter: 0, Name: '', LimitValueActivate: false, LimitValue: 0, LimitValueString: ''
         });
 
         _clearQpsConfig();
@@ -1101,19 +1138,22 @@ function _addBtnToAddQp(qpId) {
         li.classList.add('active');
         document.querySelector(li.dataset.target).classList.remove('d-none');
         _scrollToBottomTable(li.dataset.target + ' > .table-container > .table-content');
-        _editQpMethod(
-            document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild,
-            document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild.querySelector('.edit-methods-btn')
-        )
+        _editQpMethod(document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild, document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild.querySelector('.edit-methods-btn'))
     });
+
 
     let img = document.createElement('i');
     img.classList.add('fa', 'fa-plus');
     img.ariaHidden = 'true';
-    btn.appendChild(img);
+    let imgDiv = document.createElement('div');
+    imgDiv.classList.add('padding-one-px-top');
+    imgDiv.appendChild(img);
+    btn.appendChild(imgDiv);
     let lbl = document.createElement('label');
-    lbl.appendChild(document.createTextNode(' Добавить'));
-    btn.appendChild(lbl);
+    lbl.appendChild(document.createTextNode('Добавить'));
+    let lblDiv = document.createElement('div');
+    lblDiv.appendChild(lbl);
+    btn.appendChild(lblDiv);
     return btnDiv;
 }
 
@@ -1143,7 +1183,6 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
     let hRow = document.createElement('tr');
     hRow.classList.add('table-primary');
     tbMethodsHead.appendChild(hRow);
-    hRow.appendChild(_createTableColumnHeader("ID"));
     hRow.appendChild(_createTableColumnHeader("Активен"));
     hRow.appendChild(_createTableColumnHeader("Метод"));
     hRow.appendChild(_createTableColumnHeader("Параметр"));
@@ -1152,55 +1191,50 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
     hRow.appendChild(_createTableColumnHeader("Сообщение"));
     hRow.appendChild(_createTableColumnHeader("Действия"));
     let methods = qps["Methods"];
-    if (!methods)
-        return;
+    if (!methods) return;
     for (let method of methods) {
         let row = document.createElement('tr');
         row.classList.add('data-row');
-        let idCell = document.createElement('td');
-        idCell.innerText = method['Id'];
         row.dataset.id = method['Id'];
-        _verticalCenteringText(idCell);
-        row.appendChild(idCell);
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(method['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
         usedSquare.ariaHidden = true;
         let usedTd = document.createElement('td');
         usedTd.appendChild(usedSquare);
-        _verticalCenteringText(usedTd)
+        _addCellStyle(usedTd)
         row.appendChild(usedTd);
         let methodName = document.createElement('td');
         methodName.innerText = method['Name'];
-        _verticalCenteringText(methodName);
+        _addCellStyle(methodName);
         row.appendChild(methodName);
         let paramsArray = qps["Parameters"];
         let param = paramsArray.filter(item => item["Id"] === method["IdParameter"])[0];
         let paramCell = document.createElement('td')
-        _verticalCenteringText(paramCell)
+        _addCellStyle(paramCell)
         paramCell.innerText = param ? param["Name"] : " - ";
         paramCell.dataset.paramId = param ? param["Id"] : 0;
         row.appendChild(paramCell);
         let limitActive = document.createElement('i')
         limitActive.classList.add('fa');
-        limitActive.classList.add(method['LimitValueActive'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        limitActive.classList.add(method['LimitValueActivate'] === true ? 'fa-check-square-o' : 'fa-square-o');
         limitActive.ariaHidden = true;
         let limitActiveCell = document.createElement('td');
         limitActiveCell.appendChild(limitActive);
-        _verticalCenteringText(limitActiveCell)
+        _addCellStyle(limitActiveCell)
         row.appendChild(limitActiveCell);
         let LimitValueCell = document.createElement('td');
         LimitValueCell.innerText = method['LimitValue'];
-        _verticalCenteringText(LimitValueCell);
+        _addCellStyle(LimitValueCell);
         row.appendChild(LimitValueCell);
         let LimitValueStringCell = document.createElement('td');
         LimitValueStringCell.innerText = !method['LimitValueString'] ? '-' : method['LimitValueString'];
-        _verticalCenteringText(LimitValueStringCell);
+        _addCellStyle(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
         let actionCell = document.createElement('td');
         actionCell.appendChild(_createEditQpMethodsBtn('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-methods-btn', '5px'));
         actionCell.appendChild(_createDeleteQpMethodsBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px'));
-        _verticalCenteringText(actionCell);
+        _addCellStyle(actionCell);
         row.appendChild(actionCell)
         methodsTable.appendChild(row);
     }
@@ -1264,14 +1298,7 @@ function _editQpMethodBtnHandler(event) {
 */
 function _editQpMethod(row, itemBtn) {
     let rowMap = {
-        0: 'ignore',
-        1: 'bool',
-        2: 'text',
-        3: 'combobox-params',
-        4: 'bool',
-        5: 'number',
-        6: 'text',
-        7: 'ignore'
+        0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable') {
@@ -1285,8 +1312,7 @@ function _editQpMethod(row, itemBtn) {
         _convertStableRowToEditRow(row, rowMap);
         itemBtn.dataset.mode = 'edit';
     } else {
-        if (!_validateEditRow(row, rowMap))
-            return;
+        if (!_validateEditRow(row, rowMap)) return;
         _convertEditRowToStableRow(row, rowMap, true)
         _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
         RemoveClassToElement('#qp-list', 'disabled-item');
@@ -1303,59 +1329,30 @@ function _editQpMethod(row, itemBtn) {
     Применение изменений метода паспорта качества 
 */
 function _applyQpMethodsChanged(rowItem, itemId, qpId) {
-    if (!rowItem || !itemId)
-        return;
-    if (qpId === undefined)
-        return;
+    if (!rowItem || !itemId) return;
+    if (qpId === undefined) return;
     let methodIndex = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].findIndex(item => item['Id'] === itemId);
-    if (methodIndex < 0)
-        return;
+    if (methodIndex < 0) return;
     let cells = rowItem.cells;
     let updatedObject = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"][methodIndex];
-    updatedObject['Use'] = cells[1].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['Name'] = cells[2].childNodes[0].textContent;
-    let parameter = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[3].childNodes[0].textContent)[0];
+    updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
+    1
+    updatedObject['Name'] = cells[1].childNodes[0].textContent;
+    let parameter = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[2].childNodes[0].textContent)[0];
     if (parameter) {
         updatedObject['IdParameter'] = parameter['Id'];
     } else {
         updatedObject['IdParameter'] = 0;
     }
 
-    updatedObject['LimitValueActivate'] = cells[4].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['LimitValue'] = Number.parseFloat(cells[5].childNodes[0].textContent.replaceAll(',', '.'));
+    updatedObject['LimitValueActivate'] = cells[3].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['LimitValue'] = Number.parseFloat(cells[4].childNodes[0].textContent.replaceAll(',', '.'));
 
-    let msg = cells[6].childNodes[0].textContent;
+    let msg = cells[5].childNodes[0].textContent;
     if (!msg) {
         updatedObject['LimitValueString'] = '-'
     } else {
         updatedObject['LimitValueString'] = msg;
-    }
-}
-
-/*
-    Отключение строк в таблице
-    @param table - таблица в которой необходимо заблокировать строки 
-    @param ignoredId - идентификатор строки, которую необходимо игнорировать
-*/
-function _disableOtherRowsInTable(table, ignoredId) {
-    if (!table) return;
-    for (let row of table.querySelectorAll('tr')) {
-        let rowId = Number(row.dataset.id);
-        if (ignoredId === rowId)
-            continue;
-        if (!row.classList.contains('disabled-item'))
-            row.classList.add('disabled-item');
-    }
-}
-
-function _enableOtherRowsInTable(table, ignoredId) {
-    if (!table) return;
-    for (let row of table.querySelectorAll('tr')) {
-        let rowId = Number(row.dataset.id);
-        if (ignoredId === rowId)
-            continue;
-        if (row.classList.contains('disabled-item'))
-            row.classList.remove('disabled-item');
     }
 }
 
@@ -1364,6 +1361,7 @@ function _enableOtherRowsInTable(table, ignoredId) {
 /*************Хелперы*************************/
 /**********************************************/
 
+
 /*
     Создание заголовков таблицы <br/>
     Входные параметры: <br/>
@@ -1371,7 +1369,7 @@ function _enableOtherRowsInTable(table, ignoredId) {
 */
 function _createTableColumnHeader(headerText) {
     let el = _createElementWithOptions('th', {scope: "col", textContent: headerText});
-    _verticalCenteringText(el);
+    _addCellStyle(el);
     return el;
 }
 
@@ -1402,25 +1400,21 @@ function RemoveClassToElement(selector, className) {
 
 /*Модификация списка классов у элемета HTML */
 function _modificateElementClasses(selector, className, isRemove) {
-    if (!selector || !className)
-        return;
+    if (!selector || !className) return;
     let elements = document.querySelectorAll(selector);
-    if (!elements)
-        return;
+    if (!elements) return;
     let classes = className.split(':');
     elements.forEach(el => {
         if (isRemove) {
             for (let cl of classes) {
                 if (!cl) return;
-                if (el.classList.contains(cl))
-                    el.classList.remove(cl)
+                if (el.classList.contains(cl)) el.classList.remove(cl)
             }
         } else {
             elements.forEach(el => {
                 for (let cl of classes) {
                     if (!cl) return;
-                    if (!el.classList.contains(cl))
-                        el.classList.add(cl)
+                    if (!el.classList.contains(cl)) el.classList.add(cl)
                 }
             });
         }
@@ -1477,8 +1471,7 @@ function _clearRowTable(tableSelector) {
     let table = document.querySelector(tableSelector);
     if (!table) return;
     let dataRows = table.querySelectorAll('tr.data-row');
-    for (let index = 1; index < dataRows.length + 1; index++)
-        table.deleteRow(1)
+    for (let index = 1; index < dataRows.length + 1; index++) table.deleteRow(1)
 }
 
 /*
@@ -1486,11 +1479,9 @@ function _clearRowTable(tableSelector) {
     @param tableSelector - селектор таблицы
 */
 function _scrollToBottomTable(tableSelector) {
-    if (!tableSelector)
-        return;
+    if (!tableSelector) return;
     let tableController = document.querySelector(tableSelector);
-    if (!tableController)
-        return;
+    if (!tableController) return;
     tableController.scrollTo(0, tableController.scrollHeight)
 }
 
@@ -1520,6 +1511,35 @@ function _enableAllElementToDirEdit() {
     RemoveClassToElement('.modal-body', 'disabled-item')
     RemoveClassToElement('.close', 'disabled-item');
     RemoveClassToElement('.modal-header', 'disabled-item');
+}
+
+
+/*
+    Отключение строк в таблице
+    @param table - таблица в которой необходимо заблокировать строки 
+    @param ignoredId - идентификатор строки, которую необходимо игнорировать
+*/
+function _disableOtherRowsInTable(table, ignoredId) {
+    if (!table) return;
+    for (let row of table.querySelectorAll('tr')) {
+        let rowId = Number(row.dataset.id);
+        if (ignoredId === rowId) continue;
+        if (!row.classList.contains('disabled-item')) row.classList.add('disabled-item');
+    }
+}
+
+/*
+    Включение строк в таблице
+    @param table - таблица в которой необходимо включить строки 
+    @param ignoredId - идентификатор строки, которую необходимо игнорировать
+*/
+function _enableOtherRowsInTable(table, ignoredId) {
+    if (!table) return;
+    for (let row of table.querySelectorAll('tr')) {
+        let rowId = Number(row.dataset.id);
+        if (ignoredId === rowId) continue;
+        if (row.classList.contains('disabled-item')) row.classList.remove('disabled-item');
+    }
 }
 
 /**********************************************/

@@ -5,14 +5,58 @@
     <title></title>
 
     <style>
-        td, th {
-            font-size: 70%; /* Размер шрифта в процентах */
-            padding: 2px; /* Поля вокруг содержимого таблицы */
-            border: 0.5px solid black; /* Параметры рамки */
+        /*chrome*/
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /*mozilla*/
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        input {
+            outline: none;
+            border: 1px solid white;
+            /* border: 1px solid black; */
+            /* border-radius: 5px; */
+        }
+
+        td,
+        th {
+            font-size: 70%;
+            /* Размер шрифта в процентах */
+            padding: 2px;
+            /* Поля вокруг содержимого таблицы */
+            border: 0.5px solid black;
+            /* Параметры рамки */
         }
 
         Edit {
-            border-collapse: collapse; /* Убираем двойные линии между ячейками */
+            border-collapse: collapse;
+            /* Убираем двойные линии между ячейками */
+        }
+
+        .empty-parameter {
+            /* border: 2px solid white; */
+            background-color: rgb(255, 255, 130);
+        }
+
+        .filled-parameter {
+            /* border: 2px solid white; */
+            background-color: white;
+        }
+
+        .correct-rounding {
+            border: 1px solid white;
+            /* background-color: green; */
+        }
+
+        .incorrect-rounding {
+            border: 2px solid rgb(255, 105, 105);
+            /* background-color: red; */
         }
     </style>
 
@@ -25,6 +69,7 @@
         var dictionaries;
 
         function funcOnLoad() {
+            SendingMessageStateButtonSave();
             dictionaries = GetUsers();
         }
 
@@ -51,7 +96,45 @@
             }
         }
 
+        function RoundingCheck(Object) {
+            const f = x => ((x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0));
 
+            if (f(Object.value) == Object.getAttribute('data-roundValue')) {
+                Object.classList.replace("incorrect-rounding", "correct-rounding");
+            }
+            else {
+                Object.classList.replace("correct-rounding", "incorrect-rounding");
+            }
+
+            if (Object.value == '') {
+                Object.classList.replace("filled-parameter", "empty-parameter");
+            }
+            else {
+                Object.classList.replace("empty-parameter", "filled-parameter");
+            } 
+
+            SendingMessageStateButtonSave();
+        }
+
+        function SendingMessageStateButtonSave() {
+            let StateButtonSave = true;
+
+            StateButtonSave = ValidationData();
+
+            if (StateButtonSave)
+                window.top.postMessage('ButtonSaveOn', '*');
+            else
+                window.top.postMessage('ButtonSaveOff', '*');
+        }
+
+        function ValidationData() {
+            let elmnts = document.querySelectorAll('.incorrect-rounding, empty-parameter');
+
+            if (elmnts.length == 0)
+                return true;
+            else
+                return false;
+        }          
     </script>
 
 </head>

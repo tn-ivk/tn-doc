@@ -10,6 +10,78 @@
     <Content Remove="wwwroot\lib\jquery-ui\**" />
     <EmbeddedResource Remove="wwwroot\lib\jquery-ui\**" />
     <None Remove="wwwroot\lib\jquery-ui\**" />
+    <None Update="Doc\Act_N_GOSTR50.2.040(G)_ShiftTime.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_MPR_MPR_GOSTR8.1011-2022(U5).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_MPR_PU_GOSTR8.1011-2022(U6).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_MI2816_GOSTR8.1011-2022%28F2%29.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_PP_GOSTR8.1011-2022%28F1%29.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_PR_PR_GOSTR8.1011-2022(U1).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_PR_PU_GOSTR8.1011-2022(U2).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_PV_GOSTR8.1011-2022(C).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_PP_Areom_GOSTR8.1011-2022(F3).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\GOSTR8.1011-2022\KMH_PW_GOSTR8.1011-2022(C).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Passport\Passport_EAC.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Passport\Passport_GOSTR50.2.040%28I%29_ShiftTime.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Passport\Passport_GOSTR50.2.040%28I%29_ShiftTime_TR.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Passport\Passport_GOSTR50.2.040(G).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Passport\Passport_MI3532(15)_China.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Passport\Passport_MI3532(14).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Passport\Passport_MI3532(13).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka1974\Poverka1974.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka3267\Poverka3267.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka3287\Poverka3287_AnnexA.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka3287\Poverka3287_AnnexB.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka3380\Poverka3380.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\_Act_N_MI3532(18).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\_Act_N_GOSTR50.2.040(G).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Doc\Act_N_GOSTR50.2.040(G).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -27,6 +99,7 @@
 
   <ItemGroup>
     <Compile Remove="Class\DocPassport.cs" />
+    <Compile Remove="Class\DocReport.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,14 +127,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="01_Report_2022-05-05_Release_version.frx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FastReport.Web" Version="2023.2.30" />
+    <PackageReference Include="FastReport.Web.Skia" Version="2023.3.7" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="7.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.4" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,9 +142,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgAct.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgApp_temp.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgApp.json">
@@ -86,10 +156,39 @@
     <Content Update="Cfg\CfgEditActParty.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="Cfg\CfgEditKMH_MI2816_GostBinary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="Cfg\CfgEditKMH_MI2816.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="Cfg\CfgEditKMH_MPR_MPR.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_MPR_PU_GostBinary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_PP_GostBinary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="Cfg\CfgEditKMH_PP.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_PP_Areom_GostBinary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_PR_PR_GostBinary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_PR_PU_GostBinary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_PV_GostBinary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditKMH_PW_GostBinary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgEditKMH_UZR_PU.json">
@@ -151,7 +250,7 @@
     <Content Update="Cfg\CfgEditKMH_MPR_PU.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="Cfg\CfgEditKMH_MPR_MPR.json">
+    <Content Update="Cfg\CfgEditKMH_MPR_MPR_GostBinary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgKMH_MPR_PU.json">
@@ -209,6 +308,33 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgEditPoverka3380.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassportExport.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassportForActNP.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassport_EAC.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassport_GOSTR50.2.040%28G%29.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassport_GOSTR50.2.040%28I%29.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassport_MI3532%2813%29.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassport_MI3532%2814%29.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassport_MI3532(15)_China.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\Passport\CfgEditPassport_MI3532%2815%29.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\Passport\CfgPassport.json">
@@ -273,6 +399,9 @@
     </Content>
     <Content Update="Cfg\CfgReport.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Views\Home\Index.cshtml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="Views\Home\Index_27092023.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -345,40 +474,13 @@
     <None Update="Doc\25_DocMeasurementJornal_NP.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\_ActParty.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Doc\Act_NP_MI3275-2016(B).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\Passport\PassportExport.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\Passport\Passport_GOSTR50.2.040%28G%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Doc\Passport\Passport_GOSTR50.2.040%28I%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_MI3532%2813%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_MI3532%2814%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\__10_Poverka3287_AnnexA_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_10_Poverka3287_AnnexA_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_21_Poverka3272_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_08_DocKMH_PR_PU_(TPR).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Doc\09_Poverka2816_2022-04-13_Release_version.frx">
@@ -392,9 +494,6 @@
     </None>
     <None Update="Doc\Act_N_MI3532(18).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_13_Poverka3151_2022-05-11_Release-version.frx">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Doc\13_Poverka3151_2022-05-11_Release-version.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

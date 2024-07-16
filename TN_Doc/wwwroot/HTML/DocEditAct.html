@@ -5,6 +5,19 @@
     <title></title>
 
     <style>
+/*chrome*/
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /*mozilla*/
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+
         td, th {
             font-size: 70%; /* Размер шрифта в процентах */
             padding: 2px; /* Поля вокруг содержимого таблицы */
@@ -28,25 +41,30 @@
         }
 
         function UserChangeEvent(selectObject) {
-            if (selectObject.name == "Delive_IOF") {
-                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
-                var license = dictionaries.Licenses.filter(licenses => licenses["IdUser"] == $(selectObject).val());
-
-                document.getElementById("Delive_Factory").value = user[0].Factory;
-                document.getElementById("Delive_FIO").value = user[0].FIO;
-                //document.getElementById("Delive_IOF").value = user[0].IOF;
-                document.getElementById("Delive_Lic_Date").value = license[0].LicensesDate;
-                document.getElementById("Delive_Lic_Number").value = license[0].LicensesNumber;
+            if (selectObject.name === "Delive_IOF") {
+                let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
+                let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
+                if (user) {
+                document.getElementById("Delive_Factory").value = user.Factory;
+                document.getElementById("Delive_FIO").value = user.FIO;
+                }
+                if (license) {
+                document.getElementById("Delive_Lic_Date").value = license.LicensesDate;
+                document.getElementById("Delive_Lic_Number").value = license.LicensesNumber;
             }
-            else if (selectObject.name == "Receive_IOF") {
-                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
-                var license = dictionaries.Licenses.filter(licenses => licenses["IdUser"] == $(selectObject).val());
+            
+            } else if (selectObject.name === "Receive_IOF") {
+                let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
+                let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
+                if (user) {
+                document.getElementById("Receive_Factory").value = user.Factory;
+                document.getElementById("Receive_FIO").value = user.FIO;
+                }
+                if (license) {
+                document.getElementById("Receive_Lic_Date").value = license.LicensesDate;
+                document.getElementById("Receive_Lic_Number").value = license.LicensesNumber;
+}
 
-                document.getElementById("Receive_Factory").value = user[0].Factory;
-                document.getElementById("Receive_FIO").value = user[0].FIO;
-                //document.getElementById("Receive_IOF").value = user[0].IOF;
-                document.getElementById("Receive_Lic_Date").value = license[0].LicensesDate;
-                document.getElementById("Receive_Lic_Number").value = license[0].LicensesNumber;
             }
         }
     </script>

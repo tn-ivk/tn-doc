@@ -6,9 +6,10 @@
             <table class="mainTable">
                 <tr>
                     <td class="topPanel" colspan="2" align="right">
-                        @*<div class="menu-item">*@
-                            <button data-toggle="modal" data-target="#modal-window">Справочники</button>
-                        @*</div>*@
+                        <button id="ButtonDictionaries" data-toggle="modal" data-target="#modal-window"
+                            data-backdrop="static" data-keyboard="false">
+                            Справочники
+                        </button>
                     </td>
                 </tr>
                 <tr>
@@ -98,7 +99,7 @@
 @*                                <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis" hidden>
                                         Получить данные из ЕЛИС
                                     </button>*@
-                                <button id="ButtonElis" type="button" data-toggle="modal" data-target="#elis" hidden>
+                                <button id="ButtonElis" type="button" data-toggle="modal" data-target="#elis" onclick="ButtonElis" hidden>
                                     Получить данные из ЕЛИС
                                 </button>
                                     <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
@@ -120,7 +121,12 @@
 
 
 @*todo: вынести в отдельный  html*@
-<div class="modal fade" onselectstart="return false" oncontextmenu="return false" id="modal-window" tabindex="-1" role="dialog">
+<div class="modal fade"
+     onselectstart="return false"
+     oncontextmenu="return false"
+     id="modal-window"
+     tabindex="-1" role="dialog">
+
     <div class="modal-dialog modal-dialog-centered modal-dir-editor-width" role="document">
         <div class="modal-content modal-dir-editor-height">
             <div class="modal-header">
@@ -133,15 +139,15 @@
                         <a class="nav-link" data-type="#qp-dir-page" type="button">Методы испытаний</a>
                     </li>
                 </ul>
-
+                
 
                 <div class="close-menu" aria-label="Close">
-                    <button type="button" class="btn btn-outline-success save-btn close-menu-item">
+                    <button type="button" class="btn btn-outline-primary save-btn close-menu-item">
                         <i class="fa fa-spinner fa-spin d-none" aria-hidden="true"></i>
                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-secondary close-menu-item" data-dismiss="modal">
-                        <i class="fa  fa-times" aria-hidden="true"></i>
+                    <button type="button" class="btn btn-outline-danger close-menu-item close-modal-wnd-btn" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -164,7 +170,6 @@
                                             <table class="user-group-table  table table-bordered inner-item-center">
                                                 <thead >
                                                 <tr class="table-secondary">
-                                                    <th scope="col">ID</th>
                                                     <th scope="col">Активен</th>
                                                     <th scope="col">Название</th>
                                                 </tr>
@@ -183,7 +188,6 @@
                                             <table class="users-table table table-bordered inner-item-center">
                                                 <thead>
                                                 <tr class="table-primary">
-                                                    <th scope="col">ID</th>
                                                     <th scope="col">Активен</th>
                                                     <th scope="col">Группа</th>
                                                     <th scope="col">Фамилия</th>
@@ -199,8 +203,12 @@
                                         </div>
                                         <div class="table-bottom-menu">
                                             <button class="btn btn-primary default-btn-size add-user-btn">
-                                                <i class="fa fa-plus" aria-hidden="true"></i>
-                                                <label>Добавить</label>
+                                                <div class="padding-one-px-top">
+                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                </div>
+                                                <div>
+                                                    <label>Добавить</label>
+                                                </div>
                                             </button>
                                         </div>
                                     </div>
@@ -212,7 +220,6 @@
                                             <table class="licences-table table table-bordered inner-item-center">
                                                 <thead>
                                                 <tr class="table-primary">
-                                                    <th scope="col">ID</th>
                                                     <th scope="col">Активен</th>
                                                     <th scope="col">Номер доверенности</th>
                                                     <th scope="col">Дата доверенности</th>
@@ -224,8 +231,12 @@
                                         </div>
                                         <div class="table-bottom-menu">
                                             <button class="btn btn-primary default-btn-size add-lic-btn">
-                                                <i class="fa fa-plus" aria-hidden="true"></i>
-                                                <label>Добавить</label>
+                                                <div class="padding-one-px-top">
+                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                </div>
+                                                <div>
+                                                    <label>Добавить</label>
+                                                </div>
                                             </button>
                                         </div>
                                     </div>
@@ -249,6 +260,8 @@
 </div>
 
 
+@* Окно для получения данных из "ЕЛИС" *@
+
 <div class="modal fade" id="elis" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -269,7 +282,6 @@
                         <span id="spinnerDataRequest" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
                         <span id="textDataRequest" class="visually-hidden">Запросить данные</span>
                     </button>
-
                     <div id="listPassports" class="list-group">
                       
                     </div>
@@ -282,7 +294,30 @@
     </div>
 </div>
 
+@* Окно для подтверждения действий пользователя *@
+@* Текст вставляется через перегрузку метода  confirm *@
+
+<div id="PromiseConfirm" class="modal"   onselectstart="return false">
+    <div class="modal-dialog modal-dialog-centered "  role="document">
+            <div class="modal-content  rounded  border border-5 border-primary">
+                <div class="modal-header">
+                    <h7 class="modal-title">
+                        <i style="font-size: 1.5em;"></i> <span>Внимание</span>
+                    </h7>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary confirm-ok-btn" data-dismiss="modal">Да</button>
+                    <button type="button" class="btn btn-outline-danger  confirm-cancel-btn" data-dismiss="modal">Нет</button>
+                </div>
+            </div>
+    </div>
+</div>
+
+
 <script>
+        RedefinitionConfirmWindow();
         InitElement();
 </script>
 </body>

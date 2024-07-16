@@ -6,7 +6,7 @@
     "Settings": {
       "General": {
         "ObjType": 1,
-        "NefType": 2,
+        "NefType": 1,
         "NumberDensitometers": 1,
         "NumberViscometers": 1,
         "NumberWatermetrs": 1,
@@ -29,172 +29,90 @@
           {
             "Use": true,
             "Id": 1,
-            "IdGroup": 3,
-            "F": "Деревяшкин",
-            "I": "А",
-            "O": "А",
-            "Factory": "ПАО АНК «Башнефть»",
-            "Post": ""
+            "IdGroup": 1,
+            "F": "Швецов",
+            "I": "Фёдор",
+            "O": "Михайлович",
+            "Factory": "",
+            "Post": "Лаборант",
+            "LicId": 0
           },
           {
             "Use": true,
             "Id": 2,
-            "IdGroup": 3,
-            "F": "Козленко",
-            "I": "К",
-            "O": "Ю",
-            "Factory": "ПАО АНК «Башнефть»",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 3,
-            "IdGroup": 3,
-            "F": "Шарапов",
-            "I": "К",
-            "O": "А",
-            "Factory": "ПАО АНК «Башнефть»",
-            "Post": ""
+            "IdGroup": 1,
+            "F": "Горбачев",
+            "I": "Сергей",
+            "O": "Владиславович",
+            "Factory": "",
+            "Post": "Старший лаборант",
+            "LicId": 0
           },
           {
             "Use": true,
             "Id": 4,
-            "IdGroup": 3,
-            "F": "Родионова",
-            "I": "И",
-            "O": "Ю",
-            "Factory": "ПАО «Сургутнефтегаз»",
-            "Post": ""
+            "IdGroup": 2,
+            "F": "Попов",
+            "I": "Илья",
+            "O": "Фёдорович",
+            "Factory": "ООО \"Сдающая сторона\"",
+            "Post": "Оператор товарный",
+            "LicId": 1
           },
           {
             "Use": true,
             "Id": 5,
-            "IdGroup": 3,
-            "F": "Кузьмина",
-            "I": "С",
-            "O": "М",
-            "Factory": "ПАО «Сургутнефтегаз»",
-            "Post": ""
+            "IdGroup": 2,
+            "F": "Власов",
+            "I": "Григорий",
+            "O": "Егорович",
+            "Factory": "ООО \"Сдающая сторона\"",
+            "Post": "Начальник ПСП",
+            "LicId": 2
           },
           {
             "Use": true,
             "Id": 6,
-            "IdGroup": 3,
-            "F": "Родионова",
-            "I": "И",
-            "O": "Ю",
-            "Factory": "АО «Казтрансойл»",
-            "Post": ""
+            "IdGroup": 2,
+            "F": "Колесников",
+            "I": "Фёдор",
+            "O": "Алексеевич",
+            "Factory": "ООО \"Сдающая сторона\"",
+            "Post": "Оператор",
+            "LicId": 1
           },
           {
             "Use": true,
             "Id": 7,
             "IdGroup": 3,
-            "F": "Кузьмина",
-            "I": "С",
-            "O": "М",
-            "Factory": "АО «АО «Казтрансойл»",
-            "Post": ""
+            "F": "Никитин",
+            "I": "Кирилл",
+            "O": "Андреевич",
+            "Factory": "ООО \"Принимающая сторона\"",
+            "Post": "Оператор товарный",
+            "LicId": 4
           },
           {
             "Use": true,
             "Id": 8,
-            "IdGroup": 2,
-            "F": "Платошин",
-            "I": "А",
-            "O": "В",
-            "Factory": "",
-            "Post": ""
+            "IdGroup": 3,
+            "F": "Игнатьев",
+            "I": "Александр",
+            "O": "Данилович",
+            "Factory": "ООО \"Принимающая сторона\"",
+            "Post": "Начальник ПСП",
+            "LicId": 5
           },
           {
             "Use": true,
             "Id": 9,
-            "IdGroup": 2,
-            "F": "Коптев",
-            "I": "А",
-            "O": "В",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 10,
-            "IdGroup": 2,
-            "F": "Чингалаев",
-            "I": "А",
-            "O": "С",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 11,
-            "IdGroup": 1,
-            "F": "Тринк",
-            "I": "Т",
-            "O": "С",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 12,
-            "IdGroup": 1,
-            "F": "Козлова",
-            "I": "Т",
-            "O": "И",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 13,
-            "IdGroup": 1,
-            "F": "Маркова",
-            "I": "Е",
-            "O": "В",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 14,
-            "IdGroup": 1,
-            "F": "Федорова",
-            "I": "И",
-            "O": "В",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 15,
-            "IdGroup": 1,
-            "F": "Кононова",
-            "I": "М",
-            "O": "В",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 16,
-            "IdGroup": 1,
-            "F": "Волокитина",
-            "I": "О",
-            "O": "З",
-            "Factory": "",
-            "Post": ""
-          },
-          {
-            "Use": true,
-            "Id": 17,
-            "IdGroup": 1,
-            "F": "Бурханова",
-            "I": "С",
-            "O": "В",
-            "Factory": "",
-            "Post": ""
+            "IdGroup": 3,
+            "F": "Леонов",
+            "I": "Михаил",
+            "O": "Ильич",
+            "Factory": "ООО \"Принимающая сторона\"",
+            "Post": "Оператор",
+            "LicId": 6
           }
         ],
         "UsersGroup": [
@@ -223,73 +141,60 @@
           {
             "Id": 1,
             "Use": true,
-            "IdUser": 1,
-            "LicensesNumber": "ДОВ/8/126/21",
-            "LicensesDate": "01.08.2021"
+            "LicensesDate": "1.01.2024",
+            "LicensesNumber": "ДОВ/10/123/71"
           },
           {
             "Id": 2,
             "Use": true,
-            "IdUser": 2,
-            "LicensesNumber": "ДОВ/8/126/21",
-            "LicensesDate": "01.08.2021"
+            "LicensesDate": "1.01.2024",
+            "LicensesNumber": "ДОВ/10/123/72"
           },
           {
             "Id": 3,
             "Use": true,
-            "IdUser": 3,
-            "LicensesNumber": "ДОВ/8/126/21",
-            "LicensesDate": "01.08.2021"
+            "LicensesDate": "1.01.2024",
+            "LicensesNumber": "ДОВ/10/123/73"
           },
           {
             "Id": 4,
             "Use": true,
-            "IdUser": 4,
-            "LicensesNumber": "644-Д",
-            "LicensesDate": "01.01.2023"
+            "LicensesDate": "10.01.2024",
+            "LicensesNumber": "ДОВ/88/542/21"
           },
           {
             "Id": 5,
             "Use": true,
-            "IdUser": 5,
-            "LicensesNumber": "645-Д",
-            "LicensesDate": "01.01.2023"
+            "LicensesDate": "10.01.2024",
+            "LicensesNumber": "ДОВ/88/542/22"
           },
           {
             "Id": 6,
             "Use": true,
-            "IdUser": 6,
-            "LicensesNumber": "1/2021",
-            "LicensesDate": "25.01.2021"
-          },
-          {
-            "Id": 7,
-            "Use": true,
-            "IdUser": 7,
-            "LicensesNumber": "1/2021",
-            "LicensesDate": "25.01.2021"
-          },
-          {
-            "Id": 8,
-            "Use": true,
-            "IdUser": 8,
-            "LicensesNumber": "20-27/479-22",
-            "LicensesDate": "12.12.2022"
-          },
-          {
-            "Id": 9,
-            "Use": true,
-            "IdUser": 9,
-            "LicensesNumber": "20-27/482-22",
-            "LicensesDate": "12.12.2022"
-          },
-          {
-            "Id": 10,
-            "Use": true,
-            "IdUser": 10,
-            "LicensesNumber": "20-27/480-22",
-            "LicensesDate": "12.12.2022"
+            "LicensesDate": "10.01.2024",
+            "LicensesNumber": "ДОВ/88/542/23"
           }
+        ],
+        "BIKs": [
+          {
+            "Id": 1,
+            "Name": "БИК-1"
+          }
+        ],
+        "Directions": [
+          {
+            "Id": 0,
+            "Name": "СИКН"
+          }
+          //,
+          //{
+          //  "Id": 1,
+          //  "Name": "ЯНОС"
+          //},
+          //{
+          //  "Id": 2,
+          //  "Name": "РП"
+          //}
         ]
       }
     },

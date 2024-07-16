@@ -1,4 +1,17 @@
 ﻿
+/*отключение стрелочек у  input[type=number]*/
+
+/*chrome*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/*mozilla*/
+input[type=number] {
+    -moz-appearance: textfield;
+}
 
 /***************************************************/
 .cont {
@@ -141,6 +154,10 @@ td {
     /*align-items: center;*/
 }
 
+.close-modal-wnd-btn{
+    
+}
+
 .data-row {
     text-align: center;
     vertical-align: middle;
@@ -188,10 +205,11 @@ td {
     width: 115px;
 }
 
-.add-lic-btn {
-}
-
-.add-user-btn {
+.add-lic-btn,
+.add-user-btn,
+.add-qp-btn {
+display: flex;
+    justify-content: space-between;
 }
 
 .close-menu-item {
@@ -203,4 +221,8 @@ td {
 .close-menu {
     display: flex;
     justify-content: space-between;
+}
+
+.padding-one-px-top{
+ padding-top: 1px;
 }

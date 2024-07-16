@@ -1,0 +1,632 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/12/2024 08:23:21" ReportInfo.CreatorVersion="2023.2.0.0">
+  <ScriptText>using System;
+using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;         
+using System.Drawing;
+using System.Data;
+using System.IO;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    JToken JDoc;
+    JToken JSettings;
+    JToken JTableKMH_MPR_PU;
+    JToken JProtokol;
+    JToken JAdditionalInfo;    
+
+    private void Page_StartPage(object sender, EventArgs e)
+    {
+      JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
+      JSettings = JDoc[&quot;Doc&quot;][&quot;Settings&quot;];
+      JTableKMH_MPR_PU = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TableKMH_MPR_PU&quot;];
+      JProtokol = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TableKMH_MPR_PU&quot;][&quot;Protokol&quot;];
+      JAdditionalInfo = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TableKMH_MPR_PU&quot;][&quot;AdditionalInfo&quot;];
+      
+      Page.PaperHeight = 210; //(int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperHeight&quot;];
+      Page.PaperWidth = 297; //(int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperWidth&quot;];
+         
+      Page.TopMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;TopMargin&quot;];
+      Page.BottomMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;BottomMargin&quot;];
+      Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
+      Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
+      
+      FillReportTitle();
+      FillReportSummary();
+    }
+      
+    public void FillReportTitle()
+    {
+      PR_Type.Text = $&quot;Тип СИ массового расхода &lt;u&gt;{JAdditionalInfo[&quot;PR_Type&quot;].ToString()}&lt;/u&gt;&quot;;
+      PR_FactoryNumber.Text = $&quot;Заводской номер &lt;u&gt;{JAdditionalInfo[&quot;PR_FactoryNumber&quot;].ToString()}&lt;/u&gt;&quot;;
+      DeltaPr.Text = $&quot;Пределы допускаемой относительной погрешности, % &lt;u&gt;{JProtokol[&quot;DeltaPr&quot;].ToString().Replace('.',',')}&lt;/u&gt;&quot;;    
+      
+      string placeSiknName = String.IsNullOrEmpty(JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString()) ?
+      $&quot;СИКН/СИКНП &lt;u&gt;{JAdditionalInfo[&quot;SIKN&quot;].ToString()}&lt;/u&gt;&quot; :
+      $&quot;{JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString()} &lt;u&gt;{JAdditionalInfo[&quot;SIKN&quot;].ToString()}&lt;/u&gt;&quot;;                    
+      SIKN.Text = placeSiknName;
+      
+      string placePspName = String.IsNullOrEmpty(JSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString()) ?
+      $&quot;ПСП &lt;u&gt;{JAdditionalInfo[&quot;Place_PSP&quot;].ToString()}&lt;/u&gt;&quot; :
+      $&quot;{JSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString()} &lt;u&gt;{JAdditionalInfo[&quot;Place_PSP&quot;].ToString()}&lt;/u&gt;&quot;;      
+      Place_PSP.Text = placePspName;      
+      
+      //SIKN.Text = $&quot;СИКН/СИКНП &lt;u&gt;{JAdditionalInfo[&quot;SIKN&quot;].ToString()}&lt;/u&gt;&quot;;
+      //Place_PSP.Text = $&quot;ПСП &lt;u&gt;{JAdditionalInfo[&quot;Place_PSP&quot;].ToString()}&lt;/u&gt;&quot;;
+      
+      PU_Type.Text = $&quot;Тип ПУ &lt;u&gt;{JAdditionalInfo[&quot;PU_Type&quot;].ToString()}&lt;/u&gt;&quot;;
+      PU_FactoryNumber.Text = $&quot;Заводской номер &lt;u&gt;{JAdditionalInfo[&quot;PU_FactoryNumber&quot;].ToString()}&lt;/u&gt;&quot;;
+      Title_Delta_PU.Text = $&quot;Пределы допускаемой относительной погрешности, % &lt;u&gt;{JProtokol[&quot;Table1&quot;][&quot;Delta_PU&quot;].ToString().Replace('.',',')}&lt;/u&gt;&quot;;
+      PU_CheckDate.Text = $&quot;Дата поверки &lt;u&gt;{JAdditionalInfo[&quot;PU_CheckDate&quot;].ToString()}&lt;/u&gt;&quot;;
+    }
+
+    private void Table1_ManualBuild(object sender, EventArgs e)
+    {
+      if (Engine.FinalPass == true)
+      {
+        JToken jsonTable1 = JTableKMH_MPR_PU[&quot;Protokol&quot;][&quot;Table1&quot;]; 
+
+        List&lt;string&gt; listDetName = jsonTable1[&quot;DetName&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
+        List&lt;string&gt; listV0 = jsonTable1[&quot;V0&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
+
+        List&lt;TableRow&gt; rows = new List&lt;TableRow&gt;();
+        
+        for (int i=0; i&lt;listDetName.Count; i++)
+        {
+          if (i==0)
+          {
+            Delta_PU.RowSpan = listDetName.Count;
+            m_D.RowSpan = listDetName.Count;
+            m_S.RowSpan = listDetName.Count;
+            m_E.RowSpan = listDetName.Count;
+            Alpha_t_PU.RowSpan = listDetName.Count;
+            Delta_t_PU.RowSpan = listDetName.Count;
+            Delta_PP.RowSpan = listDetName.Count;
+            Delta_t_PP.RowSpan = listDetName.Count;
+            Delta_k_UOI.RowSpan = listDetName.Count;
+            KF_konf.RowSpan = listDetName.Count;
+            ZS.RowSpan = listDetName.Count;
+            Alpha_k1_PU.RowSpan = listDetName.Count;
+            Alpha_t_cm.RowSpan = listDetName.Count;
+          }
+          else 
+          {
+            Delta_PU.RowSpan = 1;
+            m_D.RowSpan = 1;
+            m_S.RowSpan = 1;
+            m_E.RowSpan = 1;
+            Alpha_t_PU.RowSpan = 1;
+            Delta_t_PU.RowSpan = 1;
+            Delta_PP.RowSpan = 1;
+            Delta_t_PP.RowSpan = 1;
+            Delta_k_UOI.RowSpan = 1;
+            KF_konf.RowSpan = 1;
+            ZS.RowSpan = 1;
+            Alpha_k1_PU.RowSpan = 1;
+            Alpha_t_cm.RowSpan = 1;
+          }
+
+          DetName.Text = listDetName[i].ToString();
+          V0.Text = listV0[i].ToString();
+
+          Delta_PU.Text = jsonTable1[&quot;Delta_PU&quot;].ToString().Replace('.',',');
+          m_D.Text = jsonTable1[&quot;m_D&quot;].ToString().Replace('.',',');
+          m_S.Text = jsonTable1[&quot;m_S&quot;].ToString().Replace('.',',');
+          m_E.Text = jsonTable1[&quot;m_E&quot;].ToString().Replace('.',',');
+          Alpha_t_PU.Text = jsonTable1[&quot;Alpha_t_PU&quot;].ToString().Replace('.',',');
+          Delta_t_PU.Text = jsonTable1[&quot;Delta_t_PU&quot;].ToString().Replace('.',',');
+          Delta_PP.Text = jsonTable1[&quot;Delta_PP&quot;].ToString().Replace('.',',');
+          Delta_t_PP.Text = jsonTable1[&quot;Delta_t_PP&quot;].ToString().Replace('.',',');
+          Delta_k_UOI.Text = jsonTable1[&quot;Delta_k_UOI&quot;].ToString().Replace('.',',');
+          KF_konf.Text = jsonTable1[&quot;KF_konf&quot;].ToString().Replace('.',',');
+          ZS.Text = jsonTable1[&quot;ZS&quot;].ToString().Replace('.',',');
+          Alpha_k1_PU.Text = jsonTable1[&quot;Alpha_k1_PU&quot;].ToString().Replace('.',',');
+          Alpha_t_cm.Text = jsonTable1[&quot;Alpha_t_cm&quot;].ToString().Replace('.',',');
+          
+          TableRow row = new TableRow();
+          row.AssignAll(Table1_RowData);
+          row.Visible=true;
+          //row.Name = $&quot;row{j}&quot;;
+          rows.Add(row);        
+        }
+        
+        Table1.Rows.AddRange(rows.ToArray());
+        
+        MI.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;MI&quot;].ToString();
+      
+        PrintTable(Table1);
+      }      
+    }
+
+    private void Table2_ManualBuild(object sender, EventArgs e)
+    {
+      if (Engine.FinalPass == true)
+      {
+        JToken jsonTable2 = JTableKMH_MPR_PU[&quot;Protokol&quot;][&quot;Table2&quot;];
+
+        List&lt;JToken&gt; listTable2 = jsonTable2.Where(x=&gt;x[&quot;Ser&quot;].ToString()!=&quot;-&quot; &amp;&amp; x[&quot;Ser&quot;].ToString()!=&quot;&quot;).ToList();
+        List&lt;string&gt; listSerTable2 = listTable2.Select(x =&gt; x[&quot;Ser&quot;].ToString()).Distinct().ToList();
+
+        List&lt;TableRow&gt; rows = new List&lt;TableRow&gt;();
+        
+        for (int i=0; i&lt;listSerTable2.Count; i++)
+        {
+          List&lt;JToken&gt; SerTable2 = jsonTable2.Where(x=&gt;x[&quot;Ser&quot;].ToString()==listSerTable2[i]).ToList();          
+         
+          for (int j = 0; j &lt; SerTable2.Count; j++)
+          {
+            if (j==0)
+              Ser.RowSpan = SerTable2.Count;
+            else 
+              Ser.RowSpan = 1;
+         
+            Ser.Text = SerTable2[j][&quot;Ser&quot;].ToString();
+            Row.Text = SerTable2[j][&quot;Row&quot;].ToString();
+            Q_ji.Text = SerTable2[j][&quot;Q_ji&quot;].ToString().Replace('.',',');
+            T_ji.Text = SerTable2[j][&quot;T_ji&quot;].ToString().Replace('.',',');
+            t_PU_ji.Text = SerTable2[j][&quot;t_PU_ji&quot;].ToString().Replace('.',',');
+            P_PU_ji.Text = SerTable2[j][&quot;P_PU_ji&quot;].ToString().Replace('.',',');
+            Dens_ji.Text = SerTable2[j][&quot;Dens_ji&quot;].ToString().Replace('.',',');
+            DensTemp_ji.Text = SerTable2[j][&quot;DensTemp_ji&quot;].ToString().Replace('.',',');
+            DensPress_ji.Text = SerTable2[j][&quot;DensPress_ji&quot;].ToString().Replace('.',',');
+            N_ji.Text = SerTable2[j][&quot;N_ji&quot;].ToString().Replace('.',',');
+            V_PU_PR_ji.Text = SerTable2[j][&quot;V_PU_PR_ji&quot;].ToString().Replace('.',',');
+            Dens_PP_PR_ji.Text = SerTable2[j][&quot;Dens_PP_PR_ji&quot;].ToString().Replace('.',',');
+            M_RA_ji.Text = SerTable2[j][&quot;M_RA_ji&quot;].ToString().Replace('.',',');
+            M_from_GH_ji.Text = SerTable2[j][&quot;M_from_GH_ji&quot;].ToString().Replace('.',',');
+            Delta_KMH_ji.Text = SerTable2[j][&quot;Delta_KMH_ji&quot;].ToString().Replace('.',',');
+          
+            TableRow row = new TableRow();
+            row.AssignAll(Table2_RowData);
+            row.Visible=true;
+            //row.Name = $&quot;row{j}&quot;;
+            rows.Add(row);        
+          }
+          
+          Table2.Rows.AddRange(rows.ToArray());
+        }
+        
+        MI.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;MI&quot;].ToString();
+      
+        PrintTable(Table2);
+      }    
+    }
+
+    public void FillReportSummary()
+    {
+      Report.SetParameterValue(&quot;Delta_KMH_Max&quot;, JProtokol[&quot;Delta_max&quot;].ToString().Replace('.',','));
+      Report.SetParameterValue(&quot;ARM_KMH_Result&quot;, JAdditionalInfo[&quot;ARM_KMH_Result&quot;].ToString() == &quot;годен&quot; ? &quot;годно&quot; : &quot;не годно&quot;);
+      
+      DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTableKMH_MPR_PU[&quot;DateTimeLong&quot;]);
+      Report.SetParameterValue(&quot;DateKMH&quot;, date.ToString(&quot;dd.MM.yyyy&quot;));
+      
+      
+      //if ((bool)JARMData[&quot;GostBinary&quot;][&quot;OperatingStaffDataIsDelivery&quot;])
+      //{
+      //}       
+      
+      ServiceStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Company&quot;].ToString();
+      ServiceStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Post&quot;].ToString();
+      ServiceStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;FIO&quot;].ToString();
+      
+      OperatingStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Company&quot;].ToString();
+      OperatingStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Post&quot;].ToString();
+      OperatingStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;FIO&quot;].ToString();
+      
+      DeliveryOrRecievingStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Company&quot;].ToString();
+      DeliveryOrRecievingStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Post&quot;].ToString();
+      DeliveryOrRecievingStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;FIO&quot;].ToString();
+    }  
+      
+    private void PrintTable(TableObject table)
+    {
+      for (int i=0;i&lt;table.RowCount;i++)
+      {       
+        table.PrintRow(i);
+        table.PrintColumns();
+      }    
+    }
+
+  }    
+}
+
+</ScriptText>
+  <Styles>
+    <Style Name="Arial_Bold_9" Font="Arial, 9pt, style=Bold"/>
+    <Style Name="Arial_Reg_8" Font="Arial, 8pt"/>
+  </Styles>
+  <Dictionary>
+    <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
+    <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
+    <Parameter Name="ARM_KMH_Result" DataType="System.String" AsString=""/>
+    <Parameter Name="Delta_KMH_Max" DataType="System.String" AsString=""/>
+    <Parameter Name="DateKMH" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
+    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="173.88" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableHeader" Width="1047.06" Height="154.98" CanBreak="false">
+        <TableColumn Name="Column267" Width="523.49"/>
+        <TableColumn Name="Column268" Width="523.57"/>
+        <TableRow Name="Row136" Height="60.48" AutoSize="true">
+          <TableCell Name="Cell1480" Text="ПРОТОКОЛ&#13;&#10;&#13;&#10;контроля метрологических характеристик рабочих, резервных СИ массового расхода по поверочным установкам" Padding="2, 1, 2, 6" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="Cell1481" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row179">
+          <TableCell Name="PR_Type" Border.Lines="Left, Right, Top" Text="Тип СИ массового расхода __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="PU_Type" Border.Lines="Right, Top" Text="Тип ПУ __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row132">
+          <TableCell Name="PR_FactoryNumber" Border.Lines="Left, Right" Text="Заводской номер __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="PU_FactoryNumber" Border.Lines="Right" Text="Заводской номер __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row133">
+          <TableCell Name="DeltaPr" Border.Lines="Left, Right" Text="Пределы допускаемой относительной погрешности, % __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Title_Delta_PU" Border.Lines="Right" Text="Пределы допускаемой относительной погрешности, % __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row134">
+          <TableCell Name="SIKN" Border.Lines="Left, Right" Text="СИКН/СИКНП __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="PU_CheckDate" Border.Lines="Right" Text="Дата поверки __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Row135">
+          <TableCell Name="Place_PSP" Border.Lines="Left, Right, Bottom" Text="ПСП __________" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1486" Border.Lines="Right, Bottom" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+    </ReportTitleBand>
+    <DataBand Name="DataBandTable1" Top="177.88" Width="1047.06" Height="302.4">
+      <TableObject Name="Table1" Top="9.45" Width="1047" Height="292.95" ManualBuildEvent="Table1_ManualBuild">
+        <TableColumn Name="Column269" Width="58.46"/>
+        <TableColumn Name="Column270" Width="58.46"/>
+        <TableColumn Name="Column271" Width="58.46"/>
+        <TableColumn Name="Column272" Width="58.46"/>
+        <TableColumn Name="Column273" Width="58.46"/>
+        <TableColumn Name="Column274" Width="58.46"/>
+        <TableColumn Name="Column275" Width="77.36"/>
+        <TableColumn Name="Column276" Width="58.46"/>
+        <TableColumn Name="Column277" Width="67.91"/>
+        <TableColumn Name="Column278" Width="67.91"/>
+        <TableColumn Name="Column279" Width="67.91"/>
+        <TableColumn Name="Column280" Width="67.91"/>
+        <TableColumn Name="Column281" Width="96.26"/>
+        <TableColumn Name="Column282" Width="96.26"/>
+        <TableColumn Name="Column283" Width="96.26"/>
+        <TableRow Name="Row180">
+          <TableCell Name="Cell1487" Text="     1 Исходные данные" Font="Arial, 10pt, style=Bold" ColSpan="15"/>
+          <TableCell Name="Cell1488" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1489" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1490" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1491" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1512" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1517" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1522" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1527" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1532" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1537" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1542" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1547" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1552" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1557" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row181" Height="56.7">
+          <TableCell Name="Cell1492" Border.Lines="All" Text="Характеристики трубопоршневой установки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" ColSpan="8"/>
+          <TableCell Name="Cell1493" Border.Lines="All" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1494" Border.Lines="All" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1495" Border.Lines="All" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1496" Border.Lines="All" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1513" Border.Lines="All" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1518" Border.Lines="All" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1523" Border.Lines="All" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1528" Border.Lines="All" Text="Характеристики&#13;&#10;поточного СИ&#13;&#10;плотности" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell1533" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1538" Border.Lines="All" Text="Характеристики&#13;&#10;СОИ " HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" ColSpan="2"/>
+          <TableCell Name="Cell1543" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1548" Border.Lines="All" Text="СИ расхода" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1553" Border.Lines="All" Text=" Характеристики компакт-&lt;br&gt;прувера&lt;sup&gt;1)&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell1558" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row182" Height="198.45">
+          <TableCell Name="Cell1497" Border.Lines="All" Border.BottomLine.Style="Double" Text="Детекторы" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1498" Border.Lines="All" Border.BottomLine.Style="Double" Text="Объем калиброванного участка&lt;br&gt;V&lt;sub&gt;0&lt;/sub&gt;&lt;sup&gt;тпу&lt;/sup&gt;, м&lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1499" Border.Lines="All" Border.BottomLine.Style="Double" Text="Пределы допускаемой&lt;br&gt;относительной погрешности δ&lt;sub&gt;тпу&lt;/sub&gt;, %" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1500" Border.Lines="All" Border.BottomLine.Style="Double" Text="Внутренний диаметр&#13;&#10;калиброванного участка D, мм" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1501" Border.Lines="All" Border.BottomLine.Style="Double" Text="Толщина стенок калиброванного&#13;&#10;участка S, мм" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1514" Border.Lines="All" Border.BottomLine.Style="Double" Text="Модуль упругости материала стенок&#13;&#10;Е, МПа" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1519" Border.Lines="All" Border.BottomLine.Style="Double" Text="Коэффициент линейного расшире-&lt;br&gt;ния материала стенок калиброван-&lt;br&gt;ного участка α&lt;sub&gt;t&lt;/sub&gt;, °С&lt;sup&gt;-1&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1524" Border.Lines="All" Border.BottomLine.Style="Double" Text="Пределы допускаемой абсолютной&lt;br&gt;погрешности преобразователей&lt;br&gt;температуры Δt&lt;sub&gt;тпу&lt;/sub&gt;, °С" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1529" Border.Lines="All" Border.BottomLine.Style="Double" Text="Пределы допускаемой приведенной&lt;br&gt;погрешности δ&lt;sub&gt;п.п&lt;/sub&gt;, %" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1534" Border.Lines="All" Border.BottomLine.Style="Double" Text="Пределы допускаемой абсолютной&lt;br&gt;погрешности Δt&lt;sub&gt;п.п&lt;/sub&gt;, °С" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1539" Border.Lines="All" Border.BottomLine.Style="Double" Text="Пределы допускаемой относитель-&lt;br&gt;ной погрешности δ&lt;sub&gt;к&lt;/sub&gt;&lt;sup&gt;СОИ&lt;/sup&gt; , %" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1544" Border.Lines="All" Border.BottomLine.Style="Double" Text="Коэффициент преобразования&lt;br&gt;КF&lt;sub&gt;коэф&lt;/sub&gt;, имп./т" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1549" Border.Lines="All" Border.BottomLine.Style="Double" Text="Стабильность нуля ZS, т/ч" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1554" Border.Lines="All" Border.BottomLine.Style="Double" Text="Коэффициент линейного&lt;br&gt;расширения материала стенок&lt;br&gt;цилиндра α&lt;sub&gt;k1&lt;/sub&gt;, 1/°С" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1559" Border.Lines="All" Border.BottomLine.Style="Double" Text="Коэффициент линейного&lt;br&gt;расширения материала планки&lt;br&gt;с детекторами α&lt;sub&gt;Д&lt;/sub&gt;, 1/°С" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+        </TableRow>
+        <TableRow Name="Table1_RowData" Visible="false">
+          <TableCell Name="DetName" Border.Lines="All" Text="DetName" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="V0" Border.Lines="All" Text="V0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Delta_PU" Border.Lines="All" Text="Delta_PU" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="m_D" Border.Lines="All" Text="m_D" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="m_S" Border.Lines="All" Text="m_S" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="m_E" Border.Lines="All" Text="m_E" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Alpha_t_PU" Border.Lines="All" Text="Alpha_t_PU" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Delta_t_PU" Border.Lines="All" Text="Delta_t_PU" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Delta_PP" Border.Lines="All" Text="Delta_PP" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Delta_t_PP" Border.Lines="All" Text="Delta_t_PP" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Delta_k_UOI" Border.Lines="All" Text="Delta_k_UOI" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="KF_konf" Border.Lines="All" Text="KF_konf" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="ZS" Border.Lines="All" Text="ZS" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Alpha_k1_PU" Border.Lines="All" Text="Alpha_k1_PU" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Alpha_t_cm" Border.Lines="All" Text="Alpha_t_cm" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataFooterBand Name="DataFooter1" Top="484.28" Width="1047.06" Height="18.9">
+        <TableObject Name="Table4" Width="1047.06" Height="18.9" Dock="Fill">
+          <TableColumn Name="Column300" MinWidth="18.9" MaxWidth="18.9" Width="18.9"/>
+          <TableColumn Name="Column301" Width="1028.16"/>
+          <TableRow Name="Row187">
+            <TableCell Name="Cell1639" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt"/>
+            <TableCell Name="Cell1640" Border.Lines="Right, Top, Bottom" Text="&lt;sup&gt;1)&lt;/sup&gt; Заполняется при применении компакт-прувера." VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          </TableRow>
+        </TableObject>
+      </DataFooterBand>
+    </DataBand>
+    <DataBand Name="DataBandTable2" Top="507.18" Width="1047.06" Height="189" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table2" Top="9.45" Width="1047" Height="179.55" ManualBuildEvent="Table2_ManualBuild">
+        <TableColumn Name="Column284" Width="50.9"/>
+        <TableColumn Name="Column285" Width="50.9"/>
+        <TableColumn Name="Column286" Width="69.8"/>
+        <TableColumn Name="Column287" Width="69.8"/>
+        <TableColumn Name="Column288" Width="69.8"/>
+        <TableColumn Name="Column289" Width="69.8"/>
+        <TableColumn Name="Column290" Width="69.8"/>
+        <TableColumn Name="Column291" Width="69.8"/>
+        <TableColumn Name="Column292" Width="69.8"/>
+        <TableColumn Name="Column293" Width="69.8"/>
+        <TableColumn Name="Column294" Width="88.7"/>
+        <TableColumn Name="Column295" Width="88.7"/>
+        <TableColumn Name="Column296" Width="69.8"/>
+        <TableColumn Name="Column297" Width="69.8"/>
+        <TableColumn Name="Column298" Width="69.8"/>
+        <TableRow Name="Row183">
+          <TableCell Name="Cell1560" Text="     2 Результаты измерений и вычислений" Font="Arial, 10pt, style=Bold" ColSpan="15"/>
+          <TableCell Name="Cell1561" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1562" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1563" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1564" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1585" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1590" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1595" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1600" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1605" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1610" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1615" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1620" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1625" Font="Arial, 10pt, style=Bold"/>
+          <TableCell Name="Cell1630" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row184" Height="47.25">
+          <TableCell Name="Cell1565" Border.Lines="All" Border.BottomLine.Style="Double" Text="Номер поддиапазона m" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell1566" Border.Lines="All" Border.BottomLine.Style="Double" Text="Номер измерения n" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" RowSpan="2"/>
+          <TableCell Name="Cell1567" Border.Lines="All" Border.BottomLine.Style="Double" Text="Расход Q&lt;sub&gt;ij&lt;/sub&gt;, т/ч" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell1568" Border.Lines="All" Text="ПУ" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1569" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1586" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1591" Border.Lines="All" Text=" БИК" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1596" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1601" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1606" Border.Lines="All" Text="СИ мас-&#13;&#10;сового&#13;&#10;расхода" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1611" Border.Lines="All" Border.BottomLine.Style="Double" Text="Объем нефти/нефте-&lt;br&gt;продуктов, измеренный&lt;br&gt;ПУ, при рабочих&lt;br&gt;условиях или приведен-&lt;br&gt;ный к стандартным&lt;br&gt;условиям&lt;sup&gt;1)&lt;/sup&gt; V&lt;sup&gt;тпу&lt;/sup&gt;&lt;sub&gt;прij&lt;/sub&gt;, м&lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell1616" Border.Lines="All" Border.BottomLine.Style="Double" Text="Плотность нефти/&lt;br&gt;нефтепродуктов, при&lt;br&gt;рабочих условиях или&lt;br&gt;приведенный к&lt;br&gt;стандартным услови-&lt;br&gt;ям&lt;sup&gt;1)&lt;/sup&gt; ρ&lt;sup&gt;п.п&lt;/sup&gt;&lt;sub&gt;прij&lt;/sub&gt;, кг/м&lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell1621" Border.Lines="All" Border.BottomLine.Style="Double" Text="Масса нефти/нефтепро-&lt;br&gt;дуктов, измеренная ПУ&lt;br&gt;М&lt;sub&gt;конij&lt;/sub&gt;, т" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell1626" Border.Lines="All" Border.BottomLine.Style="Double" Text="Масса нефти/нефте-&lt;br&gt;продуктов, измеренная&lt;br&gt;СИ массового расхода&lt;br&gt;M&lt;sub&gt;прij&lt;/sub&gt;, т" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell1631" Border.Lines="All" Border.BottomLine.Style="Double" Text="Относительное откло-&lt;br&gt;нение δ&lt;sub&gt;ij&lt;/sub&gt;, %" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Row185" Height="94.5">
+          <TableCell Name="Cell1570" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1571" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1572" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1573" Border.Lines="All" Border.BottomLine.Style="Double" Text="Время Т&lt;sub&gt;конij&lt;/sub&gt;, с" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1574" Border.Lines="All" Border.BottomLine.Style="Double" Text="Температура&lt;br&gt;t&lt;sup&gt;тпу&lt;/sup&gt;&lt;sub&gt;конij&lt;/sub&gt;, °С&#13;&#10;&#13;&#10;" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1587" Border.Lines="All" Border.BottomLine.Style="Double" Text="Давление&lt;br&gt;P&lt;sup&gt;тпу&lt;/sup&gt;&lt;sub&gt;конij&lt;/sub&gt;, МПа" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1592" Border.Lines="All" Border.BottomLine.Style="Double" Text="Плотность&lt;br&gt;нефти/&lt;br&gt;нефтепродук-&lt;br&gt;тов ρ&lt;sub&gt;ij&lt;/sub&gt;&lt;sup&gt;п.п&lt;/sup&gt;, кг/м3" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1597" Border.Lines="All" Border.BottomLine.Style="Double" Text="Температура&lt;br&gt;нефти/&lt;br&gt;нефтепродук-&lt;br&gt;тов t&lt;sub&gt;ij&lt;/sub&gt;&lt;sup&gt;п.п&lt;/sup&gt;, °С" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1602" Border.Lines="All" Border.BottomLine.Style="Double" Text="Давление&lt;br&gt;нефти/&lt;br&gt;нефтепродук-&lt;br&gt;тов P&lt;sub&gt;ij&lt;/sub&gt;&lt;sup&gt;п.п&lt;/sup&gt;, МПа" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1607" Border.Lines="All" Border.BottomLine.Style="Double" Text="Количество&lt;br&gt;импульсов&lt;br&gt;N&lt;sup&gt;мас&lt;/sup&gt;&lt;sub&gt;прij&lt;/sub&gt;, имп" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1612" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1617" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1622" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1627" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1632" Border.Lines="All" Border.BottomLine.Style="Double" HorzAlign="Center" VertAlign="Center" Angle="270" Font="Arial, 8pt"/>
+        </TableRow>
+        <TableRow Name="Table2_RowData" Visible="false">
+          <TableCell Name="Ser" Border.Lines="All" Text="Ser" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Row" Border.Lines="All" Text="Row" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Q_ji" Border.Lines="All" Text="Q_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="T_ji" Border.Lines="All" Text="T_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="t_PU_ji" Border.Lines="All" Text="t_PU_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="P_PU_ji" Border.Lines="All" Text="P_PU_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Dens_ji" Border.Lines="All" Text="Dens_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="DensTemp_ji" Border.Lines="All" Text="DensTemp_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="DensPress_ji" Border.Lines="All" Text="DensPress_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="N_ji" Border.Lines="All" Text="N_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="V_PU_PR_ji" Border.Lines="All" Text="V_PU_PR_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Dens_PP_PR_ji" Border.Lines="All" Text="Dens_PP_PR_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="M_RA_ji" Border.Lines="All" Text="M_RA_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="M_from_GH_ji" Border.Lines="All" Text="M_from_GH_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Delta_KMH_ji" Border.Lines="All" Text="Delta_KMH_ji" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <DataFooterBand Name="DataFooter2" Top="700.18" Width="1047.06" Height="56.7">
+        <TableObject Name="Table3" Width="1047.14" Height="56.7" PrintOnParent="true">
+          <TableColumn Name="Column299" MinWidth="18.9" MaxWidth="18.9" Width="18.9"/>
+          <TableColumn Name="Column199" Width="261.51"/>
+          <TableColumn Name="Column200" Width="766.73"/>
+          <TableRow Name="Row186">
+            <TableCell Name="Cell1636" Border.Lines="Left, Top, Bottom" Font="Arial, 10pt"/>
+            <TableCell Name="Cell1634" Border.Lines="Right, Top, Bottom" Text="&lt;sup&gt;1)&lt;/sup&gt; Указывают значения, приведенные к 15 °С или 20 °С." VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags" ColSpan="2"/>
+            <TableCell Name="Cell1635" Border.Lines="All" Font="Arial, 10pt"/>
+          </TableRow>
+          <TableRow Name="Row140">
+            <TableCell Name="Cell1637" Font="Arial, 10pt"/>
+            <TableCell Name="Cell1059" Text="Расчеты проведены в соответствии с" Font="Arial, 10pt"/>
+            <TableCell Name="MI" Border.Lines="Bottom" Font="Arial, 10pt"/>
+          </TableRow>
+          <TableRow Name="Row141">
+            <TableCell Name="Cell1638" Font="Arial, 10pt"/>
+            <TableCell Name="Cell1064" Font="Arial, 10pt"/>
+            <TableCell Name="Cell1065" Text="наименование документа, в соответствии с которым проведены расчеты" HorzAlign="Center" Font="Arial, 8pt"/>
+          </TableRow>
+        </TableObject>
+      </DataFooterBand>
+    </DataBand>
+    <ReportSummaryBand Name="ReportSummary" Top="760.88" Width="1047.06" Height="359.1" CanShrink="true">
+      <TableObject Name="Table5" Top="9.45" Width="1048.95" Height="85.05" PrintOnParent="true">
+        <TableColumn Name="Column201" Width="1048.95"/>
+        <TableRow Name="Row142">
+          <TableCell Name="Cell1066" Text="     3 Заключение" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
+        </TableRow>
+        <TableRow Name="Row143" Height="66.15">
+          <TableCell Name="Cell1071" Text="Максимальное относительное отклонение&lt;sup&gt;1)&lt;/sup&gt; δ = «+» или «–» &lt;u&gt;[Delta_KMH_Max]&lt;/u&gt; %.&#13;&#10;СИ массового расхода [ARM_KMH_Result] к дальнейшей эксплуатации.&#13;&#10;Дата проведения КМХ: [DateKMH]&#13;&#10;Подписи лиц, проводивших КМХ:" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table6" Top="94.5" Width="784.35" Height="37.8" PrintOnParent="true">
+        <TableColumn Name="Column202" Width="37.8"/>
+        <TableColumn Name="Column203" Width="708.75"/>
+        <TableColumn Name="Column204" Width="37.8"/>
+        <TableRow Name="Row144">
+          <TableCell Name="Cell1072" Text="От" Font="Arial, 10pt"/>
+          <TableCell Name="ServiceStaffData_Company" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1074" Text=":" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row145">
+          <TableCell Name="Cell1075" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1076" Text="организация, проводящая техническое обслуживание СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1077" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table8" Top="132.3" Width="746.55" Height="37.8">
+        <TableColumn Name="Column211" Width="236.25"/>
+        <TableColumn Name="Column212" Width="18.9"/>
+        <TableColumn Name="Column213" Width="236.25"/>
+        <TableColumn Name="Column214" Width="18.9"/>
+        <TableColumn Name="Column215" Width="236.25"/>
+        <TableRow Name="Row150">
+          <TableCell Name="ServiceStaffData_Post" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1091" Font="Arial, 10pt"/>
+          <TableCell Name="ServiceStaffData_FIO" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1093" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1094" Border.Lines="Bottom" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row151">
+          <TableCell Name="Cell1095" Text="должность" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1096" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1097" Text="И.О. Фамилия" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1098" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1099" Text="подпись" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table9" Top="170.1" Width="784.35" Height="37.8" PrintOnParent="true">
+        <TableColumn Name="Column205" Width="37.8"/>
+        <TableColumn Name="Column206" Width="708.75"/>
+        <TableColumn Name="Column207" Width="37.8"/>
+        <TableRow Name="Row146">
+          <TableCell Name="Cell1078" Text="От" Font="Arial, 10pt"/>
+          <TableCell Name="OperatingStaffData_Company" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1080" Text=":" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row147">
+          <TableCell Name="Cell1081" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1082" Text="организация, эксплуатирующая СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1083" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table10" Top="207.9" Width="746.55" Height="37.8" PrintOnParent="true">
+        <TableColumn Name="Column216" Width="236.25"/>
+        <TableColumn Name="Column217" Width="18.9"/>
+        <TableColumn Name="Column218" Width="236.25"/>
+        <TableColumn Name="Column219" Width="18.9"/>
+        <TableColumn Name="Column220" Width="236.25"/>
+        <TableRow Name="Row152">
+          <TableCell Name="OperatingStaffData_Post" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1101" Font="Arial, 10pt"/>
+          <TableCell Name="OperatingStaffData_FIO" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1103" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1104" Border.Lines="Bottom" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row153">
+          <TableCell Name="Cell1105" Text="должность" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1106" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1107" Text="И.О. Фамилия" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1108" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1109" Text="подпись" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table7" Top="245.7" Width="784.35" Height="37.8" PrintOnParent="true">
+        <TableColumn Name="Column208" Width="37.8"/>
+        <TableColumn Name="Column209" Width="708.75"/>
+        <TableColumn Name="Column210" Width="37.8"/>
+        <TableRow Name="Row148">
+          <TableCell Name="Cell1084" Text="От" Font="Arial, 10pt"/>
+          <TableCell Name="DeliveryOrRecievingStaffData_Company" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1086" Text=":" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row149">
+          <TableCell Name="Cell1087" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1088" Text="принимающая/сдающая сторона" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1089" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table11" Top="283.5" Width="746.55" Height="37.8" PrintOnParent="true">
+        <TableColumn Name="Column221" Width="236.25"/>
+        <TableColumn Name="Column222" Width="18.9"/>
+        <TableColumn Name="Column223" Width="236.25"/>
+        <TableColumn Name="Column224" Width="18.9"/>
+        <TableColumn Name="Column225" Width="236.25"/>
+        <TableRow Name="Row154">
+          <TableCell Name="DeliveryOrRecievingStaffData_Post" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1111" Font="Arial, 10pt"/>
+          <TableCell Name="DeliveryOrRecievingStaffData_FIO" Border.Lines="Bottom" HorzAlign="Center" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1113" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1114" Border.Lines="Bottom" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row155">
+          <TableCell Name="Cell1115" Text="должность" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1116" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1117" Text="И.О. Фамилия" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="Cell1118" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1119" Text="подпись" HorzAlign="Center" Font="Arial, 8pt"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="Table12" Top="321.3" Width="1048.93" Height="37.8" PrintOnParent="true">
+        <TableColumn Name="Column226" Width="47.24"/>
+        <TableColumn Name="Column228" Width="47.25"/>
+        <TableColumn Name="Column227" Width="954.44"/>
+        <TableRow Name="Row156">
+          <TableCell Name="Cell1120" Border.Lines="Bottom" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1127" Border.Lines="Bottom" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1121" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row157">
+          <TableCell Name="Cell1125" VertAlign="Bottom" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1128" Text="&lt;sup&gt;1)&lt;/sup&gt; Приводят значение максимальной допускаемой относительной погрешности, округленное до двух знаков после запятой в большую сторону." VertAlign="Bottom" Font="Arial, 10pt" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell1126" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </ReportSummaryBand>
+    <PageFooterBand Name="PageFooter" Top="1123.98" Width="1047.06" Height="18.9" BeforeLayoutEvent="PageFooter_BeforeLayout">
+      <TextObject Name="PageNumeration" Width="1047.06" Height="18.9" Dock="Top" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,11 +22,23 @@ namespace TN_Doc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddPolicy("CorsPolicy",
+            builder =>
+            {
+                builder.AllowAnyHeader()
+                       .AllowAnyMethod()
+                       //.AllowAnyOrigin()
+                       .SetIsOriginAllowed((host) => true)
+                       .AllowCredentials();
+            }));
+
+            services.ConfigAppDirectory();
             services.AddDirectoryService(Configuration);
             services.AddPrinters();
             services.AddPrinterService();
             services.AddControllersWithViews();
             services.AddDbContext<DocGeneral>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure
@@ -41,11 +55,11 @@ namespace TN_Doc
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
-            
+
             app.UseStaticFiles();
-            app.UseFastReport();
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>
             {

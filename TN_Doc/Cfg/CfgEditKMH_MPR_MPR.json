@@ -17,7 +17,7 @@
       "Name": "Линия"
     },
     {
-      "Id": 2,
+      "Id": 3,
       "Use": true,
       "Edit": false,
       "Key": "Place_PSP",
@@ -25,7 +25,7 @@
       "Name": "Место проведения КМХ"
     },
     {
-      "Id": 3,
+      "Id": 4,
       "Use": true,
       "Edit": false,
       "Key": "Place_Factory",
@@ -33,7 +33,7 @@
       "Name": "Заводской №"
     },
     {
-      "Id": 4,
+      "Id": 5,
       "Use": true,
       "Edit": false,
       "Key": "Place_SIKN_Name",
@@ -41,7 +41,7 @@
       "Name": "Место проведения КМХ"
     },
     {
-      "Id": 5,
+      "Id": 6,
       "Use": true,
       "Edit": false,
       "Key": "MPR_Type",
@@ -49,7 +49,7 @@
       "Name": "ПР: Тип"
     },
     {
-      "Id": 6,
+      "Id": 7,
       "Use": true,
       "Edit": false,
       "Key": "MPR_FactoryNum",
@@ -57,7 +57,7 @@
       "Name": "ПР: Заводской №"
     },
     {
-      "Id": 7,
+      "Id": 8,
       "Use": true,
       "Edit": false,
       "Key": "MPR_CTRL_Type",
@@ -65,7 +65,7 @@
       "Name": "Контрольный ПР: Тип"
     },
     {
-      "Id": 8,
+      "Id": 9,
       "Use": true,
       "Edit": false,
       "Key": "MPR_CTRL_Factory",
@@ -73,7 +73,7 @@
       "Name": "Контрольный ПР: Заводской №"
     },
     {
-      "Id": 9,
+      "Id": 10,
       "Use": true,
       "Edit": false,
       "Key": "MPR_CTRL_CheckDate",
@@ -81,7 +81,7 @@
       "Name": "Контрольный ПР: Дата поверки"
     },
     {
-      "Id": 9,
+      "Id": 11,
       "Use": true,
       "Edit": true,
       "Key": "ARM_KMH_Result",
@@ -89,7 +89,7 @@
       "Name": "Заключение"
     },
     {
-      "Id": 10,
+      "Id": 12,
       "Use": true,
       "Edit": true,
       "Key": "ServiceStaffData",
@@ -97,7 +97,7 @@
       "Name": "От сервисной организации ФИО"
     },
     {
-      "Id": 11,
+      "Id": 13,
       "Use": true,
       "Edit": true,
       "Key": "DeliveryStaffData",
@@ -105,7 +105,7 @@
       "Name": "От сдающей стороны ФИО"
     },
     {
-      "Id": 12,
+      "Id": 14,
       "Use": true,
       "Edit": true,
       "Key": "RecievingStaffData",
@@ -113,7 +113,7 @@
       "Name": "От принимающей стороны ФИО"
     },
     {
-      "Id": 13,
+      "Id": 15,
       "Use": false,
       "Edit": true,
       "Key": "ARM_CheckDate",

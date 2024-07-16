@@ -1,0 +1,170 @@
+﻿{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place",
+      "Type": "text",
+      "Name": "Место проведения КМХ"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN",
+      "Type": "text",
+      "Name": "СИКН №"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Наименование организации"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Name",
+      "Type": "text",
+      "Name": "ПР: Линия"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Type",
+      "Type": "text",
+      "Name": "ПР: Тип"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_FactoryNumber",
+      "Type": "text",
+      "Name": "ПР: Заводской №"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Type",
+      "Type": "text",
+      "Name": "ПУ: Тип"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_FactoryNumber",
+      "Type": "text",
+      "Name": "ПУ: Заводской №"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_CheckDate",
+      "Type": "text",
+      "Name": "Дата поверки ПУ"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_KMH_Result",
+      "Type": "list",
+      "Name": "Заключение"
+    },
+
+
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.MI",
+      "Type": "text",
+      "Name": "Наименование документа, в соответствии с которым проведены расчеты"
+    },
+
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.ServiceStaffData.Company",
+      "Type": "text",
+      "Name": "Сервисная организация (организация)"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.ServiceStaffData.Post",
+      "Type": "text",
+      "Name": "Сервисная организация (должность)"
+    },
+
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.ServiceStaffData.FIO",
+      "Type": "text",
+      "Name": "Сервисная организация (И.О. Фамилия)"
+    },
+
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.OperatingStaffData.Company",
+      "Type": "text",
+      "Name": "Эксплуатирующая организация (организация)"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.OperatingStaffData.Post",
+      "Type": "text",
+      "Name": "Эксплуатирующая организация (должность)"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.OperatingStaffData.FIO",
+      "Type": "text",
+      "Name": "Эксплуатирующая организация (И.О. Фамилия)"
+    },
+
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.DeliveryOrRecievingStaffData.Company",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона (организация)"
+    },
+    {
+      "Id": 19,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.DeliveryOrRecievingStaffData.Post",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона (должность)"
+    },
+    {
+      "Id": 20,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.DeliveryOrRecievingStaffData.FIO",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона (И.О. Фамилия)"
+    }
+  ]
+}
