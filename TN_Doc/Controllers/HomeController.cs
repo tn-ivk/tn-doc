@@ -374,7 +374,7 @@ namespace TN_Doc.Controllers
             //pdfExport.HideMenubar = true;
             //pdfExport.HideToolbar = true;
             //pdfExport.HideWindowUI= true;
-
+            
             FR.Report.Export(pdfExport, Directory.GetCurrentDirectory() + "/wwwroot/PDF/PDF.pdf");
 
             pdfExport.Dispose();

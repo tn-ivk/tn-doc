@@ -32,7 +32,7 @@ namespace TN_Doc
                        .AllowCredentials();
             }));
 
-            services.ConfigAppDirectory();
+            // services.ConfigAppDirectory();
             services.AddDirectoryService(Configuration);
             services.AddPrinters();
             services.AddPrinterService();

@@ -44,7 +44,6 @@ namespace TN_Doc.Models.Printer
                 if (!printersName.Contains(printerName))
                     return;
                 var consoleStr = $"-H localhost -P  {printerName} -ol {Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf")}";
-                Console.WriteLine(consoleStr);
                 using var process = new Process();
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
