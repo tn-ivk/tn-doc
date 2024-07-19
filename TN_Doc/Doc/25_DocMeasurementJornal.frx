@@ -254,7 +254,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableJournal" Top="58.92" Width="1047.06" Height="151.22">
+    <DataBand Name="DataBandTableJournal" Top="60.7" Width="1047.06" Height="151.22">
       <TableObject Name="TableJournal" Width="1047.06" Height="151.22" FixedRows="5" ManualBuildEvent="TableJournal_ManualBuild">
         <TableColumn Name="Column122" Width="30.24"/>
         <TableColumn Name="Column123" Width="64.26"/>
@@ -382,7 +382,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableTotal" Top="212.36" Width="1047.06" Height="23.63" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableTotal" Top="215.92" Width="1047.06" Height="23.63" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableTotal" Top="7.56" Width="718.2" Height="16.07" ManualBuildEvent="TableTotal_ManualBuild">
         <TableColumn Name="Column138" Width="718.2"/>
         <TableRow Name="Row106" Height="16.07">
@@ -390,7 +390,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="238.22" Width="1047.06" Height="153.09" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="243.55" Width="1047.06" Height="153.09" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="11.34" Width="1041.39" Height="94.5">
         <TableColumn Name="Column52" Width="94.5"/>
         <TableColumn Name="Column51" Width="5.67"/>
@@ -476,7 +476,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="393.53" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="400.64" Width="1047.06" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
