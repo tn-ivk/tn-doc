@@ -33,11 +33,14 @@ namespace TN_Doc
             }));
 
             // services.ConfigAppDirectory();
+            services.AddAppInfoProvider();
             services.AddDirectoryService(Configuration);
             services.AddPrinters();
             services.AddPrinterService();
             services.AddControllersWithViews();
             services.AddDbContext<DocGeneral>();
+            
+            
             
         }
 

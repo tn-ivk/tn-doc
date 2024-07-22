@@ -262,38 +262,30 @@ namespace TN_Doc.Controllers
                 return "";
         }
 
-        public IActionResult Index()
+        public IActionResult Index([FromServices]AppInfoProvider provider)
         {
+            ViewData["Version"] = provider.Version;
             try
             {
-                //FastReport.Utils.Config.WebMode = false;
                 FastReport.Utils.Config.EnableScriptSecurity = false;
                 FR.EnableMargins = true;
-                //modelReport.FR.ShowExports = true;
                 FR.Mode = WebReportMode.Preview;
                 FR.SinglePage = true;
-                //modelReport.FR.SplitReportPagesInTabs = true;
                 FR.Toolbar = new ToolbarSettings() 
                 { 
                     Show = false, 
                     ShowRefreshButton = false, 
                     ShowFirstButton = false 
                 };
-                //modelReport.FR.ToolbarHeight = 300;
-
                 FR.Width = "100%";
                 FR.Height = "auto";
-                //FR.Report.Load(Path.Combine(reportsPath, $"Report.frx"));
                 FR.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), $"01_Report_2022-05-05_Release_version.frx"));
                 FR.Render();             
             }
             catch (Exception ex)
             {
             }
-
-            //(string, string) tuple = new("string 1", "string 2");
-            //return View(tuple);
-
+            
             return View(CfgApp);
         }
 
