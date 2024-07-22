@@ -11,10 +11,9 @@ namespace TN_Doc
         public static void Main(string[] args)
         {
             try
-            {
-
-            CreateHostBuilder(args).Build().Run();
-        }
+            { 
+                CreateHostBuilder(args).Build().Run(); 
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e);
@@ -36,7 +35,6 @@ namespace TN_Doc
                 ? builder.UseWindowsService()
                 : builder.UseSystemd();
         }
-        
    		
         /// <summary>
         /// Флаг определения операционной системы
@@ -46,7 +44,5 @@ namespace TN_Doc
         /// </returns>
         private static bool IsHostOsWindows() => Environment.OSVersion.Platform != PlatformID.Unix &&
                                              Environment.OSVersion.Platform != PlatformID.MacOSX;
-        
-        
     }
 }

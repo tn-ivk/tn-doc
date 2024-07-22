@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/12/2024 08:26:11" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/22/2024 08:33:52" ReportInfo.CreatorVersion="2023.3.5.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -109,11 +109,22 @@ namespace FastReport
             row[TColumn_Table1_Q.Index+1].AssignAll(row[TColumn_Table1_Q.Index]);
         }         
         Table1_Q_Header.ColSpan = Q0.Count;
-        
-      
-        float widthColumn=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/Table1.Columns.Count;                  
-        for (int i = 0; i &lt; Table1.ColumnCount; i++)                 
-          Table1.Columns[i].Width = widthColumn * Units.Millimeters;
+
+        float widthColumn = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/Table1.Columns.Count;
+        if (Q0.Count==1){
+          float delta=2F;            
+          for (int i = 0; i &lt; Table1.ColumnCount; i++){
+            float  tmpWh= i==8 ?widthColumn+delta*10:widthColumn-delta;
+             Table1.Columns[i].Width = tmpWh * Units.Millimeters;   
+          }
+        }else{   
+          for (int i = 0; i &lt; Table1.ColumnCount; i++)                 
+            Table1.Columns[i].Width = widthColumn * Units.Millimeters;
+        }  
+//       
+//        float widthColumn=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/Table1.Columns.Count;                  
+//        for (int i = 0; i &lt; Table1.ColumnCount; i++)                 
+//          Table1.Columns[i].Width = widthColumn * Units.Millimeters;
 
         for (int i = 0; i &lt; listV0.Count; i++)
         {           
@@ -371,7 +382,7 @@ namespace FastReport
         <TableColumn Name="Column1" Width="523.49"/>
         <TableColumn Name="Column2" Width="523.57"/>
         <TableRow Name="Row1" Height="69.93" AutoSize="true">
-          <TableCell Name="ProtocolType" Text="ПРОТОКОЛ&#13;&#10;&#13;&#10;контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими,&#13;&#10;резервными средствами измерений объемного расхода с поверочными установками" Padding="2, 1, 2, 6" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
+          <TableCell Name="ProtocolType" Text="ПРОТОКОЛ1&#13;&#10;&#13;&#10;контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими,&#13;&#10;резервными средствами измерений объемного расхода с поверочными установками" Padding="2, 1, 2, 6" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt, style=Bold" FontWidthRatio="0.85" ColSpan="2"/>
           <TableCell Name="Cell2" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row131">
@@ -396,19 +407,19 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1" Top="168.43" Width="1047.06" Height="279.72" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="Table1" Top="9.45" Width="1047.04" Height="270.27" ManualBuildEvent="Table1_ManualBuild">
+    <DataBand Name="DataBandTable1" Top="169.76" Width="1047.06" Height="289.17" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="Table1" Top="9.45" Width="980.89" Height="279.72" ManualBuildEvent="Table1_ManualBuild">
         <TableColumn Name="TColumn_Table1_V0" Width="87.85"/>
         <TableColumn Name="Table1_m_D" Width="76.62"/>
         <TableColumn Name="Table1_m_S" Width="87.85"/>
-        <TableColumn Name="Table1_m_E" Width="87.85"/>
-        <TableColumn Name="Table1_Alpha_t" Width="87.85"/>
-        <TableColumn Name="Column120" Width="87.85"/>
-        <TableColumn Name="Column121" Width="87.85"/>
-        <TableColumn Name="Column122" Width="87.85"/>
-        <TableColumn Name="TColumn_Table1_Q" Width="179.77"/>
-        <TableColumn Name="Column181" Width="87.85"/>
-        <TableColumn Name="Table1_Alpha_D" Width="87.85"/>
+        <TableColumn Name="Table1_m_E" Width="78.4"/>
+        <TableColumn Name="Table1_Alpha_t" Width="78.4"/>
+        <TableColumn Name="Column120" Width="68.95"/>
+        <TableColumn Name="Column121" Width="78.4"/>
+        <TableColumn Name="Column122" Width="68.95"/>
+        <TableColumn Name="TColumn_Table1_Q" Width="151.42"/>
+        <TableColumn Name="Column181" Width="106.75"/>
+        <TableColumn Name="Table1_Alpha_D" Width="97.3"/>
         <TableRow Name="Row128" AutoSize="true">
           <TableCell Name="Cell941" Text="     1 Исходные данные" VertAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="11"/>
           <TableCell Name="SourceData" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85"/>
@@ -422,7 +433,7 @@ namespace FastReport
           <TableCell Name="Cell953" Font="Arial, 10pt"/>
           <TableCell Name="Cell959" Font="Arial, 10pt"/>
         </TableRow>
-        <TableRow Name="Row136" Height="56.7">
+        <TableRow Name="Row136" Height="66.15">
           <TableCell Name="Table1_V0_Header" Border.Lines="All" Text="Характеристики трубопоршневой установки" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt" ColSpan="5"/>
           <TableCell Name="Cell934" Border.Lines="All" Font="Arial, 10pt"/>
           <TableCell Name="Cell935" Border.Lines="All" Font="Arial, 10pt"/>
@@ -462,11 +473,11 @@ namespace FastReport
           <TableCell Name="Alpha_D" Border.Lines="All" Text="Alpha_D" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataBandTable1_Footer" Top="452.15" Width="1047.06" Height="37.8">
+      <DataFooterBand Name="DataBandTable1_Footer" Top="464.27" Width="1047.06" Height="37.8">
         <TextObject Name="Text1" Width="1047.06" Height="37.8" Dock="Top" Border.Lines="All" Text="&lt;sup&gt;1)&lt;/sup&gt; При наличии в СОИ алгоритма измерений и вычислений результатов КМХ по ПУ не заполняют.&#13;&#10;&lt;sup&gt;2)&lt;/sup&gt; Заполняют при применении компакт-прувера." HorzAlign="Justify" VertAlign="Center" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
       </DataFooterBand>
     </DataBand>
-    <DataBand Name="DataBandTable2" Top="493.95" Width="1047.06" Height="160.65" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable2" Top="507.4" Width="1047.06" Height="160.65" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table2" Top="9.45" Width="1047.09" Height="151.2" ManualBuildEvent="Table2_ManualBuild">
         <TableColumn Name="Column182" Width="69.05"/>
         <TableColumn Name="Column183" Width="69.05"/>
@@ -552,7 +563,7 @@ namespace FastReport
           <TableCell Name="Delta_j" Border.Lines="All" Text="Delta_j" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataBandTable2_Footer" Top="658.6" Width="1047.06" Height="37.8">
+      <DataFooterBand Name="DataBandTable2_Footer" Top="673.38" Width="1047.06" Height="37.8">
         <TableObject Name="Table3" Width="1047.07" Height="37.8">
           <TableColumn Name="Column199" Width="263.65"/>
           <TableColumn Name="Column200" Width="783.42"/>
@@ -567,7 +578,7 @@ namespace FastReport
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="700.4" Width="1047.06" Height="359.1" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="716.52" Width="1047.06" Height="359.1" CanShrink="true">
       <TableObject Name="Table4" Top="9.45" Width="1048.95" Height="85.05">
         <TableColumn Name="Column201" Width="1048.95"/>
         <TableRow Name="Row142">
@@ -701,8 +712,13 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1063.5" Width="1047.06" Height="18.9" Visible="false" VisibleExpression="IIf([TotalPages]&gt;1,true,false)">
-      <TextObject Name="PageNumeration" Width="1047.06" Height="18.9" Dock="Top" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
+    <PageFooterBand Name="PageFooter" Top="1080.95" Width="1047.06" Height="18.9" Visible="false" VisibleExpression="IIf([TotalPages]&gt;1,true,false)">
+      <TextObject Name="PageNumeration" Width="1047.06" Height="18.9" Dock="Top" Anchor="Left" Text="Страница [Page#] из [[TotalPages]-1]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85">
+        <Formats>
+          <GeneralFormat/>
+          <GeneralFormat/>
+        </Formats>
+      </TextObject>
     </PageFooterBand>
   </ReportPage>
   <ReportPage Name="PageControlTableSKO" RawPaperSize="9" Watermark.Font="Arial, 60pt">
