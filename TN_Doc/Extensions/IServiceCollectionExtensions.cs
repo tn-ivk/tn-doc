@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using TN_Doc.Models;
 using TN_Doc.Models.Printer;
 using TN_Doc.Models.Services;
 
@@ -56,6 +60,21 @@ namespace TN_Doc.Extensions
                 return new DirectoryService(cfgPath, cfgAppPath, cfgDirName, logger);
             });
         }
+
+        /// <summary>
+        /// Сбор информации о приложение
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static void AddAppInfoProvider(this IServiceCollection services)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo vi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            AppInfoProvider pr = new (vi.FileVersion??"???");
+            Console.WriteLine(pr.Version);
+            services.AddSingleton(pr);
+        }
+        
         
         /// <summary>
         /// Флаг использования операционной системы Windows
