@@ -335,7 +335,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 7,
           "Name": "КМХ ПВл",
           "Description": "",
@@ -371,7 +371,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 8,
           "Name": "КМХ ПВз",
           "Description": "",
@@ -971,11 +971,11 @@
           ]
         }
       ],
-      "DBConnectionStrings": [
+      "DBConnectionStrings": [ 
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.15.7",
+          "Server": "192.168.25.7",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "ivk_tn",
@@ -1329,7 +1329,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 7,
           "Name": "КМХ ПВл",
           "Description": "",
@@ -1365,7 +1365,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 8,
           "Name": "КМХ ПВз",
           "Description": "",
