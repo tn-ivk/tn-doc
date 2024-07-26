@@ -6,7 +6,7 @@
     <Version>1.0.0.0</Version>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -151,7 +151,7 @@
     <Content Update="Cfg\CfgAct.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="Cfg\CfgApp.json">
+    <Content Update="Cfg\CfgApp_old.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="Cfg\CfgEditActNP.json">
