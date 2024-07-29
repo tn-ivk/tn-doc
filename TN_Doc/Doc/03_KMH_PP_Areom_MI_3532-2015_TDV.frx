@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/26/2024 13:48:41" ReportInfo.CreatorVersion="2023.3.5.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/29/2024 13:16:04" ReportInfo.CreatorVersion="2023.3.5.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -325,7 +325,7 @@ namespace FastReport
           <TableCell Name="PSP_Name" Border.Lines="All" Text="PSP_Name" Padding="3, 6, 0, 6" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row3" AutoSize="true">
-          <TableCell Name="Cell11" Text="       &lt;i&gt;Условие конт роля: |Δ &lt;sub&gt;pki&lt;/sub&gt;| ≤ Δ &lt;sub&gt;пл&lt;/sub&gt; + Δ &lt;sub&gt;мет&lt;/sub&gt; (для каждого измерения)" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" Style="Arial_Reg_8" ColSpan="2"/>
+          <TableCell Name="Cell11" Text="       &lt;i&gt;Условие контроля: |Δ &lt;sub&gt;pki&lt;/sub&gt;| ≤ Δ &lt;sub&gt;пл&lt;/sub&gt; + Δ &lt;sub&gt;мет&lt;/sub&gt; (для каждого измерения)" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" Style="Arial_Reg_8" ColSpan="2"/>
           <TableCell Name="Cell12" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" Style="Arial_Reg_8"/>
         </TableRow>
       </TableObject>
@@ -452,7 +452,7 @@ namespace FastReport
           <TableCell Name="Delta" Border.Lines="All" Text="Delta" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
-      <TextObject Name="TableResultsHeader" Top="7.56" Width="718.2" Height="22.68" Text="&lt;b&gt;&lt;i&gt;2 Результ ат ы измерений и конт роля" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+      <TextObject Name="TableResultsHeader" Top="7.56" Width="718.2" Height="22.68" Text="&lt;b&gt;&lt;i&gt;2 Результаты измерений и контроля" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
     </DataBand>
     <ReportSummaryBand Name="ReportSummary" Top="425.91" Width="718.2" Height="206.01" CanGrow="true">
       <TableObject Name="TableConclusion" Top="9.45" Width="718.2" Height="196.56">

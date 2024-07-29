@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/26/2024 14:09:21" ReportInfo.CreatorVersion="2023.3.5.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MI2816.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/29/2024 13:17:44" ReportInfo.CreatorVersion="2023.3.5.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -400,7 +400,7 @@ namespace FastReport
           <TableCell Name="PSP_Name" Border.Lines="All" Text="PSP_Name" Padding="2, 6, 2, 6" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row3" Height="15.12" AutoSize="true">
-          <TableCell Name="Cell11" Text="       &lt;i&gt;Условие конт роля:&lt;/i&gt; | ρ &lt;sub&gt;&lt;i&gt;пл&lt;/i&gt;&lt;/sub&gt; - ρ &lt;sub&gt;&lt;i&gt;ппл&lt;/i&gt;&lt;/sub&gt; | ≤ Δ &lt;sub&gt;&lt;i&gt;пл&lt;/i&gt;&lt;/sub&gt; + Δ &lt;sub&gt;&lt;i&gt;о&lt;/i&gt;&lt;/sub&gt;" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" Style="Arial_Reg_8" ColSpan="2"/>
+          <TableCell Name="Cell11" Text="       &lt;i&gt;Условие контроля:&lt;/i&gt; | ρ &lt;sub&gt;&lt;i&gt;пл&lt;/i&gt;&lt;/sub&gt; - ρ &lt;sub&gt;&lt;i&gt;ппл&lt;/i&gt;&lt;/sub&gt; | ≤ Δ &lt;sub&gt;&lt;i&gt;пл&lt;/i&gt;&lt;/sub&gt; + Δ &lt;sub&gt;&lt;i&gt;о&lt;/i&gt;&lt;/sub&gt;" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" Style="Arial_Reg_8" ColSpan="2"/>
           <TableCell Name="Cell12" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" Style="Arial_Reg_8"/>
         </TableRow>
       </TableObject>
@@ -435,7 +435,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row90" Height="17.95">
           <TableCell Name="Cell555" Border.Lines="All" Text="&lt;i&gt;1.1." Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell701" Border.Lines="All" Text="Напорный пикномет р" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
+          <TableCell Name="Cell701" Border.Lines="All" Text="Напорный пикнометр" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
           <TableCell Name="Cell702" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell21" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
@@ -507,7 +507,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row65" Height="17.95">
           <TableCell Name="Cell603" Border.Lines="All" Text="1.2." HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell604" Border.Lines="All" Text="Весы элект ронные" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
+          <TableCell Name="Cell604" Border.Lines="All" Text="Весы электронные" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
           <TableCell Name="Cell605" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell606" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
@@ -543,7 +543,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row67" Height="17.95">
           <TableCell Name="Cell611" Border.Lines="All" Text="1.3." HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell612" Border.Lines="All" Text="СИ т емперат уры" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
+          <TableCell Name="Cell612" Border.Lines="All" Text="СИ температуры" VertAlign="Center" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
           <TableCell Name="Cell613" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell614" Border.Lines="All" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
