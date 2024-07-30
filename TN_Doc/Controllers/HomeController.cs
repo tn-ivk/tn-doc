@@ -536,17 +536,9 @@ namespace TN_Doc.Controllers
         {
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             if (!dirInfo.Exists) dirInfo.Create();
-
             string PathFileName = path + FileName;
             if (File.Exists(PathFileName)) File.Delete(PathFileName);
-            File.WriteAllText(PathFileName, JsonConvert.SerializeObject(st), Encoding.UTF8);
-
-            //using (StreamWriter file = File.CreateText(path))
-            //{
-            //    JsonSerializer ser = new JsonSerializer();
-            //    ser.Serialize(file, st);
-            //}
-
+            File.WriteAllText(PathFileName, JsonConvert.SerializeObject(st,Formatting.Indented), Encoding.UTF8);
             return true;
         }
 
@@ -555,7 +547,6 @@ namespace TN_Doc.Controllers
         {
             if (File.Exists(path))
             {
-                //using (StreamReader file = new StreamReader(File.Open(path, FileMode.Open), Encoding.UTF8))
                 using (StreamReader file = new StreamReader(File.OpenRead(path), Encoding.UTF8))
                 {
                     JsonSerializer serializer = new JsonSerializer();
