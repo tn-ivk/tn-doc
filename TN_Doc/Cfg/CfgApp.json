@@ -975,7 +975,12 @@
         }
       ],
       "Elis": null,
-      "UsedSI": null
+      "UsedSI": null,
+      "UsedProcedureType":{
+        "UseKmhPu": false,
+        "UseKmhPR": true,
+        "UseVerification": true
+      }
     }
   ],
   "PrintSettings": {
