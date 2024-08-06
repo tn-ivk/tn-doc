@@ -967,17 +967,17 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.25.7",
+          "Server": "192.168.90.30",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
-          "Database": "ivk_tn",
+          "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
       ],
       "Elis": null,
       "UsedSI": null,
-      "UsedProcedureType":{
-        "UseKmhPu": false,
+      "UsedProcedureTypePR":{
+        "UseKmhPU": true,
         "UseKmhPR": true,
         "UseVerification": true
       }
