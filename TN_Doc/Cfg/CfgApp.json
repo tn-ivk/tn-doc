@@ -1990,8 +1990,8 @@
       "UsedSI": {
         "UsedPR": true,
         "UsedPP": true,
-        "UsedPVL": false,
-        "UsedPVS": false,
+        "UsedPVL": true,
+        "UsedPVS": true,
         "UsedSecondSI_PP": false,
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
@@ -3017,5 +3017,5 @@
     "ClientName": "clientName",
     "ClientToken": ""
   },
-  "UseSecurityFeatures": true
+  "UseSecurityFeatures": false
 }

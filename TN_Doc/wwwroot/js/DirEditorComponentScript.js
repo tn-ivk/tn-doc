@@ -4,7 +4,6 @@ let dictFetchOptions;
 let hashCodeLoadedCodeDict;
 let hashCodeLoadedQpConfigs;
 
-
 /*
     Инициализация компонента "Редактора справочника"
 */
@@ -66,7 +65,6 @@ function _loadAppDictionaries() {
 * Добавление обработчика событий для словарей
 */
 function _addDitctionariesHandler() {
-
     document.querySelector('#dictionaries-list').addEventListener('click', function (e) {
         let element = e.target;
         if (element.classList.contains('active')) return;
@@ -93,14 +91,15 @@ function _renderUserGroupsRowTable() {
     for (let userGroup of appDictionaries['UsersGroup']) {
         let row = document.createElement('tr');
         row.classList.add('data-row')
-        let usedSquare = document.createElement('i')
-        usedSquare.classList.add('fa');
-        usedSquare.classList.add(userGroup['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
-        usedSquare.ariaHidden = true;
-        let usedTd = document.createElement('td');
-        usedTd.appendChild(usedSquare);
-        _addCellStyle(usedTd)
-        row.appendChild(usedTd);
+        
+        // let usedSquare = document.createElement('i')
+        // usedSquare.classList.add('fa');
+        // usedSquare.classList.add(userGroup['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        // usedSquare.ariaHidden = true;
+        // let usedTd = document.createElement('td');
+        // usedTd.appendChild(usedSquare);
+        // _addCellStyle(usedTd)
+        // row.appendChild(usedTd);
 
         let nameTD = document.createElement('td');
         nameTD.innerText = userGroup['Name'].toString();
@@ -879,7 +878,7 @@ async function _checkIntentSaving() {
 }
 
 /**
- *  Проверка намерения закрыть окно. Выскакиевает окно с подтверждением..
+ *  Проверка намерения закрыть окно. Выскакиевает окно с подтверждением.
  * @return {Promise<boolean>}
  * @desc Если пользователь ответил отрицательно, то вернется false и таблица перередерится со старыми значениями.
  * @desc Если пользователь ответил утвердительно, то  вернется truе и таблица сохранится измененые значения.
