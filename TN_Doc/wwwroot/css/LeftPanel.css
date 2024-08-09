@@ -1,5 +1,4 @@
-﻿
-/*отключение стрелочек у  input[type=number]*/
+﻿/*отключение стрелочек у  input[type=number]*/
 
 /*chrome*/
 input::-webkit-outer-spin-button,
@@ -18,11 +17,8 @@ input[type=number] {
     position: absolute;
     top: 0;
     left: 0;
-    width: 99%;
     height: 98%;
-    /* border-width: 1;
-            border-color: rgb(0, 4, 255);
-            border-style: solid; */
+    width: 98%;
 }
 
 .mainTable {
@@ -30,31 +26,44 @@ input[type=number] {
     width: 100%;
     height: 100%;
     font-size: 10pt;
-    /* border-width: 1;
-            border-color: rgb(0, 255, 76);
-            border-style: solid; */
+}
+
+.mainTable > tbody > tr > td {
+    border: 1px solid black;
+    border-collapse: collapse;
 }
 
 .topPanel {
-    /* position: absolute; */
     height: 30px;
 }
 
 .leftPanel {
     width: 400px;
-    /* height: 100px; */
 }
-
-/* .rightPanel {
-            position: absolute;
-            width: auto;
-            height: auto;
-        } */
 
 .filterTable {
     width: 100%;
     height: 100%;
+    border-collapse: collapse;
+    border-top-style: hidden;
+    border-left-style: hidden;
+    border-right-style: hidden;
 }
+
+.filterTable > tbody > tr > td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.searched-table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.searched-table > tbody > tr > td {
+    border-collapse: collapse;
+}
+
 
 .docTable {
     width: 100%;
@@ -66,19 +75,19 @@ input[type=number] {
     height: 100%;
 }
 
-table,
-td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    /*vertical-align: middle;*/
-}
+/*table,*/
+/*td {*/
+/*    border: 0px solid black;*/
+/*    border-collapse: collapse;*/
+/*    !*vertical-align: middle;*!*/
+/*}*/
 
 .filterSelect {
     width: 100%;
 }
 
 .filterDatepicker {
-    width: 98%;
+    width: 100%
 }
 
 .filterButton {
@@ -154,8 +163,8 @@ td {
     /*align-items: center;*/
 }
 
-.close-modal-wnd-btn{
-    
+.close-modal-wnd-btn {
+
 }
 
 .data-row {
@@ -208,7 +217,7 @@ td {
 .add-lic-btn,
 .add-user-btn,
 .add-qp-btn {
-display: flex;
+    display: flex;
     justify-content: space-between;
 }
 
@@ -223,6 +232,6 @@ display: flex;
     justify-content: space-between;
 }
 
-.padding-one-px-top{
- padding-top: 1px;
+.padding-one-px-top {
+    padding-top: 1px;
 }

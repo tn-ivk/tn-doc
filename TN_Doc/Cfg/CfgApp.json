@@ -2197,7 +2197,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 3,
           "Name": "Журналы",
           "Description": "",
@@ -2271,7 +2271,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 1,
               "Name": "КМХ Лаб. СИ (ТДВ)",
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
@@ -2368,10 +2368,10 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
-              "Use": false,
+              "Use": true,
               "Id": 0,
               "Name": "КМХ ПВз",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -2379,7 +2379,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 1,
               "Name": "КМХ ПВз (ТДВ)",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -2415,7 +2415,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 1,
               "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (ТДВ)",
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
@@ -2451,7 +2451,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 1,
               "Name": "КМХ РАБ ПП по МИ 2816 (ТДВ)",
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
@@ -2489,7 +2489,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -2981,17 +2981,27 @@
           "ConnectionTimeout": 1
         }
       ],
-      "Elis": null,
+      "Elis": {
+        "Use": false,
+        "OstKey": "ostKey",
+        "SiknKey": "siknKey",
+        "ClientName": "clientName",
+        "ClientToken": ""
+      },
       "UsedSI": {
         "UsedPR": true,
         "UsedPP": true,
-        "UsedPVL": false,
-        "UsedPVS": false,
-        "UsedSecondSI_PP": false,
-        "UsedSecondSI_PVL": false,
-        "UsedSecondSI_PVS": false
+        "UsedPVL": true,
+        "UsedPVS": true,
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
       },
-      "UsedProcedureTypePR": null
+      "UsedProcedureTypePR": {
+        "UseKmhPU": true,
+        "UseKmhPR": true,
+        "UseVerification": true
+      }
     }
   ],
   "PrintSettings": {
@@ -3007,5 +3017,5 @@
     "ClientName": "clientName",
     "ClientToken": ""
   },
-  "UseSecurityFeatures": false
+  "UseSecurityFeatures": true
 }
