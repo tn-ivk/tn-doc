@@ -309,31 +309,60 @@
       "Id": 39,
       "Use": true,
       "Edit": true,
+      "Key": "GostBinary.Env.Temperature",
+      "Type": "number",
+      "Name": "3.1 Температура окружающей среды (°С)"
+    },
+    {
+      "Id": 40,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.Env.PressureKp",
+      "Type": "number",
+      "Name": "3.2 Давление (кПА)"
+    },
+    {
+      "Id": 41,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.Env.PressureMmMercury",
+      "Type": "number",
+      "Name": "3.2 Давление (мм рт.ст.)"
+    },
+    {
+      "Id": 42,
+      "Use": true,
+      "Edit": true,
+      "Key": "GostBinary.Env.RelativeHumidity",
+      "Type": "number",
+      "Name": "3.3 Относительная влажность воздуха (%)"
+    },
+    {
+      "Id": 43,
+      "Use": true,
+      "Edit": true,
       "Key": "ARM_KMH_Result1",
       "Type": "list",
       "Name": "ПП1: Заключение"
     },
     {
-      "Id": 40,
+      "Id": 44,
       "Use": true,
       "Edit": true,
       "Key": "ARM_KMH_Result2",
       "Type": "list",
       "Name": "ПП2: Заключение"
     },
-
-
     {
-      "Id": 41,
+      "Id": 45,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.MI",
       "Type": "text",
       "Name": "Наименование документа, в соответствии с которым проведены расчеты"
     },
-
     {
-      "Id": 42,
+      "Id": 46,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.ServiceStaffData.Company",
@@ -341,7 +370,7 @@
       "Name": "Сервисная организация (организация)"
     },
     {
-      "Id": 43,
+      "Id": 47,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.ServiceStaffData.Post",
@@ -350,7 +379,7 @@
     },
 
     {
-      "Id": 44,
+      "Id": 48,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.ServiceStaffData.FIO",
@@ -359,7 +388,7 @@
     },
 
     {
-      "Id": 45,
+      "Id": 49,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.OperatingStaffData.Company",
@@ -367,7 +396,7 @@
       "Name": "Эксплуатирующая организация (организация)"
     },
     {
-      "Id": 46,
+      "Id": 50,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.OperatingStaffData.Post",
@@ -375,7 +404,7 @@
       "Name": "Эксплуатирующая организация (должность)"
     },
     {
-      "Id": 47,
+      "Id": 51,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.OperatingStaffData.FIO",
@@ -384,7 +413,7 @@
     },
 
     {
-      "Id": 48,
+      "Id": 52,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.DeliveryOrRecievingStaffData.Company",
@@ -392,7 +421,7 @@
       "Name": "Принимающая/сдающая сторона (организация)"
     },
     {
-      "Id": 49,
+      "Id": 53,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.DeliveryOrRecievingStaffData.Post",
@@ -400,7 +429,7 @@
       "Name": "Принимающая/сдающая сторона (должность)"
     },
     {
-      "Id": 50,
+      "Id": 54,
       "Use": true,
       "Edit": true,
       "Key": "GostBinary.DeliveryOrRecievingStaffData.FIO",
