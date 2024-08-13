@@ -8,6 +8,10 @@ namespace TN_Doc
 {
     public class Program
     {
+        /// <summary>
+        /// Точка входа приложения
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main(string[] args)
         {
             try
@@ -27,7 +31,7 @@ namespace TN_Doc
         /// </summary>
         /// <param name="args">Аргументы командной строки</param>
         /// <returns>Билдер хоста приложения</returns>
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        private static IHostBuilder CreateHostBuilder(string[] args)
         {
             IHostBuilder builder= Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });

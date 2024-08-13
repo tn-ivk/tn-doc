@@ -35,7 +35,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 32,
           "Name": "Отчеты (незавершенные)",
           "Description": "",
@@ -70,7 +70,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 4,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
               "Use": false,
@@ -105,7 +105,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 4,
               "Name": "Паспорт (МИ 3532-2015 Приложение 13)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 13)",
@@ -113,7 +113,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 5,
               "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
@@ -173,7 +173,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "Акт для нефтепродукта",
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
@@ -217,7 +217,7 @@
           "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "Журнал регистрации СИ (Нефть)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3532-2015 (Приложение 12)",
@@ -225,7 +225,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 1,
               "Name": "Журнал регистрации СИ (Нефтепродукт)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3275-2016 (Приложение Д)",
@@ -289,7 +289,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "КМХ Лаб. СИ (ГОСТ Р 8.1011-2022)",
               "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по лабораторным или переносным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.3)",
@@ -299,7 +299,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 6,
           "Name": "КМХ ПР по ПУ",
           "Description": "",
@@ -325,7 +325,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_UZR_PU.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "КМХ ПР по ПУ (ГОСТ Р 8.1011-2022)",
               "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода с поверочными установками. ГОСТ Р 8.1011-2022 (Приложение У.2)",
@@ -335,7 +335,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 7,
           "Name": "КМХ ПВл",
           "Description": "",
@@ -345,7 +345,7 @@
           "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВл",
               "Description": "Протокол КМХ методом сличений показаний ПВл с результатом измерений массовой (обЪемной) доли воды лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.14 (Г.15))",
@@ -361,7 +361,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "КМХ ПВл (ГОСТ Р 8.1011-2022)",
               "Description": "Протокол контроля метрологических характеристик поточных средств измерений объемной доли воды в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
@@ -371,7 +371,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 8,
           "Name": "КМХ ПВз",
           "Description": "",
@@ -381,7 +381,7 @@
           "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВз",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -397,7 +397,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "КМХ ПВз (ГОСТ Р 8.1011-2022)",
               "Description": "Протокол контроля метрологических характеристик поточных средств измерений вязкости в нефти. ГОСТ Р 8.1011-2022 (Приложение Ц)",
@@ -433,7 +433,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (ГОСТ Р 8.1011-2022)",
               "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по поточным эталонам единицы плотности, рабочих поточных СИ плотности по резервным поточным СИ плотности. ГОСТ Р 8.1011-2022 (Приложение Ф.1)",
@@ -469,7 +469,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "КМХ РАБ ПП по МИ 2816 (ГОСТ Р 8.1011-2022)",
               "Description": "Протокол контроля метрологических характеристик рабочих, резервных поточных СИ плотности по переносным эталонам единицы плотности (пикнометрам). ГОСТ Р 8.1011-2022 (Приложение Ф.2)",
@@ -499,7 +499,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -517,7 +517,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 1,
               "Name": "КМХ ПР по ПР (ГОСТ Р 8.1011-2022)",
               "Description": "Протокол контроля метрологических характеристик посредством сравнения коэффициентов преобразования при измерениях расхода рабочими, резервными средствами измерений объемного расхода и контрольно-резервными средствами измерений, эталонами единицы объемного расхода. ГОСТ Р 8.1011-2022 (Приложение У.1)",
@@ -527,7 +527,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 13,
           "Name": "КМХ МПР по МПР",
           "Description": "",
@@ -675,7 +675,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 20,
           "Name": "Поверка МИ 3312-2011 МПР по ПУ",
           "Description": "",
@@ -783,7 +783,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 25,
           "Name": "Поверка МИ 3151-2008",
           "Description": "Протокол поверки массового преобразователя расхода по МИ 3151-2008",
@@ -803,7 +803,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 26,
           "Name": "КМХ рабочего МПР по ПУ",
           "Description": "",
@@ -871,7 +871,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 29,
           "Name": "Поверка МИ 3272-2010",
           "Description": "Протокол поверки счетчика-расходомера массового (массомера) ПР по МИ 3272-2010",
@@ -891,7 +891,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 30,
           "Name": "КМХ МИ 3272-2010",
           "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
@@ -975,7 +975,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.101",
+          "Server": "192.168.90.30",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -984,7 +984,7 @@
         {
           "Use": false,
           "GuidDevice": 0,
-          "Server": "192.168.233.201",
+          "Server": "192.168.30.201",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -994,18 +994,18 @@
       "Elis": {
         "Use": true,
         "OstKey": "3",
-        "SiknKey": "K-00146",
-        "ClientName": "IVK_TN_01",
+        "SiknKey": "3",
+        "ClientName": "ИВК-1",
         "ClientToken": ""
       },
       "UsedSI": {
         "UsedPR": true,
         "UsedPP": true,
-        "UsedPVL": true,
-        "UsedPVS": true,
-        "UsedSecondSI_PP": true,
-        "UsedSecondSI_PVL": true,
-        "UsedSecondSI_PVS": true
+        "UsedPVL": false,
+        "UsedPVS": false,
+        "UsedSecondSI_PP": false,
+        "UsedSecondSI_PVL": false,
+        "UsedSecondSI_PVS": false
       },
       "UsedProcedureTypePR": {
         "UseKmhPU": true,

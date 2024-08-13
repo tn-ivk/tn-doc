@@ -128,13 +128,14 @@
         }
 
         function ValidationData() {
-            let elmnts = document.querySelectorAll('.incorrect-rounding, empty-parameter');
+            let elmnts = document.querySelectorAll('.incorrect-rounding, .empty-parameter');
 
+            // tuda suda копируем
             if (elmnts.length == 0)
                 return true;
             else
                 return false;
-        }          
+        }
     </script>
 
 </head>
@@ -153,7 +154,7 @@
         <thead>
             <tr>
                 <th> Н </th>
-                <th> тттт Наименование показателя </th>
+                <th> Наименование показателя </th>
                 <th> Метод испытаний </th>
                 <th> Измерение ИВК </th>
                 <th> Измерение ХАЛ </th>
@@ -165,5 +166,27 @@
         </tbody>
     </table>
 
+<script type="text/javascript">
+    function CheckElisInput(){
+        console.group('--check-elis-input--');
+        const elements = document.querySelectorAll('.elis-data');
+        console.log(document.body);
+        console.log('собираем данные, заполняемые елис ->', elements.length)
+        if( elements.length===0){
+            console.log('данные елиса отсутствуют -> выходим')
+            console.groupEnd();
+            return
+        }
+        console.log('Проверяем  input еще раз');
+        for(const input of elements){
+            RoundingCheck(input)
+        }
+
+        console.groupEnd();
+    }
+
+    CheckElisInput();
+</script>
 </body>
+
 </html>
