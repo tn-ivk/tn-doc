@@ -70,10 +70,10 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "Паспорт для нефтепродукта",
               "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
@@ -113,7 +113,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 5,
               "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
@@ -154,7 +154,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
               "Use": true,
@@ -197,7 +197,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 5,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
@@ -235,7 +235,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 4,
           "Name": "Поверка МИ3287",
           "Description": "",
@@ -299,7 +299,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 6,
           "Name": "КМХ ПР по ПУ",
           "Description": "",
@@ -335,7 +335,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 7,
           "Name": "КМХ ПВл",
           "Description": "",
@@ -371,7 +371,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 8,
           "Name": "КМХ ПВз",
           "Description": "",
@@ -499,7 +499,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -527,7 +527,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 13,
           "Name": "КМХ МПР по МПР",
           "Description": "",
@@ -555,7 +555,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 14,
           "Name": "Поверка МИ 3380",
           "Description": "",
@@ -575,7 +575,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 15,
           "Name": "Поверка МИ3265 ПР по ПУ",
           "Description": "",
@@ -635,7 +635,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 18,
           "Name": "КМХ МИ3265 ПР с помощью ПУ",
           "Description": "",
@@ -655,7 +655,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 19,
           "Name": "КМХ МИ3265 ПР РСУ по ПР ОСУ",
           "Description": "",
@@ -735,7 +735,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 23,
           "Name": "КМХ МИ 3312-2011 ПР РСУ по ПР ОСУ",
           "Description": "Протокол КМХ ПР РСУ по ПР основной схемы учета",
@@ -783,7 +783,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 25,
           "Name": "Поверка МИ 3151-2008",
           "Description": "Протокол поверки массового преобразователя расхода по МИ 3151-2008",
@@ -803,7 +803,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 26,
           "Name": "КМХ рабочего МПР по ПУ",
           "Description": "",
@@ -871,7 +871,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 29,
           "Name": "Поверка МИ 3272-2010",
           "Description": "Протокол поверки счетчика-расходомера массового (массомера) ПР по МИ 3272-2010",
@@ -891,7 +891,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 30,
           "Name": "КМХ МИ 3272-2010",
           "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
@@ -975,16 +975,16 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.30.101",
+          "Server": "192.168.22.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": false,
+          "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.30.201",
+          "Server": "192.168.22.201",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -995,8 +995,8 @@
       "UsedSI": {
         "UsedPR": true,
         "UsedPP": true,
-        "UsedPVL": false,
-        "UsedPVS": false,
+        "UsedPVL": true,
+        "UsedPVS": true,
         "UsedSecondSI_PP": false,
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
@@ -1004,7 +1004,7 @@
       "UsedProcedureTypePR": null
     },
     {
-      "Use": false,
+      "Use": true,
       "IdDevice": 1,
       "Name": "ИВК-2",
       "Description": "",
@@ -1970,7 +1970,7 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.30.102",
+          "Server": "192.168.22.102",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1979,7 +1979,7 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.30.202",
+          "Server": "192.168.22.202",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1990,8 +1990,8 @@
       "UsedSI": {
         "UsedPR": true,
         "UsedPP": true,
-        "UsedPVL": true,
-        "UsedPVS": true,
+        "UsedPVL": false,
+        "UsedPVS": false,
         "UsedSecondSI_PP": false,
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
@@ -2197,7 +2197,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 3,
           "Name": "Журналы",
           "Description": "",
@@ -2271,7 +2271,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "КМХ Лаб. СИ (ТДВ)",
               "Description": "Протокол КМХ рабочего ПП по лабораторному плотномеру. МИ 3532-2015 (Приложение 11)",
@@ -2368,10 +2368,10 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
-              "Use": true,
+              "Use": false,
               "Id": 0,
               "Name": "КМХ ПВз",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -2379,7 +2379,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "КМХ ПВз (ТДВ)",
               "Description": "Протокол КМХ поточного ПВз методом сличений показаний поточного ПВз с результатами измерений динамической (кинематической) вязкости лабораторным методом. ОМД-17.060.00-КТН-0062-20_ч.1 (Приложение Г.11 (Г.13))",
@@ -2415,7 +2415,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП (ТДВ)",
               "Description": "Протокол КМХ рабочего ПП по резервному (эталонному) ПП. МИ 3532-2015 (Приложение 7(8))",
@@ -2451,7 +2451,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "КМХ РАБ ПП по МИ 2816 (ТДВ)",
               "Description": "Протокол КМХ рабочего ПП по переносной пикнометрической установке. МИ 3532-2015 (Приложение 9)",
@@ -2489,7 +2489,7 @@
           ]
         },
         {
-          "Use": false,
+          "Use": true,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -2981,27 +2981,17 @@
           "ConnectionTimeout": 1
         }
       ],
-      "Elis": {
-        "Use": false,
-        "OstKey": "ostKey",
-        "SiknKey": "siknKey",
-        "ClientName": "clientName",
-        "ClientToken": ""
-      },
+      "Elis": null,
       "UsedSI": {
         "UsedPR": true,
         "UsedPP": true,
-        "UsedPVL": true,
-        "UsedPVS": true,
-        "UsedSecondSI_PP": true,
-        "UsedSecondSI_PVL": true,
-        "UsedSecondSI_PVS": true
+        "UsedPVL": false,
+        "UsedPVS": false,
+        "UsedSecondSI_PP": false,
+        "UsedSecondSI_PVL": false,
+        "UsedSecondSI_PVS": false
       },
-      "UsedProcedureTypePR": {
-        "UseKmhPU": true,
-        "UseKmhPR": true,
-        "UseVerification": true
-      }
+      "UsedProcedureTypePR": null
     }
   ],
   "PrintSettings": {

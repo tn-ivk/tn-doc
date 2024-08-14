@@ -9,8 +9,7 @@ hubConnection.on("Receive", function (deviceName, tagName, tagValue) {
 
         if (tagName == GetFullNameTag('ARM.ARM_OnlineReportCounter'))
             GetDoc();
-    }
-    else if (deviceName == 'ARM') {
+    } else if (deviceName == 'ARM') {
         ApplicationSecurity(tagName, tagValue);
     }
 
@@ -20,8 +19,7 @@ hubConnection.start();
 window.onmessage = function (event) {
     if (event.data == 'ButtonSaveOn') {
         $("#ButtonSave").prop("disabled", false);
-    }
-    else if (event.data == 'ButtonSaveOff') {
+    } else if (event.data == 'ButtonSaveOff') {
         $("#ButtonSave").prop("disabled", true);
     }
 };
@@ -387,8 +385,7 @@ function InitDevices() {
             type: "GET",
             //dataType: "json",
             data:
-            {
-            },
+                {},
             success: function (data) {
                 if (data) {
 
@@ -571,7 +568,7 @@ function InitPrinterName() {
             type: 'GET',
             success: function (data) {
                 data.forEach((item) => {
-                    let opt=document.createElement("option");
+                    let opt = document.createElement("option");
                     opt.value = item;
                     opt.appendChild(document.createTextNode(item));
                     document.querySelector('#ComboboxPrinterName').appendChild(opt);
@@ -661,22 +658,22 @@ function InitTableDocs() {
 
             ajax: function (data, callback, settings) {
                 callback
-                    (
-                        GetData()
-                    );
+                (
+                    GetData()
+                );
             },
 
             columns:
                 [
-                    { data: 'dt' },
+                    {data: 'dt'},
                     //{ data: function (data) { return moment(data.dt, "DD-MM-YYYYTHH:mm").format("DD.MM.YYYY HH:mm"); } },
-                    { data: 'description' }
+                    {data: 'description'}
                 ],
-        //    columnDefs: [
-        //        {
-        //            targets: 0,
-        //            render: DataTable.render.date()
-        //        }]
+            //    columnDefs: [
+            //        {
+            //            targets: 0,
+            //            render: DataTable.render.date()
+            //        }]
         });
 
     table.on('select', function (e, dt, type, indexes) {
@@ -687,10 +684,9 @@ function InitTableDocs() {
             if ($('#ComboboxDocGUID').val() == 32) {
 
                 let BIKId = 1;
-                let DirId = 0;               
+                let DirId = 0;
 
-                table.rows(indexes).data().pluck('advancedProperties')[0].forEach((item) =>
-                {
+                table.rows(indexes).data().pluck('advancedProperties')[0].forEach((item) => {
                     if (item.key == 'BIKId') BIKId = item.value;
                     else if (item.key == 'DirId') DirId = item.value;
                 });
@@ -699,8 +695,7 @@ function InitTableDocs() {
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_DirId'), DirId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_OnlineReportType'), currentId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport'), true, 2, 0);
-            }
-            else {
+            } else {
                 GetDoc();
             }
         }
@@ -708,12 +703,12 @@ function InitTableDocs() {
 }
 
 function InitElement() {
-    
+
     /**/
     InitDirEditorComponent();
     /**/
-    
-    
+
+
     InitDevices();
     InitDocs();
     InitDatepickerBegin();
@@ -871,7 +866,6 @@ function SaveDoc() {
 function GetPeriodDocument() {
 
     var ret = null;
-
     $.ajax(
         {
             async: false,
@@ -883,7 +877,7 @@ function GetPeriodDocument() {
                 id: currentId
             },
             success: function (data) {
-                ret = data;                
+                ret = data;
             }
         });
 
@@ -988,6 +982,8 @@ function GetFullNameTag(tagName) {
 //Получить данные из ЕЛИС
 function GetElisData() {
 
+    ClearDataElis();
+
     var dataELIS;
 
     var clientToken = GetClientToken(CurrentDeviceId);
@@ -1017,10 +1013,10 @@ function GetElisData() {
                 "client-token": clientToken.clientToken
             },
             data:
-                //JSON.stringify({
-                //startPeriod: '2023-08-14T09:14:49.345Z',
-                //endPeriod: '2023-08-14T09:14:49.345Z'
-                //}),
+            //JSON.stringify({
+            //startPeriod: '2023-08-14T09:14:49.345Z',
+            //endPeriod: '2023-08-14T09:14:49.345Z'
+            //}),
 
                 JSON.stringify({
                     startPeriod: moment(periodDocument.begin * 1000).format(),
@@ -1032,7 +1028,7 @@ function GetElisData() {
                 dataELIS = data;
             },
             error: function (data) {
-                $('#info').text(data.statusText);
+                $('#info').text('Ошибка выполнения запроса.');
 
                 //Неавторизованный пользователь
                 if (data.status == 401) {
@@ -1041,9 +1037,9 @@ function GetElisData() {
             },
             complete: function (data) {
                 StateButtonGetElisData(false);
-                DrawTablePassports(dataELIS); 
+                DrawTablePassports(dataELIS);
             }
-        });    
+        });
 }
 
 //Зарегистрировать устройство для ЕЛИС
@@ -1099,7 +1095,7 @@ function GetDataForRegistrationDeviceInELIS(idDevice) {
             success: function (data) {
 
                 regData = data;
-              
+
             },
             error: function (data) {
 
@@ -1173,9 +1169,9 @@ function DrawTablePassports(dataELIS) {
 
                 if (item.classList.contains('active'))
                     item.classList.remove('active');
-                
+
             })
-            
+
             elmnt.classList.add('active');
         });
 
@@ -1184,53 +1180,150 @@ function DrawTablePassports(dataELIS) {
 }
 
 
-function SetDataLocalStorage() {}
+function SetDataLocalStorage() {
+}
 
 
+function FillPassportDataElis() {
 
-function FillPassportDataElis() { 
+    try {
+        let dataPassport = JSON.parse(localStorage.dataPassport);
+        let iframe = document.querySelector('.FR');
+        let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
+        elisNodes.forEach((item, index, array) => {
+            let itemKeys = item.dataset.elisAlias.split('|');
+            let root = null;
+            let currentKey = "";
+            for (let key in dataPassport.parameters) {
+                if (itemKeys.includes(key)) {
+                    root = dataPassport.parameters
+                    for (let iKey of itemKeys) {
+                        if (iKey === key) {
+                            currentKey = key;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
 
-    let dataPassport = JSON.parse(localStorage.dataPassport);
-    let iframe = document.querySelector('.FR');    
-    let elmnts = iframe.contentWindow.document.querySelectorAll('.elis-data')
-
-    elmnts.forEach(function (item, i, arr) {        
-
-        if (!dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
-            return;
-
-        if (item.nodeName == 'INPUT') {
-            let value = dataPassport.parameters[item.dataset.keyelis].value;
-            item.value = value;
-        }
-        if (item.nodeName == 'SELECT') {
-
-            item.contains = function (value) {
-                for (var i = 0, l = this.options.length; i < l; i++) {
-                    if (this.options[i].text == value) {
-                        return true;
+            if (root === null) {
+                for (let key in dataPassport) {
+                    if (itemKeys.includes(key)) {
+                        root = dataPassport
+                        for (let iKey of itemKeys) {
+                            if (iKey === key) {
+                                currentKey = key;
+                                break;
+                            }
+                        }
+                        break;
                     }
                 }
-                return false;
             }
 
-            let testMethodName = dataPassport.parameters[item.dataset.keyelis].testMethodName;
-
-            //Проверяем наличие метода в списке, если нет, добавляем.
-            if (!item.contains(testMethodName)) {
-
-                let newOption = new Option(testMethodName, testMethodName);
-                item.append(newOption);
-                //newOption.selected = true;
+            if (root === null) {
+                return;
             }
 
-            item.value = testMethodName;
-            //for (let i = 0; i < item.length; i++) {
-            //    if (item[i].value === testMethodName) item[i].selected = true;
-            //}
-        }
-    });  
+            if (item.nodeName === 'INPUT') {
+                item.value = item.dataset.tag === 'AdditionalInfo'
+                    ? root[currentKey]
+                    : root[currentKey].value;
+                ValidateElisInput(item);
+            }
+
+            if (item.nodeName === 'SELECT') {
+
+                item.contains = function (value) {
+                    for (var i = 0, l = this.options.length; i < l; i++) {
+                        if (this.options[i].text === value) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                let testMethodName = root[currentKey].testMethodName;
+
+                //Проверяем наличие значения в списке, если нет, добавляем.
+                if (!item.contains(testMethodName)) {
+                    let newOption = new Option(testMethodName, testMethodName);
+                    item.append(newOption);
+                }
+                item.value = testMethodName;
+            }
+
+        });
+        // elmnts.forEach(function (item, i, arr) {
+        //
+        //     if (dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
+        //         data = dataPassport.parameters;
+        //     else if (dataPassport.hasOwnProperty(item.dataset.keyelis))
+        //         data = dataPassport;
+        //     else
+        //         return;
+        //
+        //     if (item.nodeName == 'INPUT') {
+        //         let value;
+        //         if (item.dataset.tag == 'AdditionalInfo')
+        //             value = data[item.dataset.keyelis];
+        //         else
+        //             value = data[item.dataset.keyelis].value;
+        //         item.value = value;
+        //
+        //         ValidateElisInput(item);
+        //     }
+        //
+        //     if (item.nodeName == 'SELECT') {
+        //
+        //         item.contains = function (value) {
+        //             for (var i = 0, l = this.options.length; i < l; i++) {
+        //                 if (this.options[i].text == value) {
+        //                     return true;
+        //                 }
+        //             }
+        //             return false;
+        //         }
+        //
+        //         let testMethodName = data[item.dataset.keyelis].testMethodName;
+        //
+        //         //Проверяем наличие значения в списке, если нет, добавляем.
+        //         if (!item.contains(testMethodName)) {
+        //
+        //             let newOption = new Option(testMethodName, testMethodName);
+        //             item.append(newOption);
+        //             //newOption.selected = true;
+        //         }
+        //
+        //         item.value = testMethodName;
+        //         //for (let i = 0; i < item.length; i++) {
+        //         //    if (item[i].value === testMethodName) item[i].selected = true;
+        //         //}
+        //     }
+        // });
+
+    } finally {
+        console.groupEnd();
+    }
 }
+
+function ValidateElisInput(Object) {
+    const f = x => ((x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0));
+    f(Object.value) == Object.getAttribute('data-roundValue')
+        ? Object.classList.replace("incorrect-rounding", "correct-rounding")
+        : Object.classList.replace("correct-rounding", "incorrect-rounding");
+
+    Object.value === ''
+        ? Object.classList.replace("filled-parameter", "empty-parameter")
+        : Object.classList.replace("empty-parameter", "filled-parameter");
+
+    window.top.postMessage(document.querySelectorAll('.incorrect-rounding, .empty-parameter').length === 0
+            ? 'ButtonSaveOn'
+            : 'ButtonSaveOff',
+        '*')
+}
+
 
 //Состояние кнопки "Запросить данные"
 function StateButtonGetElisData(state) {
@@ -1238,12 +1331,11 @@ function StateButtonGetElisData(state) {
     if (state) {
         $("#buttonDataRequest").prop("disabled", true);
         $("#spinnerDataRequest").prop("hidden", false);
-        $("#textDataRequest")[0].innerText = "Идет запрос...";        
-    }
-    else {
+        $("#textDataRequest")[0].innerText = "Идет запрос...";
+    } else {
         $("#buttonDataRequest").prop("disabled", false);
         $("#spinnerDataRequest").prop("hidden", true);
-        $("#textDataRequest")[0].innerText = "Запросить данные"; 
+        $("#textDataRequest")[0].innerText = "Запросить данные";
     }
 }
 
@@ -1261,21 +1353,24 @@ function ApplicationSecurity(tagName, tagValue) {
     else if (tagName == 'root.ARM.Reports.ShowPrint') {
         $("#ComboboxPrinterName").prop("hidden", !tagValue);
         $("#ButtonPrint").prop("hidden", !tagValue);
-    }
-    else if (tagName == 'root.ARM.Reports.AllowPrint') {
+    } else if (tagName == 'root.ARM.Reports.AllowPrint') {
         $("#ComboboxPrinterName").prop("disabled", !tagValue);
         $("#ButtonPrint").prop("disabled", !tagValue);
-    }
-    else if (tagName == 'root.ARM.Reports.ShowExport') {
+    } else if (tagName == 'root.ARM.Reports.ShowExport') {
         $("#ComboboxExportFormat").prop("hidden", !tagValue);
         $("#ButtonExport").prop("hidden", !tagValue);
-    }
-    else if (tagName == 'root.ARM.Reports.AllowExport') {
+    } else if (tagName == 'root.ARM.Reports.AllowExport') {
         $("#ComboboxExportFormat").prop("disabled", !tagValue);
         $("#ButtonExport").prop("disabled", !tagValue);
-    }
-    else if (tagName == 'root.ARM.Reports.ShowEditDictionaries')
+    } else if (tagName == 'root.ARM.Reports.ShowEditDictionaries')
         $("#ButtonDictionaries").prop("hidden", !tagValue);
     else if (tagName == 'root.ARM.Reports.AllowEditDictionaries')
         $("#ButtonDictionaries").prop("disabled", !tagValue);
+}
+
+
+function ClearDataElis() {
+    $('#info').text('');
+    $('#listPassports').empty();
+    localStorage.removeItem('dataPassport');
 }

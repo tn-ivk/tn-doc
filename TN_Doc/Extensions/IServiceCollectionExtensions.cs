@@ -70,7 +70,8 @@ namespace TN_Doc.Extensions
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             FileVersionInfo vi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            AppInfoProvider pr = new (vi.FileVersion??"???");
+            var testVersion =$"{( vi.FileVersion??"???")}.test-{Guid.NewGuid().ToString().Substring(0,5)}";
+            AppInfoProvider pr = new (testVersion);
             Console.WriteLine(pr.Version);
             services.AddSingleton(pr);
         }

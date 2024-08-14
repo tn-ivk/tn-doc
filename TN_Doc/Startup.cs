@@ -10,64 +10,58 @@ using TN.Doc;
 
 namespace TN_Doc
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+	public class Startup
+	{
+		public Startup(IConfiguration configuration)
+		{
+			Configuration = configuration;
+		}
 
-        public IConfiguration Configuration { get; }
+		public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddCors(options => options.AddPolicy("CorsPolicy",
-            builder =>
-            {
-                builder.AllowAnyHeader()
-                       .AllowAnyMethod()
-                       //.AllowAnyOrigin()
-                       .SetIsOriginAllowed((host) => true)
-                       .AllowCredentials();
-            }));
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices(IServiceCollection services)
+		{
+			services.AddCors(options => options.AddPolicy("CorsPolicy",
+				builder =>
+				{
+					builder.AllowAnyHeader()
+						.AllowAnyMethod()
+						//.AllowAnyOrigin()
+						.SetIsOriginAllowed((host) => true)
+						.AllowCredentials();
+				}));
+// #if !DEBUG
+// 			services.ConfigAppDirectory();
+// #endif
+			services.AddAppInfoProvider();
+			services.AddDirectoryService(Configuration);
+			services.AddPrinters();
+			services.AddPrinterService();
+			services.AddControllersWithViews();
+			services.AddDbContext<DocGeneral>();
+		}
 
-            // services.ConfigAppDirectory();
-            services.AddAppInfoProvider();
-            services.AddDirectoryService(Configuration);
-            services.AddPrinters();
-            services.AddPrinterService();
-            services.AddControllersWithViews();
-            services.AddDbContext<DocGeneral>();
-            
-            
-            
-        }
+		// This method gets called by the runtime. Use this method to configure
+		// the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseExceptionHandler("/Home/Error");
+				app.UseHsts();
+			}
 
-        // This method gets called by the runtime. Use this method to configure
-        // the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+			app.UseStaticFiles();
+			app.UseRouting();
 
-            app.UseStaticFiles();
-            app.UseRouting();
+			app.UseCors("CorsPolicy");
 
-            app.UseCors("CorsPolicy");
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
-        }
-    }
+			app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}"); });
+		}
+	}
 }
