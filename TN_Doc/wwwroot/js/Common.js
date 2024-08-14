@@ -866,7 +866,6 @@ function SaveDoc() {
 function GetPeriodDocument() {
 
     var ret = null;
-
     $.ajax(
         {
             async: false,
@@ -1187,62 +1186,131 @@ function SetDataLocalStorage() {
 
 function FillPassportDataElis() {
 
-    let dataPassport = JSON.parse(localStorage.dataPassport);
-    let iframe = document.querySelector('.FR');
-    let elmnts = iframe.contentWindow.document.querySelectorAll('.elis-data')
+    try {
+        let dataPassport = JSON.parse(localStorage.dataPassport);
+        let iframe = document.querySelector('.FR');
+        let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
+        elisNodes.forEach((item, index, array) => {
+            let itemKeys = item.dataset.elisAlias.split('|');
+            let root = null;
+            let currentKey = "";
+            for (let key in dataPassport.parameters) {
+                if (itemKeys.includes(key)) {
+                    root = dataPassport.parameters
+                    for (let iKey of itemKeys) {
+                        if (iKey === key) {
+                            currentKey = key;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
 
-    elmnts.forEach(function (item, i, arr) {
-
-        if (dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
-            data = dataPassport.parameters;
-        else if (dataPassport.hasOwnProperty(item.dataset.keyelis))
-            data = dataPassport;
-        else
-            return;
-
-        if (item.nodeName == 'INPUT') {
-            let value;
-            if (item.dataset.tag == 'AdditionalInfo')
-                value = data[item.dataset.keyelis];
-            else
-                value = data[item.dataset.keyelis].value;
-            item.value = value;
-
-            ValidateElisInput(item);
-        }
-
-        if (item.nodeName == 'SELECT') {
-
-            item.contains = function (value) {
-                for (var i = 0, l = this.options.length; i < l; i++) {
-                    if (this.options[i].text == value) {
-                        return true;
+            if (root === null) {
+                for (let key in dataPassport) {
+                    if (itemKeys.includes(key)) {
+                        root = dataPassport
+                        for (let iKey of itemKeys) {
+                            if (iKey === key) {
+                                currentKey = key;
+                                break;
+                            }
+                        }
+                        break;
                     }
                 }
-                return false;
             }
 
-            let testMethodName = data[item.dataset.keyelis].testMethodName;
-
-            //Проверяем наличие значения в списке, если нет, добавляем.
-            if (!item.contains(testMethodName)) {
-
-                let newOption = new Option(testMethodName, testMethodName);
-                item.append(newOption);
-                //newOption.selected = true;
+            if (root === null) {
+                return;
             }
 
-            item.value = testMethodName;
-            //for (let i = 0; i < item.length; i++) {
-            //    if (item[i].value === testMethodName) item[i].selected = true;
-            //}
-        }
-    });
+            if (item.nodeName === 'INPUT') {
+                item.value = item.dataset.tag === 'AdditionalInfo'
+                    ? root[currentKey]
+                    : root[currentKey].value;
+                ValidateElisInput(item);
+            }
+
+            if (item.nodeName === 'SELECT') {
+
+                item.contains = function (value) {
+                    for (var i = 0, l = this.options.length; i < l; i++) {
+                        if (this.options[i].text === value) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                let testMethodName = root[currentKey].testMethodName;
+
+                //Проверяем наличие значения в списке, если нет, добавляем.
+                if (!item.contains(testMethodName)) {
+                    let newOption = new Option(testMethodName, testMethodName);
+                    item.append(newOption);
+                }
+                item.value = testMethodName;
+            }
+
+        });
+        // elmnts.forEach(function (item, i, arr) {
+        //
+        //     if (dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
+        //         data = dataPassport.parameters;
+        //     else if (dataPassport.hasOwnProperty(item.dataset.keyelis))
+        //         data = dataPassport;
+        //     else
+        //         return;
+        //
+        //     if (item.nodeName == 'INPUT') {
+        //         let value;
+        //         if (item.dataset.tag == 'AdditionalInfo')
+        //             value = data[item.dataset.keyelis];
+        //         else
+        //             value = data[item.dataset.keyelis].value;
+        //         item.value = value;
+        //
+        //         ValidateElisInput(item);
+        //     }
+        //
+        //     if (item.nodeName == 'SELECT') {
+        //
+        //         item.contains = function (value) {
+        //             for (var i = 0, l = this.options.length; i < l; i++) {
+        //                 if (this.options[i].text == value) {
+        //                     return true;
+        //                 }
+        //             }
+        //             return false;
+        //         }
+        //
+        //         let testMethodName = data[item.dataset.keyelis].testMethodName;
+        //
+        //         //Проверяем наличие значения в списке, если нет, добавляем.
+        //         if (!item.contains(testMethodName)) {
+        //
+        //             let newOption = new Option(testMethodName, testMethodName);
+        //             item.append(newOption);
+        //             //newOption.selected = true;
+        //         }
+        //
+        //         item.value = testMethodName;
+        //         //for (let i = 0; i < item.length; i++) {
+        //         //    if (item[i].value === testMethodName) item[i].selected = true;
+        //         //}
+        //     }
+        // });
+
+    } finally {
+        console.groupEnd();
+    }
 }
 
 function ValidateElisInput(Object) {
     const f = x => ((x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0));
-    f(Object.value) === Object.getAttribute('data-roundValue')
+    f(Object.value) == Object.getAttribute('data-roundValue')
         ? Object.classList.replace("incorrect-rounding", "correct-rounding")
         : Object.classList.replace("correct-rounding", "incorrect-rounding");
 

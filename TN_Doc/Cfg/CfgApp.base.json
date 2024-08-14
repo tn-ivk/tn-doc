@@ -1001,11 +1001,11 @@
       "UsedSI": {
         "UsedPR": true,
         "UsedPP": true,
-        "UsedPVL": false,
-        "UsedPVS": false,
-        "UsedSecondSI_PP": false,
-        "UsedSecondSI_PVL": false,
-        "UsedSecondSI_PVS": false
+        "UsedPVL": true,
+        "UsedPVS": true,
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
       },
       "UsedProcedureTypePR": {
         "UseKmhPU": true,
@@ -2008,9 +2008,9 @@
         "UsedPP": true,
         "UsedPVL": true,
         "UsedPVS": true,
-        "UsedSecondSI_PP": false,
-        "UsedSecondSI_PVL": false,
-        "UsedSecondSI_PVS": false
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
       },
       "UsedProcedureTypePR": {
         "UseKmhPU": true,

@@ -151,9 +151,6 @@
     <Content Update="Cfg\CfgAct.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="Cfg\CfgApp_old.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Update="Cfg\CfgEditActNP.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
