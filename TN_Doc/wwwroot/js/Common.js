@@ -1013,16 +1013,10 @@ function GetElisData() {
                 "client-token": clientToken.clientToken
             },
             data:
-            //JSON.stringify({
-            //startPeriod: '2023-08-14T09:14:49.345Z',
-            //endPeriod: '2023-08-14T09:14:49.345Z'
-            //}),
-
                 JSON.stringify({
-                    startPeriod: moment(periodDocument.begin * 1000).format(),
-                    endPeriod: moment(periodDocument.end * 1000).format()
+                    startPeriod: moment.utc(periodDocument.begin * 1000).format(),
+                    endPeriod: moment.utc(periodDocument.end * 1000).format()
                 }),
-
             success: function (data) {
                 //отрисовываем таблицу с паспортами
                 dataELIS = data;
