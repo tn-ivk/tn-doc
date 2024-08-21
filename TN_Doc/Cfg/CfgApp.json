@@ -70,7 +70,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 8,
           "TemplateDocs": [
             {
               "Use": true,
@@ -154,7 +154,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 3,
+          "LastUsedTemplateId": 6,
           "TemplateDocs": [
             {
               "Use": true,
@@ -202,6 +202,14 @@
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
               "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+            },
+            {
+              "Use": true,
+              "Id": 6,
+              "Name": "Акт для валовых объемов нефти (Китай)",
+              "Description": "(Китай)Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             }
           ]
@@ -997,7 +1005,6 @@
         "UsedPP": true,
         "UsedPVL": true,
         "UsedPVS": true,
-        "UsedSecondSI_PP": false,
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
@@ -1992,7 +1999,6 @@
         "UsedPP": true,
         "UsedPVL": false,
         "UsedPVS": false,
-        "UsedSecondSI_PP": false,
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
@@ -2987,7 +2993,6 @@
         "UsedPP": true,
         "UsedPVL": false,
         "UsedPVS": false,
-        "UsedSecondSI_PP": false,
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },

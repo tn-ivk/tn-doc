@@ -27,17 +27,6 @@
         "Users": [
           {
             "Use": true,
-            "Id": 1,
-            "IdGroup": 1,
-            "F": "Швецов1",
-            "I": "Фёдор",
-            "O": "Михайлович",
-            "Factory": "",
-            "Post": "Лаборант",
-            "LicId": 0
-          },
-          {
-            "Use": true,
             "Id": 2,
             "IdGroup": 1,
             "F": "Горбачев",
@@ -45,7 +34,10 @@
             "O": "Владиславович",
             "Factory": "",
             "Post": "Старший лаборант",
-            "LicId": 0
+            "LicId": 0,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -56,7 +48,10 @@
             "O": "Фёдорович",
             "Factory": "ООО \"Сдающая сторона\"",
             "Post": "Оператор товарный",
-            "LicId": 1
+            "LicId": 1,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -67,7 +62,10 @@
             "O": "Егорович",
             "Factory": "ООО \"Сдающая сторона\"",
             "Post": "Начальник ПСП",
-            "LicId": 2
+            "LicId": 2,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -78,7 +76,10 @@
             "O": "Алексеевич",
             "Factory": "ООО \"Сдающая сторона\"",
             "Post": "Оператор",
-            "LicId": 1
+            "LicId": 1,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -89,7 +90,10 @@
             "O": "Андреевич",
             "Factory": "ООО \"Принимающая сторона\"",
             "Post": "Оператор товарный",
-            "LicId": 4
+            "LicId": 4,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -100,7 +104,10 @@
             "O": "Данилович",
             "Factory": "ООО \"Принимающая сторона\"",
             "Post": "Начальник ПСП",
-            "LicId": 5
+            "LicId": 5,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -111,6 +118,23 @@
             "O": "Ильич",
             "Factory": "ООО \"Принимающая сторона\"",
             "Post": "Оператор",
+            "LicId": 6,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 10,
+            "IdGroup": 3,
+            "F": "王",
+            "I": "华丽",
+            "O": "",
+            "Factory": "ООО Китай",
+            "Post": "Инженер",
+            "UseFullNameSeparator": false,
+            "UseFullNameWhiteSpace": false,
+            "UseShortFullNameForm": false,
             "LicId": 6
           }
         ],

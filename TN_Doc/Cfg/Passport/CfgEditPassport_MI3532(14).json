@@ -1,4 +1,4 @@
-﻿{
+{
   "Methods": [
     {
       "Id": 1,
@@ -342,7 +342,6 @@
       "LimitValue": 0,
       "LimitValueString": "-"
     }
-
   ],
   "Parameters": [
     {
