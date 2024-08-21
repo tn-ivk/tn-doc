@@ -31,9 +31,9 @@ namespace TN_Doc
 						.SetIsOriginAllowed((host) => true)
 						.AllowCredentials();
 				}));
-// #if !DEBUG
-// 			services.ConfigAppDirectory();
-// #endif
+#if RELEASE
+			services.ConfigAppDirectory();
+#endif
 			services.AddAppInfoProvider();
 			services.AddDirectoryService(Configuration);
 			services.AddPrinters();
