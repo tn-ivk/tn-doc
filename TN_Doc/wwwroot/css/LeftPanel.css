@@ -122,6 +122,7 @@ input[type=number] {
 
 .qp-dir-item,
 .dir-item {
+    font-size: 14px;
     height: 750px;
 }
 

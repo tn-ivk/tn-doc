@@ -91,16 +91,6 @@ function _renderUserGroupsRowTable() {
     for (let userGroup of appDictionaries['UsersGroup']) {
         let row = document.createElement('tr');
         row.classList.add('data-row')
-        
-        // let usedSquare = document.createElement('i')
-        // usedSquare.classList.add('fa');
-        // usedSquare.classList.add(userGroup['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
-        // usedSquare.ariaHidden = true;
-        // let usedTd = document.createElement('td');
-        // usedTd.appendChild(usedSquare);
-        // _addCellStyle(usedTd)
-        // row.appendChild(usedTd);
-
         let nameTD = document.createElement('td');
         nameTD.innerText = userGroup['Name'].toString();
         _addCellStyle(nameTD)
@@ -212,7 +202,6 @@ function _renderAndAddHandlerUserTable() {
         _addCellStyle(licCell);
 
         let licItem = licences.filter(lic => lic['Id'] === user['LicId'])[0];
-
         if (licItem) {
             licCell.innerText = `${licItem['LicensesNumber']}`;
             licCell.dataset.licId = licItem['Id'];
@@ -221,7 +210,33 @@ function _renderAndAddHandlerUserTable() {
             licCell.dataset.licId = 0;
         }
         row.appendChild(licCell);
+        
+        let usedSepSquare = document.createElement('i')
+        usedSepSquare.classList.add('fa');
+        usedSepSquare.classList.add(user['UseFullNameSeparator'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        usedSepSquare.ariaHidden = true;
+        let sepCell = document.createElement('td');
+        sepCell.appendChild(usedSepSquare);
+        _addCellStyle(sepCell);
+        row.appendChild(sepCell);
 
+        let usedWhiteSpaceSquare = document.createElement('i')
+        usedWhiteSpaceSquare.classList.add('fa');
+        usedWhiteSpaceSquare.classList.add(user['UseFullNameWhiteSpace'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        usedWhiteSpaceSquare.ariaHidden = true;
+        let whiteSpaceCell = document.createElement('td');
+        whiteSpaceCell.appendChild(usedWhiteSpaceSquare);
+        _addCellStyle(whiteSpaceCell);
+        row.appendChild(whiteSpaceCell);
+
+        let usedShortFormSquare = document.createElement('i')
+        usedShortFormSquare.classList.add('fa');
+        usedShortFormSquare.classList.add(user['UseShortFullNameForm'] === true ? 'fa-check-square-o' : 'fa-square-o');
+        usedShortFormSquare.ariaHidden = true;
+        let shortFormCell = document.createElement('td');
+        shortFormCell.appendChild(usedShortFormSquare);
+        _addCellStyle(shortFormCell);
+        row.appendChild(shortFormCell);
 
         let editDivElement = document.createElement('div');
         editDivElement.appendChild(_createEditUsersButton('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-user-btn', '5px'))
@@ -364,7 +379,7 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
 */
 function _editSelectedUser(itemBtn, rowItem, itemId) {
     let rowMap = {
-        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'ignore'
+        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic',  8: 'bool',9: 'bool',10: 'bool' ,11: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable') {
@@ -379,9 +394,11 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
+        rowMap[4] = "ignore";
         rowMap[5] = "ignore";
         rowMap[6] = "ignore";
         if (!_validateEditRow(rowItem, rowMap)) return;
+        rowMap[4] = "text";
         rowMap[5] = "text";
         rowMap[6] = "text";
         _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
@@ -471,7 +488,10 @@ function _applyUserChanges(rowItem, itemId) {
     updatedObject['I'] = cells[3].childNodes[0].textContent;
     updatedObject['O'] = cells[4].childNodes[0].textContent;
     updatedObject['LicId'] = Number(cells[7].dataset.licId);
-
+    updatedObject['UseFullNameSeparator'] =cells[8].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['UseFullNameWhiteSpace'] =cells[9].childNodes[0].classList.contains('fa-check-square-o');
+    updatedObject['UseShortFullNameForm'] =cells[10].childNodes[0].classList.contains('fa-check-square-o');
+    
     let fact = cells[5].childNodes[0].textContent;
     if (!fact) {
         updatedObject['Factory'] = "";
@@ -820,7 +840,17 @@ function _addUserHandler() {
             return aid > cid ? aid : cid;
         })['Id'] : 0;
         appDictionaries['Users'].push({
-            Use: false, Id: maxId + 1, IdGroup: 1, F: "", I: "", O: "", Factory: "", Post: ""
+            Use: false,
+            Id: maxId + 1, 
+            IdGroup: 1,
+            F: "",
+            I: "", 
+            O: "", 
+            Factory: "", 
+            Post: "",
+            UseFullNameSeparator:true,
+            UseFullNameWhiteSpace:true,
+            UseShortFullNameForm:true,
         })
         _clearRowTable('.users-table')
         _renderAndAddHandlerUserTable();
