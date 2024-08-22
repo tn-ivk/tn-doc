@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/07/2024 13:15:15" ReportInfo.CreatorVersion="2023.3.5.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/22/2024 10:47:23" ReportInfo.CreatorVersion="2023.3.5.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -194,17 +194,20 @@ namespace FastReport
       Report.SetParameterValue(&quot;DateKMH&quot;, date.ToString(&quot;dd.MM.yyyy&quot;)); 
       
       
-      //if ((bool)JARMData[&quot;GostBinary&quot;][&quot;OperatingStaffDataIsDelivery&quot;])
-      //{
-      //}       
-      
+      bool hasCustomSIKNName = !String.IsNullOrEmpty(JSettings[&quot;Footer&quot;][&quot;FieldSIKN&quot;].ToString());
       ServiceStaffData_Company.Text = JARMData[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Company&quot;].ToString();
       ServiceStaffData_Post.Text = JARMData[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Post&quot;].ToString();
       ServiceStaffData_FIO.Text = JARMData[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;FIO&quot;].ToString();
+      if(hasCustomSIKNName){
+        ServiceStaffData_Company_Desc.Text=$&quot;организация, проводящая техническое обслуживание {JSettings[&quot;Footer&quot;][&quot;FieldSIKN&quot;]}&quot;;
+      }
       
       OperatingStaffData_Company.Text = JARMData[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Company&quot;].ToString();
       OperatingStaffData_Post.Text = JARMData[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Post&quot;].ToString();
       OperatingStaffData_FIO.Text = JARMData[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;FIO&quot;].ToString();
+      if(hasCustomSIKNName){
+        OperatingStaffData_Company_Desc.Text=$&quot;организация, эксплуатирующая {JSettings[&quot;Footer&quot;][&quot;FieldSIKN&quot;]}&quot;;
+      }
       
       DeliveryOrRecievingStaffData_Company.Text = JARMData[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Company&quot;].ToString();
       DeliveryOrRecievingStaffData_Post.Text = JARMData[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Post&quot;].ToString();
@@ -250,7 +253,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="106.62" Width="718.2" Height="859.95">
+    <DataBand Name="Data1" Top="109.28" Width="718.2" Height="859.95">
       <TableObject Name="Table1" Top="9.45" Width="718.2" Height="850.5">
         <TableColumn Name="Column181" Width="529.2"/>
         <TableColumn Name="Column182" Width="94.5"/>
@@ -477,7 +480,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="969.23" Width="718.2" Height="274.05">
+    <DataBand Name="Data2" Top="974.57" Width="718.2" Height="274.05">
       <TableObject Name="Table2" Top="9.45" Width="718.2" Height="264.6">
         <TableColumn Name="Column251" Width="59.85"/>
         <TableColumn Name="Column252" Width="59.85"/>
@@ -562,7 +565,7 @@ namespace FastReport
           <TableCell Name="Cell1391" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataFooter1" Top="1245.95" Width="718.2" Height="56.7">
+      <DataFooterBand Name="DataFooter1" Top="1253.95" Width="718.2" Height="56.7">
         <TableObject Name="Table5" Width="718.2" Height="37.8" PrintOnParent="true">
           <TableColumn Name="Column201" Width="259.86"/>
           <TableColumn Name="Column202" Width="458.34"/>
@@ -585,7 +588,7 @@ namespace FastReport
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="1305.32" Width="718.2" Height="321.3" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="1315.98" Width="718.2" Height="321.3" CanShrink="true">
       <TableObject Name="Table4" Top="9.45" Width="718.2" Height="85.05">
         <TableColumn Name="Column205" Width="718.2"/>
         <TableRow Name="Row142">
@@ -606,7 +609,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row145">
           <TableCell Name="Cell1130" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1076" Text="организация, проводящая техническое обслуживание СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="ServiceStaffData_Company_Desc" Text="организация, проводящая техническое обслуживание СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell1131" Font="Arial, 10pt"/>
         </TableRow>
       </TableObject>
@@ -642,7 +645,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row147">
           <TableCell Name="Cell1134" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1135" Text="организация, эксплуатирующая СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="OperatingStaffData_Company_Desc" Text="организация, эксплуатирующая СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell1136" Font="Arial, 10pt"/>
         </TableRow>
       </TableObject>
