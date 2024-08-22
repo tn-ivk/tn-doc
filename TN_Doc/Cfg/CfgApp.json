@@ -278,7 +278,7 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": true,
@@ -422,7 +422,7 @@
           "PathToDocDll": "/Dll/KMH_PP.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": true,
@@ -514,7 +514,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PR.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": true,
