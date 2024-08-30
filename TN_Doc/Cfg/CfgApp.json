@@ -70,7 +70,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
               "Use": true,
@@ -154,7 +154,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 4,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
               "Use": false,
