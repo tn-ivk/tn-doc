@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/17/2024 14:38:13" ReportInfo.CreatorVersion="2024.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/18/2024 08:34:41" ReportInfo.CreatorVersion="2024.2.0.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -14,11 +14,9 @@ using Newtonsoft.Json.Linq;
 namespace FastReport
 {
   // Измы:
-  // Форма отличается от формы в ГОСТ 50.2.040 (Приложение Ж).
-  // Расхождения обусловлены письмом ПАО &quot;№ АК-11-01-06/54199 от 18.10.2017&quot;.
-  // Отличия:
-  //    1. скрыт параметр для отображения &quot;Выход фракции, %: при температуре до 350 °C&quot;;
-  //    2. переименован параметр &quot;Массовая доля органических хлоридов, млн-1(ppm)&quot; 
+  // Форма паспорт на экспорт. Форма взята из ГОСТ 50.2.040(Приложение Ж).
+  // Форма отличается от &quot;Passport_GOSTR50.2.040(G).frx&quot; тем, что в обозначение марки нефти указывается марка для  экспорта
+  // Не GostIndexResult,а ExtendGostIndexResult
   public class ReportScript
   {
     JToken JDoc;
@@ -201,7 +199,7 @@ namespace FastReport
      
     public void  DrawTableSigners()
     {
-      GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858 &lt;u&gt;{0}&quot;, JResult[&quot;GostIndexResult&quot;].ToString().Replace('X','-'));
+      ExtendGOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858 &lt;u&gt;{0}&quot;, JResult[&quot;ExtendGostIndexResult&quot;].ToString().Replace('X','-'));
       Laboratory_IOF.Text = $&quot;{JAdditionalData[&quot;Laboratory_IOF&quot;]}&quot;;
       Delive_Post.Text = $&quot;{JAdditionalData[&quot;Delive_Post&quot;]}&quot;;
       Delive_Factory.Text = $&quot;{JAdditionalData[&quot;Delive_Factory&quot;]}&quot;;
@@ -376,7 +374,7 @@ namespace FastReport
           <TableCell Name="Cell1538" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row188" Height="30.24">
-          <TableCell Name="GOSTIndexResult" Text="GOSTIndexResult" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="ExtendGOSTIndexResult" Text="ExtendGOSTIndexResult" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell1531" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1532" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1533" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>

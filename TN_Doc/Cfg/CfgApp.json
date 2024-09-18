@@ -70,7 +70,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 5,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": true,
@@ -143,6 +143,14 @@
               "Description": "石油品质报告 Форма паспорта качества для поставки нефти на экспорт. МИ 3532-2015 (Приложение 15)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15)_China.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
+            },
+            {
+              "Use": true,
+              "Id": 9,
+              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж) (Экспорт)",
+              "Description": "Форма паспорта качества на экспорт. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G)(Export_Rus).frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json"
             }
           ]
         },
@@ -154,7 +162,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
-          "LastUsedTemplateId": 5,
+          "LastUsedTemplateId": 7,
           "TemplateDocs": [
             {
               "Use": false,
@@ -197,7 +205,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 5,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
@@ -208,8 +216,16 @@
               "Use": false,
               "Id": 6,
               "Name": "Акт для валовых объемов нефти (Китай)",
-              "Description": "(Китай)Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
+              "Description": "(Китай) Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
               "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+            },
+            {
+              "Use": true,
+              "Id": 7,
+              "Name": "Акт для валовых объемов нефти (Экспорт)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)(Экспорт)",
+              "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             }
           ]
@@ -983,14 +999,14 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.22.101",
+          "Server": "192.168.90.30",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": true,
+          "Use": false,
           "GuidDevice": 0,
           "Server": "192.168.22.201",
           "Userid": "user",
@@ -1011,7 +1027,7 @@
       "UsedProcedureTypePR": null
     },
     {
-      "Use": true,
+      "Use": false,
       "IdDevice": 1,
       "Name": "ИВК-2",
       "Description": "",

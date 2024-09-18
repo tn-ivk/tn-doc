@@ -6,7 +6,7 @@
     <Version>1.0.0.0</Version>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <AssemblyVersion>1.0.0.6</AssemblyVersion>
+    <AssemblyVersion>1.0.0.7</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -103,6 +103,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Update="changes.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Update="Cfg\Passport\CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Update="Doc\Act_N_GOSTR50.2.040(G)(Export_Rus).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
