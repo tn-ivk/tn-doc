@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3380.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="03/25/2024 16:08:14" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3380.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/19/2024 13:29:16" ReportInfo.CreatorVersion="2024.2.0.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -40,11 +40,6 @@ namespace FastReport
 
     private void Page_StartPage(object sender, EventArgs e)
     {
-      //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/14_TablePoverka3380/DocPoverka3380.json&quot;))
-      //{
-      //   // Read the stream as a string
-      //   Report.SetParameterValue(&quot;JsonDoc&quot;, sr.ReadToEnd());
-      //}
          
       //// Десериализация данных (формат json) из входного параметра - Json                         
       string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
@@ -64,7 +59,7 @@ namespace FastReport
          
       Page.PaperHeight = General.PageSettings.PaperHeight;
       Page.PaperWidth = General.PageSettings.PaperWidth;
-      //Page.Border.Lines = BorderLines.All;
+      Page.Border.Lines = BorderLines.All;
          
       // Поля/отступы от краёв (в мм)
       Page.TopMargin = General.PageSettings.TopMargin;
@@ -86,7 +81,7 @@ namespace FastReport
       TableHeader01.Columns[0].Width =  (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/Units.Millimeters;
 
       // Filling table with data   
-      ProtokolNum.Text = string.Format( &quot;П Р О Т О К О Л   П О В Е Р К И № {0}&quot;, DataIVK.TablePoverka3380.AdditionalInfo.ProtokolNum); 
+      ProtokolNum.Text = string.Format( &quot;П Р О Т О К О Л   П О В Е Р К И № {0}&quot;, DataIVK.TablePoverka3380.AdditionalInfo.ProtokolNum??&quot;&quot;); 
       PR_Type.Text = string.Format(&quot;преобразователя объемного расхода модели (типа) {0} по МИ 3380-2012&quot;,  
         DataIVK.TablePoverka3380.AdditionalInfo.PR_Model); 
       PoverkaPlace.Text = string.Format( &quot;{0} {1}&quot;, DataIVK.TablePoverka3380.AdditionalInfo.PoverkaPlace,
@@ -259,6 +254,9 @@ namespace FastReport
 
     private void Table4_1Results_ManualBuild(object sender, EventArgs e)
     {
+      if(DataIVK.TablePoverka3380.Protokol.CfgTables == null)
+        return;
+      
       if (DataIVK.TablePoverka3380.Protokol.CfgTables.Table4_921 == 1)
       {
         Dictionary&lt;string,string&gt; dictTable4_921 = new Dictionary&lt;string,string&gt; ();
@@ -298,6 +296,8 @@ namespace FastReport
       
     private void Table4_2Results_ManualBuild(object sender, EventArgs e)
     {
+      if(DataIVK.TablePoverka3380.Protokol.CfgTables==null)
+         return;
          
       if (DataIVK.TablePoverka3380.Protokol.CfgTables.Table4_922 == 1)
       {
@@ -336,6 +336,9 @@ namespace FastReport
       
     private void Table4_3Results_ManualBuild(object sender, EventArgs e)
     {                
+      if(DataIVK.TablePoverka3380.Protokol.CfgTables ==null)
+        return;
+      
       if (DataIVK.TablePoverka3380.Protokol.CfgTables.Table4_923 == 1)
       {
         List &lt;TN.Doc.Points&gt; listPointsTable4_3;      
@@ -413,6 +416,8 @@ namespace FastReport
       
     private void Table5Results_ManualBuild(object sender, EventArgs e)
     {
+      if(DataIVK.TablePoverka3380.Protokol.CfgTables == null) return;
+      
       if (DataIVK.TablePoverka3380.Protokol.CfgTables.Table5 == 1)
       {
         List &lt;TN.Doc.Table5&gt; listPointsTable5;      
@@ -450,6 +455,14 @@ namespace FastReport
       
     private void Table6ApproximationEquations_ManualBuild(object sender, EventArgs e)
     {
+      if(DataIVK.TablePoverka3380.Protokol.CfgTables==null){
+        return;
+      }        
+      
+      if(DataIVK.TablePoverka3380.Protokol.CfgTables.Parabola==null){
+        return;
+      }
+        
       if (DataIVK.TablePoverka3380.Protokol.CfgTables.Parabola == 1)
       {
         List &lt;TN.Doc.Parabola&gt; listParabolaTable6;      
@@ -493,8 +506,8 @@ namespace FastReport
       else
         Permitting.Text = &quot;&quot;;       
          
-      StaffData_company.Text = DataIVK.TablePoverka3380.AdditionalInfo.StaffData_company;       
-      StaffData_fio.Text = DataIVK.TablePoverka3380.AdditionalInfo.StaffData_fio;       
+      StaffData_company.Text = DataIVK.TablePoverka3380.AdditionalInfo.StaffData_company?? &quot;&quot;;       
+      StaffData_fio.Text = DataIVK.TablePoverka3380.AdditionalInfo.StaffData_fio?? &quot;&quot;;           
       DateTimeLong.Text = string.Format(&quot;Дата поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,(tools.UnixTimestampToDatetime(DataIVK.TablePoverka3380.DateTimeLong)));               
     }  
       
@@ -644,7 +657,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1SourceData" Top="177.77" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable1SourceData" Top="176.06" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="718.2" Height="102.06" FixedRows="4" ManualBuildEvent="Table1SourceData_ManualBuild">
         <TableColumn Name="Column4" Width="62.37"/>
         <TableColumn Name="Column5" Width="62.37"/>
@@ -724,7 +737,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2Results" Top="297.06" Width="718.2" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable2Results" Top="293.63" Width="718.2" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table2Results" Top="7.56" Width="718.19" Height="102.06" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2Results_ManualBuild">
         <TableColumn Name="Column158" Width="65.29"/>
         <TableColumn Name="Column159" Width="65.29"/>
@@ -804,7 +817,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2ResultsEnding" Top="410.68" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable2ResultsEnding" Top="405.54" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table2ResultsEnding" Top="7.56" Width="718.2" Height="105.84" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2ResultsEnding_ManualBuild">
         <TableColumn Name="Column219" Width="59.85"/>
         <TableColumn Name="Column228" Width="59.85"/>
@@ -890,7 +903,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3Results" Top="528.08" Width="718.2" Height="64.26">
+    <DataBand Name="DataBandTable3Results" Top="521.22" Width="718.2" Height="64.26">
       <TableObject Name="Table3Results" Top="7.56" Width="718.2" Height="56.7" GrowToBottom="true" FixedRows="2" ManualBuildEvent="Table3Results_ManualBuild">
         <TableColumn Name="Column275" Width="158.76"/>
         <TableColumn Name="Column276" Width="158.76"/>
@@ -912,7 +925,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_1Results" Top="596.34" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_1Results" Top="587.77" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_1Results" Top="7.56" Width="718.24" Height="94.5" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_1Results_ManualBuild">
         <TableColumn Name="Column34" Width="89.78"/>
         <TableColumn Name="Column35" Width="89.78"/>
@@ -964,7 +977,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_2Results" Top="702.4" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_2Results" Top="692.11" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_2Results" Top="7.56" Width="718.2" Height="94.5" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_2Results_ManualBuild">
         <TableColumn Name="Column293" Width="79.8"/>
         <TableColumn Name="Column294" Width="79.8"/>
@@ -1021,7 +1034,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_3Results" Top="808.46" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_3Results" Top="796.46" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_3Results" Top="7.56" Width="718.25" Height="94.5" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_3Results_ManualBuild">
         <TableColumn Name="Column304" Width="59.33"/>
         <TableColumn Name="Column305" Width="59.33"/>
@@ -1093,7 +1106,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable5Results" Top="916.41" Width="718.2" Height="113.4">
+    <DataBand Name="DataBandTable5Results" Top="902.7" Width="718.2" Height="113.4">
       <TableObject Name="Table5Results" Top="7.56" Width="718.24" Height="105.84" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table5Results_ManualBuild">
         <TableColumn Name="Column336" Width="89.78"/>
         <TableColumn Name="Column337" Width="89.78"/>
@@ -1145,7 +1158,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable6Results" Top="1033.81" Width="718.2" Height="109.62">
+    <DataBand Name="DataBandTable6Results" Top="1018.38" Width="718.2" Height="109.62">
       <TableObject Name="Table6ApproximationEquations" Top="7.56" Width="538.68" Height="102.06" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table6ApproximationEquations_ManualBuild">
         <TableColumn Name="Column356" Width="89.78"/>
         <TableColumn Name="Column357" Width="89.78"/>
@@ -1195,7 +1208,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="1147.43" Width="718.2" Height="139.86" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="1130.29" Width="718.2" Height="139.86" CanShrink="true">
       <TableObject Name="TableConclusion1" Top="7.56" Width="554.23" Height="30.24" GrowToBottom="true">
         <TableColumn Name="Column178" Width="234.36"/>
         <TableColumn Name="Column236" Width="113.4"/>
@@ -1260,7 +1273,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1291.29" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1272.43" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
