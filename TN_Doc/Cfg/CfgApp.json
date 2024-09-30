@@ -70,7 +70,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 6,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": true,
@@ -1024,7 +1024,8 @@
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
-      "UsedProcedureTypePR": null
+      "UsedProcedureTypePR": null,
+      "OpcConnectionSettings": null
     },
     {
       "Use": false,
@@ -2018,7 +2019,8 @@
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
-      "UsedProcedureTypePR": null
+      "UsedProcedureTypePR": null,
+      "OpcConnectionSettings": null
     },
     {
       "Use": false,
@@ -3012,7 +3014,8 @@
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
-      "UsedProcedureTypePR": null
+      "UsedProcedureTypePR": null,
+      "OpcConnectionSettings": null
     }
   ],
   "PrintSettings": {
@@ -3022,7 +3025,7 @@
     "Path": "/archive/cpa.reports"
   },
   "Elis": {
-    "Use": false,
+    "Use": true,
     "OstKey": "ostKey",
     "SiknKey": "siknKey",
     "ClientName": "clientName",
