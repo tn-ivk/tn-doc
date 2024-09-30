@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/03/2024 10:53:01" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/30/2024 09:50:32" ReportInfo.CreatorVersion="2024.2.0.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -12,6 +12,9 @@ using Newtonsoft.Json.Linq;
 
 namespace FastReport
 {
+  
+  // Скрыт параметр &quot;Выход франкции: при температуре 350&quot; в соответствие с письмом ПАО &quot;№ АК-11-01-06/54199 от 18.10.2017&quot;.
+  // Исправлен параметр &quot;Обозначение параметр по ГОСТ 51858&quot;: теперь выводится марка нефти для экспорта.
   public class ReportScript
   {
     JToken JDoc;
@@ -136,9 +139,9 @@ namespace FastReport
       result = $&quot;\n{JResult[&quot;Yield_fraction_300&quot;]}&quot;;
       RowYield_fraction[3].Text += metod == null ? result : GetResult(metod, result);
 
-      metod = GetMetod(metods, &quot;Yield_fraction_350&quot;);
-      result = $&quot;\n{JResult[&quot;Yield_fraction_350&quot;]}&quot;;
-      RowYield_fraction[3].Text += metod == null ? result : GetResult(metod, result);
+      //metod = GetMetod(metods, &quot;Yield_fraction_350&quot;);
+      //result = $&quot;\n{JResult[&quot;Yield_fraction_350&quot;]}&quot;;
+      //RowYield_fraction[3].Text += metod == null ? result : GetResult(metod, result);
 
       metod = GetMetod(metods, &quot;Mass_fraction_of_paraffin&quot;);
       result = $&quot;{JResult[&quot;Mass_fraction_of_paraffin&quot;]}&quot;;
@@ -195,7 +198,8 @@ namespace FastReport
 
     public void  DrawTableSigners()
     {
-      GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858 /Classification according to GOST R 51858/ &lt;u&gt;{0}&quot;, JResult[&quot;GostIndexResult&quot;].ToString().Replace('X','-'));
+      //GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858 /Classification according to GOST R 51858/ &lt;u&gt;{0}&quot;, JResult[&quot;GostIndexResult&quot;].ToString().Replace('X','-'));
+      GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858 /Classification according to GOST R 51858/ &lt;u&gt;{0}&quot;, JResult[&quot;ExtendGostIndexResult&quot;].ToString().Replace('X','-'));      
       Laboratory_IOF.Text = $&quot;{JAdditionalData[&quot;Laboratory_IOF&quot;]}&quot;;
       Laboratory_Factory.Text = $&quot;{JAdditionalData[&quot;Laboratory_Factory&quot;]}&quot;;  
       Delive_Factory.Text = $&quot;{JAdditionalData[&quot;Delive_Factory&quot;]}&quot;;
@@ -219,7 +223,7 @@ namespace FastReport
         <TableColumn Name="Column01" Width="325.89"/>
         <TableColumn Name="Column03" Width="391.93"/>
         <TableRow Name="Row187" Height="37.8" AutoSize="true">
-          <TableCell Name="Cell1526" Text="ПАСПОРТ КАЧЕСТВА НЕФТИ&#13;&#10;CERTIFICATE OF QUALITY" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell1526" Text="ПАСПОРТ КАЧЕСТВА НЕФТИ1&#13;&#10;CERTIFICATE OF QUALITY" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
           <TableCell Name="Cell1528" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row186" Height="26.46" AutoSize="true">
@@ -252,7 +256,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="157.65" Width="718.2" Height="478.17" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="160.31" Width="718.2" Height="478.17" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="468.72" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="434.7"/>
@@ -356,7 +360,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="638.48" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="643.82" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="328.86">
         <TableColumn Name="Column29" Width="245.7"/>
         <TableColumn Name="Column31" Width="202.23"/>

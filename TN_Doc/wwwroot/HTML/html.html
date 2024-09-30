@@ -16,18 +16,55 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
-        
-        td, th 
-        {
-            font-size: 70%;             /* Размер шрифта в процентах */
-            padding: 2px;               /* Поля вокруг содержимого таблицы */
-            border: 0.5px solid black;  /* Параметры рамки */
+
+        input {
+            outline: none;
+            border: 1px solid white;
+            /* border: 1px solid black; */
+            /* border-radius: 5px; */
         }
 
-        Edit 
-        {
-            border-collapse: collapse;  /* Убираем двойные линии между ячейками */
+        td,
+        th {
+            font-size: 70%;
+            /* Размер шрифта в процентах */
+            padding: 2px;
+            /* Поля вокруг содержимого таблицы */
+            border: 0.5px solid black;
+            /* Параметры рамки */
         }
+
+        Edit {
+            border-collapse: collapse;
+            /* Убираем двойные линии между ячейками */
+        }
+
+        .empty-parameter {
+            /* border: 2px solid white; */
+            background-color: rgb(255, 255, 130);
+        }
+
+        .filled-parameter {
+            /* border: 2px solid white; */
+            background-color: white;
+        }
+
+        .correct-rounding {
+            border: 1px solid white;
+            /* background-color: green; */
+        }
+
+        .incorrect-rounding {
+            border: 2px solid rgb(255, 105, 105);
+            /* background-color: red; */
+        }
+        
+        .-manual-input-disabled{
+            text-align: center;
+            background: #EEEEEE;
+            color:black;
+        }
+
     </style>
 
     <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
@@ -39,21 +76,25 @@
         var dictionaries;
 
         function funcOnLoad() {
+            SendingMessageStateButtonSave();
             dictionaries = GetUsers();
         }
 
-        function UserChangeEvent(selectObject)
-        {
-            if (selectObject.name == "Delive_IOF")
-            {
+        function UserChangeEvent(selectObject) {
+            if (selectObject.name == "Laboratory_IOF") {
+                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                document.getElementById("Laboratory_Post").value = user[0].Post;
+                document.getElementById("Laboratory_Factory").value = user[0].Factory;
+
+            }
+            else if (selectObject.name == "Delive_IOF") {
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Delive_Post").value = user[0].Post;
                 document.getElementById("Delive_Factory").value = user[0].Factory;
 
                 //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
-            else if (selectObject.name == "Receive_IOF")
-            {
+            else if (selectObject.name == "Receive_IOF") {
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Receive_Post").value = user[0].Post;
                 document.getElementById("Receive_Factory").value = user[0].Factory;
@@ -61,16 +102,100 @@
                 //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
         }
+
+        function RoundingCheck(Object) {
+            const f = x => ((x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0));
+
+            if (f(Object.value) == Object.getAttribute('data-roundValue')) {
+                Object.classList.replace("incorrect-rounding", "correct-rounding");
+            }
+            else {
+                Object.classList.replace("correct-rounding", "incorrect-rounding");
+            }
+
+            if (Object.value == '') {
+                Object.classList.replace("filled-parameter", "empty-parameter");
+            }
+            else {
+                Object.classList.replace("empty-parameter", "filled-parameter");
+            } 
+
+            SendingMessageStateButtonSave();
+        }
+
+        function SendingMessageStateButtonSave() {
+            let StateButtonSave = true;
+
+            StateButtonSave = ValidationData();
+
+            if (StateButtonSave)
+                window.top.postMessage('ButtonSaveOn', '*');
+            else
+                window.top.postMessage('ButtonSaveOff', '*');
+        }
+
+        function ValidationData() {
+            let elmnts = document.querySelectorAll('.incorrect-rounding, .empty-parameter');
+
+            // tuda suda копируем
+            if (elmnts.length == 0)
+                return true;
+            else
+                return false;
+        }
     </script>
 
 </head>
 <body onload="funcOnLoad()">
 
+    <menu type="toolbar">
+        
+    </menu>
+
     <table id="AdditionalInfo">
         <tbody>
-
-        <tr><td>ПР: тип (модель)</td><td><input id="PR_Model_Top" data-edit="1" data-key="PR_Model_Top" data-tag="AdditionalInfo" type="text" value="FT202" disabled="disabled"></td></tr><tr><td>Место проведения поверки</td><td><input id="PoverkaPlace" data-edit="1" data-key="PoverkaPlace" data-tag="AdditionalInfo" type="text" value="" disabled="disabled"></td></tr><tr><td>Пункт приема сдачи нефти</td><td><input id="PlaceSIKN" data-edit="1" data-key="PlaceSIKN" data-tag="AdditionalInfo" type="text" value="НПС 6 «Тихорецкая»»" disabled="disabled"></td></tr><tr><td>Наименование организации</td><td><input id="PlaceFactory" data-edit="1" data-key="PlaceFactory" data-tag="AdditionalInfo" type="text" value="АО «Черномортранснефть»" disabled="disabled"></td></tr><tr><td>ПР: тип (модель)</td><td><input id="PR_Model" data-edit="1" data-key="PR_Model" data-tag="AdditionalInfo" type="text" value="FT202" disabled="disabled"></td></tr><tr><td>ПР: DN</td><td><input id="PR_DN" data-edit="1" data-key="PR_DN" data-tag="AdditionalInfo" type="text" value="300" disabled="disabled"></td></tr><tr><td>ПР: PN</td><td><input id="PR_PN" data-edit="1" data-key="PR_PN" data-tag="AdditionalInfo" type="text" value="1" disabled="disabled"></td></tr><tr><td>ПР: Заводской №</td><td><input id="PR_FactoryNumber" data-edit="1" data-key="PR_FactoryNumber" data-tag="AdditionalInfo" type="text" value="13" disabled="disabled"></td></tr><tr><td>Линия</td><td><input id="LineName" data-edit="1" data-key="LineName" data-tag="AdditionalInfo" type="text" value="МН1" disabled="disabled"></td></tr><tr><td>Рабочая жидкость</td><td><input id="Oil" data-edit="1" data-key="Oil" data-tag="AdditionalInfo" type="text" value="Нефть" disabled="disabled"></td></tr><tr><td>ПУ</td><td><input id="PU" data-edit="1" data-key="PU" data-tag="AdditionalInfo" type="text" value="Daniel" disabled="disabled"></td></tr><tr><td>ПУ: Разряд</td><td><input id="PU_Category" data-edit="1" data-key="PU_Category" data-tag="AdditionalInfo" type="text" value="1" disabled="disabled"></td></tr><tr><td>ПУ: Заводской №</td><td><input id="PU_FactoryNumber" data-edit="1" data-key="PU_FactoryNumber" data-tag="AdditionalInfo" type="text" value="012" disabled="disabled"></td></tr><tr><td>ПУ: PN</td><td><input id="PU_PN" data-edit="1" data-key="PU_PN" data-tag="AdditionalInfo" type="text" value="4" disabled="disabled"></td></tr><tr><td>ПУ: Дата поверки</td><td><input id="PU_Poverka_Date" data-edit="1" data-key="PU_Poverka_Date" data-tag="AdditionalInfo" type="text" value="12.12.2020" disabled="disabled"></td></tr><tr><td>Номер протокола</td><td><input id="ProtokolNum" data-edit="1" data-key="ProtokolNum" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>Наименование поверяющей организации</td><td><input id="StaffData_company" data-edit="1" data-key="StaffData_company" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>И.О. Фамилия</td><td><input id="StaffData_fio" data-edit="1" data-key="StaffData_fio" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>Заключение: преобразователь объемного расхода</td><td><select name="ARM_Poverka_Result" data-edit="1" data-key="ARM_Poverka_Result" data-tag="AdditionalInfo"><option value=""></option><option value="годен">годен</option><option value="не годен">не годен</option></select></td></tr><tr><td>Применение в качестве</td><td><select name="ARM_Poverka_Result_Type" data-edit="1" data-key="ARM_Poverka_Result_Type" data-tag="AdditionalInfo"><option value=""></option><option value="рабочего">рабочего</option><option value="резервно-контрольного">резервно-контрольного</option></select></td></tr></tbody>
+        <tr><td>Номер паспорта</td><td><input id="Passport.PassportID" data-edit="1" data-key="Passport.PassportID" data-tag="AdditionalInfo" type="text" value=""></td></tr><tr><td>К акту приема-сдачи нефти №</td><td><input id="ProtokolNumAct" data-edit="1" data-key="ProtokolNumAct" data-tag="AdditionalInfo" type="text" value="3"></td></tr><tr><td>Пункт приема сдачи нефти</td><td><input id="DelivePoint" data-edit="1" data-key="DelivePoint" data-tag="AdditionalInfo" type="text" value="Юргамыш"></td></tr><tr><td>Номер аттестата аккредитации</td><td><input id="AccrSertifNumber" data-edit="1" data-key="AccrSertifNumber" data-tag="AdditionalInfo" type="text" value="123/456"></td></tr><tr><td>Лаборатория предприятия</td><td><input id="Laboratory" data-edit="1" data-key="Laboratory" data-tag="AdditionalInfo" type="text" value="ХАЛ"></td></tr><tr><td>СИКН №</td><td><input id="SIKN_Number" data-edit="1" data-key="SIKN_Number" data-tag="AdditionalInfo" type="text" value="17"></td></tr><tr><td>Представитель испытательной лаборатории (должность)</td><td><input id="Laboratory_Post" data-edit="1" data-key="Laboratory_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель испытательной лаборатории (предприятие)</td><td><input id="Laboratory_Factory" data-edit="1" data-key="Laboratory_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель испытательной лаборатории (ИОФ)</td><td><select name="Laboratory_IOF" data-edit="1" data-key="Laboratory_IOF" data-tag="AdditionalInfo" onchange="UserChangeEvent(this)"><option value="2">С.В. Горбачев</option></select></td></tr><tr><td>Представитель сдающей стороны (должность)</td><td><input id="Delive_Post" data-edit="1" data-key="Delive_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель сдающей стороны (предприятие)</td><td><input id="Delive_Factory" data-edit="1" data-key="Delive_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель сдающей стороны (ИОФ)</td><td><select name="Delive_IOF" data-edit="1" data-key="Delive_IOF" data-tag="AdditionalInfo" onchange="UserChangeEvent(this)"><option value="4">И.Ф. Попов</option><option value="5">Г.Е. Власов</option><option value="6">Ф.А. Колесников</option></select></td></tr><tr><td>Представитель принимающей стороны (должность)</td><td><input id="Receive_Post" data-edit="1" data-key="Receive_Post" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель принимающей стороны (предприятие)</td><td><input id="Receive_Factory" data-edit="1" data-key="Receive_Factory" data-tag="AdditionalInfo" type="text" value="-"></td></tr><tr><td>Представитель принимающей стороны (ИОФ)</td><td><select name="Receive_IOF" data-edit="1" data-key="Receive_IOF" data-tag="AdditionalInfo" onchange="UserChangeEvent(this)"><option value="7">К.А. Никитин</option><option value="8">А.Д. Игнатьев</option><option value="9">М.И. Леонов</option><option value="10">华丽王</option></select></td></tr><tr><td>Дата и время отбора пробы (начало)</td><td><input id="PassportPeriodDT.Begin" data-edit="1" data-key="PassportPeriodDT.Begin" data-tag="AdditionalInfo" type="datetime-local" value="2024-09-30T11:20:30"></td></tr><tr><td>Дата и время отбора пробы (окончание)</td><td><input id="PassportPeriodDT.End" data-edit="1" data-key="PassportPeriodDT.End" data-tag="AdditionalInfo" type="datetime-local" value="2024-09-30T12:00:00"></td></tr><tr><td>Название танкера</td><td><input id="TankerName" data-edit="1" data-key="TankerName" data-tag="AdditionalInfo" type="text" value=""></td></tr></tbody>
     </table>
 
+    <table id="Edit">
+        <thead>
+            <tr>
+                <th> Н </th>
+                <th> Наименование показателя </th>
+                <th> Метод испытаний </th>
+                <th> Измерение ИВК </th>
+                <th> Измерение ХАЛ </th>
+                <th> Результат </th>
+            </tr>
+        </thead>
+
+        <tbody>
+        <tr><td>1</td><td>Температура нефти при условиях измерений объема, °C</td><td><select data-edit="1" data-key="TempCorrection" data-tag="Metod" name="cb1"><option data-metod="{&quot;Id&quot;:1,&quot;Use&quot;:true,&quot;IdParameter&quot;:1,&quot;Name&quot;:&quot;ГОСТ Р 00001-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00001-2001 Метод А">ГОСТ Р 00001-2001 Метод А</option><option data-metod="{&quot;Id&quot;:2,&quot;Use&quot;:true,&quot;IdParameter&quot;:1,&quot;Name&quot;:&quot;ГОСТ Р 00001-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00001-2001 Метод Б">ГОСТ Р 00001-2001 Метод Б</option></select></td><td>0</td><td><input data-edit="1" data-key="TempCorrection" data-tag="Value" step="any" name="tb1" disabled="disabled" class="-manual-input-disabled" type="text" value="—"></td><td>-</td></tr><tr><td>2</td><td>Давление нефти при условиях измерений объема, МПа</td><td><select data-edit="1" data-key="PressCorrection" data-tag="Metod" name="cb2"><option data-metod="{&quot;Id&quot;:3,&quot;Use&quot;:true,&quot;IdParameter&quot;:2,&quot;Name&quot;:&quot;ГОСТ Р 00002-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00002-2001 Метод А">ГОСТ Р 00002-2001 Метод А</option><option data-metod="{&quot;Id&quot;:4,&quot;Use&quot;:true,&quot;IdParameter&quot;:2,&quot;Name&quot;:&quot;ГОСТ Р 00002-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00002-2001 Метод Б">ГОСТ Р 00002-2001 Метод Б</option></select></td><td>0</td><td><input data-edit="1" data-key="PressCorrection" data-tag="Value" step="any" name="tb2" disabled="disabled" class="-manual-input-disabled" type="text" value="—"></td><td>-</td></tr><tr><td>3</td><td>Плотность нефти при температуре и давлении
+в условиях измерений объема, кг/м³</td><td><select data-edit="1" data-key="DensCorrection" data-tag="Metod" name="cb3"><option data-metod="{&quot;Id&quot;:5,&quot;Use&quot;:true,&quot;IdParameter&quot;:3,&quot;Name&quot;:&quot;ГОСТ Р 00003-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00003-2001 Метод А">ГОСТ Р 00003-2001 Метод А</option><option data-metod="{&quot;Id&quot;:6,&quot;Use&quot;:true,&quot;IdParameter&quot;:3,&quot;Name&quot;:&quot;ГОСТ Р 00003-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00003-2001 Метод Б">ГОСТ Р 00003-2001 Метод Б</option></select></td><td>0</td><td><input data-edit="1" data-key="DensCorrection" data-tag="Value" step="any" name="tb3" disabled="disabled" class="-manual-input-disabled" type="text" value="—"></td><td>-</td></tr><tr><td>4</td><td>Плотность нефти при 20 °C, кг/м³</td><td><select data-edit="1" data-key="Dens20Correction" data-tag="Metod" name="cb4"><option data-metod="{&quot;Id&quot;:7,&quot;Use&quot;:true,&quot;IdParameter&quot;:4,&quot;Name&quot;:&quot;ГОСТ Р 00004-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00004-2001 Метод А">ГОСТ Р 00004-2001 Метод А</option><option data-metod="{&quot;Id&quot;:8,&quot;Use&quot;:true,&quot;IdParameter&quot;:4,&quot;Name&quot;:&quot;ГОСТ Р 00004-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00004-2001 Метод Б">ГОСТ Р 00004-2001 Метод Б</option></select></td><td>0</td><td><input data-edit="1" data-key="Dens20Correction" data-tag="Value" step="any" name="tb4" disabled="disabled" class="-manual-input-disabled" type="text" value="—"></td><td>-</td></tr><tr><td>5</td><td>Плотность нефти при 15 °C, кг/м³</td><td><select data-edit="1" data-key="Dens15Correction" data-tag="Metod" name="cb5"><option data-metod="{&quot;Id&quot;:9,&quot;Use&quot;:true,&quot;IdParameter&quot;:5,&quot;Name&quot;:&quot;ГОСТ Р 00005-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00005-2001 Метод А">ГОСТ Р 00005-2001 Метод А</option><option data-metod="{&quot;Id&quot;:10,&quot;Use&quot;:true,&quot;IdParameter&quot;:5,&quot;Name&quot;:&quot;ГОСТ Р 00005-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00005-2001 Метод Б">ГОСТ Р 00005-2001 Метод Б</option></select></td><td>0</td><td><input data-edit="1" data-key="Dens15Correction" data-tag="Value" step="any" name="tb5" disabled="disabled" class="-manual-input-disabled" type="text" value="—"></td><td>-</td></tr><tr><td>6</td><td>Массовая доля воды, %</td><td><select data-edit="1" data-key="MassWaterFracCorrection" data-tag="Metod" name="cb6"><option data-metod="{&quot;Id&quot;:11,&quot;Use&quot;:true,&quot;IdParameter&quot;:6,&quot;Name&quot;:&quot;ГОСТ Р 00006-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00006-2001 Метод А">ГОСТ Р 00006-2001 Метод А</option><option data-metod="{&quot;Id&quot;:12,&quot;Use&quot;:true,&quot;IdParameter&quot;:6,&quot;Name&quot;:&quot;ГОСТ Р 00006-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00006-2001 Метод Б">ГОСТ Р 00006-2001 Метод Б</option></select></td><td>0</td><td><input data-edit="1" data-key="MassWaterFracCorrection" data-tag="Value" type="number" step="any" name="tb6" value=""></td><td>-</td></tr><tr><td>7</td><td>Массовая концентрация хлористых солей, мг/дм³</td><td><select data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Metod" name="cb7"><option data-metod="{&quot;Id&quot;:13,&quot;Use&quot;:true,&quot;IdParameter&quot;:7,&quot;Name&quot;:&quot;ГОСТ Р 00007-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00007-2001 Метод А">ГОСТ Р 00007-2001 Метод А</option><option data-metod="{&quot;Id&quot;:14,&quot;Use&quot;:true,&quot;IdParameter&quot;:7,&quot;Name&quot;:&quot;ГОСТ Р 00007-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00007-2001 Метод Б">ГОСТ Р 00007-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Chloride_Salts.Concentration" data-tag="Value" type="number" step="any" name="tb7" value=""></td><td>-</td></tr><tr><td>8</td><td>Массовая концентрация хлористых солей, %</td><td><select data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Metod" name="cb8"><option data-metod="{&quot;Id&quot;:15,&quot;Use&quot;:true,&quot;IdParameter&quot;:8,&quot;Name&quot;:&quot;ГОСТ Р 00008-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00008-2001 Метод А">ГОСТ Р 00008-2001 Метод А</option><option data-metod="{&quot;Id&quot;:16,&quot;Use&quot;:true,&quot;IdParameter&quot;:8,&quot;Name&quot;:&quot;ГОСТ Р 00008-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00008-2001 Метод Б">ГОСТ Р 00008-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Chloride_Salts.MassFraction" data-tag="Value" type="number" step="any" name="tb8" value=""></td><td>-</td></tr><tr><td>9</td><td>Массовая доля механических примесей, %</td><td><select data-edit="1" data-key="Impurity" data-tag="Metod" name="cb9"><option data-metod="{&quot;Id&quot;:17,&quot;Use&quot;:true,&quot;IdParameter&quot;:9,&quot;Name&quot;:&quot;ГОСТ Р 00009-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00009-2001 Метод А">ГОСТ Р 00009-2001 Метод А</option><option data-metod="{&quot;Id&quot;:18,&quot;Use&quot;:true,&quot;IdParameter&quot;:9,&quot;Name&quot;:&quot;ГОСТ Р 00009-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00009-2001 Метод Б">ГОСТ Р 00009-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Impurity" data-tag="Value" type="number" step="any" name="tb9" value=""></td><td>-</td></tr><tr><td>10</td><td>Массовая доля серы, %</td><td><select data-edit="1" data-key="SulfurCorrection" data-tag="Metod" name="cb10"><option data-metod="{&quot;Id&quot;:19,&quot;Use&quot;:true,&quot;IdParameter&quot;:10,&quot;Name&quot;:&quot;ГОСТ Р 00010-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00010-2001 Метод А">ГОСТ Р 00010-2001 Метод А</option><option data-metod="{&quot;Id&quot;:20,&quot;Use&quot;:true,&quot;IdParameter&quot;:10,&quot;Name&quot;:&quot;ГОСТ Р 00010-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00010-2001 Метод Б">ГОСТ Р 00010-2001 Метод Б</option></select></td><td>0</td><td><input data-edit="1" data-key="SulfurCorrection" data-tag="Value" type="number" step="any" name="tb10" value=""></td><td>-</td></tr><tr><td>11</td><td>Давление насыщенных паров, кПа</td><td><select data-edit="1" data-key="DNP.kPa" data-tag="Metod" name="cb11"><option data-metod="{&quot;Id&quot;:21,&quot;Use&quot;:true,&quot;IdParameter&quot;:11,&quot;Name&quot;:&quot;ГОСТ Р 00011-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00011-2001 Метод А">ГОСТ Р 00011-2001 Метод А</option><option data-metod="{&quot;Id&quot;:22,&quot;Use&quot;:true,&quot;IdParameter&quot;:11,&quot;Name&quot;:&quot;ГОСТ Р 00011-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00011-2001 Метод Б">ГОСТ Р 00011-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="DNP.kPa" data-tag="Value" type="number" step="any" name="tb11" value=""></td><td>-</td></tr><tr><td>12</td><td>Давление насыщенных паров, мм рт. ст.</td><td><select data-edit="1" data-key="DNP.mercury_mm" data-tag="Metod" name="cb12"><option data-metod="{&quot;Id&quot;:23,&quot;Use&quot;:true,&quot;IdParameter&quot;:12,&quot;Name&quot;:&quot;ГОСТ Р 00012-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00012-2001 Метод А">ГОСТ Р 00012-2001 Метод А</option><option data-metod="{&quot;Id&quot;:24,&quot;Use&quot;:true,&quot;IdParameter&quot;:12,&quot;Name&quot;:&quot;ГОСТ Р 00012-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00012-2001 Метод Б">ГОСТ Р 00012-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="DNP.mercury_mm" data-tag="Value" type="number" step="any" name="tb12" value=""></td><td>-</td></tr><tr><td>13</td><td>Выход фракций, %:    при температуре до 200 °С</td><td><select data-edit="1" data-key="Yield_fraction_200" data-tag="Metod" name="cb13"><option data-metod="{&quot;Id&quot;:25,&quot;Use&quot;:true,&quot;IdParameter&quot;:13,&quot;Name&quot;:&quot;ГОСТ Р 00013-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00013-2001 Метод А">ГОСТ Р 00013-2001 Метод А</option><option data-metod="{&quot;Id&quot;:26,&quot;Use&quot;:true,&quot;IdParameter&quot;:13,&quot;Name&quot;:&quot;ГОСТ Р 00013-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00013-2001 Метод Б">ГОСТ Р 00013-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Yield_fraction_200" data-tag="Value" type="number" step="any" name="tb13" value=""></td><td>-</td></tr><tr><td>14</td><td>Выход фракций, %:    при температуре до 300 °С</td><td><select data-edit="1" data-key="Yield_fraction_300" data-tag="Metod" name="cb14"><option data-metod="{&quot;Id&quot;:27,&quot;Use&quot;:true,&quot;IdParameter&quot;:14,&quot;Name&quot;:&quot;ГОСТ Р 00014-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00014-2001 Метод А">ГОСТ Р 00014-2001 Метод А</option><option data-metod="{&quot;Id&quot;:28,&quot;Use&quot;:true,&quot;IdParameter&quot;:14,&quot;Name&quot;:&quot;ГОСТ Р 00014-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00014-2001 Метод Б">ГОСТ Р 00014-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Yield_fraction_300" data-tag="Value" type="number" step="any" name="tb14" value=""></td><td>-</td></tr><tr><td>15</td><td>Выход фракций: при температуре до 350 °С, %</td><td><select data-edit="1" data-key="Yield_fraction_350" data-tag="Metod" name="cb15"><option data-metod="{&quot;Id&quot;:29,&quot;Use&quot;:true,&quot;IdParameter&quot;:15,&quot;Name&quot;:&quot;ГОСТ Р 00015-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00015-2001 Метод А">ГОСТ Р 00015-2001 Метод А</option><option data-metod="{&quot;Id&quot;:30,&quot;Use&quot;:true,&quot;IdParameter&quot;:15,&quot;Name&quot;:&quot;ГОСТ Р 00015-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00015-2001 Метод Б">ГОСТ Р 00015-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Yield_fraction_350" data-tag="Value" type="number" step="any" name="tb15" value=""></td><td>-</td></tr><tr><td>16</td><td>Массовая доля парафина, %</td><td><select data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Metod" name="cb16"><option data-metod="{&quot;Id&quot;:31,&quot;Use&quot;:true,&quot;IdParameter&quot;:16,&quot;Name&quot;:&quot;ГОСТ Р 00016-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00016-2001 Метод А">ГОСТ Р 00016-2001 Метод А</option><option data-metod="{&quot;Id&quot;:32,&quot;Use&quot;:true,&quot;IdParameter&quot;:16,&quot;Name&quot;:&quot;ГОСТ Р 00016-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00016-2001 Метод Б">ГОСТ Р 00016-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_paraffin" data-tag="Value" type="number" step="any" name="tb16" value=""></td><td>-</td></tr><tr><td>17</td><td>Массовая доля сероводорода, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Metod" name="cb17"><option data-metod="{&quot;Id&quot;:33,&quot;Use&quot;:true,&quot;IdParameter&quot;:17,&quot;Name&quot;:&quot;ГОСТ Р 00017-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00017-2001 Метод А">ГОСТ Р 00017-2001 Метод А</option><option data-metod="{&quot;Id&quot;:34,&quot;Use&quot;:true,&quot;IdParameter&quot;:17,&quot;Name&quot;:&quot;ГОСТ Р 00017-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00017-2001 Метод Б">ГОСТ Р 00017-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_hydrogen_sulfide" data-tag="Value" type="number" step="any" name="tb17" value=""></td><td>-</td></tr><tr><td>18</td><td>Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Metod" name="cb18"><option data-metod="{&quot;Id&quot;:35,&quot;Use&quot;:true,&quot;IdParameter&quot;:18,&quot;Name&quot;:&quot;ГОСТ Р 00018-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00018-2001 Метод А">ГОСТ Р 00018-2001 Метод А</option><option data-metod="{&quot;Id&quot;:36,&quot;Use&quot;:true,&quot;IdParameter&quot;:18,&quot;Name&quot;:&quot;ГОСТ Р 00018-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00018-2001 Метод Б">ГОСТ Р 00018-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_methyl_and_ethyl_mercaptan" data-tag="Value" type="number" step="any" name="tb18" value=""></td><td>-</td></tr><tr><td>19</td><td>Массовая доля органических хлоридов во фракции, выкипающей до
+температуры 204 °С, млнˉ¹ (ppm)</td><td><select data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Metod" name="cb19"><option data-metod="{&quot;Id&quot;:37,&quot;Use&quot;:true,&quot;IdParameter&quot;:19,&quot;Name&quot;:&quot;ГОСТ Р 00019-2001 Метод А&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00019-2001 Метод А">ГОСТ Р 00019-2001 Метод А</option><option data-metod="{&quot;Id&quot;:38,&quot;Use&quot;:true,&quot;IdParameter&quot;:19,&quot;Name&quot;:&quot;ГОСТ Р 00019-2001 Метод Б&quot;,&quot;LimitValueActivate&quot;:false,&quot;LimitValue&quot;:0.0,&quot;LimitValueString&quot;:&quot;-&quot;}" value="ГОСТ Р 00019-2001 Метод Б">ГОСТ Р 00019-2001 Метод Б</option></select></td><td>-</td><td><input data-edit="1" data-key="Mass_fraction_of_organic_chlorides" data-tag="Value" type="number" step="any" name="tb19" value=""></td><td>-</td></tr></tbody>
+    </table>
+
+<script type="text/javascript">
+    function CheckElisInput(){
+        //console.group('--check-elis-input--');
+        const elements = document.querySelectorAll('.elis-data');
+        //console.log(document.body);
+       // console.log('собираем данные, заполняемые елис ->', elements.length)
+        if( elements.length===0){
+            //console.log('данные елиса отсутствуют -> выходим')
+            //console.groupEnd();
+            return
+        }
+        //console.log('Проверяем  input еще раз');
+        for(const input of elements){
+           // RoundingCheck(input)
+        }
+
+        //console.groupEnd();
+    }
+
+    CheckElisInput();
+</script>
 </body>
+
 </html>
