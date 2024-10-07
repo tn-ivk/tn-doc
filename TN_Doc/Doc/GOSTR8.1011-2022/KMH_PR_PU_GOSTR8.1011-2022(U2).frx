@@ -270,21 +270,7 @@ namespace FastReport
     
     private void FillReportSummary()
     {
-      string kmhDeltaMax = JProtokol[&quot;Delta_KMH_Max&quot;].ToString().Replace('.',',');
-      
-      if(kmhDeltaMax.StartsWith(&quot;-&quot;)&amp;&amp; kmhDeltaMax.Length ==1){
-        kmhDeltaMax = &quot; —  &quot;;
-      }
-      
-      if(kmhDeltaMax.Length ==0){
-        kmhDeltaMax = &quot; —  &quot;;
-      }
-      
-      if(kmhDeltaMax.StartsWith(&quot;-&quot;)&amp;&amp; kmhDeltaMax.Length &gt;1){
-        kmhDeltaMax = $&quot;  {kmhDeltaMax.Substring(1)}  &quot;;
-      }
-      
-      Report.SetParameterValue(&quot;Delta_KMH_Max&quot;, kmhDeltaMax);
+      Report.SetParameterValue(&quot;Delta_KMH_Max&quot;, JProtokol[&quot;Delta_Max&quot;].ToString().Replace('.',','));
       Report.SetParameterValue(&quot;ARM_KMH_Result&quot;, JAdditionalInfo[&quot;ARM_KMH_Result&quot;].ToString() == &quot;годен&quot; ? &quot;годно&quot; : &quot;не годно&quot;);
       
       DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTableKMH_PR_PU[&quot;DateTimeLong&quot;]);
@@ -601,7 +587,7 @@ namespace FastReport
           <TableCell Name="Cell1066" Text="     3 Заключение" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row143" Height="66.15">
-          <TableCell Name="Cell1071" Text="Максимальное относительное отклонение&lt;sup&gt;1)&lt;/sup&gt; δ = «+» или «–» &lt;u&gt;[Delta_KMH_Max]&lt;/u&gt; %.&#13;&#10;СИ объемного расхода [ARM_KMH_Result] к дальнейшей эксплуатации.&#13;&#10;Дата проведения КМХ: [DateKMH]&#13;&#10;Подписи лиц, проводивших КМХ:" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1071" Text="Максимальное относительное отклонение&lt;sup&gt;1)&lt;/sup&gt; δ = &lt;u&gt;[Delta_KMH_Max]&lt;/u&gt; %.&#13;&#10;СИ объемного расхода [ARM_KMH_Result] к дальнейшей эксплуатации.&#13;&#10;Дата проведения КМХ: [DateKMH]&#13;&#10;Подписи лиц, проводивших КМХ:" Font="Arial, 10pt" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
       <TableObject Name="Table5" Top="94.5" Width="784.35" Height="37.8" PrintOnParent="true">
