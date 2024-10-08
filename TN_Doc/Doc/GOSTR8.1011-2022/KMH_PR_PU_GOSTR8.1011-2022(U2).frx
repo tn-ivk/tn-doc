@@ -270,7 +270,7 @@ namespace FastReport
     
     private void FillReportSummary()
     {
-      Report.SetParameterValue(&quot;Delta_KMH_Max&quot;, JProtokol[&quot;Delta_Max&quot;].ToString().Replace('.',','));
+      Report.SetParameterValue(&quot;Delta_KMH_Max&quot;, JProtokol[&quot;Delta_KMH_Max&quot;].ToString().Replace('.',','));
       Report.SetParameterValue(&quot;ARM_KMH_Result&quot;, JAdditionalInfo[&quot;ARM_KMH_Result&quot;].ToString() == &quot;годен&quot; ? &quot;годно&quot; : &quot;не годно&quot;);
       
       DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTableKMH_PR_PU[&quot;DateTimeLong&quot;]);
