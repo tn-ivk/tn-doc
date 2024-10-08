@@ -202,12 +202,13 @@ namespace FastReport
       List &lt;string&gt; distListExtendGostIndex51858 = listExtendGostIndex51858.Distinct().ToList();
       List &lt;string&gt; resultListExtendGostIndex51858 = distListExtendGostIndex51858.Count == 1 ? distListExtendGostIndex51858 : listExtendGostIndex51858;     
       
-      for (int n = 0; n &lt; resultListExtendGostIndex51858.Count; n++)
-      {
-        ExtendGostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  listExtendGostIndex51858[n]);
+      //for (int n = 0; n &lt; resultListExtendGostIndex51858.Count; n++)
+      //{
+        ExtendGostIndex51858.Text = $&quot;Обозначение нефти: &lt;u&gt; {String.Join(" &lt;/u&gt; по ГОСТ Р 51858, &lt;u&gt; ", resultListExtendGostIndex51858.ToArray())}&lt;/u&gt; по ГОСТ Р 51858.&quot;;
+        //ExtendGostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  listExtendGostIndex51858[n]);
         TableAdditionlInfo.PrintRow(1);
         TableAdditionlInfo.PrintColumns();                                             
-      }
+      //}
     }
       
     public void  DrawTableSigners()
