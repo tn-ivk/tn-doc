@@ -474,7 +474,7 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": true,
@@ -999,7 +999,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.26.30",
+          "Server": "192.168.233.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1008,7 +1008,7 @@
         {
           "Use": false,
           "GuidDevice": 0,
-          "Server": "192.168.22.201",
+          "Server": "192.168.233.201",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
