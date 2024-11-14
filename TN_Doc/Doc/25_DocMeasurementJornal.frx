@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/28/2024 10:52:08" ReportInfo.CreatorVersion="2024.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/23/2024 21:36:57" ReportInfo.CreatorVersion="2024.2.0.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -112,6 +112,7 @@ namespace FastReport
     {  
       SIKN_Name.Text = $&quot;{DataIVK.TableMeasurementJornal.AdditionalInfo.SIKN_Name} {DataIVK.TableMeasurementJornal.AdditionalInfo.DirName}&quot;; 
       Factory.Text = DataIVK.TableMeasurementJornal.AdditionalInfo.Factory; 
+      NameIVK.Text = Header.NameIVK;
     }
 
     private void TableJournal_ManualBuild(object sender, EventArgs e)
@@ -218,6 +219,11 @@ namespace FastReport
       {
         PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
       }
+    }  
+
+    private void ReportTitle_AfterLayout(object sender, EventArgs e)
+    {
+      TableHeader01.Columns[2].Width = 1047 - TableHeader01.Columns[1].Width - TableHeader01.Columns[0].Width;
     }
   }    
 }
@@ -231,22 +237,24 @@ namespace FastReport
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
     <Parameter Name="Journal" DataType="System.String" AsString=""/>
   </Dictionary>
-  <ReportPage Name="Page" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
-    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="56.7" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableHeader01" Width="289.17" Height="18.9" CanBreak="false">
-        <TableColumn Name="Column1" Width="41.58"/>
-        <TableColumn Name="Column270" Width="247.59" AutoSize="true"/>
-        <TableRow Name="Row1" AutoSize="true">
-          <TableCell Name="ProtocolType" Text="СИКН №" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="SIKN_Name" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Name" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+  <ReportPage Name="Page" PaperWidth="297" PaperHeight="210" RawPaperSize="9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
+    <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="56.7" CanGrow="true" CanShrink="true" CanBreak="true" AfterLayoutEvent="ReportTitle_AfterLayout">
+      <TableObject Name="TableHeader01" Width="1047.06" Height="18.9" CanBreak="false">
+        <TableColumn Name="Column1" Width="42.21"/>
+        <TableColumn Name="Column270" Width="248.22" AutoSize="true"/>
+        <TableColumn Name="Column275" Width="756.63"/>
+        <TableRow Name="Row1">
+          <TableCell Name="ProtocolType" Text="СИКН №" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="SIKN_Name" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Name" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="NameIVK" Text="NameIVK" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="TableHeader02" Top="18.9" Width="289.17" Height="37.8" CanBreak="false">
+      <TableObject Name="TableHeader02" Top="18.9" Width="289.17" Height="37.8" CanBreak="false" PrintOnParent="true">
         <TableColumn Name="Column271" Width="41.58"/>
         <TableColumn Name="Column272" Width="247.59" AutoSize="true"/>
         <TableRow Name="Row183">
           <TableCell Name="Factory" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Factory" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ParagraphFormat.LineSpacing="75.6" ParagraphFormat.LineSpacingType="Exactly" ColSpan="2"/>
-          <TableCell Name="Cell1519" Border.Lines="Bottom" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1523" Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row184">
           <TableCell Name="Cell1520" Text="владелец СИКН" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="2"/>
