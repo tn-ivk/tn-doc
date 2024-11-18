@@ -164,7 +164,8 @@ namespace FastReport
       else 
       ReportType.Text = reportIncompleteName[reportType]; // Тип незавершенного отчета
          
-      ReportTime.Text = String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy HH:mm}&quot;, dtBegin, dtEnd);
+      //ReportTime.Text = String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy HH:mm}&quot;, dtBegin, dtEnd);
+      ReportTime.Text = String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy} {2}&quot;, dtBegin, ((dtEnd.TimeOfDay==TimeSpan.Zero)?dtEnd.AddDays(-1):dtEnd), ((dtEnd.TimeOfDay==TimeSpan.Zero)?"24:00":dtEnd.ToString("HH:mm")));
     } 
 
     private void TableReport_ManualBuild(object sender, EventArgs e)

@@ -583,12 +583,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="TN_ToolsFastReport">
-      <HintPath>..\tn_toolsfastreport\TN_Tools\bin\Release\net5.0\TN_ToolsFastReport.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\tn_toolsfastreport\TN_Tools\TN_Tools.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties cfg_4cfgapp_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" /></VisualStudio></ProjectExtensions>
