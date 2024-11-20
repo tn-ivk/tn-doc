@@ -294,7 +294,7 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": true,
