@@ -704,6 +704,18 @@ function InitTableDocs() {
 
 function InitElement() {
 
+
+     let iframe = document.querySelector('.FR');
+     iframe.onload = function(){
+        let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
+
+        elisNodes.forEach((item, index, array) => {
+         if (item.nodeName === 'INPUT') {
+             ValidateElisInput(item);
+         }       
+     });     
+    }
+
     /**/
     InitDirEditorComponent();
     /**/
@@ -1018,8 +1030,13 @@ function GetElisData() {
                     endPeriod: moment.utc(periodDocument.end * 1000).format()
                 }),
             success: function (data) {
+                if (data.isError)
+                    $('#info').text(data.textError);
+                else if (data.passports.length == 0)
+                    $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
                 //отрисовываем таблицу с паспортами
-                dataELIS = data;
+                else
+                    dataELIS = data;
             },
             error: function (data) {
                 $('#info').text('Ошибка выполнения запроса.');
