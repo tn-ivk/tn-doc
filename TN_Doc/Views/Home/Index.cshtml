@@ -8,10 +8,8 @@
             <table class="mainTable">
                 <tr>
                     <td class="topPanel" colspan="2" align="right">
-                        <button id="ButtonDictionaries" data-toggle="modal" data-target="#modal-window"
-                            data-backdrop="static" data-keyboard="false">
-                            Справочники
-                        </button>
+                        <input id="ButtonDictionaries" type="button" value="Справочники" data-toggle="modal" data-target="#modal-window"
+                            data-backdrop="static" data-keyboard="false">                         
                     </td>
                 </tr>
                 <tr>
@@ -101,10 +99,8 @@
 @*                                <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis" hidden>
                                         Получить данные из ЕЛИС
                                     </button>*@
-                                <button id="ButtonElis" type="button" data-toggle="modal" data-target="#elis" onclick="ButtonElis" hidden>
-                                    Получить данные из ЕЛИС
-                                </button>
-                                    <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
+                                <input id="ButtonElis" type="button" value="Получить данные из ЕЛИС" data-toggle="modal" data-target="#elis" onclick="ButtonElis" hidden>                                 
+                                <input id="ButtonSave" type="button" value="Завершить редактирование и отправить" onclick="SaveDoc()">                                 
                                 </td>
                             </tr>
                             <tr>
