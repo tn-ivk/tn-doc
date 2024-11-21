@@ -70,7 +70,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 1,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": true,
@@ -294,7 +294,7 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": true,
@@ -474,7 +474,7 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": true,
@@ -999,7 +999,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.90.30",
+          "Server": "192.168.233.101",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1008,7 +1008,7 @@
         {
           "Use": false,
           "GuidDevice": 0,
-          "Server": "192.168.22.201",
+          "Server": "192.168.233.201",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1024,7 +1024,8 @@
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
-      "UsedProcedureTypePR": null
+      "UsedProcedureTypePR": null,
+      "OpcConnectionSettings": null
     },
     {
       "Use": false,
@@ -2018,7 +2019,8 @@
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
-      "UsedProcedureTypePR": null
+      "UsedProcedureTypePR": null,
+      "OpcConnectionSettings": null
     },
     {
       "Use": false,
@@ -3012,7 +3014,8 @@
         "UsedSecondSI_PVL": false,
         "UsedSecondSI_PVS": false
       },
-      "UsedProcedureTypePR": null
+      "UsedProcedureTypePR": null,
+      "OpcConnectionSettings": null
     }
   ],
   "PrintSettings": {
@@ -3022,7 +3025,7 @@
     "Path": "/archive/cpa.reports"
   },
   "Elis": {
-    "Use": false,
+    "Use": true,
     "OstKey": "ostKey",
     "SiknKey": "siknKey",
     "ClientName": "clientName",

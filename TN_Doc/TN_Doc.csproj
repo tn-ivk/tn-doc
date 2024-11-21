@@ -6,7 +6,7 @@
     <Version>1.0.0.0</Version>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <AssemblyVersion>1.0.0.7</AssemblyVersion>
+    <AssemblyVersion>1.0.0.11</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -578,17 +578,11 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\css\font-awesome\" />
-    <Folder Include="wwwroot\PDF\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="TN_ToolsFastReport">
-      <HintPath>..\tn_toolsfastreport\TN_Tools\bin\Release\net5.0\TN_ToolsFastReport.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\tn_toolsfastreport\TN_Tools\TN_Tools.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties cfg_4cfgapp_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" /></VisualStudio></ProjectExtensions>

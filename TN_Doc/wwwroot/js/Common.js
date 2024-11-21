@@ -1179,20 +1179,26 @@ function SetDataLocalStorage() {
 
 
 function FillPassportDataElis() {
-
     try {
+        //console.log("FillPassportDataElis -> me tut" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
+        //console.log('dataPassport.parameters',dataPassport.parameters);
+        //console.log()
         elisNodes.forEach((item, index, array) => {
             let itemKeys = item.dataset.elisAlias.split('|');
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
+                //console.log('itemKeys', itemKeys);
+                //console.log('key', key);
+                //console.log('itemKeys.includes(key)', itemKeys.includes(key));
                 if (itemKeys.includes(key)) {
                     root = dataPassport.parameters
                     for (let iKey of itemKeys) {
                         if (iKey === key) {
+                            
                             currentKey = key;
                             break;
                         }

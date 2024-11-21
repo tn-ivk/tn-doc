@@ -104,25 +104,33 @@
         }
 
         function RoundingCheck(Object) {
-            const f = x => ((x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0));
+            CheckRounding(Object);
+            CheckEmpty(Object);
+            SendingMessageStateButtonSave();
+        }
 
-            if (f(Object.value) == Object.getAttribute('data-roundValue')) {
+        function CheckRounding(Object) {
+            const round = Number(Object.getAttribute('data-roundValue'));
+            if(isNaN(round) || round < 1)
+                return;
+            const strRegExPattern = "^-?([0-9]+\.[0-9]{1," + round + "})$";
+            if (Object.value.match(new RegExp(strRegExPattern,'g'))) {
                 Object.classList.replace("incorrect-rounding", "correct-rounding");
             }
             else {
                 Object.classList.replace("correct-rounding", "incorrect-rounding");
             }
+        }
 
-            if (Object.value == '') {
+        function CheckEmpty(Object) {
+            if (!Object.value) {
                 Object.classList.replace("filled-parameter", "empty-parameter");
             }
             else {
                 Object.classList.replace("empty-parameter", "filled-parameter");
-            } 
-
-            SendingMessageStateButtonSave();
+            }
         }
-
+        
         function SendingMessageStateButtonSave() {
             let StateButtonSave = true;
 
@@ -175,21 +183,21 @@
 
 <script type="text/javascript">
     function CheckElisInput(){
-        console.group('--check-elis-input--');
+        //console.group('--check-elis-input--');
         const elements = document.querySelectorAll('.elis-data');
-        console.log(document.body);
-        console.log('собираем данные, заполняемые елис ->', elements.length)
+        //console.log(document.body);
+       // console.log('собираем данные, заполняемые елис ->', elements.length)
         if( elements.length===0){
-            console.log('данные елиса отсутствуют -> выходим')
-            console.groupEnd();
+            //console.log('данные елиса отсутствуют -> выходим')
+            //console.groupEnd();
             return
         }
-        console.log('Проверяем  input еще раз');
+        //console.log('Проверяем  input еще раз');
         for(const input of elements){
-            RoundingCheck(input)
+           // RoundingCheck(input)
         }
 
-        console.groupEnd();
+        //console.groupEnd();
     }
 
     CheckElisInput();
