@@ -164,19 +164,19 @@
           {
             "Id": 1,
             "Use": true,
-            "LicensesDate": "1.01.2024",
+            "LicensesDate": "01.01.2024",
             "LicensesNumber": "ДОВ/10/123/71"
           },
           {
             "Id": 2,
             "Use": true,
-            "LicensesDate": "1.01.2024",
+            "LicensesDate": "01.01.2024",
             "LicensesNumber": "ДОВ/10/123/72"
           },
           {
             "Id": 3,
             "Use": true,
-            "LicensesDate": "1.01.2024",
+            "LicensesDate": "01.01.2024",
             "LicensesNumber": "ДОВ/10/123/73"
           },
           {
@@ -196,6 +196,12 @@
             "Use": true,
             "LicensesDate": "10.01.2024",
             "LicensesNumber": "ДОВ/88/542/23"
+          },
+          {
+            "Id": 7,
+            "Use": true,
+            "LicensesDate": "01.11.2024",
+            "LicensesNumber": "ДОВ/88/542/24"
           }
         ],
         "BIKs": [
