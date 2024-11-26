@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/22/2024 10:07:28" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/26/2024 17:25:16" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -21,7 +21,7 @@ namespace FastReport
     JToken JMethod;
     JToken JAdditionalData;
     JToken JDataARM;
-      
+    
     private void Page_StartPage(object sender, EventArgs e)
     {
       JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
@@ -44,9 +44,15 @@ namespace FastReport
       Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
          
       //Запуск отрисовки таблиц на странице отчета
+      DrawPageHeader();
       DrawTableHeader();
       DrawTablePassport();
       DrawTableSigners();
+    }
+    
+    public void DrawPageHeader()
+    {            
+      PageHeaderText.Text = $&quot;{JSettings[&quot;Header&quot;][&quot;NameIVK&quot;]}&quot;; //(string)JSettings[&quot;Header&quot;][&quot;NameIVK&quot;];
     }
       
     public void DrawTableHeader()
@@ -213,8 +219,11 @@ namespace FastReport
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
     <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
-  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage" FinishPageEvent="Page_FinishPage" LastPageSource="15" FirstPageSource="15">
-    <ReportTitleBand Name="ReportTitle" Width="718.2" Height="139.86" CanGrow="true" CanShrink="true" CanBreak="true">
+  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" TitleBeforeHeader="false" StartPageEvent="Page_StartPage" FinishPageEvent="Page_FinishPage" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="30.24">
+      <TextObject Name="PageHeaderText" Top="9.45" Width="708.75" Height="18.9" Text="PageHeaderText" HorzAlign="Right" Font="Arial, 8.25pt"/>
+    </PageHeaderBand>
+    <ReportTitleBand Name="ReportTitle" Top="32.53" Width="718.2" Height="139.86" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableHeader" Width="717.82" Height="139.86">
         <TableColumn Name="Column01" Width="325.89"/>
         <TableColumn Name="Column03" Width="391.93"/>
@@ -248,7 +257,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="142.15" Width="718.2" Height="468.72" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="174.67" Width="718.2" Height="468.72" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="459.27" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="434.7"/>
@@ -352,7 +361,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="613.15" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="645.68" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="328.86">
         <TableColumn Name="Column29" Width="245.7"/>
         <TableColumn Name="Column31" Width="202.23"/>
