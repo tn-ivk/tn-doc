@@ -592,9 +592,10 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
             break;
         case 'date':
             let date = $('.calendar').datepicker('getDate');
-            let dayStr = date.getDate().toString();
+            let day = date.getDate();
+            let dayStr = day < 10 ? `0${day}` : day.toString();
             let month = date.getMonth() + 1;
-            let monthStr = month < 9 ? `0${date.getMonth() + 1}` : month.toString();
+            let monthStr = month < 10 ? `0${month}` : month.toString();
             let yearStr = date.getFullYear().toString();
             let newDateText = document.createTextNode(dayStr + '.' + monthStr + '.' + yearStr);
             cell.replaceChild(newDateText, cell.childNodes[0])

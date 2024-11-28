@@ -6,7 +6,7 @@
     <Version>1.0.0.0</Version>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <AssemblyVersion>1.0.0.11</AssemblyVersion>
+    <AssemblyVersion>1.0.0.12</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -109,6 +109,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Update="Doc\Act_N_GOSTR50.2.040(G)(Export_Rus).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
