@@ -114,6 +114,12 @@
     <None Update="Doc\Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Update="Cfg\CfgEditPoverkaSikn425_PR_PU.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditPoverkaSikn425_UPR_PR.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
