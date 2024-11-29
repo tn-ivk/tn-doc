@@ -993,6 +993,46 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json"
             }
           ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 35,
+          "Name": "Поверка методика СИКН 425 МПР по ПУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_PR_PU.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_PR_PU.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка методика СИКН 425 МПР по ПУ",
+              "Description": "Протокол определения коэффициента преобразования СРМ с помощью ПУ и ПП по методика СИКН 425 (Приложение А)",
+              "PathToDocTemplateFile": "/Doc/34_PoverkaSikn425_PR_PU_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_PR_PU.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 36,
+          "Name": "Поверка методика СИКН 425 УПР с помощью ПУ, ПП и СРМ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_UPR_PR.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_UPR_PR.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка методика СИКН 425 УПР с помощью ПУ, ПП и СРМ",
+              "Description": "Протокол поверки УПР с помощью ПУ, ПП и СРМ по методика СИКН 425",
+              "PathToDocTemplateFile": "/Doc/35_PoverkaSikn425_UPR_PR_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_UPR_PR.json"
+            }
+          ]
         }
       ],
       "DBConnectionStrings": [
