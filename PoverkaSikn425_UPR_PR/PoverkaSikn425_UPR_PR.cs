@@ -261,20 +261,21 @@ namespace TN.Doc
     }
 
 
-    [Table("TablePoverkaSikn425_UPR_PR")]
+    [Table("Msikn425MprByMpr")]
     public class TablePoverkaSikn425_UPR_PRList
     {
         [Key, ForeignKey("Data")]
         public int id { get; set; }
-        public int IL { get; set; }
+        public int Il { get; set; }
         public string DateTimeString { get; set; }
         public long DateTimeLong { get; set; }
-        public int BIK_ID { get; set; }
-        public byte[] IL_Name { get; set; }
+        public int SiknId { get; set; }
+        public int DirId { get; set; }
+        public byte[] IlName { get; set; }
         public TablePoverkaSikn425_UPR_PRData Data { get; set; }
     }
 
-    [Table("TablePoverkaSikn425_UPR_PR")]
+    [Table("Msikn425MprByMpr")]
     public class TablePoverkaSikn425_UPR_PRData
     {
         [Key]
@@ -350,16 +351,23 @@ namespace TN.Doc
     public class TablePoverkaSikn425_UPR_PR
     {
         public int id { get; set; }
-        public int IL { get; set; }
+        public int Il { get; set; }
         public Protokol Protokol { get; set; }
         public AdditionalInfo AdditionalInfo { get; set; }
         public string DateTimeString { get; set; }
         public long DateTimeLong { get; set; }
-        public int BIK_ID { get; set; }
-        public string IL_Name { get; set; }
+        public int SiknId { get; set; }
+        public int DirId { get; set; }
+        public string IlName { get; set; }
     }
     public class Protokol
     {
+        public string Place_PSP { get; set; }
+        public string Place_SIKN { get; set; }
+        public string Place_Factory { get; set; }
+        public MprInfo MprRsuInfo { get; set; }
+        public List<MprInfo> MprOsuInfo { get; set; }
+        public DeviceInfo IvkInfo { get; set; }
         public string OilType { get; set; }
         public Table1 Table1 { get; set; }
         public List<Table2> Table2 { get; set; }
@@ -367,42 +375,65 @@ namespace TN.Doc
         public List<Table4> Table4 { get; set; }
         public Table5 Table5 { get; set; }
     }
+    
+    public class MprInfo
+    {
+        public string LineName { get; set; }
+        public DeviceInfo Sensor { get; set; }
+        public DeviceInfo Pep { get; set; }
+    }
+    
+    public class DeviceInfo
+    {
+        public string DevType { get; set; }
+        public string DevNumb { get; set; }
+    }
+    
     public class Table1
     {
-        public string Teta_M { get; set; }
-        public string Delta_t_UPR { get; set; }
-        public string Delta_t_PP { get; set; }
-        public string Delta_Dens_PP { get; set; }
-        public string Delta_IVK { get; set; }
+        public string TetaM { get; set; }
+        public string deltaIVK { get; set; }
+        public string Kpm { get; set; }
+        public string KmMFust { get; set; }
+        public string QmMax { get; set; }
+        public string ZS { get; set; }
+        public string Qnom { get; set; }
+        public string deltaTempDop { get; set; }
+        public string tMin { get; set; }
+        public string tMax { get; set; }
+        public string deltaPdop { get; set; }
+        public string Pmin { get; set; }
+        public string Pmax { get; set; }
     }
     public class Table2
     {
-        public string Ser { get; set; }
-        public string Row { get; set; }
-        public string PR { get; set; }
+        public string ser { get; set; }
+        public string row { get; set; }
+        public string MPR_Id { get; set; }
         public string Q_jik { get; set; }
+        public string t_MPR_jik { get; set; }
+        public string P_MPR_jik { get; set; }
         public string N_jik { get; set; }
-        public string K_jik { get; set; }
+        public string Kpm_jik { get; set; }
         public string M_jik { get; set; }
     }
     public class Table3
     {
-        public string Ser { get; set; }
-        public string Row { get; set; }
+        public string ser { get; set; }
+        public string row { get; set; }
         public string Q_ji { get; set; }
+        public string t_MPR_ji { get; set; }
+        public string P_MPR_ji { get; set; }
         public string T_ji { get; set; }
-        public string M_ji { get; set; }
-        public string Dens_ji { get; set; }
-        public string DensTemp_ji { get; set; }
-        public string DensPress_ji { get; set; }
-        public string beta_ji { get; set; }
-        public string t_UPR_ji { get; set; }
-        public string P_UPR_ji { get; set; }
-        public string f_ji { get; set; }
         public string N_ji { get; set; }
-        public string K_ji { get; set; }
+        public string Me_ji { get; set; }
+        public string M_ji { get; set; }
+        public string Km_MF_ji { get; set; }
         public string U_ji { get; set; }
-        public string U_ERROR_ji { get; set; }
+        public string U_error_ji { get; set; }
+        public string Q_KMH_ji { get; set; }
+        public string M_KMH_ji { get; set; }
+        public string delta_KMH_ji { get; set; }
     }
     public class Table4
     {
