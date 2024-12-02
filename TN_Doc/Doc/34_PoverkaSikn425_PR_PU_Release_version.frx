@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/02/2024 13:28:48" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/02/2024 16:18:56" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -67,12 +67,13 @@ namespace FastReport
       Page.RightMargin = General.PageSettings.RightMargin;
 
       // Load data into global lists
-      //listTable2Results = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table2.Where(i =&gt; ! i.Ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Ser) == false).ToList();
+      listTable2Results = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table2.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
       //listPointsTable3 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Point.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;)   &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      listPointsTable3 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Point.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
     
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();    
-      //DrawTableConclusion();
+      DrawTableConclusion();
     }
     #region //Имхо лишний метод
     private void PrintTable(TableObject table)
@@ -114,225 +115,225 @@ namespace FastReport
               
     private void Table1SourceData_ManualBuild(object sender, EventArgs e)
     {
-    //  // Get data for Table
-    //  listTable1Detectors = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 &amp; String.IsNullOrEmpty(i) == false).ToList();
-    //  listTable1V0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.V0.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
-    //  listTable1Teta_Sum_0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Teta_Sum_0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
-    //  listTable1Teta_V_0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Teta_V_0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
+      // Get data for Table
+      listTable1Detectors = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listTable1V0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.V0.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listTable1Teta_Sum_0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.TetaSum0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listTable1Teta_V_0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.TetaV0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
 
       //Setup Columns width
-    //  int sumDynamicCols=Table1SourceData.ColumnCount;
-    //  float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+      int sumDynamicCols=Table1SourceData.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
  
-    //  for (int w = 0; w &lt; (Table1SourceData.ColumnCount); w++)                 
-    //  {
-    //    Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-    //  }      
+      for (int w = 0; w &lt; (Table1SourceData.ColumnCount); w++)                 
+      {
+        Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
                             
       //Draw Fixed rows
-    //  for (int n = 0; n &lt; Table1SourceData.FixedRows; n++)
-    //  {
-    //    Table1SourceData.PrintRow(n);
-    //    Table1SourceData.PrintColumns();                                             
-    //  }
+      for (int n = 0; n &lt; Table1SourceData.FixedRows; n++)
+      {
+        Table1SourceData.PrintRow(n);
+        Table1SourceData.PrintColumns();                                             
+      }
                                                      
       //Fill table with data
-    //  for (int n = 0; n &lt; (listTable1Detectors.Count); n++)
-    //  {
-    //    DetName.Text =  listTable1Detectors[n];
-    //    V0.Text =  tools.GetNormalizedValue(listTable1V0[n]);        
-    //    m_D.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.m_D);
-    //    m_S.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.m_S);
-    //    m_E.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.m_E);
-    //    Alpha_t.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Alpha_t);
-    //    Teta_Sum_0.Text = tools.GetNormalizedValue(listTable1Teta_Sum_0[n]);        
-    //    Teta_V_0.Text = tools.GetNormalizedValue(listTable1Teta_V_0[n]);        
+      for (int n = 0; n &lt; (listTable1Detectors.Count); n++)
+      {
+        DetName.Text =  listTable1Detectors[n];
+        V0.Text =  tools.GetNormalizedValue(listTable1V0[n]);        
+        D_V0.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.D_V0);
+        S_V0.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.S_V0);
+        E_V0.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.E_V0);
+        Alpha_t.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.alpha_t);
+        Teta_Sum_0.Text = tools.GetNormalizedValue(listTable1Teta_Sum_0[n]);        
+        Teta_V_0.Text = tools.GetNormalizedValue(listTable1Teta_V_0[n]);        
                            
         //RowSpans
-    //    for (int i = 0; i &lt; (Table1SourceData.ColumnCount); i++)
-    //    {          
-    //      switch(i)
-    //      {
-    //        case 2:
-    //        case 3:  
-    //        case 4:
-    //        case 5:  
-    //          Table1SourceData[i,3].RowSpan =  listTable1Detectors.Count;
-    //          break;  
-    //      }
-    //    }
+        for (int i = 0; i &lt; (Table1SourceData.ColumnCount); i++)
+        {          
+          switch(i)
+          {
+            case 2:
+            case 3:  
+            case 4:
+            case 5:  
+              Table1SourceData[i,3].RowSpan =  listTable1Detectors.Count;
+              break;  
+          }
+        }
                              
-    //    Table1SourceData.PrintRow(3);     
-    //    Table1SourceData.PrintColumns();  
-    //  }                            
+        Table1SourceData.PrintRow(3);     
+        Table1SourceData.PrintColumns();  
+      }                            
     }
       
     private void Table1SourceDataEnding_ManualBuild(object sender, EventArgs e)
     {                         
       //Setup Columns width as in the previous table
-    //  for (int i = 0; i &lt; (Table1SourceDataEnding.ColumnCount); i++)
-    //  {          
-    //    Table1SourceDataEnding.Columns[i].Width =  Table1SourceData.Columns[i].Width;
-    //  }
+      for (int i = 0; i &lt; (Table1SourceDataEnding.ColumnCount); i++)
+      {          
+        Table1SourceDataEnding.Columns[i].Width =  Table1SourceData.Columns[i].Width;
+      }
          
       //Draw Fixed rows
-    //  for (int n = 0; n &lt; Table1SourceDataEnding.FixedRows; n++)
-    //  {
-    //    Table1SourceDataEnding.PrintRow(n);
-    //    Table1SourceDataEnding.PrintColumns();                                             
-    //  }           
+      for (int n = 0; n &lt; Table1SourceDataEnding.FixedRows; n++)
+      {
+        Table1SourceDataEnding.PrintRow(n);
+        Table1SourceDataEnding.PrintColumns();                                             
+      }           
          
       //Fill table with data                 
-    //  Delta_t_PU.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_t_PU);
-    //  Delta_t_PP.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_t_PP);                               
-    //  Delta_Dens_PP.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_Dens_PP);
-    //  Delta_IVK.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_IVK);            
-    //  ZSk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.ZSk);                                    
+      Delta_t_PU.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_tPU);
+      Delta_t_PP.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_tPP);                               
+      Delta_Dens_PP.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_DensPP);
+      Delta_IVK.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.deltaIVK);            
+      ZSk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.ZSk);                                    
 
-    //  Table1SourceDataEnding.PrintRow(3);     
-    //  Table1SourceDataEnding.PrintColumns();           
+      Table1SourceDataEnding.PrintRow(3);     
+      Table1SourceDataEnding.PrintColumns();           
     }
 
     private void Table2Results_ManualBuild(object sender, EventArgs e)
     {                                                                                                                               
       //Setup Columns width
-    //  int sumDynamicCols=Table2Results.ColumnCount;
-    //  float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-    //  for (int w = 0; w &lt; (Table2Results.ColumnCount); w++)                 
-    //  {
-    //    Table2Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-    //  }      
+      int sumDynamicCols=Table2Results.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+      for (int w = 0; w &lt; (Table2Results.ColumnCount); w++)                 
+      {
+        Table2Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
          
       //Draw Fixed rows
-    //  for (int n = 0; n &lt; Table2Results.FixedRows; n++)
-    //  {
-    //    Table2Results.PrintRow(n);
-    //    Table2Results.PrintColumns();                                             
-    //  }
+      for (int n = 0; n &lt; Table2Results.FixedRows; n++)
+      {
+        Table2Results.PrintRow(n);
+        Table2Results.PrintColumns();                                             
+      }
          
       //Fill table with data
-    //  for (int n = 0; n &lt; (listTable2Results.Count); n++)
-    //  {
-    //    SerRow.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2Results[n].Ser, listTable2Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
-    //    Q_jik.Text = tools.GetNormalizedValue(listTable2Results[n].Q_jik);
-    //    Detector.Text =  tools.GetNormalizedValue(listTable2Results[n].Detector);
-    //    T_jik.Text = tools.GetNormalizedValue(listTable2Results[n].T_jik);
-    //    t_PU_jik.Text = tools.GetNormalizedValue(listTable2Results[n].t_PU_jik);
-    //    P_PU_jik.Text = tools.GetNormalizedValue(listTable2Results[n].P_PU_jik);
-    //    Dens_jik.Text = tools.GetNormalizedValue(listTable2Results[n].Dens_jik);
-    //    DensTemp_jik.Text =  tools.GetNormalizedValue(listTable2Results[n].DensTemp_jik);
+      for (int n = 0; n &lt; (listTable2Results.Count); n++)
+      {
+        SerRow.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2Results[n].ser, listTable2Results[n].row);//+ &quot; | &quot; + (n+1).ToString();
+        Q_jik.Text = tools.GetNormalizedValue(listTable2Results[n].Q_jik);
+        Detector.Text =  tools.GetNormalizedValue(listTable2Results[n].Det);
+        T_jik.Text = tools.GetNormalizedValue(listTable2Results[n].T_jik);
+        t_PU_jik.Text = tools.GetNormalizedValue(listTable2Results[n].t_PU_jik);
+        P_PU_jik.Text = tools.GetNormalizedValue(listTable2Results[n].P_PU_jik);
+        Dens_jik.Text = tools.GetNormalizedValue(listTable2Results[n].dens_PP_jik);
+        DensTemp_jik.Text =  tools.GetNormalizedValue(listTable2Results[n].t_PP_jik);
             
-    //    Table2Results.PrintRow(3);     
-    //    Table2Results.PrintColumns();  
-    //  }                  
+        Table2Results.PrintRow(3);     
+        Table2Results.PrintColumns();  
+      }                  
     }
 
     private void Table2ResultsEnding_ManualBuild(object sender, EventArgs e)
     {
                               
       //Setup Columns widths as previous table
-    //  for (int i = 0; i &lt; (Table2ResultsEnding.ColumnCount); i++)
-    //  {          
-    //    Table2ResultsEnding.Columns[i].Width =  Table2Results.Columns[i].Width;
-    //  }
+      for (int i = 0; i &lt; (Table2ResultsEnding.ColumnCount); i++)
+      {          
+        Table2ResultsEnding.Columns[i].Width =  Table2Results.Columns[i].Width;
+      }
           
       //Draw Fixed rows
-    //  for (int n = 0; n &lt; Table2ResultsEnding.FixedRows; n++)
-    //  {
-    //    Table2ResultsEnding.PrintRow(n);
-    //    Table2ResultsEnding.PrintColumns();                                             
-    //  }
+      for (int n = 0; n &lt; Table2ResultsEnding.FixedRows; n++)
+      {
+        Table2ResultsEnding.PrintRow(n);
+        Table2ResultsEnding.PrintColumns();                                             
+      }
          
       //Fill table with data
-    //  for (int n = 0; n &lt; (listTable2Results.Count); n++)
-    //  {
-    //    SerRow2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2Results[n].Ser, listTable2Results[n].Row);//+ &quot; | &quot; + (n+1).ToString();
-    //    DensPress_jik.Text =  tools.GetNormalizedValue(listTable2Results[n].DensPress_jik);
-    //    Beta_jik.Text = tools.GetNormalizedValue(listTable2Results[n].Beta_jik);
-    //    N_jik.Text = tools.GetNormalizedValue(listTable2Results[n].N_jik);
-    //    M_jik.Text = tools.GetNormalizedValue(listTable2Results[n].M_jik);
-    //    K_jik.Text = tools.GetNormalizedValue(listTable2Results[n].K_jik);
+      for (int n = 0; n &lt; (listTable2Results.Count); n++)
+      {
+        SerRow2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2Results[n].ser, listTable2Results[n].row);//+ &quot; | &quot; + (n+1).ToString();
+        DensPress_jik.Text =  tools.GetNormalizedValue(listTable2Results[n].P_PP_jik);
+        Beta_jik.Text = tools.GetNormalizedValue(listTable2Results[n].beta_jik);
+        N_jik.Text = tools.GetNormalizedValue(listTable2Results[n].N_jik);
+        M_jik.Text = tools.GetNormalizedValue(listTable2Results[n].Mpu_jik);
+        K_jik.Text = tools.GetNormalizedValue(listTable2Results[n].Kpm_jik);
 
-    //    Table2ResultsEnding.PrintRow(3);     
-    //    Table2ResultsEnding.PrintColumns();  
-    //  }
+        Table2ResultsEnding.PrintRow(3);     
+        Table2ResultsEnding.PrintColumns();  
+      }
     }
       
     private void Table3Results_ManualBuild(object sender, EventArgs e)
     {
       //Setup Columns width
-    //  int sumDynamicCols=Table3Results.ColumnCount;
-    //  float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-    //  for (int w = 0; w &lt; (Table3Results.ColumnCount); w++)                 
-    //  {
-    //    Table3Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-    //  }      
+      int sumDynamicCols=Table3Results.ColumnCount;
+      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+      for (int w = 0; w &lt; (Table3Results.ColumnCount); w++)                 
+      {
+        Table3Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+      }      
          
       //Draw Fixed rows 
-    //  for (int n = 0; n &lt; Table3Results.FixedRows; n++)
-    //  {
-    //    Table3Results.PrintRow(n);
-    //    Table3Results.PrintColumns();                                             
-    //  }
+      for (int n = 0; n &lt; Table3Results.FixedRows; n++)
+      {
+        Table3Results.PrintRow(n);
+        Table3Results.PrintColumns();                                             
+      }
              
       //Fill table with data
-    //  for (int n = 0; n &lt; (listPointsTable3.Count); n++)
-    //  {
-    //    Point.Text =  listPointsTable3[n].Point;
-    //    Q_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].Q_jk);
-    //    K_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].K_jk);
-    //    S_jk.Text =tools.GetNormalizedValue( listPointsTable3[n].S_jk);
-    //    n_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].n_jk);
-    //    S0_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].S0_jk);
-    //    t095_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].t095_jk);
-    //    e_jk.Text =  tools.GetNormalizedValue(listPointsTable3[n].e_jk);
+      for (int n = 0; n &lt; (listPointsTable3.Count); n++)
+      {
+        Point.Text =  listPointsTable3[n].ser;
+        Q_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].Q_jk);
+        K_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].Kpm_jk);
+        S_jk.Text =tools.GetNormalizedValue( listPointsTable3[n].S_jk);
+        n_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].n_jk);
+        S0_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].S0_jk);
+        t095_jk.Text = tools.GetNormalizedValue(listPointsTable3[n].t095_jk);
+        e_jk.Text =  tools.GetNormalizedValue(listPointsTable3[n].e_jk);
            
-    //    Table3Results.PrintRow(3);     
-    //    Table3Results.PrintColumns();  
-    //  }              
+        Table3Results.PrintRow(3);     
+        Table3Results.PrintColumns();  
+      }              
     }
       
     private void Table3ResultsEnding_ManualBuild(object sender, EventArgs e)
     {     
       //Setup Columns widths as previous table
-    //  for (int i = 0; i &lt; (Table3ResultsEnding.ColumnCount); i++)
-    //  {          
-    //    Table3ResultsEnding.Columns[i].Width =  Table3Results.Columns[i].Width;
-    //  }
+      for (int i = 0; i &lt; (Table3ResultsEnding.ColumnCount); i++)
+      {          
+        Table3ResultsEnding.Columns[i].Width =  Table3Results.Columns[i].Width;
+      }
           
       //Draw Fixed rows
-    //  for (int n = 0; n &lt; Table3ResultsEnding.FixedRows; n++)
-    //  {
-    //    Table3ResultsEnding.PrintRow(n);
-    //    Table3ResultsEnding.PrintColumns();                                             
-    //  }                   
+      for (int n = 0; n &lt; Table3ResultsEnding.FixedRows; n++)
+      {
+        Table3ResultsEnding.PrintRow(n);
+        Table3ResultsEnding.PrintColumns();                                             
+      }                   
          
       //Fill table with data
-    //  for (int n = 0; n &lt; (listPointsTable3.Count); n++)
-    //  {
-    //    Point2.Text =  listPointsTable3[n].Point;
-    //    Teta_tk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Teta_tk);
-    //    Teta_pk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Teta_pk);
-    //    Teta_Z_jk.Text =tools.GetNormalizedValue(listPointsTable3[n].Teta_Z_jk);
-    //    Teta_Sum_jk.Text =tools.GetNormalizedValue(listPointsTable3[n].Teta_Sum_jk);
-    //    Delta_jk.Text =tools.GetNormalizedValue(listPointsTable3[n].Delta_jk);
-    //    Delta_k.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Delta_k);
+      for (int n = 0; n &lt; (listPointsTable3.Count); n++)
+      {
+        Point2.Text =  listPointsTable3[n].ser;
+        //Teta_tk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Teta_tk);
+        //Teta_pk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Teta_pk);
+        Teta_Z_jk.Text =tools.GetNormalizedValue(listPointsTable3[n].Teta_Z_jk);
+        Teta_Sum_jk.Text =tools.GetNormalizedValue(listPointsTable3[n].Teta_Sum_jk);
+        Delta_jk.Text =tools.GetNormalizedValue(listPointsTable3[n].delta_jk);
+        //Delta_k.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Delta_k);
             
         //RowSpans
-    //    for (int i = 0; i &lt; (Table3ResultsEnding.ColumnCount); i++)
-    //    {          
-    //      switch(i)
-    //      {
-    //        case 1:
-    //        case 2:  
-    //        case 6:
-    //          Table3ResultsEnding[i,3].RowSpan =  listPointsTable3.Count;
-    //          break;  
-    //      }
-    //    }
-    //    Table3ResultsEnding.PrintRow(3);     
-    //    Table3ResultsEnding.PrintColumns();  
-    //  }      
+        for (int i = 0; i &lt; (Table3ResultsEnding.ColumnCount); i++)
+        {          
+          switch(i)
+          {
+            case 1:
+            case 2:  
+            case 6:
+              Table3ResultsEnding[i,3].RowSpan =  listPointsTable3.Count;
+              break;  
+          }
+        }
+        Table3ResultsEnding.PrintRow(3);     
+        Table3ResultsEnding.PrintColumns();  
+      }      
     }
 
     public void  DrawTableConclusion()
@@ -456,6 +457,8 @@ namespace FastReport
           <TableCell Name="Oil_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Oil_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
+      <TextObject Name="Text1" Left="-9450" Top="-9450" Width="94.5" Height="18.9" Text="D_V0" Font="Arial, 10pt"/>
+      <TextObject Name="Text4" Left="-9450" Top="-9450" Width="94.5" Height="18.9" Text="D_V0" Font="Arial, 10pt"/>
     </ReportTitleBand>
     <DataBand Name="DataBandTable1SourceData" Top="176.17" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="558.4" Height="79.38" FixedRows="3" ManualBuildEvent="Table1SourceData_ManualBuild">
@@ -500,9 +503,9 @@ namespace FastReport
         <TableRow Name="baseRowTableSourceData" Height="15.12">
           <TableCell Name="DetName" Border.Lines="All" Text="DetName" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="V0" Border.Lines="All" Text="V0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="m_D" Border.Lines="All" Text="m_D" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="m_S" Border.Lines="All" Text="m_S" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="m_E" Border.Lines="All" Text="m_E" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="D_V0" Border.Lines="All" Text="D_V0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="S_V0" Border.Lines="All" Text="S_V0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="E_V0" Border.Lines="All" Text="E_V0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Alpha_t" Border.Lines="All" Text="Alpha_t" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="6" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Teta_Sum_0" Border.Lines="All" Text="Teta_Sum_0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Teta_V_0" Border.Lines="All" Text="Teta_V_0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
@@ -545,6 +548,7 @@ namespace FastReport
           <TableCell Name="ZSk" Border.Lines="All" Text="ZSk" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
+      <TextObject Name="Text2" Left="897.75" Top="37.8" Width="94.5" Height="18.9" Text="D_V0" Font="Arial, 10pt"/>
     </DataBand>
     <DataBand Name="DataBandTable2Results" Top="354.62" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table2Results" Top="7.56" Width="718.24" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table2Results_ManualBuild">
@@ -597,6 +601,7 @@ namespace FastReport
           <TableCell Name="DensTemp_jik" Border.Lines="All" Text="DensTemp_jik" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
+      <TextObject Name="Text5" Left="803.25" Top="28.35" Width="94.5" Height="18.9" Text="D_V0" Font="Arial, 10pt"/>
     </DataBand>
     <DataBand Name="DataBandTable2ResultsEnding" Top="443.84" Width="718.2" Height="86.94">
       <TableObject Name="Table2ResultsEnding" Top="7.56" Width="378" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table2ResultsEnding_ManualBuild">
@@ -639,6 +644,7 @@ namespace FastReport
           <TableCell Name="K_jik" Border.Lines="All" Text="K_jik" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
+      <TextObject Name="Text3" Left="888.3" Top="28.35" Width="94.5" Height="18.9" Text="D_V0" Font="Arial, 10pt"/>
     </DataBand>
     <DataBand Name="DataBandTable3Results" Top="533.07" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table3Results" Top="7.56" Width="718.23" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table3Results_ManualBuild">

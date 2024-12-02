@@ -74,7 +74,13 @@ namespace TN.Doc
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Il = list.Il;
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.RsuLineIndx = list.RsuLineIndx;
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Protokol = JsonDeserializeObject<Protokol>(ArrByteToString(list.Data.Protokol));
-            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo = JsonDeserializeObject<AdditionalInfo>(ArrByteToString(list.Data.AdditionalInfo));
+            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo = JsonDeserializeObject<AdditionalInfo>(ArrByteToString(list.Data.Protokol)) ?? new AdditionalInfo()
+            {
+                Place_PSP = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Protokol.Place_PSP,
+                Place_SIKN = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Protokol.Place_SIKN,
+                Place_Factory = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Protokol.Place_Factory,
+                Oil_Type = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Protokol.OilType
+            };
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DateTimeString = list.DateTimeString;
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DateTimeLong = list.DateTimeLong;
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.SiknId = list.SiknId;
@@ -393,6 +399,7 @@ namespace TN.Doc
     public class Table2
     {
         public string ser { get; set; }
+        public string row { get; set; }
         public string Q_jik { get; set; }
         public string Det { get; set; }
         public string T_jik { get; set; }
@@ -407,6 +414,14 @@ namespace TN.Doc
         public string Kpm_jik { get; set; }
         public string U_jik { get; set; }
         public string Uerror_jik { get; set; }
+        public string dens15_jik { get; set; }
+        public string alpha15_jik { get; set; }
+        public string CTS_jik { get; set; }
+        public string CPS_jik { get; set; }
+        public string CTL_PU_jik { get; set; }
+        public string CPL_PU_jik { get; set; }
+        public string CTL_PP_jik { get; set; }
+        public string CPL_PP_jik { get; set; }
     }
     public class Table3
     {
@@ -430,6 +445,9 @@ namespace TN.Doc
         public string Teta_Sum_jk { get; set; }
         public string delta_jk { get; set; }
         public string SK_jk { get; set; }
+        public string t_Sum_jk { get; set; }
+        public string S_Teta_jk { get; set; }
+        public string S_Sum_jk { get; set; }
     }
     public class AdditionalInfo
     {
