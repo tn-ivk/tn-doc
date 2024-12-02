@@ -785,12 +785,12 @@ function GetData() {
                     $('#ComboboxDocGUID').val() == 3 ||
                     $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
-                    $('#ButtonReview').prop('disabled', true);
-                    $('#ButtonEdit').prop('disabled', true);
+                    $('#ButtonReview').prop('hidden', true);
+                    $('#ButtonEdit').prop('hidden', true);
                 } else {
                     $('#ButtonSave').prop('disabled', false);
-                    $('#ButtonReview').prop('disabled', false);
-                    $('#ButtonEdit').prop('disabled', false);
+                    $('#ButtonReview').prop('hidden', false);
+                    $('#ButtonEdit').prop('hidden', false);
                 }
 
                 if ($('#ComboboxDocGUID').val() == 1) {
