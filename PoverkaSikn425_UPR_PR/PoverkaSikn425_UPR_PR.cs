@@ -6,10 +6,9 @@ using System.Linq;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using TN.Doc;
 using TN.DocData;
 
-namespace PoverkaSikn425_UPR_PR
+namespace TN.Doc
 {
     public class PoverkaSikn425_UPR_PR : DocGeneral
     {
