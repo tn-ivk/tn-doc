@@ -43,7 +43,7 @@ namespace PoverkaSikn425_PR_PU
                     {
                         Id = item.id,
                         DT = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(item.DateTimeLong).ToString("dd.MM.yy HH:mm"),
-                        Description = $"{ArrByteToString(item.IL_Name)}"
+                        //Description = $"{ArrByteToString(item.IL_Name)}"
                     });
                 }
             }
@@ -72,16 +72,17 @@ namespace PoverkaSikn425_PR_PU
             doc.Doc.Settings.Dictionarys.Licenses = CfgGeneral.Doc.Settings.Dictionarys.Licenses;
 
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.id = list.id;
-            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.IL = list.IL;
-            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.UPR_LineIndx = list.UPR_LineIndx;
+            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Il = list.Il;
+            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.RsuLineIndx = list.RsuLineIndx;
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.Protokol = JsonDeserializeObject<Protokol>(ArrByteToString(list.Data.Protokol));
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo = JsonDeserializeObject<AdditionalInfo>(ArrByteToString(list.Data.AdditionalInfo));
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DateTimeString = list.DateTimeString;
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DateTimeLong = list.DateTimeLong;
-            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.BIK_ID = list.BIK_ID;
-            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.IL_Name = ArrByteToString(list.IL_Name);
+            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.SiknId = list.SiknId;
+            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DirId = list.DirId;
+            ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.IlName = ArrByteToString(list.IlName);
 
-            string fileName = string.Format("{0}_Поверка МИ 3312-2011 МПР по ПУ",
+            string fileName = string.Format("{0}_Поверка СИКН 425 МПР по ПУ",
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DateTimeString.Replace(":", "."));
             doc.Doc.Settings.General.FileNameForExportDoc = $"{fileName}";
 
@@ -243,21 +244,23 @@ namespace PoverkaSikn425_PR_PU
     }
 
 
-    [Table("TablePoverkaSikn425_PR_PU")]
+    //[Table("TablePoverkaSikn425_PR_PU")]
+    [Table("Msikn425MprByProver")]
     public class TablePoverkaSikn425_PR_PUList
     {
         [Key, ForeignKey("Data")]
         public int id { get; set; }
-        public int IL { get; set; }
-        public int UPR_LineIndx { get; set; }
+        public int Il { get; set; }
+        public int RsuLineIndx { get; set; }
         public string DateTimeString { get; set; }
         public long DateTimeLong { get; set; }
-        public int BIK_ID { get; set; }
-        public byte[] IL_Name { get; set; }
+        public int SiknId { get; set; }
+        public int DirId { get; set; }
+        public byte[] IlName { get; set; }
         public TablePoverkaSikn425_PR_PUData Data { get; set; }
     }
 
-    [Table("TablePoverkaSikn425_PR_PU")]
+    [Table("Msikn425MprByProver")]
     public class TablePoverkaSikn425_PR_PUData
     {
         [Key]
@@ -334,14 +337,15 @@ namespace PoverkaSikn425_PR_PU
     public class TablePoverkaSikn425_PR_PU
     {
         public int id { get; set; }
-        public int IL { get; set; }
-        public int UPR_LineIndx { get; set; }
+        public int Il { get; set; }
+        public int RsuLineIndx { get; set; }
         public Protokol Protokol { get; set; }
         public AdditionalInfo AdditionalInfo { get; set; }
         public string DateTimeString { get; set; }
         public long DateTimeLong { get; set; }
-        public int BIK_ID { get; set; }
-        public string IL_Name { get; set; }
+        public int SiknId { get; set; }
+        public int DirId { get; set; }
+        public string IlName { get; set; }
     }
     public class Protokol
     {
