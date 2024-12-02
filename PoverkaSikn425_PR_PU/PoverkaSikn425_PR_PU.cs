@@ -348,68 +348,87 @@ namespace TN.Doc
     }
     public class Protokol
     {
-        public List<string> DetName { get; set; }
+        public string Place_PSP { get; set; }
+        public string Place_SIKN { get; set; }
+        public string Place_Factory { get; set; }
+        public MprInfo MprInfo { get; set; }
+        public DeviceInfo PuInfo { get; set; }
+        public DeviceInfo PpInfo { get; set; }
+        public DeviceInfo IvkInfo { get; set; }
         public string OilType { get; set; }
         public Table1 Table1 { get; set; }
         public List<Table2> Table2 { get; set; }
         public Table3 Table3 { get; set; }
     }
+    
+    public class MprInfo
+    {
+        public string LineName { get; set; }
+        public DeviceInfo Sensor { get; set; }
+        public DeviceInfo Pep { get; set; }
+    }
+    
+    public class DeviceInfo
+    {
+        public string DevType { get; set; }
+        public string DevNumb { get; set; }
+    }
+    
     public class Table1
     {
         public List<string> DetName { get; set; }
         public List<string> V0 { get; set; }
-        public string m_D { get; set; }
-        public string m_S { get; set; }
-        public string m_E { get; set; }
-        public string Alpha_t { get; set; }
-        public List<string> Teta_Sum_0 { get; set; }
-        public List<string> Teta_V_0 { get; set; }
-        public string Delta_t_PU { get; set; }
-        public string Delta_t_PP { get; set; }
-        public string Delta_Dens_PP { get; set; }
-        public string Delta_IVK { get; set; }
+        public string D_V0 { get; set; }
+        public string S_V0 { get; set; }
+        public string E_V0 { get; set; }
+        public string alpha_t { get; set; }
+        public List<string> TetaSum0 { get; set; }
+        public List<string> TetaV0 { get; set; }
+        public string Delta_tPU { get; set; }
+        public string Delta_tPP { get; set; }
+        public string Delta_DensPP { get; set; }
+        public string deltaIVK { get; set; }
         public string ZSk { get; set; }
     }
     public class Table2
     {
-        public string Ser { get; set; }
-        public string Row { get; set; }
+        public string ser { get; set; }
         public string Q_jik { get; set; }
-        public string Detector { get; set; }
+        public string Det { get; set; }
         public string T_jik { get; set; }
         public string t_PU_jik { get; set; }
         public string P_PU_jik { get; set; }
-        public string Dens_jik { get; set; }
-        public string DensTemp_jik { get; set; }
-        public string DensPress_jik { get; set; }
-        public string Beta_jik { get; set; }
+        public string dens_PP_jik { get; set; }
+        public string t_PP_jik { get; set; }
+        public string P_PP_jik { get; set; }
+        public string beta_jik { get; set; }
         public string N_jik { get; set; }
-        public string M_jik { get; set; }
-        public string K_jik { get; set; }
+        public string Mpu_jik { get; set; }
+        public string Kpm_jik { get; set; }
         public string U_jik { get; set; }
-        public string U_ERROR_jik { get; set; }
+        public string Uerror_jik { get; set; }
     }
     public class Table3
     {
-        public string Teta_tk { get; set; }
-        public string Teta_pk { get; set; }
-        public string Delta_k { get; set; }
+        public string Teta_t_k { get; set; }
+        public string Teta_p_k { get; set; }
+        public string delta_k { get; set; }
         public List<Points> Point { get; set; }
     }
     public class Points
     {
-        public string Point { get; set; }
+        public string ser { get; set; }
         public string Q_jk { get; set; }
-        public string K_jk { get; set; }
+        public string Kpm_jk { get; set; }
         public string S_jk { get; set; }
-        public string S_jk_ERROR { get; set; }
+        public string S_error_jk { get; set; }
         public string n_jk { get; set; }
         public string S0_jk { get; set; }
         public string t095_jk { get; set; }
         public string e_jk { get; set; }
         public string Teta_Z_jk { get; set; }
         public string Teta_Sum_jk { get; set; }
-        public string Delta_jk { get; set; }
+        public string delta_jk { get; set; }
         public string SK_jk { get; set; }
     }
     public class AdditionalInfo
