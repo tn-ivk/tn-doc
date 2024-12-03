@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_UPR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/02/2024 23:51:51" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_UPR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/03/2024 12:23:01" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -89,16 +89,12 @@ namespace FastReport
     public void DrawTableHeader()
     {
       List &lt;TN.Doc.PRs_Info&gt; listPRs_Info;
-      listPRs_Info = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PRs_Info.Where(i =&gt; ! i.PR_Type.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.PR_Type) == false).ToList();
+      listPRs_Info = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprOsuInfo.Where(i =&gt; ! i.Sensor.DevType.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Sensor.DevType) == false).ToList();
          
       if (listPRs_Info.Count == 0)
-      listPRs_Info.Add(new TN.Doc.PRs_Info(){ PR_Type = &quot;&quot;, 
-      PR_FactoryNumber = &quot;&quot;, 
-      PR_LineName = &quot;&quot;, 
-      MM_Sensor_Type = &quot;&quot;, 
-      MM_Sensor_DU = &quot;&quot;, 
-      MM_Sensor_FactoryNumber = &quot;&quot;, 
-      MM_PEP = &quot;&quot;, MM_PEP_FactoryNumber = &quot;&quot; });
+      listPRs_Info.Add(new TN.Doc.MprInfo(){ LineName = &quot;&quot;, 
+      Sensor = new TN.Doc.MprInfo() { DevType = &quot;&quot;, DevNumb = &quot;&quot; }, 
+      Pep = new TN.Doc.MprInfo() { DevType = &quot;&quot;, DevNumb = &quot;&quot; }});
       
       //Setup Columns width
       TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
@@ -109,22 +105,18 @@ namespace FastReport
         DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.Place_SIKN, 
         DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.Place_PSP,
         DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.Place_Factory);
-      UPR_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.UPR_Type;
-      UPR_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.UPR_FactoryNumber;
-      PU_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PU_Type;
-      PU_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PU_FactoryNumber;
-      PP_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PP_Type;
-      PP_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PP_FactoryNumber;
+      UPR_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevType;
+      UPR_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevNumb;
   
       switch(listPRs_Info.Count)
       {
         case 1:
           PRs_Info.Text=&quot;СРМ:&quot;;
-          MM_Sensor_Type.Text=listPRs_Info[0].MM_Sensor_Type;
-          MM_Sensor_FactoryNumber.Text=listPRs_Info[0].MM_Sensor_FactoryNumber;
-          PR_LineName.Text = listPRs_Info[0].PR_LineName;
-          MM_PEP.Text = listPRs_Info[0].MM_PEP;
-          MM_PEP_FactoryNumber.Text = listPRs_Info[0].MM_PEP_FactoryNumber;
+          MM_Sensor_Type.Text=listPRs_Info[0].Sensor.DevType;
+          MM_Sensor_FactoryNumber.Text=listPRs_Info[0].Sensor.DevNumb;
+          PR_LineName.Text = listPRs_Info[0].LineName;
+          MM_PEP.Text = listPRs_Info[0].Pep.DevType;
+          MM_PEP_FactoryNumber.Text = listPRs_Info[0].Pep.DevNumb;
           break;  
             
         default:
@@ -161,19 +153,19 @@ namespace FastReport
               if ((i % 2) == 0)
               {
                 TablePRs[0,i].Text= String.Format(&quot;СРМ{0}:&quot;, tempCounter+1);
-                TablePRs[3,i].Text= listPRs_Info[tempCounter].MM_Sensor_Type;
-                TablePRs[5,i].Text= listPRs_Info[tempCounter].MM_Sensor_FactoryNumber;
-                TablePRs[7,i].Text= listPRs_Info[tempCounter].PR_LineName;
-                TablePRs[3,i+1].Text= listPRs_Info[tempCounter].MM_PEP;
-                TablePRs[5,i+1].Text= listPRs_Info[tempCounter].MM_PEP_FactoryNumber;                  
+                TablePRs[3,i].Text= listPRs_Info[tempCounter].Sensor.DevType;
+                TablePRs[5,i].Text= listPRs_Info[tempCounter].Sensor.DevNumb;
+                TablePRs[7,i].Text= listPRs_Info[tempCounter].LineName;
+                TablePRs[3,i+1].Text= listPRs_Info[tempCounter].Pep.DevType;
+                TablePRs[5,i+1].Text= listPRs_Info[tempCounter].Pep.DevNumb;                  
                 tempCounter++;
               }
             }
           }
           break;
       }
-      IVK_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.IVK_Type;
-      IVK_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.IVK_FactoryNumber;
+      IVK_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.IvkInfo.DevType;
+      IVK_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.IvkInfo.DevNumb;
       Oil_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.Protokol.OilType;
       }
               
@@ -188,7 +180,7 @@ namespace FastReport
       }      
          
       //Fill table with data                 
-      Teta_M.Text =  tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_UPR_PR.Protokol.Table1.Teta_M);
+      Teta_M.Text =  tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_UPR_PR.Protokol.Table1.TetaM);
       Delta_t_UPR.Text =  tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_UPR_PR.Protokol.Table1.Delta_t_UPR);
       Delta_t_PP.Text =  tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_UPR_PR.Protokol.Table1.Delta_t_PP);
       Delta_Dens_PP.Text =  tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_UPR_PR.Protokol.Table1.Delta_Dens_PP);
@@ -399,8 +391,8 @@ namespace FastReport
     <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
   <ReportPage Name="Page" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
-    <ReportTitleBand Name="ReportTitle" Width="718.2" Height="204.12" CanGrow="true" CanShrink="true" CanBreak="true" AfterLayoutEvent="ReportTitle_AfterLayout">
-      <TableObject Name="TableHeader06" Top="185.22" Width="245.7" Height="18.9">
+    <ReportTitleBand Name="ReportTitle" Width="718.2" Height="189" CanGrow="true" CanShrink="true" CanBreak="true" AfterLayoutEvent="ReportTitle_AfterLayout">
+      <TableObject Name="TableHeader06" Top="156.87" Width="245.7" Height="18.9">
         <TableColumn Name="Column200" Width="94.5"/>
         <TableColumn Name="Column201" Width="151.2" AutoSize="true"/>
         <TableRow Name="Row158">
@@ -408,29 +400,46 @@ namespace FastReport
           <TableCell Name="Oil_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Oil_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="TableHeader05" Top="162.54" Width="395.01" Height="18.9">
-        <TableColumn Name="Column276" Width="34.02"/>
-        <TableColumn Name="Column277" Width="20.79"/>
-        <TableColumn Name="Column278" Width="151.2" AutoSize="true"/>
-        <TableColumn Name="Column279" Width="37.8"/>
-        <TableColumn Name="Column280" Width="151.2" AutoSize="true"/>
-        <TableRow Name="Row177">
-          <TableCell Name="Cell1448" Text="ИВК:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1449" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="IVK_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="IVK_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1451" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="IVK_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="IVK_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+      <TableObject Name="TableHeader03" Top="60.48" Width="417.69" Height="18.9">
+        <TableColumn Name="Column193" Width="56.7"/>
+        <TableColumn Name="Column194" Width="20.79"/>
+        <TableColumn Name="Column195" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column196" Width="37.8"/>
+        <TableColumn Name="Column197" Width="151.2" AutoSize="true"/>
+        <TableRow Name="Row150">
+          <TableCell Name="Cell1124" Text="СРМ РСУ:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1125" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="UPR_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1127" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="UPR_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="TablePRs" Top="120.96" Width="718.2" Height="37.8">
-        <TableColumn Name="Column267" Width="41.58"/>
-        <TableColumn Name="Column268" Width="94.5"/>
-        <TableColumn Name="Column269" Width="34.02"/>
-        <TableColumn Name="Column270" Width="207.9"/>
+      <TableObject Name="TableHeader01" Width="502.39" Height="41.58">
+        <TableColumn Name="Column143" Width="502.39"/>
+        <TableRow Name="Row110" Height="22.68">
+          <TableCell Name="ProtokolNum" Text="ProtokolNum" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.9"/>
+        </TableRow>
+        <TableRow Name="Row111">
+          <TableCell Name="Cell811" Text="определения метрологических характеристик СРМ РСУ" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="TableHeader02" Top="41.58" Width="674.73" Height="18.9">
+        <TableColumn Name="Column186" Width="145.53"/>
+        <TableColumn Name="Column187" Width="529.2" AutoSize="true"/>
+        <TableRow Name="Row144">
+          <TableCell Name="Cell1082" Text="Место проведения поверки:" Padding="0, 0, 0, 0" AllowExpressions="false" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Place_SIKN" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Place_SIKN" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+        </TableRow>
+      </TableObject>
+      <TableObject Name="TablePRs" Top="92.61" Width="721.98" Height="37.8" PrintOnParent="true">
+        <TableColumn Name="Column267" Width="56.7"/>
+        <TableColumn Name="Column268" Width="90.72"/>
+        <TableColumn Name="Column269" Width="26.46"/>
+        <TableColumn Name="Column270" Width="196.56"/>
         <TableColumn Name="Column271" Width="41.58"/>
-        <TableColumn Name="Column272" Width="207.9"/>
+        <TableColumn Name="Column272" Width="196.56"/>
         <TableColumn Name="Column273" Width="52.92"/>
-        <TableColumn Name="Column274" Width="37.8"/>
+        <TableColumn Name="Column274" Width="60.48"/>
         <TableRow Name="Row174" AutoSize="true">
           <TableCell Name="PRs_Info" Text="PRs_Info" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1417" Text="Датчик:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
@@ -452,53 +461,23 @@ namespace FastReport
           <TableCell Name="Cell1446" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="TableHeader03" Top="60.48" Width="395.01" Height="56.7">
-        <TableColumn Name="Column193" Width="34.02"/>
-        <TableColumn Name="Column194" Width="20.79"/>
-        <TableColumn Name="Column195" Width="151.2" AutoSize="true"/>
-        <TableColumn Name="Column196" Width="37.8"/>
-        <TableColumn Name="Column197" Width="151.2" AutoSize="true"/>
-        <TableRow Name="Row150">
-          <TableCell Name="Cell1124" Text="УПР:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1125" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="UPR_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1127" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="UPR_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-        </TableRow>
-        <TableRow Name="Row151">
-          <TableCell Name="Cell1131" Text="ПУ:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1132" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="PU_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PU_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1134" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="PU_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PU_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-        </TableRow>
-        <TableRow Name="Row152">
-          <TableCell Name="Cell1138" Text="ПП:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1139" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="PP_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PP_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1141" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="PP_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PP_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+      <TableObject Name="TableHeader05" Top="134.19" Width="395.01" Height="18.9" PrintOnParent="true">
+        <TableColumn Name="Column276" Width="34.02"/>
+        <TableColumn Name="Column277" Width="20.79"/>
+        <TableColumn Name="Column278" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column279" Width="37.8"/>
+        <TableColumn Name="Column280" Width="151.2" AutoSize="true"/>
+        <TableRow Name="Row177">
+          <TableCell Name="Cell1448" Text="ИВК:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1449" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="IVK_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="IVK_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1451" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="IVK_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="IVK_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
-      <TableObject Name="TableHeader01" Width="502.39" Height="41.58">
-        <TableColumn Name="Column143" Width="502.39"/>
-        <TableRow Name="Row110" Height="22.68">
-          <TableCell Name="ProtokolNum" Text="ProtokolNum" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.9"/>
-        </TableRow>
-        <TableRow Name="Row111">
-          <TableCell Name="Cell811" Text="поверки УПР с помощью ПУ, ПП и СРМ по методике СИКН 425" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9"/>
-        </TableRow>
-      </TableObject>
-      <TableObject Name="TableHeader02" Top="41.58" Width="674.73" Height="18.9">
-        <TableColumn Name="Column186" Width="145.53"/>
-        <TableColumn Name="Column187" Width="529.2" AutoSize="true"/>
-        <TableRow Name="Row144">
-          <TableCell Name="Cell1082" Text="Место проведения поверки:" Padding="0, 0, 0, 0" AllowExpressions="false" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Place_SIKN" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Place_SIKN" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-        </TableRow>
-      </TableObject>
+      <TextObject Name="Text1" Left="-9450" Top="-9450" Width="94.5" Height="18.9" Text="δ ,&lt;br&gt;%" Font="Arial, 10pt"/>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1SourceData" Top="206.41" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable1SourceData" Top="191.67" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="358.45" Height="79.38" FixedRows="3">
         <TableColumn Name="Column4" Width="71.69"/>
         <TableColumn Name="Column5" Width="71.69"/>
@@ -535,7 +514,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2Results" Top="295.63" Width="718.2" Height="86.94">
+    <DataBand Name="DataBandTable2Results" Top="281.27" Width="718.2" Height="86.94">
       <TableObject Name="Table2Results" Top="7.56" Width="418.8" Height="79.38" FixedRows="3" ManualBuildEvent="Table2Results_ManualBuild">
         <TableColumn Name="Column281" Width="69.8"/>
         <TableColumn Name="Column282" Width="69.8"/>
@@ -577,7 +556,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3Results" Top="384.86" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable3Results" Top="370.88" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table3Results" Top="7.56" Width="718.24" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table3Results_ManualBuild">
         <TableColumn Name="Column158" Width="89.78"/>
         <TableColumn Name="Column159" Width="89.78"/>
@@ -629,7 +608,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3ResultsEnding" Top="474.08" Width="718.2" Height="86.94">
+    <DataBand Name="DataBandTable3ResultsEnding" Top="460.49" Width="718.2" Height="86.94">
       <TableObject Name="Table3ResultsEnding" Top="7.56" Width="378" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table3ResultsEnding_ManualBuild">
         <TableColumn Name="Column219" Width="60.48"/>
         <TableColumn Name="Column228" Width="75.6"/>
@@ -671,7 +650,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4Results" Top="563.31" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4Results" Top="550.09" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4Results" Top="7.56" Width="701.26" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4Results_ManualBuild">
         <TableColumn Name="Column33" Width="80.57"/>
         <TableColumn Name="Column34" Width="80.57"/>
@@ -728,7 +707,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable5Results" Top="652.53" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable5Results" Top="639.7" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table5Results" Top="7.56" Width="674.73" Height="79.38" GrowToBottom="true" FixedRows="3">
         <TableColumn Name="Column41" Width="68.04"/>
         <TableColumn Name="Column42" Width="68.04"/>
@@ -790,7 +769,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="741.76" Width="718.2" Height="136.08" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="729.31" Width="718.2" Height="136.08" CanShrink="true">
       <TableObject Name="TableConclusion2" Top="45.36" Width="525.42" Height="37.8">
         <TableColumn Name="Column144" Width="185.22"/>
         <TableColumn Name="Column176" Width="151.2"/>
@@ -834,7 +813,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="880.13" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="868.05" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

@@ -78,7 +78,10 @@ namespace TN.Doc
                     Place_PSP = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_PSP,
                     Place_SIKN = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_SIKN,
                     Place_Factory = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_Factory,
-                    Oil_Type = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.OilType
+                    Oil_Type = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.OilType,
+                    MprRsuInfo = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.MprRsuInfo,
+                    MprOsuInfo = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.MprOsuInfo,
+                    IvkInfo = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.IvkInfo
                 };;
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DateTimeString = list.DateTimeString;
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DateTimeLong = list.DateTimeLong;
@@ -492,19 +495,21 @@ namespace TN.Doc
         public string ProtokolNum { get; set; }
         public string ARM_Poverka_Result { get; set; }
         public string StaffData { get; set; }
-        public List<PRs_Info> PRs_Info { get; set; }
+        public MprInfo MprRsuInfo { get; set; }
+        public List<MprInfo> MprOsuInfo { get; set; }
+        public DeviceInfo IvkInfo { get; set; }
     }
-    public class PRs_Info
-    {
-        public string PR_Type { get; set; }
-        public string PR_FactoryNumber { get; set; }
-        public string PR_LineName { get; set; }
-        public string MM_Sensor_Type { get; set; }
-        public string MM_Sensor_DU { get; set; }
-        public string MM_Sensor_FactoryNumber { get; set; }
-        public string MM_PEP { get; set; }
-        public string MM_PEP_FactoryNumber { get; set; }
-    }
+    // public class PRs_Info
+    // {
+    //     public string PR_Type { get; set; }
+    //     public string PR_FactoryNumber { get; set; }
+    //     public string PR_LineName { get; set; }
+    //     public string MM_Sensor_Type { get; set; }
+    //     public string MM_Sensor_DU { get; set; }
+    //     public string MM_Sensor_FactoryNumber { get; set; }
+    //     public string MM_PEP { get; set; }
+    //     public string MM_PEP_FactoryNumber { get; set; }
+    // }
 
     #endregion
 
