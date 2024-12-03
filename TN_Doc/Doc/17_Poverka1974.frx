@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/03/2024 09:27:27" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/03/2024 14:17:37" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -140,12 +140,12 @@ namespace FastReport
     private void Table1SourceData_ManualBuild(object sender, EventArgs e)
     {                                                                                                                          
       //Setup Columns width                                                                                           
-      int sumDynamicCols=Table1SourceData.ColumnCount;                                                                                                                                
-      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                                                       
-      for (int w = 0; w &lt; (Table1SourceData.ColumnCount); w++)                                                                                                                                     
-      {                                                                                                                                                                                                                                           
-        Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;                                                                                                     
-      }      
+      //int sumDynamicCols=Table1SourceData.ColumnCount;                                                                                                                                
+      //float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                                                       
+      //for (int w = 0; w &lt; (Table1SourceData.ColumnCount); w++)                                                                                                                                     
+      //{                                                                                                                                                                                                                                           
+      //  Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;                                                                                                     
+      //}      
                                                                                                                
       //Draw Fixed rows                                                                               
       for (int n = 0; n &lt; Table1SourceData.FixedRows; n++)                                                                            
@@ -538,21 +538,21 @@ namespace FastReport
       </TableObject>
     </ReportTitleBand>
     <DataBand Name="DataBandTable1SourceData" Top="138.75" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
-      <TableObject Name="Table1SourceData" Top="7.56" Width="717.79" Height="94.5" FixedRows="4" ManualBuildEvent="Table1SourceData_ManualBuild">
-        <TableColumn Name="Column4" Width="50.65"/>
-        <TableColumn Name="Column5" Width="50.65"/>
-        <TableColumn Name="Column6" Width="50.65"/>
-        <TableColumn Name="Column7" Width="50.65"/>
-        <TableColumn Name="Column8" Width="50.65"/>
-        <TableColumn Name="Column9" Width="60.48"/>
-        <TableColumn Name="Column10" Width="50.65"/>
-        <TableColumn Name="Column11" Width="51.03"/>
-        <TableColumn Name="Column260" Width="50.65"/>
-        <TableColumn Name="Column261" Width="50.65"/>
-        <TableColumn Name="Column262" Width="50.27"/>
-        <TableColumn Name="Column263" Width="50.27"/>
-        <TableColumn Name="Column264" Width="50.27"/>
-        <TableColumn Name="Column265" Width="50.27"/>
+      <TableObject Name="Table1SourceData" Top="7.56" Width="717.5" Height="94.5" FixedRows="4" ManualBuildEvent="Table1SourceData_ManualBuild">
+        <TableColumn Name="Column4" Width="49.9"/>
+        <TableColumn Name="Column5" Width="49.9"/>
+        <TableColumn Name="Column6" Width="49.9"/>
+        <TableColumn Name="Column7" Width="49.9"/>
+        <TableColumn Name="Column8" Width="49.9"/>
+        <TableColumn Name="Column9" Width="68.8"/>
+        <TableColumn Name="Column10" Width="49.9"/>
+        <TableColumn Name="Column11" Width="49.9"/>
+        <TableColumn Name="Column260" Width="49.9"/>
+        <TableColumn Name="Column261" Width="49.9"/>
+        <TableColumn Name="Column262" Width="49.9"/>
+        <TableColumn Name="Column263" Width="49.9"/>
+        <TableColumn Name="Column264" Width="49.9"/>
+        <TableColumn Name="Column265" Width="49.9"/>
         <TableRow Name="Row139">
           <TableCell Name="Cell981" Text="Таблица 1 - Исходные данные" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="14"/>
           <TableCell Name="Cell982" Font="Arial, 10pt"/>
