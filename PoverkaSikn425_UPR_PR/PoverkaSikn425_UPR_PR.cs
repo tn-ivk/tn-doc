@@ -42,7 +42,7 @@ namespace TN.Doc
                     {
                         Id = item.id,
                         DT = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(item.DateTimeLong).ToString("dd.MM.yy HH:mm"),
-                        Description = $"{ArrByteToString(item.IL_Name)}"
+                        Description = $"{ArrByteToString(item.IlName)}"
                     });
                 }
             }
@@ -71,13 +71,20 @@ namespace TN.Doc
                 doc.Doc.Settings.Dictionarys.Licenses = CfgGeneral.Doc.Settings.Dictionarys.Licenses;
 
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.id = list.id;
-                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.IL = list.IL;
+                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Il = list.Il;
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol = JsonDeserializeObject<Protokol>(ArrByteToString(list.Data.Protokol));
-                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo = JsonDeserializeObject<AdditionalInfo>(ArrByteToString(list.Data.AdditionalInfo));
+                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo = JsonDeserializeObject<AdditionalInfo>(ArrByteToString(list.Data.AdditionalInfo)) ?? new AdditionalInfo()
+                {
+                    Place_PSP = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_PSP,
+                    Place_SIKN = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_SIKN,
+                    Place_Factory = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_Factory,
+                    Oil_Type = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.OilType
+                };;
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DateTimeString = list.DateTimeString;
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DateTimeLong = list.DateTimeLong;
-                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.BIK_ID = list.BIK_ID;
-                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.IL_Name = ArrByteToString(list.IL_Name);
+                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.SiknId = list.SiknId;
+                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DirId = list.DirId;
+                ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.IlName = ArrByteToString(list.IlName);
 
                 string fileName = string.Format("{0}_Поверка СИКН 425 УПР с помощью ПУ ПП и СРМ",
                     ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DateTimeString.Replace(":", "."));
@@ -437,12 +444,12 @@ namespace TN.Doc
     }
     public class Table4
     {
-        public string Point { get; set; }
+        public string ser { get; set; }
         public string Q_j { get; set; }
-        public string f_j { get; set; }
-        public string K_j { get; set; }
-        public string S_j { get; set; }
+        public string Km_MF_j { get; set; }
         public string n_j { get; set; }
+        public string S_j { get; set; }
+        public string S_error_j { get; set; }
         public string S0_j { get; set; }
         public string t095_j { get; set; }
         public string e_j { get; set; }
@@ -452,14 +459,21 @@ namespace TN.Doc
     {
         public string Q_min { get; set; }
         public string Q_max { get; set; }
-        public string K { get; set; }
+        public string Km_MF { get; set; }
         public string S0 { get; set; }
         public string e { get; set; }
         public string Teta_A { get; set; }
-        public string Teta_t { get; set; }
-        public string Teta_p { get; set; }
+        public string Teta_Z { get; set; }
+        public string t_P { get; set; }
+        public string Teta_Mt { get; set; }
+        public string P_P { get; set; }
+        public string Teta_Mp { get; set; }
         public string Teta_Sum { get; set; }
-        public string Delta { get; set; }
+        public string delta { get; set; }
+        public string delta_KMH_max { get; set; }
+        public string t_Sum { get; set; }
+        public string S_Teta { get; set; }
+        public string S_Sum { get; set; }
     }
     public class AdditionalInfo
     {

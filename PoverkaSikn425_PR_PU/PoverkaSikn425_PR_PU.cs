@@ -42,7 +42,7 @@ namespace TN.Doc
                     {
                         Id = item.id,
                         DT = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(item.DateTimeLong).ToString("dd.MM.yy HH:mm"),
-                        //Description = $"{ArrByteToString(item.IL_Name)}"
+                        Description = $"{ArrByteToString(item.IlName)}"
                     });
                 }
             }
