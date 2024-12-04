@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/04/2024 18:27:30" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMX_Sikn425_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/05/2024 01:20:52" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -67,9 +67,8 @@ namespace FastReport
       Page.RightMargin = General.PageSettings.RightMargin;
 
       // Load data into global lists
-      listTable2Results = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table2.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
-      //listPointsTable3 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Point.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;)   &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
-      listPointsTable3 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Point.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
+      listTable2Results = DataIVK.TableKmxSikn425PrPu.Protokol.Table2.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
+      listPointsTable3 = DataIVK.TableKmxSikn425PrPu.Protokol.Table3.Point.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
     
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();    
@@ -92,34 +91,34 @@ namespace FastReport
       TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
          
       // Fill table with data   
-      ProtokolNum.Text = &quot;П Р О Т О К О Л  № &quot; + DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.ProtokolNum;
+      ProtokolNum.Text = &quot;П Р О Т О К О Л  № &quot; + DataIVK.TableKmxSikn425PrPu.AdditionalInfo.ProtokolNum;
       Place_SIKN.Text = string.Format(&quot;СИКН №{0}, {1}, {2}&quot;, 
-        DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.PlaceSikn, 
-        DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.PlacePsp,
-        DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.PlaceFactory);
-      CPM_Type.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Sensor.DevType;
-      CPM_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Sensor.DevNumb;
-      CPM_LineName.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.LineName;
+        DataIVK.TableKmxSikn425PrPu.AdditionalInfo.PlaceSikn, 
+        DataIVK.TableKmxSikn425PrPu.AdditionalInfo.PlacePsp,
+        DataIVK.TableKmxSikn425PrPu.AdditionalInfo.PlaceFactory);
+      CPM_Type.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.MprInfo.Sensor.DevType;
+      CPM_FactoryNumber.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.MprInfo.Sensor.DevNumb;
+      CPM_LineName.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.MprInfo.LineName;
          
-      CPM_PEP_Type.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Pep.DevType;
-      CPM_PEP_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Pep.DevNumb;
+      CPM_PEP_Type.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.MprInfo.Pep.DevType;
+      CPM_PEP_FactoryNumber.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.MprInfo.Pep.DevNumb;
          
-      PU_Type.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.PuInfo.DevType;
-      PU_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.PuInfo.DevNumb;
-      PP_Type.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.PpInfo.DevType;
-      PP_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.PpInfo.DevNumb;
-      IVK_Type.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.IvkInfo.DevType;
-      IVK_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.IvkInfo.DevNumb;
-      Oil_Type.Text = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.OilType;
+      PU_Type.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.PuInfo.DevType;
+      PU_FactoryNumber.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.PuInfo.DevNumb;
+      PP_Type.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.PpInfo.DevType;
+      PP_FactoryNumber.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.PpInfo.DevNumb;
+      IVK_Type.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.IvkInfo.DevType;
+      IVK_FactoryNumber.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.IvkInfo.DevNumb;
+      Oil_Type.Text = DataIVK.TableKmxSikn425PrPu.Protokol.OilType;
     }
               
     private void Table1SourceData_ManualBuild(object sender, EventArgs e)
     {
       // Get data for Table
-      listTable1Detectors = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 &amp; String.IsNullOrEmpty(i) == false).ToList();
-      listTable1V0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.V0.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
-      listTable1Teta_Sum_0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.TetaSum0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
-      listTable1Teta_V_0 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.TetaV0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listTable1Detectors = DataIVK.TableKmxSikn425PrPu.Protokol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listTable1V0 = DataIVK.TableKmxSikn425PrPu.Protokol.Table1.V0.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listTable1Teta_Sum_0 = DataIVK.TableKmxSikn425PrPu.Protokol.Table1.TetaSum0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
+      listTable1Teta_V_0 = DataIVK.TableKmxSikn425PrPu.Protokol.Table1.TetaV0.Where(i =&gt; ! i.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i) == false).ToList();
 
       //Setup Columns width
       int sumDynamicCols=Table1SourceData.ColumnCount;
@@ -142,10 +141,10 @@ namespace FastReport
       {
         DetName.Text =  listTable1Detectors[n];
         V0.Text =  tools.GetNormalizedValue(listTable1V0[n]);        
-        D_V0.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.D_V0);
-        S_V0.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.S_V0);
-        E_V0.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.E_V0);
-        Alpha_t.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.alpha_t);
+        D_V0.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.D_V0);
+        S_V0.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.S_V0);
+        E_V0.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.E_V0);
+        Alpha_t.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.alpha_t);
         Teta_Sum_0.Text = tools.GetNormalizedValue(listTable1Teta_Sum_0[n]);        
         Teta_V_0.Text = tools.GetNormalizedValue(listTable1Teta_V_0[n]);        
                            
@@ -184,11 +183,11 @@ namespace FastReport
       }           
          
       //Fill table with data                 
-      Delta_t_PU.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_tPU);
-      Delta_t_PP.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_tPP);                               
-      Delta_Dens_PP.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.Delta_DensPP);
-      Delta_IVK.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.deltaIVK);            
-      ZSk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table1.ZSk);                                    
+      Delta_t_PU.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.Delta_tPU);
+      Delta_t_PP.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.Delta_tPP);                               
+      Delta_Dens_PP.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.Delta_DensPP);
+      Delta_IVK.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.deltaIVK);            
+      ZSk.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table1.ZSk);                                    
 
       Table1SourceDataEnding.PrintRow(3);     
       Table1SourceDataEnding.PrintColumns();           
@@ -308,9 +307,9 @@ namespace FastReport
         Table3ResultsEnding.PrintColumns();                                             
       }                   
          
-      Teta_tk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Teta_t_k);
-      Teta_pk.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Teta_p_k);
-      Delta_k.Text = tools.GetNormalizedValue(DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.delta_k);
+      Teta_tk.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table3.Teta_t_k);
+      Teta_pk.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table3.Teta_p_k);
+      Delta_k.Text = tools.GetNormalizedValue(DataIVK.TableKmxSikn425PrPu.Protokol.Table3.delta_k);
       
       //Fill table with data
       for (int n = 0; n &lt; (listPointsTable3.Count); n++)
@@ -343,9 +342,9 @@ namespace FastReport
       TableConclusion3.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)  * Units.Millimeters;
         
       // Fill Table with data
-      StaffData.Text = DataIVK.TablePoverkaSikn425_PR_PU.AdditionalInfo.StaffData;
+      StaffData.Text = DataIVK.TableKmxSikn425PrPu.AdditionalInfo.StaffData;
       DateTimeLong.Text = string.Format(&quot;Дата: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
-        (tools.UnixTimestampToDatetime(DataIVK.TablePoverkaSikn425_PR_PU.DateTimeLong)));               
+        (tools.UnixTimestampToDatetime(DataIVK.TableKmxSikn425PrPu.DateTimeLong)));               
       PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters; 
     }  
       
