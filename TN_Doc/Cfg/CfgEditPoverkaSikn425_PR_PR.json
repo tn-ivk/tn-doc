@@ -3,74 +3,74 @@
     {
       "Id": 1,
       "Use": true,
-      "Edit": false,
-      "Key": "Place_PSP",
+      "Edit": true,
+      "Key": "ProtokolNum",
       "Type": "text",
-      "Name": ""
+      "Name": "Номер протокола"
     },
     {
       "Id": 2,
       "Use": true,
       "Edit": false,
-      "Key": "Place_SIKN",
+      "Key": "Place_PSP",
       "Type": "text",
-      "Name": "Место проведения поверки"
+      "Name": "Место проведения"
     },
     {
       "Id": 3,
       "Use": true,
       "Edit": false,
-      "Key": "Place_Factory",
+      "Key": "Place_SIKN",
       "Type": "text",
-      "Name": ""
+      "Name": "Пункт приема сдачи нефти"
     },
     {
       "Id": 4,
       "Use": true,
       "Edit": false,
-      "Key": "UPR_Type",
+      "Key": "Place_Factory",
       "Type": "text",
-      "Name": "УПР: Тип"
+      "Name": "Наименование организации"
     },
     {
       "Id": 5,
       "Use": true,
       "Edit": false,
-      "Key": "UPR_FactoryNumber",
+      "Key": "CPM_RSU_Type",
       "Type": "text",
-      "Name": "УПР: Заводской №"
+      "Name": "СРМ РСУ. Датчик. Тип"
     },
     {
       "Id": 6,
       "Use": true,
       "Edit": false,
-      "Key": "PU_Type",
+      "Key": "CPM_RSU_FactoryNumber",
       "Type": "text",
-      "Name": "ПУ: Тип"
+      "Name": "СРМ РСУ. Датчик. Заводской №"
     },
     {
       "Id": 7,
       "Use": true,
       "Edit": false,
-      "Key": "PU_FactoryNumber",
+      "Key": "CPM_RSU_PEP_Type",
       "Type": "text",
-      "Name": "ПУ: Заводской №"
+      "Name": "СРМ РСУ. Преобразователь. Тип"
     },
     {
       "Id": 8,
       "Use": true,
       "Edit": false,
-      "Key": "PP_Type",
+      "Key": "CPM_RSU_PEP_FactoryNumber",
       "Type": "text",
-      "Name": "ПП: Тип"
+      "Name": "СРМ РСУ. Преобразователь. Заводской №"
     },
     {
       "Id": 9,
       "Use": true,
       "Edit": false,
-      "Key": "PP_FactoryNumber",
+      "Key": "CPM_RSU_LineName",
       "Type": "text",
-      "Name": "ПП: Заводской №"
+      "Name": "СРМ РСУ. Линия №"
     },
     {
       "Id": 10,
@@ -78,7 +78,7 @@
       "Edit": false,
       "Key": "IVK_Type",
       "Type": "text",
-      "Name": "ИВК: Тип"
+      "Name": "ИВК. Тип"
     },
     {
       "Id": 11,
@@ -86,7 +86,7 @@
       "Edit": false,
       "Key": "IVK_FactoryNumber",
       "Type": "text",
-      "Name": "ИВК: Заводской №"
+      "Name": "ИВК. Заводской №"
     },
     {
       "Id": 12,
@@ -100,20 +100,12 @@
       "Id": 13,
       "Use": true,
       "Edit": true,
-      "Key": "ProtokolNum",
-      "Type": "text",
-      "Name": "Номер протокола"
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "Заключение: МПР к дальнейшей эксплуатации"
     },
     {
       "Id": 14,
-      "Use": true,
-      "Edit": true,
-      "Key": "ARM_Poverka_Result",
-      "Type": "list",
-      "Name": "Заключение: УПР к дальнейшей эксплуатации"
-    },
-    {
-      "Id": 15,
       "Use": true,
       "Edit": true,
       "Key": "StaffData",

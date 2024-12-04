@@ -91,7 +91,7 @@ namespace TN.Doc
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DirId = list.DirId;
             ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.IlName = ArrByteToString(list.IlName);
 
-            string fileName = string.Format("{0}_Поверка СИКН 425 МПР по ПУ",
+            string fileName = string.Format("{0}_Поверка СИКН 425 СРМ ОСУ по ПУ",
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.DateTimeString.Replace(":", "."));
             doc.Doc.Settings.General.FileNameForExportDoc = $"{fileName}";
 

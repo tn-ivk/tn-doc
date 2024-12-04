@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/04/2024 17:20:44" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/04/2024 21:14:06" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -107,11 +107,11 @@ namespace FastReport
         DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlaceSikn, 
         DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlacePsp,
         DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlaceFactory);
-      UPR_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevType;
-      UPR_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevNumb;
-      UPR_PEP.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Pep.DevType;
-      PEP_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Pep.DevNumb;
-      UPR_LineName.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.LineName;
+      CPM_RSU_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevType;
+      CPM_RSU_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevNumb;
+      CPM_RSU_PEP_Type.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Pep.DevType;
+      CPM_RSU_PEP_FactoryNumber.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Pep.DevNumb;
+      CPM_RSU_LineName.Text = DataIVK.TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.LineName;
   
       switch(listPRs_Info.Count)
       {
@@ -460,19 +460,19 @@ namespace FastReport
           <TableCell Name="Cell1124" Text="СРМ РСУ:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1125" Text="Датчик:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1557" Text="Тип" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="UPR_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="CPM_RSU_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="CPM_RSU_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1127" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="UPR_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="CPM_RSU_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="CPM_RSU_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1559" Text="Линия №" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="UPR_LineName" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_LineName" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="CPM_RSU_LineName" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="CPM_RSU_LineName" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row182">
           <TableCell Name="Cell1552" Font="Arial, 10pt"/>
           <TableCell Name="Cell1553" Text="Преобразователь:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1558" Text="Тип" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="UPR_PEP" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="UPR_PEP" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" MergeMode="Vertical"/>
+          <TableCell Name="CPM_RSU_PEP_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="CPM_RSU_PEP_Type" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" MergeMode="Vertical"/>
           <TableCell Name="Cell1555" Text="Зав. №" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="PEP_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PEP_FactoryNumber" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="CPM_RSU_PEP_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="CPM_RSU_PEP_FactoryNumber" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1560" Font="Arial, 10pt"/>
           <TableCell Name="Cell1562" Font="Arial, 10pt"/>
         </TableRow>
@@ -855,7 +855,7 @@ namespace FastReport
         <TableColumn Name="Column178" Width="234.36"/>
         <TableColumn Name="Column236" Width="170.1" AutoSize="true"/>
         <TableRow Name="Row136">
-          <TableCell Name="Cell959" Text="Заключение: УПР к дальнейшей эксплуатации" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9"/>
+          <TableCell Name="Cell959" Text="Заключение: МПР к дальнейшей эксплуатации" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9"/>
           <TableCell Name="ARM_Poverka_Result" Border.Lines="Bottom" Border.LeftLine.Width="0.5" Border.TopLine.Width="0.5" Border.RightLine.Width="0.5" Border.BottomLine.Width="0.75" Text="ARM_Poverka_Result" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row167">

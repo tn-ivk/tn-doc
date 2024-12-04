@@ -89,7 +89,7 @@ namespace TN.Doc
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DirId = list.DirId;
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.IlName = ArrByteToString(list.IlName);
 
-                string fileName = string.Format("{0}_Поверка СИКН 425 УПР с помощью ПУ ПП и СРМ",
+                string fileName = string.Format("{0}_Поверка СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
                     ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.DateTimeString.Replace(":", "."));
                 doc.Doc.Settings.General.FileNameForExportDoc = $"{fileName}";
 
@@ -169,22 +169,20 @@ namespace TN.Doc
                         currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlaceSikn;
                     else if (item.Key == "Place_Factory")
                         currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlaceFactory;
-                    else if (item.Key == "UPR_Type")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.UPR_Type;
-                    else if (item.Key == "UPR_FactoryNumber")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.UPR_FactoryNumber;
-                    else if (item.Key == "PU_Type")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PU_Type;
-                    else if (item.Key == "PU_FactoryNumber")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PU_FactoryNumber;
-                    else if (item.Key == "PP_Type")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PP_Type;
-                    else if (item.Key == "PP_FactoryNumber")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PP_FactoryNumber;
+                    else if (item.Key == "CPM_RSU_Type")
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevType;
+                    else if (item.Key == "CPM_RSU_FactoryNumber")
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Sensor.DevNumb;
+                    else if (item.Key == "CPM_RSU_PEP_Type")
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Pep.DevType;
+                    else if (item.Key == "CPM_RSU_PEP_FactoryNumber")
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.Pep.DevNumb;
+                    else if (item.Key == "CPM_RSU_LineName")
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.MprRsuInfo.LineName;
                     else if (item.Key == "IVK_Type")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.IVK_Type;
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.IvkInfo.DevType;
                     else if (item.Key == "IVK_FactoryNumber")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.IVK_FactoryNumber;
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.IvkInfo.DevNumb;
                     else if (item.Key == "Oil_Type")
                         currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.OilType;
                     else if (item.Key == "ProtokolNum")
@@ -232,22 +230,20 @@ namespace TN.Doc
                 ad.PlaceSikn = data.Values.Where(x => x.Key == "Place_SIKN").Single().Value;
             if (data.Values.Exists(x => x.Key == "Place_Factory"))
                 ad.PlaceFactory = data.Values.Where(x => x.Key == "Place_Factory").Single().Value;
-            if (data.Values.Exists(x => x.Key == "UPR_Type"))
-                ad.UPR_Type = data.Values.Where(x => x.Key == "UPR_Type").Single().Value;
-            if (data.Values.Exists(x => x.Key == "UPR_FactoryNumber"))
-                ad.UPR_FactoryNumber = data.Values.Where(x => x.Key == "UPR_FactoryNumber").Single().Value;
-            if (data.Values.Exists(x => x.Key == "PU_Type"))
-                ad.PU_Type = data.Values.Where(x => x.Key == "PU_Type").Single().Value;
-            if (data.Values.Exists(x => x.Key == "PU_FactoryNumber"))
-                ad.PU_FactoryNumber = data.Values.Where(x => x.Key == "PU_FactoryNumber").Single().Value;
-            if (data.Values.Exists(x => x.Key == "PP_Type"))
-                ad.PP_Type = data.Values.Where(x => x.Key == "PP_Type").Single().Value;
-            if (data.Values.Exists(x => x.Key == "PP_FactoryNumber"))
-                ad.PP_FactoryNumber = data.Values.Where(x => x.Key == "PP_FactoryNumber").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_RSU_Type"))
+                ad.MprRsuInfo.Sensor.DevType = data.Values.Where(x => x.Key == "CPM_RSU_Type").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_RSU_FactoryNumber"))
+                ad.MprRsuInfo.Sensor.DevNumb = data.Values.Where(x => x.Key == "CPM_RSU_FactoryNumber").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_RSU_PEP_Type"))
+                ad.MprRsuInfo.Pep.DevType = data.Values.Where(x => x.Key == "CPM_RSU_PEP_Type").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_RSU_PEP_FactoryNumber"))
+                ad.MprRsuInfo.Pep.DevNumb = data.Values.Where(x => x.Key == "CPM_RSU_PEP_FactoryNumber").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_RSU_LineName"))
+                ad.MprRsuInfo.LineName = data.Values.Where(x => x.Key == "CPM_RSU_LineName").Single().Value;
             if (data.Values.Exists(x => x.Key == "IVK_Type"))
-                ad.IVK_Type = data.Values.Where(x => x.Key == "IVK_Type").Single().Value;
+                ad.IvkInfo.DevType = data.Values.Where(x => x.Key == "IVK_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "IVK_FactoryNumber"))
-                ad.IVK_FactoryNumber = data.Values.Where(x => x.Key == "IVK_FactoryNumber").Single().Value;
+                ad.IvkInfo.DevNumb = data.Values.Where(x => x.Key == "IVK_FactoryNumber").Single().Value;
             if (data.Values.Exists(x => x.Key == "Oil_Type"))
                 ad.OilType = data.Values.Where(x => x.Key == "Oil_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "ProtokolNum"))
@@ -259,13 +255,10 @@ namespace TN.Doc
 
             row.id = data.DocID;
             row.AdditionalInfo = StringToHexArrByte(ad);
-
-            //DataDoc.Update(dd);
-
+            
             this.Entry(row).Property(x => x.AdditionalInfo).IsModified = true;
-
             this.SaveChanges();
-
+            
             return true;
         }
     }
@@ -483,6 +476,14 @@ namespace TN.Doc
         public string PlacePsp { get; set; }
         public string PlaceSikn { get; set; }
         public string PlaceFactory { get; set; }
+        public string OilType { get; set; }
+        public string ProtokolNum { get; set; }
+        public string ARM_Poverka_Result { get; set; }
+        public string StaffData { get; set; }
+        public MprInfo MprRsuInfo { get; set; }
+        public List<MprInfo> MprOsuInfo { get; set; }
+        public DeviceInfo IvkInfo { get; set; }
+        
         public string UPR_Type { get; set; }
         public string UPR_FactoryNumber { get; set; }
         public string PU_Type { get; set; }
@@ -491,26 +492,7 @@ namespace TN.Doc
         public string PP_FactoryNumber { get; set; }
         public string IVK_Type { get; set; }
         public string IVK_FactoryNumber { get; set; }
-        public string OilType { get; set; }
-        public string ProtokolNum { get; set; }
-        public string ARM_Poverka_Result { get; set; }
-        public string StaffData { get; set; }
-        public MprInfo MprRsuInfo { get; set; }
-        public List<MprInfo> MprOsuInfo { get; set; }
-        public DeviceInfo IvkInfo { get; set; }
+        
     }
-    // public class PRs_Info
-    // {
-    //     public string PR_Type { get; set; }
-    //     public string PR_FactoryNumber { get; set; }
-    //     public string PR_LineName { get; set; }
-    //     public string MM_Sensor_Type { get; set; }
-    //     public string MM_Sensor_DU { get; set; }
-    //     public string MM_Sensor_FactoryNumber { get; set; }
-    //     public string MM_PEP { get; set; }
-    //     public string MM_PEP_FactoryNumber { get; set; }
-    // }
-
     #endregion
-
 }
