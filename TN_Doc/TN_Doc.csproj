@@ -117,7 +117,7 @@
     <Content Update="Cfg\CfgEditPoverkaSikn425_PR_PU.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="Cfg\CfgEditPoverkaSikn425_UPR_PR.json">
+    <Content Update="Cfg\CfgEditPoverkaSikn425_PR_PR.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

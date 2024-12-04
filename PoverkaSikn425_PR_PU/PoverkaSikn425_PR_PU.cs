@@ -132,34 +132,28 @@ namespace TN.Doc
                     currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PlaceSikn;
                 else if (item.Key == "Place_Factory")
                     currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PlaceFactory;
-                else if (item.Key == "PR_Type")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PR_Type;
-                else if (item.Key == "PR_FactoryNumber")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PR_FactoryNumber;
-                else if (item.Key == "PR_LineName")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PR_LineName;
-                else if (item.Key == "MM_Sensor_Type")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MM_Sensor_Type;
-                else if (item.Key == "MM_Sensor_DU")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MM_Sensor_DU;
-                else if (item.Key == "MM_Sensor_FactoryNumber")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MM_Sensor_FactoryNumber;
-                else if (item.Key == "MM_PEP")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MM_PEP;
-                else if (item.Key == "MM_PEP_FactoryNumber")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MM_PEP_FactoryNumber;
+                else if (item.Key == "CPM_Type")
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Sensor.DevType;
+                else if (item.Key == "CPM_FactoryNumber")
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Sensor.DevNumb;
+                else if (item.Key == "CPM_LineName")
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.LineName;
+                else if (item.Key == "CPM_PEP_Type")
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Pep.DevType;
+                else if (item.Key == "CPM_PEP_FactoryNumber")
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.MprInfo.Pep.DevNumb;
                 else if (item.Key == "PU_Type")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PU_Type;
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PuInfo.DevType;
                 else if (item.Key == "PU_FactoryNumber")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PU_FactoryNumber;
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PuInfo.DevNumb;
                 else if (item.Key == "PP_Type")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PP_Type;
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PpInfo.DevType;
                 else if (item.Key == "PP_FactoryNumber")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PP_FactoryNumber;
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.PpInfo.DevNumb;
                 else if (item.Key == "IVK_Type")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.IVK_Type;
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.IvkInfo.DevType;
                 else if (item.Key == "IVK_FactoryNumber")
-                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.IVK_FactoryNumber;
+                    currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.IvkInfo.DevNumb;
                 else if (item.Key == "Oil_Type")
                     currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_PR_PU.AdditionalInfo.OilType;
                 else if (item.Key == "ProtokolNum")
@@ -203,34 +197,28 @@ namespace TN.Doc
                 ad.PlaceSikn = data.Values.Where(x => x.Key == "Place_SIKN").Single().Value;
             if (data.Values.Exists(x => x.Key == "Place_Factory"))
                 ad.PlaceFactory = data.Values.Where(x => x.Key == "Place_Factory").Single().Value;
-            if (data.Values.Exists(x => x.Key == "PR_Type"))
-                ad.PR_Type = data.Values.Where(x => x.Key == "PR_Type").Single().Value;
-            if (data.Values.Exists(x => x.Key == "PR_FactoryNumber"))
-                ad.PR_FactoryNumber = data.Values.Where(x => x.Key == "PR_FactoryNumber").Single().Value;
-            if (data.Values.Exists(x => x.Key == "PR_LineName"))
-                ad.PR_LineName = data.Values.Where(x => x.Key == "PR_LineName").Single().Value;
-            if (data.Values.Exists(x => x.Key == "MM_Sensor_Type"))
-                ad.MM_Sensor_Type = data.Values.Where(x => x.Key == "MM_Sensor_Type").Single().Value;
-            if (data.Values.Exists(x => x.Key == "MM_Sensor_DU"))
-                ad.MM_Sensor_DU = data.Values.Where(x => x.Key == "MM_Sensor_DU").Single().Value;
-            if (data.Values.Exists(x => x.Key == "MM_Sensor_FactoryNumber"))
-                ad.MM_Sensor_FactoryNumber = data.Values.Where(x => x.Key == "MM_Sensor_FactoryNumber").Single().Value;
-            if (data.Values.Exists(x => x.Key == "MM_PEP"))
-                ad.MM_PEP = data.Values.Where(x => x.Key == "MM_PEP").Single().Value;
-            if (data.Values.Exists(x => x.Key == "MM_PEP_FactoryNumber"))
-                ad.MM_PEP_FactoryNumber = data.Values.Where(x => x.Key == "MM_PEP_FactoryNumber").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_Type"))
+                ad.MprInfo.Sensor.DevType = data.Values.Where(x => x.Key == "CPM_Type").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_FactoryNumber"))
+                ad.MprInfo.Sensor.DevNumb = data.Values.Where(x => x.Key == "CPM_FactoryNumber").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_LineName"))
+                ad.MprInfo.LineName = data.Values.Where(x => x.Key == "CPM_LineName").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_PEP_Type"))
+                ad.MprInfo.Pep.DevType = data.Values.Where(x => x.Key == "CPM_PEP_Type").Single().Value;
+            if (data.Values.Exists(x => x.Key == "CPM_PEP_FactoryNumber"))
+                ad.MprInfo.Pep.DevNumb = data.Values.Where(x => x.Key == "CPM_PEP_FactoryNumber").Single().Value;
             if (data.Values.Exists(x => x.Key == "PU_Type"))
-                ad.PU_Type = data.Values.Where(x => x.Key == "PU_Type").Single().Value;
+                ad.PuInfo.DevType = data.Values.Where(x => x.Key == "PU_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "PU_FactoryNumber"))
-                ad.PU_FactoryNumber = data.Values.Where(x => x.Key == "PU_FactoryNumber").Single().Value;
+                ad.PuInfo.DevNumb = data.Values.Where(x => x.Key == "PU_FactoryNumber").Single().Value;
             if (data.Values.Exists(x => x.Key == "PP_Type"))
-                ad.PP_Type = data.Values.Where(x => x.Key == "PP_Type").Single().Value;
+                ad.PpInfo.DevType = data.Values.Where(x => x.Key == "PP_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "PP_FactoryNumber"))
-                ad.PP_FactoryNumber = data.Values.Where(x => x.Key == "PP_FactoryNumber").Single().Value;
+                ad.PpInfo.DevNumb = data.Values.Where(x => x.Key == "PP_FactoryNumber").Single().Value;
             if (data.Values.Exists(x => x.Key == "IVK_Type"))
-                ad.IVK_Type = data.Values.Where(x => x.Key == "IVK_Type").Single().Value;
+                ad.IvkInfo.DevType = data.Values.Where(x => x.Key == "IVK_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "IVK_FactoryNumber"))
-                ad.IVK_FactoryNumber = data.Values.Where(x => x.Key == "IVK_FactoryNumber").Single().Value;
+                ad.IvkInfo.DevNumb = data.Values.Where(x => x.Key == "IVK_FactoryNumber").Single().Value;
             if (data.Values.Exists(x => x.Key == "Oil_Type"))
                 ad.OilType = data.Values.Where(x => x.Key == "Oil_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "ProtokolNum"))
@@ -240,8 +228,6 @@ namespace TN.Doc
 
             row.id = data.DocID;
             row.AdditionalInfo = StringToHexArrByte(ad);
-
-            //DataDoc.Update(dd);
 
             this.Entry(row).Property(x => x.AdditionalInfo).IsModified = true;
 

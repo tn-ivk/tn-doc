@@ -3,101 +3,85 @@
     {
       "Id": 1,
       "Use": true,
-      "Edit": false,
-      "Key": "Place_PSP",
+      "Edit": true,
+      "Key": "ProtokolNum",
       "Type": "text",
-      "Name": ""
+      "Name": "Номер протокола"
     },
     {
       "Id": 2,
       "Use": true,
       "Edit": false,
-      "Key": "Place_SIKN",
+      "Key": "Place_PSP",
       "Type": "text",
-      "Name": "Место проведения калибровки"
+      "Name": "Место проведения"
     },
     {
       "Id": 3,
       "Use": true,
       "Edit": false,
-      "Key": "Place_Factory",
+      "Key": "Place_SIKN",
       "Type": "text",
-      "Name": ""
+      "Name": "Пункт приема сдачи нефти"
     },
     {
       "Id": 4,
       "Use": true,
       "Edit": false,
-      "Key": "PR_Type",
+      "Key": "Place_Factory",
       "Type": "text",
-      "Name": ""
+      "Name": "Наименование организации"
     },
     {
       "Id": 5,
       "Use": true,
       "Edit": false,
-      "Key": "PR_FactoryNumber",
+      "Key": "CPM_Type",
       "Type": "text",
-      "Name": ""
+      "Name": "СРМ. Датчик. Тип"
     },
     {
       "Id": 6,
       "Use": true,
       "Edit": false,
-      "Key": "PR_LineName",
+      "Key": "CPM_FactoryNumber",
       "Type": "text",
-      "Name": "Линия"
+      "Name": "СРМ. Датчик. Зав. №"
     },
     {
       "Id": 7,
       "Use": true,
       "Edit": false,
-      "Key": "MM_Sensor_Type",
+      "Key": "CPM_LineName",
       "Type": "text",
-      "Name": "СРМ Датчик: Тип"
+      "Name": "Линия №"
     },
     {
       "Id": 8,
       "Use": true,
       "Edit": false,
-      "Key": "MM_Sensor_DU",
+      "Key": "CPM_PEP_Type",
       "Type": "text",
-      "Name": ""
+      "Name": "СРМ. Преобразователь. Тип"
     },
     {
       "Id": 9,
       "Use": true,
       "Edit": false,
-      "Key": "MM_Sensor_FactoryNumber",
+      "Key": "CPM_PEP_FactoryNumber",
       "Type": "text",
-      "Name": "СРМ Датчик: Заводской №"
+      "Name": "СРМ. Преобразователь. Зав. №"
     },
     {
       "Id": 10,
       "Use": true,
       "Edit": false,
-      "Key": "MM_PEP",
+      "Key": "PU_Type",
       "Type": "text",
-      "Name": "СРМ Преобразователь: Тип"
+      "Name": "ТПУ: Тип"
     },
     {
       "Id": 11,
-      "Use": true,
-      "Edit": false,
-      "Key": "MM_PEP_FactoryNumber",
-      "Type": "text",
-      "Name": "СРМ Преобразователь: Заводской №"
-    },
-    {
-      "Id": 12,
-      "Use": true,
-      "Edit": false,
-      "Key": "PU_Type",
-      "Type": "text",
-      "Name": "ПУ: Тип"
-    },
-    {
-      "Id": 13,
       "Use": true,
       "Edit": false,
       "Key": "PU_FactoryNumber",
@@ -105,7 +89,7 @@
       "Name": "ПУ: Заводской №"
     },
     {
-      "Id": 14,
+      "Id": 12,
       "Use": true,
       "Edit": false,
       "Key": "PP_Type",
@@ -113,7 +97,7 @@
       "Name": "ПП: Тип"
     },
     {
-      "Id": 15,
+      "Id": 13,
       "Use": true,
       "Edit": false,
       "Key": "PP_FactoryNumber",
@@ -121,7 +105,7 @@
       "Name": "ПП: Заводской №"
     },
     {
-      "Id": 16,
+      "Id": 14,
       "Use": true,
       "Edit": false,
       "Key": "IVK_Type",
@@ -129,7 +113,7 @@
       "Name": "ИВК: Тип"
     },
     {
-      "Id": 17,
+      "Id": 15,
       "Use": true,
       "Edit": false,
       "Key": "IVK_FactoryNumber",
@@ -137,7 +121,7 @@
       "Name": "ИВК: Заводской №"
     },
     {
-      "Id": 18,
+      "Id": 16,
       "Use": true,
       "Edit": false,
       "Key": "Oil_Type",
@@ -145,15 +129,7 @@
       "Name": "Рабочая жидкость"
     },
     {
-      "Id": 19,
-      "Use": true,
-      "Edit": true,
-      "Key": "ProtokolNum",
-      "Type": "text",
-      "Name": "Номер протокола"
-    },
-    {
-      "Id": 20,
+      "Id": 17,
       "Use": true,
       "Edit": true,
       "Key": "StaffData",
