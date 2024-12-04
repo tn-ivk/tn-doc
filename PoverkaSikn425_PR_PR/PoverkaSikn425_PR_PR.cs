@@ -75,10 +75,10 @@ namespace TN.Doc
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol = JsonDeserializeObject<Protokol>(ArrByteToString(list.Data.Protokol));
                 ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo = JsonDeserializeObject<AdditionalInfo>(ArrByteToString(list.Data.AdditionalInfo)) ?? new AdditionalInfo()
                 {
-                    Place_PSP = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_PSP,
-                    Place_SIKN = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_SIKN,
-                    Place_Factory = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.Place_Factory,
-                    Oil_Type = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.OilType,
+                    PlacePsp = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.PlacePsp,
+                    PlaceSikn = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.PlaceSikn,
+                    PlaceFactory = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.PlaceFactory,
+                    OilType = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.OilType,
                     MprRsuInfo = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.MprRsuInfo,
                     MprOsuInfo = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.MprOsuInfo,
                     IvkInfo = ((DataIVKDoc)doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.Protokol.IvkInfo
@@ -164,11 +164,11 @@ namespace TN.Doc
                     HtmlNode Input = HtmlNode.CreateNode("<input></input>");
 
                     if (item.Key == "Place_PSP")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.Place_PSP;
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlacePsp;
                     else if (item.Key == "Place_SIKN")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.Place_SIKN;
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlaceSikn;
                     else if (item.Key == "Place_Factory")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.Place_Factory;
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.PlaceFactory;
                     else if (item.Key == "UPR_Type")
                         currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.UPR_Type;
                     else if (item.Key == "UPR_FactoryNumber")
@@ -186,7 +186,7 @@ namespace TN.Doc
                     else if (item.Key == "IVK_FactoryNumber")
                         currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.IVK_FactoryNumber;
                     else if (item.Key == "Oil_Type")
-                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.Oil_Type;
+                        currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.OilType;
                     else if (item.Key == "ProtokolNum")
                         currentValue = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo.ProtokolNum;
                     else if (item.Key == "ARM_Poverka_Result")
@@ -227,11 +227,11 @@ namespace TN.Doc
             ad = ((DataIVKDoc)Doc.Doc.DataIVK).TablePoverkaSikn425_UPR_PR.AdditionalInfo;
 
             if (data.Values.Exists(x => x.Key == "Place_PSP"))
-                ad.Place_PSP = data.Values.Where(x => x.Key == "Place_PSP").Single().Value;
+                ad.PlacePsp = data.Values.Where(x => x.Key == "Place_PSP").Single().Value;
             if (data.Values.Exists(x => x.Key == "Place_SIKN"))
-                ad.Place_SIKN = data.Values.Where(x => x.Key == "Place_SIKN").Single().Value;
+                ad.PlaceSikn = data.Values.Where(x => x.Key == "Place_SIKN").Single().Value;
             if (data.Values.Exists(x => x.Key == "Place_Factory"))
-                ad.Place_Factory = data.Values.Where(x => x.Key == "Place_Factory").Single().Value;
+                ad.PlaceFactory = data.Values.Where(x => x.Key == "Place_Factory").Single().Value;
             if (data.Values.Exists(x => x.Key == "UPR_Type"))
                 ad.UPR_Type = data.Values.Where(x => x.Key == "UPR_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "UPR_FactoryNumber"))
@@ -249,7 +249,7 @@ namespace TN.Doc
             if (data.Values.Exists(x => x.Key == "IVK_FactoryNumber"))
                 ad.IVK_FactoryNumber = data.Values.Where(x => x.Key == "IVK_FactoryNumber").Single().Value;
             if (data.Values.Exists(x => x.Key == "Oil_Type"))
-                ad.Oil_Type = data.Values.Where(x => x.Key == "Oil_Type").Single().Value;
+                ad.OilType = data.Values.Where(x => x.Key == "Oil_Type").Single().Value;
             if (data.Values.Exists(x => x.Key == "ProtokolNum"))
                 ad.ProtokolNum = data.Values.Where(x => x.Key == "ProtokolNum").Single().Value;
             if (data.Values.Exists(x => x.Key == "ARM_Poverka_Result"))
@@ -372,9 +372,9 @@ namespace TN.Doc
     }
     public class Protokol
     {
-        public string Place_PSP { get; set; }
-        public string Place_SIKN { get; set; }
-        public string Place_Factory { get; set; }
+        public string PlacePsp { get; set; }
+        public string PlaceSikn { get; set; }
+        public string PlaceFactory { get; set; }
         public MprInfo MprRsuInfo { get; set; }
         public List<MprInfo> MprOsuInfo { get; set; }
         public DeviceInfo IvkInfo { get; set; }
@@ -480,9 +480,9 @@ namespace TN.Doc
     }
     public class AdditionalInfo
     {
-        public string Place_PSP { get; set; }
-        public string Place_SIKN { get; set; }
-        public string Place_Factory { get; set; }
+        public string PlacePsp { get; set; }
+        public string PlaceSikn { get; set; }
+        public string PlaceFactory { get; set; }
         public string UPR_Type { get; set; }
         public string UPR_FactoryNumber { get; set; }
         public string PU_Type { get; set; }
@@ -491,7 +491,7 @@ namespace TN.Doc
         public string PP_FactoryNumber { get; set; }
         public string IVK_Type { get; set; }
         public string IVK_FactoryNumber { get; set; }
-        public string Oil_Type { get; set; }
+        public string OilType { get; set; }
         public string ProtokolNum { get; set; }
         public string ARM_Poverka_Result { get; set; }
         public string StaffData { get; set; }
