@@ -10,9 +10,9 @@ using TN.DocData;
 
 namespace TN.Doc
 {
-    public class PoverkaSikn425_UPR_PR : DocGeneral
+    public class PoverkaSikn425_PR_PR : DocGeneral
     {
-        public PoverkaSikn425_UPR_PR(DbContextOptions<DocGeneral> options, string path, Device device) : base(options, path, device)
+        public PoverkaSikn425_PR_PR(DbContextOptions<DocGeneral> options, string path, Device device) : base(options, path, device)
         {
             IdDoc = IdDoc.PoverkaSikn425_UPR_PR;
             PathToDocConfigFile = GetPathConfigFile();

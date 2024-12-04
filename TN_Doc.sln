@@ -85,7 +85,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoverkaSikn425_PR_PU", "PoverkaSikn425_PR_PU\PoverkaSikn425_PR_PU.csproj", "{A759EEB5-ED60-4795-BD4A-8ABCA26F5CDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoverkaSikn425_UPR_PR", "PoverkaSikn425_UPR_PR\PoverkaSikn425_UPR_PR.csproj", "{9E8D22BA-054D-4AF5-91A1-83E4E3F8AD1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoverkaSikn425_PR_PR", "PoverkaSikn425_PR_PR\PoverkaSikn425_PR_PR.csproj", "{9E8D22BA-054D-4AF5-91A1-83E4E3F8AD1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
