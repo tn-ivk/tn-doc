@@ -1069,7 +1069,7 @@
               "Id": 0,
               "Name": "КМХ СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
               "Description": "Протокол КМХ СРМ РСУ с помощью нескольких СРМ ОСУ",
-              "PathToDocTemplateFile": "/Doc/37_KMX_Sikn425_PR_PR_Release_version.frx",
+              "PathToDocTemplateFile": "/Doc/37_KMX_Sikn425_PR_PR_Gost_version.frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditKMX_Sikn425_PR_PR.json"
             }
           ]
