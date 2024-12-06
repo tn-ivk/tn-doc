@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/22/2024 10:07:28" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/28/2024 01:22:44" ReportInfo.CreatorVersion="2024.2.0.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -21,7 +21,7 @@ namespace FastReport
     JToken JMethod;
     JToken JAdditionalData;
     JToken JDataARM;
-      
+    
     private void Page_StartPage(object sender, EventArgs e)
     {
       JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
@@ -44,9 +44,15 @@ namespace FastReport
       Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
          
       //Запуск отрисовки таблиц на странице отчета
+      DrawPageHeader();
       DrawTableHeader();
       DrawTablePassport();
       DrawTableSigners();
+    }
+    
+    public void DrawPageHeader()
+    {            
+      PageHeaderText.Text = $&quot;{JSettings[&quot;Header&quot;][&quot;NameIVK&quot;]}&quot;; //(string)JSettings[&quot;Header&quot;][&quot;NameIVK&quot;];
     }
       
     public void DrawTableHeader()
@@ -59,7 +65,7 @@ namespace FastReport
       
       NumberAndDatePassport.Text = string.Format(&quot;№ &lt;u&gt;{0}&lt;/u&gt; от 日期 &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г.&quot;, JResult[&quot;PassportId&quot;], Begin.ToShortDateString());
       ProtokolNumAct.Text = $&quot;{JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;DataARM&quot;][&quot;ProtokolNumAct&quot;]}&quot;;
-      DelivePoint.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]}&quot;;
+      DelivePoint.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]} 加林达&quot;;
       //Laboratory.Text = $&quot;{JAdditionalData[&quot;Laboratory&quot;]}&quot;;
       AccrSertifNumber.Text = $&quot;{JAdditionalData[&quot;AccrSertifNumber&quot;]}&quot;;
       SIKN_Number.Text = $&quot;{JAdditionalData[&quot;SIKN_Number&quot;]}&quot;;
@@ -192,6 +198,11 @@ namespace FastReport
 
       return result;
     }
+    
+    private static string GetFIO(JToken users, string parameterKey)
+    {
+      return users.FirstOrDefault(x =&gt; x[&quot;F&quot;].ToString().Replace(&quot;&lt;br&gt;&quot;,&quot;&quot;) == parameterKey)?[&quot;F&quot;].ToString();
+    }
 
     public void  DrawTableSigners()
     {
@@ -199,9 +210,31 @@ namespace FastReport
       Laboratory_IOF.Text = $&quot;{JAdditionalData[&quot;Laboratory_IOF&quot;]}&quot;;
       //Laboratory_Factory.Text = $&quot;{JAdditionalData[&quot;Laboratory_Factory&quot;]}&quot;;  
       Delive_Factory.Text = $&quot;{JAdditionalData[&quot;Delive_Factory&quot;]}&quot;;
-      Delive_IOF.Text = $&quot;{JAdditionalData[&quot;Delive_IOF&quot;]}&quot;;
+      //Delive_IOF.Text = $&quot;{JAdditionalData[&quot;Delive_IOF&quot;]}&quot;;
       Receive_Factory.Text = $&quot;{JAdditionalData[&quot;Receive_Factory&quot;]}&quot;;
-      Receive_IOF.Text = $&quot;{JAdditionalData[&quot;Receive_IOF&quot;]}&quot;;
+      //Receive_IOF.Text = $&quot;{JAdditionalData[&quot;Receive_IOF&quot;]}&quot;;
+      
+      string DeliveFIO = GetFIO(JSettings[&quot;Dictionarys&quot;][&quot;Users&quot;],$&quot;{JAdditionalData[&quot;Delive_IOF&quot;]}&quot;);
+      string ReceiveFIO = GetFIO(JSettings[&quot;Dictionarys&quot;][&quot;Users&quot;],$&quot;{JAdditionalData[&quot;Receive_IOF&quot;]}&quot;);
+      
+      
+      if (!string.IsNullOrEmpty(DeliveFIO)) {
+        if (DeliveFIO.Contains(&quot;&lt;br&gt;&quot;)) {
+          string FIO = DeliveFIO.Split(&quot;&lt;br&gt;&quot;)[0];
+          if (FIO.Contains(&quot;.&quot;) &amp;&amp; FIO.Contains(&quot; &quot;))
+            Delive_IOF.Text = $&quot;{FIO.Substring(FIO.IndexOf(' ')+1)} {FIO.Substring(0, FIO.IndexOf(' '))}&quot;;
+          else
+            Delive_IOF.Text = FIO; }}
+      else    
+        Delive_IOF.Text = $&quot;{JAdditionalData[&quot;Delive_IOF&quot;]}&quot;; 
+      
+      if (!string.IsNullOrEmpty(ReceiveFIO)) {
+        if (ReceiveFIO.Contains(&quot;&lt;br&gt;&quot;))
+          Receive_IOF.Text = ReceiveFIO.Split(&quot;&lt;br&gt;&quot;)[0]; }
+      else  
+        Receive_IOF.Text = $&quot;{JAdditionalData[&quot;Receive_IOF&quot;]}&quot;;
+      
+      
     } 
   }    
 }</ScriptText>
@@ -213,8 +246,11 @@ namespace FastReport
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
     <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
-  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage" FinishPageEvent="Page_FinishPage" LastPageSource="15" FirstPageSource="15">
-    <ReportTitleBand Name="ReportTitle" Width="718.2" Height="139.86" CanGrow="true" CanShrink="true" CanBreak="true">
+  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" TitleBeforeHeader="false" StartPageEvent="Page_StartPage" FinishPageEvent="Page_FinishPage" LastPageSource="15" FirstPageSource="15">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="18.9">
+      <TextObject Name="PageHeaderText" Left="9.45" Width="708.75" Height="18.9" Text="PageHeaderText" HorzAlign="Right" Font="Arial, 8.25pt"/>
+    </PageHeaderBand>
+    <ReportTitleBand Name="ReportTitle" Top="20.68" Width="718.2" Height="139.86" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableHeader" Width="717.82" Height="139.86">
         <TableColumn Name="Column01" Width="325.89"/>
         <TableColumn Name="Column03" Width="391.93"/>
@@ -248,11 +284,11 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="142.15" Width="718.2" Height="468.72" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="162.32" Width="718.2" Height="468.72" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="459.27" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
-        <TableColumn Name="Column8" Width="434.7"/>
-        <TableColumn Name="Column9" Width="153.09"/>
+        <TableColumn Name="Column8" Width="425.25"/>
+        <TableColumn Name="Column9" Width="162.54"/>
         <TableColumn Name="Column28" Width="100.17"/>
         <TableRow Name="RowHeader" Height="45.36">
           <TableCell Name="Cell475" Border.Lines="All" Text="&lt;b&gt;№&lt;/b&gt;" Padding="0, 0, 4, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
@@ -322,7 +358,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="RowYield_fraction" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1579" Border.Lines="All" Text="11." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1580" Border.Lines="All" Text="Выход фракций, %:	до температуры 200 °С	200 °С 之前&#13;&#10;馏程, %:		до температуры 300 °С	300 °С 之前" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell1580" Border.Lines="All" Text="Выход фракций, %:	при температуре 200 °С	200 °С 之前&#13;&#10;馏程, %:		при температуре 300 °С	300 °С 之前" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1581" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1582" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
@@ -352,7 +388,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="613.15" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="632.81" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="328.86">
         <TableColumn Name="Column29" Width="245.7"/>
         <TableColumn Name="Column31" Width="202.23"/>

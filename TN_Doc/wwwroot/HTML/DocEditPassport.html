@@ -103,7 +103,7 @@
             }
         }
 
-        function RoundingCheck(Object) {
+        function InputCheck(Object) {
             CheckRounding(Object);
             CheckEmpty(Object);
             SendingMessageStateButtonSave();
@@ -113,6 +113,9 @@
             const round = Number(Object.getAttribute('data-roundValue'));
             if(isNaN(round) || round < 1)
                 return;
+            if(!Object.classList.contains("incorrect-rounding") && !Object.classList.contains("correct-rounding"))
+                return;
+                
             const strRegExPattern = "^-?([0-9]+\.[0-9]{1," + round + "})$";
             if (Object.value.match(new RegExp(strRegExPattern,'g'))) {
                 Object.classList.replace("incorrect-rounding", "correct-rounding");
@@ -123,6 +126,9 @@
         }
 
         function CheckEmpty(Object) {
+            if(!Object.classList.contains("filled-parameter") && !Object.classList.contains("empty-parameter"))
+                return;
+
             if (!Object.value) {
                 Object.classList.replace("filled-parameter", "empty-parameter");
             }
@@ -132,25 +138,12 @@
         }
         
         function SendingMessageStateButtonSave() {
-            let StateButtonSave = true;
-
-            StateButtonSave = ValidationData();
-
-            if (StateButtonSave)
-                window.top.postMessage('ButtonSaveOn', '*');
-            else
-                window.top.postMessage('ButtonSaveOff', '*');
+            window.top.postMessage(document.querySelectorAll('.incorrect-rounding, .empty-parameter').length === 0
+                    ? 'ButtonSaveOn'
+                    : 'ButtonSaveOff',
+                '*')
         }
 
-        function ValidationData() {
-            let elmnts = document.querySelectorAll('.incorrect-rounding, .empty-parameter');
-
-            // tuda suda копируем
-            if (elmnts.length == 0)
-                return true;
-            else
-                return false;
-        }
     </script>
 
 </head>

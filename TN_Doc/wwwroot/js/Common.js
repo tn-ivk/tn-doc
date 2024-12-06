@@ -704,16 +704,9 @@ function InitTableDocs() {
 
 function InitElement() {
 
-
      let iframe = document.querySelector('.FR');
      iframe.onload = function(){
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
-
-        elisNodes.forEach((item, index, array) => {
-         if (item.nodeName === 'INPUT') {
-             ValidateElisInput(item);
-         }       
-     });     
     }
 
     /**/
@@ -792,12 +785,12 @@ function GetData() {
                     $('#ComboboxDocGUID').val() == 3 ||
                     $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
-                    $('#ButtonReview').prop('disabled', true);
-                    $('#ButtonEdit').prop('disabled', true);
+                    $('#ButtonReview').prop('hidden', true);
+                    $('#ButtonEdit').prop('hidden', true);
                 } else {
                     $('#ButtonSave').prop('disabled', false);
-                    $('#ButtonReview').prop('disabled', false);
-                    $('#ButtonEdit').prop('disabled', false);
+                    $('#ButtonReview').prop('hidden', false);
+                    $('#ButtonEdit').prop('hidden', false);
                 }
 
                 if ($('#ComboboxDocGUID').val() == 1) {
@@ -1247,7 +1240,9 @@ function FillPassportDataElis() {
                 item.value = item.dataset.tag === 'AdditionalInfo'
                     ? root[currentKey]
                     : root[currentKey].value;
-                ValidateElisInput(item);
+                FixedElisData(item);
+                if(item.hasAttribute("oninput"))
+                    item.oninput();
             }
 
             if (item.nodeName === 'SELECT') {
@@ -1325,22 +1320,16 @@ function FillPassportDataElis() {
     }
 }
 
-function ValidateElisInput(Object) {
+//Добивание незначимыми нулями данных с ЕЛИС
+function FixedElisData(object) {
+    if(!object) return;
+    if(!object.hasAttribute('data-roundValue')) return;
     const f = x => ((x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0));
-    f(Object.value) == Object.getAttribute('data-roundValue')
-        ? Object.classList.replace("incorrect-rounding", "correct-rounding")
-        : Object.classList.replace("correct-rounding", "incorrect-rounding");
-
-    Object.value === ''
-        ? Object.classList.replace("filled-parameter", "empty-parameter")
-        : Object.classList.replace("empty-parameter", "filled-parameter");
-
-    window.top.postMessage(document.querySelectorAll('.incorrect-rounding, .empty-parameter').length === 0
-            ? 'ButtonSaveOn'
-            : 'ButtonSaveOff',
-        '*')
+    if (f(object) >= object.getAttribute('data-roundValue')) return;
+        
+    const num = parseFloat(object.value.replace(",", "."));
+    object.value = num.toFixed(object.getAttribute('data-roundValue'));
 }
-
 
 //Состояние кнопки "Запросить данные"
 function StateButtonGetElisData(state) {
