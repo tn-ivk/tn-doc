@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/05/2024 17:54:23" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/09/2024 01:44:39" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -499,9 +499,8 @@ namespace FastReport
           <TableCell Name="Oil_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Oil_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
-      <TextObject Name="Text1" Left="-9450" Top="-9450" Width="94.5" Height="18.9" Text="δ ,&lt;br&gt;%" Font="Arial, 10pt"/>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1SourceData" Top="190.78" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable1SourceData" Top="191.67" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="717.84" Height="86.94" FixedRows="3">
         <TableColumn Name="Column4" Width="79.76"/>
         <TableColumn Name="Column6" Width="79.76"/>
@@ -558,7 +557,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable1SourceDataEnding" Top="287.06" Width="718.2" Height="86.94">
+    <DataBand Name="DataBandTable1SourceDataEnding" Top="288.83" Width="718.2" Height="86.94">
       <TableObject Name="Table1SourceDataEnding" Width="319.04" Height="86.94" FixedRows="3">
         <TableColumn Name="Column318" Width="79.76"/>
         <TableColumn Name="Column319" Width="79.76"/>
@@ -590,7 +589,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2Results" Top="375.77" Width="718.2" Height="86.94">
+    <DataBand Name="DataBandTable2Results" Top="378.44" Width="718.2" Height="86.94">
       <TableObject Name="Table2Results" Top="7.56" Width="567" Height="79.38" FixedRows="3" ManualBuildEvent="Table2Results_ManualBuild">
         <TableColumn Name="Column281" Width="94.5"/>
         <TableColumn Name="Column302" Width="94.5"/>
@@ -632,7 +631,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3Results" Top="464.49" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable3Results" Top="468.05" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table3Results" Top="7.56" Width="661.5" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table3Results_ManualBuild">
         <TableColumn Name="Column158" Width="94.5"/>
         <TableColumn Name="Column159" Width="94.5"/>
@@ -679,7 +678,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4Results" Top="553.21" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4Results" Top="557.65" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4Results" Top="7.56" Width="716.72" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4Results_ManualBuild">
         <TableColumn Name="Column33" Width="89.59"/>
         <TableColumn Name="Column34" Width="89.59"/>
@@ -731,7 +730,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable5Results" Top="641.93" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable5Results" Top="647.26" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table5Results" Top="7.56" Width="717.84" Height="79.38" GrowToBottom="true" FixedRows="3">
         <TableColumn Name="Column41" Width="79.76"/>
         <TableColumn Name="Column42" Width="79.76"/>
@@ -788,7 +787,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable5ResultsEnding" Top="730.64" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable5ResultsEnding" Top="736.87" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table5ResultsEnding" Top="7.56" Width="319.04" Height="79.38" FixedRows="3">
         <TableColumn Name="Column219" Width="79.76"/>
         <TableColumn Name="Column228" Width="79.76"/>
@@ -820,7 +819,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="819.36" Width="718.2" Height="136.08" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="826.47" Width="718.2" Height="136.08" CanShrink="true">
       <TableObject Name="TableConclusion2" Top="45.36" Width="525.42" Height="37.8">
         <TableColumn Name="Column144" Width="185.22"/>
         <TableColumn Name="Column176" Width="151.2"/>
@@ -861,7 +860,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="957.22" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="965.22" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
