@@ -14,7 +14,7 @@
       "Edit": false,
       "Key": "Place_PSP",
       "Type": "text",
-      "Name": "Место проведения"
+      "Name": "ПСП"
     },
     {
       "Id": 3,
@@ -22,93 +22,101 @@
       "Edit": false,
       "Key": "Place_SIKN",
       "Type": "text",
-      "Name": "Пункт приема сдачи нефти"
+      "Name": "СИКН/СИКНП"
     },
     {
       "Id": 4,
       "Use": true,
       "Edit": false,
-      "Key": "Place_Factory",
+      "Key": "CPM_RSU_Type",
       "Type": "text",
-      "Name": "Наименование организации"
+      "Name": "Тип СИ массового расхода"
     },
     {
       "Id": 5,
       "Use": true,
       "Edit": false,
-      "Key": "CPM_RSU_Type",
+      "Key": "CPM_RSU_FactoryNumber",
       "Type": "text",
-      "Name": "СРМ РСУ. Датчик. Тип"
+      "Name": "Заводской номер"
     },
     {
       "Id": 6,
       "Use": true,
-      "Edit": false,
-      "Key": "CPM_RSU_FactoryNumber",
-      "Type": "text",
-      "Name": "СРМ РСУ. Датчик. Заводской №"
+      "Edit": true,
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "Заключение: СИ массового расхода к дальнейшей эксплуатации"
     },
     {
       "Id": 7,
       "Use": true,
-      "Edit": false,
-      "Key": "CPM_RSU_PEP_Type",
+      "Edit": true,
+      "Key": "ServiceStaffCompany",
       "Type": "text",
-      "Name": "СРМ РСУ. Преобразователь. Тип"
+      "Name": "Организация, проводящая техническое обслуживание СИКН/СИКНП"
     },
     {
       "Id": 8,
       "Use": true,
-      "Edit": false,
-      "Key": "CPM_RSU_PEP_FactoryNumber",
+      "Edit": true,
+      "Key": "ServiceStaffPost",
       "Type": "text",
-      "Name": "СРМ РСУ. Преобразователь. Заводской №"
+      "Name": "Должность"
     },
     {
       "Id": 9,
       "Use": true,
-      "Edit": false,
-      "Key": "CPM_RSU_LineName",
+      "Edit": true,
+      "Key": "ServiceStaffFIO",
       "Type": "text",
-      "Name": "СРМ РСУ. Линия №"
+      "Name": "И.О. Фамилия"
     },
     {
       "Id": 10,
       "Use": true,
-      "Edit": false,
-      "Key": "IVK_Type",
+      "Edit": true,
+      "Key": "OperationStaffCompany",
       "Type": "text",
-      "Name": "ИВК. Тип"
+      "Name": "Организация, эксплуатирующая СИКН/СИКНП"
     },
     {
       "Id": 11,
       "Use": true,
-      "Edit": false,
-      "Key": "IVK_FactoryNumber",
+      "Edit": true,
+      "Key": "OperationStaffPost",
       "Type": "text",
-      "Name": "ИВК. Заводской №"
+      "Name": "Должность"
     },
     {
       "Id": 12,
       "Use": true,
-      "Edit": false,
-      "Key": "Oil_Type",
+      "Edit": true,
+      "Key": "OperationStaffFIO",
       "Type": "text",
-      "Name": "Рабочая жидкость"
+      "Name": "И.О. Фамилия"
     },
     {
       "Id": 13,
       "Use": true,
       "Edit": true,
-      "Key": "ARM_Poverka_Result",
-      "Type": "list",
-      "Name": "Заключение: МПР к дальнейшей эксплуатации"
+      "Key": "RecievingStaffCompany",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона"
     },
     {
       "Id": 14,
       "Use": true,
       "Edit": true,
-      "Key": "StaffData",
+      "Key": "RecievingStaffPost",
+      "Type": "text",
+      "Name": "Должность"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffFIO",
       "Type": "text",
       "Name": "И.О. Фамилия"
     }

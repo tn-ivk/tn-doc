@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMX_Sikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/11/2024 09:54:16" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMX_Sikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/11/2024 10:56:43" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -72,10 +72,6 @@ namespace FastReport
          
       // Fill table with data   
       ProtokolNum.Text = &quot;П Р О Т О К О Л  № &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.ProtokolNum;
-      Place_SIKN.Text = string.Format(&quot;СИКН №{0}, {1}, {2}&quot;, 
-        DataIVK.TableKmxSikn425PrPr.AdditionalInfo.PlaceSikn, 
-        DataIVK.TableKmxSikn425PrPr.AdditionalInfo.PlacePsp,
-        DataIVK.TableKmxSikn425PrPr.AdditionalInfo.PlaceFactory);
       
       CPM_RSU_Type.Text = &quot;Тип СИ массового расхода &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.MprRsuInfo.Sensor.DevType;
       CPM_RSU_FactoryNumber.Text = &quot;Заводской номер &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.MprRsuInfo.Sensor.DevNumb;
@@ -142,13 +138,7 @@ namespace FastReport
     
     private void Table1Results_ManualBuild(object sender, EventArgs e)
     {            
-      List &lt;TN.Doc.Table2&gt; listTable2Results;
-      List &lt;TN.Doc.Table3&gt; listTable3Results;
-      List &lt;TN.Doc.Table1Result&gt; listTable1Results;
-      
-      listTable2Results = DataIVK.TableKmxSikn425PrPr.Protokol.Table2.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
-      listTable3Results = DataIVK.TableKmxSikn425PrPr.Protokol.Table3.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
-      listTable1Results = DataIVK.Table1Result.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
+      List &lt;TN.Doc.Table1Result&gt; listTable1Results = DataIVK.Table1Result.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
       
       //Draw Fixed rows
       for (int n = 0; n &lt; Table1Results.FixedRows; n++)
@@ -220,15 +210,15 @@ namespace FastReport
       DateTimeLong.Text = string.Format(&quot;Дата проведения поверки: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,
         (tools.UnixTimestampToDatetime(DataIVK.TableKmxSikn425PrPr.DateTimeLong)));               
       
-      ServiceStaffCompany.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      ServiceStaffPost.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      ServiceStaffFIO.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      OperationStaffCompany.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      OperationStaffPost.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      OperationStaffFIO.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      RecievingStaffCompany.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      RecievingStaffPost.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
-      RecievingStaffFIO.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.StaffData;
+      ServiceStaffCompany.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.ServiceStaffCompany;
+      ServiceStaffPost.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.ServiceStaffPost;
+      ServiceStaffFIO.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.ServiceStaffFIO;
+      OperationStaffCompany.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.OperationStaffCompany;
+      OperationStaffPost.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.OperationStaffPost;
+      OperationStaffFIO.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.OperationStaffFIO;
+      RecievingStaffCompany.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.RecievingStaffCompany;
+      RecievingStaffPost.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.RecievingStaffPost;
+      RecievingStaffFIO.Text = DataIVK.TableKmxSikn425PrPr.AdditionalInfo.RecievingStaffFIO;
     }  
       
     //// Setup heights of the all objects on the Page
