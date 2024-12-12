@@ -866,6 +866,7 @@ function SaveDoc() {
         $('#ComboboxDocGUID').val(),
         currentId,
         PrefixTag);
+    GetDoc();
 }
 
 function GetPeriodDocument() {
