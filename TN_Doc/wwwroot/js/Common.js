@@ -1191,7 +1191,7 @@ function SetDataLocalStorage() {
 
 function FillPassportDataElis() {
     try {
-        //console.log("FillPassportDataElis -> me tut" );
+        //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
@@ -1247,7 +1247,6 @@ function FillPassportDataElis() {
             }
 
             if (item.nodeName === 'SELECT') {
-
                 item.contains = function (value) {
                     for (var i = 0, l = this.options.length; i < l; i++) {
                         if (this.options[i].text === value) {
@@ -1268,53 +1267,6 @@ function FillPassportDataElis() {
             }
 
         });
-        // elmnts.forEach(function (item, i, arr) {
-        //
-        //     if (dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
-        //         data = dataPassport.parameters;
-        //     else if (dataPassport.hasOwnProperty(item.dataset.keyelis))
-        //         data = dataPassport;
-        //     else
-        //         return;
-        //
-        //     if (item.nodeName == 'INPUT') {
-        //         let value;
-        //         if (item.dataset.tag == 'AdditionalInfo')
-        //             value = data[item.dataset.keyelis];
-        //         else
-        //             value = data[item.dataset.keyelis].value;
-        //         item.value = value;
-        //
-        //         ValidateElisInput(item);
-        //     }
-        //
-        //     if (item.nodeName == 'SELECT') {
-        //
-        //         item.contains = function (value) {
-        //             for (var i = 0, l = this.options.length; i < l; i++) {
-        //                 if (this.options[i].text == value) {
-        //                     return true;
-        //                 }
-        //             }
-        //             return false;
-        //         }
-        //
-        //         let testMethodName = data[item.dataset.keyelis].testMethodName;
-        //
-        //         //Проверяем наличие значения в списке, если нет, добавляем.
-        //         if (!item.contains(testMethodName)) {
-        //
-        //             let newOption = new Option(testMethodName, testMethodName);
-        //             item.append(newOption);
-        //             //newOption.selected = true;
-        //         }
-        //
-        //         item.value = testMethodName;
-        //         //for (let i = 0; i < item.length; i++) {
-        //         //    if (item[i].value === testMethodName) item[i].selected = true;
-        //         //}
-        //     }
-        // });
 
     } finally {
         console.groupEnd();
