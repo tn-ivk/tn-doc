@@ -1242,8 +1242,12 @@ function FillPassportDataElis() {
                     ? root[currentKey]
                     : root[currentKey].value;
                 FixedElisData(item);
-                if(item.hasAttribute("oninput"))
+                if(item.hasAttribute("oninput")){
                     item.oninput();
+                }
+                if(item.hasAttribute("backlight"))
+                    item.setAttribute("backlight", "green");
+                item.addEventListener("input", ManualCorrect, {once:true});
             }
 
             if (item.nodeName === 'SELECT') {
@@ -1282,6 +1286,14 @@ function FixedElisData(object) {
         
     const num = parseFloat(object.value.replace(",", "."));
     object.value = num.toFixed(object.getAttribute('data-roundValue'));
+}
+
+//Сброс подсветки данных при ручной корректировки
+function ManualCorrect(event) {
+    if(!event) return;
+    console.log(event.target);
+    if(event.target.hasAttribute("backlight"))
+        event.target.setAttribute("backlight", "white");
 }
 
 //Состояние кнопки "Запросить данные"
