@@ -1005,7 +1005,7 @@ function GetElisData() {
     }
 
     var periodDocument = GetPeriodDocument();
-
+    
     StateButtonGetElisData(true);
 
     $.ajax(
@@ -1155,7 +1155,7 @@ function DrawTablePassports(dataELIS) {
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
                         <b>Лаборатория:</b> <small>${item.labName}</small><br>
                         <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
-
+        
         li.dataPassport = item;
 
         li.addEventListener('click', function (e) {
@@ -1238,10 +1238,17 @@ function FillPassportDataElis() {
             }
 
             if (item.nodeName === 'INPUT') {
-                item.value = item.dataset.tag === 'AdditionalInfo'
+                const value = item.dataset.tag === 'AdditionalInfo'
                     ? root[currentKey]
                     : root[currentKey].value;
-                FixedElisData(item);
+                
+                if(item.type === 'datetime-local') {
+                    item.value = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                }
+                else {
+                    item.value = value;
+                    FixedElisData(item);
+                }    
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
