@@ -39,22 +39,19 @@
             /* Убираем двойные линии между ячейками */
         }
 
-        .empty-parameter {
-            /* border: 2px solid white; */
-            background-color: rgb(255, 255, 130);
+        input[backlight="green"].elis-data {
+            background-color: #8fd19e;
         }
-
-        .filled-parameter {
-            /* border: 2px solid white; */
+        input[backlight="white"].elis-data {
             background-color: white;
         }
 
-        .correct-rounding {
+        .correct-value {
             border: 1px solid white;
             /* background-color: green; */
         }
 
-        .incorrect-rounding {
+        .incorrect-value {
             border: 2px solid rgb(255, 105, 105);
             /* background-color: red; */
         }
@@ -110,30 +107,47 @@
         }
 
         function CheckRounding(Object) {
+            if(!Object.hasAttribute('data-roundValue'))
+                return;
             const round = Number(Object.getAttribute('data-roundValue'));
             if(isNaN(round) || round < 1)
                 return;
-            if(!Object.classList.contains("incorrect-rounding") && !Object.classList.contains("correct-rounding"))
-                return;
+            
+            // if(!Object.classList.contains("incorrect-rounding") && !Object.classList.contains("correct-rounding"))
+            //     return;
                 
             const strRegExPattern = "^-?([0-9]+\.[0-9]{1," + round + "})$";
             if (Object.value.match(new RegExp(strRegExPattern,'g'))) {
-                Object.classList.replace("incorrect-rounding", "correct-rounding");
+                Object.classList.replace("incorrect-value", "correct-value");
+                if(Object.hasAttribute("title")) {
+                    Object.setAttribute("title", "")
+                }
             }
             else {
-                Object.classList.replace("correct-rounding", "incorrect-rounding");
+                Object.classList.replace("correct-value", "incorrect-value");
+                if(Object.hasAttribute("title")) {
+                    Object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
+                }
             }
         }
 
         function CheckEmpty(Object) {
-            if(!Object.classList.contains("filled-parameter") && !Object.classList.contains("empty-parameter"))
+            if(!Object.hasAttribute("fill-required"))
                 return;
+            //if(!Object.classList.contains("filled-parameter") && !Object.classList.contains("empty-parameter"))
+            //    return;
 
             if (!Object.value) {
-                Object.classList.replace("filled-parameter", "empty-parameter");
+                Object.classList.replace("correct-value", "incorrect-value");
+                if(Object.hasAttribute("title")) {
+                    Object.setAttribute("title", "Поле должно быть заполнено!")
+                }
             }
             else {
-                Object.classList.replace("empty-parameter", "filled-parameter");
+                Object.classList.replace("incorrect-value", "correct-value");
+                if(Object.hasAttribute("title")) {
+                    Object.setAttribute("title", "")
+                }
             }
         }
         

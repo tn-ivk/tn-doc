@@ -74,7 +74,7 @@ namespace TN_Doc.Controllers
 
             Assembly assembly = Assembly.LoadFrom(Directory.GetCurrentDirectory() + docCfg.PathToDocDll);
 
-            var doc = assembly.GetTypes().Single(x => x.BaseType.Name == "DocGeneral");
+            var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
 
             return (DocGeneral)assembly.CreateInstance(
                 doc.FullName,

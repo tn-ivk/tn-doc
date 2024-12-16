@@ -1005,7 +1005,7 @@ function GetElisData() {
     }
 
     var periodDocument = GetPeriodDocument();
-
+    
     StateButtonGetElisData(true);
 
     $.ajax(
@@ -1155,7 +1155,7 @@ function DrawTablePassports(dataELIS) {
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
                         <b>Лаборатория:</b> <small>${item.labName}</small><br>
                         <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
-
+        
         li.dataPassport = item;
 
         li.addEventListener('click', function (e) {
@@ -1191,7 +1191,7 @@ function SetDataLocalStorage() {
 
 function FillPassportDataElis() {
     try {
-        //console.log("FillPassportDataElis -> me tut" );
+        //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
@@ -1238,16 +1238,26 @@ function FillPassportDataElis() {
             }
 
             if (item.nodeName === 'INPUT') {
-                item.value = item.dataset.tag === 'AdditionalInfo'
+                const value = item.dataset.tag === 'AdditionalInfo'
                     ? root[currentKey]
                     : root[currentKey].value;
-                FixedElisData(item);
-                if(item.hasAttribute("oninput"))
+                
+                if(item.type === 'datetime-local') {
+                    item.value = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                }
+                else {
+                    item.value = value;
+                    FixedElisData(item);
+                }    
+                if(item.hasAttribute("oninput")){
                     item.oninput();
+                }
+                if(item.hasAttribute("backlight"))
+                    item.setAttribute("backlight", "green");
+                item.addEventListener("input", ManualCorrect, {once:true});
             }
 
             if (item.nodeName === 'SELECT') {
-
                 item.contains = function (value) {
                     for (var i = 0, l = this.options.length; i < l; i++) {
                         if (this.options[i].text === value) {
@@ -1268,53 +1278,6 @@ function FillPassportDataElis() {
             }
 
         });
-        // elmnts.forEach(function (item, i, arr) {
-        //
-        //     if (dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
-        //         data = dataPassport.parameters;
-        //     else if (dataPassport.hasOwnProperty(item.dataset.keyelis))
-        //         data = dataPassport;
-        //     else
-        //         return;
-        //
-        //     if (item.nodeName == 'INPUT') {
-        //         let value;
-        //         if (item.dataset.tag == 'AdditionalInfo')
-        //             value = data[item.dataset.keyelis];
-        //         else
-        //             value = data[item.dataset.keyelis].value;
-        //         item.value = value;
-        //
-        //         ValidateElisInput(item);
-        //     }
-        //
-        //     if (item.nodeName == 'SELECT') {
-        //
-        //         item.contains = function (value) {
-        //             for (var i = 0, l = this.options.length; i < l; i++) {
-        //                 if (this.options[i].text == value) {
-        //                     return true;
-        //                 }
-        //             }
-        //             return false;
-        //         }
-        //
-        //         let testMethodName = data[item.dataset.keyelis].testMethodName;
-        //
-        //         //Проверяем наличие значения в списке, если нет, добавляем.
-        //         if (!item.contains(testMethodName)) {
-        //
-        //             let newOption = new Option(testMethodName, testMethodName);
-        //             item.append(newOption);
-        //             //newOption.selected = true;
-        //         }
-        //
-        //         item.value = testMethodName;
-        //         //for (let i = 0; i < item.length; i++) {
-        //         //    if (item[i].value === testMethodName) item[i].selected = true;
-        //         //}
-        //     }
-        // });
 
     } finally {
         console.groupEnd();
@@ -1330,6 +1293,14 @@ function FixedElisData(object) {
         
     const num = parseFloat(object.value.replace(",", "."));
     object.value = num.toFixed(object.getAttribute('data-roundValue'));
+}
+
+//Сброс подсветки данных при ручной корректировки
+function ManualCorrect(event) {
+    if(!event) return;
+    console.log(event.target);
+    if(event.target.hasAttribute("backlight"))
+        event.target.setAttribute("backlight", "white");
 }
 
 //Состояние кнопки "Запросить данные"
