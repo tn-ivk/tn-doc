@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMX_Sikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/12/2024 10:02:59" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMX_Sikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/17/2024 10:49:26" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -73,9 +73,9 @@ namespace FastReport
       // Fill table with data   
       ProtokolNum.Text = &quot;П Р О Т О К О Л  № &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.ProtokolNum;
       
-      CPM_RSU_Type.Text = &quot;Тип СИ массового расхода &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.MprRsuInfo.Sensor.DevType;
-      CPM_RSU_FactoryNumber.Text = &quot;Заводской номер &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.MprRsuInfo.Sensor.DevNumb;
-      CPM_RSU_Delta.Text = &quot;Пределы допускаемой относительной погрешности, % &lt;u&gt; -&quot;;
+      CPM_RSU_Type.Text = &quot;Тип СИ массового расхода &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.MprRsuInfo.Mpr.DevType;
+      CPM_RSU_FactoryNumber.Text = &quot;Заводской номер &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.MprRsuInfo.Mpr.DevNumb;
+      CPM_RSU_Delta.Text = &quot;Пределы допускаемой относительной погрешности, % &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.MprRsuInfo.delta;
       Place_SIKN.Text = &quot;СИКН/СИКНП &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.PlaceSikn;
       Place_PSP.Text = &quot;ПСП &lt;u&gt; &quot; + DataIVK.TableKmxSikn425PrPr.AdditionalInfo.PlacePsp;
     
@@ -124,10 +124,10 @@ namespace FastReport
               if ((i % 4) == 0)
               {
                 TablePRs[0,i].Text= String.Format(&quot;СРМ{0}:&quot;, tempCounter+1);
-                TablePRs[1,i].Text= &quot;Тип контрольного СИ массового расхода &lt;u&gt; &quot; + listPRs_Info[tempCounter].Sensor.DevType;
-                TablePRs[1,i+1].Text= &quot;Заводской номер &lt;u&gt; &quot; + listPRs_Info[tempCounter].Sensor.DevNumb;
-                TablePRs[1,i+2].Text= &quot;Пределы допускаемой относительной погрешности, % &lt;u&gt; -&quot;; //+ listPRs_Info[tempCounter].Sensor.DevType;
-                TablePRs[1,i+3].Text= &quot;Дата поверки &lt;u&gt; -&quot;; // + listPRs_Info[tempCounter].Sensor.DevType;
+                TablePRs[1,i].Text= &quot;Тип контрольного СИ массового расхода &lt;u&gt; &quot; + listPRs_Info[tempCounter].Mpr.DevType;
+                TablePRs[1,i+1].Text= &quot;Заводской номер &lt;u&gt; &quot; + listPRs_Info[tempCounter].Mpr.DevNumb;
+                TablePRs[1,i+2].Text= &quot;Пределы допускаемой относительной погрешности, % &lt;u&gt; &quot; + listPRs_Info[tempCounter].delta;
+                TablePRs[1,i+3].Text= &quot;Дата поверки &lt;u&gt; &quot; + listPRs_Info[tempCounter].CheckDate;
                 tempCounter++;
               }
             }
@@ -333,10 +333,10 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandPrim" Top="326.63" Width="718.2" Height="37.8" BeforeLayoutEvent="DataBandPrim_BeforeLayout">
-      <TextObject Name="Prim" Top="18.9" Width="926.1" Height="18.9" Text="Prim" VertAlign="Bottom" Font="Arial, 8.25pt" TextRenderType="HtmlTags"/>
+    <DataBand Name="DataBandPrim" Top="326.63" Width="718.2" Height="26.46" BeforeLayoutEvent="DataBandPrim_BeforeLayout">
+      <TextObject Name="Prim" Top="7.56" Width="926.1" Height="18.9" Text="Prim" VertAlign="Bottom" Font="Arial, 8.25pt" TextRenderType="HtmlTags"/>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="367.1" Width="718.2" Height="378" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="355.76" Width="718.2" Height="378" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableConclusion1" Top="9.45" Width="567" Height="75.6" GrowToBottom="true">
         <TableColumn Name="Column178" Width="567"/>
         <TableRow Name="Row193">
@@ -437,7 +437,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="747.77" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="736.43" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
