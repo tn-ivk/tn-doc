@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/09/2024 01:44:39" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/17/2024 11:04:51" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -820,15 +820,15 @@ namespace FastReport
       </TableObject>
     </DataBand>
     <ReportSummaryBand Name="ReportSummary" Top="826.47" Width="718.2" Height="136.08" CanShrink="true">
-      <TableObject Name="TableConclusion2" Top="45.36" Width="525.42" Height="37.8">
+      <TableObject Name="TableConclusion2" Top="45.36" Width="470.61" Height="37.8">
         <TableColumn Name="Column144" Width="185.22"/>
         <TableColumn Name="Column176" Width="151.2"/>
-        <TableColumn Name="Column179" AutoSize="true"/>
+        <TableColumn Name="Column179" Width="11.34"/>
         <TableColumn Name="Column177" Width="122.85" AutoSize="true"/>
         <TableRow Name="Row128">
           <TableCell Name="Cell844" Text="Подпись лица, проводившего измерения" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell953" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell960" Text="/" Padding="0, 0, 2, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell960" Text="/" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="StaffData" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="StaffData" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row135">
