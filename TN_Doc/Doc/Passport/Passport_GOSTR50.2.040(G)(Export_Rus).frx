@@ -331,7 +331,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="RowYield_fraction" Height="45.36" AutoSize="true">
           <TableCell Name="Cell1579" Border.Lines="All" Text="11." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1580" Border.Lines="All" Text="Выход фракций, %:      при температуре до 200 °С&#13;&#10;		        при температуре до 300 °С" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell1580" Border.Lines="All" Text="Выход фракций, %:      при температуре до 200 °С&#13;&#10;		     при температуре до 300 °С" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1581" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1582" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
