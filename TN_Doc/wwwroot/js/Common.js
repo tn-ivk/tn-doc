@@ -1298,7 +1298,7 @@ function FixedElisData(object) {
 //Сброс подсветки данных при ручной корректировки
 function ManualCorrect(event) {
     if(!event) return;
-    console.log(event.target);
+    
     if(event.target.hasAttribute("backlight"))
         event.target.setAttribute("backlight", "white");
 }
