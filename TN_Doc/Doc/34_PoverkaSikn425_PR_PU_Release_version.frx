@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/21/2024 03:42:26" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;PoverkaSikn425_PR_PU.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/21/2024 09:59:32" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -68,7 +68,6 @@ namespace FastReport
 
       // Load data into global lists
       listTable2Results = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table2.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
-      //listPointsTable3 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Point.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;)   &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
       listPointsTable3 = DataIVK.TablePoverkaSikn425_PR_PU.Protokol.Table3.Point.Where(i =&gt; ! i.ser.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.ser) == false).ToList();
     
       // Запуск отрисовки таблиц на странице отчета
@@ -378,9 +377,9 @@ namespace FastReport
       <TableObject Name="TableHeader04" Top="98.28" Width="395.01" Height="56.7">
         <TableColumn Name="Column193" Width="34.02"/>
         <TableColumn Name="Column194" Width="20.79"/>
-        <TableColumn Name="Column195" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column195" MinWidth="151.2" Width="151.2" AutoSize="true"/>
         <TableColumn Name="Column196" Width="37.8"/>
-        <TableColumn Name="Column197" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column197" MinWidth="151.2" Width="151.2" AutoSize="true"/>
         <TableRow Name="Row150">
           <TableCell Name="Cell1124" Text="ТПУ:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1125" Text="Тип" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
@@ -424,11 +423,11 @@ namespace FastReport
         <TableColumn Name="Column267" Width="34.02"/>
         <TableColumn Name="Column268" Width="94.5"/>
         <TableColumn Name="Column269" Width="34.02"/>
-        <TableColumn Name="Column270" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column270" MinWidth="151.2" Width="151.2" AutoSize="true"/>
         <TableColumn Name="Column271" Width="45.36"/>
-        <TableColumn Name="Column272" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column272" MinWidth="151.2" Width="151.2" AutoSize="true"/>
         <TableColumn Name="Column273" Width="56.7"/>
-        <TableColumn Name="Column274" MinWidth="37.8" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column274" MinWidth="151.2" Width="151.2" AutoSize="true"/>
         <TableRow Name="Row174">
           <TableCell Name="Cell1416" Text="СРМ:" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1417" Text="Датчик:" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
@@ -452,7 +451,7 @@ namespace FastReport
       </TableObject>
       <TableObject Name="TableHeader05" Top="154.98" Width="245.7" Height="18.9">
         <TableColumn Name="Column200" Width="94.5"/>
-        <TableColumn Name="Column201" Width="151.2" AutoSize="true"/>
+        <TableColumn Name="Column201" MinWidth="151.2" Width="151.2" AutoSize="true"/>
         <TableRow Name="Row158">
           <TableCell Name="Cell1180" Text="Рабочая жидкость" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Oil_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Oil_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
