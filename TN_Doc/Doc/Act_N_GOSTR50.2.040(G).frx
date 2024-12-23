@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/19/2024 11:52:21" ReportInfo.CreatorVersion="2024.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/23/2024 11:47:50" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -258,7 +258,7 @@ namespace FastReport
         <TableColumn Name="Column275" Width="120.96"/>
         <TableColumn Name="Column3" Width="85.05"/>
         <TableRow Name="Row1" AutoSize="true">
-          <TableCell Name="ActNumberAndDate" Text="ActNumberAndDate" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" FontWidthRatio="0.85" ColSpan="6"/>
+          <TableCell Name="ActNumberAndDate" Text="ActNumberAndDate" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="6"/>
           <TableCell Name="Cell2" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1523" Font="Arial, 10pt"/>
           <TableCell Name="Cell1543" Font="Arial, 10pt"/>
@@ -339,7 +339,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="183.18" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="184.07" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="7.56" Width="576.45" Height="492.23" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="311.85"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -503,7 +503,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="684.75" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="686.52" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Top="9.45" Width="714.42" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="714.42"/>
         <TableRow Name="Row195">
@@ -514,7 +514,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="733.77" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="736.44" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="85.05" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -566,7 +566,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="828.16" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="831.72" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
