@@ -1,0 +1,125 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "ProtokolNum",
+      "Type": "text",
+      "Name": "Номер протокола"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_PSP",
+      "Type": "text",
+      "Name": "ПСП"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN",
+      "Type": "text",
+      "Name": "СИКН/СИКНП"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "CPM_RSU_Type",
+      "Type": "text",
+      "Name": "Тип СИ массового расхода"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "CPM_RSU_FactoryNumber",
+      "Type": "text",
+      "Name": "Заводской номер"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "Заключение: СИ массового расхода к дальнейшей эксплуатации"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffCompany",
+      "Type": "text",
+      "Name": "Организация, проводящая техническое обслуживание СИКН/СИКНП"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffPost",
+      "Type": "text",
+      "Name": "Должность"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffFIO",
+      "Type": "text",
+      "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": true,
+      "Key": "OperationStaffCompany",
+      "Type": "text",
+      "Name": "Организация, эксплуатирующая СИКН/СИКНП"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "OperationStaffPost",
+      "Type": "text",
+      "Name": "Должность"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "OperationStaffFIO",
+      "Type": "text",
+      "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffCompany",
+      "Type": "text",
+      "Name": "Принимающая/сдающая сторона"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffPost",
+      "Type": "text",
+      "Name": "Должность"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffFIO",
+      "Type": "text",
+      "Name": "И.О. Фамилия"
+    }
+  ]
+}
+

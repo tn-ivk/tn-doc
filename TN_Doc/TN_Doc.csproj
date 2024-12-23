@@ -114,6 +114,24 @@
     <None Update="Doc\Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Update="Cfg\CfgEditPoverkaSikn425_PR_PU.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Cfg\CfgEditPoverkaSikn425_PR_PR.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Update="Doc\34_PoverkaSikn425_PR_PU_Release_version.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\35_PoverkaSikn425_PR_PR_Release_version.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\36_KMX_Sikn425_PR_PU_Release_version.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\37_KMX_Sikn425_PR_PR_GOST8.1011(U5).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

@@ -993,13 +993,93 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json"
             }
           ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 35,
+          "Name": "Поверка СИКН 425 СРМ ОСУ по ПУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_PR_PU.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_PR_PU.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка СИКН 425 СРМ ОСУ по ПУ",
+              "Description": "Протокол определения коэффициента преобразования СРМ ОСУ с помощью ТПУ и ПП",
+              "PathToDocTemplateFile": "/Doc/34_PoverkaSikn425_PR_PU_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_PR_PU.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 36,
+          "Name": "Поверка СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_PR_PR.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_PR_PR.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+              "Description": "Протокол поверки СРМ РСУ с помощью нескольких СРМ ОСУ",
+              "PathToDocTemplateFile": "/Doc/35_PoverkaSikn425_PR_PR_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_PR_PR.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 37,
+          "Name": "КМХ СИКН 425 СРМ ОСУ по ПУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/KMX_Sikn425_PR_PU.dll",
+          "PathToDocConfigFile": "/Cfg/CfgKMX_Sikn425_PR_PU.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "КМХ СИКН 425 СРМ ОСУ по ПУ",
+              "Description": "Протокол определения коэффициента преобразования СРМ ОСУ с помощью ТПУ и ПП",
+              "PathToDocTemplateFile": "/Doc/36_KMX_Sikn425_PR_PU_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMX_Sikn425_PR_PU.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 38,
+          "Name": "КМХ СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/KMX_Sikn425_PR_PR.dll",
+          "PathToDocConfigFile": "/Cfg/CfgKMX_Sikn425_PR_PR.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "КМХ СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+              "Description": "Протокол КМХ СРМ РСУ с помощью нескольких СРМ ОСУ",
+              "PathToDocTemplateFile": "/Doc/37_KMX_Sikn425_PR_PR_GOST8.1011(U5).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMX_Sikn425_PR_PR.json"
+            }
+          ]
         }
       ],
       "DBConnectionStrings": [
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.101",
+          "Server": "127.0.0.1",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -1987,6 +2067,86 @@
               "Description": "Протокол поверки ЭПР с помощью ПР по МИ 3266-2010 (Приложение А)",
               "PathToDocTemplateFile": "/Doc/Poverka_MI3266(A).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 35,
+          "Name": "Поверка СИКН 425 СРМ ОСУ по ПУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_PR_PU.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_PR_PU.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка СИКН 425 СРМ ОСУ по ПУ",
+              "Description": "Протокол определения коэффициента преобразования СРМ ОСУ с помощью ТПУ и ПП",
+              "PathToDocTemplateFile": "/Doc/34_PoverkaSikn425_PR_PU_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_PR_PU.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 36,
+          "Name": "Поверка СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_PR_PR.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_PR_PR.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+              "Description": "Протокол поверки СРМ РСУ с помощью нескольких СРМ ОСУ",
+              "PathToDocTemplateFile": "/Doc/35_PoverkaSikn425_PR_PR_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_PR_PR.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 37,
+          "Name": "КМХ СИКН 425 СРМ ОСУ по ПУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/KMX_Sikn425_PR_PU.dll",
+          "PathToDocConfigFile": "/Cfg/CfgKMX_Sikn425_PR_PU.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "КМХ СИКН 425 СРМ ОСУ по ПУ",
+              "Description": "Протокол определения коэффициента преобразования СРМ ОСУ с помощью ТПУ и ПП",
+              "PathToDocTemplateFile": "/Doc/36_KMX_Sikn425_PR_PU_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMX_Sikn425_PR_PU.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 38,
+          "Name": "КМХ СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/KMX_Sikn425_PR_PR.dll",
+          "PathToDocConfigFile": "/Cfg/CfgKMX_Sikn425_PR_PR.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "КМХ СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+              "Description": "Протокол КМХ СРМ РСУ с помощью нескольких СРМ ОСУ",
+              "PathToDocTemplateFile": "/Doc/37_KMX_Sikn425_PR_PR_GOST8.1011(U5).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMX_Sikn425_PR_PR.json"
             }
           ]
         }
@@ -2982,6 +3142,86 @@
               "Description": "Протокол поверки ЭПР с помощью ПР по МИ 3266-2010 (Приложение А)",
               "PathToDocTemplateFile": "/Doc/Poverka_MI3266(A).frx",
               "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka_MI3266(A).json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 35,
+          "Name": "Поверка СИКН 425 СРМ ОСУ по ПУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_PR_PU.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_PR_PU.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка СИКН 425 СРМ ОСУ по ПУ",
+              "Description": "Протокол определения коэффициента преобразования СРМ ОСУ с помощью ТПУ и ПП",
+              "PathToDocTemplateFile": "/Doc/34_PoverkaSikn425_PR_PU_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_PR_PU.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 36,
+          "Name": "Поверка СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/PoverkaSikn425_PR_PR.dll",
+          "PathToDocConfigFile": "/Cfg/CfgPoverkaSikn425_PR_PR.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Поверка СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+              "Description": "Протокол поверки СРМ РСУ с помощью нескольких СРМ ОСУ",
+              "PathToDocTemplateFile": "/Doc/35_PoverkaSikn425_PR_PR_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverkaSikn425_PR_PR.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 37,
+          "Name": "КМХ СИКН 425 СРМ ОСУ по ПУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/KMX_Sikn425_PR_PU.dll",
+          "PathToDocConfigFile": "/Cfg/CfgKMX_Sikn425_PR_PU.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "КМХ СИКН 425 СРМ ОСУ по ПУ",
+              "Description": "Протокол определения коэффициента преобразования СРМ ОСУ с помощью ТПУ и ПП",
+              "PathToDocTemplateFile": "/Doc/36_KMX_Sikn425_PR_PU_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMX_Sikn425_PR_PU.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 38,
+          "Name": "КМХ СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+          "Description": "",
+          "PathToDocDll": "/Dll/KMX_Sikn425_PR_PR.dll",
+          "PathToDocConfigFile": "/Cfg/CfgKMX_Sikn425_PR_PR.json",
+          "PathToDocEditConfigFile": "",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "КМХ СИКН 425 СРМ РСУ с помощью СРМ ОСУ",
+              "Description": "Протокол КМХ СРМ РСУ с помощью нескольких СРМ ОСУ",
+              "PathToDocTemplateFile": "/Doc/37_KMX_Sikn425_PR_PR_GOST8.1011(U5).frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMX_Sikn425_PR_PR.json"
             }
           ]
         }
