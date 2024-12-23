@@ -1149,7 +1149,6 @@ function DrawTablePassports(dataELIS) {
     $('#listPassports').empty();
 
     dataELIS.passports.forEach(function (item, i, arr) {
-        //alert(i + ": " + item + " (массив:" + arr + ")");
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
@@ -1159,16 +1158,11 @@ function DrawTablePassports(dataELIS) {
         li.dataPassport = item;
 
         li.addEventListener('click', function (e) {
-
             let elmnt = e.target;
-
+            console.log(elmnt);
             sessionStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
             localStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
-            //elmnt.dataPassport
-
-            //if (elmnt.classList.contains('active')) elmnt.classList.remove('active');
-            //else elmnt.classList.add('active');
-
+            
             let elmnts = document.querySelectorAll('.list-group-item')
             elmnts.forEach(function (item, i, arr) {
 
