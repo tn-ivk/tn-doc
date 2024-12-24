@@ -1151,34 +1151,24 @@ function DrawTablePassports(dataELIS) {
     dataELIS.passports.forEach(function (item, i, arr) {
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
-        
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
                          <b>Лаборатория:</b> <small>${item.labName}</small><br>
                          <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
-        
-        // li.innerText = "Номер протокола: " + item.protocolNumber + "\n" +
-        //                  "Лаборатория: " + item.labName + "\n" +
-        //                  "Период: " + item.startPeriodTime + "-" + item.endPeriodTime;
-
-        li.addEventListener('click', ElisPassportClick);
         li.dataPassport = item;
+        li.addEventListener('click', function (e) {
+            let elisPassport = this;
+            sessionStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
+            localStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
+
+            let passports = document.querySelectorAll('.list-group-item')
+            passports.forEach(function (item, i, arr) {
+                if (item.classList.contains('active'))
+                    item.classList.remove('active');
+            })
+            elisPassport.classList.add('active');
+        });
         element.append(li);
     });
-}
-
-function ElisPassportClick(e) {
-    let elisPassport = e.target;
-    
-    console.log(elisPassport);
-    sessionStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
-    localStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
-
-    let passports = document.querySelectorAll('.list-group-item')
-    passports.forEach(function (item, i, arr) {
-        if (item.classList.contains('active'))
-            item.classList.remove('active');
-    })
-    elisPassport.classList.add('active');
 }
 
 function SetDataLocalStorage() {
