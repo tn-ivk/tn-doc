@@ -1149,41 +1149,27 @@ function DrawTablePassports(dataELIS) {
     $('#listPassports').empty();
 
     dataELIS.passports.forEach(function (item, i, arr) {
-        //alert(i + ": " + item + " (массив:" + arr + ")");
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
-                        <b>Лаборатория:</b> <small>${item.labName}</small><br>
-                        <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
-        
+                         <b>Лаборатория:</b> <small>${item.labName}</small><br>
+                         <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
         li.dataPassport = item;
-
         li.addEventListener('click', function (e) {
+            let elisPassport = this;
+            sessionStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
+            localStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
 
-            let elmnt = e.target;
-
-            sessionStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
-            localStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
-            //elmnt.dataPassport
-
-            //if (elmnt.classList.contains('active')) elmnt.classList.remove('active');
-            //else elmnt.classList.add('active');
-
-            let elmnts = document.querySelectorAll('.list-group-item')
-            elmnts.forEach(function (item, i, arr) {
-
+            let passports = document.querySelectorAll('.list-group-item')
+            passports.forEach(function (item, i, arr) {
                 if (item.classList.contains('active'))
                     item.classList.remove('active');
-
             })
-
-            elmnt.classList.add('active');
+            elisPassport.classList.add('active');
         });
-
         element.append(li);
     });
 }
-
 
 function SetDataLocalStorage() {
 }
