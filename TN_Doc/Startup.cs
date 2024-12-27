@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using TN_Doc.Extensions;
 using TN.Doc;
 
@@ -38,6 +39,8 @@ namespace TN_Doc
 			services.AddPrinterService();
 			services.AddControllersWithViews();
 			services.AddDbContext<DocGeneral>();
+			services.AddLogging(builder => 
+				builder.AddConsole());
 		}
 
 		// This method gets called by the runtime. Use this method to configure
