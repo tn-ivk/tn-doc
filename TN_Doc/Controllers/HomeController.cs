@@ -49,7 +49,7 @@ namespace TN_Doc.Controllers
 
         public HomeController(ILogger<HomeController> logger, Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> context)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             options = context;
 
@@ -527,6 +527,7 @@ namespace TN_Doc.Controllers
             }
             return strResult;
         }
+        
     }
 
     public class cfgFileRW

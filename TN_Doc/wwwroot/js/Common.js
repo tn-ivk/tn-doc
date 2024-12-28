@@ -1024,12 +1024,15 @@ function GetElisData() {
                     endPeriod: moment.utc(periodDocument.end * 1000).format()
                 }),
             success: function (data) {
-                if (data.isError)
-                    $('#info').text(data.textError);
+                if (data.isError) {
+                    if(data.textError) {
+                        $('#info').text(data.textError);
+                        $.post("Elis/ErrorMessage/", {msg:data.textError});    
+                    }
+                }
                 else if (data.passports.length == 0)
                     $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
-                //отрисовываем таблицу с паспортами
-                else
+                else    //отрисовываем таблицу с паспортами
                     dataELIS = data;
             },
             error: function (data) {
@@ -1042,7 +1045,8 @@ function GetElisData() {
             },
             complete: function (data) {
                 StateButtonGetElisData(false);
-                DrawTablePassports(dataELIS);
+                if(dataELIS)
+                    DrawTablePassports(dataELIS);
             }
         });
 }
