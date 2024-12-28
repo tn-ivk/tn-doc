@@ -1024,8 +1024,7 @@ function GetElisData() {
                     endPeriod: moment.utc(periodDocument.end * 1000).format()
                 }),
             success: function (data) {
-                if (data.isError || true) {
-                    data.textError = "ошибочка";
+                if (data.isError) {
                     if(data.textError) {
                         $('#info').text(data.textError);
                         $.post("Elis/ErrorMessage/", {msg:data.textError});    
@@ -1342,24 +1341,4 @@ function ClearDataElis() {
     $('#info').text('');
     $('#listPassports').empty();
     localStorage.removeItem('dataPassport');
-}
-
-function SendErrMsg(msg) {
-    $.ajax(
-        {
-            async: false,
-            url: 'Home/ErrorMessage',
-            type: 'GET',
-            contentType: 'application/json; charset=UTF-8',
-            dataType: 'json',
-            data: JSON.stringify({
-                msg: msg
-            }),
-            success: function (data) {
-            },
-            error: function (data) {
-            },
-            complete: function (data) {
-            }
-        });
 }
