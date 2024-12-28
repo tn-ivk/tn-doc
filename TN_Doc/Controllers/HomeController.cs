@@ -11,11 +11,11 @@ using FastReport.Web;
 using System.IO;
 using System.Threading;
 using System.Text;
-using Newtonsoft.Json;
 using System.Collections;
 using Newtonsoft.Json.Linq;
 using TN.Doc;
 using TN.DocData;
+using TN.Utils.Helpers;
 
 
 namespace TN_Doc.Controllers
@@ -64,7 +64,7 @@ namespace TN_Doc.Controllers
 
         private void InitApp()
         {
-            cfgFileRW.LoadCfg<CfgApp>(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", $"CfgApp.json"), ref CfgApp);
+            CfgFileRW.LoadCfg<CfgApp>(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", $"CfgApp.json"), ref CfgApp);
         }
 
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
@@ -143,7 +143,7 @@ namespace TN_Doc.Controllers
                 .Docs.Single(x => x.IdDoc == IdDoc)
                 .LastUsedTemplateId = IdTemplateDoc;
 
-            cfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
+            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
         }
         public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
         {
@@ -252,7 +252,7 @@ namespace TN_Doc.Controllers
             else 
                 device.Elis.ClientToken = clientToken;
 
-            cfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
+            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
 
             return true;
         }
@@ -528,35 +528,5 @@ namespace TN_Doc.Controllers
             return strResult;
         }
         
-    }
-
-    public class cfgFileRW
-    {
-        //Сохранить файл конфигурации
-        public static bool SaveCfg(string path, string FileName, object st)
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(path);
-            if (!dirInfo.Exists) dirInfo.Create();
-            string PathFileName = path + FileName;
-            if (File.Exists(PathFileName)) File.Delete(PathFileName);
-            File.WriteAllText(PathFileName, JsonConvert.SerializeObject(st,Formatting.Indented), Encoding.UTF8);
-            return true;
-        }
-
-        //Загрузить файл конфигурации
-        public static bool LoadCfg<T>(string path, ref T st)
-        {
-            if (File.Exists(path))
-            {
-                using (StreamReader file = new StreamReader(File.OpenRead(path), Encoding.UTF8))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    st = (T)serializer.Deserialize(file, typeof(T));
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }
