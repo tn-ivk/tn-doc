@@ -528,8 +528,6 @@ namespace TN_Doc.Controllers
             return strResult;
         }
         
-        public void ErrorMessage(string msg) => _logger.LogError(msg);
-        public void WarnMessage(string msg) => _logger.LogWarning(msg);
     }
 
     public class cfgFileRW

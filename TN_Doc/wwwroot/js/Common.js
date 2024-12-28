@@ -1028,7 +1028,7 @@ function GetElisData() {
                     data.textError = "ошибочка";
                     if(data.textError) {
                         $('#info').text(data.textError);
-                        $.post("Home/ErrorMessage/", {msg:data.textError});    
+                        $.post("Elis/ErrorMessage/", {msg:data.textError});    
                     }
                 }
                 else if (data.passports.length == 0)
