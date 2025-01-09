@@ -6,75 +6,59 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using TN_Doc.Models;
-using TN_Doc.Models.Home;
 using FastReport.Web;
 using System.IO;
 using System.Threading;
 using System.Text;
-using Newtonsoft.Json;
 using System.Collections;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using TN_Doc.Models.Home;
 using TN.Doc;
 using TN.DocData;
-
+using TN.Utils.Helpers;
+using Data = TN_Doc.Models.Home.Data;
 
 namespace TN_Doc.Controllers
 {
     public class HomeController : Controller
     {
-        private CfgApp CfgApp;
-
-        string PathToDocumentFile = "";
-
-        private readonly ILogger<HomeController> _logger;
-        private Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> options;
-
-        /// <summary>
-        /// Docs содержит экземпляры классов для работы с документами
-        /// </summary>
-        private List<DocGeneral> Docs = new List<DocGeneral>();
-
-        private DocGeneral dbDoc;
-
-        private ModelReport modelReport;
-
+        CfgApp _cfgApp;
+        readonly ILogger<HomeController> _logger;
+        DbContextOptions<DocGeneral> options;
+        DocGeneral dbDoc;
         private WebReport FR;
-
-        string reportsPath = "";
-
         CancellationToken stoppingToken;
-
         Device deviceCfg;
         Document docCfg;
 
-        public HomeController(ILogger<HomeController> logger, Microsoft.EntityFrameworkCore.DbContextOptions<DocGeneral> context)
+        public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context)
         {
-            _logger = logger;
-
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             options = context;
 
-            modelReport = new ModelReport();
             FR = new WebReport();
-
-            PathToDocumentFile = Directory.GetCurrentDirectory();
-            reportsPath = Directory.GetCurrentDirectory();
 
             InitApp();
         }
 
         private void InitApp()
         {
-            cfgFileRW.LoadCfg<CfgApp>(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg", $"CfgApp.json"), ref CfgApp);
+            var cfgFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Cfg", "CfgApp.json");
+            if(CfgFileRW.LoadCfg(cfgFilePath, ref _cfgApp))
+                _logger.LogDebug($"Загрузка конфигурации из файла {cfgFilePath}");
+            else
+                _logger.LogError($"Невозможно загрузить конфигурацию из файла {cfgFilePath}");
         }
 
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
         {
-            deviceCfg = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            _logger.LogDebug("Загрузка dll");
+            deviceCfg = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             docCfg = deviceCfg.Docs.Single(x => x.IdDoc == idDoc);
 
             Assembly assembly = Assembly.LoadFrom(Directory.GetCurrentDirectory() + docCfg.PathToDocDll);
-
-            var doc = assembly.GetTypes().Single(x => x.BaseType.Name == "DocGeneral");
+            var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
 
             return (DocGeneral)assembly.CreateInstance(
                 doc.FullName,
@@ -86,38 +70,34 @@ namespace TN_Doc.Controllers
                 null);
         }
 
-        public class ListItem
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-        }
         public List<ListItem> GetListDevices()
         {
-            List<ListItem> devices = CfgApp.Devices.Where(x => x.Use)
+            _logger.LogDebug($"Загрузка списка устройств");
+            List<ListItem> devices = _cfgApp.Devices.Where(x => x.Use)
                 .Select(u => new ListItem() { Id = u.IdDevice, Name = u.Name }).ToList();
-
-            string rez = System.Text.Json.JsonSerializer.Serialize(devices);
 
             return devices;
         }
 
         public string GetNameDBForDevice(int IdDevice)
         {
-            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             return device.DBConnectionStrings.First(x => x.Use).Database;
         }
 
         public List<ListItem> GetListDocs(int IdDevice)
         {
-            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-            List<ListItem> list = device.Docs.Where(x => x.Use)
-                .Select(u => new ListItem() { Id = (int)u.IdDoc, Name = u.Name }).ToList();
+            _logger.LogDebug($"Загрузка списка документов");
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            var list = device.Docs.Where(x => x.Use)
+                .Select(u => new ListItem { Id = (int)u.IdDoc, Name = u.Name }).ToList();
             return list;
         }
 
         public List<ListItem> GetTemplatesDoc(int IdDevice, IdDoc idDoc)
         {
-            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            _logger.LogDebug("Загрузка шаблонов документа");
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             var doc = device.Docs.Single(x => x.IdDoc == idDoc);
 
             return doc.TemplateDocs.Where(x => x.Use).Select(x => new ListItem() { Id = x.Id, Name = x.Name }).ToList();
@@ -125,33 +105,36 @@ namespace TN_Doc.Controllers
 
         public List<ListItem> GetListProtocolNumber(int IdDevice, IdDoc idDoc)
         {
-            //var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-            //var doc = device.Docs.Single(x => x.IdDoc == idDoc);
-
-            List<ListItem> list = new List<ListItem>()
+            _logger.LogDebug("Загрузка списка протоколов");
+            var list = new List<ListItem>
             {
-                new ListItem() { Id = 1, Name = "Протокол 1" },
-                new ListItem() { Id = 2, Name = "Протокол 2" }
+                new() { Id = 1, Name = "Протокол 1" },
+                new() { Id = 2, Name = "Протокол 2" }
             };
-
             return list;
         }
 
+        /// <summary>
+        /// Сохранение Id последнего открытого документа
+        /// </summary>
+        /// <param name="IdDevice">Id устройства</param>
+        /// <param name="IdDoc">Id библиотеки</param>
+        /// <param name="IdTemplateDoc">Id открытого документа</param>
         public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {
-            CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+            _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                 .Docs.Single(x => x.IdDoc == IdDoc)
                 .LastUsedTemplateId = IdTemplateDoc;
 
-            cfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
+            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), "Cfg"), "/CfgApp.json", _cfgApp);
         }
         public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
         {
-            int lastUsedTemplateId = CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+            int lastUsedTemplateId = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                 .Docs.Single(x => x.IdDoc == IdDoc)
                 .LastUsedTemplateId;
 
-            var usedTemplateDocs = CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+            var usedTemplateDocs = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                 .Docs.Single(x => x.IdDoc == IdDoc)
                 .TemplateDocs
                 .Where(x => x.Use);
@@ -167,13 +150,13 @@ namespace TN_Doc.Controllers
         }
         public string GetPathTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {
-            return CfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+            return _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
                             .Docs.Single(x => x.IdDoc == IdDoc)
                             .TemplateDocs.Single(x => x.Id == IdTemplateDoc).PathToDocTemplateFile;
         }
 
 
-        public bool IsUsedSecurity() => CfgApp.UseSecurityFeatures;
+        public bool IsUsedSecurity() => _cfgApp.UseSecurityFeatures;
 
 
         /// <summary>
@@ -183,12 +166,10 @@ namespace TN_Doc.Controllers
         /// <returns></returns>
         public bool IsUsedElis(int IdDevice)
         {
-            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            var cfgElisUse = _cfgApp.Elis?.Use ?? false;
 
-            if (device.Elis == null)
-                if (CfgApp.Elis == null) return false;
-                else return CfgApp.Elis.Use;
-            else return device.Elis.Use;
+            return device.Elis?.Use ?? cfgElisUse;
         }
 
         /// <summary>
@@ -196,23 +177,21 @@ namespace TN_Doc.Controllers
         /// </summary>
         /// <param name="IdDevice"></param>
         /// <returns></returns>
-        
         public Dictionary<string, string> GetDataForRegistrationDeviceInELIS(int IdDevice)
         {
-            //Dictionary<string, string> retData;
-            
-            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            _logger.LogDebug("Получение данных для регистрации устройства в ЕЛИС");
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
-                if (CfgApp.Elis == null)
+                if (_cfgApp.Elis == null)
                 {                    
                 }
                 else 
                     return new Dictionary<string, string>()
                     {
-                        { "ostKey", CfgApp.Elis.OstKey },
-                        { "siknKey", CfgApp.Elis.SiknKey },
-                        { "clientName", CfgApp.Elis.ClientName }
+                        { "ostKey", _cfgApp.Elis.OstKey },
+                        { "siknKey", _cfgApp.Elis.SiknKey },
+                        { "clientName", _cfgApp.Elis.ClientName }
                     };
             else
                 return new Dictionary<string, string>()
@@ -228,11 +207,11 @@ namespace TN_Doc.Controllers
         public Dictionary<string, string> GetClientToken(int IdDevice)
         {
             string clientToken = string.Empty;
-            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
-                if (CfgApp.Elis == null) clientToken = string.Empty;
-                else clientToken = CfgApp.Elis.ClientToken;
+                if (_cfgApp.Elis == null) clientToken = string.Empty;
+                else clientToken = _cfgApp.Elis.ClientToken;
             else clientToken = device.Elis.ClientToken;
 
             return String.IsNullOrEmpty(clientToken)
@@ -242,17 +221,17 @@ namespace TN_Doc.Controllers
 
         public bool SetClientToken(int IdDevice, string clientToken)
         {
-            var device = CfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
             if (device.Elis == null)
-                if (CfgApp.Elis == null)
+                if (_cfgApp.Elis == null)
                     return false;
                 else 
-                    CfgApp.Elis.ClientToken = clientToken;
+                    _cfgApp.Elis.ClientToken = clientToken;
             else 
                 device.Elis.ClientToken = clientToken;
 
-            cfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", CfgApp);
+            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", _cfgApp);
 
             return true;
         }
@@ -286,24 +265,10 @@ namespace TN_Doc.Controllers
             {
             }
             
-            return View(CfgApp);
+            return View(_cfgApp);
         }
 
-        public class data
-        {
-            public int IdDevice { get; set; }
-            public IdDoc IdDoc { get; set; }
-            public string DTBegin { get; set; }
-            public string DTEnd { get; set; }
-        }
-        public class ListDoc
-        {
-            public int Id { get; set; }
-            public string DT { get; set; }
-            public string Description { get; set; }
-        }
-
-        public List<RequestListDocs> GetList(data data)
+        public List<RequestListDocs> GetList(Data data)
         {
             DateTime DTBegin = new();
             DateTime DTEnd = new();
@@ -323,16 +288,14 @@ namespace TN_Doc.Controllers
 
             if (data.IdDoc == IdDoc.ReportIncomplete)
                 return doc.GetList();
-            else
-                return doc.GetList(UTBegin, UTEnd);
+            
+            return doc.GetList(UTBegin, UTEnd);
         }
 
         public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
-            //var pathTemplateDoc = Directory.GetCurrentDirectory() +
-            //    GetPathTemplateDoc(IdDevice, IdDoc, GetIdTemplateDoc(IdDevice, IdDoc));
-
+            
             string pathTemplateFile = doc.GetPathTemplateFile();
             
             if (string.IsNullOrEmpty(pathTemplateFile))
@@ -378,8 +341,6 @@ namespace TN_Doc.Controllers
         public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
-            //var doc = Docs.Single(x => x.IdDoc == IdDoc);                       
-
             return doc.GetEditDoc(id);
         }
 
@@ -387,9 +348,9 @@ namespace TN_Doc.Controllers
         {                
             var doc = LoadDocsModule(IdDevice, IdDoc);
 
-            if (!System.IO.Directory.Exists($"{CfgApp.ExportDoc.Path}/{docCfg.Name}"))
+            if (!Directory.Exists($"{_cfgApp.ExportDoc.Path}/{docCfg.Name}"))
             {
-                System.IO.Directory.CreateDirectory($"{CfgApp.ExportDoc.Path}/{docCfg.Name}");
+                Directory.CreateDirectory($"{_cfgApp.ExportDoc.Path}/{docCfg.Name}");
             }
 
             FR.Report.Load(doc.GetPathTemplateFile());
@@ -399,7 +360,7 @@ namespace TN_Doc.Controllers
 
             FR.Report.Prepare();         
 
-            string path = $"{CfgApp.ExportDoc.Path}/{docCfg.Name}/{JObject.Parse(doc.GetViewDoc(id).ToString())["Doc"]["Settings"]["General"]["FileNameForExportDoc"]}";
+            string path = $"{_cfgApp.ExportDoc.Path}/{docCfg.Name}/{JObject.Parse(doc.GetViewDoc(id).ToString())["Doc"]["Settings"]["General"]["FileNameForExportDoc"]}";
 
             if (format == "pdf")
                 FR.Report.Export(new FastReport.Export.Pdf.PDFExport() { ShowProgress = false }, path += ".pdf");
@@ -418,30 +379,21 @@ namespace TN_Doc.Controllers
         public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
-
             doc.SaveDoc(data);
         }
 
         public PeriodDocument GetPeriodDocument(int IdDevice, IdDoc IdDoc, int id)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);
-
             doc.GetPeriodDocument(id);
-
             return doc.GetPeriodDocument(id);
         }
-
 
         public string GetListUsers()
         {
             return DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
         }
-
-        // public IActionResult Privacy()
-        // {
-        //     return View();
-        // }
-
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
         public IActionResult Error()
@@ -527,35 +479,6 @@ namespace TN_Doc.Controllers
             }
             return strResult;
         }
-    }
-
-    public class cfgFileRW
-    {
-        //Сохранить файл конфигурации
-        public static bool SaveCfg(string path, string FileName, object st)
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(path);
-            if (!dirInfo.Exists) dirInfo.Create();
-            string PathFileName = path + FileName;
-            if (File.Exists(PathFileName)) File.Delete(PathFileName);
-            File.WriteAllText(PathFileName, JsonConvert.SerializeObject(st,Formatting.Indented), Encoding.UTF8);
-            return true;
-        }
-
-        //Загрузить файл конфигурации
-        public static bool LoadCfg<T>(string path, ref T st)
-        {
-            if (File.Exists(path))
-            {
-                using (StreamReader file = new StreamReader(File.OpenRead(path), Encoding.UTF8))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    st = (T)serializer.Deserialize(file, typeof(T));
-                    return true;
-                }
-            }
-
-            return false;
-        }
+        
     }
 }

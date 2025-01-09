@@ -866,6 +866,7 @@ function SaveDoc() {
         $('#ComboboxDocGUID').val(),
         currentId,
         PrefixTag);
+    GetDoc();
 }
 
 function GetPeriodDocument() {
@@ -1004,7 +1005,7 @@ function GetElisData() {
     }
 
     var periodDocument = GetPeriodDocument();
-
+    
     StateButtonGetElisData(true);
 
     $.ajax(
@@ -1023,12 +1024,15 @@ function GetElisData() {
                     endPeriod: moment.utc(periodDocument.end * 1000).format()
                 }),
             success: function (data) {
-                if (data.isError)
-                    $('#info').text(data.textError);
+                if (data.isError) {
+                    if(data.textError) {
+                        $('#info').text(data.textError);
+                        $.post("Elis/ErrorMessage/", {msg:data.textError});    
+                    }
+                }
                 else if (data.passports.length == 0)
                     $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
-                //отрисовываем таблицу с паспортами
-                else
+                else    //отрисовываем таблицу с паспортами
                     dataELIS = data;
             },
             error: function (data) {
@@ -1041,7 +1045,8 @@ function GetElisData() {
             },
             complete: function (data) {
                 StateButtonGetElisData(false);
-                DrawTablePassports(dataELIS);
+                if(dataELIS)
+                    DrawTablePassports(dataELIS);
             }
         });
 }
@@ -1148,41 +1153,27 @@ function DrawTablePassports(dataELIS) {
     $('#listPassports').empty();
 
     dataELIS.passports.forEach(function (item, i, arr) {
-        //alert(i + ": " + item + " (массив:" + arr + ")");
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
-                        <b>Лаборатория:</b> <small>${item.labName}</small><br>
-                        <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
-
+                         <b>Лаборатория:</b> <small>${item.labName}</small><br>
+                         <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
         li.dataPassport = item;
-
         li.addEventListener('click', function (e) {
+            let elisPassport = this;
+            sessionStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
+            localStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
 
-            let elmnt = e.target;
-
-            sessionStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
-            localStorage.setItem('dataPassport', JSON.stringify(elmnt.dataPassport));
-            //elmnt.dataPassport
-
-            //if (elmnt.classList.contains('active')) elmnt.classList.remove('active');
-            //else elmnt.classList.add('active');
-
-            let elmnts = document.querySelectorAll('.list-group-item')
-            elmnts.forEach(function (item, i, arr) {
-
+            let passports = document.querySelectorAll('.list-group-item')
+            passports.forEach(function (item, i, arr) {
                 if (item.classList.contains('active'))
                     item.classList.remove('active');
-
             })
-
-            elmnt.classList.add('active');
+            elisPassport.classList.add('active');
         });
-
         element.append(li);
     });
 }
-
 
 function SetDataLocalStorage() {
 }
@@ -1190,7 +1181,7 @@ function SetDataLocalStorage() {
 
 function FillPassportDataElis() {
     try {
-        //console.log("FillPassportDataElis -> me tut" );
+        //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
@@ -1237,16 +1228,26 @@ function FillPassportDataElis() {
             }
 
             if (item.nodeName === 'INPUT') {
-                item.value = item.dataset.tag === 'AdditionalInfo'
+                const value = item.dataset.tag === 'AdditionalInfo'
                     ? root[currentKey]
                     : root[currentKey].value;
-                FixedElisData(item);
-                if(item.hasAttribute("oninput"))
+                
+                if(item.type === 'datetime-local') {
+                    item.value = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                }
+                else {
+                    item.value = value;
+                    FixedElisData(item);
+                }    
+                if(item.hasAttribute("oninput")){
                     item.oninput();
+                }
+                if(item.hasAttribute("backlight"))
+                    item.setAttribute("backlight", "green");
+                item.addEventListener("input", ManualCorrect, {once:true});
             }
 
             if (item.nodeName === 'SELECT') {
-
                 item.contains = function (value) {
                     for (var i = 0, l = this.options.length; i < l; i++) {
                         if (this.options[i].text === value) {
@@ -1267,53 +1268,6 @@ function FillPassportDataElis() {
             }
 
         });
-        // elmnts.forEach(function (item, i, arr) {
-        //
-        //     if (dataPassport.parameters.hasOwnProperty(item.dataset.keyelis))
-        //         data = dataPassport.parameters;
-        //     else if (dataPassport.hasOwnProperty(item.dataset.keyelis))
-        //         data = dataPassport;
-        //     else
-        //         return;
-        //
-        //     if (item.nodeName == 'INPUT') {
-        //         let value;
-        //         if (item.dataset.tag == 'AdditionalInfo')
-        //             value = data[item.dataset.keyelis];
-        //         else
-        //             value = data[item.dataset.keyelis].value;
-        //         item.value = value;
-        //
-        //         ValidateElisInput(item);
-        //     }
-        //
-        //     if (item.nodeName == 'SELECT') {
-        //
-        //         item.contains = function (value) {
-        //             for (var i = 0, l = this.options.length; i < l; i++) {
-        //                 if (this.options[i].text == value) {
-        //                     return true;
-        //                 }
-        //             }
-        //             return false;
-        //         }
-        //
-        //         let testMethodName = data[item.dataset.keyelis].testMethodName;
-        //
-        //         //Проверяем наличие значения в списке, если нет, добавляем.
-        //         if (!item.contains(testMethodName)) {
-        //
-        //             let newOption = new Option(testMethodName, testMethodName);
-        //             item.append(newOption);
-        //             //newOption.selected = true;
-        //         }
-        //
-        //         item.value = testMethodName;
-        //         //for (let i = 0; i < item.length; i++) {
-        //         //    if (item[i].value === testMethodName) item[i].selected = true;
-        //         //}
-        //     }
-        // });
 
     } finally {
         console.groupEnd();
@@ -1329,6 +1283,14 @@ function FixedElisData(object) {
         
     const num = parseFloat(object.value.replace(",", "."));
     object.value = num.toFixed(object.getAttribute('data-roundValue'));
+}
+
+//Сброс подсветки данных при ручной корректировки
+function ManualCorrect(event) {
+    if(!event) return;
+    
+    if(event.target.hasAttribute("backlight"))
+        event.target.setAttribute("backlight", "white");
 }
 
 //Состояние кнопки "Запросить данные"
