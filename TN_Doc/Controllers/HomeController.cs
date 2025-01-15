@@ -270,26 +270,33 @@ namespace TN_Doc.Controllers
 
         public List<RequestListDocs> GetList(Data data)
         {
-            DateTime DTBegin = new();
-            DateTime DTEnd = new();
+            try
+            {
+                DateTime DTBegin = new();
+                DateTime DTEnd = new();
 
-            long UTBegin, UTEnd;
+                long UTBegin, UTEnd;
 
-            if (data.DTBegin != null)
-                DTBegin = DateTime.Parse(data.DTBegin);
-            if (data.DTEnd != null)
-                DTEnd = DateTime.Parse(data.DTEnd);
+                if (data.DTBegin != null)
+                    DTBegin = DateTime.Parse(data.DTBegin);
+                if (data.DTEnd != null)
+                    DTEnd = DateTime.Parse(data.DTEnd);
 
-            UTBegin = new DateTimeOffset(DTBegin, TimeSpan.Zero).ToUnixTimeSeconds();
-            UTEnd = new DateTimeOffset(DTEnd, TimeSpan.Zero).ToUnixTimeSeconds();
-            UTEnd++;
+                UTBegin = new DateTimeOffset(DTBegin, TimeSpan.Zero).ToUnixTimeSeconds();
+                UTEnd = new DateTimeOffset(DTEnd, TimeSpan.Zero).ToUnixTimeSeconds();
+                UTEnd++;
 
-            var doc = LoadDocsModule(data.IdDevice, data.IdDoc);
+                var doc = LoadDocsModule(data.IdDevice, data.IdDoc);
 
-            if (data.IdDoc == IdDoc.ReportIncomplete)
-                return doc.GetList();
+                if (data.IdDoc == IdDoc.ReportIncomplete)
+                    return doc.GetList();
             
-            return doc.GetList(UTBegin, UTEnd);
+                return doc.GetList(UTBegin, UTEnd);
+            }
+            catch (Exception e)
+            {
+                return new List<RequestListDocs>();
+            }
         }
 
         public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
