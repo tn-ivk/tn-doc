@@ -1086,7 +1086,7 @@
           "ConnectionTimeout": 1
         },
         {
-          "Use": false,
+          "Use": true,
           "GuidDevice": 0,
           "Server": "192.168.233.201",
           "Userid": "user",
@@ -2155,7 +2155,7 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.22.102",
+          "Server": "192.168.233.102",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
@@ -2164,7 +2164,7 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.22.202",
+          "Server": "192.168.233.202",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
           "Database": "IVK_TN_01",
