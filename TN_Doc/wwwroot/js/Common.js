@@ -1280,6 +1280,9 @@ function FillPassportDataElis() {
                     item.append(newOption);
                 }
                 item.value = testMethodName;
+                if(item.hasAttribute("backlight"))
+                    item.setAttribute("backlight", "green");
+                item.addEventListener("input", ManualCorrect, {once:true});
             }
 
         });
