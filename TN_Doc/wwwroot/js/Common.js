@@ -703,7 +703,6 @@ function InitTableDocs() {
 }
 
 function InitElement() {
-
      let iframe = document.querySelector('.FR');
      iframe.onload = function(){
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
@@ -1151,7 +1150,7 @@ function SetClientToken() {
 function DrawTablePassports(dataELIS) {
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
-
+    localStorage.setItem('labInfo', JSON.stringify(dataELIS.labInfo));
     dataELIS.passports.forEach(function (item, i, arr) {
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
@@ -1163,7 +1162,7 @@ function DrawTablePassports(dataELIS) {
             let elisPassport = this;
             sessionStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
             localStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
-
+            
             let passports = document.querySelectorAll('.list-group-item')
             passports.forEach(function (item, i, arr) {
                 if (item.classList.contains('active'))
@@ -1183,6 +1182,7 @@ function FillPassportDataElis() {
     try {
         //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
+        let labInfo = JSON.parse(localStorage.labInfo);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
         //console.log('dataPassport.parameters',dataPassport.parameters);
@@ -1212,6 +1212,21 @@ function FillPassportDataElis() {
                 for (let key in dataPassport) {
                     if (itemKeys.includes(key)) {
                         root = dataPassport
+                        for (let iKey of itemKeys) {
+                            if (iKey === key) {
+                                currentKey = key;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (root === null) {
+                for (let key in labInfo) {
+                    if (itemKeys.includes(key)) {
+                        root = labInfo
                         for (let iKey of itemKeys) {
                             if (iKey === key) {
                                 currentKey = key;

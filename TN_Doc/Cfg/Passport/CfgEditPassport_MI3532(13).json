@@ -569,6 +569,10 @@
       "Id": 2,
       "Use": true,
       "Key": "AccrSertifNumber",
+      "KeyELIS": "AccreditationNumber",
+      "ElisAlias": [
+        "accreditationNumber"
+      ],
       "Type": "text",
       "Name": "Номер аттестата аккредитации"
     },
