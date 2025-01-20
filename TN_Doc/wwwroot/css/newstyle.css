@@ -1,0 +1,205 @@
+﻿body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0!important;
+    padding: 0.5vh!important;
+}
+
+body>div.container {
+    width: 100%;
+    height: 100%;
+    max-width: initial!important;
+    margin: 0!important;
+    padding: 0!important;
+}
+
+.cont {
+    position: initial!important;
+    top: initial!important;
+    left: initial!important;
+    height: 100%!important;
+    width: initial!important;
+}
+
+.mainTable {
+    position: initial!important;
+    width: 100%;
+    height: 100%;
+    font-size: 10pt;
+}
+
+main{
+    height: 100%;
+    /*margin: 1vh;*/
+}
+main.pb-3{
+    padding-bottom: initial!important;
+}
+.modal-content{
+    padding: 1vh!important;
+    height: 80vh!important;
+    overflow: hidden!important;
+}
+div.modal-body{
+    padding: 0!important;
+    padding-top: 1vh!important;
+}
+div.modal-body > div.container-fluid{
+    padding: 0!important;
+}
+.modal-dir-editor-height {
+    max-height: initial!important;
+    min-height: initial!important;
+}
+.table-container, .dir-item{
+    height: 100%!important;
+}
+.list-group-item{
+    padding: 0.4rem 0.5rem !important;
+}
+
+button.btn.close-menu-item{
+    padding: 0 1vh!important;
+}
+.modal-header{
+    padding: initial!important;
+}
+
+div.col-3{
+    width: 20%!important;
+    padding: 0.5vh!important;
+    flex: 0 0 20%;
+    max-width: 20%;
+}
+div.col-9{
+    width: 80%!important;
+    padding: 0.5vh!important;
+    flex: 0 0 80%;
+    max-width: 80%;
+}
+.row{
+    margin: initial!important;
+}
+#qp-dir-page.row{
+
+    margin: initial!important;
+}
+table > thead > tr > td{
+    padding: initial!important;
+}
+
+.table td, .table th {
+    padding: 0.5vh 1vh;
+}
+.table th {
+    padding: 0.5vh 1vh;
+}
+.table td {
+    padding: 0;
+    text-align: center;
+    text-align: -webkit-center;
+}
+#dictionaries-list > li.list-group-item,
+#qp-list > li.list-group-item{
+    user-select: none;
+    cursor: pointer;
+    font-size: 1.5vh!important;
+}
+
+/*.table-container*/
+/*{*/
+/*    display: block;*/
+/*    overflow-x: hidden;*/
+/*    overflow-y: scroll;*/
+/*    height: 70% !important;*/
+/*}*/
+
+.qp-dir-item, .dir-item {
+    font-size: 1.5vh!important;
+    height: 70vh!important;
+    overflow: hidden;
+}
+
+.table-content {
+    height: 90%;
+    /*overflow-y: scroll!important;*/
+}
+div.table-content > table{
+    height: initial!important;
+}
+
+div.table-content > table > tr > td> select,
+div.table-content > table > tr > td> input{
+    width: 90%!important;
+}
+
+
+div.table-content > table > tr > td > div{
+    display: inherit!important;
+    /*float: left;*/
+}
+
+div.table-content > table > tr > td > div > button{
+    font-size: 2vh!important;
+    padding: .375vh .75vh!important;
+    margin: initial!important;
+    margin-left: 0.3vh!important;
+}
+
+/* -- */
+table.mainTable select  {
+    /*display: block;*/
+    /*width: 100%;*/
+    /*padding: .375rem .75rem;*/
+    /*font-size: 1rem;*/
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+table.mainTable input[type=button] {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    /*padding: .375rem .75rem;*/
+    /*font-size: 1rem;*/
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+table.mainTable input[type=button]:hover {
+    color: #fff;
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+
+#DataTable_wrapper > div.dataTables_scroll > div.dataTables_scrollHead > div > table{
+    border: initial !important;
+}
+
+.sorting_disabled,
+table.filterTable td,
+div.cont > table > tbody > tr > td{
+    border: 1px solid #ced4da !important;
+    
+}
+
+.searched-table{
+    border:initial !important;
+}

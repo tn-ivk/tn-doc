@@ -45,10 +45,11 @@ namespace TN_Doc.Controllers
         private void InitApp()
         {
             var cfgFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Cfg", "CfgApp.json");
-            if(CfgFileRW.LoadCfg(cfgFilePath, ref _cfgApp))
-                _logger.LogDebug($"Загрузка конфигурации из файла {cfgFilePath}");
-            else
+            _cfgApp = CfgFileRW.LoadCfg<CfgApp>(cfgFilePath); 
+            if(_cfgApp is null)
                 _logger.LogError($"Невозможно загрузить конфигурацию из файла {cfgFilePath}");
+            else
+                _logger.LogDebug($"Загрузка конфигурации из файла {cfgFilePath}");
         }
 
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
