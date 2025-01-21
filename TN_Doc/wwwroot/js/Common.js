@@ -1198,8 +1198,7 @@ function FillPassportDataElis() {
                 if (itemKeys.includes(key)) {
                     root = dataPassport.parameters
                     for (let iKey of itemKeys) {
-                        if (iKey === key) {
-                            
+                        if (iKey === key) { 
                             currentKey = key;
                             break;
                         }
@@ -1271,15 +1270,16 @@ function FillPassportDataElis() {
                     }
                     return false;
                 }
-
-                let testMethodName = root[currentKey].testMethodName;
-
+                const value = item.dataset.tag === 'AdditionalInfo'
+                    ? root[currentKey]
+                    : root[currentKey].testMethodName;
+                
                 //Проверяем наличие значения в списке, если нет, добавляем.
-                if (!item.contains(testMethodName)) {
-                    let newOption = new Option(testMethodName, testMethodName);
+                if (!item.contains(value)) {
+                    let newOption = new Option(value, value);
                     item.append(newOption);
                 }
-                item.value = testMethodName;
+                item.value = value;
                 if(item.hasAttribute("backlight"))
                     item.setAttribute("backlight", "green");
                 item.addEventListener("input", ManualCorrect, {once:true});
