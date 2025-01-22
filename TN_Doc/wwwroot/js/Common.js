@@ -1277,6 +1277,8 @@ function FillPassportDataElis() {
                 //Проверяем наличие значения в списке, если нет, добавляем.
                 if (!item.contains(value)) {
                     let newOption = new Option(value, value);
+                    let metod = new Metod(0,true, 0, value, false, 0.0, "-"); 
+                    newOption.setAttribute("data-metod", JSON.stringify(metod));
                     item.append(newOption);
                 }
                 item.value = value;
