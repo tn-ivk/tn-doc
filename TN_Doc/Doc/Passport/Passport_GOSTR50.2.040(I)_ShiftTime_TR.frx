@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/24/2024 14:46:15" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/23/2025 18:05:40" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -64,17 +64,8 @@ namespace FastReport
       SIKN_Number.Text = $&quot;{JAdditionalData[&quot;SIKN_Number&quot;]}&quot;;
       Reservoir.Text = &quot;&quot;;
       
-      //DateTimeSampling.Text = string.Format(&quot;{0:dd.MM.yyyy} г. с {1:HH:mm} до {2:HH:mm}&quot;, SamplingPeriodBegin, SamplingPeriodBegin, SamplingPeriodEnd);
-      
-      if ((int)JTablePassport[&quot;PeriodType&quot;] == 5)
-      {
-        string dateTimeEnd = SamplingPeriodEnd.ToString(&quot;HH:mm&quot;) == &quot;00:00&quot; ? SamplingPeriodEnd.AddDays(-1).ToString(&quot;dd.MM.yyyy HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;): SamplingPeriodEnd.ToString(&quot;dd.MM.yyyy HH:mm&quot;);
-        DateTimeSampling.Text = $&quot;с {SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy HH:mm&quot;)} до {dateTimeEnd}&quot;;      
-      }      
-      else
-      {
-        DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy&quot;)} {SamplingPeriodBegin.ToString(&quot;HH:mm&quot;)}-{SamplingPeriodEnd.ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;)}&quot;;
-      }
+      string dateTimeEnd = SamplingPeriodEnd.ToString(&quot;HH:mm&quot;) == &quot;00:00&quot; ? SamplingPeriodEnd.AddDays(-1).ToString(&quot;dd.MM.yyyy HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;): SamplingPeriodEnd.ToString(&quot;dd.MM.yyyy HH:mm&quot;);
+      DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy HH:mm&quot;)} - {dateTimeEnd}&quot;;      
     }
              
     private void DrawTablePassport()
