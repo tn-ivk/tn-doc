@@ -146,8 +146,8 @@ table.mainTable select  {
 
 table.mainTable input[type=button] {
     color: #fff;
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
     display: inline-block;
     font-weight: 400;
     text-align: center;
@@ -165,8 +165,8 @@ table.mainTable input[type=button] {
 
 table.mainTable input[type=button]:hover {
     color: #fff;
-    background-color: #0069d9;
-    border-color: #0062cc;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 
