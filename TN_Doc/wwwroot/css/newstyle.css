@@ -30,7 +30,6 @@ body>div.container {
 
 main{
     height: 100%;
-    /*margin: 1vh;*/
 }
 main.pb-3{
     padding-bottom: initial!important;
@@ -106,14 +105,6 @@ table > thead > tr > td{
     font-size: 1.5vh!important;
 }
 
-/*.table-container*/
-/*{*/
-/*    display: block;*/
-/*    overflow-x: hidden;*/
-/*    overflow-y: scroll;*/
-/*    height: 70% !important;*/
-/*}*/
-
 .qp-dir-item, .dir-item {
     font-size: 1.5vh!important;
     height: 70vh!important;
@@ -122,7 +113,6 @@ table > thead > tr > td{
 
 .table-content {
     height: 90%;
-    /*overflow-y: scroll!important;*/
 }
 div.table-content > table{
     height: initial!important;
@@ -136,7 +126,6 @@ div.table-content > table > tr > td> input{
 
 div.table-content > table > tr > td > div{
     display: inherit!important;
-    /*float: left;*/
 }
 
 div.table-content > table > tr > td > div > button{
@@ -146,12 +135,7 @@ div.table-content > table > tr > td > div > button{
     margin-left: 0.3vh!important;
 }
 
-/* -- */
 table.mainTable select  {
-    /*display: block;*/
-    /*width: 100%;*/
-    /*padding: .375rem .75rem;*/
-    /*font-size: 1rem;*/
     line-height: 1.5;
     color: #495057;
     background-color: #fff;
@@ -175,8 +159,6 @@ table.mainTable input[type=button] {
     -ms-user-select: none;
     user-select: none;
     border: 1px solid transparent;
-    /*padding: .375rem .75rem;*/
-    /*font-size: 1rem;*/
     line-height: 1.5;
     border-radius: .25rem;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
