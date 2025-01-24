@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Passport.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/05/2023 16:06:58" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Passport.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/24/2025 17:22:26" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.IO;
@@ -26,51 +26,35 @@ namespace FastReport
 {
   public class ReportScript
   {
-    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();    
-    TN.Doc.Doc doc;
-    TN.DocData.General General;
-    TN.Doc.DataIVKDoc DataIVK;
-    TN.Doc.HeaderDoc Header;
-    TN.Doc.DataDoc SettingsData;
-    TN.Doc.FooterDoc Footer;
-    TN.Doc.DictionarysDoc Dictionarys;
-    
-    JObject json;
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();
+    JToken JDoc;
+    JToken JSettings;
+    JToken JTablePassport;
+    JToken JResult;
+    JToken JMethod;
+    JToken JAdditionalData;
+    JToken JDataARM;
       
     private void Page_StartPage(object sender, EventArgs e)
     {
-      //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/12_Passport/DocPassport.json&quot;))
-      //{
-      // Read the stream as a string
-      //   Report.SetParameterValue(&quot;JsonDoc&quot;, sr.ReadToEnd());
-      //}
-      //// Десериализация данных (формат json) из входного параметра - Json                         
-         
-      string jsonDoc = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
-      json = JObject.Parse(jsonDoc);      
-        
-      Newtonsoft.Json.JsonSerializerSettings settingsReport = new Newtonsoft.Json.JsonSerializerSettings();
-      settingsReport.TypeNameHandling = TypeNameHandling.All;
-         
-      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(jsonDoc, settingsReport);
-      General = (TN.DocData.General) doc.Doc.Settings.General;
-      DataIVK = (TN.Doc.DataIVKDoc)doc.Doc.DataIVK;
-      Header = (TN.Doc.HeaderDoc)doc.Doc.Settings.Header;
-      SettingsData = (TN.Doc.DataDoc)doc.Doc.Settings.Data;
-      Footer = (TN.Doc.FooterDoc)doc.Doc.Settings.Footer;
-      Dictionarys = (TN.Doc.DictionarysDoc)doc.Doc.Settings.Dictionarys;
+      JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
+      JSettings = JDoc[&quot;Doc&quot;][&quot;Settings&quot;];
+      JTablePassport = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;];
+      JAdditionalData = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;AdditionalData&quot;];
+      JResult = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;PassportResult&quot;];
+      JMethod = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;TableActAndPassport&quot;][&quot;Passport&quot;];
+      JDataARM = JDoc[&quot;Doc&quot;][&quot;DataIVK&quot;][&quot;TablePassport&quot;][&quot;DataARM&quot;]; 
       
-      //// === Настройки страницы 
+      // Настройки страницы 
       // Ширина и высота (в мм)
-      Page.PaperHeight = General.PageSettings.PaperHeight;
-      Page.PaperWidth = General.PageSettings.PaperWidth;
-      //Page.Border.Lines = BorderLines.All;
+      Page.PaperHeight = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperHeight&quot;];
+      Page.PaperWidth = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperWidth&quot;];
          
       // Поля/отступы от краёв (в мм)
-      Page.TopMargin = General.PageSettings.TopMargin;
-      Page.BottomMargin = General.PageSettings.BottomMargin;
-      Page.LeftMargin = General.PageSettings.LeftMargin;
-      Page.RightMargin = General.PageSettings.RightMargin;
+      Page.TopMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;TopMargin&quot;];
+      Page.BottomMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;BottomMargin&quot;];
+      Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
+      Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
          
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();
@@ -80,83 +64,139 @@ namespace FastReport
       
     public void DrawTableHeader()
     {               
-      DateTime Begin =  tools.UnixTimestampToDatetime((long)DataIVK.TablePassport.Begin);
-      DateTime End =  tools.UnixTimestampToDatetime((long)DataIVK.TablePassport.End);
+      DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;Begin&quot;]);
+      DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;End&quot;]);
       
       NumberAndDatePassport.Text = string.Format(&quot;№ &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г.&quot;,
-        DataIVK.TablePassport.PassportResult.PassportId, 
+        JResult[&quot;PassportId&quot;], 
         End.ToShortDateString());
 
-      DelivePoint.Text = DataIVK.TablePassport.AdditionalData.DelivePoint;
-      Permit.Text = DataIVK.TablePassport.DataARM.ExportPermit;
-      Sample.Text = DataIVK.TablePassport.DataARM.Sample;
+      DelivePoint.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]}&quot;;
+      Permit.Text = $&quot;{JDataARM[&quot;ExportPermit&quot;]}&quot;;
+      Sample.Text = $&quot;{JDataARM[&quot;Sample&quot;]}&quot;;
       DataOfLoaded.Text = string.Format(&quot;{0:dd.MM.yyyy}&quot;, End.ToShortDateString());
-      TankerName.Text = DataIVK.TablePassport.AdditionalData.TankerName;
+      TankerName.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]}&quot;;
       //Gross.Text = DataIVK.TablePassport.TableActAndPassport.Act.Mass_Gross_Raw.Value.ToString();
       
-      if (DataIVK.TablePassport.PassportResult.Mass_Gross == null)
+      if (JResult[&quot;Mass_Gross&quot;] == null)
         Gross.Text = &quot;-&quot;;
       else
-        Gross.Text = tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Mass_Gross);
+        Gross.Text = tools.GetNormalizedValue(JResult[&quot;Mass_Gross&quot;]);
     }
 
     public void  DrawTableMain()
     {
+      string result, secondResult;
+      JToken metod, secondMetod;
+      JToken metods = JDataARM[&quot;LabInfo&quot;];
+      
       //Filling &quot;method&quot; column rows with data
-      Dens20Result_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Dens20Result.Desc;
-      Dens15Result_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Dens15Result.Desc;
-      MassWaterFracResult_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.MassWaterFracResult.Desc;
-      Chloride_Salts_Concentration_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Chloride_Salts.Concentration.Desc;
-      Impurity_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Impurity.Desc;
-      SulfurResult_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.SulfurResult.Desc;
-      DNP_kPa_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.DNP.kPa.Desc;
+      Dens20Result_Desc.Text = $&quot;{JMethod[&quot;Dens20Result&quot;][&quot;Desc&quot;]}&quot;;
+      Dens15Result_Desc.Text = $&quot;{JMethod[&quot;Dens15Result&quot;][&quot;Desc&quot;]}&quot;;
+      MassWaterFracResult_Desc.Text = $&quot;{JMethod[&quot;MassWaterFracResult&quot;][&quot;Desc&quot;]}&quot;;
+      Chloride_Salts_Concentration_Desc.Text = $&quot;{JMethod[&quot;Chloride_Salts&quot;][&quot;Concentration&quot;][&quot;Desc&quot;]}&quot;;
+      Impurity_Desc.Text = $&quot;{JMethod[&quot;Impurity&quot;][&quot;Desc&quot;]}&quot;;
+      SulfurResult_Desc.Text = $&quot;{JMethod[&quot;SulfurResult&quot;][&quot;Desc&quot;]}&quot;;
+      DNP_kPa_Desc.Text = $&quot;{JMethod[&quot;DNP&quot;][&quot;kPa&quot;][&quot;Desc&quot;]}&quot;;
       Yield_fractions_Desc.Text =string.Format(&quot;&lt;br&gt;&lt;br&gt;{0}&lt;br&gt;{1}&quot;, 
-        DataIVK.TablePassport.TableActAndPassport.Passport.Yield_fraction_200.Desc,
-        DataIVK.TablePassport.TableActAndPassport.Passport.Yield_fraction_300.Desc,
-        DataIVK.TablePassport.TableActAndPassport.Passport.Yield_fraction_350.Desc);
-      Mass_fraction_of_paraffin_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Mass_fraction_of_paraffin.Desc;
-      Mass_fraction_of_hydrogen_sulfide_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Mass_fraction_of_hydrogen_sulfide.Desc;
-      Mass_fraction_of_methyl_and_ethyl_mercaptan_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Mass_fraction_of_methyl_and_ethyl_mercaptan.Desc;
-      Mass_fraction_of_organic_chlorides_Desc.Text = DataIVK.TablePassport.TableActAndPassport.Passport.Mass_fraction_of_organic_chlorides.Desc;
+        $&quot;{JMethod[&quot;Yield_fraction_200&quot;][&quot;Desc&quot;]}&quot;,
+        $&quot;{JMethod[&quot;Yield_fraction_300&quot;][&quot;Desc&quot;]}&quot;,
+        $&quot;{JMethod[&quot;Yield_fraction_350&quot;][&quot;Desc&quot;]}&quot;);
+      Mass_fraction_of_paraffin_Desc.Text = $&quot;{JMethod[&quot;Mass_fraction_of_paraffin&quot;][&quot;Desc&quot;]}&quot;;
+      Mass_fraction_of_hydrogen_sulfide_Desc.Text = $&quot;{JMethod[&quot;Mass_fraction_of_hydrogen_sulfide&quot;][&quot;Desc&quot;]}&quot;;
+      Mass_fraction_of_methyl_and_ethyl_mercaptan_Desc.Text = $&quot;{JMethod[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;][&quot;Desc&quot;]}&quot;;
+      Mass_fraction_of_organic_chlorides_Desc.Text = $&quot;{JMethod[&quot;Mass_fraction_of_organic_chlorides&quot;][&quot;Desc&quot;]}&quot;;
       
       //Filling &quot;result&quot; column rows with data
-      Dens20Result.Text=tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Dens20Result);
-      Dens15Result.Text=tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Dens15Result);
-      MassWaterFracResult.Text =tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.MassWaterFracResult);
+      metod = GetMetod(metods, &quot;Dens20Correction&quot;);
+      result = $&quot;{JResult[&quot;Dens20Result&quot;]}&quot;;
+      Dens20Result.Text = metod == null ? result : GetResult(metod, result);
       
-      Chloride_Salts_Concentration.Text =$&quot;{tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Chloride_Salts.Concentration)} ({tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Chloride_Salts.MassFraction)})&quot;;
+      metod = GetMetod(metods, &quot;Dens15Correction&quot;);
+      result = $&quot;{JResult[&quot;Dens15Result&quot;]}&quot;;
+      Dens15Result.Text = metod == null ? result : GetResult(metod, result);
       
-      Impurity.Text =tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Impurity);
-      SulfurResult.Text =tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.SulfurResult);
+      metod = GetMetod(metods, &quot;MassWaterFracCorrection&quot;);
+      result = $&quot;{JResult[&quot;MassWaterFracResult&quot;]}&quot;;
+      MassWaterFracResult.Text = metod == null ? result : GetResult(metod, result);
       
-      DNP_kPa.Text =$&quot;{tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.DNP.kPa)} ({tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.DNP.mercury_mm)})&quot;;
+      metod = GetMetod(metods, &quot;Chloride_Salts.Concentration&quot;);
+      secondMetod = GetMetod(metods, &quot;Chloride_Salts.MassFraction&quot;);
+      result = $&quot;{JResult[&quot;Chloride_Salts&quot;][&quot;Concentration&quot;]}&quot;;
+      secondResult = $&quot;{JResult[&quot;Chloride_Salts&quot;][&quot;MassFraction&quot;]}&quot;;
+      Chloride_Salts_Concentration.Text = $&quot;{(metod == null ? result : GetResult(metod, result))} ({(secondMetod == null ? secondResult : GetResult(secondMetod, secondResult))})&quot;;
       
-      Yield_fractions.Text =string.Format(&quot;&lt;br&gt;&lt;br&gt;{0}&lt;br&gt;{1}&quot;, 
-        tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Yield_fraction_200),
-        tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Yield_fraction_300),
-        tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Yield_fraction_350));
-         
-      Mass_fraction_of_paraffin.Text =tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Mass_fraction_of_paraffin);
-         
-      Mass_fraction_of_hydrogen_sulfide.Text =tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Mass_fraction_of_hydrogen_sulfide);
-         
-      Mass_fraction_of_methyl_and_ethyl_mercaptan.Text =tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Mass_fraction_of_methyl_and_ethyl_mercaptan);
-         
-      //Mass_fraction_of_organic_chlorides.Text =tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Mass_fraction_of_organic_chlorides);
+      metod = GetMetod(metods, &quot;Impurity&quot;);
+      result = $&quot;{JResult[&quot;Impurity&quot;]}&quot;;
+      Impurity.Text = metod == null ? result : GetResult(metod, result);
       
-      float result;                          
+      metod = GetMetod(metods, &quot;SulfurCorrection&quot;);
+      result = $&quot;{JResult[&quot;SulfurResult&quot;]}&quot;;
+      SulfurResult.Text = metod == null ? result : GetResult(metod, result);
       
-      if (float.TryParse(tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Mass_fraction_of_organic_chlorides), out result) &amp;&amp; result &lt; float.Parse(&quot;5,0&quot;))
-        Mass_fraction_of_organic_chlorides.Text = $&quot;менее 5,0&quot;;
-      else
-        Mass_fraction_of_organic_chlorides.Text = tools.GetNormalizedValue(DataIVK.TablePassport.PassportResult.Mass_fraction_of_organic_chlorides); 
+      metod = GetMetod(metods, &quot;DNP.kPa&quot;);
+      secondMetod = GetMetod(metods, &quot;DNP.mercury_mm&quot;);
+      result = $&quot;{JResult[&quot;DNP&quot;][&quot;kPa&quot;]}&quot;;
+      secondResult = $&quot;{JResult[&quot;DNP&quot;][&quot;mercury_mm&quot;]}&quot;;
+      DNP_kPa.Text = $&quot;{(metod == null ? result : GetResult(metod, result))} ({(secondMetod == null ? secondResult : GetResult(secondMetod, secondResult))})&quot;;
+      
+      metod = GetMetod(metods, &quot;Yield_fraction_200&quot;);
+      result = $&quot;{JResult[&quot;Yield_fraction_200&quot;]}&quot;;
+      string fraction_200 = metod == null ? result : GetResult(metod, result);
 
+      metod = GetMetod(metods, &quot;Yield_fraction_300&quot;);
+      result = $&quot;\n{JResult[&quot;Yield_fraction_300&quot;]}&quot;;
+      string fraction_300 = metod == null ? result : GetResult(metod, result);
+
+      metod = GetMetod(metods, &quot;Yield_fraction_350&quot;);
+      result = $&quot;\n{JResult[&quot;Yield_fraction_350&quot;]}&quot;;
+      string fraction_350 = metod == null ? result : GetResult(metod, result);
+
+      Yield_fractions.Text =string.Format(&quot;&lt;br&gt;&lt;br&gt;{0}&lt;br&gt;{1}&quot;, 
+        fraction_200,
+        fraction_300,
+        fraction_350);
+         
+      metod = GetMetod(metods, &quot;Mass_fraction_of_paraffin&quot;);
+      result = $&quot;{JResult[&quot;Mass_fraction_of_paraffin&quot;]}&quot;;
+      Mass_fraction_of_paraffin.Text = metod == null ? result : GetResult(metod, result);
+
+      metod = GetMetod(metods, &quot;Mass_fraction_of_hydrogen_sulfide&quot;);
+      result = $&quot;{JResult[&quot;Mass_fraction_of_hydrogen_sulfide&quot;]}&quot;;
+      Mass_fraction_of_hydrogen_sulfide.Text = metod == null ? result : GetResult(metod, result);
+
+      metod = GetMetod(metods, &quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;);
+      result = $&quot;{JResult[&quot;Mass_fraction_of_methyl_and_ethyl_mercaptan&quot;]}&quot;;
+      Mass_fraction_of_methyl_and_ethyl_mercaptan.Text = metod == null ? result : GetResult(metod, result);
+
+      metod = GetMetod(metods, &quot;Mass_fraction_of_organic_chlorides&quot;);
+      result = $&quot;{JResult[&quot;Mass_fraction_of_organic_chlorides&quot;]}&quot;;
+      Mass_fraction_of_organic_chlorides.Text = metod == null ? result : GetResult(metod, result);
+       
     }
       
+    private static JToken GetMetod(JToken metods, string parameterKey) =&gt; metods.FirstOrDefault(x =&gt; x[&quot;ParameterKey&quot;].ToString() == parameterKey);
+
+    private static string GetResult(JToken metod, string result)
+    {
+      result = result.Replace('.', ',');
+
+      if ((bool)metod[&quot;Metod&quot;][&quot;LimitValueActivate&quot;])
+      {
+        if (!float.TryParse(result, out float value)) return result; //value = 0.0f;
+
+        float limitValue = (float)metod[&quot;Metod&quot;][&quot;LimitValue&quot;];
+
+        result = value &lt; limitValue ? $&quot;{metod[&quot;Metod&quot;][&quot;LimitValueString&quot;]}&quot; : result;
+      }
+
+      return result;
+    }
+    
     public void  DrawTableSigners()
     {     
-      GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858&lt;br&gt;/Classification according to GOST R 51858/&lt;br&gt;&lt;u&gt;{0}ГОСТ Р 51858-2002&quot;, DataIVK.TablePassport.PassportResult.ExtendGostIndexResult.Replace('X','-'));
-      Laboratory_IOF.Text = DataIVK.TablePassport.AdditionalData.Laboratory_IOF;
+      GOSTIndexResult.Text = string.Format(&quot;Обозначение нефти по ГОСТ Р 51858&lt;br&gt;/Classification according to GOST R 51858/&lt;br&gt;&lt;u&gt;{0}ГОСТ Р 51858-2002&quot;, JResult[&quot;ExtendGostIndexResult&quot;].ToString().Replace('X','-'));
+      Laboratory_IOF.Text = $&quot;{JAdditionalData[&quot;Laboratory_IOF&quot;]}&quot;;
     }  
       
     private void PageFooter_BeforeLayout(object sender, EventArgs e)
@@ -180,7 +220,7 @@ namespace FastReport
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
     <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
-  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage" LastPageSource="15" FirstPageSource="15" OtherPageSource="15">
+  <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage" LastPageSource="15" FirstPageSource="15">
     <ReportTitleBand Name="ReportTitle" Width="718.2" Height="190.89" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableHeader" Width="718.22" Height="141.75">
         <TableColumn Name="Column01" Width="203.19"/>
@@ -227,7 +267,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="194.89" Width="718.2" Height="440.37" CanGrow="true">
+    <DataBand Name="DataBandTableAct" Top="193.56" Width="718.2" Height="440.37" CanGrow="true">
       <TableObject Name="TablePassport" Top="15.12" Width="718.2" Height="425.25" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="368.55"/>
@@ -313,7 +353,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="639.26" Width="718.2" Height="80.38" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="636.59" Width="718.2" Height="80.38" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="72.82">
         <TableColumn Name="Column29" Width="226.8"/>
         <TableColumn Name="Column31" Width="136.08"/>
@@ -339,7 +379,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="723.64" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="719.64" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
