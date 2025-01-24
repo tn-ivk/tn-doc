@@ -1270,15 +1270,31 @@ function FillPassportDataElis() {
                     }
                     return false;
                 }
-                const value = item.dataset.tag === 'AdditionalInfo'
-                    ? root[currentKey]
-                    : root[currentKey].testMethodName;
+                let value, obj = root[currentKey];
+                switch(item.dataset.tag)
+                {
+                    case 'AdditionalInfo': 
+                        value = obj;
+                        break;
+                    case 'Metod': 
+                        value = obj.testMethodName;
+                        break;
+                    default: 
+                        value = obj;
+                }
+                // const value = item.dataset.tag === 'AdditionalInfo'
+                //     ? root[currentKey]
+                //     : root[currentKey].testMethodName;
                 
                 //Проверяем наличие значения в списке, если нет, добавляем.
                 if (!item.contains(value)) {
                     let newOption = new Option(value, value);
-                    let metod = new Metod(0,true, 0, value, false, 0.0, "-"); 
-                    newOption.setAttribute("data-metod", JSON.stringify(metod));
+                    if(item.dataset.tag === 'Metod'){
+                        const flag = obj.value.replace('.', ',') !== obj.valueString.replace('.', ',');
+                        const limitValue = parceFloat obj.value;
+                        let metod = new Metod(0,true, 0, value, flag, 0.0, obj.valueString);
+                        newOption.setAttribute("data-metod", JSON.stringify(metod));
+                    }
                     item.append(newOption);
                 }
                 item.value = value;
