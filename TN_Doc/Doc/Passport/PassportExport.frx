@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Passport.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/24/2025 17:22:26" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Passport.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/24/2025 17:56:37" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.IO;
@@ -75,7 +75,7 @@ namespace FastReport
       Permit.Text = $&quot;{JDataARM[&quot;ExportPermit&quot;]}&quot;;
       Sample.Text = $&quot;{JDataARM[&quot;Sample&quot;]}&quot;;
       DataOfLoaded.Text = string.Format(&quot;{0:dd.MM.yyyy}&quot;, End.ToShortDateString());
-      TankerName.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]}&quot;;
+      TankerName.Text = $&quot;{JAdditionalData[&quot;TankerName&quot;]}&quot;;
       //Gross.Text = DataIVK.TablePassport.TableActAndPassport.Act.Mass_Gross_Raw.Value.ToString();
       
       if (JResult[&quot;Mass_Gross&quot;] == null)

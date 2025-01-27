@@ -512,6 +512,15 @@
       "LimitValueActivate": true,
       "LimitValue": 5.0,
       "LimitValueString": "менее 5.0"
+    },
+    {
+      "Id":59,
+      "Use": true,
+      "IdParameter": 19,
+      "Name": "ASTM D4929-22,процедура С",
+      "LimitValueActivate": true,
+      "LimitValue": 5.0,
+      "LimitValueString": "менее 5.0"
     }
   ],
   "Parameters": [
