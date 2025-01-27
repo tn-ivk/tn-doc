@@ -1291,8 +1291,8 @@ function FillPassportDataElis() {
                     let newOption = new Option(value, value);
                     if(item.dataset.tag === 'Metod'){
                         const flag = obj.value.replace('.', ',') !== obj.valueString.replace('.', ',');
-                        const limitValue = parceFloat obj.value;
-                        let metod = new Metod(0,true, 0, value, flag, 0.0, obj.valueString);
+                        const limitValue = parseFloat(obj.value) + 0.1;
+                        let metod = new Metod(0,true, 0, value, flag, limitValue, obj.valueString);
                         newOption.setAttribute("data-metod", JSON.stringify(metod));
                     }
                     item.append(newOption);
