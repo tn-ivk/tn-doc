@@ -1270,37 +1270,36 @@ function FillPassportDataElis() {
                     }
                     return false;
                 }
-                let value, obj = root[currentKey];
+                let obj = root[currentKey];
                 switch(item.dataset.tag)
                 {
                     case 'AdditionalInfo': 
-                        value = obj;
+                        //Проверяем наличие значения в списке, если нет, добавляем.
+                        if (!item.contains(obj)) {
+                            item.append(new Option(obj, obj));
+                        }
+                        item.value = obj;            
                         break;
                     case 'Metod': 
-                        value = obj.testMethodName;
-                        break;
-                    default: 
-                        value = obj;
-                }
-                //Проверяем наличие значения в списке, если нет, добавляем.
-                if (!item.contains(value)) {
-                    let newOption = new Option(value, value);
-                    if(item.dataset.tag === 'Metod'){
                         const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat()
                         const limitValue = parseFloat(obj.value) + 0.1
-                        let metod = new Metod(0,true, 0, value, flag, limitValue, obj.valueString);
-                        newOption.setAttribute("data-metod", JSON.stringify(metod));
-                    }
-                    item.append(newOption);
+                        let metod = new Metod(0,true, 0, obj.testMethodName, flag, limitValue, obj.valueString);
+
+                        //Проверяем наличие значения в списке, если нет, добавляем.
+                        if (!item.contains(obj.testMethodName)) {
+                            item.append(new Option(obj.testMethodName, obj.testMethodName));
+                        }
+                        item.value = obj.testMethodName;
+                        item.options[item.selectedIndex].setAttribute("data-metod", JSON.stringify(metod));
+                        break;
+                    default: 
+                        break;
                 }
-                item.value = value;
                 if(item.hasAttribute("backlight"))
                     item.setAttribute("backlight", "green");
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
-
         });
-
     } finally {
         console.groupEnd();
     }
