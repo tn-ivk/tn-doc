@@ -1282,16 +1282,12 @@ function FillPassportDataElis() {
                     default: 
                         value = obj;
                 }
-                // const value = item.dataset.tag === 'AdditionalInfo'
-                //     ? root[currentKey]
-                //     : root[currentKey].testMethodName;
-                
                 //Проверяем наличие значения в списке, если нет, добавляем.
                 if (!item.contains(value)) {
                     let newOption = new Option(value, value);
                     if(item.dataset.tag === 'Metod'){
-                        const flag = obj.value.replace('.', ',') !== obj.valueString.replace('.', ',');
-                        const limitValue = parseFloat(obj.value) + 0.1;
+                        const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat()
+                        const limitValue = parseFloat(obj.value) + 0.1
                         let metod = new Metod(0,true, 0, value, flag, limitValue, obj.valueString);
                         newOption.setAttribute("data-metod", JSON.stringify(metod));
                     }
@@ -1377,6 +1373,10 @@ function ClearDataElis() {
     $('#info').text('');
     $('#listPassports').empty();
     localStorage.removeItem('dataPassport');
+}
+
+String.prototype.toFloat = function (value) {
+    return parseFloat(this.replace(',', '.').trim())
 }
 
 class Metod
