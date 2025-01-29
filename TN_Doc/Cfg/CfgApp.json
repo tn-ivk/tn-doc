@@ -14,7 +14,7 @@
           "PathToDocDll": "/Dll/Report.dll",
           "PathToDocConfigFile": "/Cfg/CfgReport.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 1,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -25,7 +25,7 @@
               "PathToDocEditConfigFile": ""
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Отчеты (Усть -Луга)",
               "Description": "",
@@ -53,7 +53,7 @@
               "PathToDocEditConfigFile": ""
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 1,
               "Name": "Отчеты (Усть -Луга)",
               "Description": "",
@@ -294,7 +294,7 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -330,7 +330,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PU.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -366,7 +366,7 @@
           "PathToDocDll": "/Dll/KMH_PW.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PW.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -402,7 +402,7 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -438,7 +438,7 @@
           "PathToDocDll": "/Dll/KMH_PP.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -474,7 +474,7 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -558,7 +558,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_MPR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_MPR.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 1,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -834,7 +834,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_PU.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 1,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
