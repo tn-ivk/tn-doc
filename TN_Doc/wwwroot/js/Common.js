@@ -703,7 +703,6 @@ function InitTableDocs() {
 }
 
 function InitElement() {
-
      let iframe = document.querySelector('.FR');
      iframe.onload = function(){
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
@@ -1151,7 +1150,7 @@ function SetClientToken() {
 function DrawTablePassports(dataELIS) {
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
-
+    localStorage.setItem('labInfo', JSON.stringify(dataELIS.labInfo));
     dataELIS.passports.forEach(function (item, i, arr) {
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
@@ -1163,7 +1162,7 @@ function DrawTablePassports(dataELIS) {
             let elisPassport = this;
             sessionStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
             localStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
-
+            
             let passports = document.querySelectorAll('.list-group-item')
             passports.forEach(function (item, i, arr) {
                 if (item.classList.contains('active'))
@@ -1183,6 +1182,7 @@ function FillPassportDataElis() {
     try {
         //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
+        let labInfo = JSON.parse(localStorage.labInfo);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
         //console.log('dataPassport.parameters',dataPassport.parameters);
@@ -1198,8 +1198,7 @@ function FillPassportDataElis() {
                 if (itemKeys.includes(key)) {
                     root = dataPassport.parameters
                     for (let iKey of itemKeys) {
-                        if (iKey === key) {
-                            
+                        if (iKey === key) { 
                             currentKey = key;
                             break;
                         }
@@ -1212,6 +1211,21 @@ function FillPassportDataElis() {
                 for (let key in dataPassport) {
                     if (itemKeys.includes(key)) {
                         root = dataPassport
+                        for (let iKey of itemKeys) {
+                            if (iKey === key) {
+                                currentKey = key;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (root === null) {
+                for (let key in labInfo) {
+                    if (itemKeys.includes(key)) {
+                        root = labInfo
                         for (let iKey of itemKeys) {
                             if (iKey === key) {
                                 currentKey = key;
@@ -1256,19 +1270,36 @@ function FillPassportDataElis() {
                     }
                     return false;
                 }
+                let obj = root[currentKey];
+                switch(item.dataset.tag)
+                {
+                    case 'AdditionalInfo': 
+                        //Проверяем наличие значения в списке, если нет, добавляем.
+                        if (!item.contains(obj)) {
+                            item.append(new Option(obj, obj));
+                        }
+                        item.value = obj;            
+                        break;
+                    case 'Metod': 
+                        const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat()
+                        const limitValue = parseFloat(obj.value) + 0.1
+                        let metod = new Metod(0,true, 0, obj.testMethodName, flag, limitValue, obj.valueString);
 
-                let testMethodName = root[currentKey].testMethodName;
-
-                //Проверяем наличие значения в списке, если нет, добавляем.
-                if (!item.contains(testMethodName)) {
-                    let newOption = new Option(testMethodName, testMethodName);
-                    item.append(newOption);
+                        //Проверяем наличие значения в списке, если нет, добавляем.
+                        if (!item.contains(obj.testMethodName)) {
+                            item.append(new Option(obj.testMethodName, obj.testMethodName));
+                        }
+                        item.value = obj.testMethodName;
+                        item.options[item.selectedIndex].setAttribute("data-metod", JSON.stringify(metod));
+                        break;
+                    default: 
+                        break;
                 }
-                item.value = testMethodName;
+                if(item.hasAttribute("backlight"))
+                    item.setAttribute("backlight", "green");
+                item.addEventListener("input", ManualCorrect, {once:true});
             }
-
         });
-
     } finally {
         console.groupEnd();
     }
@@ -1341,4 +1372,29 @@ function ClearDataElis() {
     $('#info').text('');
     $('#listPassports').empty();
     localStorage.removeItem('dataPassport');
+}
+
+String.prototype.toFloat = function (value) {
+    return parseFloat(this.replace(',', '.').trim())
+}
+
+class Metod
+{
+    Id;
+    Use;
+    IdParameter;
+    Name;
+    LimitValueActivate;
+    LimitValue;
+    LimitValueString;
+
+    constructor(pId, pUse, pIdParameter, pName, pLimitValueActivate, pLimitValue, pLimitValueString) {
+        this.Id = pId;
+        this.Use = pUse;
+        this.IdParameter = pIdParameter;
+        this.Name = pName;
+        this.LimitValueActivate = pLimitValueActivate;
+        this.LimitValue = pLimitValue;
+        this.LimitValueString = pLimitValueString;
+    }
 }

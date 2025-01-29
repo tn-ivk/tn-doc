@@ -30,14 +30,12 @@ body>div.container {
 
 main{
     height: 100%;
-    /*margin: 1vh;*/
 }
 main.pb-3{
     padding-bottom: initial!important;
 }
 .modal-content{
     padding: 1vh!important;
-    height: 80vh!important;
     overflow: hidden!important;
 }
 div.modal-body{
@@ -106,14 +104,6 @@ table > thead > tr > td{
     font-size: 1.5vh!important;
 }
 
-/*.table-container*/
-/*{*/
-/*    display: block;*/
-/*    overflow-x: hidden;*/
-/*    overflow-y: scroll;*/
-/*    height: 70% !important;*/
-/*}*/
-
 .qp-dir-item, .dir-item {
     font-size: 1.5vh!important;
     height: 70vh!important;
@@ -122,7 +112,6 @@ table > thead > tr > td{
 
 .table-content {
     height: 90%;
-    /*overflow-y: scroll!important;*/
 }
 div.table-content > table{
     height: initial!important;
@@ -136,7 +125,6 @@ div.table-content > table > tr > td> input{
 
 div.table-content > table > tr > td > div{
     display: inherit!important;
-    /*float: left;*/
 }
 
 div.table-content > table > tr > td > div > button{
@@ -146,12 +134,7 @@ div.table-content > table > tr > td > div > button{
     margin-left: 0.3vh!important;
 }
 
-/* -- */
 table.mainTable select  {
-    /*display: block;*/
-    /*width: 100%;*/
-    /*padding: .375rem .75rem;*/
-    /*font-size: 1rem;*/
     line-height: 1.5;
     color: #495057;
     background-color: #fff;
@@ -163,8 +146,8 @@ table.mainTable select  {
 
 table.mainTable input[type=button] {
     color: #fff;
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
     display: inline-block;
     font-weight: 400;
     text-align: center;
@@ -175,8 +158,6 @@ table.mainTable input[type=button] {
     -ms-user-select: none;
     user-select: none;
     border: 1px solid transparent;
-    /*padding: .375rem .75rem;*/
-    /*font-size: 1rem;*/
     line-height: 1.5;
     border-radius: .25rem;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -184,8 +165,8 @@ table.mainTable input[type=button] {
 
 table.mainTable input[type=button]:hover {
     color: #fff;
-    background-color: #0069d9;
-    border-color: #0062cc;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 

@@ -349,35 +349,35 @@
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
-      "Edit": true
+      "Edit": false
     },
     {
       "Id": 2,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
-      "Edit": true
+      "Edit": false
     },
     {
       "Id": 3,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
-      "Edit": true
+      "Edit": false
     },
     {
       "Id": 4,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": false,
-      "Edit": true
+      "Edit": false
     },
     {
       "Id": 5,
       "Key": "Dens15Correction",
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
-      "Edit": true
+      "Edit": false
     },
     {
       "Id": 6,
@@ -544,10 +544,6 @@
     {
       "Id": 0,
       "Use": true,
-      "KeyELIS": "protocolNumber",
-      "ElisAlias": [
-        "protocolNumber"
-      ],
       "Key": "Passport.PassportID",
       "Type": "text",
       "RequiredFill": false,
@@ -569,6 +565,10 @@
       "Id": 2,
       "Use": true,
       "Key": "AccrSertifNumber",
+      "KeyELIS": "AccreditationNumber",
+      "ElisAlias": [
+        "accreditationNumber"
+      ],
       "Type": "text",
       "Name": "Номер аттестата аккредитации"
     },

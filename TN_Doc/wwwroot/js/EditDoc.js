@@ -21,7 +21,7 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
     var result = {};
     //var metods = [];
     //var values = [];
-
+    
     $("select, input").each(function () {
         if ($(this).attr('data-edit') == "1") {
             param = {};
@@ -33,10 +33,13 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 else
                     //param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
                     /////////
-                    if ($(this).attr('data-tag') == 'Metod')
+                    if ($(this).attr('data-tag') == 'Metod') {
                         param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].dataset.metod;
-                    else
+                        //param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].value;
+                    }
+                    else {
                         param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
+                    }
                     /////////
             }
             else if ($(this)[0].nodeName == "INPUT")
