@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/12/2023 10:15:44" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/29/2025 17:05:02" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -200,8 +200,13 @@ namespace FastReport
       // Setup Last Column width
       TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
          
-      WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt;&quot;, 
-        DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart);
+      string wholePart = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart;
+      int startIndexTon = wholePart.IndexOf(&quot; тон&quot;);
+      
+      if (startIndexTon != -1)
+        wholePart = wholePart.Remove(startIndexTon);        
+        
+      WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt; т.&quot;, wholePart);
          
       //Draw static Rows
       TableAdditionlInfo.PrintRow(0);
@@ -353,7 +358,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="185.4" Width="718.2" Height="501.68" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="184.07" Width="718.2" Height="501.68" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="9.45" Width="567" Height="492.23" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="302.4"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -517,7 +522,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandFootNote" Top="691.08" Width="718.2" Height="26.46" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandFootNote" Top="688.41" Width="718.2" Height="26.46" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableFootnote" Width="616.14" Height="26.46" GrowToBottom="true" ManualBuildEvent="TableFootnote_ManualBuild">
         <TableColumn Name="Column278" Width="11.34"/>
         <TableColumn Name="Column279" Width="75.6"/>
@@ -534,7 +539,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="721.54" Width="718.2" Height="45.36" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="717.54" Width="718.2" Height="45.36" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Width="336.42" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="336.42"/>
         <TableRow Name="Row195">
@@ -545,7 +550,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="770.9" Width="718.2" Height="64.26" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="765.57" Width="718.2" Height="64.26" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="56.7" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -587,7 +592,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="839.16" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="832.49" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/23/2024 11:47:50" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/29/2025 18:11:02" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -185,9 +185,14 @@ namespace FastReport
     {
       // Setup Last Column width
       TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         
-      WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt;&quot;, 
-        DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart);
+        
+      string wholePart = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart;
+      int startIndexTon = wholePart.IndexOf(&quot; тон&quot;);
+      
+      if (startIndexTon != -1)
+        wholePart = wholePart.Remove(startIndexTon);        
+        
+      WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt; т.&quot;, wholePart);
          
       //Draw static Rows
       TableAdditionlInfo.PrintRow(0);
