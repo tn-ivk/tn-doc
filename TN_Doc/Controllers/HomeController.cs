@@ -14,6 +14,7 @@ using System.Collections;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
+using TN_DocGeneral.Cfg;
 using TN.Doc;
 using TN.DocData;
 using TN.Utils.Helpers;
