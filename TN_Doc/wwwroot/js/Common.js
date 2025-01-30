@@ -836,7 +836,9 @@ function GetDoc() {
 }
 
 function GetEditDoc() {
-
+    if(currentId == null) 
+        return;
+    
     $.ajax(
         {
             async: false,

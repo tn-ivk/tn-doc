@@ -302,8 +302,13 @@ namespace TN_Doc.Controllers
 
         public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            if (id == 0)
+            {
+                _logger.LogWarning($"Попытка отображения документа {IdDoc} с нулевым идентификатором");
+                return false;
+            }
             
+            var doc = LoadDocsModule(IdDevice, IdDoc);
             string pathTemplateFile = doc.GetPathTemplateFile();
             
             if (string.IsNullOrEmpty(pathTemplateFile))
@@ -348,6 +353,12 @@ namespace TN_Doc.Controllers
 
         public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
         {
+            if (id == 0)
+            {
+                _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
+                return string.Empty;
+            }
+            
             var doc = LoadDocsModule(IdDevice, IdDoc);
             return doc.GetEditDoc(id);
         }
