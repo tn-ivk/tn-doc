@@ -14,7 +14,7 @@ using System.Collections;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
-using TN_DocGeneral.Cfg;
+using TN_Doc.Models.Services;
 using TN.Doc;
 using TN.DocData;
 using TN.Utils.Helpers;
@@ -25,6 +25,7 @@ namespace TN_Doc.Controllers
     public class HomeController : Controller
     {
         CfgApp _cfgApp;
+        LastUsedTemplateListCfg _lastTempList;
         readonly ILogger<HomeController> _logger;
         DbContextOptions<DocGeneral> options;
         DocGeneral dbDoc;
@@ -32,11 +33,13 @@ namespace TN_Doc.Controllers
         CancellationToken stoppingToken;
         Device deviceCfg;
         Document docCfg;
+        IAppConfigService _appConfig;
 
-        public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context)
+        public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IAppConfigService appConfig)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             options = context;
+            _appConfig = appConfig;
 
             FR = new WebReport();
 
@@ -45,12 +48,8 @@ namespace TN_Doc.Controllers
 
         private void InitApp()
         {
-            var cfgFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Cfg", "CfgApp.json");
-            _cfgApp = CfgFileRW.LoadCfg<CfgApp>(cfgFilePath); 
-            if(_cfgApp is null)
-                _logger.LogError($"Невозможно загрузить конфигурацию из файла {cfgFilePath}");
-            else
-                _logger.LogDebug($"Загрузка конфигурации из файла {cfgFilePath}");
+            _cfgApp = _appConfig.GetAppCfg();
+            _lastTempList = _appConfig.GetLastUsedTemplateList();
         }
 
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
@@ -119,37 +118,64 @@ namespace TN_Doc.Controllers
         /// <summary>
         /// Сохранение Id последнего открытого документа
         /// </summary>
-        /// <param name="IdDevice">Id устройства</param>
-        /// <param name="IdDoc">Id библиотеки</param>
-        /// <param name="IdTemplateDoc">Id открытого документа</param>
-        public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
+        /// <param name="idDevice">Id устройства</param>
+        /// <param name="idDoc">Id библиотеки</param>
+        /// <param name="idTemplateDoc">Id открытого документа</param>
+        public void SetIdTemplateDoc(int idDevice, IdDoc idDoc, int idTemplateDoc)
         {
-            _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
-                .Docs.Single(x => x.IdDoc == IdDoc)
-                .LastUsedTemplateId = IdTemplateDoc;
-
-            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), "Cfg"), "/CfgApp.json", _cfgApp);
-        }
-        public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
-        {
-            int lastUsedTemplateId = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
-                .Docs.Single(x => x.IdDoc == IdDoc)
-                .LastUsedTemplateId;
-
-            var usedTemplateDocs = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
-                .Docs.Single(x => x.IdDoc == IdDoc)
-                .TemplateDocs
-                .Where(x => x.Use);
-
-            if (usedTemplateDocs.Where(x => x.Id == lastUsedTemplateId).Count() > 0)
-                return lastUsedTemplateId;
-            else
+            if (_lastTempList is null)
             {
-                int id = usedTemplateDocs.First().Id;
-                SetIdTemplateDoc(IdDevice, IdDoc, id);
-                return id;
+                _logger.LogError($"Сохранение Id последнего открытого документа невозможно. " +
+                                 $"Список последних открытых шаблонов документов не инициализирован {nameof(_lastTempList)}");
+                return;
             }
+
+            // TODO: сделать в классе Device метод проверки наличия и добавление устройства
+            var lastUsedTemplate = _lastTempList.Devices.FirstOrDefault(x => x.IdDevice == idDevice)
+                ?.LastTemplateList.FirstOrDefault(x => x.IdDoc == idDoc);
+            if (lastUsedTemplate is null)
+            {
+                _logger.LogError("Сохранение Id последнего открытого документа невозможно. " +
+                                 $"Список последних открытых шаблонов документов не инициализирован {nameof(_lastTempList)}"); 
+                return;
+            }
+            lastUsedTemplate.LastTemplateId = idTemplateDoc;
+            _logger.LogDebug($"Сохранение Id последнего открытого документа");
+            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), "UserPreference"), "/LastUsedTemplateList.json", _lastTempList);
         }
+        
+        public int GetIdTemplateDoc(int idDevice, IdDoc idDoc)
+        {
+            var lastUsedTemplateId = _lastTempList.Devices.FirstOrDefault(x => x.IdDevice == idDevice)
+                ?.LastTemplateList.FirstOrDefault(x => x.IdDoc == idDoc)
+                ?.LastTemplateId ?? -1;
+
+            if(lastUsedTemplateId < 0)
+                _logger.LogWarning($"Идентификатор последних открытых шаблонов документов не инициализирован {nameof(_lastTempList)}");
+            
+            var usedTemplateDocs = _cfgApp.Devices.Single(x => x.IdDevice == idDevice)
+                .Docs.Single(x => x.IdDoc == idDoc)
+                .TemplateDocs
+                .Where(x => x.Use)
+                .ToArray();
+
+            if (usedTemplateDocs.Any(x => x.Id == lastUsedTemplateId))
+            {
+                _logger.LogDebug($"Идентификатор шаблона последнего открытого документа: {lastUsedTemplateId}");
+                return lastUsedTemplateId;
+            }
+            if (!usedTemplateDocs.Any())
+            {
+                _logger.LogError("Не удалось загрузить список используемых шаблонов приложения");
+                return lastUsedTemplateId;
+            }
+            
+            var id = usedTemplateDocs.FirstOrDefault()?.Id ?? -1;
+            if(id >= 0)
+                SetIdTemplateDoc(idDevice, idDoc, id);
+            return id;
+        }
+        
         public string GetPathTemplateDoc(int IdDevice, IdDoc IdDoc, int IdTemplateDoc)
         {
             return _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)

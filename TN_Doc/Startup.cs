@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TN_Doc.Extensions;
+using TN_Doc.Models.Services;
 using TN.Doc;
 
 namespace TN_Doc
@@ -35,6 +36,7 @@ namespace TN_Doc
 #endif
 			services.AddAppInfoProvider();
 			services.AddDirectoryService(Configuration);
+			services.AddSingleton<IAppConfigService, AppConfigService>();
 			services.AddPrinters();
 			services.AddPrinterService();
 			services.AddControllersWithViews();
