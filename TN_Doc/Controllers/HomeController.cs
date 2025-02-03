@@ -14,6 +14,7 @@ using System.Collections;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
+using TN_Doc.Models.Services;
 using TN.Doc;
 using TN.DocData;
 using TN.Utils.Helpers;
@@ -32,11 +33,13 @@ namespace TN_Doc.Controllers
         CancellationToken stoppingToken;
         Device deviceCfg;
         Document docCfg;
+        IAppConfigService _appConfig;
 
-        public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context)
+        public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IAppConfigService appConfig)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             options = context;
+            _appConfig = appConfig;
 
             FR = new WebReport();
 
@@ -47,7 +50,8 @@ namespace TN_Doc.Controllers
         {
             // считывание файла-конфигурации CfgApp.json - основные настройки приложения
             var cfgFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Cfg", "CfgApp.json");
-            _cfgApp = CfgFileRW.LoadCfg<CfgApp>(cfgFilePath); 
+            _cfgApp = CfgFileRW.LoadCfg<CfgApp>(cfgFilePath);
+            _cfgApp = _appConfig.GetAppCfg();
             if(_cfgApp is null)
                 _logger.LogError($"Невозможно загрузить конфигурацию из файла {cfgFilePath}");
             else
