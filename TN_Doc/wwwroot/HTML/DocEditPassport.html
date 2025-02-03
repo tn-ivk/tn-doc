@@ -162,7 +162,7 @@
         }
         
         function SendingMessageStateButtonSave() {
-            window.top.postMessage(document.querySelectorAll('.incorrect-rounding, .empty-parameter').length === 0
+            window.top.postMessage(document.querySelectorAll('.incorrect-value').length === 0
                     ? 'ButtonSaveOn'
                     : 'ButtonSaveOff',
                 '*')

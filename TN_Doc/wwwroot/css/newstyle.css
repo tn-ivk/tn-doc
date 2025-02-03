@@ -169,6 +169,12 @@ table.mainTable input[type=button]:hover {
     border-color: #1861ac;
 }
 
+table.mainTable input[type=button]:disabled {
+    color: #666666;
+    background-color: #cccccc;
+    border-color: #666666;
+}
+
 
 #DataTable_wrapper > div.dataTables_scroll > div.dataTables_scrollHead > div > table{
     border: initial !important;
