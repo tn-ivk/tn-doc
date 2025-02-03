@@ -20,9 +20,16 @@ namespace TN_Doc
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                File.WriteAllText(Path.Combine(AppContext.BaseDirectory,"logs","startup_fail.log"),e.ToString());
+                var failLogFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, "logs", "startup_fail.log"));
+                var directoryPath = failLogFile.DirectoryName;
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+                using FileStream fs = failLogFile.Create();
+                using StreamWriter writer = new StreamWriter(fs);
+                writer.Write(e.ToString());
             }
-         
         }
 
         /// <summary>
