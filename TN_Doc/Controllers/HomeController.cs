@@ -48,47 +48,8 @@ namespace TN_Doc.Controllers
 
         private void InitApp()
         {
-            // считывание файла-конфигурации CfgApp.json - основные настройки приложения
-            var cfgFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Cfg", "CfgApp.json");
-            _cfgApp = CfgFileRW.LoadCfg<CfgApp>(cfgFilePath);
             _cfgApp = _appConfig.GetAppCfg();
-            if(_cfgApp is null)
-                _logger.LogError($"Невозможно загрузить конфигурацию из файла {cfgFilePath}");
-            else
-                _logger.LogDebug($"Загрузка конфигурации из файла {cfgFilePath}");
-            
-            // считывание файла-списка последних шаблонов документов
-            var lastTempIdPath = Path.Combine(Directory.GetCurrentDirectory(),"UserPreference", "LastUsedTemplateList.json");
-            if (System.IO.File.Exists(lastTempIdPath))
-            {
-                _logger.LogDebug($"Считывание списка идентификаторов последних просматриваемых шаблонов документов из файла {lastTempIdPath}");
-                _lastTempList = CfgFileRW.LoadCfg<LastUsedTemplateListCfg>(lastTempIdPath);
-            }
-            else
-            {
-                _logger.LogWarning($"Файл {lastTempIdPath} не существет");
-                if (_cfgApp is not null)
-                {
-                    _logger.LogDebug($"Восстановление списка идентификаторов последних просматриваемых шаблонов документов из файла настроек приложения");
-                    _lastTempList = new LastUsedTemplateListCfg()
-                    {
-                        Devices = _cfgApp.Devices.Select(device => new LastUsedTemplateList()
-                            {
-                                IdDevice = device.IdDevice,
-                                LastTemplateList = device.Docs.Select(doc => new LastUsedTemplate()
-                                {
-                                    IdDoc = doc.IdDoc, 
-                                    LastTemplateId = doc.LastUsedTemplateId
-                                }).ToList() 
-                            }).ToList()
-                    };
-                }
-                else
-                {
-                    _logger.LogError($"Невозможно восстановить список идентификаторов последних просматриваемых шаблонов документов. " +
-                                     $"Переменная {nameof(_lastTempList)} не инициализированна");
-                }
-            }
+            _lastTempList = _appConfig.GetLastUsedTemplateList();
         }
 
         private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
