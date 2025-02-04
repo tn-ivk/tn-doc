@@ -72,7 +72,18 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
         });
 
     if (DocGUID == 1)
+    {
+        let v = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
+        console.log("Чтение ARM_FillActAndPassportResult: " + v);
+
         WriteTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassport', PrefixTag), true, 2, 0);
+        console.log("Запись ARM_FillActAndPassport");
+
+        v = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
+        console.log("Чтение ARM_FillActAndPassportResult: " + v);
+
+    }
+        
 }
 
 function SaveDocPassport(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
@@ -149,6 +160,23 @@ function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray 
                 })
         });
 
+    return result;
+}
+
+function ReadTag(GuidDevice, tagName, namespaceIndex = 2, indexArray = 0) {
+    if (GuidDevice == undefined) return undefined;
+
+    var url = "http://localhost:5010/api/Values/";
+    var result;
+    $.ajax(
+        {
+            async: false,
+            url: url + GuidDevice + '/' + tagName + '/' + namespaceIndex + '/' + indexArray,
+            type: "Get",
+            success: function (data) {
+                result = data;
+            },
+        });
     return result;
 }
 

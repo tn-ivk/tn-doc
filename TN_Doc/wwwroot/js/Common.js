@@ -1190,7 +1190,15 @@ function FillPassportDataElis() {
         //console.log('dataPassport.parameters',dataPassport.parameters);
         //console.log()
         elisNodes.forEach((item, index, array) => {
-            let itemKeys = item.dataset.elisAlias.split('|');
+            let itemKeys = item.dataset.elisAlias?.split('|');
+            if (itemKeys === undefined)
+            {
+                console.log(item.dataset.key + " не имеет корректного алиаса");
+            }
+            else
+            {
+                console.log(item.dataset.key + " имеет корректный алиас");
+            }
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
