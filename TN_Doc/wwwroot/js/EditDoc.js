@@ -73,15 +73,30 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
 
     if (DocGUID == 1)
     {
-        let v = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
-        console.log("Чтение ARM_FillActAndPassportResult: " + v);
+        const lastResult = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
+        console.log("Чтение ARM_FillActAndPassportResult: " + lastResult);
 
         WriteTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassport', PrefixTag), true, 2, 0);
         console.log("Запись ARM_FillActAndPassport");
+        
+        const intervalId = setInterval(() => {
+            let curResult = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
+            console.log("Чтение ARM_FillActAndPassportResult: " + curResult);
 
-        v = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
-        console.log("Чтение ARM_FillActAndPassportResult: " + v);
+            const shouldStop = curResult > lastResult; // Вызываем функцию и получаем её результат
+            if (shouldStop) {
+                clearInterval(intervalId); // Останавливаем интервал, если функция вернула true
+                console.log("Цикл остановлен, так как функция вернула true.");
+                return true;
+            }
+        }, 500);
 
+        setTimeout(() => {
+            clearInterval(intervalId); // Останавливаем интервал
+            console.log("Интервал остановлен.");
+        }, 5000)
+        
+        
     }
         
 }

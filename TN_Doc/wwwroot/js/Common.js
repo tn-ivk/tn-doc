@@ -861,13 +861,14 @@ function GetEditDoc() {
 }
 
 function SaveDoc() {
-    document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
+    const result = document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
         $('#ComboboxDevice :selected').text(),
         $('#ComboboxDevice').val(),
         $('#ComboboxDocGUID').val(),
         currentId,
         PrefixTag);
-    //GetDoc();
+    if(result)
+        GetDoc();
 }
 
 function GetPeriodDocument() {
