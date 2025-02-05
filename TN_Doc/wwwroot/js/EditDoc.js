@@ -21,7 +21,7 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
         var params = [];
         var result = {};
         let startTime = Date.now(); // Время начала опроса
-        const maxDuration = 50000; // Максимальное время опроса (5000 мс)
+        const maxDuration = 5000; // Максимальное время опроса (5000 мс)
         const pollInterval = 500; // Период опроса (500 мс)
 
         $("select, input").each(function () {
@@ -87,14 +87,16 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 if (shouldStop) {
                     clearInterval(intervalId); // Останавливаем интервал, если функция вернула true
                     Spinner.hide();
-                    console.log("Цикл остановлен, так как функция вернула true.");
                     resolve(true);
                 }
                 console.log(currentTime - startTime);
                 if ((currentTime - startTime) >= maxDuration) {
                     clearInterval(intervalId); // Останавливаем интервал
                     Spinner.hide();
-                    alert("Ошибка: Приращение значения не произошло за отведённое время."); // Модальное окно с ошибкой
+                    // const errorDialog = document.getElementById('errorDialog');
+                    // const errorMessage = document.getElementById('errorMessage');
+                    // errorMessage.textContent = "Ошибка: не получено подтверждение записи данных от ИВК";
+                    // errorDialog.showModal();
                     resolve(false); // Возвращаем false
                 }
             }, pollInterval);
