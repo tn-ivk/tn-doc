@@ -1,14 +1,12 @@
 ﻿
-function GetUsers()
-{
+function GetUsers() {
     var dic;
     $.ajax(
         {
             async: false,
             url: "http://localhost:5000/Home/GetListUsers",
             type: "GET",
-            success: function (data)
-            {                
+            success: function (data) {
                 dic = JSON.parse(data);
             }
         });
@@ -18,13 +16,14 @@ function GetUsers()
 
 function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
     return new Promise((resolve, reject) => {
-        document.getElementById("loading").style.display = "block";
+        Spinner();
+        Spinner.show();
         var params = [];
         var result = {};
         let startTime = Date.now(); // Время начала опроса
         const maxDuration = 50000; // Максимальное время опроса (5000 мс)
         const pollInterval = 500; // Период опроса (500 мс)
-        
+
         $("select, input").each(function () {
             if ($(this).attr('data-edit') == "1") {
                 param = {};
@@ -87,19 +86,19 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 const shouldStop = curResult > lastResult; // Вызываем функцию и получаем её результат
                 if (shouldStop) {
                     clearInterval(intervalId); // Останавливаем интервал, если функция вернула true
-                    document.getElementById("loading").style.display = "none";
+                    Spinner.hide();
                     console.log("Цикл остановлен, так как функция вернула true.");
                     resolve(true);
                 }
                 console.log(currentTime - startTime);
                 if ((currentTime - startTime) >= maxDuration) {
                     clearInterval(intervalId); // Останавливаем интервал
-                    document.getElementById("loading").style.display = "none"; // Скрываем индикацию
+                    Spinner.hide();
                     alert("Ошибка: Приращение значения не произошло за отведённое время."); // Модальное окно с ошибкой
                     resolve(false); // Возвращаем false
                 }
             }, pollInterval);
-            
+
         }
     });
 }
@@ -124,8 +123,7 @@ function SaveDocPassport(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                     else
                         param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
                 }
-            }
-            else if ($(this)[0].nodeName == "INPUT")
+            } else if ($(this)[0].nodeName == "INPUT")
                 param["Value"] = $(this).val();
 
             params.push(param);
