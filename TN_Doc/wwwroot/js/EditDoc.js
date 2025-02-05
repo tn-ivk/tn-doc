@@ -73,31 +73,22 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
 
         if (DocGUID == 1) {
             const lastResult = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
-            console.log("Чтение ARM_FillActAndPassportResult: " + lastResult);
-
             WriteTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassport', PrefixTag), true, 2, 0);
-            console.log("Запись ARM_FillActAndPassport");
 
             const intervalId = setInterval(() => {
                 const curResult = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
-                const currentTime = Date.now(); // Текущее время
-                console.log("Чтение ARM_FillActAndPassportResult: " + curResult);
+                const currentTime = Date.now();
 
-                const shouldStop = curResult > lastResult; // Вызываем функцию и получаем её результат
+                const shouldStop = curResult > lastResult;
                 if (shouldStop) {
-                    clearInterval(intervalId); // Останавливаем интервал, если функция вернула true
+                    clearInterval(intervalId); 
                     Spinner.hide();
                     resolve(true);
                 }
-                console.log(currentTime - startTime);
                 if ((currentTime - startTime) >= maxDuration) {
-                    clearInterval(intervalId); // Останавливаем интервал
+                    clearInterval(intervalId);
                     Spinner.hide();
-                    // const errorDialog = document.getElementById('errorDialog');
-                    // const errorMessage = document.getElementById('errorMessage');
-                    // errorMessage.textContent = "Ошибка: не получено подтверждение записи данных от ИВК";
-                    // errorDialog.showModal();
-                    resolve(false); // Возвращаем false
+                    resolve(false); 
                 }
             }, pollInterval);
 

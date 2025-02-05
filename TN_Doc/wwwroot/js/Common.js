@@ -870,16 +870,15 @@ async function SaveDoc() {
     if (result)
     {
         GetDoc();
-        console.log("let's view ok message");
     }
     else
     {
-        console.log("let's view error message");
+        const errorDialog = document.getElementById('errorDialog');
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = "Не получено подтверждение записи данных от ИВК";
+        errorDialog.showModal();
     }
-    const errorDialog = document.getElementById('errorDialog');
-    const errorMessage = document.getElementById('errorMessage');
-    errorMessage.textContent = "Ошибка: не получено подтверждение записи данных от ИВК";
-    errorDialog.showModal();
+    
 }
 
 function GetPeriodDocument() {

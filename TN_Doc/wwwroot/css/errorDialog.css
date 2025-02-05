@@ -25,6 +25,19 @@
   backdrop-filter: blur(4px);
 }
 
+.dialog-header {
+  margin-bottom: 15px;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 20px;
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  padding: 10px 20px;
+}
+
 /* Контент внутри модального окна */
 .dialog-content {
   display: flex;
@@ -34,11 +47,16 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end; /* Выравниваем кнопку справа */
+}
+
 /* Сообщение об ошибке */
 .dialog-message {
   font-size: 16px;
   color: #333333;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   line-height: 1.5;
 }
 
@@ -51,8 +69,8 @@
   padding: 10px 20px;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 10px 20px;
 }
 
 /* Эффект при наведении на кнопку */
@@ -69,4 +87,5 @@
   width: 48px;
   height: 48px;
   margin-bottom: 16px;
+  padding: 5px 10px;
 }
