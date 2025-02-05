@@ -860,14 +860,14 @@ function GetEditDoc() {
         });
 }
 
-function SaveDoc() {
-    const result = document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
+async function SaveDoc() {
+    const result = await document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
         $('#ComboboxDevice :selected').text(),
         $('#ComboboxDevice').val(),
         $('#ComboboxDocGUID').val(),
         currentId,
         PrefixTag);
-    if(result)
+    if (result)
         GetDoc();
 }
 
