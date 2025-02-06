@@ -113,7 +113,7 @@
                                 @*                                <button id="ButtonElis" type="button" class="btn btn-primary" data-toggle="modal" data-target="#elis" hidden>
                                             Получить данные из ЕЛИС
                                         </button>*@
-                                <input id="ButtonElis" type="button" value="Получить данные из ЕЛИС" data-toggle="modal" data-target="#elis" onclick="ButtonElis" hidden>
+                                <input id="ButtonElis" type="button" value="Получить данные из ЕЛИС" data-toggle="modal" data-target="#elis" onclick="OpenElisDialog()" hidden>
                                 <input id="ButtonSave" type="button" value="Завершить редактирование и отправить" onclick="SaveDoc()">
                             </td>
                         </tr>
@@ -279,15 +279,10 @@
 
 <div class="modal fade" id="elis" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Получение данных из ЕЛИС</h5>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-
-            </div>
+        <div class="elis-dialog-header">
+            <h2 class="modal-title" id="modalTitle">Получение данных из ЕЛИС</h2>
+        </div>
+        <div class="elis-dialog-content">
             <div class="modal-body">
 
                 <h6 class="modal-title" id="info"></h6>
