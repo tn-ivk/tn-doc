@@ -145,34 +145,33 @@ table.mainTable select  {
 }
 
 table.mainTable input[type=button] {
-    color: #fff;
     background-color: #1b6ec2;
-    border-color: #1861ac;
-    display: inline-block;
-    font-weight: 400;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: middle;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    border: 1px solid transparent;
-    line-height: 1.5;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    
+    /*display: inline-block;*/
+    /*font-weight: 400;*/
+    /*text-align: center;*/
+    /*white-space: nowrap;*/
+    /*vertical-align: middle;*/
+    /*-webkit-user-select: none;*/
+    /*-moz-user-select: none;*/
+    /*-ms-user-select: none;*/
+    /*user-select: none;*/
+    /*line-height: 1.5;*/
 }
 
 table.mainTable input[type=button]:hover {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #155a9e;
 }
 
 table.mainTable input[type=button]:disabled {
-    color: #666666;
-    background-color: #cccccc;
-    border-color: #666666;
+    background-color: #10487d;
 }
 
 

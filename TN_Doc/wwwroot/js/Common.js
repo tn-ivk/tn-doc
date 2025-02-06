@@ -860,14 +860,25 @@ function GetEditDoc() {
         });
 }
 
-function SaveDoc() {
-    document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
+async function SaveDoc() {
+    const result = await document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
         $('#ComboboxDevice :selected').text(),
         $('#ComboboxDevice').val(),
         $('#ComboboxDocGUID').val(),
         currentId,
         PrefixTag);
-    //GetDoc();
+    if (result)
+    {
+        GetDoc();
+    }
+    else
+    {
+        const errorDialog = document.getElementById('errorDialog');
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = "Не получено подтверждение записи данных от ИВК";
+        errorDialog.showModal();
+    }
+    
 }
 
 function GetPeriodDocument() {
@@ -1190,7 +1201,15 @@ function FillPassportDataElis() {
         //console.log('dataPassport.parameters',dataPassport.parameters);
         //console.log()
         elisNodes.forEach((item, index, array) => {
-            let itemKeys = item.dataset.elisAlias.split('|');
+            let itemKeys = item.dataset.elisAlias?.split('|');
+            if (itemKeys === undefined)
+            {
+                console.log(item.dataset.key + " не имеет корректного алиаса");
+            }
+            else
+            {
+                console.log(item.dataset.key + " имеет корректный алиас");
+            }
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
