@@ -1359,7 +1359,7 @@ function StateButtonGetElisData(state) {
     }
 }
 
-function ButtonElis() {
+function OpenElisDialog() {
     $('#listPassports').empty();
     localStorage.removeItem('dataPassport');
 }
