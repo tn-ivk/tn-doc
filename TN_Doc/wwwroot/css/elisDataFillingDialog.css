@@ -1,37 +1,36 @@
 ﻿/* Стили для модального окна */
-.elis-dialog {
+#elis .modal-dialog {
   border: none;
   border-radius: 12px;
   padding: 0;
-  width: 550px;
   max-width: 90%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   background-color: #ffffff;
   font-family: Arial, sans-serif;
   overflow: hidden;
-  opacity: 0;
+  /*opacity: 0;*/
   transform: translateY(-20px);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.elis-dialog[open] {
+#elis .modal-dialog[open] {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* Фон модального окна */
-.elis-dialog::backdrop {
+#elis .modal-dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
 }
 
-.elis-dialog-header {
+#elis .modal-header {
   margin-bottom: 15px;
-  background-color: #1b6ec2;
-  color: white;
+  background-color: #1b6ec2 !important; /* Красный фон */
+  color: white !important; /* Белый текст */
+  border-bottom: none; /* Убираем границу */
 }
-
-.elis-dialog-title {
+#elis .modal-title {
   margin: 0;
   font-size: 20px;
   background-color: #1b6ec2;
@@ -41,7 +40,7 @@
 }
 
 /* Контент внутри модального окна */
-.elis-dialog-content {
+#elis .modal-dialog-content {
   display: flex;
   align-items: center;
   padding: 24px;
@@ -49,13 +48,13 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.elis-dialog-footer {
+#elis .modal-dialog-footer {
   display: flex;
   justify-content: flex-end; /* Выравниваем кнопку справа */
 }
 
 /* Сообщение об ошибке */
-.elis-dialog-message {
+#elis .modal-dialog-message {
   font-size: 16px;
   color: #333333;
   margin-bottom: 10px;
@@ -63,7 +62,7 @@
 }
 
 /* Кнопка закрытия */
-.elis-dialog-button {
+#elis .modal-dialog-button {
   background-color: #1b6ec2;
   color: #ffffff;
   border: none;
@@ -76,11 +75,11 @@
 }
 
 /* Эффект при наведении на кнопку */
-.elis-dialog-button:hover {
+#elis .modal-dialog-button:hover {
   background-color: #155a9e;
 }
 
 /* Эффект при нажатии на кнопку */
-.elis-dialog-button:active {
+#elis .modal-dialog-button:active {
   background-color: #10487d;
 }
