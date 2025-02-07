@@ -83,6 +83,12 @@
         function funcOnLoad() {
             SendingMessageStateButtonSave();
             dictionaries = GetUsers();
+            // Отключаем прокрутку колесиком мыши на input[type="number"]
+            document.querySelectorAll('input[type="number"]').forEach(function(input) {
+                input.addEventListener('wheel', function(event) {
+                    event.preventDefault();  // Отключаем изменение значения колесиком мыши
+                });
+            });
         }
 
         function UserChangeEvent(selectObject) {
