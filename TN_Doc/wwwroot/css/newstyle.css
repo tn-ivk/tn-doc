@@ -153,17 +153,6 @@ table.mainTable input[type=button] {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
-    
-    /*display: inline-block;*/
-    /*font-weight: 400;*/
-    /*text-align: center;*/
-    /*white-space: nowrap;*/
-    /*vertical-align: middle;*/
-    /*-webkit-user-select: none;*/
-    /*-moz-user-select: none;*/
-    /*-ms-user-select: none;*/
-    /*user-select: none;*/
-    /*line-height: 1.5;*/
 }
 
 table.mainTable input[type=button]:hover {
@@ -171,7 +160,8 @@ table.mainTable input[type=button]:hover {
 }
 
 table.mainTable input[type=button]:disabled {
-    background-color: #10487d;
+    color: #666666;
+    background-color: #cccccc;
 }
 
 
