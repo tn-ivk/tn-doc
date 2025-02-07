@@ -1,69 +1,54 @@
 ﻿/* Стили для модального окна */
-.elis-dialog {
-  border: none;
-  border-radius: 12px;
-  padding: 0;
-  width: 550px;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background-color: #ffffff;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+#elis .modal {
+  border: none !important; /* Убираем границу вокруг окна */
+  box-shadow: none !important; /* Убираем тень */
+  background-color: transparent !important; /* Убираем фон */
+  border-radius: 5px !important; /* Закругляем углы */
 }
 
-.elis-dialog[open] {
-  opacity: 1;
-  transform: translateY(0);
+#elis .modal-dialog {
+  border: none !important;
+  border-radius: 12px !important;
+  font-family: Arial, sans-serif !important;
+  overflow: hidden !important;
 }
 
-/* Фон модального окна */
-.elis-dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.elis-dialog-header {
+#elis .modal-header {
+  border: none !important;
   margin-bottom: 15px;
-  background-color: #1b6ec2;
-  color: white;
-}
-
-.elis-dialog-title {
-  margin: 0;
-  font-size: 20px;
-  background-color: #1b6ec2;
-  color: white;
+  background-color: #1b6ec2 !important;
+  color: white !important; 
+  font-size: 16px;
   font-weight: bold;
+}
+#elis .modal-title {
+  border: none !important;
+  margin: 0;
   padding: 10px 20px;
 }
 
 /* Контент внутри модального окна */
-.elis-dialog-content {
+#elis .modal-dialog-content {
+  border: none !important; /* Убираем границу вокруг окна */
+  box-shadow: none !important; /* Убираем тень */
+  background-color: transparent !important; /* Убираем фон */
+  border-radius: 5px !important; /* Закругляем углы */
   display: flex;
   align-items: center;
-  padding: 24px;
+  padding: 0 !important;
+  margin: 0 !important;
   text-align: center;
   border-bottom: 1px solid #e0e0e0;
 }
 
-.elis-dialog-footer {
+#elis .modal-dialog-footer {
   display: flex;
-  justify-content: flex-end; /* Выравниваем кнопку справа */
+  justify-content: flex-end; 
+  margin: 0;
 }
 
-/* Сообщение об ошибке */
-.elis-dialog-message {
-  font-size: 16px;
-  color: #333333;
-  margin-bottom: 10px;
-  line-height: 1.5;
-}
-
-/* Кнопка закрытия */
-.elis-dialog-button {
+/* Кнопки */
+#elis .btn {
   background-color: #1b6ec2;
   color: #ffffff;
   border: none;
@@ -72,15 +57,27 @@
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
-  margin: 10px 20px;
+  margin: 10px 10px;
 }
 
 /* Эффект при наведении на кнопку */
-.elis-dialog-button:hover {
+#elis .btn:hover {
   background-color: #155a9e;
 }
 
 /* Эффект при нажатии на кнопку */
-.elis-dialog-button:active {
+#elis .btn:active {
   background-color: #10487d;
+}
+
+#elis div.modal-content {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#elis div.modal-footer {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }

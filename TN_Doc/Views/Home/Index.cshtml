@@ -277,32 +277,29 @@
 
 @* Окно для получения данных из "ЕЛИС" *@
 
-<div class="modal fade" id="elis" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="elis-dialog-header">
-            <h2 class="modal-title" id="modalTitle">Получение данных из ЕЛИС</h2>
-        </div>
-        <div class="elis-dialog-content">
-            <div class="modal-body">
-
-                <h6 class="modal-title" id="info"></h6>
-
-                <br/>
-                <button id="buttonDataRequest" type="button" class="btn btn-primary" onclick="GetElisData()">
-                    <span id="spinnerDataRequest" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
-                    <span id="textDataRequest" class="visually-hidden">Запросить данные</span>
-                </button>
-                <div id="listPassports" class="list-group">
-
+    <div class="modal fade" id="elis" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalTitle">Получение данных из ЕЛИС</h2>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="FillPassportDataElis()">Применить</button>
+                <div class="modal-body">
+                    <h6 class="modal-title" id="info"></h6>
+
+                    <br/>
+                    <button id="buttonDataRequest" type="button" class="btn btn-primary" onclick="GetElisData()">
+                        <span id="spinnerDataRequest" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+                        <span id="textDataRequest">Запросить данные</span>
+                    </button>
+                    <div id="listPassports" class="list-group"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="FillPassportDataElis()">Применить</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 @* Окно для подтверждения действий пользователя *@
 @* Текст вставляется через перегрузку метода  confirm *@
