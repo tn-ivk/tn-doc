@@ -31,10 +31,15 @@ namespace TN_Doc.Models.Services
         }
 
         public CfgApp GetAppCfg() => _cfgApp;
+
+        public Device GetDeviceCfg(int idDevice) => UpdateCfgApp(_cfgApp, _lastUsedTemplateList).Devices
+            .FirstOrDefault(x => x.IdDevice == idDevice);
+        
+
         public LastUsedTemplateListCfg GetLastUsedTemplateList() => _lastUsedTemplateList;
 
 
-        private CfgApp LoadAppCfg(string dirName, string fileName)
+        CfgApp LoadAppCfg(string dirName, string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -48,7 +53,7 @@ namespace TN_Doc.Models.Services
             return CfgFileRW.LoadCfg<CfgApp>(mainAppCfgFile.FullName);
         }
         
-        private LastUsedTemplateListCfg LoadLastUsedTemplateList(string dirName, string fileName, CfgApp cfg)
+        LastUsedTemplateListCfg LoadLastUsedTemplateList(string dirName, string fileName, CfgApp cfg)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -85,6 +90,24 @@ namespace TN_Doc.Models.Services
                     
             _logger.LogError("Невозможно восстановить список идентификаторов последних просматриваемых шаблонов документов");
             return null;
+        }
+
+        CfgApp UpdateCfgApp(CfgApp cfgApp, LastUsedTemplateListCfg lastUsedTemplateList)
+        {
+            foreach (var device in cfgApp.Devices)
+            {
+                foreach (var doc in device.Docs)
+                {
+                    var lastId = lastUsedTemplateList
+                        .Devices.FirstOrDefault(x => x.IdDevice == device.IdDevice)
+                        ?.LastTemplateList.FirstOrDefault(x => x.IdDoc == doc.IdDoc);
+                    if(lastId is null)
+                        continue;
+                    doc.LastUsedTemplateId = lastId.LastTemplateId;
+                }
+            }
+
+            return cfgApp;
         }
     }
 }

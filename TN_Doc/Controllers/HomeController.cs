@@ -52,15 +52,16 @@ namespace TN_Doc.Controllers
             _lastTempList = _appConfig.GetLastUsedTemplateList();
         }
 
-        private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
+        private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
         {
-            _logger.LogDebug("Загрузка dll");
-            deviceCfg = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            
+            deviceCfg = _appConfig.GetDeviceCfg(idDevice);
             docCfg = deviceCfg.Docs.Single(x => x.IdDoc == idDoc);
 
             Assembly assembly = Assembly.LoadFrom(Directory.GetCurrentDirectory() + docCfg.PathToDocDll);
             var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
 
+            _logger.LogDebug($"Загрузка dll {doc.FullName}");
             return (DocGeneral)assembly.CreateInstance(
                 doc.FullName,
                 false,
