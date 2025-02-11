@@ -39,7 +39,7 @@ namespace TN_Doc.Controllers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             options = context;
-            _appConfig = AppConfigService.GetInstance(configuration, logger);
+            _appConfig = AppConfigService.GetInstance(configuration);
 
             FR = new WebReport();
 
