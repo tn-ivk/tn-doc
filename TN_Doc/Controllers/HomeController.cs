@@ -12,9 +12,10 @@ using System.Threading;
 using System.Text;
 using System.Collections;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
-using TN_Doc.Models.Services;
+using TN_DocGeneral.Services;
 using TN.Doc;
 using TN.DocData;
 using TN.Utils.Helpers;
@@ -31,15 +32,14 @@ namespace TN_Doc.Controllers
         DocGeneral dbDoc;
         private WebReport FR;
         CancellationToken stoppingToken;
-        Device deviceCfg;
         Document docCfg;
         IAppConfigService _appConfig;
 
-        public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IAppConfigService appConfig)
+        public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             options = context;
-            _appConfig = appConfig;
+            _appConfig = AppConfigService.GetInstance(configuration, logger);
 
             FR = new WebReport();
 
@@ -52,21 +52,19 @@ namespace TN_Doc.Controllers
             _lastTempList = _appConfig.GetLastUsedTemplateList();
         }
 
-        private DocGeneral LoadDocsModule(int IdDevice, IdDoc idDoc)
+        private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
         {
-            _logger.LogDebug("Загрузка dll");
-            deviceCfg = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-            docCfg = deviceCfg.Docs.Single(x => x.IdDoc == idDoc);
-
-            Assembly assembly = Assembly.LoadFrom(Directory.GetCurrentDirectory() + docCfg.PathToDocDll);
+            //TODO: выполнить проверки на null
+            Assembly assembly = Assembly.LoadFrom(Directory.GetCurrentDirectory() + _appConfig.GetPathToDocDll(idDevice, idDoc));
             var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
 
+            _logger.LogDebug($"Загрузка dll {doc.FullName}");
             return (DocGeneral)assembly.CreateInstance(
                 doc.FullName,
                 false,
                 BindingFlags.Default,
                 null,
-                new object[] { options, Path.Combine(Directory.GetCurrentDirectory()), deviceCfg },
+                new object[] { options, _appConfig, idDevice, idDoc, Directory.GetCurrentDirectory() },
                 null,
                 null);
         }
@@ -337,9 +335,19 @@ namespace TN_Doc.Controllers
             
             var doc = LoadDocsModule(IdDevice, IdDoc);
             string pathTemplateFile = doc.GetPathTemplateFile();
-            
+
             if (string.IsNullOrEmpty(pathTemplateFile))
+            {
+                _logger.LogError($"Пустой путь для выбранного шаблона документа {nameof(pathTemplateFile)}");
                 return false;
+            }
+                
+            var templateFile = new FileInfo(pathTemplateFile);
+            if (!templateFile.Exists)
+            {
+                _logger.LogError($"Отсутствует файл шаблона документа: {pathTemplateFile}");
+                return false;
+            }
 
             FR.Report.Load(pathTemplateFile);
 
