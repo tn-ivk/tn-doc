@@ -14,25 +14,15 @@ namespace TN_Doc
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            var logger = LogManager.Setup().GetCurrentClassLogger();
+            var logger = LogManager.GetCurrentClassLogger();
             try
             { 
-                logger.Info("Запуск приложения");
+                logger.Info("Инициализация приложения");
                 CreateHostBuilder(args).Build().Run(); 
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                logger.Error(e, "Приложение останводено в связи с критической ошибкой");
-                Console.WriteLine(e);
-                var failLogFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, "logs", "startup_fail.log"));
-                var directoryPath = failLogFile.DirectoryName;
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-                using FileStream fs = failLogFile.Create();
-                using StreamWriter writer = new StreamWriter(fs);
-                writer.Write(e.ToString());
+                logger.Error(exception, "Приложение завершено в связи с критической ошибкой");
             }
         }
 

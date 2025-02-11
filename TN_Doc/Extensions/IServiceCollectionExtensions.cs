@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog;
 using TN_Doc.Models;
 using TN_Doc.Models.Printer;
 using TN_Doc.Models.Services;
@@ -71,12 +72,13 @@ namespace TN_Doc.Extensions
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			FileVersionInfo vi = FileVersionInfo.GetVersionInfo(assembly.Location);
 			string version = $"{(vi.FileVersion ?? "???")}";
-#if !RELEASE
+#if DEBUG
             version += $".test-{Guid.NewGuid().ToString().Substring(0,5)}";
 #endif
 			AppInfoProvider pr = new(version);
-			Console.WriteLine(pr.Version);
 			services.AddSingleton(pr);
+			var logger = LogManager.GetCurrentClassLogger();
+			logger.Info($"Запуск приложения: {assembly.GetName().Name} версии: {pr.Version}");
 		}
 
 		/// <summary>
