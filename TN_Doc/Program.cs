@@ -2,9 +2,7 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NLog;
-using NLog.Web;
 
 namespace TN_Doc
 {
@@ -16,15 +14,15 @@ namespace TN_Doc
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+            var logger = LogManager.Setup().GetCurrentClassLogger();
             try
             { 
-                logger.Debug("init main");
+                logger.Info("Запуск приложения");
                 CreateHostBuilder(args).Build().Run(); 
             }
             catch (Exception e)
             {
-                logger.Error(e, "Stopped program because of exception");
+                logger.Error(e, "Приложение останводено в связи с критической ошибкой");
                 Console.WriteLine(e);
                 var failLogFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, "logs", "startup_fail.log"));
                 var directoryPath = failLogFile.DirectoryName;
