@@ -73,8 +73,8 @@ namespace TN_Doc.Controllers
         {
             _logger.LogDebug($"Загрузка списка устройств");
             List<ListItem> devices = _cfgApp.Devices.Where(x => x.Use)
-                .Select(u => new ListItem() { Id = u.IdDevice, Name = u.Name }).ToList();
-
+                .Select(u => new ListItem { Id = u.IdDevice, Name = u.Name }).ToList();
+            _logger.LogTrace($"Загружен список устройств: {string.Join(',', devices.Select(x => x.Name))}");
             return devices;
         }
 
@@ -84,27 +84,31 @@ namespace TN_Doc.Controllers
             return device.DBConnectionStrings.First(x => x.Use).Database;
         }
 
-        public List<ListItem> GetListDocs(int IdDevice)
+        public List<ListItem> GetListDocs(int deviceId)
         {
             _logger.LogDebug($"Загрузка списка документов");
-            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == deviceId);
             var list = device.Docs.Where(x => x.Use)
                 .Select(u => new ListItem { Id = (int)u.IdDoc, Name = u.Name }).ToList();
+            _logger.LogTrace($"Загружено {list.Count} документов для устройства {device.Name}, ИД:{device.IdDevice}");
             return list;
         }
 
         public List<ListItem> GetTemplatesDoc(int IdDevice, IdDoc idDoc)
         {
-            _logger.LogDebug("Загрузка шаблонов документа");
+            _logger.LogDebug($"Загрузка шаблонов документа {idDoc}");
             var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             var doc = device.Docs.Single(x => x.IdDoc == idDoc);
-
-            return doc.TemplateDocs.Where(x => x.Use).Select(x => new ListItem() { Id = x.Id, Name = x.Name }).ToList();
+            var templates = doc.TemplateDocs.Where(x => x.Use)
+                .Select(x => new ListItem() { Id = x.Id, Name = x.Name })
+                .ToList();
+            _logger.LogTrace($"Загружено {templates.Count} шаблонов документа {doc.Name}");
+            return templates;
         }
 
         public List<ListItem> GetListProtocolNumber(int IdDevice, IdDoc idDoc)
         {
-            _logger.LogDebug("Загрузка списка протоколов");
+            _logger.LogDebug($"Загрузка списка протоколов для документа {idDoc}");
             var list = new List<ListItem>
             {
                 new() { Id = 1, Name = "Протокол 1" },
@@ -116,10 +120,10 @@ namespace TN_Doc.Controllers
         /// <summary>
         /// Сохранение Id последнего открытого документа
         /// </summary>
-        /// <param name="idDevice">Id устройства</param>
-        /// <param name="idDoc">Id библиотеки</param>
+        /// <param name="IdDevice">Id устройства</param>
+        /// <param name="IdDoc">Id библиотеки</param>
         /// <param name="idTemplateDoc">Id открытого документа</param>
-        public void SetIdTemplateDoc(int idDevice, IdDoc idDoc, int idTemplateDoc)
+        public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int idTemplateDoc)
         {
             if (_lastTempList is null)
             {
@@ -129,8 +133,8 @@ namespace TN_Doc.Controllers
             }
 
             // TODO: сделать в классе Device метод проверки наличия и добавление устройства
-            var lastUsedTemplate = _lastTempList.Devices.FirstOrDefault(x => x.IdDevice == idDevice)
-                ?.LastTemplateList.FirstOrDefault(x => x.IdDoc == idDoc);
+            var lastUsedTemplate = _lastTempList.Devices.FirstOrDefault(x => x.IdDevice == IdDevice)
+                ?.LastTemplateList.FirstOrDefault(x => x.IdDoc == IdDoc);
             if (lastUsedTemplate is null)
             {
                 _logger.LogError("Сохранение Id последнего открытого документа невозможно. " +
@@ -138,39 +142,53 @@ namespace TN_Doc.Controllers
                 return;
             }
             lastUsedTemplate.LastTemplateId = idTemplateDoc;
-            _logger.LogDebug($"Сохранение Id последнего открытого документа");
+            _logger.LogDebug($"Сохранение идентификатора последнего открытого шаблона документа {IdDoc}");
             CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), "UserPreference"), "/LastUsedTemplateList.json", _lastTempList);
         }
         
-        public int GetIdTemplateDoc(int idDevice, IdDoc idDoc)
+        public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
         {
-            var lastUsedTemplateId = _lastTempList.Devices.FirstOrDefault(x => x.IdDevice == idDevice)
-                ?.LastTemplateList.FirstOrDefault(x => x.IdDoc == idDoc)
-                ?.LastTemplateId ?? -1;
-
-            if(lastUsedTemplateId < 0)
-                _logger.LogWarning($"Идентификатор последних открытых шаблонов документов не инициализирован {nameof(_lastTempList)}");
-            
-            var usedTemplateDocs = _cfgApp.Devices.Single(x => x.IdDevice == idDevice)
-                .Docs.Single(x => x.IdDoc == idDoc)
+            _logger.LogDebug($"Получение идентификатора последнего открытого шаблона документа {IdDoc}");
+            int id;
+            bool validResult = false;
+            var lastUsedTemplateId = _appConfig.GetLastUsedTemplateId(IdDevice, IdDoc);
+            var usedTemplateDocs = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice)
+                .Docs.Single(x => x.IdDoc == IdDoc)
                 .TemplateDocs
                 .Where(x => x.Use)
                 .ToArray();
 
-            if (usedTemplateDocs.Any(x => x.Id == lastUsedTemplateId))
+            if (lastUsedTemplateId is not null && usedTemplateDocs.Any())
             {
-                _logger.LogDebug($"Идентификатор шаблона последнего открытого документа: {lastUsedTemplateId}");
-                return lastUsedTemplateId;
+                var template = usedTemplateDocs.FirstOrDefault(x => x.Id == lastUsedTemplateId);
+                if (template != null)
+                {
+                    // Если нашли шаблон с последним ID, используем его
+                    _logger.LogDebug($"Идентификатор шаблона последнего открытого документа {IdDoc}: {lastUsedTemplateId}");
+                    id = (int)lastUsedTemplateId;
+                    validResult = true;
+                }
+                else
+                {
+                    // Если шаблон с последним ID не найден, используем первый доступный шаблон
+                    _logger.LogWarning($"Идентификатор шаблона последнего открытого документа {IdDoc}: {lastUsedTemplateId} отсутствует в списке используемых шаблонов");
+                    id = usedTemplateDocs.First().Id;
+                    validResult = true;
+                }
             }
-            if (!usedTemplateDocs.Any())
+            else if(usedTemplateDocs.Any())
             {
-                _logger.LogError("Не удалось загрузить список используемых шаблонов приложения");
-                return lastUsedTemplateId;
+                _logger.LogWarning($"Идентификатор шаблона последнего открытого документа {IdDoc} не определен: применяется первый из списка используемых");
+                id = usedTemplateDocs.First().Id;
+                validResult = true;
             }
-            
-            var id = usedTemplateDocs.FirstOrDefault()?.Id ?? -1;
-            if(id >= 0)
-                SetIdTemplateDoc(idDevice, idDoc, id);
+            else
+            {
+                _logger.LogError($"Список используемых шаблонов документа {IdDoc} не инициализирован");
+                id = lastUsedTemplateId ?? 0;
+            }
+            if(validResult)
+                SetIdTemplateDoc(IdDevice, IdDoc, id);
             return id;
         }
         
@@ -327,6 +345,7 @@ namespace TN_Doc.Controllers
 
         public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
         {
+            _logger.LogDebug($"Отображение документа устройства с ИД: {IdDevice}, документа {IdDoc} c ИД: {id}");
             if (id == 0)
             {
                 _logger.LogWarning($"Попытка отображения документа {IdDoc} с нулевым идентификатором");

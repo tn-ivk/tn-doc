@@ -806,7 +806,7 @@ function GetData() {
 
 function GetDoc() {
     $('.FR').attr('src', '');
-
+    
     $.ajax(
         {
             async: true,
