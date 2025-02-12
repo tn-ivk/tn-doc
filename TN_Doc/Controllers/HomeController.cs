@@ -314,6 +314,7 @@ namespace TN_Doc.Controllers
 
         public List<RequestListDocs> GetList(Data data)
         {
+            _logger.LogDebug($"Получение списка документов типа {data.IdDoc} для устройства с ИД: {data.IdDevice}");
             try
             {
                 DateTime DTBegin = new();
@@ -407,6 +408,7 @@ namespace TN_Doc.Controllers
 
         public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
         {
+            _logger.LogDebug($"Отображение формы редактирования документа устройства с ИД: {IdDevice}, документа {IdDoc} c ИД: {id}");
             if (id == 0)
             {
                 _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
