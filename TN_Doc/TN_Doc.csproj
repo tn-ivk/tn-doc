@@ -167,7 +167,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EncryptionLibrary" Version="1.0.0" />
+    <PackageReference Include="EncryptionLibrary" Version="1.0.1" />
     <PackageReference Include="FastReport.Web.Skia" Version="2023.3.7" />
     <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="7.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
