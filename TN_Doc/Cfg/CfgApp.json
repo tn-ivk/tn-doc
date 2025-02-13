@@ -1081,7 +1081,7 @@
           "GuidDevice": 0,
           "Server": "192.168.90.39",
           "Userid": "user",
-          "Password": "mJKuyb&9!2@m",
+          "Password": "$1$83F+qTyYmHOfVHKPsApmT1xgFnO64A/lEkxNn9k8VKs=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
@@ -1090,7 +1090,7 @@
           "GuidDevice": 0,
           "Server": "192.168.233.201",
           "Userid": "user",
-          "Password": "mJKuyb&9!2@m",
+          "Password": "$1$cA34ZrL19FeEuzhyvEmZvAzFAfLBIivo3/LKZfbfoVg=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
@@ -2157,7 +2157,7 @@
           "GuidDevice": 1,
           "Server": "192.168.233.102",
           "Userid": "user",
-          "Password": "mJKuyb&9!2@m",
+          "Password": "$1$lWYmN8fbjJBXRxMriPw5JLsfa6PbyzBcZthtH5hRJQ8=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
@@ -2166,7 +2166,7 @@
           "GuidDevice": 1,
           "Server": "192.168.233.202",
           "Userid": "user",
-          "Password": "mJKuyb&9!2@m",
+          "Password": "$1$Da1vbiUU2jMTiRqMJKHD4Yh0s0CDqJg2IBl47HuEx8c=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
@@ -3233,7 +3233,7 @@
           "GuidDevice": 2,
           "Server": "192.168.233.103",
           "Userid": "user",
-          "Password": "mJKuyb&9!2@m",
+          "Password": "$1$tMxr/hnj4vSosbFKfg4zl3FS3gSxe/whDp4SZFPTL+I=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
@@ -3242,7 +3242,7 @@
           "GuidDevice": 2,
           "Server": "192.168.233.203",
           "Userid": "user",
-          "Password": "mJKuyb&9!2@m",
+          "Password": "$1$KqBhyXeSlR25iUyUR3ohFnwoNEgBmaK494RV6WyP4NI=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
