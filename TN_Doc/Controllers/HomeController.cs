@@ -18,7 +18,6 @@ using TN_Doc.Models.Home;
 using TN_DocGeneral.Services;
 using TN.Doc;
 using TN.DocData;
-using TN.Utils.Helpers;
 using Data = TN_Doc.Models.Home.Data;
 
 namespace TN_Doc.Controllers
@@ -26,7 +25,6 @@ namespace TN_Doc.Controllers
     public class HomeController : Controller
     {
         CfgApp _cfgApp;
-        LastUsedTemplateListCfg _lastTempList;
         readonly ILogger<HomeController> _logger;
         DbContextOptions<DocGeneral> options;
         DocGeneral dbDoc;
@@ -43,13 +41,7 @@ namespace TN_Doc.Controllers
 
             FR = new WebReport();
 
-            InitApp();
-        }
-
-        private void InitApp()
-        {
             _cfgApp = _appConfig.GetAppCfg();
-            _lastTempList = _appConfig.GetLastUsedTemplateList();
         }
 
         private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
@@ -96,13 +88,13 @@ namespace TN_Doc.Controllers
 
         public List<ListItem> GetTemplatesDoc(int IdDevice, IdDoc idDoc)
         {
-            _logger.LogDebug($"Загрузка шаблонов документа {idDoc}");
+            _logger.LogTrace($"Загрузка шаблонов документа {idDoc}");
             var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
             var doc = device.Docs.Single(x => x.IdDoc == idDoc);
             var templates = doc.TemplateDocs.Where(x => x.Use)
                 .Select(x => new ListItem() { Id = x.Id, Name = x.Name })
                 .ToList();
-            _logger.LogTrace($"Загружено {templates.Count} шаблонов документа {doc.Name}");
+            _logger.LogDebug($"Загружено {templates.Count} шаблонов документа {doc.Name}");
             return templates;
         }
 
@@ -125,25 +117,8 @@ namespace TN_Doc.Controllers
         /// <param name="idTemplateDoc">Id открытого документа</param>
         public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int idTemplateDoc)
         {
-            if (_lastTempList is null)
-            {
-                _logger.LogError($"Сохранение Id последнего открытого документа невозможно. " +
-                                 $"Список последних открытых шаблонов документов не инициализирован {nameof(_lastTempList)}");
-                return;
-            }
-
-            // TODO: сделать в классе Device метод проверки наличия и добавление устройства
-            var lastUsedTemplate = _lastTempList.Devices.FirstOrDefault(x => x.IdDevice == IdDevice)
-                ?.LastTemplateList.FirstOrDefault(x => x.IdDoc == IdDoc);
-            if (lastUsedTemplate is null)
-            {
-                _logger.LogError("Сохранение Id последнего открытого документа невозможно. " +
-                                 $"Список последних открытых шаблонов документов не инициализирован {nameof(_lastTempList)}"); 
-                return;
-            }
-            lastUsedTemplate.LastTemplateId = idTemplateDoc;
-            _logger.LogDebug($"Сохранение идентификатора последнего открытого шаблона документа {IdDoc}");
-            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), "UserPreference"), "/LastUsedTemplateList.json", _lastTempList);
+            if (_appConfig.SetLastUsedTemplateId(IdDevice, IdDoc, idTemplateDoc))
+                _appConfig.SetLastUsedTemplateList();
         }
         
         public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
@@ -263,23 +238,9 @@ namespace TN_Doc.Controllers
                 : new Dictionary<string, string>() { { "clientToken", clientToken } };
         }
 
-        public bool SetClientToken(int IdDevice, string clientToken)
-        {
-            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-
-            if (device.Elis == null)
-                if (_cfgApp.Elis == null)
-                    return false;
-                else 
-                    _cfgApp.Elis.ClientToken = clientToken;
-            else 
-                device.Elis.ClientToken = clientToken;
-
-            CfgFileRW.SaveCfg(Path.Combine(Directory.GetCurrentDirectory(), $"Cfg"), $"/CfgApp.json", _cfgApp);
-
-            return true;
-        }
-
+        public bool SetClientToken(int IdDevice, string clientToken) =>
+            _appConfig.SetElisClientToken(IdDevice, clientToken);
+        
         public string GetElisData()
         {
                 return "";
