@@ -275,7 +275,7 @@ namespace TN_Doc.Controllers
 
         public List<RequestListDocs> GetList(Data data)
         {
-            _logger.LogDebug($"Получение списка документов типа {data.IdDoc} для устройства с ИД: {data.IdDevice}");
+            _logger.LogTrace($"Получение списка документов типа {data.IdDoc} для устройства с ИД: {data.IdDevice}");
             try
             {
                 DateTime DTBegin = new();
@@ -299,8 +299,9 @@ namespace TN_Doc.Controllers
             
                 return doc.GetList(UTBegin, UTEnd);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
+                _logger.LogError($"Ошибка получение списка документов: {ex.Message}");
                 return new List<RequestListDocs>();
             }
         }
