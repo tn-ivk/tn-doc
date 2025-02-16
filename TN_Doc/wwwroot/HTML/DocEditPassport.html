@@ -89,6 +89,12 @@
                     event.preventDefault();  // Отключаем изменение значения колесиком мыши
                 });
             });
+            const elementsWithOnInput = document.querySelectorAll('[oninput]');
+            elementsWithOnInput.forEach(element => {
+                if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+                    element.oninput();
+                }
+            });
         }
 
         function UserChangeEvent(selectObject) {
@@ -114,16 +120,43 @@
             }
         }
 
-        function InputCheck(Object) {
-            CheckList(Object);             
+        function InputStringCheck(Object) {
+            if(CheckEmpty(Object))
+                CheckInvalidChars(Object);
+            SendingMessageStateButtonSave();
+        }
+        
+        let invalidChars = ['"', "'", '\\'];
+        function CheckInvalidChars(element) {
+            let value = null;
+            if (element instanceof HTMLInputElement) {
+                value = element.value; 
+            } else if (element instanceof HTMLSelectElement) {
+                const selectedOption = element.options[element.selectedIndex]; 
+                value = selectedOption ? selectedOption.text : null;
+            }
+            if(value === null) {
+                return true;
+            }
+            for (let char of invalidChars) {
+                if (value.includes(char)) {
+                    element.classList.replace("correct-value", "incorrect-value");
+                    if(element.hasAttribute("title")) {
+                        element.setAttribute("title", `Некорректный символ: ${char}`)
+                    }
+                    return false;
+                }
+            }
+            element.classList.replace("incorrect-value", "correct-value");
+            return true;
+        } 
+            
+        function InputValueCheck(Object) {
+            if(CheckEmpty(Object))
+                CheckRounding(Object);
             SendingMessageStateButtonSave();
         }
 
-        function CheckList(Object) {
-            if(!CheckEmpty(Object)) return;
-            CheckRounding(Object);
-        }
-        
         function CheckRounding(Object) {
             if(!Object.hasAttribute('data-roundvalue')) {
                 return true;
