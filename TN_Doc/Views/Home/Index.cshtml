@@ -91,8 +91,9 @@
                     <table class="docTable">
                         <tr>
                             <td height="25" width="250">
-                                <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()">
-                                <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()">
+                                <input id="viewModeButton" type="button" value="Редактирование" width="100" hidden="hidden" onclick="ToggleMode()">
+                                @* <input id="ButtonReview" type="button" value="Просмотр" onclick="GetDoc()"> *@
+                                @* <input id="ButtonEdit" type="button" value="Редактирование" onclick="GetEditDoc()"> *@
                             </td>
                             <td id="viewPanel">
                                 <table width="100%" height="100%" style="border: 1px none rgb(248, 2, 2)">

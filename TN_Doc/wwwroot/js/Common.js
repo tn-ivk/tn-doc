@@ -34,6 +34,8 @@ var CurrentDeviceId;
 var table = null;
 var currentId = null;
 var docTemplates = {};
+let isViewing = false;
+let isEditingDoc = false;
 
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
@@ -724,13 +726,12 @@ function InitElement() {
     InitProtocolNumber();
     $('#ComboboxDocGUID').change(function () {
         if (table != null) $('#DataTable').DataTable().clear().draw();
-        //$('.FR').each(function () {
-        //    $(this).attr('src', '');
-        //});
         $('.FR').attr('src', '');
 
         InitTemplatesDoc();
         InitProtocolNumber();
+        
+        $('#viewModeButton').prop('hidden', true);
     });
     $('#ComboboxTemplateDoc').change(function () {
         SetIdTemplateDoc();
@@ -753,8 +754,6 @@ function GetData() {
         var strDTEnd = DTEnd.getDate() + '.' + (DTEnd.getMonth() + 1) + '.' + DTEnd.getFullYear();
     }
 
-    //alert('1: ' + 'ComboboxDocGUID' + $('#ComboboxDocGUID').val());
-
     $.ajax(
         {
             async: false,
@@ -770,10 +769,6 @@ function GetData() {
             beforeSend: function (data) {
             },
             success: function (data) {
-                //var table = $('#example');
-                //table.data = data.tableReport;
-                //table.ajax.reload();
-
                 ret = data;
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -784,12 +779,11 @@ function GetData() {
                     $('#ComboboxDocGUID').val() == 3 ||
                     $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
-                    $('#ButtonReview').prop('hidden', true);
-                    $('#ButtonEdit').prop('hidden', true);
+                    isEditingDoc = false;
+                    $('#viewModeButton').prop('hidden', true);
                 } else {
                     $('#ButtonSave').prop('disabled', false);
-                    $('#ButtonReview').prop('hidden', false);
-                    $('#ButtonEdit').prop('hidden', false);
+                    isEditingDoc = true;
                 }
 
                 if ($('#ComboboxDocGUID').val() == 1) {
@@ -800,7 +794,6 @@ function GetData() {
         });
 
     var data = {'data': ret};
-
     return data;
 }
 
@@ -819,18 +812,16 @@ function GetDoc() {
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
             success: function (data) {
-                //$('.FR').each(function () {
-                //    //#toolbar=0&view=FitH
-                //    $(this).attr('src', '/PDF/PDF.pdf');
-                //});
-
-                //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&id=' + x);
-
                 if (data)
                     $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
 
                 $('#viewPanel').prop('hidden', false);
                 $('#editPanel').prop('hidden', true);
+                isViewing = true;
+                if(isEditingDoc)
+                    $('#viewModeButton')
+                        .prop('value', 'Редактирование')
+                        .prop('hidden', false);
             },
         });
 }
@@ -856,8 +847,13 @@ function GetEditDoc() {
 
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
+                
             }
         });
+    
+    isViewing = false;
+    $('#viewModeButton').prop('hidden', false)
+        .prop('value', '     Просмотр     ');
 }
 
 async function SaveDoc() {
@@ -1388,7 +1384,6 @@ function ApplicationSecurity(tagName, tagValue) {
         $("#ButtonDictionaries").prop("disabled", !tagValue);
 }
 
-
 function ClearDataElis() {
     $('#info').text('');
     $('#listPassports').empty();
@@ -1399,6 +1394,13 @@ String.prototype.toFloat = function (value) {
     return parseFloat(this.replace(',', '.').trim())
 }
 
+
+function ToggleMode() {
+    if(isViewing)
+        GetEditDoc();
+    else
+        GetDoc();
+}
 class Metod
 {
     Id;
