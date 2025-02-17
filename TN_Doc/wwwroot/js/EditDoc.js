@@ -14,6 +14,23 @@ function GetUsers() {
     return dic;
 }
 
+function GetInvalideChars() {
+    var chars;
+    $.ajax(
+        {
+            async: false,
+            url: "http://localhost:5000/Home/GetInvalideChars",
+            type: "GET",
+            data: {
+                IdDevice: $('#ComboboxDevice').val()
+            },
+            success: function (data) {
+                chars = JSON.parse(data);
+            }
+        });
+    return chars;
+}
+
 function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
     return new Promise((resolve, reject) => {
         Spinner();

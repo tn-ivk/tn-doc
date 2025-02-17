@@ -1106,7 +1106,8 @@
         "UsedSecondSI_PVS": false
       },
       "UsedProcedureTypePR": null,
-      "OpcConnectionSettings": null
+      "OpcConnectionSettings": null,
+      "InvalidChars" : ["\"", "'", "\\"]
     },
     {
       "Use": false,
@@ -2182,7 +2183,8 @@
         "UsedSecondSI_PVS": false
       },
       "UsedProcedureTypePR": null,
-      "OpcConnectionSettings": null
+      "OpcConnectionSettings": null,
+      "InvalidChars" : ["\"", "'", "\\"]
     },
     {
       "Use": false,
@@ -3258,7 +3260,8 @@
         "UsedSecondSI_PVS": false
       },
       "UsedProcedureTypePR": null,
-      "OpcConnectionSettings": null
+      "OpcConnectionSettings": null,
+      "InvalidChars" : ["\"", "'", "\\"]
     }
   ],
   "PrintSettings": {

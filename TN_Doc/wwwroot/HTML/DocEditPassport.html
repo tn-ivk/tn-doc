@@ -78,16 +78,24 @@
 
     <script id="ElementChangeEventHandling" type="text/javascript">
 
-        var dictionaries;
+        let dictionaries;
+        let invalidChars;
 
         function funcOnLoad() {
             SendingMessageStateButtonSave();
             dictionaries = GetUsers();
+            invalidChars = GetInvalideChars();
             // Отключаем прокрутку колесиком мыши на input[type="number"]
             document.querySelectorAll('input[type="number"]').forEach(function(input) {
                 input.addEventListener('wheel', function(event) {
                     event.preventDefault();  // Отключаем изменение значения колесиком мыши
                 });
+            });
+            const elementsWithOnInput = document.querySelectorAll('[oninput]');
+            elementsWithOnInput.forEach(element => {
+                if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+                    element.oninput();
+                }
             });
         }
 
@@ -102,28 +110,53 @@
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Delive_Post").value = user[0].Post;
                 document.getElementById("Delive_Factory").value = user[0].Factory;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
             else if (selectObject.name == "Receive_IOF") {
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Receive_Post").value = user[0].Post;
                 document.getElementById("Receive_Factory").value = user[0].Factory;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
         }
 
-        function InputCheck(Object) {
-            CheckList(Object);             
+        function InputStringCheck(Object) {
+            if(CheckEmpty(Object))
+                CheckInvalidChars(Object);
+            SendingMessageStateButtonSave();
+        }
+        
+        function CheckInvalidChars(element) {
+            if(invalidChars == null || invalidChars.length === 0)
+                return true;
+            
+            let value = null;
+            if (element instanceof HTMLInputElement) {
+                value = element.value; 
+            } else if (element instanceof HTMLSelectElement) {
+                const selectedOption = element.options[element.selectedIndex]; 
+                value = selectedOption ? selectedOption.text : null;
+            }
+            if(value === null) {
+                return true;
+            }
+            for (let char of invalidChars) {
+                if (value.includes(char)) {
+                    element.classList.replace("correct-value", "incorrect-value");
+                    if(element.hasAttribute("title")) {
+                        element.setAttribute("title", `Некорректный символ: ${char}`)
+                    }
+                    return false;
+                }
+            }
+            element.classList.replace("incorrect-value", "correct-value");
+            return true;
+        } 
+            
+        function InputValueCheck(Object) {
+            if(CheckEmpty(Object))
+                CheckRounding(Object);
             SendingMessageStateButtonSave();
         }
 
-        function CheckList(Object) {
-            if(!CheckEmpty(Object)) return;
-            CheckRounding(Object);
-        }
-        
         function CheckRounding(Object) {
             if(!Object.hasAttribute('data-roundvalue')) {
                 return true;

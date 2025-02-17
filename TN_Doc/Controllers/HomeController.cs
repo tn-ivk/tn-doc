@@ -13,6 +13,7 @@ using System.Text;
 using System.Collections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
 using TN_DocGeneral.Services;
@@ -429,6 +430,11 @@ namespace TN_Doc.Controllers
         public string GetListUsers()
         {
             return DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
+        }
+
+        public string GetInvalideChars(int IdDevice)
+        {
+            return JsonConvert.SerializeObject(_appConfig.GetDeviceCfg(IdDevice).InvalidChars); 
         }
         
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
