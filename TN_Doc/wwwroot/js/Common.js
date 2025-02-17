@@ -36,6 +36,8 @@ var currentId = null;
 var docTemplates = {};
 let isViewing = false;
 let isEditingDoc = false;
+let isShowEditAndSave = true;
+let isAllowEditAndSave = true;
 
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
@@ -821,7 +823,8 @@ function GetDoc() {
                 if(isEditingDoc)
                     $('#viewModeButton')
                         .prop('value', 'Редактирование')
-                        .prop('hidden', false);
+                        .prop('hidden', false)
+                        .prop('disabled', !isAllowEditAndSave);
             },
         });
 }
@@ -1362,10 +1365,12 @@ function OpenElisDialog() {
 
 function ApplicationSecurity(tagName, tagValue) {
 
-    if (tagName == 'root.ARM.Reports.ShowEditAndSave')
-        $("#ButtonEdit").prop("hidden", !tagValue);
-    else if (tagName == 'root.ARM.Reports.AllowEditAndSave')
-        $("#ButtonEdit").prop("disabled", !tagValue);
+    if (tagName == 'root.ARM.Reports.ShowEditAndSave') {
+        isShowEditAndSave = tagValue;
+    }   
+    else if (tagName == 'root.ARM.Reports.AllowEditAndSave') {
+        isAllowEditAndSave = tagValue;
+    }
     else if (tagName == 'root.ARM.Reports.ShowPrint') {
         $("#ComboboxPrinterName").prop("hidden", !tagValue);
         $("#ButtonPrint").prop("hidden", !tagValue);
