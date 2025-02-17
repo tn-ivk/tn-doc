@@ -78,11 +78,13 @@
 
     <script id="ElementChangeEventHandling" type="text/javascript">
 
-        var dictionaries;
+        let dictionaries;
+        let invalidChars;
 
         function funcOnLoad() {
             SendingMessageStateButtonSave();
             dictionaries = GetUsers();
+            invalidChars = GetInvalideChars();
             // Отключаем прокрутку колесиком мыши на input[type="number"]
             document.querySelectorAll('input[type="number"]').forEach(function(input) {
                 input.addEventListener('wheel', function(event) {
@@ -108,15 +110,11 @@
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Delive_Post").value = user[0].Post;
                 document.getElementById("Delive_Factory").value = user[0].Factory;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
             else if (selectObject.name == "Receive_IOF") {
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Receive_Post").value = user[0].Post;
                 document.getElementById("Receive_Factory").value = user[0].Factory;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
         }
 
@@ -126,8 +124,10 @@
             SendingMessageStateButtonSave();
         }
         
-        let invalidChars = ['"', "'", '\\'];
         function CheckInvalidChars(element) {
+            if(invalidChars == null || invalidChars.length === 0)
+                return true;
+            
             let value = null;
             if (element instanceof HTMLInputElement) {
                 value = element.value; 
