@@ -16,10 +16,21 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
-
-
+        input {
+            font-size: 14px;
+            font-family: Arial,sans-serif;
+            outline: none;
+            border: 1px solid white;
+        }
+        select {
+            font-size: 14px;
+            font-family: Arial,sans-serif;
+            outline: none;
+            border: 1px solid white;
+        }
         td, th {
-            font-size: 70%; /* Размер шрифта в процентах */
+            font-size: 14px;
+            font-family: Arial,sans-serif;
             padding: 2px; /* Поля вокруг содержимого таблицы */
             border: 0.5px solid black; /* Параметры рамки */
         }
@@ -27,6 +38,17 @@
         Edit {
             border-collapse: collapse; /* Убираем двойные линии между ячейками */
         }
+
+        .correct-value {
+            border: 1px solid white;
+            /* background-color: green; */
+        }
+        
+        .incorrect-value {
+            border: 2px solid rgb(255, 105, 105);
+            /* background-color: red; */
+        }
+        
     </style>
 
     <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
@@ -34,10 +56,23 @@
 
     <script id="ElementChangeEventHandling" type="text/javascript">
 
-        var dictionaries;
-
+        let dictionaries;
+        let invalidChars;
         function funcOnLoad() {
             dictionaries = GetUsers();
+            invalidChars = GetInvalideChars();
+            // Отключаем прокрутку колесиком мыши на input[type="number"]
+            document.querySelectorAll('input[type="number"]').forEach(function(input) {
+                input.addEventListener('wheel', function(event) {
+                    event.preventDefault();  // Отключаем изменение значения колесиком мыши
+                });
+            });
+            const elementsWithOnInput = document.querySelectorAll('[oninput]');
+            elementsWithOnInput.forEach(element => {
+                if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+                    element.oninput();
+                }
+            });
         }
 
         function UserChangeEvent(selectObject) {
@@ -67,6 +102,68 @@
 
             }
         }
+
+        function InputStringCheck(Object) {
+            console.log("InputStringCheck");
+            if(CheckEmpty(Object))
+                CheckInvalidChars(Object);
+            SendingMessageStateButtonSave();
+        }
+
+        function CheckEmpty(Object) {
+            if(!Object.hasAttribute("fill-required"))
+                return true;
+
+            if (!Object.value) {
+                Object.classList.replace("correct-value", "incorrect-value");
+                if(Object.hasAttribute("title")) {
+                    Object.setAttribute("title", "Поле должно быть заполнено!")
+                }
+                return false;
+            }
+            else {
+                Object.classList.replace("incorrect-value", "correct-value");
+                if(Object.hasAttribute("title")) {
+                    Object.setAttribute("title", "")
+                }
+            }
+            return true;
+        }
+        
+        function CheckInvalidChars(element) {
+            if(invalidChars == null || invalidChars.length === 0)
+                return true;
+
+            let value = null;
+            if (element instanceof HTMLInputElement) {
+                value = element.value;
+            } else if (element instanceof HTMLSelectElement) {
+                const selectedOption = element.options[element.selectedIndex];
+                value = selectedOption ? selectedOption.text : null;
+            }
+            if(value === null) {
+                return true;
+            }
+            for (let char of invalidChars) {
+                if (value.includes(char)) {
+                    element.classList.replace("correct-value", "incorrect-value");
+                    if(element.hasAttribute("title")) {
+                        element.setAttribute("title", `Некорректный символ: ${char}`)
+                    }
+                    return false;
+                }
+            }
+            element.classList.replace("incorrect-value", "correct-value");
+            return true;
+        }
+        
+        function SendingMessageStateButtonSave() {
+            window.top.postMessage(document.querySelectorAll('.incorrect-value').length === 0
+                    ? 'ButtonSaveOn'
+                    : 'ButtonSaveOff',
+                '*')
+        }
+        
     </script>
 
 </head>
