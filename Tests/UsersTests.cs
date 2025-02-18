@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
+using TN_DocGeneral.Dictionaries;
 using TN.DocData;
 
 namespace Tests
