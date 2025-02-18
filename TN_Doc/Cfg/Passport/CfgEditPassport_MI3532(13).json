@@ -546,8 +546,8 @@
       "Use": true,
       "Key": "Passport.PassportID",
       "Type": "text",
-      "RequiredFill": false,
-      "Name": "Номер паспорта"
+      "Name": "Номер паспорта",
+      "RequiredFill": true
     },
     {
       "Id": 1,
@@ -557,7 +557,6 @@
       "ElisAlias": [
         "pointDeliveryName"
       ],
-      "RequiredFill": true,
       "Type": "text",
       "Name": "Пункт приема сдачи нефти"
     },

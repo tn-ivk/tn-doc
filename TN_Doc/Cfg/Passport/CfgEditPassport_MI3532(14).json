@@ -493,7 +493,8 @@
       "Use": true,
       "Key": "Passport.PassportID",
       "Type": "text",
-      "Name": "Номер паспорта"
+      "Name": "Номер паспорта",
+      "RequiredFill": true
     },
     {
       "Id": 1,
