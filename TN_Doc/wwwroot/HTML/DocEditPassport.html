@@ -75,12 +75,27 @@
             color:black;
         }
 
+        /* Стиль для подсказки */
+        .ui-tooltip {
+            background-color: red;
+            color: white;
+            font-size: 14px;
+            font-family: Arial,sans-serif;
+            padding: 10px;
+            border-radius: 4px;
+            position: absolute;
+            /*top: 0;*/
+            /*left: 100%;*/
+            /*margin-top: -5px;*/
+            /*margin-left: 10px;*/
+        }
+
     </style>
 
     <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:5000/lib/jquery-ui-1.13.1.custom/jquery-ui.js"></script>
     <script src="/js/EditDoc.js"></script>
     <script src="/js/loading-spinner.js"></script>
-
     <script id="ElementChangeEventHandling" type="text/javascript">
 
         let dictionaries;
@@ -101,6 +116,16 @@
                 if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
                     element.oninput();
                 }
+            });
+            // Инициализация jQuery UI Tooltip
+            $(document).ready(function() {
+                // Инициализация подсказок для всех элементов с атрибутом title
+                $(document).tooltip(); //{
+                    // position: {
+                    //     my: "left+10 center",  // Позиция подсказки справа от элемента
+                    //     at: "right center"     // Позиция подсказки относительно элемента
+                    // }
+                //});
             });
         }
 
