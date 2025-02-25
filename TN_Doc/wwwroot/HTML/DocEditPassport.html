@@ -200,13 +200,15 @@
             if (Object.value.match(new RegExp(strRegExPattern,'g'))) {
                 Object.classList.replace("incorrect-value", "correct-value");
                 if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "")
+                    updateTooltip(Object.name, "")
+                    //Object.setAttribute("title", "")
                 }
             }
             else {
                 Object.classList.replace("correct-value", "incorrect-value");
                 if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
+                    updateTooltip(Object.name, "Кол-во знаков после запятой не соответствует заданным правилам!")
+                    //Object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
                 }
                 return false;
             }
@@ -220,13 +222,15 @@
             if (!Object.value) {
                 Object.classList.replace("correct-value", "incorrect-value");
                 if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "Поле должно быть заполнено!")
+                    updateTooltip(Object.name, "Поле должно быть заполнено!")
+                    //Object.setAttribute("title", "Поле должно быть заполнено!")
                 }
                 return false;
             }
             else {
                 Object.classList.replace("incorrect-value", "correct-value");
                 if(Object.hasAttribute("title")) {
+                    updateTooltip(Object.name, "")
                     Object.setAttribute("title", "")
                 }
             }
@@ -240,6 +244,14 @@
                 '*')
         }
 
+        function updateTooltip(elementId, newText) {
+            // if(newText === "")
+            //     $("#" + elementId).attr("title", newText).tooltip("disable");
+            // else
+            //     $("#" + elementId).attr("title", newText).tooltip("option", "content", newText);
+            $("#" + elementId).attr("title", newText).tooltip("option", "content", newText);
+            console.log("new tooltip: " + elementId + ": " + newText);
+        }
     </script>
 </head>
 <body onload="funcOnLoad()">
