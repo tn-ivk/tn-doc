@@ -278,21 +278,12 @@
     });
     
     function CheckElisInput(){
-        //console.group('--check-elis-input--');
         const elements = document.querySelectorAll('.elis-data');
-        //console.log(document.body);
-       // console.log('собираем данные, заполняемые елис ->', elements.length)
         if( elements.length===0){
-            //console.log('данные елиса отсутствуют -> выходим')
-            //console.groupEnd();
             return
         }
-        //console.log('Проверяем  input еще раз');
         for(const input of elements){
-           // RoundingCheck(input)
         }
-
-        //console.groupEnd();
     }
 
     CheckElisInput();
