@@ -92,8 +92,8 @@
 
     </style>
 
-    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
-    <script src="http://localhost:5000/lib/jquery-ui-1.13.1.custom/jquery-ui.js"></script>
+<!--    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>-->
+<!--    <script src="http://localhost:5000/lib/jquery-ui-1.13.1.custom/jquery-ui.js"></script>-->
 
     <!-- Подключение jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -255,9 +255,6 @@
         }
 
         function updateTooltip(element) {
-            if(!element.hasAttribute("title"))
-                return;
-            
             if(element.classList.contains("incorrect-value"))
             {
                 console.log("нужно анимировать подсказку для элемента: " + element.id);
@@ -265,7 +262,8 @@
                     .tooltip("enable")
                     .tooltip("option", "content", element.getAttribute("title"));  
             }
-            else
+            
+            if(element.classList.contains("correct-value"))
             {
                 console.log("нужно отключить подсказку для элемента: " + element.id);
                 $('#' + element.id).tooltip("disable");
