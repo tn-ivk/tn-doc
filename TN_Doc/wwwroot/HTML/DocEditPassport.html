@@ -75,34 +75,25 @@
             color:black;
         }
 
+        /* Стиль для подсказки */
+        .ui-tooltip {
+            background-color: red!important;
+            color: white!important;
+            font-size: 14px!important;
+            font-family: Arial,sans-serif!important;
+        }
+        
     </style>
 
-    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.css">
     <script src="/js/EditDoc.js"></script>
     <script src="/js/loading-spinner.js"></script>
-
     <script id="ElementChangeEventHandling" type="text/javascript">
 
         let dictionaries;
         let invalidChars;
-
-        function funcOnLoad() {
-            SendingMessageStateButtonSave();
-            dictionaries = GetUsers();
-            invalidChars = GetInvalideChars();
-            // Отключаем прокрутку колесиком мыши на input[type="number"]
-            document.querySelectorAll('input[type="number"]').forEach(function(input) {
-                input.addEventListener('wheel', function(event) {
-                    event.preventDefault();  // Отключаем изменение значения колесиком мыши
-                });
-            });
-            const elementsWithOnInput = document.querySelectorAll('[oninput]');
-            elementsWithOnInput.forEach(element => {
-                if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
-                    element.oninput();
-                }
-            });
-        }
 
         function UserChangeEvent(selectObject) {
             if (selectObject.name == "Laboratory_IOF") {
@@ -126,6 +117,7 @@
         function InputStringCheck(Object) {
             if(CheckEmpty(Object))
                 CheckInvalidChars(Object);
+            updateTooltip(Object);
             SendingMessageStateButtonSave();
         }
         
@@ -147,18 +139,22 @@
                 if (value.includes(char)) {
                     element.classList.replace("correct-value", "incorrect-value");
                     if(element.hasAttribute("title")) {
-                        element.setAttribute("title", `Некорректный символ: ${char}`)
+                        element.setAttribute("title", "Некорректный символ: ${char}");
                     }
                     return false;
                 }
             }
             element.classList.replace("incorrect-value", "correct-value");
+            if(element.hasAttribute("title")) {
+                element.setAttribute("title", "")
+            }
             return true;
         } 
             
         function InputValueCheck(Object) {
             if(CheckEmpty(Object))
                 CheckRounding(Object);
+            updateTooltip(Object);
             SendingMessageStateButtonSave();
         }
 
@@ -215,9 +211,22 @@
                 '*')
         }
 
+        function updateTooltip(element) {
+            if(element.classList.contains("incorrect-value"))
+            {
+                $('#' + element.id)
+                    .tooltip("enable")
+                    .tooltip("option", "content", element.getAttribute("title"));  
+            }
+            
+            if(element.classList.contains("correct-value"))
+            {
+                $('#' + element.id).tooltip("disable");
+            }
+        }
     </script>
 </head>
-<body onload="funcOnLoad()">
+<body>
     <menu type="toolbar">
         
     </menu>
@@ -243,23 +252,38 @@
         </tbody>
     </table>
 
+    
 <script type="text/javascript">
+    
+    $(document).ready(function() {
+        // Инициализация подсказки для всех элементов с атрибутом title
+        $('[title]').tooltip();
+
+        SendingMessageStateButtonSave();
+        dictionaries = GetUsers();
+        invalidChars = GetInvalideChars();
+
+        // Отключаем прокрутку колесиком мыши на input[type="number"]
+        document.querySelectorAll('input[type="number"]').forEach(function(input) {
+            input.addEventListener('wheel', function(event) {
+                event.preventDefault();  // Отключаем изменение значения колесиком мыши
+            });
+        });
+        const elementsWithOnInput = document.querySelectorAll('[oninput]');
+        elementsWithOnInput.forEach(element => {
+            if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+                element.oninput();
+            }
+        });
+    });
+    
     function CheckElisInput(){
-        //console.group('--check-elis-input--');
         const elements = document.querySelectorAll('.elis-data');
-        //console.log(document.body);
-       // console.log('собираем данные, заполняемые елис ->', elements.length)
         if( elements.length===0){
-            //console.log('данные елиса отсутствуют -> выходим')
-            //console.groupEnd();
             return
         }
-        //console.log('Проверяем  input еще раз');
         for(const input of elements){
-           // RoundingCheck(input)
         }
-
-        //console.groupEnd();
     }
 
     CheckElisInput();
