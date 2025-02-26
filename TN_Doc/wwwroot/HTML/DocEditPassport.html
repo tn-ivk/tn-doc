@@ -114,22 +114,22 @@
             }
         }
 
-        function InputStringCheck(Object) {
-            if(CheckEmpty(Object))
-                CheckInvalidChars(Object);
-            updateTooltip(Object);
+        function InputStringCheck(object) {
+            if(CheckEmpty(object))
+                CheckInvalidChars(object);
+            updateTooltip(object);
             SendingMessageStateButtonSave();
         }
         
-        function CheckInvalidChars(element) {
+        function CheckInvalidChars(object) {
             if(invalidChars == null || invalidChars.length === 0)
                 return true;
             
             let value = null;
-            if (element instanceof HTMLInputElement) {
-                value = element.value; 
-            } else if (element instanceof HTMLSelectElement) {
-                const selectedOption = element.options[element.selectedIndex]; 
+            if (object instanceof HTMLInputElement) {
+                value = object.value; 
+            } else if (object instanceof HTMLSelectElement) {
+                const selectedOption = object.options[object.selectedIndex]; 
                 value = selectedOption ? selectedOption.text : null;
             }
             if(value === null) {
@@ -137,22 +137,22 @@
             }
             for (let char of invalidChars) {
                 if (value.includes(char)) {
-                    element.classList.replace("correct-value", "incorrect-value");
-                    element.setAttribute("title", "Некорректный символ: ${char}");
+                    object.classList.replace("correct-value", "incorrect-value");
+                    object.setAttribute("title", "Некорректный символ: ${char}");
                     return false;
                 }
             }
-            element.classList.replace("incorrect-value", "correct-value");
-            if(element.hasAttribute("title")) {
-                element.setAttribute("title", "")
+            object.classList.replace("incorrect-value", "correct-value");
+            if(object.hasAttribute("title")) {
+                object.setAttribute("title", "")
             }
             return true;
         } 
             
-        function InputValueCheck(Object) {
-            if(CheckEmpty(Object))
-                CheckRounding(Object);
-            updateTooltip(Object);
+        function InputValueCheck(object) {
+            if(CheckEmpty(object))
+                CheckRounding(object);
+            updateTooltip(object);
             SendingMessageStateButtonSave();
         }
 
@@ -180,19 +180,19 @@
             return true;
         }
 
-        function CheckEmpty(Object) {
-            if(!Object.hasAttribute("fill-required"))
+        function CheckEmpty(object) {
+            if(!object.hasAttribute("fill-required"))
                 return true;
             
-            if (!Object.value) {
-                Object.classList.replace("correct-value", "incorrect-value");
-                Object.setAttribute("title", "Поле должно быть заполнено!");
+            if (!object.value) {
+                object.classList.replace("correct-value", "incorrect-value");
+                object.setAttribute("title", "Поле должно быть заполнено!");
                 return false;
             }
             else {
-                Object.classList.replace("incorrect-value", "correct-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "")
+                object.classList.replace("incorrect-value", "correct-value");
+                if(object.hasAttribute("title")) {
+                    object.setAttribute("title", "")
                 }
             }
             return true;
