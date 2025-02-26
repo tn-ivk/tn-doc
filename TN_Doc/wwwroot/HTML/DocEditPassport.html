@@ -138,9 +138,7 @@
             for (let char of invalidChars) {
                 if (value.includes(char)) {
                     element.classList.replace("correct-value", "incorrect-value");
-                    if(element.hasAttribute("title")) {
-                        element.setAttribute("title", "Некорректный символ: ${char}");
-                    }
+                    element.setAttribute("title", "Некорректный символ: ${char}");
                     return false;
                 }
             }
@@ -158,41 +156,43 @@
             SendingMessageStateButtonSave();
         }
 
-        function CheckRounding(Object) {
-            if(!Object.hasAttribute('data-roundvalue')) {
+        function CheckRounding(object) {
+            if(!object.hasAttribute('data-roundvalue')) {
                 return true;
             }
                 
-            const round = Number(Object.getAttribute('data-roundvalue'));
+            const round = Number(object.getAttribute('data-roundvalue'));
             if(isNaN(round) || round < 1)
                 return true;
                 
-            const strRegExPattern = "^-?([0-9]+\.[0-9]{1," + round + "})$";
-            if (Object.value.match(new RegExp(strRegExPattern,'g'))) {
-                Object.classList.replace("incorrect-value", "correct-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "")
+            const strRegExPattern = "^-?[0-9]+(?:\\.[0-9]{1," + round + "})?$";
+            if (object.value.match(new RegExp(strRegExPattern,'g'))) {
+                object.classList.replace("incorrect-value", "correct-value");
+                if(object.hasAttribute("title")) {
+                    object.setAttribute("title", "")
                 }
             }
             else {
-                Object.classList.replace("correct-value", "incorrect-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
-                }
+                object.classList.replace("correct-value", "incorrect-value");
+                object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
                 return false;
             }
             return true;
         }
 
         function CheckEmpty(Object) {
+            console.log("CheckEmpty: " + Object.value);
             if(!Object.hasAttribute("fill-required"))
                 return true;
             
+            if (!Object.value)
+                console.log("value is empty");
+            else
+                console.log("value is not empty");
+                    
             if (!Object.value) {
                 Object.classList.replace("correct-value", "incorrect-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "Поле должно быть заполнено!")
-                }
+                Object.setAttribute("title", "Поле должно быть заполнено!");
                 return false;
             }
             else {
