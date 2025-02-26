@@ -77,66 +77,23 @@
 
         /* Стиль для подсказки */
         .ui-tooltip {
-            background-color: red;
-            color: white;
-            font-size: 14px;
-            font-family: Arial,sans-serif;
-            padding: 10px;
-            border-radius: 4px;
-            position: absolute;
-            /*top: 0;*/
-            /*left: 100%;*/
-            /*margin-top: -5px;*/
-            /*margin-left: 10px;*/
+            background-color: red!important;
+            color: white!important;
+            font-size: 14px!important;
+            font-family: Arial,sans-serif!important;
         }
-
+        
     </style>
 
-<!--    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>-->
-<!--    <script src="http://localhost:5000/lib/jquery-ui-1.13.1.custom/jquery-ui.js"></script>-->
-
-    <!-- Подключение jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Подключение jQuery UI -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    
+    <script src="/lib/jquery/jquery-3.7.1.min.js"></script>
+    <script src="/lib/jquery-ui-1.14.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/lib/jquery-ui-1.14.1/jquery-ui.min.css">
     <script src="/js/EditDoc.js"></script>
     <script src="/js/loading-spinner.js"></script>
     <script id="ElementChangeEventHandling" type="text/javascript">
 
         let dictionaries;
         let invalidChars;
-
-        function funcOnLoad() {
-            // SendingMessageStateButtonSave();
-            // dictionaries = GetUsers();
-            // invalidChars = GetInvalideChars();
-            //
-            // // Инициализация jQuery UI Tooltip
-            // $(document).ready(function() {
-            //     // Инициализация подсказок для всех элементов с атрибутом title
-            //     console.log("Инициализация подсказок для всех элементов");
-            //     $("input").tooltip();
-            //     $("select").tooltip();
-            //     //$(document).tooltip();
-            // });
-            //
-            // // Отключаем прокрутку колесиком мыши на input[type="number"]
-            // document.querySelectorAll('input[type="number"]').forEach(function(input) {
-            //     input.addEventListener('wheel', function(event) {
-            //         event.preventDefault();  // Отключаем изменение значения колесиком мыши
-            //     });
-            // });
-            // const elementsWithOnInput = document.querySelectorAll('[oninput]');
-            // elementsWithOnInput.forEach(element => {
-            //     if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
-            //         element.oninput();
-            //     }
-            // });
-            
-        }
 
         function UserChangeEvent(selectObject) {
             if (selectObject.name == "Laboratory_IOF") {
@@ -271,7 +228,7 @@
         }
     </script>
 </head>
-<body onload="funcOnLoad()">
+<body>
     <menu type="toolbar">
         
     </menu>
@@ -309,7 +266,6 @@
         });
         // Инициализация подсказки для всех элементов с атрибутом title
         $('[title]').tooltip();
-        //$('select').tooltip();
 
         SendingMessageStateButtonSave();
         dictionaries = GetUsers();
