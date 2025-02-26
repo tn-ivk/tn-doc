@@ -214,7 +214,6 @@
         function updateTooltip(element) {
             if(element.classList.contains("incorrect-value"))
             {
-                console.log("нужно анимировать подсказку для элемента: " + element.id);
                 $('#' + element.id)
                     .tooltip("enable")
                     .tooltip("option", "content", element.getAttribute("title"));  
@@ -222,7 +221,6 @@
             
             if(element.classList.contains("correct-value"))
             {
-                console.log("нужно отключить подсказку для элемента: " + element.id);
                 $('#' + element.id).tooltip("disable");
             }
         }
@@ -258,12 +256,6 @@
 <script type="text/javascript">
     
     $(document).ready(function() {
-        // Инициализация подсказок для всех элементов с атрибутом title
-        console.log("Инициализация подсказок для всех элементов");
-        const elementsWithTitle = document.querySelectorAll('[title]');
-        elementsWithTitle.forEach(element => {
-            console.log(element.id);
-        });
         // Инициализация подсказки для всех элементов с атрибутом title
         $('[title]').tooltip();
 
