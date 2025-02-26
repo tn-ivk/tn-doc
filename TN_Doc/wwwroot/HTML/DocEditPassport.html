@@ -181,15 +181,9 @@
         }
 
         function CheckEmpty(Object) {
-            console.log("CheckEmpty: " + Object.value);
             if(!Object.hasAttribute("fill-required"))
                 return true;
             
-            if (!Object.value)
-                console.log("value is empty");
-            else
-                console.log("value is not empty");
-                    
             if (!Object.value) {
                 Object.classList.replace("correct-value", "incorrect-value");
                 Object.setAttribute("title", "Поле должно быть заполнено!");
