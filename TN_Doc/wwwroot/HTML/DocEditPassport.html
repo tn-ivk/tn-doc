@@ -94,6 +94,14 @@
 
     <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
     <script src="http://localhost:5000/lib/jquery-ui-1.13.1.custom/jquery-ui.js"></script>
+
+    <!-- Подключение jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Подключение jQuery UI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    
     <script src="/js/EditDoc.js"></script>
     <script src="/js/loading-spinner.js"></script>
     <script id="ElementChangeEventHandling" type="text/javascript">
@@ -102,31 +110,32 @@
         let invalidChars;
 
         function funcOnLoad() {
-            SendingMessageStateButtonSave();
-            dictionaries = GetUsers();
-            invalidChars = GetInvalideChars();
-            // Отключаем прокрутку колесиком мыши на input[type="number"]
-            document.querySelectorAll('input[type="number"]').forEach(function(input) {
-                input.addEventListener('wheel', function(event) {
-                    event.preventDefault();  // Отключаем изменение значения колесиком мыши
-                });
-            });
-            const elementsWithOnInput = document.querySelectorAll('[oninput]');
-            elementsWithOnInput.forEach(element => {
-                if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
-                    element.oninput();
-                }
-            });
-            // Инициализация jQuery UI Tooltip
-            $(document).ready(function() {
-                // Инициализация подсказок для всех элементов с атрибутом title
-                $(document).tooltip(); //{
-                    // position: {
-                    //     my: "left+10 center",  // Позиция подсказки справа от элемента
-                    //     at: "right center"     // Позиция подсказки относительно элемента
-                    // }
-                //});
-            });
+            // SendingMessageStateButtonSave();
+            // dictionaries = GetUsers();
+            // invalidChars = GetInvalideChars();
+            //
+            // // Инициализация jQuery UI Tooltip
+            // $(document).ready(function() {
+            //     // Инициализация подсказок для всех элементов с атрибутом title
+            //     console.log("Инициализация подсказок для всех элементов");
+            //     $("input").tooltip();
+            //     $("select").tooltip();
+            //     //$(document).tooltip();
+            // });
+            //
+            // // Отключаем прокрутку колесиком мыши на input[type="number"]
+            // document.querySelectorAll('input[type="number"]').forEach(function(input) {
+            //     input.addEventListener('wheel', function(event) {
+            //         event.preventDefault();  // Отключаем изменение значения колесиком мыши
+            //     });
+            // });
+            // const elementsWithOnInput = document.querySelectorAll('[oninput]');
+            // elementsWithOnInput.forEach(element => {
+            //     if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+            //         element.oninput();
+            //     }
+            // });
+            
         }
 
         function UserChangeEvent(selectObject) {
@@ -151,6 +160,7 @@
         function InputStringCheck(Object) {
             if(CheckEmpty(Object))
                 CheckInvalidChars(Object);
+            updateTooltip(Object);
             SendingMessageStateButtonSave();
         }
         
@@ -172,18 +182,22 @@
                 if (value.includes(char)) {
                     element.classList.replace("correct-value", "incorrect-value");
                     if(element.hasAttribute("title")) {
-                        element.setAttribute("title", `Некорректный символ: ${char}`)
+                        element.setAttribute("title", "Некорректный символ: ${char}");
                     }
                     return false;
                 }
             }
             element.classList.replace("incorrect-value", "correct-value");
+            if(element.hasAttribute("title")) {
+                element.setAttribute("title", "")
+            }
             return true;
         } 
             
         function InputValueCheck(Object) {
             if(CheckEmpty(Object))
                 CheckRounding(Object);
+            updateTooltip(Object);
             SendingMessageStateButtonSave();
         }
 
@@ -200,15 +214,13 @@
             if (Object.value.match(new RegExp(strRegExPattern,'g'))) {
                 Object.classList.replace("incorrect-value", "correct-value");
                 if(Object.hasAttribute("title")) {
-                    updateTooltip(Object.name, "")
-                    //Object.setAttribute("title", "")
+                    Object.setAttribute("title", "")
                 }
             }
             else {
                 Object.classList.replace("correct-value", "incorrect-value");
                 if(Object.hasAttribute("title")) {
-                    updateTooltip(Object.name, "Кол-во знаков после запятой не соответствует заданным правилам!")
-                    //Object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
+                    Object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
                 }
                 return false;
             }
@@ -222,15 +234,13 @@
             if (!Object.value) {
                 Object.classList.replace("correct-value", "incorrect-value");
                 if(Object.hasAttribute("title")) {
-                    updateTooltip(Object.name, "Поле должно быть заполнено!")
-                    //Object.setAttribute("title", "Поле должно быть заполнено!")
+                    Object.setAttribute("title", "Поле должно быть заполнено!")
                 }
                 return false;
             }
             else {
                 Object.classList.replace("incorrect-value", "correct-value");
                 if(Object.hasAttribute("title")) {
-                    updateTooltip(Object.name, "")
                     Object.setAttribute("title", "")
                 }
             }
@@ -244,13 +254,22 @@
                 '*')
         }
 
-        function updateTooltip(elementId, newText) {
-            // if(newText === "")
-            //     $("#" + elementId).attr("title", newText).tooltip("disable");
-            // else
-            //     $("#" + elementId).attr("title", newText).tooltip("option", "content", newText);
-            $("#" + elementId).attr("title", newText).tooltip("option", "content", newText);
-            console.log("new tooltip: " + elementId + ": " + newText);
+        function updateTooltip(element) {
+            if(!element.hasAttribute("title"))
+                return;
+            
+            if(element.classList.contains("incorrect-value"))
+            {
+                console.log("нужно анимировать подсказку для элемента: " + element.id);
+                $('#' + element.id)
+                    .tooltip("enable")
+                    .tooltip("option", "content", element.getAttribute("title"));  
+            }
+            else
+            {
+                console.log("нужно отключить подсказку для элемента: " + element.id);
+                $('#' + element.id).tooltip("disable");
+            }
         }
     </script>
 </head>
@@ -280,7 +299,38 @@
         </tbody>
     </table>
 
+    
 <script type="text/javascript">
+    
+    $(document).ready(function() {
+        // Инициализация подсказок для всех элементов с атрибутом title
+        console.log("Инициализация подсказок для всех элементов");
+        const elementsWithTitle = document.querySelectorAll('[title]');
+        elementsWithTitle.forEach(element => {
+            console.log(element.id);
+        });
+        // Инициализация подсказки для всех элементов с атрибутом title
+        $('[title]').tooltip();
+        //$('select').tooltip();
+
+        SendingMessageStateButtonSave();
+        dictionaries = GetUsers();
+        invalidChars = GetInvalideChars();
+
+        // Отключаем прокрутку колесиком мыши на input[type="number"]
+        document.querySelectorAll('input[type="number"]').forEach(function(input) {
+            input.addEventListener('wheel', function(event) {
+                event.preventDefault();  // Отключаем изменение значения колесиком мыши
+            });
+        });
+        const elementsWithOnInput = document.querySelectorAll('[oninput]');
+        elementsWithOnInput.forEach(element => {
+            if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+                element.oninput();
+            }
+        });
+    });
+    
     function CheckElisInput(){
         //console.group('--check-elis-input--');
         const elements = document.querySelectorAll('.elis-data');
