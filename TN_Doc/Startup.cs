@@ -7,8 +7,6 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
 using TN_Doc.Extensions;
-using TN_Doc.Models.Services;
-using TN_DocGeneral.Services;
 using TN.Doc;
 
 namespace TN_Doc
