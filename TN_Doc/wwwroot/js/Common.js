@@ -996,7 +996,7 @@ function GetFullNameTag(tagName) {
     return PrefixTag + '.' + tagName;
 }
 
-//Получить данные из ЕЛИС
+//Запросить данные из ЕЛИС
 function GetElisData() {
 
     ClearDataElis();
