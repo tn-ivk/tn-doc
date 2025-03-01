@@ -27,22 +27,23 @@
 
 .dialog-header {
   margin-bottom: 15px;
+  background-color: red;
+  color: white;
+  padding: 10px 10px;
 }
 
 .dialog-title {
   margin: 0;
-  font-size: 16px;
-  background-color: red;
-  color: white;
-  font-weight: bold;
-  padding: 10px 20px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  padding: 10px 10px;
 }
 
 /* Контент внутри модального окна */
 .dialog-content {
   display: flex;
   align-items: center;
-  padding: 24px;
+  padding: 10px;
   text-align: center;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -54,9 +55,10 @@
 
 /* Сообщение об ошибке */
 .dialog-message {
-  font-size: 16px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
   color: #333333;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   line-height: 1.5;
 }
 
@@ -68,6 +70,7 @@
   border-radius: 6px;
   padding: 10px 20px;
   font-size: 14px;
+  font-family: Arial, sans-serif;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
   margin: 10px 20px;
