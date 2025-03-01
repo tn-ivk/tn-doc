@@ -9,6 +9,7 @@
 #elis .modal-dialog {
   border: none !important;
   border-radius: 12px !important;
+  font-size: 14px;
   font-family: Arial, sans-serif !important;
   overflow: hidden !important;
 }
@@ -18,7 +19,6 @@
   margin-bottom: 15px;
   background-color: #1b6ec2 !important;
   color: white !important; 
-  font-weight: bold;
 }
 
 #elis .modal-title {
@@ -56,6 +56,7 @@
   border-radius: 6px;
   padding: 10px 20px;
   font-size: 14px;
+  font-family: Arial, sans-serif;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
   margin: 10px 10px;
