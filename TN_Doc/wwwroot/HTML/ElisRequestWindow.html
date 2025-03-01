@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Окно запроса данных из ЕЛИС</title>
+</head>
+<body>
+    <!-- Модальное окно для запроса данных из ЕЛИС -->
+    <div class="modal fade" id="elis" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <!-- Заголовок модального окна -->
+                <div class="modal-header">
+                    <span class="modal-title" id="modalTitle">Получение данных из ЕЛИС</span>
+                </div>
+                <!-- Содержимое модального окна -->
+                <div class="modal-body">
+                    <span class="modal-title" id="info"></span>
+    
+                    <button id="buttonDataRequest" type="button" class="btn btn-primary" onclick="GetElisData()">
+                        <span id="spinnerDataRequest" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+                        <span id="textDataRequest">Запросить данные</span>
+                    </button>
+                    <div id="listPassports" class="list-group"></div>
+                </div>
+                <!-- Футер модального окна -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="FillPassportDataElis()">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
