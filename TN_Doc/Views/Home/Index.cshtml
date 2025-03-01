@@ -4,20 +4,20 @@
     ViewData["Title"] = $" Модуль - документы ({ ViewData["Version"]})";
 }
 <body>
-    <dialog id="errorDialog" class="custom-dialog">
-        <div class="dialog-header">
-            <h2 class="dialog-title">Ошибка</h2>
-        </div>
-        <div class="dialog-content">
-            <svg class="dialog-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#ff4444"/>
-            </svg>
-            <p id="errorMessage" class="dialog-message"></p>
-        </div>
-        <div class="dialog-footer">
-            <button class="dialog-button" onclick="document.getElementById('errorDialog').close()">Закрыть</button>
-        </div>
-    </dialog>
+    @* <dialog id="errorDialog" class="custom-dialog"> *@
+    @*     <div class="dialog-header"> *@
+    @*         <h2 class="dialog-title">Ошибка</h2> *@
+    @*     </div> *@
+    @*     <div class="dialog-content"> *@
+    @*         <svg class="dialog-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> *@
+    @*             <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#ff4444"/> *@
+    @*         </svg> *@
+    @*         <p id="errorMessage" class="dialog-message"></p> *@
+    @*     </div> *@
+    @*     <div class="dialog-footer"> *@
+    @*         <button class="dialog-button" onclick="document.getElementById('errorDialog').close()">Закрыть</button> *@
+    @*     </div> *@
+    @* </dialog> *@
     <div class="cont">
         <table class="mainTable">
             <tr>
@@ -128,8 +128,8 @@
 
 
 
-@*todo: вынести в отдельный  html*@
-<div class="modal fade"
+    @*todo: вынести в отдельный  html*@
+    <div class="modal fade"
      onselectstart="return false"
      oncontextmenu="return false"
      id="modal-window"
@@ -270,32 +270,12 @@
     </div>
 </div>
 
-
-@* Окно для получения данных из "ЕЛИС" *@
-
-<div class="modal fade" id="elis" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Получение данных из ЕЛИС</h5>
-            </div>
-            <div class="modal-body">
-                <h6 class="modal-title" id="info"></h6>
-
-                <br/>
-                <button id="buttonDataRequest" type="button" class="btn btn-primary" onclick="GetElisData()">
-                    <span id="spinnerDataRequest" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
-                    <span id="textDataRequest">Запросить данные</span>
-                </button>
-                <div id="listPassports" class="list-group"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="FillPassportDataElis()">Применить</button>
-            </div>
-        </div>
+    <div id="ErrorDialogContent">
+        <!-- Здесь будет загружен HTML файл -->
     </div>
-</div>
+    <div id="ElisRequestContent">
+        <!-- Здесь будет загружен HTML файл -->
+    </div>
 
 @* Окно для подтверждения действий пользователя *@
 @* Текст вставляется через перегрузку метода  confirm *@
@@ -322,5 +302,10 @@
 <script>
         RedefinitionConfirmWindow();
         InitElement();
+        // загрузка статичного html    
+        $(document).ready(function () {
+            $("#ErrorDialogContent").load("/HTML/ErrorDialogWindow.html");
+            $("#ElisRequestContent").load("/HTML/ElisRequestWindow.html");
+        });
 </script>
 </body>
