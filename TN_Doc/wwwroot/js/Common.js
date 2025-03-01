@@ -998,25 +998,18 @@ function GetFullNameTag(tagName) {
 
 //Запросить данные из ЕЛИС
 function GetElisData() {
-
     ClearDataElis();
-
-    var dataELIS;
-
-    var clientToken = GetClientToken(CurrentDeviceId);
+    let dataELIS;
+    let clientToken = GetClientToken(CurrentDeviceId);
 
     if (clientToken == undefined) {
-
-        var regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
-
+        const regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
         if (regData == '')
             return;
         else
             clientToken = RegistrationClient(regData);
     }
-
-    var periodDocument = GetPeriodDocument();
-    
+    const periodDocument = GetPeriodDocument();
     StateButtonGetElisData(true);
 
     $.ajax(
