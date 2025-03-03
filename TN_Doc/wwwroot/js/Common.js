@@ -998,25 +998,15 @@ function GetFullNameTag(tagName) {
 
 //Запросить данные из ЕЛИС
 function GetElisData() {
-
     ClearDataElis();
+    let dataELIS;
+    let clientToken = GetElisToken();
 
-    var dataELIS;
-
-    var clientToken = GetClientToken(CurrentDeviceId);
-
-    if (clientToken == undefined) {
-
-        var regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
-
-        if (regData == '')
-            return;
-        else
-            clientToken = RegistrationClient(regData);
+    if (clientToken == null) {
+        $('#info').html('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
+        return;
     }
-
-    var periodDocument = GetPeriodDocument();
-    
+    const periodDocument = GetPeriodDocument();
     StateButtonGetElisData(true);
 
     $.ajax(
@@ -1062,10 +1052,24 @@ function GetElisData() {
         });
 }
 
+//Получение токена для ЕЛИС
+function GetElisToken() {
+    let elisToken = GetClientToken(CurrentDeviceId);
+
+    if (elisToken == null) {
+        const regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
+        if (regData == '')
+            return;
+        else
+            elisToken = RegistrationClient(regData);
+    }
+    return elisToken;
+}
+
 //Зарегистрировать устройство для ЕЛИС
 function RegistrationClient(regData) {
 
-    var clientToken = null;
+    let clientToken = null;
 
     $.ajax(
         {
@@ -1075,17 +1079,12 @@ function RegistrationClient(regData) {
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',
             data: JSON.stringify(regData),
-            //    JSON.stringify({
-            //    ostKey: nameDevice,
-            //    siknKey: '',
-            //    clientName: ''
-            //}),
             success: function (data) {
 
                 clientToken = data;
             },
             error: function (data) {
-
+                
             }
         });
 
@@ -1189,7 +1188,10 @@ function DrawTablePassports(dataELIS) {
 function SetDataLocalStorage() {
 }
 
-
+function ResetPassportDataElis() {
+    $('#info').text('');
+    StateButtonGetElisData(false);
+}
 function FillPassportDataElis() {
     try {
         //console.log("FillPassportDataElis" );

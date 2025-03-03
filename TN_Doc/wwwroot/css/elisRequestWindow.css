@@ -27,19 +27,27 @@
   padding: 10px 20px;
 }
 
-
-/* Контент внутри модального окна */
-#elis .modal-dialog-content {
-  border: none !important; /* Убираем границу вокруг окна */
+#elis .modal-body {
   box-shadow: none !important; /* Убираем тень */
   background-color: transparent !important; /* Убираем фон */
-  border-radius: 5px !important; /* Закругляем углы */
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: left;
+  align-items: start;
   padding: 0 !important;
   margin: 0 !important;
-  text-align: center;
   border-bottom: 1px solid #e0e0e0;
+}
+
+#elis .modal-info {
+  border: none !important;
+  margin: 0;
+  padding: 10px 10px;
+  color: red;
+}
+
+#elis .modal-info:empty {
+  display: none;
 }
 
 #elis .modal-dialog-footer {

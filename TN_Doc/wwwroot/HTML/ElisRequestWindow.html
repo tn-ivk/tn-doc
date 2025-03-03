@@ -15,7 +15,7 @@
                 </div>
                 <!-- Содержимое модального окна -->
                 <div class="modal-body">
-                    <span class="modal-title" id="info"></span>
+                    <span class="modal-info" id="info"></span>
     
                     <button id="buttonDataRequest" type="button" class="btn btn-primary" onclick="GetElisData()">
                         <span id="spinnerDataRequest" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
@@ -25,7 +25,7 @@
                 </div>
                 <!-- Футер модального окна -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="ResetPassportDataElis()">Закрыть</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="FillPassportDataElis()">Применить</button>
                 </div>
             </div>
