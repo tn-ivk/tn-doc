@@ -1003,7 +1003,7 @@ function GetElisData() {
     let clientToken = GetElisToken();
 
     if (clientToken == null) {
-        $('#info').text('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
+        $('#info').html('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
         return;
     }
     const periodDocument = GetPeriodDocument();
