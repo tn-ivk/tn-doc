@@ -1000,14 +1000,11 @@ function GetFullNameTag(tagName) {
 function GetElisData() {
     ClearDataElis();
     let dataELIS;
-    let clientToken = GetClientToken(CurrentDeviceId);
+    let clientToken = GetElisToken();
 
-    if (clientToken == undefined) {
-        const regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
-        if (regData == '')
-            return;
-        else
-            clientToken = RegistrationClient(regData);
+    if (clientToken == null) {
+        $('#info').text('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
+        return;
     }
     const periodDocument = GetPeriodDocument();
     StateButtonGetElisData(true);
@@ -1055,10 +1052,24 @@ function GetElisData() {
         });
 }
 
+//Получение токена для ЕЛИС
+function GetElisToken() {
+    let elisToken = GetClientToken(CurrentDeviceId);
+
+    if (elisToken == null) {
+        const regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
+        if (regData == '')
+            return;
+        else
+            elisToken = RegistrationClient(regData);
+    }
+    return elisToken;
+}
+
 //Зарегистрировать устройство для ЕЛИС
 function RegistrationClient(regData) {
 
-    var clientToken = null;
+    let clientToken = null;
 
     $.ajax(
         {
@@ -1068,17 +1079,12 @@ function RegistrationClient(regData) {
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',
             data: JSON.stringify(regData),
-            //    JSON.stringify({
-            //    ostKey: nameDevice,
-            //    siknKey: '',
-            //    clientName: ''
-            //}),
             success: function (data) {
 
                 clientToken = data;
             },
             error: function (data) {
-
+                
             }
         });
 
@@ -1182,7 +1188,10 @@ function DrawTablePassports(dataELIS) {
 function SetDataLocalStorage() {
 }
 
-
+function ResetPassportDataElis() {
+    $('#info').text('');
+    StateButtonGetElisData(false);
+}
 function FillPassportDataElis() {
     try {
         //console.log("FillPassportDataElis" );
