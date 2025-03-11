@@ -1194,21 +1194,24 @@ function ResetPassportDataElis() {
 }
 function FillPassportDataElis() {
     try {
-        //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let labInfo = JSON.parse(localStorage.labInfo);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
-        //console.log('dataPassport.parameters',dataPassport.parameters);
-        //console.log()
+        
+        // Добавляем данные о представителе лаборатории из Signers
+        if (dataPassport.signers?.laboratory) {
+            // Добавляем данные в dataPassport для обратной совместимости
+            dataPassport.chiefLabShortSign = dataPassport.signers.laboratory.iof;
+            dataPassport.chiefLabPosition = dataPassport.signers.laboratory.post;
+            dataPassport.chiefLabOrganization = dataPassport.signers.laboratory.company;
+        }
+
         elisNodes.forEach((item, index, array) => {
             let itemKeys = item.dataset.elisAlias?.split('|');
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
-                //console.log('itemKeys', itemKeys);
-                //console.log('key', key);
-                //console.log('itemKeys.includes(key)', itemKeys.includes(key));
                 if (itemKeys.includes(key)) {
                     root = dataPassport.parameters
                     for (let iKey of itemKeys) {
@@ -1314,8 +1317,8 @@ function FillPassportDataElis() {
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
-    } finally {
-        console.groupEnd();
+    } catch (error) {
+        console.error("Ошибка в FillPassportDataElis:", error);
     }
 }
 
