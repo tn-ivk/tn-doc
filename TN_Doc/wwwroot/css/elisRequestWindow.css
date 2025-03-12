@@ -91,3 +91,15 @@
   padding: 0 !important;
   margin: 0 !important;
 }
+
+#elis .list-group {
+  width: calc(100% - 20px); /* Ширина кнопки с учетом отступов */
+  margin: 10px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+#elis .list-group-item {
+  
+  display: block; /* Блоковый элемент для полной ширины */
+}
