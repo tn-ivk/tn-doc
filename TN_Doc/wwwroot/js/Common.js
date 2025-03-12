@@ -1269,7 +1269,7 @@ function FillPassportDataElis() {
                         }
                         break;
                     case 'DocNum':
-                        item.value = root[currentKey].value;
+                        item.value = root[currentKey].documentNumber;
                         break;
                     case 'Value':
                         item.value = root[currentKey].value;
