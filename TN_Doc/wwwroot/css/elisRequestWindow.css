@@ -80,6 +80,18 @@
   background-color: #10487d;
 }
 
+#elis .btn-secondary {
+  background-color: #6c757d; /* Серый цвет для кнопки Закрыть */
+}
+
+#elis .btn-secondary:hover {
+  background-color: #5a6268; /* Темно-серый при наведении */
+}
+
+#elis .btn-secondary:active {
+  background-color: #545b62; /* Еще темнее при нажатии */
+}
+
 #elis div.modal-content {
   border: none !important;
   padding: 0 !important;
