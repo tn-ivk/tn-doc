@@ -138,7 +138,7 @@
             for (let char of invalidChars) {
                 if (value.includes(char)) {
                     object.classList.replace("correct-value", "incorrect-value");
-                    object.setAttribute("title", "Некорректный символ: ${char}");
+                    object.setAttribute("title", `Некорректный символ: ${char}`);
                     return false;
                 }
             }
