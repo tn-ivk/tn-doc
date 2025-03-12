@@ -61,8 +61,7 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                     /////////
                 } else if ($(this)[0].nodeName == "INPUT") {
                     if ($(this).attr('data-tag') == 'DocNum') {
-                        const labDoc = $(this)[0].dataset.labdocument; 
-                        param["Value"] = labDoc;
+                        param["Value"] = $(this)[0].dataset.document;
                     }
                     else {
                         param["Value"] = $(this).val();    

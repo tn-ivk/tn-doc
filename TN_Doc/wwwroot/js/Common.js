@@ -1270,8 +1270,8 @@ function FillPassportDataElis() {
                         break;
                     case 'DocNum':
                         item.value = root[currentKey].documentNumber;
-                        if(item.hasAttribute("data-labDocument"))
-                            item.setAttribute("data-labDocument", JSON.stringify(new LabDocumentInfo(root[currentKey].documentType, root[currentKey].documentNumber, root[currentKey].documentDate)));
+                        if(item.hasAttribute("data-document"))
+                            item.setAttribute("data-document", JSON.stringify(new LabDocumentInfo(root[currentKey].documentType, root[currentKey].documentNumber, root[currentKey].documentDate)));
                         break;
                     case 'Value':
                         item.value = root[currentKey].value;
