@@ -1259,17 +1259,26 @@ function FillPassportDataElis() {
             }
 
             if (item.nodeName === 'INPUT') {
-                const value = item.dataset.tag === 'AdditionalInfo'
-                    ? root[currentKey]
-                    : root[currentKey].value;
-                
-                if(item.type === 'datetime-local') {
-                    item.value = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                switch (item.dataset.tag) {
+                    case 'AdditionalInfo':
+                        if(item.type === 'datetime-local') {
+                            item.value = moment(root[currentKey]).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                        else {
+                            item.value = root[currentKey];    
+                        }
+                        break;
+                    case 'DocNum':
+                        item.value = root[currentKey].value;
+                        break;
+                    case 'Value':
+                        item.value = root[currentKey].value;
+                        FixedElisData(item);
+                        break;
+                    default:
+                        break;
                 }
-                else {
-                    item.value = value;
-                    FixedElisData(item);
-                }    
+                
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
