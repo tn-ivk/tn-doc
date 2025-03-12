@@ -1270,6 +1270,8 @@ function FillPassportDataElis() {
                         break;
                     case 'DocNum':
                         item.value = root[currentKey].documentNumber;
+                        if(item.hasAttribute("data-labDocument"))
+                            item.setAttribute("data-labDocument", JSON.stringify(new LabDocumentInfo(root[currentKey].documentType, root[currentKey].documentNumber, root[currentKey].documentDate)));
                         break;
                     case 'Value':
                         item.value = root[currentKey].value;
@@ -1430,5 +1432,18 @@ class Metod
         this.LimitValueActivate = pLimitValueActivate;
         this.LimitValue = pLimitValue;
         this.LimitValueString = pLimitValueString;
+    }
+}
+
+class LabDocumentInfo
+{
+    Type;
+    Number;
+    Date;
+    
+    constructor(pType, pNumber, pDate) {
+        this.Type = pType;
+        this.Number = pNumber;
+        this.Date = pDate;
     }
 }
