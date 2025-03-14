@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
+using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Services;
 using TN.Doc;
 using TN.DocData;
@@ -420,6 +421,26 @@ namespace TN_Doc.Controllers
             doc.SaveDoc(data);
         }
 
+        [HttpPost]
+        public void UpdateDoc(int IdDevice, IdDoc IdDoc, string data)
+        {
+            if (IdDoc != IdDoc.Passport)
+            {
+                _logger.LogWarning($"Обновление данных не применяется для документов типа {IdDoc}");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(data))
+            {
+                _logger.LogError("Данные для обновления пустые или отсутсвуют");
+                return;                
+            }
+                
+            var doc = LoadDocsModule(IdDevice, IdDoc);
+            if(doc is IDocUpdater docUpdater)
+                docUpdater.DocUpdate(data);
+        }
+        
         public PeriodDocument GetPeriodDocument(int IdDevice, IdDoc IdDoc, int id)
         {
             var doc = LoadDocsModule(IdDevice, IdDoc);

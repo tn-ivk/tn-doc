@@ -108,6 +108,23 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 if (shouldStop) {
                     clearInterval(intervalId); 
                     Spinner.hide();
+                    $.ajax({
+                        async: false,
+                        url: 'http://localhost:5000/Home/UpdateDoc',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            IdDevice: GuidDevice,
+                            IdDoc: DocGUID,
+                            data: JSON.stringify(result)
+                        },
+                        success: function (data) {
+
+                        },
+                        error: function (data) {
+
+                        }
+                    });
                     resolve(true);
                 }
                 if ((currentTime - startTime) >= maxDuration) {
