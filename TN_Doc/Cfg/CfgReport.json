@@ -79,12 +79,6 @@
             },
             {
               "Visible": true,
-              "Name": "Расход",
-              "SI": "м³/ч",
-              "Key": "Flow"
-            },
-            {
-              "Visible": true,
               "Name": "Объемная доля воды",
               "SI": "%",
               "Key": "VolWater"
@@ -100,6 +94,12 @@
               "Name": "Массовая доля серы",
               "SI": "%",
               "Key": "MasSulphur"
+            },
+            {
+              "Visible": true,
+              "Name": "Расход",
+              "SI": "м³/ч",
+              "Key": "Flow"
             }
           ]
         },
