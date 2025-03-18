@@ -59,8 +59,16 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                         param["Value"] = $(this)[0].options[$(this)[0].selectedIndex].text;
                     }
                     /////////
-                } else if ($(this)[0].nodeName == "INPUT")
-                    param["Value"] = $(this).val();
+                } else if ($(this)[0].nodeName == "INPUT") {
+                    if ($(this).attr('data-tag') == 'DocNum') {
+                        param["Value"] = $(this)[0].dataset.document;
+                    }
+                    else {
+                        param["Value"] = $(this).val();    
+                    }
+                    
+                }
+                    
 
                 params.push(param);
             }

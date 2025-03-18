@@ -593,6 +593,10 @@
       "Id": 5,
       "Use": true,
       "Key": "Laboratory_Post",
+      "KeyELIS": "chiefLabPosition",
+      "ElisAlias": [
+        "chiefLabPosition"
+      ],
       "Type": "text",
       "Name": "Представитель испытательной лаборатории (должность)"
     },
@@ -600,6 +604,10 @@
       "Id": 6,
       "Use": true,
       "Key": "Laboratory_Factory",
+      "KeyELIS": "chiefLabOrganization",
+      "ElisAlias": [
+        "chiefLabOrganization"
+      ],
       "Type": "text",
       "Name": "Представитель испытательной лаборатории (предприятие)"
     },

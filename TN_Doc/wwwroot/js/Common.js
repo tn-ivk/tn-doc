@@ -1194,21 +1194,24 @@ function ResetPassportDataElis() {
 }
 function FillPassportDataElis() {
     try {
-        //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let labInfo = JSON.parse(localStorage.labInfo);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
-        //console.log('dataPassport.parameters',dataPassport.parameters);
-        //console.log()
+        
+        // Добавляем данные о представителе лаборатории из Signers
+        if (dataPassport.signers?.laboratory) {
+            // Добавляем данные в dataPassport для обратной совместимости
+            dataPassport.chiefLabShortSign = dataPassport.signers.laboratory.iof;
+            dataPassport.chiefLabPosition = dataPassport.signers.laboratory.post;
+            dataPassport.chiefLabOrganization = dataPassport.signers.laboratory.company;
+        }
+
         elisNodes.forEach((item, index, array) => {
             let itemKeys = item.dataset.elisAlias?.split('|');
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
-                //console.log('itemKeys', itemKeys);
-                //console.log('key', key);
-                //console.log('itemKeys.includes(key)', itemKeys.includes(key));
                 if (itemKeys.includes(key)) {
                     root = dataPassport.parameters
                     for (let iKey of itemKeys) {
@@ -1256,17 +1259,28 @@ function FillPassportDataElis() {
             }
 
             if (item.nodeName === 'INPUT') {
-                const value = item.dataset.tag === 'AdditionalInfo'
-                    ? root[currentKey]
-                    : root[currentKey].value;
-                
-                if(item.type === 'datetime-local') {
-                    item.value = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                switch (item.dataset.tag) {
+                    case 'AdditionalInfo':
+                        if(item.type === 'datetime-local') {
+                            item.value = moment(root[currentKey]).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                        else {
+                            item.value = root[currentKey];    
+                        }
+                        break;
+                    case 'DocNum':
+                        item.value = root[currentKey].documentNumber;
+                        if(item.hasAttribute("data-document"))
+                            item.setAttribute("data-document", JSON.stringify(new LabDocumentInfo(root[currentKey].documentType, root[currentKey].documentNumber, root[currentKey].documentDate)));
+                        break;
+                    case 'Value':
+                        item.value = root[currentKey].value;
+                        FixedElisData(item);
+                        break;
+                    default:
+                        break;
                 }
-                else {
-                    item.value = value;
-                    FixedElisData(item);
-                }    
+                
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
@@ -1314,8 +1328,8 @@ function FillPassportDataElis() {
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
-    } finally {
-        console.groupEnd();
+    } catch (error) {
+        console.error("Ошибка в FillPassportDataElis:", error);
     }
 }
 
@@ -1418,5 +1432,18 @@ class Metod
         this.LimitValueActivate = pLimitValueActivate;
         this.LimitValue = pLimitValue;
         this.LimitValueString = pLimitValueString;
+    }
+}
+
+class LabDocumentInfo
+{
+    Type;
+    Number;
+    Date;
+    
+    constructor(pType, pNumber, pDate) {
+        this.Type = pType;
+        this.Number = pNumber;
+        this.Date = pDate;
     }
 }
