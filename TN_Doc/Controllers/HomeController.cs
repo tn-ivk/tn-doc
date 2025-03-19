@@ -32,7 +32,6 @@ namespace TN_Doc.Controllers
         DocGeneral dbDoc;
         private WebReport FR;
         CancellationToken stoppingToken;
-        Document docCfg;
         IAppConfigService _appConfig;
 
         public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration)
@@ -48,8 +47,21 @@ namespace TN_Doc.Controllers
 
         private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
         {
-            //TODO: выполнить проверки на null
-            Assembly assembly = Assembly.LoadFrom(Directory.GetCurrentDirectory() + _appConfig.GetPathToDocDll(idDevice, idDoc));
+            var pathToDll = Directory.GetCurrentDirectory() + _appConfig.GetPathToDocDll(idDevice, idDoc);
+            if (string.IsNullOrEmpty(pathToDll))
+            {
+                _logger.LogError($"Невозможно определить путь до файла dll документа {idDoc}");
+                return null;
+            }
+
+            var dllFileInfo = new FileInfo(pathToDll);
+            if (!dllFileInfo.Exists)
+            {
+                _logger.LogError($"Файл {dllFileInfo.FullName} не существует");
+                return null;
+            }
+                
+            Assembly assembly = Assembly.LoadFrom(dllFileInfo.FullName);
             var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
 
             _logger.LogDebug($"Загрузка dll {doc.FullName}");
@@ -386,33 +398,36 @@ namespace TN_Doc.Controllers
         public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format)
         {                
             var doc = LoadDocsModule(IdDevice, IdDoc);
-
-            if (!Directory.Exists($"{_cfgApp.ExportDoc.Path}/{docCfg.Name}"))
-            {
-                Directory.CreateDirectory($"{_cfgApp.ExportDoc.Path}/{docCfg.Name}");
-            }
+            var exportDirPath = Path.Combine(_appConfig.GetAppCfg().ExportDoc.Path, _appConfig.GetDocCfg(IdDevice, IdDoc).Name);
+            if (!Directory.Exists(exportDirPath))
+                Directory.CreateDirectory(exportDirPath);
 
             FR.Report.Load(doc.GetPathTemplateFile());
 
             var jsonDoc = doc.GetViewDoc(id);
             FR.Report.SetParameterValue("JsonDoc", jsonDoc);
+            FR.Report.Prepare();
 
-            FR.Report.Prepare();         
-
-            string path = $"{_cfgApp.ExportDoc.Path}/{docCfg.Name}/{JObject.Parse(doc.GetViewDoc(id).ToString())["Doc"]["Settings"]["General"]["FileNameForExportDoc"]}";
-
+            var exportFileName = JObject.Parse(doc.GetViewDoc(id).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
+            if (string.IsNullOrEmpty(exportFileName))
+            {
+                _logger.LogError($"Невозможно определить имя для экспортируемого файла");
+                exportFileName = "undefined";
+            }
+            var exportFilePath = Path.Combine(exportDirPath, exportFileName);
+            
             if (format == "pdf")
-                FR.Report.Export(new FastReport.Export.Pdf.PDFExport() { ShowProgress = false }, path += ".pdf");
+                FR.Report.Export(new FastReport.Export.Pdf.PDFExport() { ShowProgress = false }, exportFilePath += ".pdf");
             else if (format == "excel")
-                FR.Report.Export(new FastReport.Export.OoXML.Excel2007Export() { ShowProgress = false }, path += ".xlsx");
+                FR.Report.Export(new FastReport.Export.OoXML.Excel2007Export() { ShowProgress = false }, exportFilePath += ".xlsx");
             else if (format == "ods")
-                FR.Report.Export(new FastReport.Export.Odf.ODSExport() { ShowProgress = false }, path += ".ods");
+                FR.Report.Export(new FastReport.Export.Odf.ODSExport() { ShowProgress = false }, exportFilePath += ".ods");
             else if (format == "xml")
-                FR.Report.Export(new FastReport.Export.Xml.XMLExport() { ShowProgress = false }, path += ".xml");
+                FR.Report.Export(new FastReport.Export.Xml.XMLExport() { ShowProgress = false }, exportFilePath += ".xml");
 
             FR.Report.Dispose();
 
-            return path;
+            return exportFilePath;
         }
 
         public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
