@@ -23,8 +23,12 @@ namespace TN_Doc.Controllers
         /// </summary>
         /// <param name="service">Сервис для взаимодействия с со справочниками</param>
         /// <exception cref="ArgumentNullException">При отсутствие сервиса взаимодействия со справочниками</exception>
-        public DirEditorController(DirectoryService service) =>
+        public DirEditorController(DirectoryService service, ILogger<DirEditorController> logger)
+        {
             _service = service ?? throw new ArgumentNullException(nameof(service), @"Отсутствует сервис для работы со правочниками");
+            _logger = logger;
+        }
+
 
         /// <summary>
         /// Получения всех справочник
@@ -33,7 +37,12 @@ namespace TN_Doc.Controllers
         /// <returns>200 - словарь приложения</returns>
         [HttpGet]
         [Route("GetDir")]
-        public async Task<IActionResult> GetDirAsync() => Ok(new DirEditDTO() { DirJsonRaw = await _service.GetDirectoriesJsonAsync() });
+        public async Task<IActionResult> GetDirAsync()
+        {
+            _logger.LogTrace("Получения всех справочников");
+            var directories = new DirEditDTO { DirJsonRaw = await _service.GetDirectoriesJsonAsync() };
+            return Ok(directories);
+        } 
 
         /// <summary>
         /// Установка нового значения словарей. Словари поступают в формате JSON.
@@ -44,6 +53,7 @@ namespace TN_Doc.Controllers
         [Route("SetDir")]
         public async Task<IActionResult> SetDirAsync([FromBody] DirEditDTO jsonPatch)
         {
+            _logger.LogTrace("Установка нового значения словарей");
             await _service.SetDirectoriesFromJsonAsync(jsonPatch.DirJsonRaw);
             return Ok();
         }
@@ -54,7 +64,11 @@ namespace TN_Doc.Controllers
         /// <returns>200 - конфигурация используемых паспортов</returns>
         [HttpGet]
         [Route("GetQpConfigs")]
-        public async Task<IActionResult> GetQpConfigsAsync() => Ok(new QpEditDto() { QpCfgJsonRaw = await _service.GetQualityPassportConfigs() });
+        public async Task<IActionResult> GetQpConfigsAsync()
+        {
+            _logger.LogTrace("Получения конфигурации используемых паспортов качества");
+            return Ok(new QpEditDto() { QpCfgJsonRaw = await _service.GetQualityPassportConfigs() });
+        }
 
         /// <summary>
         /// Установка новой конфигурации проекта
@@ -65,6 +79,7 @@ namespace TN_Doc.Controllers
         [Route("SetQpConfigs")]
         public async Task<IActionResult> SetQpConfigsAsync([FromBody] QpEditDto jsonPatch)
         {
+            _logger.LogTrace("Установка новой конфигурации проекта");
             await _service.SetQpConfigFromJsonAsync(jsonPatch.QpCfgJsonRaw);
             return Ok();
         }
