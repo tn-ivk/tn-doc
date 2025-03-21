@@ -204,7 +204,7 @@ namespace Tests
 			u.F = "Сталин";
 			u.I = "Иван";
 			u.UseShortFullNameForm = false;
-			Assert.That(u.FIO, Is.EqualTo("Иван. Сталин"));
+			Assert.That(u.IOF, Is.EqualTo("Иван. Сталин"));
 		}
 
 		[TestCase(TestName = "#19 Проверка работы модификаторов на китайских ФИО ")]
