@@ -35,15 +35,15 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
     return new Promise((resolve, reject) => {
         Spinner();
         Spinner.show();
-        var params = [];
-        var result = {};
+        let params = [];
+        let result = {};
         let startTime = Date.now(); // Время начала опроса
         const maxDuration = 5000; // Максимальное время опроса (5000 мс)
         const pollInterval = 500; // Период опроса (500 мс)
 
         $("select, input").each(function () {
             if ($(this).attr('data-edit') == "1") {
-                param = {};
+                let param = {};
                 param["Key"] = $(this).attr('data-key');
                 param["Tag"] = $(this).attr('data-tag');
                 if ($(this)[0].nodeName == "SELECT") {
@@ -66,7 +66,6 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                     else {
                         param["Value"] = $(this).val();    
                     }
-                    
                 }
                     
 
