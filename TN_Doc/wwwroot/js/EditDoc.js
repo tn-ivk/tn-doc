@@ -107,6 +107,19 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 if (shouldStop) {
                     clearInterval(intervalId); 
                     Spinner.hide();
+                    
+                    try {
+                        const passportData = JSON.parse(localStorage.getItem('dataPassport'));
+                        if (passportData) {
+                            result = {
+                                ...result,
+                                ...passportData
+                            };
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при объединении данных протокола:', error);
+                    }
+
                     $.ajax({
                         async: false,
                         url: 'http://localhost:5000/Home/UpdateDoc',
