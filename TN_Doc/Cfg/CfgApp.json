@@ -1106,7 +1106,20 @@
         "UsedSecondSI_PVS": false
       },
       "UsedProcedureTypePR": null,
-      "OpcConnectionSettings": null,
+      "OpcConnectionSettings": {
+        "Type": 1,
+        "DaSettings": {
+          "StartPrefix": "Root.PLC1.IVK_TN_01",
+          "Host": "localhost",
+          "ProgId": "psregulopcda_01",
+          "UpdateRate": 500
+        },
+        "UaSettings": {
+          "ConfigFilename": "Config.xml",
+          "UpdateRate": 500,
+          "StartPrefix": "IVK_TN_01"
+        }
+      },
       "InvalidChars" : ["\"", "'", "\\"]
     },
     {
@@ -2183,7 +2196,20 @@
         "UsedSecondSI_PVS": false
       },
       "UsedProcedureTypePR": null,
-      "OpcConnectionSettings": null,
+      "OpcConnectionSettings": {
+        "Type": 1,
+        "DaSettings": {
+          "StartPrefix": "Root.PLC2.IVK_TN_01",
+          "Host": "localhost",
+          "ProgId": "psregulopcda_01",
+          "UpdateRate": 500
+        },
+        "UaSettings": {
+          "ConfigFilename": "Config.xml",
+          "UpdateRate": 500,
+          "StartPrefix": "IVK_TN_01"
+        }
+      },
       "InvalidChars" : ["\"", "'", "\\"]
     },
     {
