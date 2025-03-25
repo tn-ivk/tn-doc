@@ -15,13 +15,17 @@ namespace TN_Doc
         {
             var logger = LogManager.GetCurrentClassLogger();
             try
-            { 
-                logger.Info("Инициализация приложения");
-                CreateHostBuilder(args).Build().Run(); 
-            }
-            catch (Exception exception)
             {
-                logger.Error(exception, "Приложение завершено в связи с критической ошибкой");
+                logger.Info("Инициализация приложения");
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Приложение завершено в связи с критической ошибкой: {ex.Message}");
+            }
+            finally
+            {
+                logger.Info("Стоп приложения");
             }
         }
 
