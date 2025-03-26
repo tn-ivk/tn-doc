@@ -103,7 +103,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Update="changes.md">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <Content Update="Cfg\Passport\CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
