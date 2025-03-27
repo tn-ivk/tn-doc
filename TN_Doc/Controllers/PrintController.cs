@@ -51,7 +51,8 @@ namespace TN_Doc.Controllers
             }
             catch (Exception ex)
             {
-                return null;
+                _logger.LogError($"Ошибка при получении списка принтеров: {ex.Message}");
+                return StatusCode(500, "Произошла ошибка при получении списка принтеров");
             }
                
         }
