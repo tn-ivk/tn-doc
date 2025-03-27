@@ -40,12 +40,20 @@ namespace TN_Doc.Controllers
         public IActionResult GetListPrinters()
         {
             _logger.LogTrace("Попытка получения списка принтеров...");
-            var printers = _service.GetPrinters().ToArray();
-            if(printers.Any())
-                _logger.LogTrace($"Список принтеров:\n{string.Join("\n", printers)}");
-            else
-                _logger.LogWarning($"В системе отсутствуют установленные принтеры");
-            return Ok(printers);   
+            try
+            {
+                var printers = _service.GetPrinters().ToArray();
+                if(printers.Any())
+                    _logger.LogTrace($"Список принтеров:\n{string.Join("\n", printers)}");
+                else
+                    _logger.LogWarning($"В системе отсутствуют установленные принтеры");
+                return Ok(printers);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+               
         }
         
         /// <summary>
