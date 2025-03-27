@@ -30,13 +30,9 @@ namespace TN_Doc.Extensions
 		public static void AddPrinters(this IServiceCollection services)
 		{
 			if (IsWindows)
-			{
-				services.AddTransient<AbsPrinter>((_) => new WindowsPrinter());
-			}
+				services.AddTransient<AbsPrinter, WindowsPrinter>();
 			else
-			{
-				services.AddTransient<AbsPrinter>((_) => new LinuxPrinter());
-			}
+				services.AddTransient<AbsPrinter, LinuxPrinter>();
 		}
 
 		/// <summary>
