@@ -563,22 +563,35 @@ function GetIdTemplateDoc() {
 }
 
 function InitPrinterName() {
-    $('#ComboboxPrinterName').empty();
-
-    $.ajax(
-        {
-            async: false,
-            url: 'Print/GetListPrinters',
-            type: 'GET',
-            success: function (data) {
+    const $combobox = $('#ComboboxPrinterName');
+    const $printBtn = $('#ButtonPrint');
+    $combobox.empty(); 
+    
+    $.ajax({
+        async: false, 
+        url: 'Print/GetListPrinters',
+        type: 'GET',
+        success: function (data) {
+            if (!data || data.length === 0) {
+                $combobox.hide();
+                $printBtn.hide();
+            } else {
+                $combobox.show();
+                $printBtn.show();
                 data.forEach((item) => {
                     let opt = document.createElement("option");
                     opt.value = item;
                     opt.appendChild(document.createTextNode(item));
-                    document.querySelector('#ComboboxPrinterName').appendChild(opt);
+                    $combobox.append(opt);
                 });
             }
-        });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            $combobox.hide();
+            $printBtn.hide();
+            console.error('Ошибка при загрузке списка принтеров:', textStatus, errorThrown);
+        }
+    });
 }
 
 function InitExportFormat() {
