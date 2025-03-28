@@ -21,6 +21,7 @@ using TN_DocGeneral.Services;
 using TN.Doc;
 using TN.DocData;
 using Data = TN_Doc.Models.Home.Data;
+using FileInfo = System.IO.FileInfo;
 
 namespace TN_Doc.Controllers
 {
@@ -328,58 +329,80 @@ namespace TN_Doc.Controllers
                 _logger.LogWarning($"Попытка отображения документа {IdDoc} с нулевым идентификатором");
                 return false;
             }
-            
-            var doc = LoadDocsModule(IdDevice, IdDoc);
-            string pathTemplateFile = doc.GetPathTemplateFile();
 
-            if (string.IsNullOrEmpty(pathTemplateFile))
+            try
             {
-                _logger.LogError($"Пустой путь для выбранного шаблона документа {nameof(pathTemplateFile)}");
-                return false;
-            }
+                var doc = LoadDocsModule(IdDevice, IdDoc);
+                string pathTemplateFile = doc.GetPathTemplateFile();
+
+                if (string.IsNullOrEmpty(pathTemplateFile))
+                {
+                    _logger.LogError($"Пустой путь для выбранного шаблона документа {nameof(pathTemplateFile)}");
+                    return false;
+                }
+                    
+                var templateFile = new FileInfo(pathTemplateFile);
+                if (!templateFile.Exists)
+                {
+                    _logger.LogError($"Отсутствует файл шаблона документа: {pathTemplateFile}");
+                    return false;
+                }
+                _logger.LogTrace($"Загрузка шаблона документа: {templateFile.FullName}");
+                FR.Report.Load(templateFile.FullName);
+
+                if (IdDoc == IdDoc.KMH_PP_Areom)
+                    FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
+                else if (IdDoc == IdDoc.KMH_PV)
+                    FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
+                else if (IdDoc == IdDoc.KMH_PW)
+                    FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
+                else if (IdDoc == IdDoc.Poverka2816)
+                    FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
+                else if (IdDoc == IdDoc.KMH_MI2816)
+                    FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
+
+                else
+                    FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id));
+
+                FR.Report.Prepare();
+
+                FastReport.Export.Pdf.PDFExport pdfExport = new FastReport.Export.Pdf.PDFExport();
+                pdfExport.ShowProgress = false;
+                pdfExport.Subject = "Subject";
+                pdfExport.Title = " ";
+                pdfExport.Compressed = true;
+                pdfExport.AllowPrint = true;
+                pdfExport.EmbeddingFonts = true;
+                //pdfExport.HideMenubar = true;
+                //pdfExport.HideToolbar = true;
+                //pdfExport.HideWindowUI= true;
+
+                var pdfFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf");
+                var pdfFile = new FileInfo(pdfFilePath);
+                if (pdfFile.Directory is null)
+                    throw new Exception("Ошибка определения пути файла PDF.pdf");
                 
-            var templateFile = new FileInfo(pathTemplateFile);
-            if (!templateFile.Exists)
-            {
-                _logger.LogError($"Отсутствует файл шаблона документа: {pathTemplateFile}");
-                return false;
+                if (!pdfFile.Directory.Exists)
+                {
+                    _logger.LogWarning($"Не существует директория: {pdfFile.Directory.FullName}");
+                    pdfFile.Directory.Create();
+                }
+
+                if(!pdfFile.Exists)
+                    _logger.LogWarning($"Файл не существует: {pdfFile.FullName}");
+                
+                FR.Report.Export(pdfExport,  pdfFile.FullName);
+
+                pdfExport.Dispose();
+                FR.Report.Dispose();
+
+                return true;
             }
-
-            FR.Report.Load(pathTemplateFile);
-
-            if (IdDoc == IdDoc.KMH_PP_Areom)
-                FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
-            else if (IdDoc == IdDoc.KMH_PV)
-                FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
-            else if (IdDoc == IdDoc.KMH_PW)
-                FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
-            else if (IdDoc == IdDoc.Poverka2816)
-                FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
-            else if (IdDoc == IdDoc.KMH_MI2816)
-                FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id, protocolNumber));
-
-            else
-                FR.Report.SetParameterValue("JsonDoc", doc.GetViewDoc(id));
-
-            FR.Report.Prepare();
-
-            FastReport.Export.Pdf.PDFExport pdfExport = new FastReport.Export.Pdf.PDFExport();
-            pdfExport.ShowProgress = false;
-            pdfExport.Subject = "Subject";
-            pdfExport.Title = " ";
-            pdfExport.Compressed = true;
-            pdfExport.AllowPrint = true;
-            pdfExport.EmbeddingFonts = true;
-            //pdfExport.HideMenubar = true;
-            //pdfExport.HideToolbar = true;
-            //pdfExport.HideWindowUI= true;
-            
-            FR.Report.Export(pdfExport, Directory.GetCurrentDirectory() + "/wwwroot/PDF/PDF.pdf");
-
-            pdfExport.Dispose();
-            FR.Report.Dispose();
-
-            return true;     
+            catch (Exception ex)
+            {
+                _logger.LogError($"Ошибка отображения документа: {ex.Message}");
+                throw;
+            }
         }
 
         public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
