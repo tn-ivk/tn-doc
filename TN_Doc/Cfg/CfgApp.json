@@ -3303,5 +3303,19 @@
     "ClientName": "clientName",
     "ClientToken": ""
   },
-  "UseSecurityFeatures": false
+  "UseSecurityFeatures": false,
+  "ArmOpcConnectionSettings": {
+    "Type": 1,
+    "DaSettings": {
+      "StartPrefix": "Root.ARM.Reports",
+      "Host": "localhost",
+      "ProgId": "psregulopcda_01",
+      "UpdateRate": 500
+    },
+    "UaSettings": {
+      "ConfigFilename": "Config.xml",
+      "UpdateRate": 500,
+      "StartPrefix": "root.ARM.Reports"
+    }
+  }
 }
