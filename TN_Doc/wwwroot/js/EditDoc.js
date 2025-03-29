@@ -147,6 +147,9 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
             }, pollInterval);
 
         }
+        else {
+            resolve(true);
+        }
     });
 }
 
