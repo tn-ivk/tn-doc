@@ -48,13 +48,14 @@ namespace TN_Doc.Controllers
 
         private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
         {
+            _logger.LogDebug($"Загрузка DLL документа {idDoc}");
             var pathToDll = Directory.GetCurrentDirectory() + _appConfig.GetPathToDocDll(idDevice, idDoc);
             if (string.IsNullOrEmpty(pathToDll))
             {
-                _logger.LogError($"Невозможно определить путь до файла dll документа {idDoc}");
+                _logger.LogError($"Невозможно определить путь до файла DLL документа {idDoc}");
                 return null;
             }
-
+            _logger.LogTrace($"Файл DLL: {pathToDll}");
             var dllFileInfo = new FileInfo(pathToDll);
             if (!dllFileInfo.Exists)
             {
@@ -65,7 +66,7 @@ namespace TN_Doc.Controllers
             Assembly assembly = Assembly.LoadFrom(dllFileInfo.FullName);
             var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
 
-            _logger.LogDebug($"Загрузка dll {doc.FullName}");
+            _logger.LogDebug($"Загрузка DLL {doc.FullName}");
             return (DocGeneral)assembly.CreateInstance(
                 doc.FullName,
                 false,
@@ -78,17 +79,20 @@ namespace TN_Doc.Controllers
 
         public List<ListItem> GetListDevices()
         {
-            _logger.LogDebug($"Загрузка списка устройств");
+            _logger.LogTrace($"Загрузка списка устройств...");
             List<ListItem> devices = _cfgApp.Devices.Where(x => x.Use)
                 .Select(u => new ListItem { Id = u.IdDevice, Name = u.Name }).ToList();
-            _logger.LogTrace($"Загружен список устройств: {string.Join(',', devices.Select(x => x.Name))}");
+            _logger.LogDebug($"Загружен список устройств: {string.Join(',', devices.Select(x => x.Name))}");
             return devices;
         }
 
         public string GetNameDBForDevice(int IdDevice)
         {
+            _logger.LogTrace($"Получение имени базы данных из конфигурации...");
             var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-            return device.DBConnectionStrings.First(x => x.Use).Database;
+            var dbName = device.DBConnectionStrings.First(x => x.Use).Database;
+            _logger.LogDebug($"Получение имени базы данных: {dbName}");
+            return dbName;
         }
 
         public List<ListItem> GetListDocs(int deviceId)
