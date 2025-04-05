@@ -260,11 +260,8 @@ namespace TN_Doc.Controllers
         public bool SetClientToken(int IdDevice, string clientToken) =>
             _appConfig.SetElisClientToken(IdDevice, clientToken);
         
-        public string GetElisData()
-        {
-                return "";
-        }
-
+        public string GetElisData() => String.Empty;
+     
         public IActionResult Index([FromServices]AppInfoProvider provider)
         {
             ViewData["Version"] = provider.Version;
@@ -287,6 +284,7 @@ namespace TN_Doc.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Ошибка инициализации построителя отчета");
             }
             
             return View(_cfgApp);
