@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TN_Doc.Models.DTOs;
 using TN_Doc.Models.Services;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc.Controllers
 {
@@ -16,16 +18,16 @@ namespace TN_Doc.Controllers
     public class DirEditorController : ControllerBase
     {
         private readonly ILogger<DirEditorController> _logger;
-        private readonly DirectoryService _service;
+        private readonly IAppConfigService _service;
 
         /// <summary>
         /// Инициализация объекта
         /// </summary>
         /// <param name="service">Сервис для взаимодействия с со справочниками</param>
         /// <exception cref="ArgumentNullException">При отсутствие сервиса взаимодействия со справочниками</exception>
-        public DirEditorController(DirectoryService service, ILogger<DirEditorController> logger)
+        public DirEditorController(ILogger<DirEditorController> logger, IConfiguration configuration)
         {
-            _service = service ?? throw new ArgumentNullException(nameof(service), @"Отсутствует сервис для работы со правочниками");
+            _service = AppConfigService.GetInstance(configuration);
             _logger = logger;
         }
 

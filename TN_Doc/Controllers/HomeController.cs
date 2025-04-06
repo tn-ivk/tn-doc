@@ -638,7 +638,8 @@ namespace TN_Doc.Controllers
             _logger.LogDebug($"Получение списка пользователей");
             try
             {
-                var result = DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
+                //var result = DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
+                var result = DocGeneral.JsonSerializeObject(_appConfig.GetDictionaries()).ToString();
                 return result;
             }
             catch (Exception ex)
