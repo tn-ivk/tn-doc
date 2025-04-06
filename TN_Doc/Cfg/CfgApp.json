@@ -165,7 +165,7 @@
           "LastUsedTemplateId": 7,
           "TemplateDocs": [
             {
-              "Use": false,
+              "Use": true,
               "Id": 0,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
@@ -173,7 +173,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 1,
               "Name": "Акт для партий нефти",
               "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
@@ -181,7 +181,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 2,
               "Name": "Акт для нефтепродукта",
               "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
@@ -189,7 +189,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 3,
               "Name": "Акт приема - сдачи нефти ",
               "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
@@ -205,7 +205,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 5,
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
@@ -213,7 +213,7 @@
               "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 6,
               "Name": "Акт для валовых объемов нефти (Китай)",
               "Description": "(Китай) Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
