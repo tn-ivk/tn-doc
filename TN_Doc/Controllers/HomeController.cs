@@ -11,6 +11,7 @@ using System.IO;
 using System.Threading;
 using System.Text;
 using System.Collections;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -633,13 +634,13 @@ namespace TN_Doc.Controllers
             }
         }
 
-        public string GetListUsers()
+        public async Task<string> GetListUsers()
         {
             _logger.LogDebug($"Получение списка пользователей");
             try
             {
                 //var result = DocGeneral.JsonSerializeObject(DocGeneral.DictionarysDoc).ToString();
-                var result = DocGeneral.JsonSerializeObject(_appConfig.GetDictionaries()).ToString();
+                var result = await _appConfig.GetDictionariesJsonAsync();
                 return result;
             }
             catch (Exception ex)

@@ -42,7 +42,7 @@ namespace TN_Doc.Controllers
         public async Task<IActionResult> GetDirAsync()
         {
             _logger.LogTrace("Получения всех справочников");
-            var directories = new DirEditDTO { DirJsonRaw = await _service.GetDirectoriesJsonAsync() };
+            var directories = new DirEditDTO { DirJsonRaw = await _service.GetDictionariesJsonAsync() };
             return Ok(directories);
         } 
 
