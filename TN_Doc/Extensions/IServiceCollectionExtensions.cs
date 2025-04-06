@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog;
-using TN_Doc.Models;
 using TN_Doc.Models.Printer;
 using TN_Doc.Models.Services;
+using TN.Utils;
 
 namespace TN_Doc.Extensions
 {
