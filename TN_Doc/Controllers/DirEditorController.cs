@@ -56,7 +56,7 @@ namespace TN_Doc.Controllers
         public async Task<IActionResult> SetDirAsync([FromBody] DirEditDTO jsonPatch)
         {
             _logger.LogTrace("Установка нового значения словарей");
-            await _service.SetDirectoriesFromJsonAsync(jsonPatch.DirJsonRaw);
+            await _service.SetDirectoriesJsonAsync(jsonPatch.DirJsonRaw);
             return Ok();
         }
 
