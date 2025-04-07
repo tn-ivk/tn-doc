@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/23/2025 18:06:25" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/07/2025 09:05:23" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -349,7 +349,7 @@ namespace FastReport
           <TableCell Name="Cell397" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt, style=Italic"/>
           <TableCell Name="Cell398" Text="И.О. Фамилия" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
         </TableRow>
-        <TableRow Name="Row51">
+        <TableRow Name="Row51" AutoSize="true">
           <TableCell Name="Cell449" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt"/>
           <TableCell Name="Laboratory_Post" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Laboratory_Post" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
           <TableCell Name="Cell452" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt"/>
@@ -357,9 +357,9 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row191" Height="11.34">
           <TableCell Name="Cell1599" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1600" Text="должность" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
+          <TableCell Name="Cell1600" Text="должност ь" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
           <TableCell Name="Cell1601" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1602" Text="предприятие" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
+          <TableCell Name="Cell1602" Text="предприят ие" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
         </TableRow>
         <TableRow Name="Row192">
           <TableCell Name="Cell1603" Font="Arial, 9pt"/>
@@ -387,9 +387,9 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row46" Height="11.34">
           <TableCell Name="Cell424" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt"/>
-          <TableCell Name="Cell426" Text="должность" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
+          <TableCell Name="Cell426" Text="должност ь" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
           <TableCell Name="Cell427" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt, style=Italic"/>
-          <TableCell Name="Cell428" Text="предприятие" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
+          <TableCell Name="Cell428" Text="предприят ие" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
         </TableRow>
         <TableRow Name="Row52">
           <TableCell Name="Cell454" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt"/>
@@ -417,9 +417,9 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row50" Height="11.34">
           <TableCell Name="Cell444" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt"/>
-          <TableCell Name="Cell446" Text="должность" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
+          <TableCell Name="Cell446" Text="должност ь" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
           <TableCell Name="Cell447" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt, style=Italic"/>
-          <TableCell Name="Cell448" Text="предприятие" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
+          <TableCell Name="Cell448" Text="предприят ие" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic"/>
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
