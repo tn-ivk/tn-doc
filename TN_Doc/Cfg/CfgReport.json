@@ -246,7 +246,39 @@
             "Name": "СИКН",
             "Width": 0
           }
-        }
+        },
+        "IncompleteReports": [
+          {
+            "Use": true,
+            "Id": 1,
+            "Name": "Отчет за два часа",
+            "ShortName": "Отчет за 2ч"
+          },
+          {
+            "Use": true,
+            "Id": 2,
+            "Name": "Отчет за смену",
+            "ShortName": "Отчет за см"
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "Name": "Отчет за сутки",
+            "ShortName": "Отчет за сут"
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "Name": "Отчет за месяц",
+            "ShortName": "Отчет за м"
+          },
+          {
+            "Use": false,
+            "Id": 5,
+            "Name": "Отчет за ТКО",
+            "ShortName": "Отчет за ТКО"
+          }
+        ]
       },
       "Footer": {
         "Signers": [
