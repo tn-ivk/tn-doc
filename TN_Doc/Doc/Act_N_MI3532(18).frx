@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/08/2025 14:32:23" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/08/2025 18:38:20" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -137,36 +137,37 @@ namespace FastReport
         TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
             
         // Fill TableAct with data
-            
+        string shiftCountStr = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
+        if (!int.TryParse(shiftCountStr, out int shiftCount) || shiftCount &lt; 1)
+          shiftCount = 1;
+        double hoursPerShift = 24.0 / shiftCount;
+        
         for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
         {
-          for (int j=1;j&lt;TableAct.RowCount;j++)
-          {
-            string begin = DateTimeOffset.FromUnixTimeSeconds(DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].Begin).DateTime.ToString(&quot;HH:mm&quot;);
-            string end = DateTimeOffset.FromUnixTimeSeconds(DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].End).DateTime.ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;);
-            TableAct[(2+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
-            TableAct[(2+i),2].Text = $&quot;{begin}-{end}&quot;;            
-            TableAct[(2+i),3].Text = $&quot;Смена {i+1}&quot;;            
-            TableAct[(2+i),5].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
-            TableAct[(2+i),6].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
-            TableAct[(2+i),8].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
-            TableAct[(2+i),9].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
-            TableAct[(2+i),11].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
-            TableAct[(2+i),12].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
-            TableAct[(2+i),13].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
-            TableAct[(2+i),14].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
-            TableAct[(2+i),15].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
-            TableAct[(2+i),16].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
-            TableAct[(2+i),17].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
-            TableAct[(2+i),18].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
-            TableAct[(2+i),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
-            TableAct[(2+i),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
-            TableAct[(2+i),22].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
-            TableAct[(2+i),23].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
-            TableAct[(2+i),24].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
-            TableAct[(2+i),25].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
-            TableAct[(2+i),26].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
-          }
+          string begin = FormatTime(i * hoursPerShift);
+          string end = FormatTime((i + 1) * hoursPerShift);
+          TableAct[(2+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
+          TableAct[(2+i),2].Text = $&quot;{begin}-{end}&quot;;            
+          TableAct[(2+i),3].Text = $&quot;Смена {i+1}&quot;;            
+          TableAct[(2+i),5].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
+          TableAct[(2+i),6].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
+          TableAct[(2+i),8].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
+          TableAct[(2+i),9].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
+          TableAct[(2+i),11].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
+          TableAct[(2+i),12].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
+          TableAct[(2+i),13].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
+          TableAct[(2+i),14].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
+          TableAct[(2+i),15].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
+          TableAct[(2+i),16].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
+          TableAct[(2+i),17].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
+          TableAct[(2+i),18].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
+          TableAct[(2+i),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
+          TableAct[(2+i),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
+          TableAct[(2+i),22].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
+          TableAct[(2+i),23].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
+          TableAct[(2+i),24].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
+          TableAct[(2+i),25].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
+          TableAct[(2+i),26].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
         }
       }
          
@@ -182,7 +183,18 @@ namespace FastReport
         TableAct.PrintColumns();                                             
       }
     }
-      
+     
+    private string FormatTime(double totalHours)
+    {
+      int hours = (int)totalHours;
+      int minutes = (int)((totalHours - hours) * 60);
+
+      if (hours == 24)
+        return &quot;24:00&quot;;
+
+      return $&quot;{hours:00}:{minutes:00}&quot;;
+    }
+    
     private void TableFootnote_ManualBuild(object sender, EventArgs e)
     {
       // Setup Last Column width
