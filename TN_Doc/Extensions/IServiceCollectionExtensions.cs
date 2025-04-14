@@ -41,23 +41,6 @@ namespace TN_Doc.Extensions
 		public static void AddPrinterService(this IServiceCollection services) => services.AddTransient<PrinterService>();
 
 		/// <summary>
-		/// Добавление сервиса взаимодействия со справочниками
-		/// </summary>
-		/// <param name="services">Коллекция сервисов</param>
-		/// <param name="cfg">Провайдер конфигурации приложения</param>
-		public static void AddDirectoryService(this IServiceCollection services, IConfiguration cfg)
-		{
-			services.AddSingleton((provider) =>
-			{
-				string cfgDirName = cfg.GetValue<string>("CfgDirPath");
-				string cfgPath = cfg.GetValue<string>("RelCfgName");
-				string cfgAppPath = cfg.GetValue<string>("RelCfgAppName");
-				ILogger<DirectoryService> logger = provider.GetRequiredService<ILogger<DirectoryService>>();
-				return new DirectoryService(cfgPath, cfgAppPath, cfgDirName, logger);
-			});
-		}
-
-		/// <summary>
 		/// Сбор информации о приложение
 		/// </summary>
 		/// <param name="services"></param>

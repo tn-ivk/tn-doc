@@ -36,7 +36,6 @@ namespace TN_Doc
 			services.ConfigAppDirectory();
 #endif
 			services.AddAppInfoProvider();
-			//services.AddDirectoryService(Configuration);
 			services.AddPrinters();
 			services.AddPrinterService();
 			services.AddControllersWithViews();
