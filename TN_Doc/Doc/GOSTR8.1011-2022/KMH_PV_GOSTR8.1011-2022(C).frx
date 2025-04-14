@@ -172,7 +172,7 @@ namespace FastReport
           <TableCell Name="Cell1070" Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row214">
-          <TableCell Name="Cell1139" Text="контроля метрологических характеристик поточных СИ [KMHType] вязкости в [OilName]" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
+          <TableCell Name="Cell1139" Text="контроля метрологических характеристик поточных СИ [KMHType] вязкости" HorzAlign="Center" Font="Arial, 10pt, style=Bold" ColSpan="2"/>
           <TableCell Name="Cell1140" HorzAlign="Center" Font="Arial, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row213">
@@ -298,7 +298,7 @@ namespace FastReport
           <TableCell Name="Cell1083" Text="     3 Заключение" VertAlign="Center" Font="Arial, 10pt, style=Bold"/>
         </TableRow>
         <TableRow Name="Row143" Height="66.15">
-          <TableCell Name="Cell1071" Text="     Поточное СИ вязкости в [OilName] [ARM_KMH_Result] к дальнейшей эксплуатации.&#13;&#10;&#13;&#10;Дата проведения КМХ: [DateKMH]&#13;&#10;Подписи лиц, проводивших КМХ:" Font="Arial, 10pt" TextRenderType="HtmlTags">
+          <TableCell Name="Cell1071" Text="     Поточное СИ вязкости [ARM_KMH_Result] к дальнейшей эксплуатации.&#13;&#10;&#13;&#10;Дата проведения КМХ: [DateKMH]&#13;&#10;Подписи лиц, проводивших КМХ:" Font="Arial, 10pt" TextRenderType="HtmlTags">
             <Formats>
               <GeneralFormat/>
               <GeneralFormat/>
