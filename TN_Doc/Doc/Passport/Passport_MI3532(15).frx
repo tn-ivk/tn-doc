@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/23/2025 18:07:00" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/16/2025 14:50:06" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -214,11 +214,11 @@ namespace FastReport
         <TableColumn Name="Column01" Width="363.69"/>
         <TableColumn Name="Column03" Width="354.13"/>
         <TableRow Name="Row187" Height="37.8" AutoSize="true">
-          <TableCell Name="Cell1526" Text="ПАСПОРТ КАЧЕСТВА НЕФТИ&#13;&#10;CERTIFICATE OF QUALITY" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell1526" Text="ПАСПОРТ КАЧЕСТВА НЕФТИ&#13;&#10;CERTIFICATE OF QUALITY" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextRenderType="HtmlTags" ColSpan="2"/>
           <TableCell Name="Cell1528" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row186" Height="26.46" AutoSize="true">
-          <TableCell Name="NumberAndDatePassport" Text="NumberAndDatePassport" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="NumberAndDatePassport" Text="NumberAndDatePassport" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" TextRenderType="HtmlTags" ColSpan="2"/>
           <TableCell Name="Cell1525" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row193" Height="15.12">
@@ -247,7 +247,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="157.27" Width="718.2" Height="478.17" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="158.18" Width="718.2" Height="478.17" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="468.72" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="415.8"/>
@@ -351,7 +351,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="637.72" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="639.55" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="328.86">
         <TableColumn Name="Column29" Width="255.15"/>
         <TableColumn Name="Column31" Width="230.58"/>
