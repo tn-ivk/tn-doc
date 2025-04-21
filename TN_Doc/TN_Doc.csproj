@@ -138,6 +138,7 @@
     <Content Update="appsettings.Development.json">
       <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
       <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 
