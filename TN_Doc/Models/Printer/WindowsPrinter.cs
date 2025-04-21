@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 
 namespace TN_Doc.Models.Printer
@@ -13,13 +15,32 @@ namespace TN_Doc.Models.Printer
     /// </summary>
     public sealed class WindowsPrinter : AbsPrinter
     {
+        private readonly ILogger<WindowsPrinter> _logger;
+        
+        public WindowsPrinter(ILogger<WindowsPrinter> logger)
+        {
+            _logger = logger;
+        }
+        
         /// <summary>
         /// Получение списка доступных принтеров в системе
         /// </summary>
         /// <returns>Список доступных принтеров в системе</returns>
-        public override IEnumerable<string> GetAvailablePrinters() => new List<string>() { "" };
-
-
+        public override IEnumerable<string> GetAvailablePrinters()
+        {
+            try
+            {
+                var printers = PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
+                return printers;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Ошибка получения списка доступных принтеров в системе: {ex.Message}");
+                return Enumerable.Empty<string>();
+            }
+            
+        }
+        
         /// <summary>
         /// Печать документа на заданном принтере
         /// </summary>

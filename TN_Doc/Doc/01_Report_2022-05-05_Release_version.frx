@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Report.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="06/18/2021 09:21:52" ReportInfo.Modified="06/25/2024 09:18:02" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Report.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="06/18/2021 09:21:52" ReportInfo.Modified="03/19/2025 13:09:56" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -165,7 +165,7 @@ namespace FastReport
       ReportType.Text = reportIncompleteName[reportType]; // Тип незавершенного отчета
          
       //ReportTime.Text = String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy HH:mm}&quot;, dtBegin, dtEnd);
-      ReportTime.Text = String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy} {2}&quot;, dtBegin, ((dtEnd.TimeOfDay==TimeSpan.Zero)?dtEnd.AddDays(-1):dtEnd), ((dtEnd.TimeOfDay==TimeSpan.Zero)?"24:00":dtEnd.ToString("HH:mm")));
+      ReportTime.Text = String.Format(&quot;За период с {0:dd.MM.yyyy HH:mm} до {1:dd.MM.yyyy} {2}&quot;, dtBegin, ((dtEnd.TimeOfDay==TimeSpan.Zero)?dtEnd.AddDays(-1):dtEnd), ((dtEnd.TimeOfDay==TimeSpan.Zero)?&quot;24:00&quot;:dtEnd.ToString(&quot;HH:mm&quot;)));
     } 
 
     private void TableReport_ManualBuild(object sender, EventArgs e)
@@ -324,129 +324,175 @@ namespace FastReport
      
     public void DrawTableBIK(TN.Doc.BIK bik, int idx)
     {
-      if (Engine.FirstPass == true)
-      {
-        int rows = 0;
-        //// Create &amp; setup: Band as dataBandBIK //
-        DataBand dataBandBIK = new DataBand(); // создание экземпляра датабенда
-        dataBandBIK.Name = &quot;DataBandBIK&quot;;
-        dataBandBIK.CanGrow=true;
-        //dataBandBIK.Height = 10f * Units.Millimeters;           
-        //dataBandBIK.FillColor = Color.Red; // for test
-        Page.Bands.Add(dataBandBIK);  // &quot;прикрепление&quot; датабенда к странице 1
-            
-        //// Create &amp; setup: Table as tableBIK// ---------------------------------
-        TableObject tableBIK = new TableObject(); // создание экземпляра таблицы tableBIK
-        //tableBIK.Top = (float)conf.Data.TableBIKSettings.Offset*Units.Millimeters; // установка отступа сверху (в см.) для таблицы
-        dataBandBIK.Objects.Add(tableBIK); // &quot;прикрепление&quot; таблицы к  датабенду 
-        tableBIK.Top =2f * Units.Millimeters;           
+      if (!Engine.FirstPass) return;
 
-        // Set columns numbers for table
-        decimal columns = 8;
-         
-        //// === Setup columns of the tableBIK
-        // ширина нединамических  столбцов (в мм)
-        float widthColumn1 = 7.5f; // width column 1 
+      DataBand dataBandBIK = CreateDataBand();
+      Page.Bands.Add(dataBandBIK);
 
-        // ширина динамических столбцов. От ширины страницы отнимаются: 
-        //отступы (слева, справа), ширин первого столбца. Результат делится на заданное кол-во колонок минус 1 (первый столбец).
-        float widthRemainingColumns = ((Page.PaperWidth-Page.LeftMargin-Page.RightMargin-widthColumn1)/((float)columns-1));
-
-        //Calculate Rows number
-        decimal tempvar = (decimal)listBIKParams.Count/(columns-1);
-        rows = (Decimal.ToInt32(Math.Ceiling(tempvar))*2);
-         
-        //// === Create columns, set width, link their to the tableBIK // 
-        for (int i = 0; i &lt; columns ; i++)
-        {
-          TableColumn column = new TableColumn();  
-          tableBIK.Columns.Add(column);   
-          switch (i)
-          {
-            case 0: 
-              column.Width = widthColumn1* Units.Millimeters; 
-              break;
-            default:
-              column.Width = widthRemainingColumns* Units.Millimeters; 
-              break;
-          } 
-        }
-        //Create rows, set width, link their to the tableBIK //
-        for (int n = 0; n &lt; rows; n++)
-        {
-          TableRow row = new TableRow();  
-          tableBIK.Rows.Add(row);          
-          tableBIK.Rows[n].AutoSize = true;
-        }
-            
-        //// Fill the cells with color and Data
-        int z=0;
-        object result = &quot;-&quot;;
-        object IllegalTimeResult = 0;
-        for (int j = 0; j &lt; (tableBIK.RowCount); j++)
-        {
-          for (int i = 1; i &lt; tableBIK.ColumnCount; i++,  z++ )
-          {
-            if (z==listBIKParams.Count) 
-              break;             
-                                              
-            // Fill table headers cells with text
-            tableBIK[i,j].Text = String.Format(&quot;{0},&lt;br&gt;{1}&quot;, listBIKParams[z].Name, listBIKParams[z].SI);
-            //tableBIK[i,j].FillColor=Color.Gainsboro;
-            tableBIK[i,j].FontWidthRatio=(float)0.85;
-            tableBIK[i,j].Font =  new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Bold); 
-            tableBIK[i,j].Border.Lines=BorderLines.All;
-                  
-            // Fill regular cells with data
-            result = &quot;-&quot;;
-            IllegalTimeResult = (long)0;
-            
-            tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.BIK[0], listBIKParams[z].Key, ref result); //SearchSuitableValueBIK
-                  
-            tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.BikIllegalTime, listBIKParams[z].Key, ref IllegalTimeResult);
-                  
-            result = tools.GetNormalizedValue(result).ToString();
-            if ((long)IllegalTimeResult!=0 &amp;&amp; result.ToString() !=&quot;-&quot; &amp;&amp; Data.ShowInvalidValues)
-            {
-              result = result + &quot; *&quot;;
-              isIllegalTimeResult = true;
-            }                    
-            
-            tableBIK[i,j+1].Text = result.ToString();
-            //tableBIK[i,j+1].Font = new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Regular); 
-            tableBIK[i,j+1].Border.Lines=BorderLines.All;                               
-          }
-          j++;
-        }
-        // Fill with data 1 column
-        if (DataIVK.TableReport.Report.Obj.BIK.Count==1)
-        {     
-          tableBIK[0,0].Text = &quot;БИК&quot;;
-        }
-        else
-        {
-          tableBIK[0,0].Text = &quot;БИК &quot;+(idx+1).ToString(); 
-        }
-            
-        tableBIK[0,0].Angle = 270; // rotate font to 270 degree 
-        tableBIK[0,0].Font =  new Font(&quot;Arial&quot;, (float)8.0, FontStyle.Bold); 
-        tableBIK[0,0].RowSpan =rows;
-        tableBIK[0,0].Border.Lines=BorderLines.All;
-         
-        //setup of the all cells
-        for (int i = 0; i &lt; columns; i++)
-        {
-          for (int j = 0; j &lt; rows; j++)
-          {
-            tableBIK[i,j].HorzAlign=HorzAlign.Center; // отцентровать текст в ячейке по горизонтали
-            tableBIK[i,j].VertAlign=VertAlign.Center; // отцентровать текст в ячейке по вертикали
-            tableBIK[i,j].TextRenderType=TextRenderType.HtmlTags;
-            tableBIK[i,j].FontWidthRatio=(float)0.85;
-          }
-        }       
-      }
+      TableObject tableBIK = CreateTable(dataBandBIK);
+      ConfigureTableStructure(tableBIK);
+      FillTableData(tableBIK, idx);
+      ApplyCellStyles(tableBIK);
     }    
-      
+     
+    // Константы для таблицы BIK
+    private static class BikTableConstants
+    {
+      public const float FirstColumnWidthMm = 7.5f;
+      public const float TopOffsetMm = 2f;
+      public const int MaxColumns = 8;
+      public const float FontSize = 8f;
+      public const float FontWidthRatio = 0.85f;
+      public const string FontFamily = &quot;Arial&quot;;
+    }
+
+    // Создание и настройка DataBand
+    private DataBand CreateDataBand()
+    {
+      var dataBand = new DataBand()
+      {
+        Name = &quot;DataBandBIK&quot;,
+        CanGrow = true
+      };
+      return dataBand;
+    }
+
+    // Создание и базовая настройка таблицы
+    private TableObject CreateTable(DataBand dataBand)
+    {
+      var table = new TableObject()
+      {
+        Top = BikTableConstants.TopOffsetMm * Units.Millimeters
+      };
+      dataBand.Objects.Add(table);
+      return table;
+    }
+
+    // Настройка структуры таблицы (колонки и строки)
+    private void ConfigureTableStructure(TableObject table)
+    {
+      int columns = CalculateColumnCount();
+      int rows = CalculateRowCount(columns);
+
+      // Настройка колонок
+      float remainingWidth = CalculateRemainingColumnWidth(table);
+      for (int i = 0; i &lt; columns; i++)
+      {
+        var column = new TableColumn()
+        {
+          Width = (i == 0 ? BikTableConstants.FirstColumnWidthMm : remainingWidth) * Units.Millimeters
+        };
+        table.Columns.Add(column);
+      }
+
+      // Настройка строк
+      for (int n = 0; n &lt; rows; n++)
+      {
+        var row = new TableRow() { AutoSize = true };
+        table.Rows.Add(row);
+        }
+    }
+
+    // Расчёт количества колонок
+    private int CalculateColumnCount()
+    {
+      decimal itemsPerColumn = (decimal)listBIKParams.Count / (BikTableConstants.MaxColumns - 1);
+      int baseRows = Decimal.ToInt32(Math.Ceiling(itemsPerColumn));
+      return Decimal.ToInt32(Math.Ceiling((decimal)listBIKParams.Count / baseRows)) + 1;
+    }
+
+    // Расчёт количества строк
+    private int CalculateRowCount(int columns)
+    {
+      decimal tempVar = (decimal)listBIKParams.Count / (columns - 1);
+      return Decimal.ToInt32(Math.Ceiling(tempVar)) * 2;
+    }
+
+    // Расчёт ширины оставшихся колонок
+    private float CalculateRemainingColumnWidth(TableObject table)
+    {
+      return (Page.PaperWidth - Page.LeftMargin - Page.RightMargin - BikTableConstants.FirstColumnWidthMm) 
+        / (BikTableConstants.MaxColumns - 1);
+    }
+
+    // Заполнение таблицы данными
+    private void FillTableData(TableObject table, int idx)
+    {
+      int paramIndex = 0;
+
+      // Заполнение заголовков и данных
+      for (int j = 0; j &lt; table.RowCount &amp;&amp; paramIndex &lt; listBIKParams.Count; j += 2)
+      {
+        for (int i = 1; i &lt; table.ColumnCount &amp;&amp; paramIndex &lt; listBIKParams.Count; i++, paramIndex++)
+        {
+          FillHeaderCell(table, i, j, paramIndex);
+          FillDataCell(table, i, j + 1, paramIndex);
+        }
+      }
+
+      // Заполнение первой колонки (BIK)
+      FillFirstColumn(table, idx);
+    }
+
+    // Заполнение ячейки заголовка
+    private void FillHeaderCell(TableObject table, int col, int row, int paramIndex)
+    {
+      var cell = table[col, row];
+      cell.Text = $&quot;{listBIKParams[paramIndex].Name},&lt;br&gt;{listBIKParams[paramIndex].SI}&quot;;
+      cell.FillColor = Color.Gainsboro;
+      cell.Font = new Font(BikTableConstants.FontFamily, BikTableConstants.FontSize, FontStyle.Bold);
+      cell.Border.Lines = BorderLines.All;
+    }
+
+    // Заполнение ячейки с данными
+    private void FillDataCell(TableObject table, int col, int row, int paramIndex)
+    {
+      object result = &quot;-&quot;;
+      object illegalTimeResult = (long)0; // Изменяем тип на object, изначально задаём 0 как long
+
+      tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.BIK[0], listBIKParams[paramIndex].Key, ref result);
+      tools.GetPropertyValue(DataIVK.TableReport.Report.Obj.BikIllegalTime, listBIKParams[paramIndex].Key, ref illegalTimeResult);
+
+      string normalizedValue = tools.GetNormalizedValue(result).ToString();
+      if (Convert.ToInt64(illegalTimeResult) != 0 &amp;&amp; normalizedValue != &quot;-&quot; &amp;&amp; Data.ShowInvalidValues)
+      {
+        normalizedValue += &quot; *&quot;;
+        isIllegalTimeResult = true;
+      }
+
+      var cell = table[col, row];
+      cell.Text = normalizedValue;
+      cell.Font = new Font(BikTableConstants.FontFamily, BikTableConstants.FontSize, FontStyle.Regular);
+      cell.Border.Lines = BorderLines.All;
+    }
+
+    // Заполнение первой колонки
+    private void FillFirstColumn(TableObject table, int idx)
+    {
+      var cell = table[0, 0];
+      cell.Text = DataIVK.TableReport.Report.Obj.BIK.Count == 1 ? &quot;БИК&quot; : $&quot;БИК {idx + 1}&quot;;
+      cell.Angle = 270;
+      cell.Font = new Font(BikTableConstants.FontFamily, BikTableConstants.FontSize, FontStyle.Bold);
+      cell.RowSpan = table.RowCount;
+      cell.Border.Lines = BorderLines.All;
+    }
+
+    // Применение стилей ко всем ячейкам
+    private void ApplyCellStyles(TableObject table)
+    {
+      for (int i = 0; i &lt; table.ColumnCount; i++)
+      {
+        for (int j = 0; j &lt; table.RowCount; j++)
+        {
+          var cell = table[i, j];
+          cell.HorzAlign = HorzAlign.Center;
+          cell.VertAlign = VertAlign.Center;
+          cell.TextRenderType = TextRenderType.HtmlTags;
+          cell.FontWidthRatio = BikTableConstants.FontWidthRatio;
+        }
+      }
+    }
+    
     private void DrawTableSigners()
     {
       if (Page.PaperWidth&gt;  210 )
@@ -551,7 +597,7 @@ namespace FastReport
         <TableColumn Name="Column03" Width="56.7"/>
         <TableRow Name="Row8" Height="22.68" AutoSize="true">
           <TableCell Name="Cell419" Border.Lines="All" Fill.Color="Gainsboro" Text="№" Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85"/>
-          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Gainsboro" Text="НАИМЕНОВАНИЕ  ПАРАМЕТРА" Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" Wysiwyg="true"/>
+          <TableCell Name="Cell34" Border.Lines="All" Fill.Color="Gainsboro" Text="Наименование параметра" Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85" Wysiwyg="true"/>
           <TableCell Name="Cell35" Border.Lines="All" Fill.Color="Gainsboro" Text="Ед. изм." Padding="2, 2, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row9" Height="17.01">

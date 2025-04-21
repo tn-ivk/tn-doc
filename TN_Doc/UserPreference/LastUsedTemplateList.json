@@ -1,0 +1,487 @@
+﻿{
+  "Devices": [
+    {
+      "IdDevice": 0,
+      "LastTemplateList": [
+        {
+          "IdDoc": 0,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 32,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 1,
+          "LastTemplateId": 4
+        },
+        {
+          "IdDoc": 2,
+          "LastTemplateId": 4
+        },
+        {
+          "IdDoc": 3,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 4,
+          "LastTemplateId": 1
+        },
+        {
+          "IdDoc": 5,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 6,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 7,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 8,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 9,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 10,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 11,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 12,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 13,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 14,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 15,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 16,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 17,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 18,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 19,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 20,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 21,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 22,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 23,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 24,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 25,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 26,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 27,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 28,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 29,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 30,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 31,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 33,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 34,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 35,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 36,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 37,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 38,
+          "LastTemplateId": 0
+        }
+      ]
+    },
+    {
+      "IdDevice": 1,
+      "LastTemplateList": [
+        {
+          "IdDoc": 0,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 32,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 1,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 2,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 3,
+          "LastTemplateId": 1
+        },
+        {
+          "IdDoc": 4,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 5,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 6,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 7,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 8,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 9,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 10,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 11,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 12,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 13,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 14,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 15,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 16,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 17,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 18,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 19,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 20,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 21,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 22,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 23,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 24,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 25,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 26,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 27,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 28,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 29,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 30,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 31,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 33,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 34,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 35,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 36,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 37,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 38,
+          "LastTemplateId": 0
+        }
+      ]
+    },
+    {
+      "IdDevice": 2,
+      "LastTemplateList": [
+        {
+          "IdDoc": 0,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 32,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 1,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 2,
+          "LastTemplateId": 5
+        },
+        {
+          "IdDoc": 3,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 4,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 5,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 6,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 7,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 8,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 9,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 10,
+          "LastTemplateId": 2
+        },
+        {
+          "IdDoc": 11,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 12,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 13,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 14,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 15,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 16,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 17,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 18,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 19,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 20,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 21,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 22,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 23,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 24,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 25,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 26,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 27,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 28,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 29,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 30,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 31,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 33,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 34,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 35,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 36,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 37,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 38,
+          "LastTemplateId": 0
+        }
+      ]
+    }
+  ]
+}

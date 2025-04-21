@@ -31,75 +31,75 @@
           "Parameters": [
             {
               "Visible": true,
-              "Name": "ПЛОТНОСТЬ",
+              "Name": "Плотность",
               "SI": "кг/м³",
               "Key": "Dens"
             },
             {
               "Visible": true,
-              "Name": "ПЛОТНОСТЬ ПРИ 15°C",
+              "Name": "Плотность при 15°C",
               "SI": "кг/м³",
               "Key": "Dens15"
             },
             {
               "Visible": true,
-              "Name": "ПЛОТНОСТЬ ПРИ 20°C",
+              "Name": "Плотность при 20°C",
               "SI": "кг/м³",
               "Key": "Dens20"
             },
             {
               "Visible": true,
-              "Name": "ДИНАМ. ВЯЗКОСТЬ",
-              "SI": "мПа·с (сП)",
-              "Key": "DynamicVisc"
-            },
-            {
-              "Visible": true,
-              "Name": "КИНЕМ. ВЯЗКОСТЬ",
-              "SI": "мм²/с (сСт)",
-              "Key": "KinemVisc"
-            },
-            {
-              "Visible": true,
-              "Name": "РАСХОД",
-              "SI": "м³/ч",
-              "Key": "Flow"
-            },
-            {
-              "Visible": true,
-              "Name": "ОБЪЕМНАЯ ДОЛЯ ВОДЫ",
-              "SI": "%",
-              "Key": "VolWater"
-            },
-            {
-              "Visible": true,
-              "Name": "МАССОВАЯ ДОЛЯ ВОДЫ",
-              "SI": "%",
-              "Key": "MasWater"
-            },
-            {
-              "Visible": true,
-              "Name": "МАССОВАЯ ДОЛЯ СЕРЫ",
-              "SI": "%",
-              "Key": "MasSulphur"
-            },
-            {
-              "Visible": true,
-              "Name": "ТЕМПЕР. ПЛОТНОМЕРА",
+              "Name": "Темпер. плотномера",
               "SI": "°C",
               "Key": "DensTemp"
             },
             {
               "Visible": true,
-              "Name": "ДАВЛЕНИЕ ПЛОТНОМЕРА",
+              "Name": "Давление плотномера",
               "SI": "МПа",
               "Key": "DensPress"
             },
             {
+              "Visible": true,
+              "Name": "Динам. вязкость",
+              "SI": "мПа·с (сП)",
+              "Key": "DynamicVisc"
+            },
+            {
+              "Visible": true,
+              "Name": "Кинем. вязкость",
+              "SI": "мм²/с (сСт)",
+              "Key": "KinemVisc"
+            },
+            {
               "Visible": false,
-              "Name": "ТЕМПЕР. ВИСКОЗИМЕТРА",
+              "Name": "Темпер. вискозиметра",
               "SI": "°C",
               "Key": "ViscTemp"
+            },
+            {
+              "Visible": true,
+              "Name": "Объемная доля воды",
+              "SI": "%",
+              "Key": "VolWater"
+            },
+            {
+              "Visible": true,
+              "Name": "Массовая доля воды",
+              "SI": "%",
+              "Key": "MasWater"
+            },
+            {
+              "Visible": true,
+              "Name": "Массовая доля серы",
+              "SI": "%",
+              "Key": "MasSulphur"
+            },
+            {
+              "Visible": true,
+              "Name": "Расход",
+              "SI": "м³/ч",
+              "Key": "Flow"
             }
           ]
         },
@@ -246,13 +246,44 @@
             "Name": "СИКН",
             "Width": 0
           }
-        }
+        },
+        "IncompleteReports": [
+          {
+            "Use": true,
+            "Id": 1,
+            "Name": "Отчет за два часа",
+            "ShortName": "Отчет за 2ч"
+          },
+          {
+            "Use": true,
+            "Id": 2,
+            "Name": "Отчет за смену",
+            "ShortName": "Отчет за см"
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "Name": "Отчет за сутки",
+            "ShortName": "Отчет за сут"
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "Name": "Отчет за месяц",
+            "ShortName": "Отчет за м"
+          },
+          {
+            "Use": true,
+            "Id": 5,
+            "Name": "Отчет за ТКО",
+            "ShortName": "Отчет за ТКО"
+          }
+        ]
       },
       "Footer": {
         "Signers": [
           {
             "Id": 1,
-            //Представитель сдающей стороны
             "Name": "Оператор товарный сдающей стороны:",
             "ShowSigner": [
               {
@@ -284,7 +315,6 @@
           },
           {
             "Id": 2,
-            //Представитель принимающей стороны
             "Name": "Оператор товарный принимающей стороны:",
             "ShowSigner": [
               {

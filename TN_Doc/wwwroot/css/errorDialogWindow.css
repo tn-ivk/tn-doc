@@ -1,0 +1,94 @@
+﻿/* Стили для модального окна */
+.custom-dialog {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  width: 550px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.custom-dialog[open] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Фон модального окна */
+.custom-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.dialog-header {
+  margin-bottom: 15px;
+  background-color: red;
+  color: white;
+  padding: 10px 10px;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  padding: 10px 10px;
+}
+
+/* Контент внутри модального окна */
+.dialog-content {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end; /* Выравниваем кнопку справа */
+}
+
+/* Сообщение об ошибке */
+.dialog-message {
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  color: #333333;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* Кнопка закрытия */
+.dialog-button {
+  background-color: #1b6ec2;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 10px 20px;
+}
+
+/* Эффект при наведении на кнопку */
+.dialog-button:hover {
+  background-color: #155a9e;
+}
+
+/* Эффект при нажатии на кнопку */
+.dialog-button:active {
+  background-color: #10487d;
+}
+
+.dialog-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  padding: 5px 10px;
+}

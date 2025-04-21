@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TN_Doc.Models;
+using NLog;
 using TN_Doc.Models.Printer;
 using TN_Doc.Models.Services;
+using TN.Utils;
 
 namespace TN_Doc.Extensions
 {
@@ -29,13 +29,9 @@ namespace TN_Doc.Extensions
 		public static void AddPrinters(this IServiceCollection services)
 		{
 			if (IsWindows)
-			{
-				services.AddTransient<AbsPrinter>((_) => new WindowsPrinter());
-			}
+				services.AddTransient<AbsPrinter, WindowsPrinter>();
 			else
-			{
-				services.AddTransient<AbsPrinter>((_) => new LinuxPrinter());
-			}
+				services.AddTransient<AbsPrinter, LinuxPrinter>();
 		}
 
 		/// <summary>
@@ -43,23 +39,6 @@ namespace TN_Doc.Extensions
 		/// </summary>
 		/// <param name="services">Коллекция сервисов</param>
 		public static void AddPrinterService(this IServiceCollection services) => services.AddTransient<PrinterService>();
-
-		/// <summary>
-		/// Добавление сервиса взаимодействия со справочниками
-		/// </summary>
-		/// <param name="services">Коллекция сервисов</param>
-		/// <param name="cfg">Провайдер конфигурации приложения</param>
-		public static void AddDirectoryService(this IServiceCollection services, IConfiguration cfg)
-		{
-			services.AddSingleton((provider) =>
-			{
-				string cfgDirName = cfg.GetValue<string>("CfgDirPath");
-				string cfgPath = cfg.GetValue<string>("RelCfgName");
-				string cfgAppPath = cfg.GetValue<string>("RelCfgAppName");
-				ILogger<DirectoryService> logger = provider.GetRequiredService<ILogger<DirectoryService>>();
-				return new DirectoryService(cfgPath, cfgAppPath, cfgDirName, logger);
-			});
-		}
 
 		/// <summary>
 		/// Сбор информации о приложение
@@ -71,12 +50,13 @@ namespace TN_Doc.Extensions
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			FileVersionInfo vi = FileVersionInfo.GetVersionInfo(assembly.Location);
 			string version = $"{(vi.FileVersion ?? "???")}";
-#if !RELEASE
+#if DEBUG
             version += $".test-{Guid.NewGuid().ToString().Substring(0,5)}";
 #endif
 			AppInfoProvider pr = new(version);
-			Console.WriteLine(pr.Version);
 			services.AddSingleton(pr);
+			var logger = LogManager.GetCurrentClassLogger();
+			logger.Info($"Запуск приложения: {assembly.GetName().Name} версии: {pr.Version}");
 		}
 
 		/// <summary>

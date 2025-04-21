@@ -1,0 +1,117 @@
+﻿/* Стили для модального окна */
+#elis .modal {
+  border: none !important; /* Убираем границу вокруг окна */
+  box-shadow: none !important; /* Убираем тень */
+  background-color: transparent !important; /* Убираем фон */
+  border-radius: 5px !important; /* Закругляем углы */
+}
+
+#elis .modal-dialog {
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 14px;
+  font-family: Arial, sans-serif !important;
+  overflow: hidden !important;
+}
+
+#elis .modal-header {
+  border: none !important;
+  margin-bottom: 15px;
+  background-color: #1b6ec2 !important;
+  color: white !important; 
+}
+
+#elis .modal-title {
+  border: none !important;
+  margin: 0;
+  padding: 10px 20px;
+}
+
+#elis .modal-body {
+  box-shadow: none !important; /* Убираем тень */
+  background-color: transparent !important; /* Убираем фон */
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: start;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#elis .modal-info {
+  border: none !important;
+  margin: 0;
+  padding: 10px 10px;
+  color: red;
+}
+
+#elis .modal-info:empty {
+  display: none;
+}
+
+#elis .modal-dialog-footer {
+  display: flex;
+  justify-content: flex-end; 
+  margin: 0;
+}
+
+/* Кнопки */
+#elis .btn {
+  background-color: #1b6ec2;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 10px 10px;
+}
+
+/* Эффект при наведении на кнопку */
+#elis .btn:hover {
+  background-color: #155a9e;
+}
+
+/* Эффект при нажатии на кнопку */
+#elis .btn:active {
+  background-color: #10487d;
+}
+
+#elis .btn-secondary {
+  background-color: #6c757d; /* Серый цвет для кнопки Закрыть */
+}
+
+#elis .btn-secondary:hover {
+  background-color: #5a6268; /* Темно-серый при наведении */
+}
+
+#elis .btn-secondary:active {
+  background-color: #545b62; /* Еще темнее при нажатии */
+}
+
+#elis div.modal-content {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#elis div.modal-footer {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#elis .list-group {
+  width: calc(100% - 20px); /* Ширина кнопки с учетом отступов */
+  margin: 10px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+#elis .list-group-item {
+  
+  display: block; /* Блоковый элемент для полной ширины */
+}

@@ -18,15 +18,23 @@
         }
 
         input {
+            font-size: 14px;
+            font-family: Arial,sans-serif;
             outline: none;
             border: 1px solid white;
-            /* border: 1px solid black; */
-            /* border-radius: 5px; */
+        }
+        select {
+            font-size: 14px;
+            font-family: Arial,sans-serif;
+            outline: none;
+            border: 1px solid white;
+            width: 100%;
         }
 
         td,
         th {
-            font-size: 70%;
+            font-size: 14px;
+            font-family: Arial,sans-serif;
             /* Размер шрифта в процентах */
             padding: 2px;
             /* Поля вокруг содержимого таблицы */
@@ -67,20 +75,25 @@
             color:black;
         }
 
+        /* Стиль для подсказки */
+        .ui-tooltip {
+            background-color: red!important;
+            color: white!important;
+            font-size: 14px!important;
+            font-family: Arial,sans-serif!important;
+        }
+        
     </style>
 
-    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.css">
     <script src="/js/EditDoc.js"></script>
-
-
+    <script src="/js/loading-spinner.js"></script>
     <script id="ElementChangeEventHandling" type="text/javascript">
 
-        var dictionaries;
-
-        function funcOnLoad() {
-            SendingMessageStateButtonSave();
-            dictionaries = GetUsers();
-        }
+        let dictionaries;
+        let invalidChars;
 
         function UserChangeEvent(selectObject) {
             if (selectObject.name == "Laboratory_IOF") {
@@ -93,86 +106,121 @@
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Delive_Post").value = user[0].Post;
                 document.getElementById("Delive_Factory").value = user[0].Factory;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
             else if (selectObject.name == "Receive_IOF") {
                 var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
                 document.getElementById("Receive_Post").value = user[0].Post;
                 document.getElementById("Receive_Factory").value = user[0].Factory;
-
-                //alert(selectObject.name + ' ' + $(selectObject).val() + ' ' + $(selectObject).text());
             }
         }
 
-        function InputCheck(Object) {
-            CheckList(Object);             
+        function InputStringCheck(object) {
+            if(CheckEmpty(object))
+                CheckInvalidChars(object);
+            updateTooltip(object);
+            SendingMessageStateButtonSave();
+        }
+        
+        function CheckInvalidChars(object) {
+            if(invalidChars == null || invalidChars.length === 0)
+                return true;
+            
+            let value = null;
+            if (object instanceof HTMLInputElement) {
+                value = object.value; 
+            } else if (object instanceof HTMLSelectElement) {
+                const selectedOption = object.options[object.selectedIndex]; 
+                value = selectedOption ? selectedOption.text : null;
+            }
+            if(value === null) {
+                return true;
+            }
+            for (let char of invalidChars) {
+                if (value.includes(char)) {
+                    object.classList.replace("correct-value", "incorrect-value");
+                    object.setAttribute("title", `Некорректный символ: ${char}`);
+                    return false;
+                }
+            }
+            object.classList.replace("incorrect-value", "correct-value");
+            if(object.hasAttribute("title")) {
+                object.setAttribute("title", "")
+            }
+            return true;
+        } 
+            
+        function InputValueCheck(object) {
+            if(CheckEmpty(object))
+                CheckRounding(object);
+            updateTooltip(object);
             SendingMessageStateButtonSave();
         }
 
-        function CheckList(Object) {
-            if(!CheckEmpty(Object)) return;
-            CheckRounding(Object);
-        }
-        
-        function CheckRounding(Object) {
-            if(!Object.hasAttribute('data-roundvalue')) {
+        function CheckRounding(object) {
+            if(!object.hasAttribute('data-roundvalue')) {
                 return true;
             }
                 
-            const round = Number(Object.getAttribute('data-roundvalue'));
+            const round = Number(object.getAttribute('data-roundvalue'));
             if(isNaN(round) || round < 1)
                 return true;
                 
-            const strRegExPattern = "^-?([0-9]+\.[0-9]{1," + round + "})$";
-            if (Object.value.match(new RegExp(strRegExPattern,'g'))) {
-                Object.classList.replace("incorrect-value", "correct-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "")
+            const strRegExPattern = "^-?[0-9]+(?:\\.[0-9]{1," + round + "})?$";
+            if (object.value.match(new RegExp(strRegExPattern,'g'))) {
+                object.classList.replace("incorrect-value", "correct-value");
+                if(object.hasAttribute("title")) {
+                    object.setAttribute("title", "")
                 }
             }
             else {
-                Object.classList.replace("correct-value", "incorrect-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
-                }
+                object.classList.replace("correct-value", "incorrect-value");
+                object.setAttribute("title", "Кол-во знаков после запятой не соответствует заданным правилам!")
                 return false;
             }
             return true;
         }
 
-        function CheckEmpty(Object) {
-            if(!Object.hasAttribute("fill-required"))
+        function CheckEmpty(object) {
+            if(!object.hasAttribute("fill-required"))
                 return true;
             
-            if (!Object.value) {
-                Object.classList.replace("correct-value", "incorrect-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "Поле должно быть заполнено!")
-                }
+            if (!object.value) {
+                object.classList.replace("correct-value", "incorrect-value");
+                object.setAttribute("title", "Поле должно быть заполнено!");
                 return false;
             }
             else {
-                Object.classList.replace("incorrect-value", "correct-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "")
+                object.classList.replace("incorrect-value", "correct-value");
+                if(object.hasAttribute("title")) {
+                    object.setAttribute("title", "")
                 }
             }
             return true;
         }
         
         function SendingMessageStateButtonSave() {
-            window.top.postMessage(document.querySelectorAll('.incorrect-rounding, .empty-parameter').length === 0
+            window.top.postMessage(document.querySelectorAll('.incorrect-value').length === 0
                     ? 'ButtonSaveOn'
                     : 'ButtonSaveOff',
                 '*')
         }
 
+        function updateTooltip(element) {
+            if(element.classList.contains("incorrect-value"))
+            {
+                $('#' + element.id)
+                    .tooltip("enable")
+                    .tooltip("option", "content", element.getAttribute("title"));  
+            }
+            
+            if(element.classList.contains("correct-value"))
+            {
+                $('#' + element.id).tooltip("disable");
+            }
+        }
     </script>
-
 </head>
-<body onload="funcOnLoad()">
-
+<body>
     <menu type="toolbar">
         
     </menu>
@@ -189,6 +237,7 @@
                 <th> Наименование показателя </th>
                 <th> Метод испытаний </th>
                 <th> Измерение ИВК </th>
+                <th> Номер документа </th>
                 <th> Измерение ХАЛ </th>
                 <th> Результат </th>
             </tr>
@@ -198,23 +247,38 @@
         </tbody>
     </table>
 
+    
 <script type="text/javascript">
+    
+    $(document).ready(function() {
+        // Инициализация подсказки для всех элементов с атрибутом title
+        $('[title]').tooltip();
+
+        SendingMessageStateButtonSave();
+        dictionaries = GetUsers();
+        invalidChars = GetInvalideChars();
+
+        // Отключаем прокрутку колесиком мыши на input[type="number"]
+        document.querySelectorAll('input[type="number"]').forEach(function(input) {
+            input.addEventListener('wheel', function(event) {
+                event.preventDefault();  // Отключаем изменение значения колесиком мыши
+            });
+        });
+        const elementsWithOnInput = document.querySelectorAll('[oninput]');
+        elementsWithOnInput.forEach(element => {
+            if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+                element.oninput();
+            }
+        });
+    });
+    
     function CheckElisInput(){
-        //console.group('--check-elis-input--');
         const elements = document.querySelectorAll('.elis-data');
-        //console.log(document.body);
-       // console.log('собираем данные, заполняемые елис ->', elements.length)
         if( elements.length===0){
-            //console.log('данные елиса отсутствуют -> выходим')
-            //console.groupEnd();
             return
         }
-        //console.log('Проверяем  input еще раз');
         for(const input of elements){
-           // RoundingCheck(input)
         }
-
-        //console.groupEnd();
     }
 
     CheckElisInput();

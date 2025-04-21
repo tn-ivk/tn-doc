@@ -34,6 +34,10 @@ var CurrentDeviceId;
 var table = null;
 var currentId = null;
 var docTemplates = {};
+let isViewing = false;
+let isEditingDoc = false;
+let isShowEditAndSave = true;
+let isAllowEditAndSave = true;
 
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
@@ -559,22 +563,35 @@ function GetIdTemplateDoc() {
 }
 
 function InitPrinterName() {
-    $('#ComboboxPrinterName').empty();
-
-    $.ajax(
-        {
-            async: false,
-            url: 'Print/GetListPrinters',
-            type: 'GET',
-            success: function (data) {
+    const $combobox = $('#ComboboxPrinterName');
+    const $printBtn = $('#ButtonPrint');
+    $combobox.empty(); 
+    
+    $.ajax({
+        async: false, 
+        url: 'Print/GetListPrinters',
+        type: 'GET',
+        success: function (data) {
+            if (!data || data.length === 0) {
+                $combobox.hide();
+                $printBtn.hide();
+            } else {
+                $combobox.show();
+                $printBtn.show();
                 data.forEach((item) => {
                     let opt = document.createElement("option");
                     opt.value = item;
                     opt.appendChild(document.createTextNode(item));
-                    document.querySelector('#ComboboxPrinterName').appendChild(opt);
+                    $combobox.append(opt);
                 });
             }
-        });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            $combobox.hide();
+            $printBtn.hide();
+            console.error('Ошибка при загрузке списка принтеров:', textStatus, errorThrown);
+        }
+    });
 }
 
 function InitExportFormat() {
@@ -724,13 +741,12 @@ function InitElement() {
     InitProtocolNumber();
     $('#ComboboxDocGUID').change(function () {
         if (table != null) $('#DataTable').DataTable().clear().draw();
-        //$('.FR').each(function () {
-        //    $(this).attr('src', '');
-        //});
         $('.FR').attr('src', '');
 
         InitTemplatesDoc();
         InitProtocolNumber();
+        
+        $('#viewModeButton').prop('hidden', true);
     });
     $('#ComboboxTemplateDoc').change(function () {
         SetIdTemplateDoc();
@@ -753,8 +769,6 @@ function GetData() {
         var strDTEnd = DTEnd.getDate() + '.' + (DTEnd.getMonth() + 1) + '.' + DTEnd.getFullYear();
     }
 
-    //alert('1: ' + 'ComboboxDocGUID' + $('#ComboboxDocGUID').val());
-
     $.ajax(
         {
             async: false,
@@ -770,10 +784,6 @@ function GetData() {
             beforeSend: function (data) {
             },
             success: function (data) {
-                //var table = $('#example');
-                //table.data = data.tableReport;
-                //table.ajax.reload();
-
                 ret = data;
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -784,12 +794,11 @@ function GetData() {
                     $('#ComboboxDocGUID').val() == 3 ||
                     $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
-                    $('#ButtonReview').prop('hidden', true);
-                    $('#ButtonEdit').prop('hidden', true);
+                    isEditingDoc = false;
+                    $('#viewModeButton').prop('hidden', true);
                 } else {
                     $('#ButtonSave').prop('disabled', false);
-                    $('#ButtonReview').prop('hidden', false);
-                    $('#ButtonEdit').prop('hidden', false);
+                    isEditingDoc = true;
                 }
 
                 if ($('#ComboboxDocGUID').val() == 1) {
@@ -800,13 +809,12 @@ function GetData() {
         });
 
     var data = {'data': ret};
-
     return data;
 }
 
 function GetDoc() {
     $('.FR').attr('src', '');
-
+    
     $.ajax(
         {
             async: true,
@@ -819,24 +827,25 @@ function GetDoc() {
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
             success: function (data) {
-                //$('.FR').each(function () {
-                //    //#toolbar=0&view=FitH
-                //    $(this).attr('src', '/PDF/PDF.pdf');
-                //});
-
-                //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&id=' + x);
-
                 if (data)
                     $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
 
                 $('#viewPanel').prop('hidden', false);
                 $('#editPanel').prop('hidden', true);
+                isViewing = true;
+                if(isEditingDoc)
+                    $('#viewModeButton')
+                        .prop('value', 'Редактирование')
+                        .prop('hidden', false)
+                        .prop('disabled', !isAllowEditAndSave);
             },
         });
 }
 
 function GetEditDoc() {
-
+    if(currentId == null) 
+        return;
+    
     $.ajax(
         {
             async: false,
@@ -854,18 +863,34 @@ function GetEditDoc() {
 
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
+                
             }
         });
+    
+    isViewing = false;
+    $('#viewModeButton').prop('hidden', false)
+        .prop('value', '     Просмотр     ');
 }
 
-function SaveDoc() {
-    document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
+async function SaveDoc() {
+    const result = await document.getElementsByClassName('FR')[0].contentWindow.SaveDoc(
         $('#ComboboxDevice :selected').text(),
         $('#ComboboxDevice').val(),
         $('#ComboboxDocGUID').val(),
         currentId,
         PrefixTag);
-    //GetDoc();
+    if (result)
+    {
+        GetDoc();
+    }
+    else
+    {
+        const errorDialog = document.getElementById('errorDialog');
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = "Не получено подтверждение записи данных от ИВК";
+        errorDialog.showModal();
+    }
+    
 }
 
 function GetPeriodDocument() {
@@ -984,27 +1009,17 @@ function GetFullNameTag(tagName) {
     return PrefixTag + '.' + tagName;
 }
 
-//Получить данные из ЕЛИС
+//Запросить данные из ЕЛИС
 function GetElisData() {
-
     ClearDataElis();
+    let dataELIS;
+    let clientToken = GetElisToken();
 
-    var dataELIS;
-
-    var clientToken = GetClientToken(CurrentDeviceId);
-
-    if (clientToken == undefined) {
-
-        var regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
-
-        if (regData == '')
-            return;
-        else
-            clientToken = RegistrationClient(regData);
+    if (clientToken == null) {
+        $('#info').html('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
+        return;
     }
-
-    var periodDocument = GetPeriodDocument();
-    
+    const periodDocument = GetPeriodDocument();
     StateButtonGetElisData(true);
 
     $.ajax(
@@ -1050,10 +1065,24 @@ function GetElisData() {
         });
 }
 
+//Получение токена для ЕЛИС
+function GetElisToken() {
+    let elisToken = GetClientToken(CurrentDeviceId);
+
+    if (elisToken == null) {
+        const regData = GetDataForRegistrationDeviceInELIS(CurrentDeviceId);
+        if (regData == '')
+            return;
+        else
+            elisToken = RegistrationClient(regData);
+    }
+    return elisToken;
+}
+
 //Зарегистрировать устройство для ЕЛИС
 function RegistrationClient(regData) {
 
-    var clientToken = null;
+    let clientToken = null;
 
     $.ajax(
         {
@@ -1063,17 +1092,12 @@ function RegistrationClient(regData) {
             contentType: 'application/json; charset=UTF-8',
             dataType: 'json',
             data: JSON.stringify(regData),
-            //    JSON.stringify({
-            //    ostKey: nameDevice,
-            //    siknKey: '',
-            //    clientName: ''
-            //}),
             success: function (data) {
 
                 clientToken = data;
             },
             error: function (data) {
-
+                
             }
         });
 
@@ -1177,24 +1201,30 @@ function DrawTablePassports(dataELIS) {
 function SetDataLocalStorage() {
 }
 
-
+function ResetPassportDataElis() {
+    $('#info').text('');
+    StateButtonGetElisData(false);
+}
 function FillPassportDataElis() {
     try {
-        //console.log("FillPassportDataElis" );
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let labInfo = JSON.parse(localStorage.labInfo);
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
-        //console.log('dataPassport.parameters',dataPassport.parameters);
-        //console.log()
+        
+        // Добавляем данные о представителе лаборатории из Signers
+        if (dataPassport.signers?.laboratory) {
+            // Добавляем данные в dataPassport для обратной совместимости
+            dataPassport.chiefLabShortSign = dataPassport.signers.laboratory.iof;
+            dataPassport.chiefLabPosition = dataPassport.signers.laboratory.post;
+            dataPassport.chiefLabOrganization = dataPassport.signers.laboratory.company;
+        }
+
         elisNodes.forEach((item, index, array) => {
-            let itemKeys = item.dataset.elisAlias.split('|');
+            let itemKeys = item.dataset.elisAlias?.split('|');
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
-                //console.log('itemKeys', itemKeys);
-                //console.log('key', key);
-                //console.log('itemKeys.includes(key)', itemKeys.includes(key));
                 if (itemKeys.includes(key)) {
                     root = dataPassport.parameters
                     for (let iKey of itemKeys) {
@@ -1242,17 +1272,28 @@ function FillPassportDataElis() {
             }
 
             if (item.nodeName === 'INPUT') {
-                const value = item.dataset.tag === 'AdditionalInfo'
-                    ? root[currentKey]
-                    : root[currentKey].value;
-                
-                if(item.type === 'datetime-local') {
-                    item.value = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                switch (item.dataset.tag) {
+                    case 'AdditionalInfo':
+                        if(item.type === 'datetime-local') {
+                            item.value = moment(root[currentKey]).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                        else {
+                            item.value = root[currentKey];    
+                        }
+                        break;
+                    case 'DocNum':
+                        item.value = root[currentKey].documentNumber;
+                        if(item.hasAttribute("data-document"))
+                            item.setAttribute("data-document", JSON.stringify(new LabDocumentInfo(root[currentKey].documentType, root[currentKey].documentNumber, root[currentKey].documentDate)));
+                        break;
+                    case 'Value':
+                        item.value = root[currentKey].value;
+                        FixedElisData(item);
+                        break;
+                    default:
+                        break;
                 }
-                else {
-                    item.value = value;
-                    FixedElisData(item);
-                }    
+                
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
@@ -1300,8 +1341,8 @@ function FillPassportDataElis() {
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
-    } finally {
-        console.groupEnd();
+    } catch (error) {
+        console.error("Ошибка в FillPassportDataElis:", error);
     }
 }
 
@@ -1338,17 +1379,19 @@ function StateButtonGetElisData(state) {
     }
 }
 
-function ButtonElis() {
+function OpenElisDialog() {
     $('#listPassports').empty();
     localStorage.removeItem('dataPassport');
 }
 
 function ApplicationSecurity(tagName, tagValue) {
 
-    if (tagName == 'root.ARM.Reports.ShowEditAndSave')
-        $("#ButtonEdit").prop("hidden", !tagValue);
-    else if (tagName == 'root.ARM.Reports.AllowEditAndSave')
-        $("#ButtonEdit").prop("disabled", !tagValue);
+    if (tagName == 'root.ARM.Reports.ShowEditAndSave') {
+        isShowEditAndSave = tagValue;
+    }   
+    else if (tagName == 'root.ARM.Reports.AllowEditAndSave') {
+        isAllowEditAndSave = tagValue;
+    }
     else if (tagName == 'root.ARM.Reports.ShowPrint') {
         $("#ComboboxPrinterName").prop("hidden", !tagValue);
         $("#ButtonPrint").prop("hidden", !tagValue);
@@ -1367,7 +1410,6 @@ function ApplicationSecurity(tagName, tagValue) {
         $("#ButtonDictionaries").prop("disabled", !tagValue);
 }
 
-
 function ClearDataElis() {
     $('#info').text('');
     $('#listPassports').empty();
@@ -1378,6 +1420,13 @@ String.prototype.toFloat = function (value) {
     return parseFloat(this.replace(',', '.').trim())
 }
 
+
+function ToggleMode() {
+    if(isViewing)
+        GetEditDoc();
+    else
+        GetDoc();
+}
 class Metod
 {
     Id;
@@ -1396,5 +1445,18 @@ class Metod
         this.LimitValueActivate = pLimitValueActivate;
         this.LimitValue = pLimitValue;
         this.LimitValueString = pLimitValueString;
+    }
+}
+
+class LabDocumentInfo
+{
+    Type;
+    Number;
+    Date;
+    
+    constructor(pType, pNumber, pDate) {
+        this.Type = pType;
+        this.Number = pNumber;
+        this.Date = pDate;
     }
 }

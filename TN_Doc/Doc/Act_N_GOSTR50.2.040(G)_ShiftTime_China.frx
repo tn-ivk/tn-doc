@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/28/2024 11:00:31" ReportInfo.CreatorVersion="2024.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/16/2025 10:21:27" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -105,9 +105,9 @@ namespace FastReport
       else
         Receive_License.Text = &quot;&quot;;
      }    
-      
-      private void TableAct_ManualBuild(object sender, EventArgs e)
-      {
+    
+    private void TableAct_ManualBuild(object sender, EventArgs e)
+    {
       bool ShowResultColumn = SettingsData.ShowResultColumn;
       int ColumnsCount = 0; 
       List&lt;TN.Doc.Act&gt; listShiftsData;
@@ -134,7 +134,7 @@ namespace FastReport
           TableAct.Columns[1].Width/Units.Millimeters-
           TableAct.Columns[2].Width/Units.Millimeters)
           /ColumnsCount;         
-
+  
         // Insert Columns for Volumes  (V0) &amp; fill them headers with text
         int indexColTemplate = ColumnTemplate.Index;
         for (int i=1; i&lt;listShiftsData.Count; i++)
@@ -155,39 +155,37 @@ namespace FastReport
         TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
             
         // Fill TableAct with data
-            
+        string shiftCountStr = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
+        if (!int.TryParse(shiftCountStr, out int shiftCount) || shiftCount &lt; 1)
+        shiftCount = 1;
+        double hoursPerShift = 24.0 / shiftCount;
+        
         for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
         {
-          for (int j=1;j&lt;TableAct.RowCount;j++)
-          {
-            TableAct[(3+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
-            
-            TableAct[(3+i),2].Text = string.Format(&quot;{0} смена&quot;,( i+1)); 
-            
-          //  string begin = DateTimeOffset.FromUnixTimeSeconds(DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].Begin).DateTime.ToString(&quot;HH:mm&quot;);
-          //  string end = DateTimeOffset.FromUnixTimeSeconds(DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].End).DateTime.ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;);
-          //  TableAct[(3+i),3].Text = $&quot;{begin}-{end}&quot;;            
-            
-            TableAct[(3+i),5].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
-            TableAct[(3+i),6].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
-            TableAct[(3+i),8].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
-            TableAct[(3+i),9].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
-            TableAct[(3+i),11].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
-            TableAct[(3+i),12].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
-            TableAct[(3+i),13].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
-            TableAct[(3+i),14].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
-            TableAct[(3+i),15].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
-            TableAct[(3+i),16].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
-            TableAct[(3+i),17].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
-            TableAct[(3+i),18].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
-            TableAct[(3+i),19].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
-            TableAct[(3+i),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
-            TableAct[(3+i),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
-            TableAct[(3+i),22].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
-            TableAct[(3+i),23].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
-            TableAct[(3+i),24].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
-            TableAct[(3+i),25].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
-          }
+          string begin = FormatTime(i * hoursPerShift);
+          string end = FormatTime((i + 1) * hoursPerShift);
+          TableAct[(3+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
+          TableAct[(3+i),2].Text = $&quot;{begin}-{end}&quot;;            
+          TableAct[(3+i),3].Text = $&quot;Смена {i+1}&quot;;
+          TableAct[(3+i),6].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
+          TableAct[(3+i),7].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
+          TableAct[(3+i),9].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
+          TableAct[(3+i),10].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
+          TableAct[(3+i),12].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
+          TableAct[(3+i),13].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
+          TableAct[(3+i),14].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
+          TableAct[(3+i),15].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
+          TableAct[(3+i),16].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
+          TableAct[(3+i),17].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
+          TableAct[(3+i),18].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
+          TableAct[(3+i),19].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
+          TableAct[(3+i),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
+          TableAct[(3+i),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
+          TableAct[(3+i),22].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
+          TableAct[(3+i),23].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
+          TableAct[(3+i),24].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
+          TableAct[(3+i),25].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
+          TableAct[(3+i),26].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
         }
       }
          
@@ -203,9 +201,20 @@ namespace FastReport
         TableAct.PrintColumns();                                             
       }
     }      
-      
-      private void TableAdditionlInfo_ManualBuild(object sender, EventArgs e)
-      {
+    
+    private string FormatTime(double totalHours)
+    {
+      int hours = (int)totalHours;
+      int minutes = (int)((totalHours - hours) * 60);
+
+      if (hours == 24)
+        return &quot;24:00&quot;;
+
+      return $&quot;{hours:00}:{minutes:00}&quot;;
+    }
+    
+    private void TableAdditionlInfo_ManualBuild(object sender, EventArgs e)
+    {
       // Setup Last Column width
       TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
       
@@ -234,8 +243,8 @@ namespace FastReport
       }
       }
       
-      public void  DrawTableSigners()
-      {
+    public void  DrawTableSigners()
+    {
       if (Page.PaperWidth == 297)
       {
         if (Engine.FinalPass == true)
@@ -265,10 +274,10 @@ namespace FastReport
       
       if (!string.IsNullOrEmpty(Footer.LabMIDensity))
         LabMIDensity.Text = $&quot;*) заполняют при отказе поточного преобразователя плотности (определяют по {Footer.LabMIDensity})&quot;;
-      }  
+    }  
       
-      private void PageFooter_BeforeLayout(object sender, EventArgs e)
-      {
+    private void PageFooter_BeforeLayout(object sender, EventArgs e)
+    {
       if((Int32)Report.GetVariableValue(&quot;TotalPages&quot;) &lt; 2) 
       { 
         PageFooter.Visible = false; 
@@ -277,8 +286,8 @@ namespace FastReport
       {
         PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
       }
-      }
-      }    
+    }
+  }    
 }
 
 </ScriptText>
@@ -294,28 +303,28 @@ namespace FastReport
     <PageHeaderBand Name="PageHeader1" Width="718.2" Height="15.12">
       <TextObject Name="PageHeaderText" Width="708.75" Height="15.12" Text="PageHeaderText" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt" FontWidthRatio="0.9"/>
     </PageHeaderBand>
-    <ReportTitleBand Name="ReportTitle" Top="16.9" Width="718.2" Height="268.38" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportTitleBand Name="ReportTitle" Top="19.12" Width="718.2" Height="268.38" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableHeader" Width="708.04" Height="268.38">
         <TableColumn Name="Column1" Width="302.54"/>
         <TableColumn Name="Column2" Width="317.51"/>
         <TableColumn Name="Column274" Width="87.99"/>
         <TableRow Name="Row1" AutoSize="true">
-          <TableCell Name="ActNumberAndDate" Text="ActNumberAndDate" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
+          <TableCell Name="ActNumberAndDate" Text="ActNumberAndDate" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="3"/>
           <TableCell Name="Cell2" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 11pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1523" Padding="0, 0, 0, 0" Font="Arial, 11pt" FontWidthRatio="0.9"/>
         </TableRow>
         <TableRow Name="Row2" Height="20.79">
-          <TableCell Name="TextHelper1" Text="(для валовых объемов нефти)" Padding="0, 0, 0, 0" AllowExpressions="false" HorzAlign="Center" Font="Arial, 11pt, style=Italic" FontWidthRatio="0.9" ColSpan="3"/>
+          <TableCell Name="TextHelper1" Text="(для валовых объемов нефти)" Padding="0, 0, 0, 0" AllowExpressions="false" HorzAlign="Center" Font="Arial, 11pt, style=Italic" FontWidthRatio="0.85" ColSpan="3"/>
           <TableCell Name="Cell7" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 11pt" FontWidthRatio="0.9"/>
           <TableCell Name="Cell8" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 11pt" FontWidthRatio="0.9"/>
         </TableRow>
         <TableRow Name="Row199">
-          <TableCell Name="ActNumberAndDate_China" Text="ActNumberAndDate_China" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt, style=Bold" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="3"/>
+          <TableCell Name="ActNumberAndDate_China" Text="ActNumberAndDate_China" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 12pt, style=Bold" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="3"/>
           <TableCell Name="Cell1610" Padding="0, 0, 0, 0" Font="Arial, 11pt" FontWidthRatio="0.9"/>
           <TableCell Name="Cell1611" Padding="0, 0, 0, 0" Font="Arial, 11pt" FontWidthRatio="0.9"/>
         </TableRow>
         <TableRow Name="Row200" Height="20.79">
-          <TableCell Name="Cell1612" Text="(原油总量的格式) " Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 11pt, style=Italic" FontWidthRatio="0.9" ColSpan="3"/>
+          <TableCell Name="Cell1612" Text="(原油总量的格式) " Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 11pt, style=Italic" FontWidthRatio="0.85" ColSpan="3"/>
           <TableCell Name="Cell1616" Padding="0, 0, 0, 0" Font="Arial, 11pt" FontWidthRatio="0.9"/>
           <TableCell Name="Cell1617" Padding="0, 0, 0, 0" Font="Arial, 11pt" FontWidthRatio="0.9"/>
         </TableRow>
@@ -361,19 +370,19 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="287.06" Width="718.2" Height="549.88" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableAct" Top="9.45" Width="546.55" Height="522.48" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
+    <DataBand Name="DataBandTableAct" Top="291.5" Width="718.2" Height="549.88" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableAct" Top="9.45" Width="546.55" Height="541.38" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="253.17"/>
         <TableColumn Name="Column282" Width="104.38"/>
         <TableColumn Name="Column8" Width="56.7"/>
         <TableColumn Name="ColumnTemplate"/>
         <TableColumn Name="ColumnResult"/>
         <TableRow Name="Row88" Height="17.95">
-          <TableCell Name="Cell702" Border.Lines="All" Text="Показатели&#13;&#10;指 标" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1" ColSpan="2" RowSpan="3"/>
+          <TableCell Name="Cell702" Border.Lines="All" Text="Показатели&#13;&#10;指 标" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1" ColSpan="2" RowSpan="4"/>
           <TableCell Name="Cell1622" Font="Arial, 10pt" FontWidthRatio="0.9"/>
-          <TableCell Name="Cell703" Border.Lines="All" Text="ед. изм.&#13;&#10;计量单位" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1" RowSpan="3"/>
+          <TableCell Name="Cell703" Border.Lines="All" Text="ед. изм.&#13;&#10;计量单位" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1" RowSpan="4"/>
           <TableCell Name="Cell710" Border.Lines="All" Text="Дата, смена 日期和班次" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1"/>
-          <TableCell Name="Cell1582" Border.Lines="Bottom" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" FontWidthRatio="0.9" FirstTabOffset="1" RowSpan="3"/>
+          <TableCell Name="Cell1582" Border.Lines="Bottom" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 11pt" FontWidthRatio="0.9" FirstTabOffset="1" RowSpan="4"/>
         </TableRow>
         <TableRow Name="Row197">
           <TableCell Name="Cell1572" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1"/>
@@ -381,6 +390,13 @@ namespace FastReport
           <TableCell Name="Cell1573" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1"/>
           <TableCell Name="date" Border.Lines="Left, Right, Top" Text="Дата акта" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" FirstTabOffset="1"/>
           <TableCell Name="Cell1583" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 11pt" FontWidthRatio="0.9" FirstTabOffset="1"/>
+        </TableRow>
+        <TableRow Name="Row203">
+          <TableCell Name="Cell1654" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1655" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1656" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1657" Border.Lines="Right" Text="Время смены" HorzAlign="Center" VertAlign="Center" WordWrap="false" Font="Arial, 9pt" FontWidthRatio="0.9"/>
+          <TableCell Name="Cell1658" Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row202">
           <TableCell Name="Cell1649" Font="Arial, 10pt"/>
@@ -552,7 +568,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="838.71" Width="718.2" Height="37.8" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="845.38" Width="718.2" Height="37.8" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Width="657.72" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="657.72"/>
         <TableRow Name="Row195">
@@ -563,7 +579,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="878.29" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="887.18" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="658.5" Height="88.83" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="74.98"/>
         <TableColumn Name="Column5" Width="94.27"/>
@@ -615,7 +631,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="995.36" Width="718.2" Height="18.9" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1006.47" Width="718.2" Height="18.9" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Top="-1.89" Width="217.35" Height="18.9" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

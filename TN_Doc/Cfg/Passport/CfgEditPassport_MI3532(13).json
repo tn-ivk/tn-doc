@@ -546,8 +546,8 @@
       "Use": true,
       "Key": "Passport.PassportID",
       "Type": "text",
-      "RequiredFill": false,
-      "Name": "Номер паспорта"
+      "Name": "Номер паспорта",
+      "RequiredFill": true
     },
     {
       "Id": 1,
@@ -557,7 +557,6 @@
       "ElisAlias": [
         "pointDeliveryName"
       ],
-      "RequiredFill": true,
       "Type": "text",
       "Name": "Пункт приема сдачи нефти"
     },
@@ -594,6 +593,10 @@
       "Id": 5,
       "Use": true,
       "Key": "Laboratory_Post",
+      "KeyELIS": "chiefLabPosition",
+      "ElisAlias": [
+        "chiefLabPosition"
+      ],
       "Type": "text",
       "Name": "Представитель испытательной лаборатории (должность)"
     },
@@ -601,6 +604,10 @@
       "Id": 6,
       "Use": true,
       "Key": "Laboratory_Factory",
+      "KeyELIS": "chiefLabOrganization",
+      "ElisAlias": [
+        "chiefLabOrganization"
+      ],
       "Type": "text",
       "Name": "Представитель испытательной лаборатории (предприятие)"
     },

@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Extensions.Logging;
 using TN_Doc.Extensions;
 using TN.Doc;
 
@@ -34,13 +36,18 @@ namespace TN_Doc
 			services.ConfigAppDirectory();
 #endif
 			services.AddAppInfoProvider();
-			services.AddDirectoryService(Configuration);
 			services.AddPrinters();
 			services.AddPrinterService();
 			services.AddControllersWithViews();
 			services.AddDbContext<DocGeneral>();
-			services.AddLogging(builder => 
-				builder.AddConsole());
+			services.AddLogging(builder =>
+			{
+				var logLevel = Configuration.GetValue<string>("Logging:LogLevel:Default");
+				LogManager.Configuration.Variables["logLevel"] = logLevel;
+				builder.ClearProviders();
+				builder.AddNLog();
+			});
+			
 		}
 
 		// This method gets called by the runtime. Use this method to configure

@@ -1,7 +1,7 @@
 using System;
-using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using NLog;
 
 namespace TN_Doc
 {
@@ -13,16 +13,20 @@ namespace TN_Doc
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            var logger = LogManager.GetCurrentClassLogger();
             try
-            { 
-                CreateHostBuilder(args).Build().Run(); 
-            }
-            catch (Exception e)
             {
-                Console.WriteLine(e);
-                File.WriteAllText(Path.Combine(AppContext.BaseDirectory,"logs","startup_fail.log"),e.ToString());
+                logger.Info("Инициализация приложения");
+                CreateHostBuilder(args).Build().Run();
             }
-         
+            catch (Exception ex)
+            {
+                logger.Error($"Приложение завершено в связи с критической ошибкой: {ex.Message}");
+            }
+            finally
+            {
+                logger.Info("Стоп приложения");
+            }
         }
 
         /// <summary>
