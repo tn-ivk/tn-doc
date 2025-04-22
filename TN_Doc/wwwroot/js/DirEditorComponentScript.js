@@ -543,28 +543,12 @@ function _validateEditCell(cell, type) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Поле не может быть пустым');
-            try {
-                $(input).tooltip('open');
-            } catch (e) {
-                $(input).tooltip({
-                    content: 'Поле не может быть пустым',
-                    position: { my: 'left+15 center', at: 'right center', of: input },
-                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
-                }).tooltip('open');
-            }
+            updateTooltip(input);
         } else if (value.length > 100) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Превышена максимальная длина (100 символов)');
-            try {
-                $(input).tooltip('open');
-            } catch (e) {
-                $(input).tooltip({
-                    content: 'Превышена максимальная длина (100 символов)',
-                    position: { my: 'left+15 center', at: 'right center', of: input },
-                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
-                }).tooltip('open');
-            }
+            updateTooltip(input);
         } else {
             const invalidChars = GetInvalideChars();
             for (let char of invalidChars) {
@@ -572,17 +556,14 @@ function _validateEditCell(cell, type) {
                     isValid = false;
                     $(input).addClass('invalid-cell-content')
                            .attr('title', `Некорректный символ: ${char}`);
-                    try {
-                        $(input).tooltip('open');
-                    } catch (e) {
-                        $(input).tooltip({
-                            content: `Некорректный символ: ${char}`,
-                            position: { my: 'left+15 center', at: 'right center', of: input },
-                            classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
-                        }).tooltip('open');
-                    }
+                    updateTooltip(input);
                     break;
                 }
+            }
+            if (isValid) {
+                $(input).removeClass('invalid-cell-content')
+                       .removeAttr('title');
+                updateTooltip(input);
             }
         }
     } else if (type === 'number') {
@@ -590,15 +571,11 @@ function _validateEditCell(cell, type) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Введите числовое значение');
-            try {
-                $(input).tooltip('open');
-            } catch (e) {
-                $(input).tooltip({
-                    content: 'Введите числовое значение',
-                    position: { my: 'left+15 center', at: 'right center', of: input },
-                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
-                }).tooltip('open');
-            }
+            updateTooltip(input);
+        } else {
+            $(input).removeClass('invalid-cell-content')
+                   .removeAttr('title');
+            updateTooltip(input);
         }
     } else if (type === 'email') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -606,15 +583,11 @@ function _validateEditCell(cell, type) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Введите корректный email адрес');
-            try {
-                $(input).tooltip('open');
-            } catch (e) {
-                $(input).tooltip({
-                    content: 'Введите корректный email адрес',
-                    position: { my: 'left+15 center', at: 'right center', of: input },
-                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
-                }).tooltip('open');
-            }
+            updateTooltip(input);
+        } else {
+            $(input).removeClass('invalid-cell-content')
+                   .removeAttr('title');
+            updateTooltip(input);
         }
     }
     
@@ -1773,3 +1746,24 @@ function _initTooltips() {
         });
     });
 }
+
+function updateTooltip(input) {
+    if (input.classList.contains('invalid-cell-content')) {
+        try {
+            $(input).tooltip('open');
+        } catch (e) {
+            $(input).tooltip({
+                content: input.getAttribute('title'),
+                position: { my: 'left+15 center', at: 'right center', of: input },
+                classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+            }).tooltip('open');
+        }
+    } else {
+        try {
+            $(input).tooltip('close');
+        } catch (e) {
+            // Игнорируем ошибку, если tooltip еще не инициализирован
+        }
+    }
+}
+
