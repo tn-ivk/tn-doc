@@ -532,18 +532,36 @@ function _validateEditCell(cell, type) {
     switch (type) {
         case 'text':
             let text = cell.childNodes[0].value;
-            if (!text) cell.classList.add('invalid-cell-content');
+            if (!text) {
+                cell.classList.add('invalid-cell-content');
+                return false;
+            }
+            
+            // Получаем список некорректных символов для текущего устройства
+            let invalidChars = GetInvalideChars();
+            if (invalidChars && invalidChars.length > 0) {
+                for (let char of invalidChars) {
+                    if (text.includes(char)) {
+                        cell.classList.add('invalid-cell-content');
+                        cell.setAttribute('title', `Некорректный символ: ${char}`);
+                        return false;
+                    }
+                }
+            }
             break;
+            
         case 'date':
             let date = cell.childNodes[0].value;
             if (!date) cell.classList.add('invalid-cell-content');
             break;
+            
         case 'number':
             let num = cell.childNodes[0].value;
             if (!num) cell.classList.add('invalid-cell-content');
             break;
     }
 
+    return true;
 }
 
 /*
@@ -1575,3 +1593,67 @@ function _enableOtherRowsInTable(table, ignoredId) {
 /**********************************************/
 /*************Хелперы*************************/
 /**********************************************/
+
+function GetInvalideChars() {
+    let chars = [];
+    $.ajax({
+        async: false,
+        url: '/Home/GetInvalideChars',
+        type: 'GET',
+        data: {
+            IdDevice: $('#ComboboxDevice').val()
+        },
+        success: function(data) {
+            if (data) {
+                chars = JSON.parse(data);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Ошибка при получении списка некорректных символов:', error);
+        }
+    });
+    return chars;
+}
+
+function TestValidation() {
+    console.log('Начало тестирования валидации...');
+    
+    // Проверяем наличие комбобокса
+    const deviceCombo = $('#ComboboxDevice');
+    if (!deviceCombo.length) {
+        console.error('Элемент ComboboxDevice не найден');
+        return;
+    }
+    console.log('ID устройства:', deviceCombo.val());
+    
+    // Получаем список некорректных символов
+    const invalidChars = GetInvalideChars();
+    console.log('Получены некорректные символы:', invalidChars);
+    
+    // Находим все текстовые поля
+    const textFields = document.querySelectorAll('td input[type="text"]');
+    console.log('Найдено текстовых полей:', textFields.length);
+    
+    // Тестируем валидацию на каждом поле
+    textFields.forEach((field, index) => {
+        console.log(`Тестирование поля ${index + 1}:`);
+        
+        // Тест 1: Пустое значение
+        field.value = '';
+        _validateEditCell(field.parentElement, 'text');
+        console.log('- Пустое значение:', field.parentElement.classList.contains('invalid-cell-content'));
+        
+        // Тест 2: Значение с некорректным символом
+        if (invalidChars && invalidChars.length > 0) {
+            field.value = `Тест${invalidChars[0]}текст`;
+            _validateEditCell(field.parentElement, 'text');
+            console.log('- Некорректный символ:', field.parentElement.classList.contains('invalid-cell-content'));
+            console.log('- Подсказка:', field.parentElement.getAttribute('title'));
+        }
+        
+        // Тест 3: Корректное значение
+        field.value = 'Тестовый текст';
+        _validateEditCell(field.parentElement, 'text');
+        console.log('- Корректное значение:', !field.parentElement.classList.contains('invalid-cell-content'));
+    });
+}
