@@ -594,6 +594,26 @@ function _validateEditCell(cell, type) {
     return isValid;
 }
 
+function updateTooltip(input) {
+    if (input.classList.contains('invalid-cell-content')) {
+        try {
+            $(input).tooltip('open');
+        } catch (e) {
+            $(input).tooltip({
+                content: input.getAttribute('title'),
+                position: { my: 'left+15 center', at: 'right center', of: input },
+                classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+            }).tooltip('open');
+        }
+    } else {
+        try {
+            $(input).tooltip('close');
+        } catch (e) {
+            // Игнорируем ошибку, если tooltip еще не инициализирован
+        }
+    }
+}
+
 /*
     Добавляем обработчики для валидации в реальном времени
 */
@@ -1745,25 +1765,5 @@ function _initTooltips() {
             classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
         });
     });
-}
-
-function updateTooltip(input) {
-    if (input.classList.contains('invalid-cell-content')) {
-        try {
-            $(input).tooltip('open');
-        } catch (e) {
-            $(input).tooltip({
-                content: input.getAttribute('title'),
-                position: { my: 'left+15 center', at: 'right center', of: input },
-                classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
-            }).tooltip('open');
-        }
-    } else {
-        try {
-            $(input).tooltip('close');
-        } catch (e) {
-            // Игнорируем ошибку, если tooltip еще не инициализирован
-        }
-    }
 }
 
