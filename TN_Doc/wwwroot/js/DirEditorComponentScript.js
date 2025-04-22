@@ -3,6 +3,8 @@ let qpCfgsDictionaries
 let dictFetchOptions;
 let hashCodeLoadedCodeDict;
 let hashCodeLoadedQpConfigs;
+let cachedInvalidChars = null; // Кэш для недопустимых символов
+let lastDeviceId = null; // ID последнего устройства
 
 /*
     Инициализация компонента "Редактора справочника"
@@ -25,6 +27,7 @@ function InitDirEditorComponent() {
     _renderQpConfigs();
     _addSaveButtonHandler();
     _addCloseButtonWindowHandler();
+    _initTooltips();
     /*end*/
 }
 
@@ -521,66 +524,137 @@ function _validateEditRow(row, rowMap) {
    Валидация значение ячеек таблицы 
 */
 function _validateEditCell(cell, type) {
-    if (!type || !cell) return false;
-
-    const inputElement = cell.querySelector('input, select');
-    if (!inputElement) {
-        console.log('Валидация: input/select элемент не найден в ячейке', cell);
-        return false;
+    const input = cell.querySelector('input, select');
+    if (!input) return true;
+    
+    let isValid = true;
+    const value = input.value.trim();
+    
+    // Удаляем предыдущие стили и подсказки
+    $(input).removeClass('invalid-cell-content');
+    try {
+        $(input).tooltip('close');
+    } catch (e) {
+        // Игнорируем ошибку, если tooltip еще не инициализирован
     }
-
-    console.log('Валидация: проверка элемента', inputElement, 'тип:', type);
-
-    if (inputElement.classList.contains('invalid-cell-content')) {
-        inputElement.classList.remove('invalid-cell-content');
-        console.log('Валидация: удален класс invalid-cell-content');
-    }
-
-    switch (type) {
-        case 'text':
-            let text = inputElement.value;
-            console.log('Валидация текста:', text);
-            if (!text) {
-                inputElement.classList.add('invalid-cell-content');
-                console.log('Валидация: добавлен класс invalid-cell-content (пустое значение)');
-                return false;
+    
+    if (type === 'text') {
+        if (value === '') {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Поле не может быть пустым');
+            try {
+                $(input).tooltip('open');
+            } catch (e) {
+                $(input).tooltip({
+                    content: 'Поле не может быть пустым',
+                    position: { my: 'left+15 center', at: 'right center', of: input },
+                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+                }).tooltip('open');
             }
-            
-            // Получаем список некорректных символов для текущего устройства
-            let invalidChars = GetInvalideChars();
-            console.log('Валидация: получены некорректные символы:', invalidChars);
-            if (invalidChars && invalidChars.length > 0) {
-                for (let char of invalidChars) {
-                    if (text.includes(char)) {
-                        inputElement.classList.add('invalid-cell-content');
-                        inputElement.setAttribute('title', `Некорректный символ: ${char}`);
-                        console.log('Валидация: добавлен класс invalid-cell-content (некорректный символ:', char, ')');
-                        return false;
+        } else if (value.length > 100) {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Превышена максимальная длина (100 символов)');
+            try {
+                $(input).tooltip('open');
+            } catch (e) {
+                $(input).tooltip({
+                    content: 'Превышена максимальная длина (100 символов)',
+                    position: { my: 'left+15 center', at: 'right center', of: input },
+                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+                }).tooltip('open');
+            }
+        } else {
+            const invalidChars = GetInvalideChars();
+            for (let char of invalidChars) {
+                if (value.includes(char)) {
+                    isValid = false;
+                    $(input).addClass('invalid-cell-content')
+                           .attr('title', `Некорректный символ: ${char}`);
+                    try {
+                        $(input).tooltip('open');
+                    } catch (e) {
+                        $(input).tooltip({
+                            content: `Некорректный символ: ${char}`,
+                            position: { my: 'left+15 center', at: 'right center', of: input },
+                            classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+                        }).tooltip('open');
                     }
+                    break;
                 }
             }
-            break;
-            
-        case 'date':
-            let date = inputElement.value;
-            console.log('Валидация даты:', date);
-            if (!date) {
-                inputElement.classList.add('invalid-cell-content');
-                console.log('Валидация: добавлен класс invalid-cell-content (пустая дата)');
+        }
+    } else if (type === 'number') {
+        if (!/^\d+$/.test(value)) {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Введите числовое значение');
+            try {
+                $(input).tooltip('open');
+            } catch (e) {
+                $(input).tooltip({
+                    content: 'Введите числовое значение',
+                    position: { my: 'left+15 center', at: 'right center', of: input },
+                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+                }).tooltip('open');
             }
-            break;
-            
-        case 'number':
-            let num = inputElement.value;
-            console.log('Валидация числа:', num);
-            if (!num) {
-                inputElement.classList.add('invalid-cell-content');
-                console.log('Валидация: добавлен класс invalid-cell-content (пустое число)');
+        }
+    } else if (type === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Введите корректный email адрес');
+            try {
+                $(input).tooltip('open');
+            } catch (e) {
+                $(input).tooltip({
+                    content: 'Введите корректный email адрес',
+                    position: { my: 'left+15 center', at: 'right center', of: input },
+                    classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+                }).tooltip('open');
             }
-            break;
+        }
     }
+    
+    return isValid;
+}
 
-    return true;
+/*
+    Добавляем обработчики для валидации в реальном времени
+*/
+function _addValidationHandlers(row) {
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        // Валидация при потере фокуса
+        input.addEventListener('blur', function() {
+            const cell = this.closest('td');
+            const rowMap = {
+                0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 
+                5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 
+                9: 'bool', 10: 'bool', 11: 'ignore'
+            };
+            const cellIndex = Array.from(cell.parentElement.children).indexOf(cell);
+            _validateEditCell(cell, rowMap[cellIndex]);
+        });
+
+        // Валидация при вводе (с задержкой)
+        let timeout;
+        input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                const cell = this.closest('td');
+                const rowMap = {
+                    0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 
+                    5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 
+                    9: 'bool', 10: 'bool', 11: 'ignore'
+                };
+                const cellIndex = Array.from(cell.parentElement.children).indexOf(cell);
+                _validateEditCell(cell, rowMap[cellIndex]);
+            }, 500);
+        });
+    });
 }
 
 /*
@@ -602,6 +676,8 @@ function _convertEditRowToStableRow(row, rowMap, isPassportTable) {
     for (let i = 0; i < cells.length; i++) {
         _convertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, qpMethodsArray, qpParametersArray);
     }
+    // Добавляем обработчики валидации
+    _addValidationHandlers(row);
 }
 
 /*
@@ -684,11 +760,12 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
     @param rowMap -  карта строки
 */
 function _convertStableRowToEditRow(row, rowMap) {
-
     let cells = row.querySelectorAll('td');
     for (let i = 0; i < cells.length; i++) {
         _convertStableCellToEditCell(cells[i], rowMap[i])
     }
+    // Добавляем обработчики валидации
+    _addValidationHandlers(row);
 }
 
 /*
@@ -799,8 +876,6 @@ function _convertStableCellToEditCell(cell, type) {
         default:
             break
     }
-
-
 }
 
 /*
@@ -1614,24 +1689,31 @@ function _enableOtherRowsInTable(table, ignoredId) {
 /**********************************************/
 
 function GetInvalideChars() {
-    let chars = [];
-    $.ajax({
-        async: false,
-        url: '/Home/GetInvalideChars',
-        type: 'GET',
-        data: {
-            IdDevice: $('#ComboboxDevice').val()
-        },
-        success: function(data) {
-            if (data) {
-                chars = JSON.parse(data);
+    const currentDeviceId = $('#ComboboxDevice').val();
+    
+    // Если ID устройства изменился или кэш пуст, обновляем кэш
+    if (currentDeviceId !== lastDeviceId || cachedInvalidChars === null) {
+        $.ajax({
+            async: false,
+            url: '/Home/GetInvalideChars',
+            type: 'GET',
+            data: {
+                IdDevice: currentDeviceId
+            },
+            success: function(data) {
+                if (data) {
+                    cachedInvalidChars = JSON.parse(data);
+                    lastDeviceId = currentDeviceId;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Ошибка при получении списка некорректных символов:', error);
+                cachedInvalidChars = [];
             }
-        },
-        error: function(xhr, status, error) {
-            console.error('Ошибка при получении списка некорректных символов:', error);
-        }
-    });
-    return chars;
+        });
+    }
+    
+    return cachedInvalidChars || [];
 }
 
 function TestValidation() {
@@ -1674,5 +1756,20 @@ function TestValidation() {
         field.value = 'Тестовый текст';
         _validateEditCell(field.parentElement, 'text');
         console.log('- Корректное значение:', !field.parentElement.classList.contains('invalid-cell-content'));
+    });
+}
+
+function _initTooltips() {
+    $('.dir-editor-table input, .dir-editor-table select').each(function() {
+        try {
+            $(this).tooltip('destroy');
+        } catch (e) {
+            // Игнорируем ошибку, если tooltip еще не инициализирован
+        }
+        
+        $(this).tooltip({
+            position: { my: 'left+15 center', at: 'right center', of: this },
+            classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+        });
     });
 }
