@@ -512,11 +512,15 @@ function _applyUserChanges(rowItem, itemId) {
     Валидация строки таблицы
 */
 function _validateEditRow(row, rowMap) {
+    console.log('Валидация строки:', row);
     let cells = row.querySelectorAll('td')
     for (let i = 0; i < cells.length; i++) {
         _validateEditCell(cells[i], rowMap[i]);
     }
-    return row.querySelectorAll('td.invalid-cell-content').length === 0;
+    // Проверяем наличие класса invalid-cell-content у элементов ввода, а не у ячеек таблицы
+    const invalidElements = row.querySelectorAll('td input.invalid-cell-content, td select.invalid-cell-content');
+    console.log('Найдено элементов с классом invalid-cell-content:', invalidElements.length);
+    return invalidElements.length === 0;
 }
 
 /*
@@ -525,25 +529,38 @@ function _validateEditRow(row, rowMap) {
 function _validateEditCell(cell, type) {
     if (!type || !cell) return false;
 
-    if (cell.classList.contains('invalid-cell-content')) {
-        cell.classList.remove('invalid-cell-content')
+    const inputElement = cell.querySelector('input, select');
+    if (!inputElement) {
+        console.log('Валидация: input/select элемент не найден в ячейке', cell);
+        return false;
+    }
+
+    console.log('Валидация: проверка элемента', inputElement, 'тип:', type);
+
+    if (inputElement.classList.contains('invalid-cell-content')) {
+        inputElement.classList.remove('invalid-cell-content');
+        console.log('Валидация: удален класс invalid-cell-content');
     }
 
     switch (type) {
         case 'text':
-            let text = cell.childNodes[0].value;
+            let text = inputElement.value;
+            console.log('Валидация текста:', text);
             if (!text) {
-                cell.classList.add('invalid-cell-content');
+                inputElement.classList.add('invalid-cell-content');
+                console.log('Валидация: добавлен класс invalid-cell-content (пустое значение)');
                 return false;
             }
             
             // Получаем список некорректных символов для текущего устройства
             let invalidChars = GetInvalideChars();
+            console.log('Валидация: получены некорректные символы:', invalidChars);
             if (invalidChars && invalidChars.length > 0) {
                 for (let char of invalidChars) {
                     if (text.includes(char)) {
-                        cell.classList.add('invalid-cell-content');
-                        cell.setAttribute('title', `Некорректный символ: ${char}`);
+                        inputElement.classList.add('invalid-cell-content');
+                        inputElement.setAttribute('title', `Некорректный символ: ${char}`);
+                        console.log('Валидация: добавлен класс invalid-cell-content (некорректный символ:', char, ')');
                         return false;
                     }
                 }
@@ -551,13 +568,21 @@ function _validateEditCell(cell, type) {
             break;
             
         case 'date':
-            let date = cell.childNodes[0].value;
-            if (!date) cell.classList.add('invalid-cell-content');
+            let date = inputElement.value;
+            console.log('Валидация даты:', date);
+            if (!date) {
+                inputElement.classList.add('invalid-cell-content');
+                console.log('Валидация: добавлен класс invalid-cell-content (пустая дата)');
+            }
             break;
             
         case 'number':
-            let num = cell.childNodes[0].value;
-            if (!num) cell.classList.add('invalid-cell-content');
+            let num = inputElement.value;
+            console.log('Валидация числа:', num);
+            if (!num) {
+                inputElement.classList.add('invalid-cell-content');
+                console.log('Валидация: добавлен класс invalid-cell-content (пустое число)');
+            }
             break;
     }
 

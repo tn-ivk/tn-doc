@@ -177,9 +177,16 @@ input[type=number] {
 }
 
 .invalid-cell-content {
-    outline: 2px solid red;
-    outline-offset: -2px;
+    outline: 2px solid red !important;
+    outline-offset: -2px !important;
     /*border: 1px solid red;*/
+}
+
+input.invalid-cell-content,
+select.invalid-cell-content {
+    border: 2px solid red !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px red !important;
 }
 
 .table-container {
