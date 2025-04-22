@@ -379,7 +379,7 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
 */
 function _editSelectedUser(itemBtn, rowItem, itemId) {
     let rowMap = {
-        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic',  8: 'bool',9: 'bool',10: 'bool' ,11: 'ignore'
+        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable') {
@@ -394,13 +394,7 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
-        rowMap[4] = "ignore";
-        rowMap[5] = "ignore";
-        rowMap[6] = "ignore";
         if (!_validateEditRow(rowItem, rowMap)) return;
-        rowMap[4] = "text";
-        rowMap[5] = "text";
-        rowMap[6] = "text";
         _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
         _convertEditRowToStableRow(rowItem, rowMap, false)
         RemoveClassToElement('.table-bottom-menu', 'disabled-item')
