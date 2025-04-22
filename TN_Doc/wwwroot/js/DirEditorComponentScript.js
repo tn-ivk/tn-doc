@@ -533,7 +533,7 @@ function _validateEditCell(cell, type) {
     // Удаляем предыдущие стили и подсказки
     $(input).removeClass('invalid-cell-content');
     try {
-        $(input).tooltip('close');
+        $(input).tooltip('destroy');
     } catch (e) {
         // Игнорируем ошибку, если tooltip еще не инициализирован
     }
@@ -543,12 +543,12 @@ function _validateEditCell(cell, type) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Поле не может быть пустым');
-            updateTooltip(input);
+            initTooltip(input);
         } else if (value.length > 100) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Превышена максимальная длина (100 символов)');
-            updateTooltip(input);
+            initTooltip(input);
         } else {
             const invalidChars = GetInvalideChars();
             for (let char of invalidChars) {
@@ -556,14 +556,18 @@ function _validateEditCell(cell, type) {
                     isValid = false;
                     $(input).addClass('invalid-cell-content')
                            .attr('title', `Некорректный символ: ${char}`);
-                    updateTooltip(input);
+                    initTooltip(input);
                     break;
                 }
             }
             if (isValid) {
                 $(input).removeClass('invalid-cell-content')
                        .removeAttr('title');
-                updateTooltip(input);
+                try {
+                    $(input).tooltip('destroy');
+                } catch (e) {
+                    // Игнорируем ошибку
+                }
             }
         }
     } else if (type === 'number') {
@@ -571,11 +575,15 @@ function _validateEditCell(cell, type) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Введите числовое значение');
-            updateTooltip(input);
+            initTooltip(input);
         } else {
             $(input).removeClass('invalid-cell-content')
                    .removeAttr('title');
-            updateTooltip(input);
+            try {
+                $(input).tooltip('destroy');
+            } catch (e) {
+                // Игнорируем ошибку
+            }
         }
     } else if (type === 'email') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -583,35 +591,41 @@ function _validateEditCell(cell, type) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Введите корректный email адрес');
-            updateTooltip(input);
+            initTooltip(input);
         } else {
             $(input).removeClass('invalid-cell-content')
                    .removeAttr('title');
-            updateTooltip(input);
+            try {
+                $(input).tooltip('destroy');
+            } catch (e) {
+                // Игнорируем ошибку
+            }
         }
     }
     
     return isValid;
 }
 
-function updateTooltip(input) {
-    if (input.classList.contains('invalid-cell-content')) {
-        try {
-            $(input).tooltip('open');
-        } catch (e) {
-            $(input).tooltip({
-                content: input.getAttribute('title'),
-                position: { my: 'left+15 center', at: 'right center', of: input },
-                classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
-            }).tooltip('open');
-        }
-    } else {
-        try {
-            $(input).tooltip('close');
-        } catch (e) {
-            // Игнорируем ошибку, если tooltip еще не инициализирован
-        }
+function initTooltip(input) {
+    try {
+        $(input).tooltip('destroy');
+    } catch (e) {
+        // Игнорируем ошибку
     }
+    
+    $(input).tooltip({
+        content: input.getAttribute('title'),
+        position: { my: 'left+15 center', at: 'right center', of: input },
+        classes: { 'ui-tooltip': 'tooltip-inner bg-danger' },
+        show: { effect: 'fade', duration: 200 },
+        hide: { effect: 'fade', duration: 200 },
+        open: function(event, ui) {
+            // Подсказка будет показываться только при наведении
+            if (!$(this).is(':hover')) {
+                $(this).tooltip('close');
+            }
+        }
+    });
 }
 
 /*
