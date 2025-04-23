@@ -406,6 +406,8 @@ function _createCancelEditButton(faClass, buttonClass, margin) {
             _cancelEditUser(rowItem, itemId);
         } else if (rowItem.closest('.licences-table')) {
             _cancelEditLicence(rowItem, itemId);
+        } else if (rowItem.closest('.qp-method-table')) {
+            _cancelEditQpMethod(rowItem, itemId);
         }
     });
     return btn
@@ -910,6 +912,11 @@ function _addValidationHandlers(row) {
         } else if (row.closest('.licences-table')) {
             rowMap = {
                 0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
+            };
+        } else if (row.closest('.qp-method-table')) {
+            rowMap = {
+                0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 
+                4: 'number', 5: 'text', 6: 'ignore'
             };
         } else {
             return; // Если таблица не распознана, выходим
@@ -1652,8 +1659,12 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
         _addCellStyle(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
         let actionCell = document.createElement('td');
-        actionCell.appendChild(_createEditQpMethodsBtn('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-methods-btn', '5px'));
-        actionCell.appendChild(_createDeleteQpMethodsBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px'));
+        let editDivElement = document.createElement('div');
+        editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
+        let deleteDivElement = document.createElement('div');
+        deleteDivElement.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+        actionCell.appendChild(editDivElement);
+        actionCell.appendChild(deleteDivElement);
         _addCellStyle(actionCell);
         row.appendChild(actionCell)
         methodsTable.appendChild(row);
@@ -1666,10 +1677,19 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
 */
 function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
-    btn.addEventListener('click', _deleteQpMethodsBtnHandler)
-    let div = document.createElement('div')
-    div.appendChild(btn);
-    return div;
+    btn.classList.add('delete-btn');
+    btn.addEventListener('click', function(e) {
+        let row = e.target.closest('tr');
+        if (!row) return;
+        let table = row.closest('table');
+        if (!table) return;
+        let qpId = Number(table.dataset.qpId);
+        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries["QpsInfo"][qpId]['Methods'].filter(function (item) {
+            return item["Id"] !== Number(row.dataset.id);
+        });
+        row.remove();
+    });
+    return btn;
 }
 
 /*
@@ -1678,10 +1698,32 @@ function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
 function _createEditQpMethodsBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.dataset.mode = 'stable';
-    let div = document.createElement('div');
-    btn.addEventListener('click', _editQpMethodBtnHandler)
-    div.appendChild(btn);
-    return div;
+    btn.classList.add('edit-methods-btn');
+    
+    // Обновляем иконку в зависимости от режима
+    const updateIcon = () => {
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = 'fa';
+            icon.classList.add(btn.dataset.mode === 'stable' ? 'fa-lock' : 'fa-unlock');
+        }
+    };
+    
+    // Обновляем иконку при изменении режима
+    const observer = new MutationObserver(updateIcon);
+    observer.observe(btn, { attributes: true, attributeFilter: ['data-mode'] });
+    
+    btn.addEventListener('click', function(e) {
+        let item = e.target.tagName === 'I' ? e.target.closest('button') : e.target;
+        let row = item.closest('tr');
+        if (!row) return;
+        _editQpMethod(row, item);
+    });
+    
+    // Инициализируем иконку
+    updateIcon();
+    
+    return btn;
 }
 
 
@@ -1708,6 +1750,15 @@ function _deleteQpMethodsBtnHandler(event) {
 function _editQpMethodBtnHandler(event) {
     let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
     let row = item.closest('tr');
+    if (!row) return;
+    
+    // Если это кнопка отмены, вызываем соответствующую функцию
+    if (item.classList.contains('cancel-edit-btn')) {
+        _cancelEditQpMethod(row, Number(row.dataset.id));
+        return;
+    }
+    
+    // В противном случае обрабатываем как обычное редактирование
     _editQpMethod(row, item);
 }
 
@@ -1717,32 +1768,189 @@ function _editQpMethodBtnHandler(event) {
     @param itemBtn - кнопка редактирования в строке
 */
 function _editQpMethod(row, itemBtn) {
+    if (!row || !itemBtn) return;
+    
     let rowMap = {
         0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable') {
-        _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+        // Сохраняем предыдущие значения перед редактированием
+        row.dataset.previousState = JSON.stringify(_getCurrentQpMethodState(row));
+        
+        // Отключаем другие элементы
         AddClassToElement('#qp-list', 'disabled-item');
         AddClassToElement('.modal-header', 'disabled-item');
         AddClassToElement('.save-btn', 'disabled-item');
         AddClassToElement('row', 'disabled-item');
         AddClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
+        
+        // Отключаем другие строки
         _disableOtherRowsInTable(itemBtn.closest('table'), Number(row.dataset.id));
+        
+        // Преобразуем строку в режим редактирования
         _convertStableRowToEditRow(row, rowMap);
+        
+        // Добавляем обработчики валидации в реальном времени
+        _addValidationHandlers(row);
+        
+        // Меняем кнопки
+        let actionCell = row.querySelector('td:last-child');
+        if (!actionCell) return;
+        
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        if (editDiv && deleteDiv) {
+            // Удаляем текущие кнопки
+            editDiv.innerHTML = '';
+            deleteDiv.innerHTML = '';
+            
+            // Добавляем кнопки редактирования
+            let editBtn = _createEditQpMethodsBtn('fa-unlock', 'btn-outline-primary', 'me-1');
+            editBtn.dataset.mode = 'edit';
+            editDiv.appendChild(editBtn);
+            
+            let cancelBtn = _createCancelEditButton('fa-times', 'btn-outline-danger', '');
+            deleteDiv.appendChild(cancelBtn);
+        }
+        
         itemBtn.dataset.mode = 'edit';
-    } else {
+    } else if (itemBtn.dataset.mode === 'edit') {
         if (!_validateEditRow(row, rowMap)) return;
-        _convertEditRowToStableRow(row, rowMap, true)
-        _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
+        
+        // Применяем изменения
+        _applyQpMethodsChanged(row, Number(row.dataset.id), Number(itemBtn.closest('table').dataset.qpId));
+        _convertEditRowToStableRow(row, rowMap, true);
+        
+        // Удаляем сохраненное предыдущее состояние
+        delete row.dataset.previousState;
+        
+        // Включаем все элементы
         RemoveClassToElement('#qp-list', 'disabled-item');
         RemoveClassToElement('.modal-header', 'disabled-item');
         RemoveClassToElement('.save-btn', 'disabled-item');
         RemoveClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
-        _enableOtherRowsInTable(itemBtn.closest('table'), Number(itemBtn.closest('tr').dataset.id));
-        _applyQpMethodsChanged(row, Number(row.dataset.id), Number(itemBtn.closest('table').dataset.qpId));
+        
+        // Включаем другие строки
+        _enableOtherRowsInTable(itemBtn.closest('table'), Number(row.dataset.id));
+        
+        // Меняем кнопки обратно
+        let actionCell = row.querySelector('td:last-child');
+        if (!actionCell) return;
+        
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        if (editDiv && deleteDiv) {
+            // Удаляем текущие кнопки
+            editDiv.innerHTML = '';
+            deleteDiv.innerHTML = '';
+            
+            // Добавляем кнопки просмотра
+            let editBtn = _createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1');
+            editBtn.dataset.mode = 'stable';
+            editDiv.appendChild(editBtn);
+            
+            let deleteBtn = _createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', '');
+            deleteDiv.appendChild(deleteBtn);
+        }
+        
         itemBtn.dataset.mode = 'stable';
     }
+}
+
+/*
+    Получение текущего состояния строки метода испытаний
+    @param rowItem - строка таблицы
+    @returns {Object} - объект с текущим состоянием
+*/
+function _getCurrentQpMethodState(rowItem) {
+    const cells = rowItem.cells;
+    return {
+        use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        name: cells[1].textContent.trim(),
+        paramId: cells[2].dataset.paramId || "0",
+        limitValueActivate: cells[3].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        limitValue: cells[4].textContent.trim(),
+        limitValueString: cells[5].textContent.trim()
+    };
+}
+
+/*
+    Отмена редактирования метода испытаний
+    @param rowItem - редактируемая строка
+    @param itemId - id метода
+*/
+function _cancelEditQpMethod(rowItem, itemId) {
+    let rowMap = {
+        0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
+    };
+    
+    // Восстанавливаем предыдущее состояние
+    if (rowItem.dataset.previousState) {
+        const previousState = JSON.parse(rowItem.dataset.previousState);
+        _restoreQpMethodState(rowItem, previousState);
+        delete rowItem.dataset.previousState;
+    }
+    
+    // Включаем все элементы
+    RemoveClassToElement('#qp-list', 'disabled-item');
+    RemoveClassToElement('.modal-header', 'disabled-item');
+    RemoveClassToElement('.save-btn', 'disabled-item');
+    RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+    
+    // Включаем другие строки
+    _enableOtherRowsInTable(rowItem.closest('table'), itemId);
+    
+    // Меняем кнопки обратно
+    let actionCell = rowItem.querySelector('td:last-child');
+    let editDiv = actionCell.querySelector('div:first-child');
+    let deleteDiv = actionCell.querySelector('div:last-child');
+    
+    // Удаляем текущие кнопки
+    editDiv.innerHTML = '';
+    deleteDiv.innerHTML = '';
+    
+    // Добавляем кнопки просмотра
+    editDiv.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
+    deleteDiv.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+}
+
+/*
+    Восстановление состояния строки метода испытаний
+    @param rowItem - строка таблицы
+    @param previousState - предыдущее состояние
+*/
+function _restoreQpMethodState(rowItem, previousState) {
+    const cells = rowItem.cells;
+    
+    // Восстанавливаем флаг использования
+    const useIcon = document.createElement('i');
+    useIcon.classList.add('fa', previousState.use ? 'fa-check-square-o' : 'fa-square-o');
+    useIcon.ariaHidden = true;
+    cells[0].innerHTML = '';
+    cells[0].appendChild(useIcon);
+    
+    // Восстанавливаем название метода
+    cells[1].textContent = previousState.name;
+    
+    // Восстанавливаем параметр
+    const param = qpCfgsDictionaries['QpsInfo'][Number(rowItem.closest('table').dataset.qpId)]['Parameters']
+        .find(p => p.Id === Number(previousState.paramId));
+    cells[2].textContent = param ? param.Name : "Параметр не выбран";
+    cells[2].dataset.paramId = previousState.paramId;
+    
+    // Восстанавливаем флаг контроля минимального значения
+    const limitIcon = document.createElement('i');
+    limitIcon.classList.add('fa', previousState.limitValueActivate ? 'fa-check-square-o' : 'fa-square-o');
+    limitIcon.ariaHidden = true;
+    cells[3].innerHTML = '';
+    cells[3].appendChild(limitIcon);
+    
+    // Восстанавливаем минимальное значение и сообщение
+    cells[4].textContent = previousState.limitValue;
+    cells[5].textContent = previousState.limitValueString;
 }
 
 /*
