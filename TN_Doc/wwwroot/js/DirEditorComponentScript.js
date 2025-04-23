@@ -242,10 +242,10 @@ function _renderAndAddHandlerUserTable() {
         row.appendChild(shortFormCell);
 
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditUsersButton('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-user-btn', '5px'))
+        editDivElement.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
 
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteUserBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Users'))
+        deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
 
         let actionCell = document.createElement('td');
         actionCell.appendChild(editDivElement);
@@ -272,6 +272,7 @@ function _addCellStyle(cell) {
 */
 function _createDeleteUserBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.classList.add('delete-btn');
     btn.addEventListener('click', function (e) {
         _deleteSelectedRowHandler(e, 'Users');
     });
@@ -359,6 +360,7 @@ function _createEditLicensesButton(faClass, buttonClass, margin) {
 function _createEditUsersButton(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.dataset.mode = 'stable';
+    btn.classList.add('edit-user-btn');
     btn.addEventListener('click', function (e) {
         let itemBtn;
         if (e.target.tagName === 'I') {
@@ -375,6 +377,66 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
 }
 
 /*
+    Создание кнопки отмены редактирования
+    @param faClass - набор классов с картинками. Разделитель ":"
+    @param buttonClass - набор классов для кнопки. Разделитель ":"
+    @param margin - конфигурация отсутупов
+*/
+function _createCancelEditButton(faClass, buttonClass, margin) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.addEventListener('click', function (e) {
+        let itemBtn;
+        if (e.target.tagName === 'I') {
+            itemBtn = e.target.closest('button')
+        } else {
+            itemBtn = e.target;
+        }
+        let rowItem = itemBtn.closest('tr')
+        let itemId = Number(rowItem.dataset.id);
+        if (!itemId) return;
+        _cancelEditUser(rowItem, itemId);
+    });
+    return btn;
+}
+
+/*
+    Отмена редактирования пользователя
+    @param rowItem - редактируемая строка
+    @param itemId - id пользователя
+*/
+function _cancelEditUser(rowItem, itemId) {
+    let rowMap = {
+        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
+    };
+    
+    // Возвращаем строку в исходное состояние
+    _convertEditRowToStableRow(rowItem, rowMap, false);
+    
+    // Включаем все элементы
+    RemoveClassToElement('.table-bottom-menu', 'disabled-item');
+    RemoveClassToElement('#dictionaries-list', 'disabled-item');
+    RemoveClassToElement('.save-btn', 'disabled-item');
+    RemoveClassToElement('.close', 'disabled-item');
+    RemoveClassToElement('.modal-header', 'disabled-item');
+    
+    // Включаем другие строки
+    _enableOtherTableRows(itemId, 'users-table');
+    
+    // Меняем кнопки обратно
+    let actionCell = rowItem.querySelector('td:last-child');
+    let editDiv = actionCell.querySelector('div:first-child');
+    let deleteDiv = actionCell.querySelector('div:last-child');
+    
+    // Удаляем текущие кнопки
+    editDiv.innerHTML = '';
+    deleteDiv.innerHTML = '';
+    
+    // Добавляем кнопки просмотра
+    editDiv.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
+    deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
+}
+
+/*
     Редактирование выбранной доверенности в таблице.
     @param itemBtn - кнопка по которой нажали. Кнопка должна находиться в редактируемой строке  таблице.
     @param rowItem - редактируемая строка в таблице.
@@ -386,29 +448,66 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
     }
 
     if (itemBtn.dataset.mode === 'stable') {
-        AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+        // Отключаем другие элементы
         AddClassToElement('#dictionaries-list', 'disabled-item');
         AddClassToElement('.save-btn', 'disabled-item');
         AddClassToElement('.close', 'disabled-item');
-        AddClassToElement('.table-bottom-menu', 'disabled-item')
-        AddClassToElement('.modal-header', 'disabled-item')
+        AddClassToElement('.table-bottom-menu', 'disabled-item');
+        AddClassToElement('.modal-header', 'disabled-item');
+        
+        // Отключаем другие строки
         _disableOtherTableRows(itemId, 'users-table');
-        _convertStableRowToEditRow(rowItem, rowMap)
-        _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+        
+        // Преобразуем строку в режим редактирования
+        _convertStableRowToEditRow(rowItem, rowMap);
+        
+        // Меняем кнопки
+        let actionCell = rowItem.querySelector('td:last-child');
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        // Удаляем текущие кнопки
+        editDiv.innerHTML = '';
+        deleteDiv.innerHTML = '';
+        
+        // Добавляем кнопки редактирования
+        let editBtn = _createEditUsersButton('fa-unlock', 'btn-outline-primary', 'me-1');
+        editBtn.dataset.mode = 'edit';
+        editDiv.appendChild(editBtn);
+        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger', ''));
+        
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
         if (!_validateEditRow(rowItem, rowMap)) return;
-        _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-        _convertEditRowToStableRow(rowItem, rowMap, false)
-        RemoveClassToElement('.table-bottom-menu', 'disabled-item')
-        RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
+        
+        // Применяем изменения
+        _applyUserChanges(rowItem, itemId);
+        _convertEditRowToStableRow(rowItem, rowMap, false);
+        
+        // Включаем все элементы
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item');
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
         RemoveClassToElement('.save-btn', 'disabled-item');
         RemoveClassToElement('.close', 'disabled-item');
-        RemoveClassToElement('.modal-header', 'disabled-item')
-        _applyUserChanges(rowItem, itemId)
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        
+        // Включаем другие строки
         _enableOtherTableRows(itemId, 'users-table');
-        itemBtn.dataset.mode = 'stable';
+        
+        // Меняем кнопки обратно
+        let actionCell = rowItem.querySelector('td:last-child');
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        // Удаляем текущие кнопки
+        editDiv.innerHTML = '';
+        deleteDiv.innerHTML = '';
+        
+        // Добавляем кнопки просмотра
+        let editBtn = _createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1');
+        editBtn.dataset.mode = 'stable';
+        editDiv.appendChild(editBtn);
+        deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
     }
 }
 
@@ -478,31 +577,52 @@ function _applyUserChanges(rowItem, itemId) {
     let objIndex = appDictionaries['Users'].findIndex(item => item.Id === itemId);
     if (objIndex < 0) return;
     let cells = rowItem.cells;
-    let updatedObject = appDictionaries['Users'][objIndex]
-    updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['IdGroup'] = appDictionaries['UsersGroup'].filter(item => item['Name'] === cells[1].childNodes[0].textContent)[0]['Id'];
-    updatedObject['F'] = cells[2].childNodes[0].textContent;
-    updatedObject['I'] = cells[3].childNodes[0].textContent;
-    updatedObject['O'] = cells[4].childNodes[0].textContent;
-    updatedObject['LicId'] = Number(cells[7].dataset.licId);
-    updatedObject['UseFullNameSeparator'] =cells[8].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['UseFullNameWhiteSpace'] =cells[9].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['UseShortFullNameForm'] =cells[10].childNodes[0].classList.contains('fa-check-square-o');
+    let updatedObject = appDictionaries['Users'][objIndex];
     
-    let fact = cells[5].childNodes[0].textContent;
-    if (!fact) {
-        updatedObject['Factory'] = "";
+    // Обновляем флаг использования
+    const useIcon = cells[0].querySelector('i');
+    updatedObject['Use'] = useIcon ? useIcon.classList.contains('fa-check-square-o') : false;
+    
+    // Обновляем ID группы
+    const groupInput = cells[1].querySelector('select');
+    if (groupInput) {
+        updatedObject['IdGroup'] = Number(groupInput.value);
     } else {
-        updatedObject['Factory'] = fact;
+        const groupName = cells[1].textContent.trim();
+        const group = appDictionaries['UsersGroup'].find(item => item['Name'] === groupName);
+        updatedObject['IdGroup'] = group ? group['Id'] : 1;
     }
-
-    let post = cells[6].childNodes[0].textContent;
-    if (!post) {
-        updatedObject['Post'] = "";
-    } else {
-        updatedObject['Post'] = post;
-    }
-
+    
+    // Обновляем ФИО
+    const surnameInput = cells[2].querySelector('input');
+    updatedObject['F'] = surnameInput ? surnameInput.value : cells[2].textContent.trim();
+    
+    const nameInput = cells[3].querySelector('input');
+    updatedObject['I'] = nameInput ? nameInput.value : cells[3].textContent.trim();
+    
+    const patronymicInput = cells[4].querySelector('input');
+    updatedObject['O'] = patronymicInput ? patronymicInput.value : cells[4].textContent.trim();
+    
+    // Обновляем организацию и должность
+    const factoryInput = cells[5].querySelector('input');
+    updatedObject['Factory'] = factoryInput ? factoryInput.value : cells[5].textContent.trim();
+    
+    const postInput = cells[6].querySelector('input');
+    updatedObject['Post'] = postInput ? postInput.value : cells[6].textContent.trim();
+    
+    // Обновляем ID лицензии
+    const licSelect = cells[7].querySelector('select');
+    updatedObject['LicId'] = licSelect ? Number(licSelect.value) : Number(cells[7].dataset.licId || 0);
+    
+    // Обновляем флаги форматирования
+    const sepIcon = cells[8].querySelector('i');
+    updatedObject['UseFullNameSeparator'] = sepIcon ? sepIcon.classList.contains('fa-check-square-o') : false;
+    
+    const whiteSpaceIcon = cells[9].querySelector('i');
+    updatedObject['UseFullNameWhiteSpace'] = whiteSpaceIcon ? whiteSpaceIcon.classList.contains('fa-check-square-o') : false;
+    
+    const shortFormIcon = cells[10].querySelector('i');
+    updatedObject['UseShortFullNameForm'] = shortFormIcon ? shortFormIcon.classList.contains('fa-check-square-o') : false;
 }
 
 /*
@@ -1579,27 +1699,38 @@ function _modificateElementClasses(selector, className, isRemove) {
     @param margin - конфигурация отсутупов
 */
 function _createWithOnlyImgButton(faClass, buttonClass, margin) {
-
     let img = document.createElement('i');
-    AddClassToElement(faClass, img)
+    img.classList.add('fa');
+    if (typeof faClass === 'string') {
+        if (faClass.includes(':')) {
+            let faClasses = faClass.split(':');
+            for (let cl of faClasses) {
+                if (!cl) continue;
+                img.classList.add(cl);
+            }
+        } else {
+            img.classList.add(faClass);
+        }
+    }
     img.ariaHidden = true;
-    img.style.fontSize = '1.5em'
-    let btn = document.createElement('button')
-    AddClassToElement(buttonClass, btn)
+    img.style.fontSize = '1.5em';
+    
+    let btn = document.createElement('button');
+    if (typeof buttonClass === 'string') {
+        if (buttonClass.includes(':')) {
+            let btnClasses = buttonClass.split(':');
+            for (let cl of btnClasses) {
+                if (!cl) continue;
+                btn.classList.add(cl);
+            }
+        } else {
+            btn.classList.add(buttonClass);
+        }
+    }
     btn.appendChild(img);
     btn.style.margin = margin;
     btn.style.alignSelf = 'center';
     return btn;
-
-    function AddClassToElement(classes, element) {
-        if (!classes) return;
-        let elClasses = classes.split(':');
-        for (let cl of elClasses) {
-            if (!cl) continue;
-            element.classList.add(cl);
-        }
-    }
-
 }
 
 /*
