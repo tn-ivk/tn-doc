@@ -409,8 +409,12 @@ function _cancelEditUser(rowItem, itemId) {
         0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
     };
     
-    // Возвращаем строку в исходное состояние
-    _convertEditRowToStableRow(rowItem, rowMap, false);
+    // Восстанавливаем предыдущее состояние
+    if (rowItem.dataset.previousState) {
+        const previousState = JSON.parse(rowItem.dataset.previousState);
+        _restoreRowState(rowItem, previousState);
+        delete rowItem.dataset.previousState;
+    }
     
     // Включаем все элементы
     RemoveClassToElement('.table-bottom-menu', 'disabled-item');
@@ -448,6 +452,9 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
     }
 
     if (itemBtn.dataset.mode === 'stable') {
+        // Сохраняем предыдущие значения перед редактированием
+        rowItem.dataset.previousState = JSON.stringify(_getCurrentRowState(rowItem));
+        
         // Отключаем другие элементы
         AddClassToElement('#dictionaries-list', 'disabled-item');
         AddClassToElement('.save-btn', 'disabled-item');
@@ -484,6 +491,9 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         _applyUserChanges(rowItem, itemId);
         _convertEditRowToStableRow(rowItem, rowMap, false);
         
+        // Удаляем сохраненное предыдущее состояние
+        delete rowItem.dataset.previousState;
+        
         // Включаем все элементы
         RemoveClassToElement('.table-bottom-menu', 'disabled-item');
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
@@ -511,6 +521,59 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
     }
 }
 
+function _getCurrentRowState(rowItem) {
+    const cells = rowItem.cells;
+    return {
+        use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        groupName: cells[1].textContent.trim(),
+        surname: cells[2].textContent.trim(),
+        name: cells[3].textContent.trim(),
+        patronymic: cells[4].textContent.trim(),
+        factory: cells[5].textContent.trim(),
+        post: cells[6].textContent.trim(),
+        licId: cells[7].dataset.licId,
+        useFullNameSeparator: cells[8].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        useFullNameWhiteSpace: cells[9].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        useShortFullNameForm: cells[10].querySelector('i')?.classList.contains('fa-check-square-o') || false
+    };
+}
+
+function _restoreRowState(rowItem, previousState) {
+    const cells = rowItem.cells;
+    
+    // Восстанавливаем флаг использования
+    const useIcon = document.createElement('i');
+    useIcon.classList.add('fa', previousState.use ? 'fa-check-square-o' : 'fa-square-o');
+    useIcon.ariaHidden = true;
+    cells[0].innerHTML = '';
+    cells[0].appendChild(useIcon);
+    
+    // Восстанавливаем имя группы
+    cells[1].textContent = previousState.groupName;
+    
+    // Восстанавливаем ФИО
+    cells[2].textContent = previousState.surname;
+    cells[3].textContent = previousState.name;
+    cells[4].textContent = previousState.patronymic;
+    
+    // Восстанавливаем организацию и должность
+    cells[5].textContent = previousState.factory;
+    cells[6].textContent = previousState.post;
+    
+    // Восстанавливаем лицензию
+    cells[7].textContent = previousState.licId === "0" ? "Доверенность не выбрана" : 
+        appDictionaries['Licenses'].find(lic => lic.Id === Number(previousState.licId))?.LicensesNumber || "Доверенность не выбрана";
+    cells[7].dataset.licId = previousState.licId;
+    
+    // Восстанавливаем флаги форматирования
+    ['useFullNameSeparator', 'useFullNameWhiteSpace', 'useShortFullNameForm'].forEach((flag, index) => {
+        const icon = document.createElement('i');
+        icon.classList.add('fa', previousState[flag] ? 'fa-check-square-o' : 'fa-square-o');
+        icon.ariaHidden = true;
+        cells[8 + index].innerHTML = '';
+        cells[8 + index].appendChild(icon);
+    });
+}
 
 /*
     Редактирование выбранной доверенности в таблице.
