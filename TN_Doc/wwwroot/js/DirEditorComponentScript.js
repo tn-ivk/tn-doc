@@ -636,6 +636,9 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
         // Преобразуем строку в режим редактирования
         _convertStableRowToEditRow(rowItem, rowMap);
         
+        // Добавляем обработчики валидации в реальном времени
+        _addValidationHandlers(rowItem);
+        
         // Меняем кнопки
         let actionCell = rowItem.querySelector('td:last-child');
         let editDiv = actionCell.querySelector('div:first-child');
@@ -896,14 +899,25 @@ function initTooltip(input) {
 function _addValidationHandlers(row) {
     const inputs = row.querySelectorAll('input, select');
     inputs.forEach(input => {
-        // Валидация при потере фокуса
-        input.addEventListener('blur', function() {
-            const cell = this.closest('td');
-            const rowMap = {
+        // Определяем тип таблицы и соответствующую карту полей
+        let rowMap;
+        if (row.closest('.users-table')) {
+            rowMap = {
                 0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 
                 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 
                 9: 'bool', 10: 'bool', 11: 'ignore'
             };
+        } else if (row.closest('.licences-table')) {
+            rowMap = {
+                0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
+            };
+        } else {
+            return; // Если таблица не распознана, выходим
+        }
+
+        // Валидация при потере фокуса
+        input.addEventListener('blur', function() {
+            const cell = this.closest('td');
             const cellIndex = Array.from(cell.parentElement.children).indexOf(cell);
             _validateEditCell(cell, rowMap[cellIndex]);
         });
@@ -914,11 +928,6 @@ function _addValidationHandlers(row) {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 const cell = this.closest('td');
-                const rowMap = {
-                    0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 
-                    5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 
-                    9: 'bool', 10: 'bool', 11: 'ignore'
-                };
                 const cellIndex = Array.from(cell.parentElement.children).indexOf(cell);
                 _validateEditCell(cell, rowMap[cellIndex]);
             }, 500);
