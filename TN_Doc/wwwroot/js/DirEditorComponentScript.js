@@ -317,8 +317,14 @@ function _cleatUserLicId(e) {
     @param arrayName - имя массива для удаления
 */
 function _deleteSelectedRowHandler(e, arrayName) {
-    if (!e.target.classList.contains('delete-btn')) return;
-    let rowItem = e.target.closest('tr');
+    let target = e.target;
+    // Если клик был по иконке, получаем родительскую кнопку
+    if (target.tagName === 'I') {
+        target = target.closest('button');
+    }
+    if (!target || !target.classList.contains('delete-btn')) return;
+    
+    let rowItem = target.closest('tr');
     let itemId = Number(rowItem.dataset.id);
     if (!itemId) return;
     appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
