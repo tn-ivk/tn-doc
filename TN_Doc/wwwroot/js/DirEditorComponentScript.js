@@ -647,9 +647,14 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
     let rowMap = {
         0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
     }
-    if (itemBtn.dataset.mode === 'stable') {
+    if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
         // Сохраняем предыдущие значения перед редактированием
-        rowItem.dataset.previousState = JSON.stringify(_getCurrentRowState(rowItem));
+        if (itemBtn.dataset.mode === 'stable') {
+            rowItem.dataset.previousState = JSON.stringify(_getCurrentRowState(rowItem));
+        } else {
+            // Для режима инициализации сохраняем этот факт в строке
+            rowItem.dataset.isInit = 'true';
+        }
         
         // Отключаем другие элементы
         AddClassToElement('#dictionaries-list', 'disabled-item');
@@ -690,8 +695,9 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
         _applyLicenceChanges(rowItem, itemId);
         _convertEditRowToStableRow(rowItem, rowMap, false);
         
-        // Удаляем сохраненное предыдущее состояние
+        // Удаляем сохраненное предыдущее состояние и флаг инициализации
         delete rowItem.dataset.previousState;
+        delete rowItem.dataset.isInit;
         
         // Включаем все элементы
         RemoveClassToElement('.table-bottom-menu', 'disabled-item');
@@ -1251,7 +1257,10 @@ function _addLicHandler() {
         let itemId = Number(lastRow.dataset.id);
         let itemBtn = lastRow.querySelector('.edit-licences-btn');
         if (!itemId || !itemBtn || !lastRow) return;
-        _editSelectedLicences(itemBtn, lastRow, itemId)
+        
+        // Устанавливаем режим инициализации для новой строки
+        itemBtn.dataset.mode = 'init';
+        _editSelectedLicences(itemBtn, lastRow, itemId);
     });
 }
 
@@ -2306,6 +2315,26 @@ function _initTooltips() {
     @param itemId - id доверенности
 */
 function _cancelEditLicence(rowItem, itemId) {
+    // Проверяем, является ли строка новой (в режиме инициализации)
+    if (rowItem.dataset.isInit === 'true') {
+        // Удаляем доверенность из массива
+        appDictionaries['Licenses'] = appDictionaries['Licenses'].filter(lic => lic.Id !== itemId);
+        
+        // Включаем все элементы
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item');
+        RemoveClassToElement('#dictionaries-list', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('.close', 'disabled-item');
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        
+        // Включаем другие строки
+        _enableOtherTableRows(itemId, 'licences-table');
+        
+        // Удаляем строку из таблицы
+        rowItem.remove();
+        return;
+    }
+
     let rowMap = {
         0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
     };
