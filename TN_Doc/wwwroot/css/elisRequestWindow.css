@@ -1,4 +1,4 @@
-﻿/* Стили для модального окна */
+﻿/* Стили для модального окна Запроса данных от ЕЛИС*/
 #elis .modal {
   border: none !important; /* Убираем границу вокруг окна */
   box-shadow: none !important; /* Убираем тень */
@@ -58,6 +58,7 @@
 
 /* Кнопки */
 #elis .btn {
+  min-width: 120px;
   background-color: #1b6ec2;
   color: #ffffff;
   border: none;
@@ -82,6 +83,7 @@
 
 #elis .btn-secondary {
   background-color: #6c757d; /* Серый цвет для кнопки Закрыть */
+  margin-right: 0;
 }
 
 #elis .btn-secondary:hover {
