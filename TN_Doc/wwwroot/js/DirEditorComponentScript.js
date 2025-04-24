@@ -1570,7 +1570,6 @@ function _addBtnToAddQp(qpId) {
     btn.dataset.qpId = qpId
     btnDiv.appendChild(btn);
 
-
     btn.addEventListener('click', function (event) {
         let item = event.target;
         if (event.target.tagName === "I" || event.target.tagName === "LABEL") {
@@ -1603,9 +1602,15 @@ function _addBtnToAddQp(qpId) {
         li.classList.add('active');
         document.querySelector(li.dataset.target).classList.remove('d-none');
         _scrollToBottomTable(li.dataset.target + ' > .table-container > .table-content');
-        _editQpMethod(document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild, document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild.querySelector('.edit-methods-btn'))
+        
+        let lastRow = document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild;
+        let itemBtn = lastRow.querySelector('.edit-methods-btn');
+        if (!itemBtn || !lastRow) return;
+        
+        // Устанавливаем режим инициализации для новой строки
+        itemBtn.dataset.mode = 'init';
+        _editQpMethod(lastRow, itemBtn);
     });
-
 
     let img = document.createElement('i');
     img.classList.add('fa', 'fa-plus');
@@ -1812,9 +1817,14 @@ function _editQpMethod(row, itemBtn) {
         0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
     }
 
-    if (itemBtn.dataset.mode === 'stable') {
-        // Сохраняем предыдущие значения перед редактированием
-        row.dataset.previousState = JSON.stringify(_getCurrentQpMethodState(row));
+    if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
+        // Сохраняем предыдущие значения перед редактированием только в режиме stable
+        if (itemBtn.dataset.mode === 'stable') {
+            row.dataset.previousState = JSON.stringify(_getCurrentQpMethodState(row));
+        } else {
+            // Для режима инициализации сохраняем этот факт в строке
+            row.dataset.isInit = 'true';
+        }
         
         // Отключаем другие элементы
         AddClassToElement('#qp-list', 'disabled-item');
@@ -1861,8 +1871,9 @@ function _editQpMethod(row, itemBtn) {
         _applyQpMethodsChanged(row, Number(row.dataset.id), Number(itemBtn.closest('table').dataset.qpId));
         _convertEditRowToStableRow(row, rowMap, true);
         
-        // Удаляем сохраненное предыдущее состояние
+        // Удаляем сохраненное предыдущее состояние и флаг инициализации
         delete row.dataset.previousState;
+        delete row.dataset.isInit;
         
         // Включаем все элементы
         RemoveClassToElement('#qp-list', 'disabled-item');
@@ -1921,6 +1932,29 @@ function _getCurrentQpMethodState(rowItem) {
     @param itemId - id метода
 */
 function _cancelEditQpMethod(rowItem, itemId) {
+    // Проверяем, является ли строка новой (в режиме инициализации)
+    if (rowItem.dataset.isInit === 'true') {
+        let table = rowItem.closest('table');
+        let qpId = Number(table.dataset.qpId);
+        
+        // Удаляем метод из массива
+        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries['QpsInfo'][qpId]['Methods']
+            .filter(method => method.Id !== itemId);
+        
+        // Включаем все элементы
+        RemoveClassToElement('#qp-list', 'disabled-item');
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+        
+        // Включаем другие строки
+        _enableOtherRowsInTable(table, itemId);
+        
+        // Удаляем строку из таблицы
+        rowItem.remove();
+        return;
+    }
+
     let rowMap = {
         0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
     };
