@@ -140,6 +140,16 @@
       <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
+    <Content Update="Cfg\CfgApp.Development.json">
+      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Cfg\Cfg.Development.json">
+      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
