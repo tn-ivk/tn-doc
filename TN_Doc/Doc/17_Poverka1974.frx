@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/26/2025 00:07:09" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/26/2025 00:41:09" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -302,21 +302,13 @@ namespace FastReport
 
     private void DataBandTable3Results_BeforePrint(object sender, EventArgs e)
     {
-      // Рассчитываем высоту таблицы
-      float rowHeight = 15.12f; // Высота строки данных
-      float fixedRowsHeight = Table3Results.FixedRows * rowHeight; // Высота фиксированных строк
-      float dataRowsHeight = listTable3Results.Count * rowHeight; // Высота строк с данными
-      float totalTableHeight = fixedRowsHeight + dataRowsHeight;
-
-      // Рассчитываем оставшееся место на странице
-      float currentPosition = Engine.CurY; // Текущая позиция на странице
-      float pageHeight = Page.PaperHeight - Page.TopMargin - Page.BottomMargin;
-      float remainingSpace = pageHeight - currentPosition;
-
-      // Если таблица не помещается, начинаем новую страницу
-      if (remainingSpace &lt; totalTableHeight)
+      var rowHeight = 15.12f; // Высота строки данных
+      var fixedRowsHeight = Table3Results.FixedRows * rowHeight;
+      var remainingSpace = Engine.FreeSpace;
+      // Проверяем, достаточно ли места хотя бы для фиксированных строк (хедера)
+      if (remainingSpace &lt; fixedRowsHeight)
       {
-        Engine.StartNewPage();
+        Engine.StartNewPage(); // Если хедер не помещается, начинаем новую страницу
       }
     }
     
