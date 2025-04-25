@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/25/2025 19:17:33" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/25/2025 19:24:27" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 
 using System.Collections.Generic;
@@ -365,7 +365,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DBTable1SourceData" Top="149.53" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" Columns.Layout="DownThenAcross">
+    <DataBand Name="DBTable1SourceData" Top="149.53" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true" Columns.Layout="DownThenAcross">
       <TableObject Name="Table1_1" Width="718.2" Height="103.95" Dock="Left" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table1_1_ManualBuild">
         <TableColumn Name="Column237" Width="77.96"/>
         <TableColumn Name="Column238" Width="96.86"/>
@@ -417,7 +417,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DBTable1EndSourceData" Top="257.48" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true">
+    <DataBand Name="DBTable1EndSourceData" Top="257.48" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table1_2" Width="718.2" Height="85.05" GrowToBottom="true" FixedRows="3" PrintOnParent="true" ManualBuildEvent="Table1_2_ManualBuild">
         <TableColumn Name="Column251" Width="119.7"/>
         <TableColumn Name="Column252" Width="119.7"/>
@@ -459,7 +459,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DBTable2CalcResult" Top="363.54" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true">
+    <DataBand Name="DBTable2CalcResult" Top="363.54" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table2_1" Width="718.2" Height="92.61" GrowToBottom="true" FixedRows="3" PrintOnParent="true" ManualBuildEvent="Table2_1_ManualBuild">
         <TableColumn Name="Column257" Width="79.8"/>
         <TableColumn Name="Column258" Width="79.8"/>
@@ -516,7 +516,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DBTable2EndCalcResult" Top="471.49" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" Guides="0">
+    <DataBand Name="DBTable2EndCalcResult" Top="471.49" Width="718.2" Height="103.95" CanGrow="true" CanShrink="true" CanBreak="true" Guides="0">
       <TableObject Name="Table2_2" Width="718.2" Height="85.05" GrowToBottom="true" FixedRows="3" PrintOnParent="true" ManualBuildEvent="Table2_2_ManualBuild">
         <TableColumn Name="Column266" Width="79.8"/>
         <TableColumn Name="Column267" Width="79.8"/>
@@ -573,7 +573,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DBTable3CheckPoint" Top="579.44" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true">
+    <DataBand Name="DBTable3CheckPoint" Top="579.44" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table3" Width="718.2" Height="85.05" GrowToBottom="true" FixedRows="3" PrintOnParent="true" ManualBuildEvent="Table3_ManualBuild">
         <TableColumn Name="Column275" Width="79.8"/>
         <TableColumn Name="Column276" Width="79.8"/>
@@ -630,7 +630,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DBTable4CheckWokingRange" Top="677.94" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true">
+    <DataBand Name="DBTable4CheckWokingRange" Top="677.94" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4" Width="718.2" Height="85.05" GrowToBottom="true" FixedRows="3" PrintOnParent="true" ManualBuildEvent="Table4_ManualBuild">
         <TableColumn Name="Column284" Width="71.82"/>
         <TableColumn Name="Column285" Width="71.82"/>
