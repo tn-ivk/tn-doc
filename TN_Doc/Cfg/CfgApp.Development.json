@@ -1086,7 +1086,7 @@
           "ConnectionTimeout": 1
         },
         {
-          "Use": true,
+          "Use": false,
           "GuidDevice": 0,
           "Server": "192.168.233.201",
           "Userid": "user",
