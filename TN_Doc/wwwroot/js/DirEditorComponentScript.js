@@ -3,6 +3,8 @@ let qpCfgsDictionaries
 let dictFetchOptions;
 let hashCodeLoadedCodeDict;
 let hashCodeLoadedQpConfigs;
+let cachedInvalidChars = null; // Кэш для недопустимых символов
+let lastDeviceId = null; // ID последнего устройства
 
 /*
     Инициализация компонента "Редактора справочника"
@@ -25,6 +27,7 @@ function InitDirEditorComponent() {
     _renderQpConfigs();
     _addSaveButtonHandler();
     _addCloseButtonWindowHandler();
+    _initTooltips();
     /*end*/
 }
 
@@ -131,13 +134,11 @@ function _renderAndAddHandlerLicencesTable() {
         _addCellStyle(dateCell);
         row.appendChild(dateCell);
 
-        let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditLicensesButton('fa:fa-lock:edit-licences-btn', 'btn:btn-outline-primary:edit-licences-btn', '5px'))
-
-        let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteLicenseBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Licenses'))
-
         let actionCell = document.createElement('td');
+        let editDivElement = document.createElement('div');
+        editDivElement.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1'));
+        let deleteDivElement = document.createElement('div');
+        deleteDivElement.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
         actionCell.appendChild(editDivElement);
         actionCell.appendChild(deleteDivElement);
         row.appendChild(actionCell);
@@ -239,10 +240,10 @@ function _renderAndAddHandlerUserTable() {
         row.appendChild(shortFormCell);
 
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditUsersButton('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-user-btn', '5px'))
+        editDivElement.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
 
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteUserBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px', 'Users'))
+        deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
 
         let actionCell = document.createElement('td');
         actionCell.appendChild(editDivElement);
@@ -269,6 +270,7 @@ function _addCellStyle(cell) {
 */
 function _createDeleteUserBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.classList.add('delete-btn');
     btn.addEventListener('click', function (e) {
         _deleteSelectedRowHandler(e, 'Users');
     });
@@ -313,8 +315,14 @@ function _cleatUserLicId(e) {
     @param arrayName - имя массива для удаления
 */
 function _deleteSelectedRowHandler(e, arrayName) {
-    if (!e.target.classList.contains('delete-btn')) return;
-    let rowItem = e.target.closest('tr');
+    let target = e.target;
+    // Если клик был по иконке, получаем родительскую кнопку
+    if (target.tagName === 'I') {
+        target = target.closest('button');
+    }
+    if (!target || !target.classList.contains('delete-btn')) return;
+    
+    let rowItem = target.closest('tr');
     let itemId = Number(rowItem.dataset.id);
     if (!itemId) return;
     appDictionaries[arrayName] = appDictionaries[arrayName].filter(function (item) {
@@ -324,7 +332,7 @@ function _deleteSelectedRowHandler(e, arrayName) {
 }
 
 /*
-    Создание кнопки редактирования для доверенностей
+    Создание кнопки редактирования для доверенности
     @param faClass - набор классов с картинками. Разделитель ":"
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
@@ -332,6 +340,7 @@ function _deleteSelectedRowHandler(e, arrayName) {
 function _createEditLicensesButton(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.dataset.mode = 'stable';
+    btn.classList.add('edit-licences-btn');
     btn.addEventListener('click', function (e) {
         let itemBtn;
         if (e.target.tagName === 'I') {
@@ -356,6 +365,7 @@ function _createEditLicensesButton(faClass, buttonClass, margin) {
 function _createEditUsersButton(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.dataset.mode = 'stable';
+    btn.classList.add('edit-user-btn');
     btn.addEventListener('click', function (e) {
         let itemBtn;
         if (e.target.tagName === 'I') {
@@ -372,6 +382,99 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
 }
 
 /*
+    Создание кнопки отмены редактирования
+    @param faClass - набор классов с картинками. Разделитель ":"
+    @param buttonClass - набор классов для кнопки. Разделитель ":"
+    @param margin - конфигурация отсутупов
+*/
+function _createCancelEditButton(faClass, buttonClass, margin) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.classList.add('cancel-edit-btn');
+    btn.addEventListener('click', function (e) {
+        let itemBtn;
+        if (e.target.tagName === 'I') {
+            itemBtn = e.target.closest('button')
+        } else {
+            itemBtn = e.target;
+        }
+        let rowItem = itemBtn.closest('tr')
+        let itemId = Number(rowItem.dataset.id);
+        if (!itemId) return;
+        
+        // Определяем тип таблицы и вызываем соответствующую функцию отмены
+        if (rowItem.closest('.users-table')) {
+            _cancelEditUser(rowItem, itemId);
+        } else if (rowItem.closest('.licences-table')) {
+            _cancelEditLicence(rowItem, itemId);
+        } else if (rowItem.closest('.qp-method-table')) {
+            _cancelEditQpMethod(rowItem, itemId);
+        }
+    });
+    return btn
+}
+
+/*
+    Отмена редактирования пользователя
+    @param rowItem - редактируемая строка
+    @param itemId - id пользователя
+*/
+function _cancelEditUser(rowItem, itemId) {
+    // Проверяем, является ли строка новой (в режиме инициализации)
+    if (rowItem.dataset.isInit === 'true') {
+        // Удаляем пользователя из массива
+        appDictionaries['Users'] = appDictionaries['Users'].filter(user => user.Id !== itemId);
+        
+        // Включаем все элементы
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item');
+        RemoveClassToElement('#dictionaries-list', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('.close', 'disabled-item');
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        
+        // Включаем другие строки
+        _enableOtherTableRows(itemId, 'users-table');
+        
+        // Удаляем строку из таблицы
+        rowItem.remove();
+        return;
+    }
+
+    let rowMap = {
+        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
+    };
+    
+    // Восстанавливаем предыдущее состояние
+    if (rowItem.dataset.previousState) {
+        const previousState = JSON.parse(rowItem.dataset.previousState);
+        _restoreRowState(rowItem, previousState);
+        delete rowItem.dataset.previousState;
+    }
+    
+    // Включаем все элементы
+    RemoveClassToElement('.table-bottom-menu', 'disabled-item');
+    RemoveClassToElement('#dictionaries-list', 'disabled-item');
+    RemoveClassToElement('.save-btn', 'disabled-item');
+    RemoveClassToElement('.close', 'disabled-item');
+    RemoveClassToElement('.modal-header', 'disabled-item');
+    
+    // Включаем другие строки
+    _enableOtherTableRows(itemId, 'users-table');
+    
+    // Меняем кнопки обратно
+    let actionCell = rowItem.querySelector('td:last-child');
+    let editDiv = actionCell.querySelector('div:first-child');
+    let deleteDiv = actionCell.querySelector('div:last-child');
+    
+    // Удаляем текущие кнопки
+    editDiv.innerHTML = '';
+    deleteDiv.innerHTML = '';
+    
+    // Добавляем кнопки просмотра
+    editDiv.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
+    deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
+}
+
+/*
     Редактирование выбранной доверенности в таблице.
     @param itemBtn - кнопка по которой нажали. Кнопка должна находиться в редактируемой строке  таблице.
     @param rowItem - редактируемая строка в таблице.
@@ -379,42 +482,160 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
 */
 function _editSelectedUser(itemBtn, rowItem, itemId) {
     let rowMap = {
-        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic',  8: 'bool',9: 'bool',10: 'bool' ,11: 'ignore'
+        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
     }
 
-    if (itemBtn.dataset.mode === 'stable') {
-        AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+    if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
+        // Сохраняем предыдущие значения перед редактированием
+        if (itemBtn.dataset.mode === 'stable') {
+            rowItem.dataset.previousState = JSON.stringify(_getCurrentRowState(rowItem));
+        } else {
+            // Для режима инициализации сохраняем этот факт в строке
+            rowItem.dataset.isInit = 'true';
+        }
+        
+        // Отключаем другие элементы
         AddClassToElement('#dictionaries-list', 'disabled-item');
         AddClassToElement('.save-btn', 'disabled-item');
         AddClassToElement('.close', 'disabled-item');
-        AddClassToElement('.table-bottom-menu', 'disabled-item')
-        AddClassToElement('.modal-header', 'disabled-item')
+        AddClassToElement('.table-bottom-menu', 'disabled-item');
+        AddClassToElement('.modal-header', 'disabled-item');
+        
+        // Отключаем другие строки
         _disableOtherTableRows(itemId, 'users-table');
-        _convertStableRowToEditRow(rowItem, rowMap)
-        _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+        
+        // Преобразуем строку в режим редактирования
+        _convertStableRowToEditRow(rowItem, rowMap);
+        
+        // Меняем кнопки
+        let actionCell = rowItem.querySelector('td:last-child');
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        // Удаляем текущие кнопки
+        editDiv.innerHTML = '';
+        deleteDiv.innerHTML = '';
+        
+        // Добавляем кнопки редактирования
+        let editBtn = _createEditUsersButton('fa-unlock', 'btn-outline-primary', 'me-1');
+        editBtn.dataset.mode = 'edit';
+        editDiv.appendChild(editBtn);
+        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger', ''));
+        
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
-        rowMap[4] = "ignore";
-        rowMap[5] = "ignore";
-        rowMap[6] = "ignore";
         if (!_validateEditRow(rowItem, rowMap)) return;
-        rowMap[4] = "text";
-        rowMap[5] = "text";
-        rowMap[6] = "text";
-        _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-        _convertEditRowToStableRow(rowItem, rowMap, false)
-        RemoveClassToElement('.table-bottom-menu', 'disabled-item')
-        RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
+        
+        // Применяем изменения
+        _applyUserChanges(rowItem, itemId);
+        _convertEditRowToStableRow(rowItem, rowMap, false);
+        
+        // Удаляем сохраненное предыдущее состояние и флаг инициализации
+        delete rowItem.dataset.previousState;
+        delete rowItem.dataset.isInit;
+        
+        // Включаем все элементы
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item');
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
         RemoveClassToElement('.save-btn', 'disabled-item');
         RemoveClassToElement('.close', 'disabled-item');
-        RemoveClassToElement('.modal-header', 'disabled-item')
-        _applyUserChanges(rowItem, itemId)
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        
+        // Включаем другие строки
         _enableOtherTableRows(itemId, 'users-table');
-        itemBtn.dataset.mode = 'stable';
+        
+        // Меняем кнопки обратно
+        let actionCell = rowItem.querySelector('td:last-child');
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        // Удаляем текущие кнопки
+        editDiv.innerHTML = '';
+        deleteDiv.innerHTML = '';
+        
+        // Добавляем кнопки просмотра
+        let editBtn = _createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1');
+        editBtn.dataset.mode = 'stable';
+        editDiv.appendChild(editBtn);
+        deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
     }
 }
 
+function _getCurrentRowState(rowItem) {
+    const cells = rowItem.cells;
+    if (rowItem.closest('.users-table')) {
+        return {
+            use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            groupName: cells[1].textContent.trim(),
+            surname: cells[2].textContent.trim(),
+            name: cells[3].textContent.trim(),
+            patronymic: cells[4].textContent.trim(),
+            factory: cells[5].textContent.trim(),
+            post: cells[6].textContent.trim(),
+            licId: cells[7].dataset.licId,
+            useFullNameSeparator: cells[8].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            useFullNameWhiteSpace: cells[9].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            useShortFullNameForm: cells[10].querySelector('i')?.classList.contains('fa-check-square-o') || false
+        };
+    } else if (rowItem.closest('.licences-table')) {
+        return {
+            use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            licensesNumber: cells[1].textContent.trim(),
+            licensesDate: cells[2].textContent.trim()
+        };
+    }
+    return null;
+}
+
+function _restoreRowState(rowItem, previousState) {
+    const cells = rowItem.cells;
+    
+    if (rowItem.closest('.users-table')) {
+        // Восстанавливаем флаг использования
+        const useIcon = document.createElement('i');
+        useIcon.classList.add('fa', previousState.use ? 'fa-check-square-o' : 'fa-square-o');
+        useIcon.ariaHidden = true;
+        cells[0].innerHTML = '';
+        cells[0].appendChild(useIcon);
+        
+        // Восстанавливаем имя группы
+        cells[1].textContent = previousState.groupName;
+        
+        // Восстанавливаем ФИО
+        cells[2].textContent = previousState.surname;
+        cells[3].textContent = previousState.name;
+        cells[4].textContent = previousState.patronymic;
+        
+        // Восстанавливаем организацию и должность
+        cells[5].textContent = previousState.factory;
+        cells[6].textContent = previousState.post;
+        
+        // Восстанавливаем лицензию
+        cells[7].textContent = previousState.licId === "0" ? "Доверенность не выбрана" : 
+            appDictionaries['Licenses'].find(lic => lic.Id === Number(previousState.licId))?.LicensesNumber || "Доверенность не выбрана";
+        cells[7].dataset.licId = previousState.licId;
+        
+        // Восстанавливаем флаги форматирования
+        ['useFullNameSeparator', 'useFullNameWhiteSpace', 'useShortFullNameForm'].forEach((flag, index) => {
+            const icon = document.createElement('i');
+            icon.classList.add('fa', previousState[flag] ? 'fa-check-square-o' : 'fa-square-o');
+            icon.ariaHidden = true;
+            cells[8 + index].innerHTML = '';
+            cells[8 + index].appendChild(icon);
+        });
+    } else if (rowItem.closest('.licences-table')) {
+        // Восстанавливаем флаг использования
+        const useIcon = document.createElement('i');
+        useIcon.classList.add('fa', previousState.use ? 'fa-check-square-o' : 'fa-square-o');
+        useIcon.ariaHidden = true;
+        cells[0].innerHTML = '';
+        cells[0].appendChild(useIcon);
+        
+        // Восстанавливаем номер и дату доверенности
+        cells[1].textContent = previousState.licensesNumber;
+        cells[2].textContent = previousState.licensesDate;
+    }
+}
 
 /*
     Редактирование выбранной доверенности в таблице.
@@ -426,31 +647,85 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
     let rowMap = {
         0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
     }
-    if (itemBtn.dataset.mode === 'stable') {
-        AddClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+    if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
+        // Сохраняем предыдущие значения перед редактированием
+        if (itemBtn.dataset.mode === 'stable') {
+            rowItem.dataset.previousState = JSON.stringify(_getCurrentRowState(rowItem));
+        } else {
+            // Для режима инициализации сохраняем этот факт в строке
+            rowItem.dataset.isInit = 'true';
+        }
+        
+        // Отключаем другие элементы
         AddClassToElement('#dictionaries-list', 'disabled-item');
         AddClassToElement('.save-btn', 'disabled-item');
         AddClassToElement('.close', 'disabled-item');
-        AddClassToElement('.table-bottom-menu', 'disabled-item')
-        AddClassToElement('.modal-header', 'disabled-item')
+        AddClassToElement('.table-bottom-menu', 'disabled-item');
+        AddClassToElement('.modal-header', 'disabled-item');
+        
+        // Отключаем другие строки
         _disableOtherTableRows(itemId, 'licences-table');
-        _convertStableRowToEditRow(rowItem, rowMap)
-        _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+        
+        // Преобразуем строку в режим редактирования
+        _convertStableRowToEditRow(rowItem, rowMap);
+        
+        // Добавляем обработчики валидации в реальном времени
+        _addValidationHandlers(rowItem);
+        
+        // Меняем кнопки
+        let actionCell = rowItem.querySelector('td:last-child');
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        // Удаляем текущие кнопки
+        editDiv.innerHTML = '';
+        deleteDiv.innerHTML = '';
+        
+        // Добавляем кнопки редактирования
+        let editBtn = _createEditLicensesButton('fa-unlock', 'btn-outline-primary', 'me-1');
+        editBtn.dataset.mode = 'edit';
+        editDiv.appendChild(editBtn);
+        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger', ''));
+        
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
         if (!_validateEditRow(rowItem, rowMap)) return;
-        _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
-        _convertEditRowToStableRow(rowItem, rowMap, false)
-        RemoveClassToElement('.table-bottom-menu', 'disabled-item')
-        RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item')
+        
+        // Применяем изменения
+        _applyLicenceChanges(rowItem, itemId);
+        _convertEditRowToStableRow(rowItem, rowMap, false);
+        
+        // Удаляем сохраненное предыдущее состояние и флаг инициализации
+        delete rowItem.dataset.previousState;
+        delete rowItem.dataset.isInit;
+        
+        // Включаем все элементы
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item');
         RemoveClassToElement('#dictionaries-list', 'disabled-item');
         RemoveClassToElement('.save-btn', 'disabled-item');
         RemoveClassToElement('.close', 'disabled-item');
-        RemoveClassToElement('.modal-header', 'disabled-item')
-        _applyLicenceChanges(rowItem, itemId)
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        
+        // Включаем другие строки
         _enableOtherTableRows(itemId, 'licences-table');
-        itemBtn.dataset.mode = 'stable';
-        _clearRowTable('.users-table')
+        
+        // Меняем кнопки обратно
+        let actionCell = rowItem.querySelector('td:last-child');
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        // Удаляем текущие кнопки
+        editDiv.innerHTML = '';
+        deleteDiv.innerHTML = '';
+        
+        // Добавляем кнопки просмотра
+        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1');
+        editBtn.dataset.mode = 'stable';
+        editDiv.appendChild(editBtn);
+        deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+        
+        // Обновляем таблицу пользователей
+        _clearRowTable('.users-table');
         _renderAndAddHandlerUserTable();
     }
 }
@@ -481,69 +756,222 @@ function _applyUserChanges(rowItem, itemId) {
     let objIndex = appDictionaries['Users'].findIndex(item => item.Id === itemId);
     if (objIndex < 0) return;
     let cells = rowItem.cells;
-    let updatedObject = appDictionaries['Users'][objIndex]
-    updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['IdGroup'] = appDictionaries['UsersGroup'].filter(item => item['Name'] === cells[1].childNodes[0].textContent)[0]['Id'];
-    updatedObject['F'] = cells[2].childNodes[0].textContent;
-    updatedObject['I'] = cells[3].childNodes[0].textContent;
-    updatedObject['O'] = cells[4].childNodes[0].textContent;
-    updatedObject['LicId'] = Number(cells[7].dataset.licId);
-    updatedObject['UseFullNameSeparator'] =cells[8].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['UseFullNameWhiteSpace'] =cells[9].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['UseShortFullNameForm'] =cells[10].childNodes[0].classList.contains('fa-check-square-o');
+    let updatedObject = appDictionaries['Users'][objIndex];
     
-    let fact = cells[5].childNodes[0].textContent;
-    if (!fact) {
-        updatedObject['Factory'] = "";
+    // Обновляем флаг использования
+    const useIcon = cells[0].querySelector('i');
+    updatedObject['Use'] = useIcon ? useIcon.classList.contains('fa-check-square-o') : false;
+    
+    // Обновляем ID группы
+    const groupInput = cells[1].querySelector('select');
+    if (groupInput) {
+        updatedObject['IdGroup'] = Number(groupInput.value);
     } else {
-        updatedObject['Factory'] = fact;
+        const groupName = cells[1].textContent.trim();
+        const group = appDictionaries['UsersGroup'].find(item => item['Name'] === groupName);
+        updatedObject['IdGroup'] = group ? group['Id'] : 1;
     }
-
-    let post = cells[6].childNodes[0].textContent;
-    if (!post) {
-        updatedObject['Post'] = "";
-    } else {
-        updatedObject['Post'] = post;
-    }
-
+    
+    // Обновляем ФИО
+    const surnameInput = cells[2].querySelector('input');
+    updatedObject['F'] = surnameInput ? surnameInput.value : cells[2].textContent.trim();
+    
+    const nameInput = cells[3].querySelector('input');
+    updatedObject['I'] = nameInput ? nameInput.value : cells[3].textContent.trim();
+    
+    const patronymicInput = cells[4].querySelector('input');
+    updatedObject['O'] = patronymicInput ? patronymicInput.value : cells[4].textContent.trim();
+    
+    // Обновляем организацию и должность
+    const factoryInput = cells[5].querySelector('input');
+    updatedObject['Factory'] = factoryInput ? factoryInput.value : cells[5].textContent.trim();
+    
+    const postInput = cells[6].querySelector('input');
+    updatedObject['Post'] = postInput ? postInput.value : cells[6].textContent.trim();
+    
+    // Обновляем ID лицензии
+    const licSelect = cells[7].querySelector('select');
+    updatedObject['LicId'] = licSelect ? Number(licSelect.value) : Number(cells[7].dataset.licId || 0);
+    
+    // Обновляем флаги форматирования
+    const sepIcon = cells[8].querySelector('i');
+    updatedObject['UseFullNameSeparator'] = sepIcon ? sepIcon.classList.contains('fa-check-square-o') : false;
+    
+    const whiteSpaceIcon = cells[9].querySelector('i');
+    updatedObject['UseFullNameWhiteSpace'] = whiteSpaceIcon ? whiteSpaceIcon.classList.contains('fa-check-square-o') : false;
+    
+    const shortFormIcon = cells[10].querySelector('i');
+    updatedObject['UseShortFullNameForm'] = shortFormIcon ? shortFormIcon.classList.contains('fa-check-square-o') : false;
 }
 
 /*
     Валидация строки таблицы
 */
 function _validateEditRow(row, rowMap) {
+    console.log('Валидация строки:', row);
     let cells = row.querySelectorAll('td')
     for (let i = 0; i < cells.length; i++) {
         _validateEditCell(cells[i], rowMap[i]);
     }
-    return row.querySelectorAll('td.invalid-cell-content').length === 0;
+    // Проверяем наличие класса invalid-cell-content у элементов ввода, а не у ячеек таблицы
+    const invalidElements = row.querySelectorAll('td input.invalid-cell-content, td select.invalid-cell-content');
+    console.log('Найдено элементов с классом invalid-cell-content:', invalidElements.length);
+    return invalidElements.length === 0;
 }
 
 /*
    Валидация значение ячеек таблицы 
 */
 function _validateEditCell(cell, type) {
-    if (!type || !cell) return false;
-
-    if (cell.classList.contains('invalid-cell-content')) {
-        cell.classList.remove('invalid-cell-content')
+    const input = cell.querySelector('input, select');
+    if (!input) return true;
+    
+    let isValid = true;
+    const value = input.value.trim();
+    
+    // Удаляем предыдущие стили и подсказки
+    $(input).removeClass('invalid-cell-content');
+    try {
+        $(input).tooltip('destroy');
+    } catch (e) {
+        // Игнорируем ошибку, если tooltip еще не инициализирован
     }
-
-    switch (type) {
-        case 'text':
-            let text = cell.childNodes[0].value;
-            if (!text) cell.classList.add('invalid-cell-content');
-            break;
-        case 'date':
-            let date = cell.childNodes[0].value;
-            if (!date) cell.classList.add('invalid-cell-content');
-            break;
-        case 'number':
-            let num = cell.childNodes[0].value;
-            if (!num) cell.classList.add('invalid-cell-content');
-            break;
+    
+    if (type === 'text') {
+        if (value === '') {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Поле не может быть пустым');
+            initTooltip(input);
+        } else if (value.length > 100) {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Превышена максимальная длина (100 символов)');
+            initTooltip(input);
+        } else {
+            const invalidChars = GetInvalideChars();
+            for (let char of invalidChars) {
+                if (value.includes(char)) {
+                    isValid = false;
+                    $(input).addClass('invalid-cell-content')
+                           .attr('title', `Некорректный символ: ${char}`);
+                    initTooltip(input);
+                    break;
+                }
+            }
+            if (isValid) {
+                $(input).removeClass('invalid-cell-content')
+                       .removeAttr('title');
+                try {
+                    $(input).tooltip('destroy');
+                } catch (e) {
+                    // Игнорируем ошибку
+                }
+            }
+        }
+    } else if (type === 'number') {
+        if (!/^\d+$/.test(value)) {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Введите числовое значение');
+            initTooltip(input);
+        } else {
+            $(input).removeClass('invalid-cell-content')
+                   .removeAttr('title');
+            try {
+                $(input).tooltip('destroy');
+            } catch (e) {
+                // Игнорируем ошибку
+            }
+        }
+    } else if (type === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            isValid = false;
+            $(input).addClass('invalid-cell-content')
+                   .attr('title', 'Введите корректный email адрес');
+            initTooltip(input);
+        } else {
+            $(input).removeClass('invalid-cell-content')
+                   .removeAttr('title');
+            try {
+                $(input).tooltip('destroy');
+            } catch (e) {
+                // Игнорируем ошибку
+            }
+        }
     }
+    
+    return isValid;
+}
 
+function initTooltip(input) {
+    try {
+        $(input).tooltip('destroy');
+    } catch (e) {
+        // Игнорируем ошибку
+    }
+    
+    $(input).tooltip({
+        content: input.getAttribute('title'),
+        position: { my: 'left+15 center', at: 'right center', of: input },
+        classes: { 'ui-tooltip': 'tooltip-inner bg-danger' },
+        show: { effect: 'fade', duration: 200 },
+        hide: { effect: 'fade', duration: 200 },
+        open: function(event, ui) {
+            // Подсказка будет показываться только при наведении
+            if (!$(this).is(':hover')) {
+                $(this).tooltip('close');
+            }
+        }
+    });
+}
+
+/*
+    Добавляем обработчики для валидации в реальном времени
+*/
+function _addValidationHandlers(row) {
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        // Определяем тип таблицы и соответствующую карту полей
+        let rowMap;
+        if (row.closest('.users-table')) {
+            rowMap = {
+                0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 
+                5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 
+                9: 'bool', 10: 'bool', 11: 'ignore'
+            };
+        } else if (row.closest('.licences-table')) {
+            rowMap = {
+                0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
+            };
+        } else if (row.closest('.qp-method-table')) {
+            rowMap = {
+                0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 
+                4: 'number', 5: 'text', 6: 'ignore'
+            };
+        } else {
+            return; // Если таблица не распознана, выходим
+        }
+
+        // Валидация при потере фокуса
+        input.addEventListener('blur', function() {
+            const cell = this.closest('td');
+            const cellIndex = Array.from(cell.parentElement.children).indexOf(cell);
+            _validateEditCell(cell, rowMap[cellIndex]);
+        });
+
+        // Валидация при вводе (с задержкой)
+        let timeout;
+        input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                const cell = this.closest('td');
+                const cellIndex = Array.from(cell.parentElement.children).indexOf(cell);
+                _validateEditCell(cell, rowMap[cellIndex]);
+            }, 500);
+        });
+    });
 }
 
 /*
@@ -565,6 +993,8 @@ function _convertEditRowToStableRow(row, rowMap, isPassportTable) {
     for (let i = 0; i < cells.length; i++) {
         _convertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, qpMethodsArray, qpParametersArray);
     }
+    // Добавляем обработчики валидации
+    _addValidationHandlers(row);
 }
 
 /*
@@ -647,11 +1077,12 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
     @param rowMap -  карта строки
 */
 function _convertStableRowToEditRow(row, rowMap) {
-
     let cells = row.querySelectorAll('td');
     for (let i = 0; i < cells.length; i++) {
         _convertStableCellToEditCell(cells[i], rowMap[i])
     }
+    // Добавляем обработчики валидации
+    _addValidationHandlers(row);
 }
 
 /*
@@ -762,8 +1193,6 @@ function _convertStableCellToEditCell(cell, type) {
         default:
             break
     }
-
-
 }
 
 /*
@@ -828,7 +1257,10 @@ function _addLicHandler() {
         let itemId = Number(lastRow.dataset.id);
         let itemBtn = lastRow.querySelector('.edit-licences-btn');
         if (!itemId || !itemBtn || !lastRow) return;
-        _editSelectedLicences(itemBtn, lastRow, itemId)
+        
+        // Устанавливаем режим инициализации для новой строки
+        itemBtn.dataset.mode = 'init';
+        _editSelectedLicences(itemBtn, lastRow, itemId);
     });
 }
 
@@ -861,7 +1293,10 @@ function _addUserHandler() {
         let itemId = Number(lastRow.dataset.id);
         let itemBtn = lastRow.querySelector('.edit-user-btn');
         if (!itemId || !itemBtn || !lastRow) return;
-        _editSelectedUser(itemBtn, lastRow, itemId)
+        
+        // Устанавливаем режим инициализации для новой строки
+        itemBtn.dataset.mode = 'init';
+        _editSelectedUser(itemBtn, lastRow, itemId);
     });
 }
 
@@ -1135,7 +1570,6 @@ function _addBtnToAddQp(qpId) {
     btn.dataset.qpId = qpId
     btnDiv.appendChild(btn);
 
-
     btn.addEventListener('click', function (event) {
         let item = event.target;
         if (event.target.tagName === "I" || event.target.tagName === "LABEL") {
@@ -1168,9 +1602,15 @@ function _addBtnToAddQp(qpId) {
         li.classList.add('active');
         document.querySelector(li.dataset.target).classList.remove('d-none');
         _scrollToBottomTable(li.dataset.target + ' > .table-container > .table-content');
-        _editQpMethod(document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild, document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild.querySelector('.edit-methods-btn'))
+        
+        let lastRow = document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild;
+        let itemBtn = lastRow.querySelector('.edit-methods-btn');
+        if (!itemBtn || !lastRow) return;
+        
+        // Устанавливаем режим инициализации для новой строки
+        itemBtn.dataset.mode = 'init';
+        _editQpMethod(lastRow, itemBtn);
     });
-
 
     let img = document.createElement('i');
     img.classList.add('fa', 'fa-plus');
@@ -1262,8 +1702,12 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
         _addCellStyle(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
         let actionCell = document.createElement('td');
-        actionCell.appendChild(_createEditQpMethodsBtn('fa:fa-lock:edit-user-btn', 'btn:btn-outline-primary:edit-methods-btn', '5px'));
-        actionCell.appendChild(_createDeleteQpMethodsBtn('fa:fa-trash:delete-btn', 'btn:btn-outline-danger:delete-btn', '5px'));
+        let editDivElement = document.createElement('div');
+        editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
+        let deleteDivElement = document.createElement('div');
+        deleteDivElement.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+        actionCell.appendChild(editDivElement);
+        actionCell.appendChild(deleteDivElement);
         _addCellStyle(actionCell);
         row.appendChild(actionCell)
         methodsTable.appendChild(row);
@@ -1276,10 +1720,19 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
 */
 function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
-    btn.addEventListener('click', _deleteQpMethodsBtnHandler)
-    let div = document.createElement('div')
-    div.appendChild(btn);
-    return div;
+    btn.classList.add('delete-btn');
+    btn.addEventListener('click', function(e) {
+        let row = e.target.closest('tr');
+        if (!row) return;
+        let table = row.closest('table');
+        if (!table) return;
+        let qpId = Number(table.dataset.qpId);
+        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries["QpsInfo"][qpId]['Methods'].filter(function (item) {
+            return item["Id"] !== Number(row.dataset.id);
+        });
+        row.remove();
+    });
+    return btn;
 }
 
 /*
@@ -1288,10 +1741,32 @@ function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
 function _createEditQpMethodsBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.dataset.mode = 'stable';
-    let div = document.createElement('div');
-    btn.addEventListener('click', _editQpMethodBtnHandler)
-    div.appendChild(btn);
-    return div;
+    btn.classList.add('edit-methods-btn');
+    
+    // Обновляем иконку в зависимости от режима
+    const updateIcon = () => {
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = 'fa';
+            icon.classList.add(btn.dataset.mode === 'stable' ? 'fa-lock' : 'fa-unlock');
+        }
+    };
+    
+    // Обновляем иконку при изменении режима
+    const observer = new MutationObserver(updateIcon);
+    observer.observe(btn, { attributes: true, attributeFilter: ['data-mode'] });
+    
+    btn.addEventListener('click', function(e) {
+        let item = e.target.tagName === 'I' ? e.target.closest('button') : e.target;
+        let row = item.closest('tr');
+        if (!row) return;
+        _editQpMethod(row, item);
+    });
+    
+    // Инициализируем иконку
+    updateIcon();
+    
+    return btn;
 }
 
 
@@ -1318,6 +1793,15 @@ function _deleteQpMethodsBtnHandler(event) {
 function _editQpMethodBtnHandler(event) {
     let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
     let row = item.closest('tr');
+    if (!row) return;
+    
+    // Если это кнопка отмены, вызываем соответствующую функцию
+    if (item.classList.contains('cancel-edit-btn')) {
+        _cancelEditQpMethod(row, Number(row.dataset.id));
+        return;
+    }
+    
+    // В противном случае обрабатываем как обычное редактирование
     _editQpMethod(row, item);
 }
 
@@ -1327,32 +1811,218 @@ function _editQpMethodBtnHandler(event) {
     @param itemBtn - кнопка редактирования в строке
 */
 function _editQpMethod(row, itemBtn) {
+    if (!row || !itemBtn) return;
+    
     let rowMap = {
         0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
     }
 
-    if (itemBtn.dataset.mode === 'stable') {
-        _changeButtonIcon(itemBtn, 'fa-unlock', 'fa-lock');
+    if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
+        // Сохраняем предыдущие значения перед редактированием только в режиме stable
+        if (itemBtn.dataset.mode === 'stable') {
+            row.dataset.previousState = JSON.stringify(_getCurrentQpMethodState(row));
+        } else {
+            // Для режима инициализации сохраняем этот факт в строке
+            row.dataset.isInit = 'true';
+        }
+        
+        // Отключаем другие элементы
         AddClassToElement('#qp-list', 'disabled-item');
         AddClassToElement('.modal-header', 'disabled-item');
         AddClassToElement('.save-btn', 'disabled-item');
         AddClassToElement('row', 'disabled-item');
         AddClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
+        
+        // Отключаем другие строки
         _disableOtherRowsInTable(itemBtn.closest('table'), Number(row.dataset.id));
+        
+        // Преобразуем строку в режим редактирования
         _convertStableRowToEditRow(row, rowMap);
+        
+        // Добавляем обработчики валидации в реальном времени
+        _addValidationHandlers(row);
+        
+        // Меняем кнопки
+        let actionCell = row.querySelector('td:last-child');
+        if (!actionCell) return;
+        
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        if (editDiv && deleteDiv) {
+            // Удаляем текущие кнопки
+            editDiv.innerHTML = '';
+            deleteDiv.innerHTML = '';
+            
+            // Добавляем кнопки редактирования
+            let editBtn = _createEditQpMethodsBtn('fa-unlock', 'btn-outline-primary', 'me-1');
+            editBtn.dataset.mode = 'edit';
+            editDiv.appendChild(editBtn);
+            
+            let cancelBtn = _createCancelEditButton('fa-times', 'btn-outline-danger', '');
+            deleteDiv.appendChild(cancelBtn);
+        }
+        
         itemBtn.dataset.mode = 'edit';
-    } else {
+    } else if (itemBtn.dataset.mode === 'edit') {
         if (!_validateEditRow(row, rowMap)) return;
-        _convertEditRowToStableRow(row, rowMap, true)
-        _changeButtonIcon(itemBtn, 'fa-lock', 'fa-unlock');
+        
+        // Применяем изменения
+        _applyQpMethodsChanged(row, Number(row.dataset.id), Number(itemBtn.closest('table').dataset.qpId));
+        _convertEditRowToStableRow(row, rowMap, true);
+        
+        // Удаляем сохраненное предыдущее состояние и флаг инициализации
+        delete row.dataset.previousState;
+        delete row.dataset.isInit;
+        
+        // Включаем все элементы
         RemoveClassToElement('#qp-list', 'disabled-item');
         RemoveClassToElement('.modal-header', 'disabled-item');
         RemoveClassToElement('.save-btn', 'disabled-item');
         RemoveClassToElement('tr[data-id="' + Number(row.dataset.id) + '"] td button.delete-btn', 'disabled-item');
-        _enableOtherRowsInTable(itemBtn.closest('table'), Number(itemBtn.closest('tr').dataset.id));
-        _applyQpMethodsChanged(row, Number(row.dataset.id), Number(itemBtn.closest('table').dataset.qpId));
+        
+        // Включаем другие строки
+        _enableOtherRowsInTable(itemBtn.closest('table'), Number(row.dataset.id));
+        
+        // Меняем кнопки обратно
+        let actionCell = row.querySelector('td:last-child');
+        if (!actionCell) return;
+        
+        let editDiv = actionCell.querySelector('div:first-child');
+        let deleteDiv = actionCell.querySelector('div:last-child');
+        
+        if (editDiv && deleteDiv) {
+            // Удаляем текущие кнопки
+            editDiv.innerHTML = '';
+            deleteDiv.innerHTML = '';
+            
+            // Добавляем кнопки просмотра
+            let editBtn = _createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1');
+            editBtn.dataset.mode = 'stable';
+            editDiv.appendChild(editBtn);
+            
+            let deleteBtn = _createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', '');
+            deleteDiv.appendChild(deleteBtn);
+        }
+        
         itemBtn.dataset.mode = 'stable';
     }
+}
+
+/*
+    Получение текущего состояния строки метода испытаний
+    @param rowItem - строка таблицы
+    @returns {Object} - объект с текущим состоянием
+*/
+function _getCurrentQpMethodState(rowItem) {
+    const cells = rowItem.cells;
+    return {
+        use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        name: cells[1].textContent.trim(),
+        paramId: cells[2].dataset.paramId || "0",
+        limitValueActivate: cells[3].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        limitValue: cells[4].textContent.trim(),
+        limitValueString: cells[5].textContent.trim()
+    };
+}
+
+/*
+    Отмена редактирования метода испытаний
+    @param rowItem - редактируемая строка
+    @param itemId - id метода
+*/
+function _cancelEditQpMethod(rowItem, itemId) {
+    // Проверяем, является ли строка новой (в режиме инициализации)
+    if (rowItem.dataset.isInit === 'true') {
+        let table = rowItem.closest('table');
+        let qpId = Number(table.dataset.qpId);
+        
+        // Удаляем метод из массива
+        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries['QpsInfo'][qpId]['Methods']
+            .filter(method => method.Id !== itemId);
+        
+        // Включаем все элементы
+        RemoveClassToElement('#qp-list', 'disabled-item');
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+        
+        // Включаем другие строки
+        _enableOtherRowsInTable(table, itemId);
+        
+        // Удаляем строку из таблицы
+        rowItem.remove();
+        return;
+    }
+
+    let rowMap = {
+        0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
+    };
+    
+    // Восстанавливаем предыдущее состояние
+    if (rowItem.dataset.previousState) {
+        const previousState = JSON.parse(rowItem.dataset.previousState);
+        _restoreQpMethodState(rowItem, previousState);
+        delete rowItem.dataset.previousState;
+    }
+    
+    // Включаем все элементы
+    RemoveClassToElement('#qp-list', 'disabled-item');
+    RemoveClassToElement('.modal-header', 'disabled-item');
+    RemoveClassToElement('.save-btn', 'disabled-item');
+    RemoveClassToElement('tr[data-id="' + itemId + '"] td button.delete-btn', 'disabled-item');
+    
+    // Включаем другие строки
+    _enableOtherRowsInTable(rowItem.closest('table'), itemId);
+    
+    // Меняем кнопки обратно
+    let actionCell = rowItem.querySelector('td:last-child');
+    let editDiv = actionCell.querySelector('div:first-child');
+    let deleteDiv = actionCell.querySelector('div:last-child');
+    
+    // Удаляем текущие кнопки
+    editDiv.innerHTML = '';
+    deleteDiv.innerHTML = '';
+    
+    // Добавляем кнопки просмотра
+    editDiv.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
+    deleteDiv.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+}
+
+/*
+    Восстановление состояния строки метода испытаний
+    @param rowItem - строка таблицы
+    @param previousState - предыдущее состояние
+*/
+function _restoreQpMethodState(rowItem, previousState) {
+    const cells = rowItem.cells;
+    
+    // Восстанавливаем флаг использования
+    const useIcon = document.createElement('i');
+    useIcon.classList.add('fa', previousState.use ? 'fa-check-square-o' : 'fa-square-o');
+    useIcon.ariaHidden = true;
+    cells[0].innerHTML = '';
+    cells[0].appendChild(useIcon);
+    
+    // Восстанавливаем название метода
+    cells[1].textContent = previousState.name;
+    
+    // Восстанавливаем параметр
+    const param = qpCfgsDictionaries['QpsInfo'][Number(rowItem.closest('table').dataset.qpId)]['Parameters']
+        .find(p => p.Id === Number(previousState.paramId));
+    cells[2].textContent = param ? param.Name : "Параметр не выбран";
+    cells[2].dataset.paramId = previousState.paramId;
+    
+    // Восстанавливаем флаг контроля минимального значения
+    const limitIcon = document.createElement('i');
+    limitIcon.classList.add('fa', previousState.limitValueActivate ? 'fa-check-square-o' : 'fa-square-o');
+    limitIcon.ariaHidden = true;
+    cells[3].innerHTML = '';
+    cells[3].appendChild(limitIcon);
+    
+    // Восстанавливаем минимальное значение и сообщение
+    cells[4].textContent = previousState.limitValue;
+    cells[5].textContent = previousState.limitValueString;
 }
 
 /*
@@ -1460,27 +2130,38 @@ function _modificateElementClasses(selector, className, isRemove) {
     @param margin - конфигурация отсутупов
 */
 function _createWithOnlyImgButton(faClass, buttonClass, margin) {
-
     let img = document.createElement('i');
-    AddClassToElement(faClass, img)
+    img.classList.add('fa');
+    if (typeof faClass === 'string') {
+        if (faClass.includes(':')) {
+            let faClasses = faClass.split(':');
+            for (let cl of faClasses) {
+                if (!cl) continue;
+                img.classList.add(cl);
+            }
+        } else {
+            img.classList.add(faClass);
+        }
+    }
     img.ariaHidden = true;
-    img.style.fontSize = '1.5em'
-    let btn = document.createElement('button')
-    AddClassToElement(buttonClass, btn)
+    img.style.fontSize = '1.5em';
+    
+    let btn = document.createElement('button');
+    if (typeof buttonClass === 'string') {
+        if (buttonClass.includes(':')) {
+            let btnClasses = buttonClass.split(':');
+            for (let cl of btnClasses) {
+                if (!cl) continue;
+                btn.classList.add(cl);
+            }
+        } else {
+            btn.classList.add(buttonClass);
+        }
+    }
     btn.appendChild(img);
     btn.style.margin = margin;
     btn.style.alignSelf = 'center';
     return btn;
-
-    function AddClassToElement(classes, element) {
-        if (!classes) return;
-        let elClasses = classes.split(':');
-        for (let cl of elClasses) {
-            if (!cl) continue;
-            element.classList.add(cl);
-        }
-    }
-
 }
 
 /*
@@ -1575,3 +2256,151 @@ function _enableOtherRowsInTable(table, ignoredId) {
 /**********************************************/
 /*************Хелперы*************************/
 /**********************************************/
+
+function GetInvalideChars() {
+    const currentDeviceId = $('#ComboboxDevice').val();
+    
+    // Если ID устройства изменился или кэш пуст, обновляем кэш
+    if (currentDeviceId !== lastDeviceId || cachedInvalidChars === null) {
+        $.ajax({
+            async: false,
+            url: '/Home/GetInvalideChars',
+            type: 'GET',
+            data: {
+                IdDevice: currentDeviceId
+            },
+            success: function(data) {
+                if (data) {
+                    cachedInvalidChars = JSON.parse(data);
+                    lastDeviceId = currentDeviceId;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Ошибка при получении списка некорректных символов:', error);
+                cachedInvalidChars = [];
+            }
+        });
+    }
+    
+    return cachedInvalidChars || [];
+}
+
+function TestValidation() {
+    console.log('Начало тестирования валидации...');
+    
+    // Проверяем наличие комбобокса
+    const deviceCombo = $('#ComboboxDevice');
+    if (!deviceCombo.length) {
+        console.error('Элемент ComboboxDevice не найден');
+        return;
+    }
+    console.log('ID устройства:', deviceCombo.val());
+    
+    // Получаем список некорректных символов
+    const invalidChars = GetInvalideChars();
+    console.log('Получены некорректные символы:', invalidChars);
+    
+    // Находим все текстовые поля
+    const textFields = document.querySelectorAll('td input[type="text"]');
+    console.log('Найдено текстовых полей:', textFields.length);
+    
+    // Тестируем валидацию на каждом поле
+    textFields.forEach((field, index) => {
+        console.log(`Тестирование поля ${index + 1}:`);
+        
+        // Тест 1: Пустое значение
+        field.value = '';
+        _validateEditCell(field.parentElement, 'text');
+        console.log('- Пустое значение:', field.parentElement.classList.contains('invalid-cell-content'));
+        
+        // Тест 2: Значение с некорректным символом
+        if (invalidChars && invalidChars.length > 0) {
+            field.value = `Тест${invalidChars[0]}текст`;
+            _validateEditCell(field.parentElement, 'text');
+            console.log('- Некорректный символ:', field.parentElement.classList.contains('invalid-cell-content'));
+            console.log('- Подсказка:', field.parentElement.getAttribute('title'));
+        }
+        
+        // Тест 3: Корректное значение
+        field.value = 'Тестовый текст';
+        _validateEditCell(field.parentElement, 'text');
+        console.log('- Корректное значение:', !field.parentElement.classList.contains('invalid-cell-content'));
+    });
+}
+
+function _initTooltips() {
+    $('.dir-editor-table input, .dir-editor-table select').each(function() {
+        try {
+            $(this).tooltip('destroy');
+        } catch (e) {
+            // Игнорируем ошибку, если tooltip еще не инициализирован
+        }
+        
+        $(this).tooltip({
+            position: { my: 'left+15 center', at: 'right center', of: this },
+            classes: { 'ui-tooltip': 'tooltip-inner bg-danger' }
+        });
+    });
+}
+
+/*
+    Отмена редактирования доверенности
+    @param rowItem - редактируемая строка
+    @param itemId - id доверенности
+*/
+function _cancelEditLicence(rowItem, itemId) {
+    // Проверяем, является ли строка новой (в режиме инициализации)
+    if (rowItem.dataset.isInit === 'true') {
+        // Удаляем доверенность из массива
+        appDictionaries['Licenses'] = appDictionaries['Licenses'].filter(lic => lic.Id !== itemId);
+        
+        // Включаем все элементы
+        RemoveClassToElement('.table-bottom-menu', 'disabled-item');
+        RemoveClassToElement('#dictionaries-list', 'disabled-item');
+        RemoveClassToElement('.save-btn', 'disabled-item');
+        RemoveClassToElement('.close', 'disabled-item');
+        RemoveClassToElement('.modal-header', 'disabled-item');
+        
+        // Включаем другие строки
+        _enableOtherTableRows(itemId, 'licences-table');
+        
+        // Удаляем строку из таблицы
+        rowItem.remove();
+        return;
+    }
+
+    let rowMap = {
+        0: 'bool', 1: 'text', 2: 'date', 3: 'ignore'
+    };
+    
+    // Восстанавливаем предыдущее состояние
+    if (rowItem.dataset.previousState) {
+        const previousState = JSON.parse(rowItem.dataset.previousState);
+        _restoreRowState(rowItem, previousState);
+        delete rowItem.dataset.previousState;
+    }
+    
+    // Включаем все элементы
+    RemoveClassToElement('.table-bottom-menu', 'disabled-item');
+    RemoveClassToElement('#dictionaries-list', 'disabled-item');
+    RemoveClassToElement('.save-btn', 'disabled-item');
+    RemoveClassToElement('.close', 'disabled-item');
+    RemoveClassToElement('.modal-header', 'disabled-item');
+    
+    // Включаем другие строки
+    _enableOtherTableRows(itemId, 'licences-table');
+    
+    // Меняем кнопки обратно
+    let actionCell = rowItem.querySelector('td:last-child');
+    let editDiv = actionCell.querySelector('div:first-child');
+    let deleteDiv = actionCell.querySelector('div:last-child');
+    
+    // Удаляем текущие кнопки
+    editDiv.innerHTML = '';
+    deleteDiv.innerHTML = '';
+    
+    // Добавляем кнопки просмотра
+    editDiv.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1'));
+    deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+}
+

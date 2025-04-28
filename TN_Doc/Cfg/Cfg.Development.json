@@ -1,0 +1,223 @@
+{
+  "Doc": {
+    "Version": "1.0.0",
+    "GUID": 1,
+    "Settings": {
+      "General": {
+        "ObjType": 1,
+        "NefType": 1,
+        "NumberDensitometers": 1,
+        "NumberViscometers": 1,
+        "NumberWatermetrs": 1,
+        "PageSettings": {
+          "PaperWidth": 210,
+          "PaperHeight": 297,
+          "TopMargin": 10,
+          "BottomMargin": 10,
+          "LeftMargin": 10,
+          "RightMargin": 10
+        },
+        "FileNameForExportDoc": "",
+        "ProtocolNumber": 1
+      },
+      "Header": {},
+      "Data": {},
+      "Footer": {},
+      "Dictionarys": {
+        "Users": [
+          {
+            "Use": true,
+            "Id": 2,
+            "IdGroup": 1,
+            "F": "Горбачев",
+            "I": "Сергей",
+            "O": "Владиславович",
+            "Factory": "",
+            "Post": "Старший лаборант",
+            "LicId": 0,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "IdGroup": 2,
+            "F": "Попов",
+            "I": "Илья",
+            "O": "Фёдорович",
+            "Factory": "ООО \"Сдающая сторона\"",
+            "Post": "Оператор товарный",
+            "LicId": 1,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 5,
+            "IdGroup": 2,
+            "F": "Власов",
+            "I": "Григорий",
+            "O": "Егорович",
+            "Factory": "ООО \"Сдающая сторона\"",
+            "Post": "Начальник ПСП",
+            "LicId": 2,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 6,
+            "IdGroup": 2,
+            "F": "Колесников",
+            "I": "Фёдор",
+            "O": "Алексеевич",
+            "Factory": "ООО \"Сдающая сторона\"",
+            "Post": "Оператор",
+            "LicId": 1,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 7,
+            "IdGroup": 3,
+            "F": "Никитин",
+            "I": "Кирилл",
+            "O": "Андреевич",
+            "Factory": "ООО \"Принимающая сторона\"",
+            "Post": "Оператор товарный",
+            "LicId": 4,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 8,
+            "IdGroup": 3,
+            "F": "Игнатьев",
+            "I": "Александр",
+            "O": "Данилович",
+            "Factory": "ООО \"Принимающая сторона\"",
+            "Post": "Начальник ПСП",
+            "LicId": 5,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 9,
+            "IdGroup": 3,
+            "F": "Леонов",
+            "I": "Михаил",
+            "O": "Ильич",
+            "Factory": "ООО \"Принимающая сторона\"",
+            "Post": "Оператор",
+            "LicId": 6,
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 10,
+            "IdGroup": 3,
+            "F": "王",
+            "I": "华丽",
+            "O": "",
+            "Factory": "ООО Китай",
+            "Post": "Инженер",
+            "UseFullNameSeparator": false,
+            "UseFullNameWhiteSpace": false,
+            "UseShortFullNameForm": false,
+            "LicId": 6
+          }
+        ],
+        "UsersGroup": [
+          {
+            "Use": true,
+            "Id": 1,
+            "Name": "Представители испытательной лаборатории"
+          },
+          {
+            "Use": true,
+            "Id": 2,
+            "Name": "Представители сдающей стороны"
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "Name": "Представители принимающей стороны"
+          },
+          {
+            "Use": true,
+            "Id": 4,
+            "Name": "Представители ТНМ"
+          }
+        ],
+        "Licenses": [
+          {
+            "Id": 1,
+            "Use": true,
+            "LicensesDate": "01.01.2024",
+            "LicensesNumber": "ДОВ/10/123/71"
+          },
+          {
+            "Id": 2,
+            "Use": true,
+            "LicensesDate": "01.01.2024",
+            "LicensesNumber": "ДОВ/10/123/72"
+          },
+          {
+            "Id": 3,
+            "Use": true,
+            "LicensesDate": "01.01.2024",
+            "LicensesNumber": "ДОВ/10/123/73"
+          },
+          {
+            "Id": 4,
+            "Use": true,
+            "LicensesDate": "10.01.2024",
+            "LicensesNumber": "ДОВ/88/542/21"
+          },
+          {
+            "Id": 5,
+            "Use": true,
+            "LicensesDate": "10.01.2024",
+            "LicensesNumber": "ДОВ/88/542/22"
+          },
+          {
+            "Id": 6,
+            "Use": true,
+            "LicensesDate": "10.01.2024",
+            "LicensesNumber": "ДОВ/88/542/23"
+          },
+          {
+            "Id": 7,
+            "Use": true,
+            "LicensesDate": "01.11.2024",
+            "LicensesNumber": "ДОВ/88/542/24"
+          }
+        ],
+        "BIKs": [
+          {
+            "Id": 1,
+            "Name": "БИК-1"
+          }
+        ],
+        "Directions": [
+          {
+            "Id": 0,
+            "Name": "СИКН"
+          }
+        ]
+      }
+    },
+    "DataIVK": {}
+  }
+}

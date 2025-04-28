@@ -688,7 +688,7 @@
     },
     {
       "Id": 16,
-      "Use": true,
+      "Use": false,
       "Key": "TankerName",
       "Type": "text",
       "Name": "Название танкера"

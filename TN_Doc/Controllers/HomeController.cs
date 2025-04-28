@@ -259,13 +259,7 @@ namespace TN_Doc.Controllers
         /// </summary>
         /// <param name="IdDevice"></param>
         /// <returns></returns>
-        public bool IsUsedElis(int IdDevice)
-        {
-            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
-            var cfgElisUse = _cfgApp.Elis?.Use ?? false;
-
-            return device.Elis?.Use ?? cfgElisUse;
-        }
+        public bool IsUsedElis(int IdDevice) => _appConfig.IsUsedElis(IdDevice);
 
         /// <summary>
         /// Получить данные для регистрации устройства в ЕЛИС.
