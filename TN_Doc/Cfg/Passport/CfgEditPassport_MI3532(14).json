@@ -614,7 +614,8 @@
       "Key": "TestProtocolNumberELIS",
       "KeyELIS": "protocolNumber",
       "Type": "text",
-      "Name": "Номер протокола испытаний ЕЛИС"
+      "Name": "Номер протокола испытаний ЕЛИС",
+      "Edit": false
     }
   ]
 }
