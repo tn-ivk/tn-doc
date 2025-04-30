@@ -27,13 +27,13 @@
             font-size: 14px;
             font-family: Arial,sans-serif;
             outline: none;
-            border: 1px solid white;
+            border: 1px solid transparent;
         }
         select {
             font-size: 14px;
             font-family: Arial,sans-serif;
             outline: none;
-            border: 1px solid white;
+            border: 1px solid transparent;
             width: 100%;
         }
 
@@ -54,13 +54,11 @@
         }
         
         .correct-value {
-            border: 1px solid white;
-            /* background-color: green; */
+            border: 1px solid transparent;
         }
 
         .incorrect-value {
             border: 2px solid rgb(255, 105, 105);
-            /* background-color: red; */
         }
         
         .manual-input--disabled{
@@ -127,6 +125,11 @@
             font-family: Arial,sans-serif!important;
         }
         
+        /* Стили для элементов ввода при фокусе */
+        input:focus,
+        select:focus {
+            border: 1px solid transparent;
+        }
     </style>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
