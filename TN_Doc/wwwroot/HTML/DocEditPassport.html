@@ -78,6 +78,26 @@
             pointer-events: none;
         }
 
+        /* Стили для ячеек с неактивными элементами */
+        td:has(input.manual-input--disabled),
+        td:has(select.manual-input--disabled) {
+            background-color: #F5F5F5;
+            position: relative;
+        }
+
+        /* Создаем эффект "затемнения" для всей ячейки */
+        td:has(input.manual-input--disabled)::after,
+        td:has(select.manual-input--disabled)::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+        }
+
         /* Стиль для подсказки */
         .ui-tooltip {
             background-color: red!important;
