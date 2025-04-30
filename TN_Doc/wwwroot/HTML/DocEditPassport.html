@@ -90,6 +90,22 @@
             background-color: var(--elis-disabled-color);
         }
 
+        /* Стили для элементов внутри ячеек */
+        input[data-elis-filled="true"],
+        select[data-elis-filled="true"] {
+            background-color: var(--elis-active-color);
+        }
+
+        input[data-elis-filled="true"].manual-input--disabled,
+        select[data-elis-filled="true"].manual-input--disabled {
+            background-color: var(--elis-disabled-color);
+        }
+
+        input.manual-input--disabled,
+        select.manual-input--disabled {
+            background-color: var(--disabled-bg-color);
+        }
+
         /* Создаем эффект "затемнения" для всей ячейки */
         td:has(input.manual-input--disabled)::after,
         td:has(select.manual-input--disabled)::after {

@@ -1297,9 +1297,7 @@ function FillPassportDataElis() {
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
-                if(item.hasAttribute("data-elis-filled")) {
-                    item.setAttribute("data-elis-filled", "true");
-                }
+                item.setAttribute("data-elis-filled", "true");
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
 
@@ -1337,9 +1335,7 @@ function FillPassportDataElis() {
                     default: 
                         break;
                 }
-                if(item.hasAttribute("data-elis-filled")) {
-                    item.setAttribute("data-elis-filled", "true");
-                }
+                item.setAttribute("data-elis-filled", "true");
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
