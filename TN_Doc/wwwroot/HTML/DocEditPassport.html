@@ -5,6 +5,10 @@
     <title></title>
 
     <style>
+        :root {
+            --disabled-bg-color: #EEEEEE;
+        }
+
         /*chrome*/
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
@@ -71,7 +75,7 @@
         
         .manual-input--disabled{
             text-align: center;
-            background: #EEEEEE;
+            background: var(--disabled-bg-color);
             color:black;
             cursor: not-allowed;
             opacity: 0.8;
@@ -81,7 +85,7 @@
         /* Стили для ячеек с неактивными элементами */
         td:has(input.manual-input--disabled),
         td:has(select.manual-input--disabled) {
-            background-color: #F5F5F5;
+            background-color: var(--disabled-bg-color);
             position: relative;
         }
 
