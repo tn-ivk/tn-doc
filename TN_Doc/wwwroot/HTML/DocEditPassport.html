@@ -7,6 +7,8 @@
     <style>
         :root {
             --disabled-bg-color: #EEEEEE;
+            --elis-active-color: #8fd19e;
+            --elis-disabled-color: #c8e5d0;
         }
 
         /*chrome*/
@@ -87,6 +89,17 @@
         td:has(select.manual-input--disabled) {
             background-color: var(--disabled-bg-color);
             position: relative;
+        }
+
+        /* Стили для ячеек с данными из ЕЛИС */
+        td:has(input[data-elis-filled="true"]),
+        td:has(select[data-elis-filled="true"]) {
+            background-color: var(--elis-active-color);
+        }
+
+        td:has(input[data-elis-filled="true"].manual-input--disabled),
+        td:has(select[data-elis-filled="true"].manual-input--disabled) {
+            background-color: var(--elis-disabled-color);
         }
 
         /* Создаем эффект "затемнения" для всей ячейки */

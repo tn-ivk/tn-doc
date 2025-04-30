@@ -1297,8 +1297,10 @@ function FillPassportDataElis() {
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
-                if(item.hasAttribute("backlight"))
-                    item.setAttribute("backlight", "green");
+                if(item.hasAttribute("backlight")) {
+                    item.setAttribute("data-elis-filled", "true");
+                    item.removeAttribute("backlight");
+                }
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
 
@@ -1336,8 +1338,10 @@ function FillPassportDataElis() {
                     default: 
                         break;
                 }
-                if(item.hasAttribute("backlight"))
-                    item.setAttribute("backlight", "green");
+                if(item.hasAttribute("backlight")) {
+                    item.setAttribute("data-elis-filled", "true");
+                    item.removeAttribute("backlight");
+                }
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
@@ -1361,8 +1365,8 @@ function FixedElisData(object) {
 function ManualCorrect(event) {
     if(!event) return;
     
-    if(event.target.hasAttribute("backlight"))
-        event.target.setAttribute("backlight", "white");
+    if(event.target.hasAttribute("data-elis-filled"))
+        event.target.removeAttribute("data-elis-filled");
 }
 
 //Состояние кнопки "Запросить данные"
