@@ -808,14 +808,12 @@ function _applyUserChanges(rowItem, itemId) {
     Валидация строки таблицы
 */
 function _validateEditRow(row, rowMap) {
-    console.log('Валидация строки:', row);
     let cells = row.querySelectorAll('td')
     for (let i = 0; i < cells.length; i++) {
         _validateEditCell(cells[i], rowMap[i]);
     }
     // Проверяем наличие класса invalid-cell-content у элементов ввода, а не у ячеек таблицы
     const invalidElements = row.querySelectorAll('td input.invalid-cell-content, td select.invalid-cell-content');
-    console.log('Найдено элементов с классом invalid-cell-content:', invalidElements.length);
     return invalidElements.length === 0;
 }
 
