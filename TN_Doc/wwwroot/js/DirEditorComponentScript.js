@@ -2291,40 +2291,32 @@ function TestValidation() {
     // Проверяем наличие комбобокса
     const deviceCombo = $('#ComboboxDevice');
     if (!deviceCombo.length) {
-        console.error('Элемент ComboboxDevice не найден');
+        // console.error('Элемент ComboboxDevice не найден');
         return;
     }
-    console.log('ID устройства:', deviceCombo.val());
     
     // Получаем список некорректных символов
     const invalidChars = GetInvalideChars();
-    console.log('Получены некорректные символы:', invalidChars);
     
     // Находим все текстовые поля
     const textFields = document.querySelectorAll('td input[type="text"]');
-    console.log('Найдено текстовых полей:', textFields.length);
     
     // Тестируем валидацию на каждом поле
     textFields.forEach((field, index) => {
-        console.log(`Тестирование поля ${index + 1}:`);
         
         // Тест 1: Пустое значение
         field.value = '';
         _validateEditCell(field.parentElement, 'text');
-        console.log('- Пустое значение:', field.parentElement.classList.contains('invalid-cell-content'));
         
         // Тест 2: Значение с некорректным символом
         if (invalidChars && invalidChars.length > 0) {
             field.value = `Тест${invalidChars[0]}текст`;
             _validateEditCell(field.parentElement, 'text');
-            console.log('- Некорректный символ:', field.parentElement.classList.contains('invalid-cell-content'));
-            console.log('- Подсказка:', field.parentElement.getAttribute('title'));
         }
         
         // Тест 3: Корректное значение
         field.value = 'Тестовый текст';
         _validateEditCell(field.parentElement, 'text');
-        console.log('- Корректное значение:', !field.parentElement.classList.contains('invalid-cell-content'));
     });
 }
 
