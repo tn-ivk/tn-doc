@@ -5,7 +5,11 @@
     <title></title>
 
     <style>
-/*chrome*/
+        :root {
+            --disabled-bg-color: #F5F5F5;
+        }
+
+        /*chrome*/
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -16,40 +20,56 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
+
         input {
             font-size: 14px;
             font-family: Arial,sans-serif;
             outline: none;
-            border: 1px solid white;
+            border: 1px solid transparent;
         }
         select {
             font-size: 14px;
             font-family: Arial,sans-serif;
             outline: none;
-            border: 1px solid white;
+            border: 1px solid transparent;
             width: 100%;
         }
-        td, th {
+
+        td,
+        th {
             font-size: 14px;
             font-family: Arial,sans-serif;
-            padding: 2px; /* Поля вокруг содержимого таблицы */
-            border: 0.5px solid black; /* Параметры рамки */
+            padding: 2px;
+            border: 0.5px solid black;
         }
 
         Edit {
-            border-collapse: collapse; /* Убираем двойные линии между ячейками */
+            border-collapse: collapse;
+        }
+        
+        .correct-value {
+            border: 1px solid transparent;
         }
 
-        .correct-value {
-            border: 1px solid white;
-            /* background-color: green; */
-        }
-        
         .incorrect-value {
             border: 2px solid rgb(255, 105, 105);
-            /* background-color: red; */
         }
         
+        .manual-input--disabled{
+            text-align: center;
+            background: var(--disabled-bg-color);
+            color:black;
+            cursor: not-allowed;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Стили для ячеек с неактивными элементами */
+        td:has(input.manual-input--disabled),
+        td:has(select.manual-input--disabled) {
+            background-color: var(--disabled-bg-color);
+            position: relative;
+        }
     </style>
 
     <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
