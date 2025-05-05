@@ -95,8 +95,8 @@
     <None Update="prutils\winprutil.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Remove="Doc\ActParty_MI3532(19).frx" />
-    <Content Include="Doc\ActParty_MI3532(19).frx">
+    <None Remove="Doc\Act\ActParty_MI3532(19).frx" />
+    <Content Include="Doc\Act\ActParty_MI3532(19).frx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\PDF\PDF.pdf">
