@@ -2286,8 +2286,6 @@ function GetInvalideChars() {
 }
 
 function TestValidation() {
-    console.log('Начало тестирования валидации...');
-    
     // Проверяем наличие комбобокса
     const deviceCombo = $('#ComboboxDevice');
     if (!deviceCombo.length) {
