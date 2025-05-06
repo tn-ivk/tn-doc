@@ -83,3 +83,23 @@ input:focus,
 select:focus {
     border: 1px solid transparent;
 }
+
+/* Стили для таблицы AdditionalInfo */
+#AdditionalInfo {
+    width: 90%;
+    table-layout: fixed;
+}
+
+#AdditionalInfo td:first-child {
+    width: 50%;
+}
+
+#AdditionalInfo td:last-child {
+    width: 50%;
+}
+
+#AdditionalInfo input,
+#AdditionalInfo select {
+    width: 100%;
+    box-sizing: border-box;
+}
