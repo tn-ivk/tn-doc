@@ -92,14 +92,17 @@ select:focus {
 
 #AdditionalInfo td:first-child {
     width: 50%;
+    text-align: left;
 }
 
 #AdditionalInfo td:last-child {
     width: 50%;
+    text-align: left;
 }
 
 #AdditionalInfo input,
 #AdditionalInfo select {
     width: 100%;
     box-sizing: border-box;
+    text-align: left;
 }
