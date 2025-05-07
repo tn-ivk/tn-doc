@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/26/2023 11:24:56" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PR_PR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/07/2025 18:48:51" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -165,11 +165,7 @@ namespace FastReport
       
     private void TableResults_ManualBuild(object sender, EventArgs e)
     {
-      // if (Engine.FirstPass == true)
-      // {
-            
       // Set width for Columns with Fixed width
-      //int sumDynamicCols;
       float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/TableResults.ColumnCount;                  
       for (int w = 0; w &lt; (TableResults.ColumnCount); w++)                 
       {                                                           
@@ -184,61 +180,72 @@ namespace FastReport
       } 
             
       // Fill TableResults with data from IVK 
-      var listTab2Measures = DataIVK.TableKMH_PR_PR.Protokol.Table2.Where(i =&gt;  i.Ser != &quot;-&quot; &amp; String.IsNullOrEmpty(i.Ser) == false).ToList();
-      var listTab2_1Points = DataIVK.TableKMH_PR_PR.Protokol.Table2_1.Where(i =&gt;  i.Point != &quot;-&quot; &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      var listTab2Measures = DataIVK.TableKMH_PR_PR.Protokol.Table2
+      .Where(i =&gt;  i.Ser != &quot;-&quot; &amp; !String.IsNullOrEmpty(i.Ser))
+      .ToList();
+      var listTab2_1Points = DataIVK.TableKMH_PR_PR.Protokol.Table2_1
+      .Where(i =&gt;  i.Point != &quot;-&quot; &amp; !String.IsNullOrEmpty(i.Point))
+      .ToList();
             
-      int sumPointMeasures =0;
-      int numRowForSpan = 0;
-      int tempCounter = 0;
-      float initialHeight = 0;
-         
+      // Group Table2 by Ser and create a dictionary of series with their measures
+      var groupedMeasures = listTab2Measures
+      .GroupBy(m =&gt; m.Ser)
+      .Select(g =&gt; new { Ser = g.Key, Measures = g.ToList() })
+      .ToList();
 
-      for (int z = 0; z &lt; (listTab2_1Points.Count); z++)                    
+      // Ensure both lists have the same number of unique series/points
+      int maxIterations = Math.Min(groupedMeasures.Count, listTab2_1Points.Count);
+      
+      int tempCounter = 0;
+      float initialHeight = BaseRow.Height;
+         
+      for (int z = 0; z &lt; maxIterations; z++)                    
       {
-        sumPointMeasures = listTab2Measures.Count(i =&gt; i.Ser == (z+1).ToString());
+        var measuresForSeries = groupedMeasures[z].Measures;
+        var pointData = listTab2_1Points[z];
                
-        //MessageBox.Show(&quot;sumPointMeasures - &quot; + sumPointMeasures.ToString());  
-        for (int j = 0; j &lt; sumPointMeasures; j++)                    
+        int sumPointMeasures = measuresForSeries.Count;
+        
+        // Set RowSpan for the last three columns based on the number of measures in the series
+        Ser.RowSpan = sumPointMeasures;
+        K_j.RowSpan = sumPointMeasures;
+        K_rasch_j.RowSpan = sumPointMeasures;
+        Delta_j.RowSpan = sumPointMeasures;
+        
+        for (int j = 0; j &lt; sumPointMeasures; j++)
         {
-                  
-          #region //Span Rows
-          //sumPointMeasures = listTab2Measures.Count(i =&gt; i.Ser == (z+1).ToString());
-          Ser.RowSpan =  sumPointMeasures;
-          K_j.RowSpan =  sumPointMeasures;
-          K_rasch_j.RowSpan =  sumPointMeasures;
-          Delta_j.RowSpan =  sumPointMeasures;
-          //numRowForSpan=numRowForSpan+sumPointMeasures;
-          #endregion
-                 
-          Ser.Text=listTab2Measures[j+tempCounter].Ser;   
-          Row.Text=listTab2Measures[j+tempCounter].Row;
-          Q_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].Q_ji);
-          f_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].f_ji);
-          t_EPR_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].t_EPR_ji);
-          P_EPR_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].P_EPR_ji);
-          t_PR_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].t_PR_ji);
-          P_PR_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].P_PR_ji);
-          k_tp_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].k_tp_ji);
-          N_EPR_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].N_EPR_ji);
-          N_PR_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].N_PR_ji);
-          K_ji.Text=tools.GetNormalizedValue(listTab2Measures[j+tempCounter].K_ji);
-                  
-          //Fill last 3 Cells in the Row     
-          K_j.Text=tools.GetNormalizedValue(listTab2_1Points[z].K_j);        
-          K_rasch_j.Text=tools.GetNormalizedValue(listTab2_1Points[z].K_rasch_j);            
-          Delta_j.Text=tools.GetNormalizedValue(listTab2_1Points[z].Delta_j);
-            
+          var measure = measuresForSeries[j];
+
+          Ser.Text = measure.Ser;
+          Row.Text = measure.Row;
+          Q_ji.Text = tools.GetNormalizedValue(measure.Q_ji);
+          f_ji.Text = tools.GetNormalizedValue(measure.f_ji);
+          t_EPR_ji.Text = tools.GetNormalizedValue(measure.t_EPR_ji);
+          P_EPR_ji.Text = tools.GetNormalizedValue(measure.P_EPR_ji);
+          t_PR_ji.Text = tools.GetNormalizedValue(measure.t_PR_ji);
+          P_PR_ji.Text = tools.GetNormalizedValue(measure.P_PR_ji);
+          k_tp_ji.Text = tools.GetNormalizedValue(measure.k_tp_ji);
+          N_EPR_ji.Text = tools.GetNormalizedValue(measure.N_EPR_ji);
+          N_PR_ji.Text = tools.GetNormalizedValue(measure.N_PR_ji);
+          K_ji.Text = tools.GetNormalizedValue(measure.K_ji);
+
+          // Fill the last three cells with data from Table2_1 for the current point
+          K_j.Text = tools.GetNormalizedValue(pointData.K_j);
+          K_rasch_j.Text = tools.GetNormalizedValue(pointData.K_rasch_j);
+          Delta_j.Text = tools.GetNormalizedValue(pointData.Delta_j);
+
           TableResults.PrintRow(4);
           TableResults.PrintColumns();
-                  
-        } 
-        tempCounter=tempCounter+sumPointMeasures;
-               
-        Ser.RowSpan =  1;
-        K_j.RowSpan =  1;
-        K_rasch_j.RowSpan =  1;
-        Delta_j.RowSpan =  1;
-               
+        }
+        
+        tempCounter += sumPointMeasures;
+
+        // Reset RowSpan for the next series
+        Ser.RowSpan = 1;
+        K_j.RowSpan = 1;
+        K_rasch_j.RowSpan = 1;
+        Delta_j.RowSpan = 1;
+ 
         initialHeight = BaseRow.Height;
         BaseRow.Height = 0;
         TableResults.PrintRow(4);
