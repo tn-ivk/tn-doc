@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-
 namespace TN_Doc.Models.Printer
 {
     /// <summary>
@@ -30,7 +29,7 @@ namespace TN_Doc.Models.Printer
         {
             try
             {
-                var printers = PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
+                var printers = System.Drawing.Printing.PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
                 return printers;
             }
             catch (Exception ex)
