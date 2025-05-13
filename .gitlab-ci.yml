@@ -24,7 +24,7 @@ build-job:       # This job runs in the build stage, which runs first.
   script:
     - echo "Building the application..."
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
-    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "tm-it@transneft.ru" --password "AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAGKs3D5fle0q7vPImb63vUgAAAAACAAAAAAAQZgAAAAEAACAAAABN/p+8g8smM5IXnEBQ/h3xQqrJM2fy3+Gbdq3Ru9cmAwAAAAAOgAAAAAIAACAAAAAO/egiebd/6mEJLzR2tmDtDue73srK3t7L8cANPyvWISAAAAAljhfqo989QM5Lj34T5Q06cY/Pa3jS5KLPQTjTjhxIGkAAAADT8Z4Q0qSPeVe4MnF+Bt/qXZnUcXUY7HHBMEuuBDgXlq5YQ64vksugGxf6QutPsYe4nkoce6v2nNwTFDLs+9/R" --store-password-in-clear-text'
+    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "tm-it@transneft.ru" --password "5rdx5tgb90-=op[]" --store-password-in-clear-text'
     - cd $PROJECT_PATH
     - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../../publish
   artifacts:
