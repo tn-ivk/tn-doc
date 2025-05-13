@@ -1,12 +1,12 @@
 [submodule "tn.utils"]
 	path = tn.utils
-	url = http://192.168.100.100/orpovy/ivk/tn.utils.git
+	url = https://git.tncpa.ru/orpovy/ivk/tn.utils.git
 [submodule "tn.docgeneral"]
 	path = tn.docgeneral
-	url = http://192.168.100.100/orpovy/ivk/tn.docgeneral.git
+	url = https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git
 [submodule "tn_toolsfastreport"]
 	path = tn_toolsfastreport
-	url = http://192.168.100.100/orpovy/ivk/tn_toolsfastreport.git
+	url = https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git
 [submodule "winprutil"]
 	path = winprutil
-	url = http://192.168.100.100/orpovy/ivk/winprutil.git
+	url = https://git.tncpa.ru/orpovy/ivk/winprutil.git
