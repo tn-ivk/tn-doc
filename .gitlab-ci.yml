@@ -102,6 +102,8 @@ package-job:      # This job runs in the deploy stage.
       chmod 644 /opt/TN_Doc/*.dll
       chown -R alphadaemon:alphadaemon /opt/TN_Doc
       chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+      chown alphadaemon:alphadaemon /var/log/TN_Doc
+      chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
 
       # Перезагрузка systemd
       systemctl daemon-reload
