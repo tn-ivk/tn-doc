@@ -132,4 +132,4 @@ package-job:      # This job runs in the deploy stage.
   artifacts:
     name: "package-${CI_COMMIT_TAG}"
     paths:
-      - tn-doc_${APP_VERSION}_amd64.deb
+      - tn-doc_${VERSION}_amd64.deb
