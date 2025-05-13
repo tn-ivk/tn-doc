@@ -7,7 +7,8 @@ variables:
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SUBMODULE_FORCE_HTTPS: "true"
     GIT_STRATEGY: clone
-    DOTNET_VERSION: "8.0"   
+    DOTNET_VERSION: "8.0.100"   
+    PROJECT_PATH: "TN_Doc"  # Путь к директории с TN_Doc.csproj
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -28,7 +29,8 @@ build-job:       # This job runs in the build stage, which runs first.
     - find . -name "TN_Doc.csproj"
   script:
     - echo "Building the application..."
-    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+    - cd $PROJECT_PATH
+    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../../publish
   artifacts:
     name: "build-${CI_COMMIT_TAG}"
     paths:
