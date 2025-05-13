@@ -8,7 +8,6 @@ variables:
     GIT_SUBMODULE_FORCE_HTTPS: "true"
     GIT_STRATEGY: clone
     GIT_SUBMODULE_DEPTH: 1
-
     DOTNET_VERSION: "8.0"   
 
 stages:          # List of stages for jobs, and their order of execution
