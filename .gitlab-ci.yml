@@ -1,0 +1,129 @@
+# CI/CD работает по tag commit
+# автоматически делает release
+
+variables:
+    BRANCH: $CI_DEFAULT_BRANCH
+    VERSION: $CI_COMMIT_TAG
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_FORCE_HTTPS: "true"
+    GIT_STRATEGY: clone
+    DOTNET_VERSION: "8.0"   
+
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - package 
+
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  script:
+    - echo "Building the application..."
+    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+  artifacts:
+    name: "build-${CI_COMMIT_TAG}"
+    paths:
+      - ./publish/
+
+package-job:      # This job runs in the deploy stage.
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  script:
+    - echo "Packaging the application into a .deb file..."
+    - apt-get update && apt-get install -y dpkg-dev
+    # Создание структуры пакета
+    - mkdir -p tn-doc-deb/DEBIAN
+    - mkdir -p tn-doc-deb/opt/TN_Doc
+    - mkdir -p tn-doc-deb/var/log/TN_Doc
+    - mkdir -p tn-doc-deb/etc/systemd/system
+    # Копирование файлов приложения
+    - cp -r ./publish/* tn-doc-deb/opt/TN_Doc/
+    # Генерация control
+    - |
+      cat << EOF > tn-doc-deb/DEBIAN/control
+      Package: tn-doc
+      Version: ${VERSION}
+      Section: utils
+      Priority: optional
+      Architecture: amd64
+      Depends: dotnet-runtime-8.0 (>= $DOTNET_VERSION), libgdiplus
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: TN_Doc это приложение для работы с документами СОИ.
+      Homepage:
+      EOF
+    # Генерация preinst
+    - |
+      cat << EOF > tn-doc-deb/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      # Проверка наличия dotnet
+      if ! command -v dotnet >/dev/null 2>&1; then
+          echo "Error: .NET 8 is not installed. Please install dotnet-runtime-8.0."
+          exit 1
+      fi
+
+      # Проверка версии .NET
+      REQUIRED_VERSION="$DOTNET_VERSION"
+      INSTALLED_VERSION=\$(dotnet --version)
+
+      if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
+          echo "Error: .NET version \$INSTALLED_VERSION is installed, but version >= \$REQUIRED_VERSION is required."
+          exit 1
+      fi
+
+      exit 0
+      EOF
+    # Копирование postinst (без изменений)
+    - |
+      cat << EOF > tn-doc-deb/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      # Установка прав и владельцев
+      chmod 755 /opt/TN_Doc/TN_Doc
+      chmod 644 /opt/TN_Doc/*.dll
+      chown -R alphadaemon:alphadaemon /opt/TN_Doc
+      chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+
+      # Перезагрузка systemd
+      systemctl daemon-reload
+
+      # Включение и запуск сервиса
+      systemctl enable TN_Doc.service
+      systemctl start TN_Doc.service
+
+      exit 0
+      EOF
+    # Копирование TN_Doc.service (без изменений)
+    - |
+      cat << EOF > tn-doc-deb/etc/systemd/system/TN_Doc.service
+      [Unit]
+      Description=TN_Doc Service
+      After=network.target
+
+      [Service]
+      ExecStart=/opt/TN_Doc/TN_Doc
+      WorkingDirectory=/opt/TN_Doc
+      User=alphadaemon
+      Group=alphadaemon
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+    # Установка прав
+    - chmod 755 tn-doc-deb/DEBIAN/preinst tn-doc-deb/DEBIAN/postinst
+    - chmod 644 tn-doc-deb/DEBIAN/control
+    - chmod 755 tn-doc-deb/opt/TN_Doc/TN_Doc
+    - chmod 644 tn-doc-deb/opt/TN_Doc/*.dll
+    # Сборка пакета
+    - dpkg-deb --build tn-doc-deb
+    - mv tn-doc-deb.deb tn-doc_${APP_VERSION}_amd64.deb
+  artifacts:
+    name: "package-${CI_COMMIT_TAG}"
+    paths:
+      - tn-doc_${APP_VERSION}_amd64.deb
