@@ -38,6 +38,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - cd $PROJECT_PATH
     - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
+    - dotnet build
     - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
     - ls -l
     - echo "Checking publish directory contents:"
