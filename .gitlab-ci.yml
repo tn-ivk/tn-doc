@@ -54,6 +54,10 @@ package-job:      # This job runs in the deploy stage.
     - build-job
   tags:
     - orpovy
+  cache:
+    key: ${CI_JOB_STAGE}
+    paths:
+      - /var/cache/apt/archives/
   script:
     - echo "Packaging the application into a .deb file..."
     - apt-get update && apt-get install -y dpkg-dev
@@ -76,7 +80,7 @@ package-job:      # This job runs in the deploy stage.
       Maintainer: DadonovAD <dadonovad@transneft.ru>
       Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
       Homepage:
-        
+
       EOF
     # Генерация preinst
     - |
