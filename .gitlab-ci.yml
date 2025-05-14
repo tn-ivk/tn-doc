@@ -34,11 +34,12 @@ build-job:       # This job runs in the build stage, which runs first.
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
     - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - echo "Current directory:$(pwd)"
+    - echo "Rebuilding solution ..."
+    - dotnet build
     - echo "Moving to $PROJECT_PATH..."
     - cd $PROJECT_PATH
     - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
-    - dotnet build
     - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
     - ls -l
     - ls -la ./Dll
