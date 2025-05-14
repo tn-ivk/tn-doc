@@ -151,6 +151,7 @@ package-job:      # This job runs in the deploy stage.
     - chmod 755 tn-doc-deb/opt/TN_Doc/TN_Doc
     - chmod 644 tn-doc-deb/opt/TN_Doc/*.dll
     # Сборка пакета
+    - ls -R tn-doc-deb
     - dpkg-deb --build tn-doc-deb
     - mv tn-doc-deb.deb tn-doc_${VERSION}_amd64.deb
   artifacts:
