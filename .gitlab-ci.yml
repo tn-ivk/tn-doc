@@ -27,7 +27,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Checking for TN_Doc.csproj:"
     - find . -name "TN_Doc.csproj"
     # Создание директории для публикации
-    - mkdir -p /publish
+    - mkdir -p ./publish
   script:
     - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
@@ -37,13 +37,13 @@ build-job:       # This job runs in the build stage, which runs first.
     - cd $PROJECT_PATH
     - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
-    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o /publish
+    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
     - echo "Checking publish directory contents:"
-    - ls -la /publish
+    - ls -la ../publish
   artifacts:
     name: "build-${CI_COMMIT_TAG}"
     paths:
-      - /publish/
+      - ./publish/
 
 package-job:      # This job runs in the deploy stage.
   stage: package
@@ -63,7 +63,7 @@ package-job:      # This job runs in the deploy stage.
     - mkdir -p tn-doc-deb/var/log/TN_Doc
     - mkdir -p tn-doc-deb/etc/systemd/system
     # Копирование файлов приложения
-    - cp -r /publish/* tn-doc-deb/opt/TN_Doc/
+    - cp -r ./publish/* tn-doc-deb/opt/TN_Doc/
     # Генерация control
     - |
       cat << EOF > tn-doc-deb/DEBIAN/control
