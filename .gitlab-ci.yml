@@ -23,7 +23,7 @@ build-job:       # This job runs in the build stage, which runs first.
   before_script:
     # Диагностика структуры
     - echo "Listing repository contents:"
-    - ls -R
+    - ls -l
     - echo "Checking for TN_Doc.csproj:"
     - find . -name "TN_Doc.csproj"
     # Создание директории для публикации
@@ -38,6 +38,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
     - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
+    - ls -l
     - echo "Checking publish directory contents:"
     - ls -la ../publish
   artifacts:
