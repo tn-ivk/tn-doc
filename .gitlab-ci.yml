@@ -2,7 +2,6 @@
 # автоматически делает release
 
 variables:
-    BRANCH: $CI_DEFAULT_BRANCH
     VERSION: $CI_COMMIT_TAG
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SUBMODULE_FORCE_HTTPS: "true"
@@ -21,12 +20,26 @@ build-job:       # This job runs in the build stage, which runs first.
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   tags:
     - orpovy
+  before_script:
+    # Диагностика структуры
+    - echo "Listing repository contents:"
+    - ls -R
+    - echo "Checking for TN_Doc.csproj:"
+    - find . -name "TN_Doc.csproj"
+    # Создание директории для публикации
+    - mkdir -p ../../publish
   script:
-    - echo "Building the application..."
+    - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
-    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "tm-it@transneft.ru" --password "5rdx5tgb90-=op[]" --store-password-in-clear-text'
+    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
+    - echo "Current directory:$(pwd)"
+    - echo "Moving to $PROJECT_PATH..."
     - cd $PROJECT_PATH
+    - echo "Current directory after cd:$(pwd)"
+    - echo "Building the application..."
     - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../../publish
+    - echo "Checking publish directory contents:"
+    - ls -la ../../publish
   artifacts:
     name: "build-${CI_COMMIT_TAG}"
     paths:
