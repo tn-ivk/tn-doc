@@ -34,7 +34,11 @@
     <None Include="changes.md">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Include="Doc\**\*.frx;Cfg\**\*.json;Dll\*.dll">
+    <None Include="Doc\**\*.frx;Dll\*.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <!-- Исключение Development-файлов из общего правила Cfg -->
+    <None Include="Cfg\**\*.json" Exclude="Cfg\CfgApp.Development.json;Cfg\Cfg.Development.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
