@@ -18,9 +18,10 @@
   </ItemGroup>
 
   <!-- Копирование Development-конфигураций только в Debug -->
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <Content Include="appsettings.Development.json;Cfg\CfgApp.Development.json;Cfg\Cfg.Development.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  <ItemGroup>
+    <Content Update="appsettings.Development.json;Cfg\CfgApp.Development.json;Cfg\Cfg.Development.json">
+      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
