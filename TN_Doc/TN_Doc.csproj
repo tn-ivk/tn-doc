@@ -9,78 +9,42 @@
     <Version>1.2.3</Version>
   </PropertyGroup>
 
+  <!-- Исключение ненужных файлов -->
   <ItemGroup>
     <Compile Remove="wwwroot\lib\jquery-ui\**" />
     <Content Remove="wwwroot\lib\jquery-ui\**" />
     <EmbeddedResource Remove="wwwroot\lib\jquery-ui\**" />
     <None Remove="wwwroot\lib\jquery-ui\**" />
-    <None Update="prutils\winprutil.exe">
+  </ItemGroup>
+
+  <!-- Копирование Development-конфигураций только в Debug -->
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Content Include="appsettings.Development.json;Cfg\CfgApp.Development.json;Cfg\Cfg.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- Общие файлы, копируемые всегда -->
+  <ItemGroup>
+    <None Include="appsettings.json;Config.xml;nlog.config;prutils\winprutil.exe;wwwroot\PDF\PDF.pdf;wwwroot\HTML\DocEditAct.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Update="wwwroot\PDF\PDF.pdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Update="changes.md">
+    <None Include="changes.md">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <Content Update="nlog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="appsettings.Development.json">
-      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
-      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Cfg\CfgApp.Development.json">
-      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
-      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Cfg\Cfg.Development.json">
-      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
-      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Doc/**/*.frx">
+    <None Include="Doc\**\*.frx;Cfg\**\*.json;Dll\*.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
+  <!-- Статические файлы и библиотеки -->
   <ItemGroup>
-    <None Include="Cfg/**/*.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="wwwroot\js\signalr\dist\browser\signalr.js;wwwroot\js\signalr\dist\browser\signalr.js.map;wwwroot\js\signalr\dist\browser\signalr.min.js;wwwroot\js\signalr\dist\browser\signalr.min.js.map" />
+    <None Include="wwwroot\lib\PDFObject\.gitignore;wwwroot\lib\PDFObject\LICENSE.md;wwwroot\lib\PDFObject\pdfobject.js;wwwroot\lib\PDFObject\pdfobject.min.js;wwwroot\lib\PDFObject\readme.md" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Dll/*.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <Content Remove="appsettings.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.js" />
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.js.map" />
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.min.js" />
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.min.js.map" />
-    <None Include="wwwroot\lib\PDFObject\.gitignore" />
-    <None Include="wwwroot\lib\PDFObject\LICENSE.md" />
-    <None Include="wwwroot\lib\PDFObject\pdfobject.js" />
-    <None Include="wwwroot\lib\PDFObject\pdfobject.min.js" />
-    <None Include="wwwroot\lib\PDFObject\readme.md" />
-  </ItemGroup>
-
+  <!-- NuGet-пакеты -->
   <ItemGroup>
     <PackageReference Include="EncryptionLibrary" Version="1.0.1" />
     <PackageReference Include="FastReport.Web.Skia" Version="2025.2.2" />
@@ -97,44 +61,39 @@
     <PackageReference Include="System.Drawing.Common" Version="8.0.15" />
   </ItemGroup>
 
+  <!-- Алиас для System.Drawing.Common -->
   <ItemGroup>
     <Reference Include="System.Drawing.Common">
       <Aliases>SystemDrawing</Aliases>
     </Reference>
   </ItemGroup>
 
+  <!-- View-файлы -->
   <ItemGroup>
     <Content Update="Views\Home\Index.cshtml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
-    <Content Update="Views\Home\Index_27092023.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\HTML\DocEditAct.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\HTML\DocEditPassport.html">
+    <Content Update="Views\Home\Index_27092023.cshtml;wwwroot\HTML\DocEditPassport.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Config.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
+  <!-- Пустая папка -->
   <ItemGroup>
     <Folder Include="wwwroot\css\font-awesome\" />
   </ItemGroup>
 
+  <!-- Ссылки на проекты -->
   <ItemGroup>
     <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
     <ProjectReference Include="..\tn_toolsfastreport\TN_Tools\TN_Tools.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties cfg_4cfgapp_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" /></VisualStudio></ProjectExtensions>
-
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties cfg_4cfgapp_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" />
+    </VisualStudio>
+  </ProjectExtensions>
+  
 </Project>
