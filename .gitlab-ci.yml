@@ -6,7 +6,8 @@ variables:
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SUBMODULE_FORCE_HTTPS: "true"
     GIT_STRATEGY: clone
-    DOTNET_VERSION: "8.0.0"   
+    DOTNET_SDK_VERSION: "8.0.408"
+    DOTNET_RT_VERSION: "8.0.13"   
     PROJECT_PATH: "TN_Doc"  # Путь к директории с TN_Doc.csproj
 
 stages:          # List of stages for jobs, and their order of execution
@@ -15,7 +16,7 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
-  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   tags:
@@ -73,7 +74,7 @@ package-job:      # This job runs in the deploy stage.
       Section: utils
       Priority: optional
       Architecture: amd64
-      Depends: dotnet-runtime-8.0 (>= $DOTNET_VERSION), libgdiplus
+      Depends: dotnet-runtime-8.0 (>= $DOTNET_RT_VERSION), libgdiplus
       Maintainer: DadonovAD <dadonovad@transneft.ru>
       Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
       Homepage:
@@ -92,7 +93,7 @@ package-job:      # This job runs in the deploy stage.
       fi
 
       # Проверка версии .NET Runtime
-      REQUIRED_VERSION="$DOTNET_VERSION"
+      REQUIRED_VERSION="$DOTNET_RT_VERSION"
       INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
 
       if [ -z "\$INSTALLED_VERSION" ]; then
