@@ -85,24 +85,29 @@ package-job:      # This job runs in the deploy stage.
       #!/bin/bash
       set -e
 
-      # Проверка наличия dotnet
-      if ! command -v dotnet >/dev/null 2>&1; then
-          echo "Error: .NET 8 is not installed. Please install dotnet-runtime-8.0."
+      # Проверка наличия .NET Runtime
+      if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+          echo "Error: .NET Runtime 8 is not installed. Please install dotnet-runtime-8.0."
           exit 1
       fi
 
-      # Проверка версии .NET
+      # Проверка версии .NET Runtime
       REQUIRED_VERSION="$DOTNET_VERSION"
-      INSTALLED_VERSION=\$(dotnet --version)
+      INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+
+      if [ -z "\$INSTALLED_VERSION" ]; then
+          echo "Error: No compatible .NET Runtime 8 version found."
+          exit 1
+      fi
 
       if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
-          echo "Error: .NET version \$INSTALLED_VERSION is installed, but version >= \$REQUIRED_VERSION is required."
+          echo "Error: .NET Runtime version \$INSTALLED_VERSION is installed, but version >= \$REQUIRED_VERSION is required."
           exit 1
       fi
 
       exit 0
       EOF
-    # Копирование postinst (без изменений)
+    # Генерация postinst
     - |
       cat << EOF > tn-doc-deb/DEBIAN/postinst
       #!/bin/bash
