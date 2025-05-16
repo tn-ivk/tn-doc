@@ -106,8 +106,38 @@ package-job:      # This job runs in the deploy stage.
           exit 1
       fi
 
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+      fi
+
+      # Удаление старых директорий
+      echo "Removing old TN_Doc directories..."
+      for dir in /usr/share/CIA /opt/TN_Doc /var/log/TN_Doc; do
+          if [ -d "\$dir" ]; then
+              rm -rf "\$dir"
+              echo "Removed \$dir"
+          fi
+      done
+
       exit 0
       EOF
+    - |
+      cat << EOF > tn-doc-deb/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+      fi
+
+      exit 0
+      EOF
+
+
     # Генерация postinst
     - |
       cat << EOF > tn-doc-deb/DEBIAN/postinst
@@ -131,19 +161,38 @@ package-job:      # This job runs in the deploy stage.
 
       exit 0
       EOF
-    # Копирование TN_Doc.service (без изменений)
+    - |
+      cat << EOF > tn-doc-deb/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      # Удаление директорий при полной очистке (purge)
+      if [ "\$1" = "purge" ]; then
+          echo "Purging TN_Doc directories..."
+          for dir in /usr/share/CIA /opt/TN_Doc /var/log/TN_Doc; do
+              if [ -d "\$dir" ]; then
+                  rm -rf "\$dir"
+                  echo "Removed \$dir"
+              fi
+          done
+      fi
+
+      exit 0
+      EOF
+    # Генерация TN_Doc.service
     - |
       cat << EOF > tn-doc-deb/etc/systemd/system/TN_Doc.service
       [Unit]
-      Description=TN_Doc Service
-      After=network.target
+      Description=Service TN_Doc
 
       [Service]
-      ExecStart=/opt/TN_Doc/TN_Doc
-      WorkingDirectory=/opt/TN_Doc
-      User=alphadaemon
-      Group=alphadaemon
+      WorkingDirectory=/opt/TN_Doc/
+      ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
       Restart=always
+      RestartSec=10
+      SyslogIdentifier=dotnet-TN_Doc
+      User=alphadaemon
+      Environment=ASPNETCORE_ENVIRONMENT=Production
 
       [Install]
       WantedBy=multi-user.target
