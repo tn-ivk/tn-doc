@@ -147,10 +147,16 @@ package-job:      # This job runs in the deploy stage.
     - chmod 644 tn-doc-deb/DEBIAN/control
     - chmod 755 tn-doc-deb/opt/TN_Doc/TN_Doc
     - chmod 644 tn-doc-deb/opt/TN_Doc/*.dll
-    # Сборка пакета
-    - ls -R tn-doc-deb
-    - dpkg-deb --build --compression=xz tn-doc-deb
-    - mv tn-doc-deb.deb tn-doc_${VERSION}_amd64.deb
+    - echo "Creating control.tar.xz..."
+    - tar -cJf control.tar.xz -C tn-doc-deb/DEBIAN .
+    - echo "Creating data.tar.xz..."
+    - tar -cJf data.tar.xz -C tn-doc-deb --exclude=DEBIAN .
+    - echo "Creating debian-binary..."
+    - echo "2.0" > debian-binary
+    - echo "Building .deb package..."
+    - ar r tn-doc_${VERSION}_amd64.deb debian-binary control.tar.xz data.tar.xz
+    - rm -f debian-binary control.tar.xz data.tar.xz
+    - ls -l tn-doc_${VERSION}_amd64.deb
   artifacts:
     name: "package-${CI_COMMIT_TAG}"
     paths:
