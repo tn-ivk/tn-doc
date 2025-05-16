@@ -114,7 +114,7 @@ package-job:      # This job runs in the deploy stage.
 
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
-      for dir in /usr/share/CIA /opt/TN_Doc /var/log/TN_Doc; do
+      for dir in /opt/TN_Doc /var/log/TN_Doc; do
           if [ -d "\$dir" ]; then
               rm -rf "\$dir"
               echo "Removed \$dir"
@@ -169,7 +169,7 @@ package-job:      # This job runs in the deploy stage.
       # Удаление директорий при полной очистке (purge)
       if [ "\$1" = "purge" ]; then
           echo "Purging TN_Doc directories..."
-          for dir in /usr/share/CIA /opt/TN_Doc /var/log/TN_Doc; do
+          for dir in /opt/TN_Doc /var/log/TN_Doc; do
               if [ -d "\$dir" ]; then
                   rm -rf "\$dir"
                   echo "Removed \$dir"
