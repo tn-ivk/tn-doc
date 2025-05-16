@@ -12,7 +12,7 @@ stages:
   - build
   - package 
 
-build-job:       # This job runs in the build stage, which runs first.
+build-job:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   rules:
@@ -33,13 +33,13 @@ build-job:       # This job runs in the build stage, which runs first.
     - cd $PROJECT_NAME
     - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
-    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
+    - dotnet publish ${PROJECT_NAME}.csproj -c Release -r linux-x64 --self-contained false -o ../publish
   artifacts:
     name: "build-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./publish/
 
-extract-version-job:       # This job runs in the build stage, which runs first.
+extract-version-job:       
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   rules:
@@ -48,7 +48,7 @@ extract-version-job:       # This job runs in the build stage, which runs first.
     - orpovy
   script:
     # Определение пути к .csproj файлу
-    - CSPROJ_FILE="$PROJECT_NAME/$PROJECT_NAME.csproj"
+    - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
     # Проверка существования файла
     - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
     # Извлечение версии из .csproj
@@ -80,16 +80,11 @@ package-job:      # This job runs in the deploy stage.
     - extract-version-job
   tags:
     - orpovy
-  cache:
-    key: ${CI_JOB_STAGE}
-    paths:
-      - /var/cache/apt/archives/
   before_script:
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
-    # Формирование имени deb-пакета
-    - DEB_NAME="${PACKAGE_NAME}-${FULL_VERSION}"
+    - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
     - mkdir -p deb/DEBIAN
@@ -108,7 +103,7 @@ package-job:      # This job runs in the deploy stage.
       Architecture: amd64
       Depends: libgdiplus
       Maintainer: DadonovAD <dadonovad@transneft.ru>
-      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
+      Description: ${PROJECT_NAME} это приложение для работы с документами СОИ СИКН/ОСИКН.
       Homepage:
 
       EOF
@@ -139,14 +134,14 @@ package-job:      # This job runs in the deploy stage.
       fi
 
       # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet TN_Doc.service; then
-          echo "Stopping TN_Doc.service..."
-          systemctl stop TN_Doc.service
+      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
+          echo "Stopping ${PROJECT_NAME}.service..."
+          systemctl stop ${PROJECT_NAME}.service
       fi
 
       # Удаление старых директорий
-      echo "Removing old TN_Doc directories..."
-      for dir in /opt/TN_Doc /var/log/TN_Doc; do
+      echo "Removing old ${PROJECT_NAME} directories..."
+      for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
           if [ -d "\$dir" ]; then
               rm -rf "\$dir"
               echo "Removed \$dir"
@@ -160,10 +155,10 @@ package-job:      # This job runs in the deploy stage.
       #!/bin/bash
       set -e
 
-      # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet TN_Doc.service; then
-          echo "Stopping TN_Doc.service..."
-          systemctl stop TN_Doc.service
+      # Остановка службы ${PROJECT_NAME}, если она запущена
+      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
+          echo "Stopping ${PROJECT_NAME}.service..."
+          systemctl stop ${PROJECT_NAME}.service
       fi
 
       exit 0
@@ -175,19 +170,19 @@ package-job:      # This job runs in the deploy stage.
       set -e
 
       # Установка прав и владельцев
-      chmod 755 /opt/TN_Doc/TN_Doc
-      chmod 644 /opt/TN_Doc/*.dll
-      chown -R alphadaemon:alphadaemon /opt/TN_Doc
-      chmod u=rwx,g=rx,o=rx /opt/TN_Doc
-      chown alphadaemon:alphadaemon /var/log/TN_Doc
-      chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+      chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
+      chmod 644 /opt/$PROJECT_NAME/*.dll
+      chown -R alphadaemon:alphadaemon /opt/$PROJECT_NAME
+      chmod u=rwx,g=rx,o=rx /opt/$PROJECT_NAME
+      chown alphadaemon:alphadaemon /var/log/$PROJECT_NAME
+      chmod u=rwx,g=rx,o=rx /var/log/$PROJECT_NAME
 
       # Перезагрузка systemd
       systemctl daemon-reload
 
       # Включение и запуск сервиса
-      systemctl enable TN_Doc.service
-      systemctl start TN_Doc.service
+      systemctl enable ${PROJECT_NAME}.service
+      systemctl start ${PROJECT_NAME}.service
 
       exit 0
       EOF
@@ -198,8 +193,8 @@ package-job:      # This job runs in the deploy stage.
 
       # Удаление директорий при полной очистке (purge)
       if [ "\$1" = "purge" ]; then
-          echo "Purging TN_Doc directories..."
-          for dir in /opt/TN_Doc /var/log/TN_Doc; do
+          echo "Purging ${PROJECT_NAME} directories..."
+          for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
               if [ -d "\$dir" ]; then
                   rm -rf "\$dir"
                   echo "Removed \$dir"
@@ -211,16 +206,16 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация TN_Doc.service
     - |
-      cat << EOF > deb/etc/systemd/system/TN_Doc.service
+      cat << EOF > deb/etc/systemd/system/${PROJECT_NAME}.service
       [Unit]
-      Description=Service TN_Doc
+      Description=Service ${PROJECT_NAME}
 
       [Service]
-      WorkingDirectory=/opt/TN_Doc/
-      ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
+      WorkingDirectory=/opt/$PROJECT_NAME/
+      ExecStart=/usr/bin/dotnet/dotnet /opt/$PROJECT_NAME/$PROJECT_NAME.dll
       Restart=always
       RestartSec=10
-      SyslogIdentifier=dotnet-TN_Doc
+      SyslogIdentifier=dotnet-${PROJECT_NAME}
       User=alphadaemon
       Environment=ASPNETCORE_ENVIRONMENT=Production
 
@@ -228,10 +223,10 @@ package-job:      # This job runs in the deploy stage.
       WantedBy=multi-user.target
       EOF
     # Установка прав
-    - chmod 755 deb/DEBIAN/preinst tn-doc-deb/DEBIAN/postinst
+    - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst
     - chmod 644 deb/DEBIAN/control
-    - chmod 755 deb/opt/TN_Doc/TN_Doc
-    - chmod 644 deb/opt/TN_Doc/*.dll
+    - chmod 755 deb/opt/$PROJECT_NAME/$PROJECT_NAME
+    - chmod 644 deb/opt/$PROJECT_NAME/*.dll
     - echo "Creating control.tar.xz..."
     - tar -cJf control.tar.xz -C deb/DEBIAN .
     - echo "Creating data.tar.xz..."
@@ -243,6 +238,6 @@ package-job:      # This job runs in the deploy stage.
     - rm -f debian-binary control.tar.xz data.tar.xz
     - ls -l ${DEB_NAME}_amd64.deb
   artifacts:
-    name: "package-${DEB_NAME}-${CI_COMMIT_TAG}"
+    name: "package-${DEB_NAME}-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ${DEB_NAME}_amd64.deb
