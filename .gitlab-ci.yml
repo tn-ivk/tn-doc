@@ -49,6 +49,10 @@ extract-version-job:       # This job runs in the build stage, which runs first.
   tags:
     - orpovy
   script:
+    # Определение пути к .csproj файлу
+    - CSPROJ_FILE="$PROJECT_PATH/TN_Doc.csproj"
+    # Проверка существования файла
+    - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
     # Извлечение версии из .csproj
     - VERSION=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" $CSPROJ_FILE 2>/dev/null || grep -oP '<Version>\K[^<]+' $CSPROJ_FILE)
     - echo "Extracted version:$VERSION"
