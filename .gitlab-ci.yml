@@ -59,7 +59,7 @@ extract-version-job:       # This job runs in the build stage, which runs first.
     # Формирование ревизии из CI_COMMIT_SHORT_SHA
     - REVISION="r${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
-    - FULL_VERSION="${VERSION}+${REVISION}"
+    - FULL_VERSION="${VERSION}-${REVISION}"
     - echo "Full version:$FULL_VERSION"
     # Сохранение переменных для последующих этапов
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
@@ -90,17 +90,18 @@ package-job:      # This job runs in the deploy stage.
     - echo "Packaging the application into a .deb file..."
     # Формирование имени deb-пакета
     - DEB_NAME="${PACKAGE_NAME}-${FULL_VERSION}"
+    - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
-    - mkdir -p tn-doc-deb/DEBIAN
-    - mkdir -p tn-doc-deb/opt/TN_Doc
-    - mkdir -p tn-doc-deb/var/log/TN_Doc
-    - mkdir -p tn-doc-deb/etc/systemd/system
+    - mkdir -p deb/DEBIAN
+    - mkdir -p deb/opt/$PROJECT_NAME
+    - mkdir -p deb/var/log/$PROJECT_NAME
+    - mkdir -p deb/etc/systemd/system
     # Копирование файлов приложения
-    - cp -r ./publish/* tn-doc-deb/opt/TN_Doc/
+    - cp -r ./publish/* deb/opt/$PROJECT_NAME/
     # Генерация control
     - |
-      cat << EOF > tn-doc-deb/DEBIAN/control
-      Package: tn-doc
+      cat << EOF > deb/DEBIAN/control
+      Package: ${PROJECT_NAME}
       Version: ${VERSION}
       Section: utils
       Priority: optional
@@ -113,7 +114,7 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация preinst
     - |
-      cat << EOF > tn-doc-deb/DEBIAN/preinst
+      cat << EOF > deb/DEBIAN/preinst
       #!/bin/bash
       set -e
 
@@ -155,7 +156,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     - |
-      cat << EOF > tn-doc-deb/DEBIAN/prerm
+      cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
 
@@ -169,7 +170,7 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация postinst
     - |
-      cat << EOF > tn-doc-deb/DEBIAN/postinst
+      cat << EOF > deb/DEBIAN/postinst
       #!/bin/bash
       set -e
 
@@ -191,7 +192,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     - |
-      cat << EOF > tn-doc-deb/DEBIAN/postrm
+      cat << EOF > deb/DEBIAN/postrm
       #!/bin/bash
       set -e
 
@@ -210,7 +211,7 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация TN_Doc.service
     - |
-      cat << EOF > tn-doc-deb/etc/systemd/system/TN_Doc.service
+      cat << EOF > deb/etc/systemd/system/TN_Doc.service
       [Unit]
       Description=Service TN_Doc
 
@@ -227,21 +228,21 @@ package-job:      # This job runs in the deploy stage.
       WantedBy=multi-user.target
       EOF
     # Установка прав
-    - chmod 755 tn-doc-deb/DEBIAN/preinst tn-doc-deb/DEBIAN/postinst
-    - chmod 644 tn-doc-deb/DEBIAN/control
-    - chmod 755 tn-doc-deb/opt/TN_Doc/TN_Doc
-    - chmod 644 tn-doc-deb/opt/TN_Doc/*.dll
+    - chmod 755 deb/DEBIAN/preinst tn-doc-deb/DEBIAN/postinst
+    - chmod 644 deb/DEBIAN/control
+    - chmod 755 deb/opt/TN_Doc/TN_Doc
+    - chmod 644 deb/opt/TN_Doc/*.dll
     - echo "Creating control.tar.xz..."
-    - tar -cJf control.tar.xz -C tn-doc-deb/DEBIAN .
+    - tar -cJf control.tar.xz -C deb/DEBIAN .
     - echo "Creating data.tar.xz..."
-    - tar -cJf data.tar.xz -C tn-doc-deb --exclude=DEBIAN .
+    - tar -cJf data.tar.xz -C deb --exclude=DEBIAN .
     - echo "Creating debian-binary..."
     - echo "2.0" > debian-binary
     - echo "Building .deb package..."
-    - ar r tn-doc_${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+    - ar r ${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
     - rm -f debian-binary control.tar.xz data.tar.xz
-    - ls -l tn-doc_${DEB_NAME}_amd64.deb
+    - ls -l ${DEB_NAME}_amd64.deb
   artifacts:
-    name: "package-${CI_COMMIT_TAG}"
+    name: "package-${DEB_NAME}-${CI_COMMIT_TAG}"
     paths:
-      - tn-doc_${DEB_NAME}_amd64.deb
+      - ${DEB_NAME}_amd64.deb
