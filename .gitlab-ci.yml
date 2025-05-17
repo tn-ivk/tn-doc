@@ -234,11 +234,11 @@ package-job:      # This job runs in the deploy stage.
     - echo "Creating debian-binary..."
     - echo "2.0" > debian-binary
     - echo "Building .deb package..."
-    - ar r ${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
     - rm -f debian-binary control.tar.xz data.tar.xz
-    - ls -l ${DEB_NAME}_amd64.deb
+    - ls -l ./packages/${DEB_NAME}_amd64.deb
     - echo "Current directory:$(pwd)"
   artifacts:
-    name: "package-${DEB_NAME}-${CI_COMMIT_SHORT_SHA}"
+    name: "package-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
     paths:
-      - ./${DEB_NAME}_amd64.deb
+      - ./packages/
