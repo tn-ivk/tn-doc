@@ -29,7 +29,7 @@ namespace FastReport
     TN.Doc.DataDoc SettingsData;
     TN.Doc.FooterDoc Footer;
     TN.Doc.DictionarysDoc Dictionarys;
-    TN.Doc.DataIVKDoc DataIVK;
+    TN.Doc.DataIvkDoc DataIVK;
 
     
     List &lt;TN.Doc.Table2&gt; tableResultsParams;
@@ -48,7 +48,7 @@ namespace FastReport
       SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
       Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
       Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
-      DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
+      DataIVK = (TN.Doc.DataIvkDoc) doc.Doc.DataIVK;
 
       
       //// === Настройки страницы 
