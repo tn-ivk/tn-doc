@@ -5,8 +5,8 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <AssemblyVersion>1.2.3</AssemblyVersion>
-    <Version>1.2.3</Version>
+    <AssemblyVersion>1.2.4</AssemblyVersion>
+    <Version>1.2.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
