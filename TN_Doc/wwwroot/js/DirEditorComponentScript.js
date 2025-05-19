@@ -285,6 +285,7 @@ function _createDeleteUserBtn(faClass, buttonClass, margin) {
 */
 function _createDeleteLicenseBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+    btn.classList.add('delete-btn');
     btn.addEventListener('click', function (e) {
         _cleatUserLicId(e)
         _deleteSelectedRowHandler(e, 'Licenses');
