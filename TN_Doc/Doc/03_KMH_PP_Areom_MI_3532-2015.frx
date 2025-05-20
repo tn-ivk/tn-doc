@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/20/2025 23:46:48" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/21/2025 00:28:08" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -15,14 +15,12 @@ using FastReport.Barcode;
 using FastReport.Table;
 using FastReport.Utils;
 using System.Linq;
-using Newtonsoft.Json;
-using TN.DocData;
+using Newtonsoft.Json.Linq;
          
 namespace FastReport
 {
   public class ReportScript
   {
-    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
     JToken JDoc;
     JToken JSettings;
     JToken JTableKMH_PP_Areom;
@@ -76,7 +74,7 @@ namespace FastReport
           break;
         default:
           SIKN_Num.Text = JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString() + &quot; &quot; + JAdditionalInfo[&quot;PP1_AddInfo&quot;][&quot;SIKN_Num&quot;];
-          PSP_Name.Text = Header.FieldPSPJSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString() + JAdditionalInfo[&quot;PP1_AddInfo&quot;][&quot;PSP_Name&quot;];                
+          PSP_Name.Text = JSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString() + JAdditionalInfo[&quot;PP1_AddInfo&quot;][&quot;PSP_Name&quot;];                
           break;
       }
     }
@@ -123,7 +121,7 @@ namespace FastReport
       
       // Column 4
       DensityMeterType.Text =Dictionarys.DensityMeterType[KMH_TYPE];
-      if (General.NefType == 1) Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефти&quot;);
+      if (NefType == 1) Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефти&quot;);
       else Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефтепродукта&quot;);
          
       if (KMH_TYPE == 0) Report.SetParameterValue(&quot;TextDensityMeter&quot;, &quot;лабораторным плотномером&quot;);
@@ -147,7 +145,7 @@ namespace FastReport
         TableResults.PrintColumns();                                             
       }
          
-      NefType.Text = Dictionarys.OilTechParams[JSettings[&quot;General&quot;][&quot;NefType&quot;]];
+      NefType.Text = Dictionarys.OilTechParams[NefType];
       JToken jsonTable2;
       switch (ProtocolNumber)
       {
@@ -212,8 +210,8 @@ namespace FastReport
       else
         tempLabHeader.Text=@&quot;&lt;i&gt;t&lt;sub&gt; ар i&lt;/i&gt;&lt;/sub&gt;, °С&quot;;
           
-      Table2.Rows.AddRange(rows.ToArray());
-      PrintTable(Table2);
+      TableResults.Rows.AddRange(rows.ToArray());
+      PrintTable(TableResults);
     }
      
     public void  DrawTableConclusion()
@@ -224,7 +222,7 @@ namespace FastReport
   
       // ===  Fill table with data
       Dictionary&lt;string,string&gt; dictAdditionalInfo = new Dictionary&lt;string,string&gt; ();
-      switch (protocolNumber)
+      switch (ProtocolNumber)
       {
         case 2:
           foreach (var propertyInfo in JAdditionalInfo[&quot;PP2_AddInfo&quot;].GetType().GetProperties())
@@ -245,8 +243,9 @@ namespace FastReport
       ARM_KMH_Result.Text =string.Format(&quot;Поточный ПП зав. № &lt;u&gt; {0}&lt;/u&gt; {1} к дальнейшей эксплуатации&quot;, 
         dictAdditionalInfo[&quot;ManufNum_Oper&quot;], 
         dictAdditionalInfo[&quot;ARM_KMH_Result&quot;]);
-           
-      DateTimeLong.Text = string.Format(&quot;Дата проведения КМХ: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,(tools.UnixTimestampToDatetime(DataIVK.TableKMH_PP_Areom.DateTimeLong)));               
+       
+      DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTableKMH_PP_Areom[&quot;DateTimeLong&quot;]);   
+      DateTimeLong.Text = string.Format(&quot;Дата проведения КМХ: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;, date);               
       ServiceStaffData.Text=dictAdditionalInfo[&quot;ServiceStaffData&quot;];
       DeliveryStaffData.Text= dictAdditionalInfo[&quot;DeliveryStaffData&quot;];
       RecievingStaffData.Text= dictAdditionalInfo[&quot;RecievingStaffData&quot;];
