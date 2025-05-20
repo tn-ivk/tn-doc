@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/20/2025 15:21:49" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/20/2025 17:30:03" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -128,37 +128,50 @@ namespace FastReport
         
         for (int i = 0; i &lt; listTable2.Count; i++)
         {
-          Number.Text = (i + 1).ToString();
+          //Number.Text = (i + 1).ToString();
+          Number.Text = (((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1).ToString();
           Q.Text = listTable2[i][&quot;Q&quot;].ToString().Replace('.',',');
           t.Text = listTable2[i][&quot;t&quot;].ToString().Replace('.',',');
           P.Text = listTable2[i][&quot;P&quot;].ToString().Replace('.',',');
           Dens_PP.Text = listTable2[i][&quot;Dens_PP&quot;].ToString().Replace('.',',');
-      
+          
+          Number.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          Q.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          t.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          P.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          Dens_PP.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          
           DensLab_1.Text = listTable2[i][&quot;DensLab&quot;][0].ToString().Replace('.',',');
           tempLab_1.Text = listTable2[i][&quot;TempLab&quot;][0].ToString().Replace('.',',');
           BetaLab_1.Text = listTable2[i][&quot;BetaLab&quot;][0].ToString().Replace('.',',');
           GamaLab_1.Text = listTable2[i][&quot;GamaLab&quot;][0].ToString().Replace('.',',');
-          DensLab_2.Text = listTable2[i][&quot;DensLab&quot;][1].ToString().Replace('.',',');
-          tempLab_2.Text = listTable2[i][&quot;TempLab&quot;][1].ToString().Replace('.',',');
-          BetaLab_2.Text = listTable2[i][&quot;BetaLab&quot;][1].ToString().Replace('.',',');
-          GamaLab_2.Text = listTable2[i][&quot;GamaLab&quot;][1].ToString().Replace('.',',');
-
+          
           Dens_Priv.Text = listTable2[i][&quot;Dens_Priv&quot;].ToString().Replace('.',',');
           Delta.Text = listTable2[i][&quot;Delta&quot;].ToString().Replace('.',',');
-           
+          
+          Dens_Priv.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          Delta.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          
+          
           TableRow row1 = new TableRow();
           row1.AssignAll(Table2_RowData1);
           row1.Visible=true;
           rows.Add(row1);         
           
-          if((bool)listTable2[i][&quot;DisplayTwoRow&quot;])
+          if((bool)JProtokol[&quot;DisplayTwoRow&quot;])
           {
+            DensLab_2.Text = listTable2[i][&quot;DensLab&quot;][1].ToString().Replace('.',',');
+            tempLab_2.Text = listTable2[i][&quot;TempLab&quot;][1].ToString().Replace('.',',');
+            BetaLab_2.Text = listTable2[i][&quot;BetaLab&quot;][1].ToString().Replace('.',',');
+            GamaLab_2.Text = listTable2[i][&quot;GamaLab&quot;][1].ToString().Replace('.',',');
+
             TableRow row2 = new TableRow();
             row2.AssignAll(Table2_RowData2);
             row2.Visible=true;
           
             rows.Add(row2);
           }
+          
         }    
           
         Table2.Rows.AddRange(rows.ToArray());
