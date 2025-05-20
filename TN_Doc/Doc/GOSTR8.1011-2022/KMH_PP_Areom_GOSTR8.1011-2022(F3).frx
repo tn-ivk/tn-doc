@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/20/2025 17:30:03" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/20/2025 18:46:51" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -125,21 +125,21 @@ namespace FastReport
       
         List&lt;JToken&gt; listTable2 = jsonTable2.Where(x=&gt;(int)x[&quot;Activated&quot;]!=0).ToList();
         List&lt;TableRow&gt; rows = new List&lt;TableRow&gt;();
-        
+        var useTwoRow = (bool)JProtokol[&quot;DisplayTwoRow&quot;];
+          
         for (int i = 0; i &lt; listTable2.Count; i++)
         {
-          //Number.Text = (i + 1).ToString();
-          Number.Text = (((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1).ToString();
+          Number.Text = (i + 1).ToString();
           Q.Text = listTable2[i][&quot;Q&quot;].ToString().Replace('.',',');
           t.Text = listTable2[i][&quot;t&quot;].ToString().Replace('.',',');
           P.Text = listTable2[i][&quot;P&quot;].ToString().Replace('.',',');
           Dens_PP.Text = listTable2[i][&quot;Dens_PP&quot;].ToString().Replace('.',',');
           
-          Number.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
-          Q.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
-          t.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
-          P.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
-          Dens_PP.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          Number.RowSpan = useTwoRow ? 2 : 1;
+          Q.RowSpan = useTwoRow ? 2 : 1;
+          t.RowSpan = useTwoRow ? 2 : 1;
+          P.RowSpan = useTwoRow ? 2 : 1;
+          Dens_PP.RowSpan = useTwoRow ? 2 : 1;
           
           DensLab_1.Text = listTable2[i][&quot;DensLab&quot;][0].ToString().Replace('.',',');
           tempLab_1.Text = listTable2[i][&quot;TempLab&quot;][0].ToString().Replace('.',',');
@@ -149,8 +149,8 @@ namespace FastReport
           Dens_Priv.Text = listTable2[i][&quot;Dens_Priv&quot;].ToString().Replace('.',',');
           Delta.Text = listTable2[i][&quot;Delta&quot;].ToString().Replace('.',',');
           
-          Dens_Priv.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
-          Delta.RowSpan = ((bool)JProtokol[&quot;DisplayTwoRow&quot;]) ? 2 : 1;
+          Dens_Priv.RowSpan = useTwoRow ? 2 : 1;
+          Delta.RowSpan = useTwoRow ? 2 : 1;
           
           
           TableRow row1 = new TableRow();
@@ -158,7 +158,7 @@ namespace FastReport
           row1.Visible=true;
           rows.Add(row1);         
           
-          if((bool)JProtokol[&quot;DisplayTwoRow&quot;])
+          if(useTwoRow)
           {
             DensLab_2.Text = listTable2[i][&quot;DensLab&quot;][1].ToString().Replace('.',',');
             tempLab_2.Text = listTable2[i][&quot;TempLab&quot;][1].ToString().Replace('.',',');
@@ -171,16 +171,12 @@ namespace FastReport
           
             rows.Add(row2);
           }
-          
         }    
           
         Table2.Rows.AddRange(rows.ToArray());
-        
         MI.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;MI&quot;].ToString();
-        
         PrintTable(Table2);      
       }
- 
     }
 
     private void FillReportSummary(int protocolNumber)
