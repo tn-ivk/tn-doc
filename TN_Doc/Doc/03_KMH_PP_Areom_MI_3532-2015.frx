@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/21/2025 00:28:08" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/21/2025 00:50:36" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -29,7 +29,7 @@ namespace FastReport
     
     int ProtocolNumber;
     int KMH_TYPE; 
-    int NefType; 
+    int OilType; 
       
     private void Page_StartPage(object sender, EventArgs e)
     {
@@ -49,7 +49,7 @@ namespace FastReport
          
       ProtocolNumber = (int)JSettings[&quot;General&quot;][&quot;ProtocolNumber&quot;];
       KMH_TYPE = (int)JTableKMH_PP_Areom[&quot;KMH_TYPE&quot;]; 
-      NefType = (int)JSettings[&quot;General&quot;][&quot;NefType&quot;];
+      OilType = (int)JSettings[&quot;General&quot;][&quot;NefType&quot;];
          
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();
@@ -120,8 +120,8 @@ namespace FastReport
       AbsError_Areom.Text = jsonPP_AddInfo[&quot;AbsError_Areom&quot;].ToString().Replace('.',',');
       
       // Column 4
-      DensityMeterType.Text =Dictionarys.DensityMeterType[KMH_TYPE];
-      if (NefType == 1) Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефти&quot;);
+      DensityMeterType.Text = JSettings[&quot;Dictionarys&quot;][&quot;DensityMeterType&quot;][KMH_TYPE].ToString();;
+      if (OilType == 1) Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефти&quot;);
       else Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефтепродукта&quot;);
          
       if (KMH_TYPE == 0) Report.SetParameterValue(&quot;TextDensityMeter&quot;, &quot;лабораторным плотномером&quot;);
@@ -145,7 +145,7 @@ namespace FastReport
         TableResults.PrintColumns();                                             
       }
          
-      NefType.Text = Dictionarys.OilTechParams[NefType];
+      NefType.Text = JSettings[&quot;Dictionarys&quot;][&quot;OilTechParams&quot;][OilType].ToString();
       JToken jsonTable2;
       switch (ProtocolNumber)
       {
