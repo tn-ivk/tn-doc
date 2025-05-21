@@ -4,8 +4,14 @@
     <meta charset="utf-8" />
     <title></title>
 
+    <link rel="stylesheet" href="/css/commonEditForm.css">
+
     <style>
-/*chrome*/
+        :root {
+            --disabled-bg-color: #F5F5F5;
+        }
+
+        /*chrome*/
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -16,52 +22,190 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
+
         input {
             font-size: 14px;
             font-family: Arial,sans-serif;
             outline: none;
-            border: 1px solid white;
+            border: 1px solid transparent;
         }
         select {
             font-size: 14px;
             font-family: Arial,sans-serif;
             outline: none;
-            border: 1px solid white;
+            border: 1px solid transparent;
             width: 100%;
         }
-        td, th {
+
+        td,
+        th {
             font-size: 14px;
             font-family: Arial,sans-serif;
-            padding: 2px; /* Поля вокруг содержимого таблицы */
-            border: 0.5px solid black; /* Параметры рамки */
+            padding: 2px;
+            border: 0.5px solid black;
         }
 
         Edit {
-            border-collapse: collapse; /* Убираем двойные линии между ячейками */
-        }
-
-        .correct-value {
-            border: 1px solid white;
-            /* background-color: green; */
+            border-collapse: collapse;
         }
         
+        .correct-value {
+            border: 1px solid transparent;
+        }
+
         .incorrect-value {
             border: 2px solid rgb(255, 105, 105);
-            /* background-color: red; */
         }
         
+        .manual-input--disabled{
+            text-align: center;
+            background: var(--disabled-bg-color);
+            color:black;
+            cursor: not-allowed;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Стили для ячеек с неактивными элементами */
+        td:has(input.manual-input--disabled),
+        td:has(select.manual-input--disabled) {
+            background-color: var(--disabled-bg-color);
+            position: relative;
+        }
     </style>
 
-    <script src="http://localhost:5000/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.css">
     <script src="/js/EditDoc.js"></script>
     <script src="/js/loading-spinner.js"></script>
     <script id="ElementChangeEventHandling" type="text/javascript">
 
-        let dictionaries;
-        let invalidChars;
-        function funcOnLoad() {
+    let dictionaries;
+    let invalidChars;
+    
+    function UserChangeEvent(selectObject) {
+        if (selectObject.name === "Delive_IOF") {
+            let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
+            let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
+            if (user) {
+            document.getElementById("Delive_Factory").value = user.Factory;
+            document.getElementById("Delive_FIO").value = user.FIO;
+            }
+            if (license) {
+            document.getElementById("Delive_Lic_Date").value = license.LicensesDate;
+            document.getElementById("Delive_Lic_Number").value = license.LicensesNumber;
+            }
+        } else if (selectObject.name === "Receive_IOF") {
+            let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
+            let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
+            if (user) {
+            document.getElementById("Receive_Factory").value = user.Factory;
+            document.getElementById("Receive_FIO").value = user.FIO;
+            }
+            if (license) {
+            document.getElementById("Receive_Lic_Date").value = license.LicensesDate;
+            document.getElementById("Receive_Lic_Number").value = license.LicensesNumber;
+            }
+        }
+    }
+
+    function InputStringCheck(Object) {
+        if(CheckEmpty(Object))
+            CheckInvalidChars(Object);
+        updateTooltip(Object);
+        updateTooltip(Object);
+        SendingMessageStateButtonSave();
+    }
+
+    function CheckEmpty(Object) {
+        if(!Object.hasAttribute("fill-required"))
+            return true;
+
+        if (!Object.value) {
+            Object.classList.replace("correct-value", "incorrect-value");
+            if(Object.hasAttribute("title")) {
+                Object.setAttribute("title", "Поле должно быть заполнено!")
+            }
+            return false;
+        }
+        else {
+            Object.classList.replace("incorrect-value", "correct-value");
+            if(Object.hasAttribute("title")) {
+                Object.setAttribute("title", "")
+            }
+        }
+        return true;
+    }
+        
+    function CheckInvalidChars(element) {
+        if(invalidChars == null || invalidChars.length === 0)
+            return true;
+
+        let value = null;
+        if (element instanceof HTMLInputElement) {
+            value = element.value;
+        } else if (element instanceof HTMLSelectElement) {
+            const selectedOption = element.options[element.selectedIndex];
+            value = selectedOption ? selectedOption.text : null;
+        }
+        if(value === null) {
+            return true;
+        }
+        for (let char of invalidChars) {
+            if (value.includes(char)) {
+                element.classList.replace("correct-value", "incorrect-value");
+                if(element.hasAttribute("title")) {
+                    element.setAttribute("title", `Некорректный символ: ${char}`)
+                }
+                return false;
+            }
+        }
+        element.classList.replace("incorrect-value", "correct-value");
+        return true;
+    }
+    
+    function SendingMessageStateButtonSave() {
+        window.top.postMessage(document.querySelectorAll('.incorrect-value').length === 0
+                ? 'ButtonSaveOn'
+                : 'ButtonSaveOff',
+            '*')
+    }
+
+    function updateTooltip(element) {
+        if(element.classList.contains("incorrect-value"))
+        {
+            $('#' + element.id)
+                .tooltip("enable")
+                .tooltip("option", "content", element.getAttribute("title"));
+        }
+
+        if(element.classList.contains("correct-value"))
+        {
+            $('#' + element.id).tooltip("disable");
+        }
+    }
+</script>
+
+</head>
+<body>
+
+    <table id="AdditionalInfo">
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            // Инициализация подсказки для всех элементов с атрибутом title
+            $('[title]').tooltip();
+
+            SendingMessageStateButtonSave();
             dictionaries = GetUsers();
             invalidChars = GetInvalideChars();
+
             // Отключаем прокрутку колесиком мыши на input[type="number"]
             document.querySelectorAll('input[type="number"]').forEach(function(input) {
                 input.addEventListener('wheel', function(event) {
@@ -74,107 +218,7 @@
                     element.oninput();
                 }
             });
-        }
-
-        function UserChangeEvent(selectObject) {
-            if (selectObject.name === "Delive_IOF") {
-                let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
-                let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
-                if (user) {
-                document.getElementById("Delive_Factory").value = user.Factory;
-                document.getElementById("Delive_FIO").value = user.FIO;
-                }
-                if (license) {
-                document.getElementById("Delive_Lic_Date").value = license.LicensesDate;
-                document.getElementById("Delive_Lic_Number").value = license.LicensesNumber;
-            }
-            
-            } else if (selectObject.name === "Receive_IOF") {
-                let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
-                let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
-                if (user) {
-                document.getElementById("Receive_Factory").value = user.Factory;
-                document.getElementById("Receive_FIO").value = user.FIO;
-                }
-                if (license) {
-                document.getElementById("Receive_Lic_Date").value = license.LicensesDate;
-                document.getElementById("Receive_Lic_Number").value = license.LicensesNumber;
-}
-
-            }
-        }
-
-        function InputStringCheck(Object) {
-            console.log("InputStringCheck");
-            if(CheckEmpty(Object))
-                CheckInvalidChars(Object);
-            SendingMessageStateButtonSave();
-        }
-
-        function CheckEmpty(Object) {
-            if(!Object.hasAttribute("fill-required"))
-                return true;
-
-            if (!Object.value) {
-                Object.classList.replace("correct-value", "incorrect-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "Поле должно быть заполнено!")
-                }
-                return false;
-            }
-            else {
-                Object.classList.replace("incorrect-value", "correct-value");
-                if(Object.hasAttribute("title")) {
-                    Object.setAttribute("title", "")
-                }
-            }
-            return true;
-        }
-        
-        function CheckInvalidChars(element) {
-            if(invalidChars == null || invalidChars.length === 0)
-                return true;
-
-            let value = null;
-            if (element instanceof HTMLInputElement) {
-                value = element.value;
-            } else if (element instanceof HTMLSelectElement) {
-                const selectedOption = element.options[element.selectedIndex];
-                value = selectedOption ? selectedOption.text : null;
-            }
-            if(value === null) {
-                return true;
-            }
-            for (let char of invalidChars) {
-                if (value.includes(char)) {
-                    element.classList.replace("correct-value", "incorrect-value");
-                    if(element.hasAttribute("title")) {
-                        element.setAttribute("title", `Некорректный символ: ${char}`)
-                    }
-                    return false;
-                }
-            }
-            element.classList.replace("incorrect-value", "correct-value");
-            return true;
-        }
-        
-        function SendingMessageStateButtonSave() {
-            window.top.postMessage(document.querySelectorAll('.incorrect-value').length === 0
-                    ? 'ButtonSaveOn'
-                    : 'ButtonSaveOff',
-                '*')
-        }
-        
+        });
     </script>
-
-</head>
-<body onload="funcOnLoad()">
-
-    <table id="AdditionalInfo">
-        <tbody>
-
-        </tbody>
-    </table>
-
 </body>
 </html>

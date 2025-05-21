@@ -583,6 +583,15 @@
       "Key": "Receive_IOF",
       "Type": "list",
       "Name": "Представитель принимающей стороны (ИОФ)"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Key": "TestProtocolNumberELIS",
+      "KeyELIS": "protocolNumber",
+      "Type": "text",
+      "Name": "Номер протокола испытаний ЕЛИС",
+      "Edit": false
     }
   ]
 }

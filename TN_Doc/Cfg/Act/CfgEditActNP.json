@@ -6,7 +6,8 @@
       "Edit": true,
       "Key": "ActNumber",
       "Type": "text",
-      "Name": "Номер акта"
+      "Name": "Номер акта",
+      "RequiredFill": true
     },
     {
       "Id": 2,
@@ -117,7 +118,7 @@
       "Use": true,
       "Edit": true,
       "Key": "Oil_Name",
-      "Type": "text",
+      "Type": "list",
       "Name": "Наименование нефтепродукта, марка, ГОСТ, ГОСТ Р"
     },
     {

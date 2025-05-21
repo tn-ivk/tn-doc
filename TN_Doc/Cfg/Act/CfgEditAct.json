@@ -6,7 +6,8 @@
       "Edit": true,
       "Key": "ActNumber",
       "Type": "text",
-      "Name": "Номер акта"
+      "Name": "Номер акта",
+      "RequiredFill": true
     },
     {
       "Id": 2,
@@ -35,7 +36,7 @@
     {
       "Id": 5,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Delive_Factory",
       "Type": "text",
       "Name": "Уполномоченный представитель сдающей стороны"
@@ -43,7 +44,7 @@
     {
       "Id": 6,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Delive_FIO",
       "Type": "text",
       "Name": "Фамилия И.О."
@@ -59,7 +60,7 @@
     {
       "Id": 8,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Delive_Lic_Date",
       "Type": "text",
       "Name": "Дата доверенности"
@@ -67,7 +68,7 @@
     {
       "Id": 9,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Delive_Lic_Number",
       "Type": "text",
       "Name": "Номер доверенности"
@@ -75,7 +76,7 @@
     {
       "Id": 10,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Receive_Factory",
       "Type": "text",
       "Name": "Уполномоченный представитель принимающей стороны"
@@ -83,7 +84,7 @@
     {
       "Id": 11,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Receive_FIO",
       "Type": "text",
       "Name": "Фамилия И.О."
@@ -99,7 +100,7 @@
     {
       "Id": 13,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Receive_Lic_Date",
       "Type": "text",
       "Name": "Дата доверенности"
@@ -107,14 +108,14 @@
     {
       "Id": 14,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Receive_Lic_Number",
-      "Type": "text",
+      "Type": "false",
       "Name": "Номер доверенности"
     },
     {
       "Id": 15,
-      "Use": false,
+      "Use": true,
       "Edit": true,
       "Key": "Oil_Name",
       "Type": "text",
@@ -126,7 +127,7 @@
       "Edit": true,
       "Key": "Contract",
       "Type": "text",
-      "Name": "Договор об оказании услуг по транспортировке, нефти №"
+      "Name": "Договор об оказании услуг по транспортировке, нефтепродукта №"
     },
     {
       "Id": 17,
@@ -134,7 +135,7 @@
       "Edit": true,
       "Key": "Route_Telegram",
       "Type": "text",
-      "Name": "Маршрутное поручение №"
+      "Name": "Маршрутная телеграмма №"
     },
     {
       "Id": 18,
@@ -142,7 +143,7 @@
       "Edit": true,
       "Key": "Refinery_Plant",
       "Type": "text",
-      "Name": "Производитель"
+      "Name": "НПЗ-производитель нефтепродукта"
     },
     {
       "Id": 19,
@@ -164,36 +165,12 @@
       "Id": 21,
       "Use": true,
       "Edit": true,
-      "Key": "SubsurfaceUser",
-      "Type": "text",
-      "Name": "Недропользователь"
-    },
-    {
-      "Id": 22,
-      "Use": false,
-      "Edit": true,
-      "Key": "FirstOwnerPetroleum",
-      "Type": "text",
-      "Name": "Первый владелец нефти"
-    },
-    {
-      "Id": 23,
-      "Use": false,
-      "Edit": true,
-      "Key": "LastOwnerPetroleum",
-      "Type": "text",
-      "Name": "Последний владелец нефти"
-    },
-    {
-      "Id": 24,
-      "Use": true,
-      "Edit": true,
       "Key": "Destination",
       "Type": "text",
       "Name": "Пункт назначения"
     },
     {
-      "Id": 25,
+      "Id": 22,
       "Use": true,
       "Edit": true,
       "Key": "Exporter_Importer",
@@ -201,24 +178,24 @@
       "Name": "Экспортер (импортер)"
     },
     {
-      "Id": 26,
+      "Id": 23,
       "Use": true,
       "Edit": true,
       "Key": "Declaration",
       "Type": "text",
-      "Name": "Таможенная декларация (ввозная, вывозная)"
+      "Name": "Декларация на товары (ввозная, вывозная)"
     },
     {
-      "Id": 27,
-      "Use": false,
+      "Id": 24,
+      "Use": true,
       "Edit": true,
       "Key": "TankerName",
       "Type": "text",
-      "Name": "Танкер"
+      "Name": "Название танкера"
     },
     {
-      "Id": 28,
-      "Use": false,
+      "Id": 25,
+      "Use": true,
       "Edit": true,
       "Key": "TimeSchedule_Position",
       "Type": "text",
