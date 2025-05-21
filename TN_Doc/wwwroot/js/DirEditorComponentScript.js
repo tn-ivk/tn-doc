@@ -742,9 +742,25 @@ function _applyLicenceChanges(rowItem, itemId) {
     if (objIndex < 0) return;
     let cells = rowItem.cells;
     let updatedObject = appDictionaries['Licenses'][objIndex]
-    updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['LicensesNumber'] = cells[1].childNodes[0].textContent;
-    updatedObject['LicensesDate'] = cells[2].childNodes[0].textContent;
+    // Корректно определяем состояние чекбокса
+    const useCheckbox = cells[0].querySelector('input[type="checkbox"]');
+    if (useCheckbox) {
+        updatedObject['Use'] = useCheckbox.checked;
+    } else {
+        updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
+    }
+    // Получаем значения из input элементов или текстовых узлов
+    const numberInput = cells[1].querySelector('input');
+    const dateInput = cells[2].querySelector('input');
+    updatedObject['LicensesNumber'] = numberInput ? numberInput.value : cells[1].textContent;
+
+    // Преобразуем дату в формат DD.MM.YYYY
+    if (dateInput && dateInput.value) {
+        const [yyyy, mm, dd] = dateInput.value.split('-');
+        updatedObject['LicensesDate'] = `${dd}.${mm}.${yyyy}`;
+    } else {
+        updatedObject['LicensesDate'] = cells[2].textContent;
+    }
 }
 
 /*
@@ -758,11 +774,14 @@ function _applyUserChanges(rowItem, itemId) {
     if (objIndex < 0) return;
     let cells = rowItem.cells;
     let updatedObject = appDictionaries['Users'][objIndex];
-    
-    // Обновляем флаг использования
-    const useIcon = cells[0].querySelector('i');
-    updatedObject['Use'] = useIcon ? useIcon.classList.contains('fa-check-square-o') : false;
-    
+    // Корректно определяем состояние чекбокса
+    const useCheckbox = cells[0].querySelector('input[type="checkbox"]');
+    if (useCheckbox) {
+        updatedObject['Use'] = useCheckbox.checked;
+    } else {
+        const useIcon = cells[0].querySelector('i');
+        updatedObject['Use'] = useIcon ? useIcon.classList.contains('fa-check-square-o') : false;
+    }
     // Обновляем ID группы
     const groupInput = cells[1].querySelector('select');
     if (groupInput) {
@@ -795,14 +814,29 @@ function _applyUserChanges(rowItem, itemId) {
     updatedObject['LicId'] = licSelect ? Number(licSelect.value) : Number(cells[7].dataset.licId || 0);
     
     // Обновляем флаги форматирования
-    const sepIcon = cells[8].querySelector('i');
-    updatedObject['UseFullNameSeparator'] = sepIcon ? sepIcon.classList.contains('fa-check-square-o') : false;
-    
-    const whiteSpaceIcon = cells[9].querySelector('i');
-    updatedObject['UseFullNameWhiteSpace'] = whiteSpaceIcon ? whiteSpaceIcon.classList.contains('fa-check-square-o') : false;
-    
-    const shortFormIcon = cells[10].querySelector('i');
-    updatedObject['UseShortFullNameForm'] = shortFormIcon ? shortFormIcon.classList.contains('fa-check-square-o') : false;
+    const sepCheckbox = cells[8].querySelector('input[type="checkbox"]');
+    if (sepCheckbox) {
+        updatedObject['UseFullNameSeparator'] = sepCheckbox.checked;
+    } else {
+        const sepIcon = cells[8].querySelector('i');
+        updatedObject['UseFullNameSeparator'] = sepIcon ? sepIcon.classList.contains('fa-check-square-o') : false;
+    }
+
+    const whiteSpaceCheckbox = cells[9].querySelector('input[type="checkbox"]');
+    if (whiteSpaceCheckbox) {
+        updatedObject['UseFullNameWhiteSpace'] = whiteSpaceCheckbox.checked;
+    } else {
+        const whiteSpaceIcon = cells[9].querySelector('i');
+        updatedObject['UseFullNameWhiteSpace'] = whiteSpaceIcon ? whiteSpaceIcon.classList.contains('fa-check-square-o') : false;
+    }
+
+    const shortFormCheckbox = cells[10].querySelector('input[type="checkbox"]');
+    if (shortFormCheckbox) {
+        updatedObject['UseShortFullNameForm'] = shortFormCheckbox.checked;
+    } else {
+        const shortFormIcon = cells[10].querySelector('i');
+        updatedObject['UseShortFullNameForm'] = shortFormIcon ? shortFormIcon.classList.contains('fa-check-square-o') : false;
+    }
 }
 
 /*
@@ -1020,13 +1054,13 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
             cell.replaceChild(newTextNode, cell.childNodes[0])
             break;
         case 'date':
-            let date = $('.calendar').datepicker('getDate');
+            let date = previewNode.value ? new Date(previewNode.value) : new Date();
             let day = date.getDate();
             let dayStr = day < 10 ? `0${day}` : day.toString();
             let month = date.getMonth() + 1;
             let monthStr = month < 10 ? `0${month}` : month.toString();
             let yearStr = date.getFullYear().toString();
-            let newDateText = document.createTextNode(dayStr + '.' + monthStr + '.' + yearStr);
+            let newDateText = document.createTextNode(`${dayStr}.${monthStr}.${yearStr}`);
             cell.replaceChild(newDateText, cell.childNodes[0])
             break;
         case 'combobox-ug':
@@ -1109,12 +1143,11 @@ function _convertStableCellToEditCell(cell, type) {
             else cell.append(newElement);
             break;
         case 'date':
-            let prDate = new Date(moment(cell.innerText, 'DD.MM.YYYY').format())
-            newElement.classList.add('calendar');
+            let prDate = cell.innerText ? moment(cell.innerText, 'DD.MM.YYYY').toDate() : new Date();
+            newElement.type = 'date';
+            newElement.value = moment(prDate).format('YYYY-MM-DD');
             if (previewNode) cell.replaceChild(newElement, previewNode)
             else cell.append(newElement);
-            $('.calendar').datepicker({dateFormat: 'dd.mm.yy'});
-            $('.calendar').datepicker('setDate', prDate);
             break;
         case 'combobox-ug':
             let cbElement = document.createElement('select');
