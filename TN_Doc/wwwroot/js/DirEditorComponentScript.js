@@ -2067,22 +2067,43 @@ function _applyQpMethodsChanged(rowItem, itemId, qpId) {
     if (methodIndex < 0) return;
     let cells = rowItem.cells;
     let updatedObject = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"][methodIndex];
-    updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
-    1
-    updatedObject['Name'] = cells[1].childNodes[0].textContent;
-    let parameter = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[2].childNodes[0].textContent)[0];
-    if (parameter) {
-        updatedObject['IdParameter'] = parameter['Id'];
+    // Корректно определяем состояние чекбокса
+    const useCheckbox = cells[0].querySelector('input[type="checkbox"]');
+    if (useCheckbox) {
+        updatedObject['Use'] = useCheckbox.checked;
     } else {
-        updatedObject['IdParameter'] = 0;
+        updatedObject['Use'] = cells[0].childNodes[0].classList.contains('fa-check-square-o');
     }
-
-    updatedObject['LimitValueActivate'] = cells[3].childNodes[0].classList.contains('fa-check-square-o');
-    updatedObject['LimitValue'] = Number.parseFloat(cells[4].childNodes[0].textContent.replaceAll(',', '.'));
-
-    let msg = cells[5].childNodes[0].textContent;
+    // Имя метода
+    const nameInput = cells[1].querySelector('input');
+    updatedObject['Name'] = nameInput ? nameInput.value : cells[1].textContent;
+    // Параметр
+    const paramSelect = cells[2].querySelector('select');
+    if (paramSelect) {
+        updatedObject['IdParameter'] = Number(paramSelect.value);
+    } else {
+        let parameter = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[2].textContent)[0];
+        if (parameter) {
+            updatedObject['IdParameter'] = parameter['Id'];
+        } else {
+            updatedObject['IdParameter'] = 0;
+        }
+    }
+    // Контроль мин. значения
+    const limitCheckbox = cells[3].querySelector('input[type="checkbox"]');
+    if (limitCheckbox) {
+        updatedObject['LimitValueActivate'] = limitCheckbox.checked;
+    } else {
+        updatedObject['LimitValueActivate'] = cells[3].childNodes[0].classList.contains('fa-check-square-o');
+    }
+    // Мин. значение
+    const limitValueInput = cells[4].querySelector('input');
+    updatedObject['LimitValue'] = limitValueInput ? Number.parseFloat(limitValueInput.value.replaceAll(',', '.')) : Number.parseFloat(cells[4].textContent.replaceAll(',', '.'));
+    // Сообщение
+    const msgInput = cells[5].querySelector('input');
+    let msg = msgInput ? msgInput.value : cells[5].textContent;
     if (!msg) {
-        updatedObject['LimitValueString'] = '-'
+        updatedObject['LimitValueString'] = '-';
     } else {
         updatedObject['LimitValueString'] = msg;
     }
