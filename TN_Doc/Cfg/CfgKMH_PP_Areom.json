@@ -25,7 +25,7 @@
         "FieldPSP": "ПСП (НСП)"
       },
       "Data": {
-   
+        "CalibrationTemperature" : 15
       },
       "Footer": {
         "FieldSIKN": "СИКН"

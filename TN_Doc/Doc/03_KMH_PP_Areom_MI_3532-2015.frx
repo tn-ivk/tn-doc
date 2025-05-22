@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/29/2024 13:00:19" ReportInfo.CreatorVersion="2023.3.5.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PP_Areom.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/21/2025 09:28:18" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -15,56 +15,41 @@ using FastReport.Barcode;
 using FastReport.Table;
 using FastReport.Utils;
 using System.Linq;
-using Newtonsoft.Json;
-using TN.DocData;
+using Newtonsoft.Json.Linq;
          
 namespace FastReport
 {
   public class ReportScript
   {
-    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета
-    TN.Doc.Doc doc; // данные из входного параметра
-    TN.DocData.General General;
-    TN.Doc.HeaderDoc Header;
-    TN.Doc.DataDoc SettingsData;
-    TN.Doc.FooterDoc Footer;
-    TN.Doc.DictionarysDoc Dictionarys;
-    TN.Doc.DataIVKDoc DataIVK;
-
+    JToken JDoc;
+    JToken JSettings;
+    JToken JTableKMH_PP_Areom;
+    JToken JProtokol;
+    JToken JAdditionalInfo;
     
-    List &lt;TN.Doc.Table2&gt; tableResultsParams;
-    int protocolNumber;
+    int ProtocolNumber;
+    int KMH_TYPE; 
+    int OilType; 
       
     private void Page_StartPage(object sender, EventArgs e)
     {
-      //// Десериализация данных (формат json) из входного параметра - Json                         
-      string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
-      Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
-      settings.TypeNameHandling = TypeNameHandling.All;
+      JDoc = JToken.Parse(Report.GetParameterValue(&quot;JsonDoc&quot;).ToString());
+      JSettings = JDoc[&quot;Doc&quot;][&quot;Settings&quot;];
+      JTableKMH_PP_Areom = JDoc[&quot;Doc&quot;][&quot;DataArm&quot;][&quot;TableKMH_PP_Areom&quot;];
+      JProtokol = JDoc[&quot;Doc&quot;][&quot;DataArm&quot;][&quot;TableKMH_PP_Areom&quot;][&quot;Protokol&quot;];
+      JAdditionalInfo = JDoc[&quot;Doc&quot;][&quot;DataArm&quot;][&quot;TableKMH_PP_Areom&quot;][&quot;AdditionalInfo&quot;];
          
-      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
-      General = (TN.DocData.General) doc.Doc.Settings.General;
-      Header = (TN.Doc.HeaderDoc) doc.Doc.Settings.Header;
-      SettingsData = (TN.Doc.DataDoc) doc.Doc.Settings.Data;
-      Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
-      Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
-      DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
-
-      
-      //// === Настройки страницы 
-      // Ширина и высота (в мм)
-      Page.PaperHeight = General.PageSettings.PaperHeight;
-      Page.PaperWidth = General.PageSettings.PaperWidth;
-      //Page.Border.Lines = BorderLines.All;
+      Page.PaperHeight = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperHeight&quot;];
+      Page.PaperWidth = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;PaperWidth&quot;];
          
-      // Поля/отступы от краёв (в мм)
-      Page.TopMargin = General.PageSettings.TopMargin;
-      Page.BottomMargin = General.PageSettings.BottomMargin;
-      Page.LeftMargin = General.PageSettings.LeftMargin;
-      Page.RightMargin = General.PageSettings.RightMargin;
+      Page.TopMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;TopMargin&quot;];
+      Page.BottomMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;BottomMargin&quot;];
+      Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
+      Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
          
-      //Definition for which device create the protocol
-      protocolNumber = General.ProtocolNumber;
+      ProtocolNumber = (int)JSettings[&quot;General&quot;][&quot;ProtocolNumber&quot;];
+      KMH_TYPE = (int)JTableKMH_PP_Areom[&quot;KMH_TYPE&quot;]; 
+      OilType = (int)JSettings[&quot;General&quot;][&quot;NefType&quot;];
          
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();
@@ -72,16 +57,6 @@ namespace FastReport
       DrawTableConclusion();
     }
       
-    // Имхо лишний метод
-    private void PrintTable(TableObject table)
-    {
-      for (int i=0;i&lt;table.RowCount;i++)
-      {       
-        table.PrintRow(i);
-        table.PrintColumns();
-      }    
-    }    
-
     public void DrawTableHeader()
     {
       // Setup Columns
@@ -90,19 +65,18 @@ namespace FastReport
       {
         TableHeader.Columns[i].Width = widthDynamicCols*Units.Millimeters;
       }
-         
-      // Fill table with data         
-      ProtocolType.Text = Dictionarys.ProtocolType[DataIVK.TableKMH_PP_Areom.KMH_TYPE];
-         
-      switch (protocolNumber)
+            
+      ProtocolType.Text = JSettings[&quot;Dictionarys&quot;][&quot;ProtocolType&quot;][KMH_TYPE.ToString()].ToString();
+      
+      switch (ProtocolNumber)
       {
         case 2:
-          SIKN_Num.Text = Header.FieldSIKN +&quot; &quot;+ DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.SIKN_Num;
-          PSP_Name.Text = Header.FieldPSP + DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.PSP_Name;                               
+          SIKN_Num.Text = JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString() + &quot; &quot; + JAdditionalInfo[&quot;PP2_AddInfo&quot;][&quot;SIKN_Num&quot;];
+          PSP_Name.Text = JSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString() + JAdditionalInfo[&quot;PP2_AddInfo&quot;][&quot;PSP_Name&quot;];                               
           break;
         default:
-          SIKN_Num.Text = Header.FieldSIKN +&quot; &quot;+ DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.SIKN_Num;
-          PSP_Name.Text = Header.FieldPSP + DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.PSP_Name;                
+          SIKN_Num.Text = JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString() + &quot; &quot; + JAdditionalInfo[&quot;PP1_AddInfo&quot;][&quot;SIKN_Num&quot;];
+          PSP_Name.Text = JSettings[&quot;Header&quot;][&quot;FieldPSP&quot;].ToString() + JAdditionalInfo[&quot;PP1_AddInfo&quot;][&quot;PSP_Name&quot;];                
           break;
       }
     }
@@ -118,129 +92,123 @@ namespace FastReport
         TableSourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
       }
          
-      //// ===  Fill table with data
-      switch (protocolNumber)
+      JToken jsonTable1;
+      JToken jsonPP_AddInfo;
+      
+      switch (ProtocolNumber)
       {
         case 2:
-          // Column 3
-          SensName_Oper.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.SensName_Oper;
-          ManufNum_Oper.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.ManufNum_Oper;
-          CheckDate_Oper.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.CheckDate_Oper;
-          Delta_PP.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.Protokol.Table1_2.Delta_PP);
-          Delta_Syst.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.Protokol.Table1_2.Delta_Syst);
-          Delta_Meth.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.Protokol.Table1_2.Delta_Meth);
-               
-          // Column 4
-          SensName_Areom.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.SensName_Areom;
-          ManufNum_Areom.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.ManufNum_Areom;
-          CheckDate_Areom.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.CheckDate_Areom;
-          AbsError_Areom.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.AbsError_Areom);
+          jsonTable1 = JProtokol[&quot;Table1_2&quot;];
+          jsonPP_AddInfo = JAdditionalInfo[&quot;PP2_AddInfo&quot;];
           break;
             
         default:
-          // Column 3
-          SensName_Oper.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.SensName_Oper;
-          ManufNum_Oper.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.ManufNum_Oper;
-          CheckDate_Oper.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.CheckDate_Oper;
-          Delta_PP.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.Protokol.Table1_1.Delta_PP);
-          Delta_Syst.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.Protokol.Table1_1.Delta_Syst);
-          Delta_Meth.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.Protokol.Table1_1.Delta_Meth);
-               
-          // Column 4
-          SensName_Areom.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.SensName_Areom;
-          ManufNum_Areom.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.ManufNum_Areom;
-          CheckDate_Areom.Text = DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.CheckDate_Areom;
-          AbsError_Areom.Text = tools.GetNormalizedValue(DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.AbsError_Areom);
+          jsonTable1 = JProtokol[&quot;Table1_1&quot;];
+          jsonPP_AddInfo = JAdditionalInfo[&quot;PP1_AddInfo&quot;];
           break;
       }
+      
+      // Column 3
+      SensName_Oper.Text = jsonPP_AddInfo[&quot;SensName_Oper&quot;].ToString();
+      ManufNum_Oper.Text = jsonPP_AddInfo[&quot;ManufNum_Oper&quot;].ToString();
+      CheckDate_Oper.Text = jsonPP_AddInfo[&quot;CheckDate_Oper&quot;].ToString();
+      Delta_PP.Text = jsonTable1[&quot;Delta_PP&quot;].ToString().Replace('.',',');
+      Delta_Syst.Text = jsonTable1[&quot;Delta_Syst&quot;].ToString().Replace('.',',');
+      Delta_Meth.Text = jsonTable1[&quot;Delta_Meth&quot;].ToString().Replace('.',',');
       // Column 4
-      DensityMeterType.Text =Dictionarys.DensityMeterType[DataIVK.TableKMH_PP_Areom.KMH_TYPE];
-      if (General.NefType == 1) Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефти&quot;);
+      SensName_Areom.Text = jsonPP_AddInfo[&quot;SensName_Areom&quot;].ToString();
+      ManufNum_Areom.Text = jsonPP_AddInfo[&quot;ManufNum_Areom&quot;].ToString();
+      CheckDate_Areom.Text = jsonPP_AddInfo[&quot;CheckDate_Areom&quot;].ToString();
+      AbsError_Areom.Text = jsonPP_AddInfo[&quot;AbsError_Areom&quot;].ToString().Replace('.',',');
+      
+      // Column 4
+      DensityMeterType.Text = JSettings[&quot;Dictionarys&quot;][&quot;DensityMeterType&quot;][KMH_TYPE.ToString()].ToString();
+      if (OilType == 1) Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефти&quot;);
       else Report.SetParameterValue(&quot;TextOil&quot;, &quot;нефтепродукта&quot;);
          
-      if (DataIVK.TableKMH_PP_Areom.KMH_TYPE == 0) Report.SetParameterValue(&quot;TextDensityMeter&quot;, &quot;лабораторным плотномером&quot;);
+      if (KMH_TYPE == 0) Report.SetParameterValue(&quot;TextDensityMeter&quot;, &quot;лабораторным плотномером&quot;);
       else Report.SetParameterValue(&quot;TextDensityMeter&quot;, &quot;ареометром&quot;);
     }
       
     private void TableResults_ManualBuild(object sender, EventArgs e)
     {
-      //Setup Columns width
-      int sumDynamicCols=TableResults.ColumnCount;
-      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
- 
-      for (int w = 0; w &lt; (TableResults.ColumnCount); w++)                 
+      if(Engine.FinalPass)
       {
-        TableResults.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-      }      
-      //Draw Fixed rows
-      for (int n = 0; n &lt; TableResults.FixedRows; n++)
-      {
-        TableResults.PrintRow(n);
-        TableResults.PrintColumns();                                             
-      }
-         
-      NefType.Text = Dictionarys.OilTechParams[General.NefType];
-      
-      //Fill table with data
-      switch (protocolNumber)
-      {
-        case 2:
-          tableResultsParams = DataIVK.TableKMH_PP_Areom.Protokol.Table2_2.Where(y =&gt; y.Activated == 1).ToList();       
-          break;
-        default:
-          tableResultsParams = DataIVK.TableKMH_PP_Areom.Protokol.Table2_1.Where(y =&gt; y.Activated == 1).ToList();
-          break;             
-      }
-         
-      int spanRows =0;         
-      for (int i = 0; i &lt; (tableResultsParams.Count); i++)                 
-      {
-        for (int j = 0; j &lt; (tableResultsParams[i].LabMeas.Count); j++)                 
+        int sumDynamicCols=TableResults.ColumnCount;
+        float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+        
+        for (int w = 0; w &lt; (TableResults.ColumnCount); w++)                 
         {
-          spanRows = tableResultsParams[i].LabMeas.Count;
-          CounterMeasure.RowSpan=spanRows;
-          Q.RowSpan=spanRows;
-          t.RowSpan=spanRows;
-          P.RowSpan=spanRows;
-          Dens_PP.RowSpan=spanRows;
-          Dens_Priv.RowSpan=spanRows;
-          Delta.RowSpan=spanRows;
-               
-          CounterMeasure.Text=(i+1).ToString();               
-          Q.Text=tools.GetNormalizedValue(tableResultsParams[i].Q);               
-          t.Text=tools.GetNormalizedValue(tableResultsParams[i].t);
-          P.Text=tools.GetNormalizedValue(tableResultsParams[i].P);
-          Dens_PP.Text=tools.GetNormalizedValue(tableResultsParams[i].Dens_PP);
-          DensLab.Text=tools.GetNormalizedValue(tableResultsParams[i].LabMeas[j].DensLab);
+          TableResults.Columns[w].Width = widthDynamicCol * Units.Millimeters;
+        }      
+           
+        NefType.Text = JSettings[&quot;Dictionarys&quot;][&quot;OilTechParams&quot;][OilType.ToString()].ToString();
+        JToken jsonTable2;
+        switch (ProtocolNumber)
+        {
+          case 2:
+            jsonTable2 = JProtokol[&quot;Table2_2&quot;];       
+            break;
+          default:
+            jsonTable2 = JProtokol[&quot;Table2_1&quot;];
+            break;             
+        }
+        List&lt;JToken&gt; listTable2 = jsonTable2.Where(x =&gt; (int)x[&quot;Activated&quot;] != 0).ToList();
+        List&lt;TableRow&gt; rows = new List&lt;TableRow&gt;();
+        var useTwoRow = (bool)JProtokol[&quot;DisplayTwoRow&quot;];
+        
+        for (int i = 0; i &lt; listTable2.Count; i++)                 
+        {
+          CounterMeasure.Text = (i + 1).ToString();
+          Q.Text = listTable2[i][&quot;Q&quot;].ToString().Replace('.',',');
+          t.Text = listTable2[i][&quot;t&quot;].ToString().Replace('.',',');
+          P.Text = listTable2[i][&quot;P&quot;].ToString().Replace('.',',');
+          Dens_PP.Text = listTable2[i][&quot;Dens_PP&quot;].ToString().Replace('.',',');
           
-          if (DataIVK.TableKMH_PP_Areom.KMH_TYPE == 0)
-            tempLabHeader.Text=@&quot;&lt;i&gt;t&lt;sub&gt; лаб i&lt;/i&gt;&lt;/sub&gt;, °С&quot;;             
-          else
-            tempLabHeader.Text=@&quot;&lt;i&gt;t&lt;sub&gt; ар i&lt;/i&gt;&lt;/sub&gt;, °С&quot;;
+          CounterMeasure.RowSpan = useTwoRow ? 2 : 1;
+          Q.RowSpan = useTwoRow ? 2 : 1;
+          t.RowSpan = useTwoRow ? 2 : 1;
+          P.RowSpan = useTwoRow ? 2 : 1;
+          Dens_PP.RowSpan = useTwoRow ? 2 : 1;
           
-          tempLab.Text=tools.GetNormalizedValue(tableResultsParams[i].LabMeas[j].tempLab);
-          
-          BetaLab.Text=tools.GetNormalizedValue(tableResultsParams[i].LabMeas[j].BetaLab);
-          GamaLab.Text=tools.GetNormalizedValue(tableResultsParams[i].LabMeas[j].GamaLab);
-          Dens_Priv.Text=tools.GetNormalizedValue(tableResultsParams[i].Dens_Priv);
-          Delta.Text= tools.GetNormalizedValue(tableResultsParams[i].Delta);
-               
-          TableResults.PrintRow(3);     
-          TableResults.PrintColumns();  
-        }  
-        CounterMeasure.RowSpan=1;
-        Q.RowSpan=1;
-        t.RowSpan=1;
-        P.RowSpan=1;
-        Dens_PP.RowSpan=1;
-        Dens_Priv.RowSpan=1;
-        Delta.RowSpan=1;
+          DensLab_1.Text = listTable2[i][&quot;DensLab&quot;][0].ToString().Replace('.',',');
+          tempLab_1.Text = listTable2[i][&quot;TempLab&quot;][0].ToString().Replace('.',',');
+          BetaLab_1.Text = listTable2[i][&quot;BetaLab&quot;][0].ToString().Replace('.',',');
+          GamaLab_1.Text = listTable2[i][&quot;GamaLab&quot;][0].ToString().Replace('.',',');
             
-        float initialHeight = DataFromJson.Height;
-        DataFromJson.Height = 0;
-        TableResults.PrintRow(3);
-        TableResults.PrintColumns();
-        DataFromJson.Height= initialHeight;
+          Dens_Priv.Text = listTable2[i][&quot;Dens_Priv&quot;].ToString().Replace('.',',');
+          Delta.Text = listTable2[i][&quot;Delta&quot;].ToString().Replace('.',',');
+          
+          Dens_Priv.RowSpan = useTwoRow ? 2 : 1;
+          Delta.RowSpan = useTwoRow ? 2 : 1;
+          
+          TableRow row1 = new TableRow();
+          row1.AssignAll(Table2_RowData1);
+          row1.Visible=true;
+          rows.Add(row1);         
+            
+          if(useTwoRow)
+          {
+            DensLab_2.Text = listTable2[i][&quot;DensLab&quot;][1].ToString().Replace('.',',');
+            tempLab_2.Text = listTable2[i][&quot;TempLab&quot;][1].ToString().Replace('.',',');
+            BetaLab_2.Text = listTable2[i][&quot;BetaLab&quot;][1].ToString().Replace('.',',');
+            GamaLab_2.Text = listTable2[i][&quot;GamaLab&quot;][1].ToString().Replace('.',',');
+  
+            TableRow row2 = new TableRow();
+            row2.AssignAll(Table2_RowData2);
+            row2.Visible=true;
+            
+            rows.Add(row2);
+          }
+        }
+        
+        if (KMH_TYPE == 0)
+          tempLabHeader.Text=@&quot;&lt;i&gt;t&lt;sub&gt; лаб i&lt;/i&gt;&lt;/sub&gt;, °С&quot;;             
+        else
+          tempLabHeader.Text=@&quot;&lt;i&gt;t&lt;sub&gt; ар i&lt;/i&gt;&lt;/sub&gt;, °С&quot;;
+            
+        TableResults.Rows.AddRange(rows.ToArray());
+        PrintTable(TableResults);
       }
     }
      
@@ -250,34 +218,23 @@ namespace FastReport
       TableConclusion.Columns[4].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin - 
         ((TableConclusion.Columns[0].Width + TableConclusion.Columns[1].Width + TableConclusion.Columns[2].Width + TableConclusion.Columns[3].Width)/Units.Millimeters))*Units.Millimeters;
   
-      //// ===  Fill table with data
-      Dictionary&lt;string,string&gt; dictAdditionalInfo = new Dictionary&lt;string,string&gt; ();
-      switch (protocolNumber)
-      {
-        case 2:
-          foreach (var propertyInfo in DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo.GetType().GetProperties())
-          {
-            var propertyValue = propertyInfo.GetValue(DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo);
-            dictAdditionalInfo.Add(propertyInfo.Name, propertyInfo.GetValue(DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP2_AddInfo, null).ToString());
-          }
-          break;
-        default:
-          foreach (var propertyInfo in DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo.GetType().GetProperties())
-          {
-            var propertyValue = propertyInfo.GetValue(DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo);
-            dictAdditionalInfo.Add(propertyInfo.Name, propertyInfo.GetValue(DataIVK.TableKMH_PP_Areom.AdditionalInfo.PP1_AddInfo, null).ToString());
-          }
-          break;
-      }
-           
+      JToken jsonPP_AddInfo;
+      
+      if (ProtocolNumber == 1)
+        jsonPP_AddInfo = JAdditionalInfo[&quot;PP1_AddInfo&quot;];
+      else
+        jsonPP_AddInfo = JAdditionalInfo[&quot;PP2_AddInfo&quot;];      
+      
       ARM_KMH_Result.Text =string.Format(&quot;Поточный ПП зав. № &lt;u&gt; {0}&lt;/u&gt; {1} к дальнейшей эксплуатации&quot;, 
-        dictAdditionalInfo[&quot;ManufNum_Oper&quot;], 
-        dictAdditionalInfo[&quot;ARM_KMH_Result&quot;]);
-           
-      DateTimeLong.Text = string.Format(&quot;Дата проведения КМХ: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;,(tools.UnixTimestampToDatetime(DataIVK.TableKMH_PP_Areom.DateTimeLong)));               
-      ServiceStaffData.Text=dictAdditionalInfo[&quot;ServiceStaffData&quot;];
-      DeliveryStaffData.Text= dictAdditionalInfo[&quot;DeliveryStaffData&quot;];
-      RecievingStaffData.Text= dictAdditionalInfo[&quot;RecievingStaffData&quot;];
+        jsonPP_AddInfo[&quot;ManufNum_Oper&quot;].ToString(), 
+        jsonPP_AddInfo[&quot;ARM_KMH_Result&quot;].ToString());
+      
+      DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTableKMH_PP_Areom[&quot;DateTimeLong&quot;]);   
+      DateTimeLong.Text = string.Format(&quot;Дата проведения КМХ: &lt;u&gt;{0:dd.MM.yyyy} г.&quot;, date);               
+      
+      ServiceStaffData.Text=jsonPP_AddInfo[&quot;ServiceStaffData&quot;].ToString();
+      DeliveryStaffData.Text= jsonPP_AddInfo[&quot;DeliveryStaffData&quot;].ToString();
+      RecievingStaffData.Text= jsonPP_AddInfo[&quot;RecievingStaffData&quot;].ToString();
     }  
 
     private void PageFooter_BeforeLayout(object sender, EventArgs e)
@@ -291,6 +248,15 @@ namespace FastReport
         PageNumeration.Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
       }
     }
+    
+    private void PrintTable(TableObject table)
+    {
+      for (int i=0;i&lt;table.RowCount;i++)
+      {       
+        table.PrintRow(i);
+        table.PrintColumns();
+      }    
+    }    
   }    
 }
 
@@ -327,7 +293,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableSourceData" Top="73.93" Width="718.2" Height="228.69" CanGrow="true" CanShrink="true">
+    <DataBand Name="DataBandTableSourceData" Top="73.13" Width="718.2" Height="228.69" CanGrow="true" CanShrink="true">
       <TableObject Name="TableSourceData" Top="7.56" Width="604.8" Height="221.13" CanBreak="false">
         <TableColumn Name="Column25" Width="37.8"/>
         <TableColumn Name="Column3" Width="340.2"/>
@@ -383,8 +349,8 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableResults" Top="306.62" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableResults" Top="30.24" Width="713.64" Height="85.05" FixedRows="3" RepeatHeaders="false" ManualBuildEvent="TableResults_ManualBuild">
+    <DataBand Name="DataBandTableResults" Top="305.02" Width="718.2" Height="134.19" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableResults" Top="30.24" Width="713.64" Height="103.95" FixedRows="3" RepeatHeaders="false" ManualBuildEvent="TableResults_ManualBuild">
         <TableColumn Name="Column6" Width="28.35"/>
         <TableColumn Name="Column7" Width="72.27"/>
         <TableColumn Name="Column8" Width="62.82"/>
@@ -435,23 +401,36 @@ namespace FastReport
           <TableCell Name="Cell143" Border.Lines="All" Text="10" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell146" Border.Lines="All" Text="11" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
-        <TableRow Name="DataFromJson">
-          <TableCell Name="CounterMeasure" Border.Lines="All" Text="CounterMeasure" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Q" Border.Lines="All" Text="Q" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="t" Border.Lines="All" Text="t" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="P" Border.Lines="All" Text="P" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Dens_PP" Border.Lines="All" Text="Dens_PP" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="DensLab" Border.Lines="All" Text="DensLab" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="tempLab" Border.Lines="All" Text="tempLab" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="BetaLab" Border.Lines="All" Text="BetaLab" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="GamaLab" Border.Lines="All" Text="GamaLab" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Dens_Priv" Border.Lines="All" Text="Dens_Priv" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Delta" Border.Lines="All" Text="Delta" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        <TableRow Name="Table2_RowData1" Visible="false">
+          <TableCell Name="CounterMeasure" Border.Lines="All" Text="CounterMeasure" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Q" Border.Lines="All" Text="Q" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="t" Border.Lines="All" Text="t" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="P" Border.Lines="All" Text="P" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Dens_PP" Border.Lines="All" Text="Dens_PP" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="DensLab_1" Border.Lines="All" Text="DensLab_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="tempLab_1" Border.Lines="All" Text="tempLab_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="BetaLab_1" Border.Lines="All" Text="BetaLab_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="GamaLab_1" Border.Lines="All" Text="GamaLab_1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Dens_Priv" Border.Lines="All" Text="Dens_Priv" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Delta" Border.Lines="All" Text="Delta" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" RowSpan="2"/>
+        </TableRow>
+        <TableRow Name="Table2_RowData2" Visible="false">
+          <TableCell Name="Cell147" Font="Arial, 10pt"/>
+          <TableCell Name="Cell148" Font="Arial, 10pt"/>
+          <TableCell Name="Cell149" Font="Arial, 10pt"/>
+          <TableCell Name="Cell150" Font="Arial, 10pt"/>
+          <TableCell Name="Cell151" Font="Arial, 10pt"/>
+          <TableCell Name="DensLab_2" Border.Lines="All" Text="DensLab_2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="tempLab_2" Border.Lines="All" Text="tempLab_2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="BetaLab_2" Border.Lines="All" Text="BetaLab_2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="GamaLab_2" Border.Lines="All" Text="GamaLab_2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell156" Font="Arial, 10pt"/>
+          <TableCell Name="Cell157" Font="Arial, 10pt"/>
         </TableRow>
       </TableObject>
       <TextObject Name="TableResultsHeader" Top="7.56" Width="718.2" Height="22.68" Text="2 Результаты измерений и контроля" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85"/>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="425.91" Width="718.2" Height="206.01" CanGrow="true">
+    <ReportSummaryBand Name="ReportSummary" Top="442.41" Width="718.2" Height="206.01" CanGrow="true">
       <TableObject Name="TableConclusion" Top="9.45" Width="718.2" Height="196.56">
         <TableColumn Name="Column13" Width="151.2"/>
         <TableColumn Name="Column14" Width="359.1"/>
@@ -530,7 +509,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="635.92" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="651.62" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

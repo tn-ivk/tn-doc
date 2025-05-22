@@ -1,0 +1,245 @@
+
+variables:
+    VERSION: $CI_COMMIT_TAG
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_FORCE_HTTPS: "true"
+    GIT_STRATEGY: clone
+    DOTNET_SDK_VERSION: "8.0"
+    DOTNET_RT_VERSION: "8.0.13"   
+    PROJECT_NAME: "TN_Doc"  
+
+stages:          
+  - build
+  - package 
+
+build-job:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  tags:
+    - orpovy
+  before_script:
+    # Создание директории для публикации
+    - mkdir -p ./publish
+    - mkdir -p $PROJECT_NAME/Dll
+  script:
+    - echo "Adding NuGet sources..."    
+    - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
+    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
+    - echo "Rebuilding solution ..."
+    - dotnet build
+    - echo "Moving to $PROJECT_NAME..."
+    - cd $PROJECT_NAME
+    - echo "Current directory after cd:$(pwd)"
+    - echo "Building the application..."
+    - dotnet publish ${PROJECT_NAME}.csproj -c Release -r linux-x64 --self-contained false -o ../publish
+  artifacts:
+    name: "build-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./publish/
+
+extract-version-job:       
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  tags:
+    - orpovy
+  script:
+    # Определение пути к .csproj файлу
+    - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
+    # Проверка существования файла
+    - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
+    # Извлечение версии из .csproj
+    - VERSION=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" $CSPROJ_FILE 2>/dev/null || grep -oP '<Version>\K[^<]+' $CSPROJ_FILE)
+    - echo "Extracted version:$VERSION"
+    # Проверка версии
+    - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
+    # Формирование ревизии из CI_COMMIT_SHORT_SHA
+    - REVISION="r${CI_COMMIT_SHORT_SHA}"
+    # Формирование полной версии
+    - FULL_VERSION="${VERSION}-${REVISION}"
+    - echo "Full version:$FULL_VERSION"
+    # Сохранение переменных для последующих этапов
+    - echo "FULL_VERSION=$FULL_VERSION" > version.env
+    - echo "VERSION=$VERSION" >> version.env
+    - echo "REVISION=$REVISION" >> version.env
+    - echo "PACKAGE_NAME=$PROJECT_NAME" >> version.env
+  artifacts:
+    reports:
+      dotenv: version.env
+
+package-job:      # This job runs in the deploy stage.
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - build-job
+    - extract-version-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev
+  script:
+    - echo "Packaging the application into a .deb file..."
+    - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
+    - echo "DEB_NAME=$DEB_NAME"
+    # Создание структуры пакета
+    - mkdir -p deb/DEBIAN
+    - mkdir -p deb/opt/$PROJECT_NAME
+    - mkdir -p deb/var/log/$PROJECT_NAME
+    - mkdir -p deb/etc/systemd/system
+    # Копирование файлов приложения
+    - cp -r ./publish/* deb/opt/$PROJECT_NAME/
+    # Генерация control
+    - |
+      cat << EOF > deb/DEBIAN/control
+      Package: ${PROJECT_NAME}
+      Version: ${VERSION}
+      Section: utils
+      Priority: optional
+      Architecture: amd64
+      Depends: libgdiplus
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: ${PROJECT_NAME} это приложение для работы с документами СОИ СИКН/ОСИКН.
+      Homepage:
+
+      EOF
+    # Генерация preinst
+    - |
+      cat << EOF > deb/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      # Проверка наличия .NET Runtime
+      if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+          echo "Error: .NET Runtime 8 is not installed. Please install dotnet-runtime-8.0."
+          exit 1
+      fi
+
+      # Проверка версии .NET Runtime
+      REQUIRED_VERSION="$DOTNET_RT_VERSION"
+      INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+
+      if [ -z "\$INSTALLED_VERSION" ]; then
+          echo "Error: No compatible .NET Runtime 8 version found."
+          exit 1
+      fi
+
+      if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
+          echo "Error: .NET Runtime version \$INSTALLED_VERSION is installed, but version >= \$REQUIRED_VERSION is required."
+          exit 1
+      fi
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
+          echo "Stopping ${PROJECT_NAME}.service..."
+          systemctl stop ${PROJECT_NAME}.service
+      fi
+
+      # Удаление старых директорий
+      echo "Removing old ${PROJECT_NAME} directories..."
+      for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+          if [ -d "\$dir" ]; then
+              rm -rf "\$dir"
+              echo "Removed \$dir"
+          fi
+      done
+
+      exit 0
+      EOF
+    - |
+      cat << EOF > deb/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      # Остановка службы ${PROJECT_NAME}, если она запущена
+      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
+          echo "Stopping ${PROJECT_NAME}.service..."
+          systemctl stop ${PROJECT_NAME}.service
+      fi
+
+      exit 0
+      EOF
+    # Генерация postinst
+    - |
+      cat << EOF > deb/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      # Установка прав и владельцев
+      chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
+      chmod 644 /opt/$PROJECT_NAME/*.dll
+      chown -R alphadaemon:alphadaemon /opt/$PROJECT_NAME
+      chmod u=rwx,g=rx,o=rx /opt/$PROJECT_NAME
+      chown alphadaemon:alphadaemon /var/log/$PROJECT_NAME
+      chmod u=rwx,g=rx,o=rx /var/log/$PROJECT_NAME
+
+      # Перезагрузка systemd
+      systemctl daemon-reload
+
+      # Включение и запуск сервиса
+      systemctl enable ${PROJECT_NAME}.service
+      systemctl start ${PROJECT_NAME}.service
+
+      exit 0
+      EOF
+    - |
+      cat << EOF > deb/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      # Удаление директорий при полной очистке (purge)
+      if [ "\$1" = "purge" ]; then
+          echo "Purging ${PROJECT_NAME} directories..."
+          for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+              if [ -d "\$dir" ]; then
+                  rm -rf "\$dir"
+                  echo "Removed \$dir"
+              fi
+          done
+      fi
+
+      exit 0
+      EOF
+    # Генерация TN_Doc.service
+    - |
+      cat << EOF > deb/etc/systemd/system/${PROJECT_NAME}.service
+      [Unit]
+      Description=Service ${PROJECT_NAME}
+
+      [Service]
+      WorkingDirectory=/opt/$PROJECT_NAME/
+      ExecStart=/usr/bin/dotnet/dotnet /opt/$PROJECT_NAME/$PROJECT_NAME.dll
+      Restart=always
+      RestartSec=10
+      SyslogIdentifier=dotnet-${PROJECT_NAME}
+      User=alphadaemon
+      Environment=ASPNETCORE_ENVIRONMENT=Production
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+    # Установка прав
+    - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst
+    - chmod 644 deb/DEBIAN/control
+    - chmod 755 deb/opt/$PROJECT_NAME/$PROJECT_NAME
+    - chmod 644 deb/opt/$PROJECT_NAME/*.dll
+    - echo "Creating control.tar.xz..."
+    - tar -cJf control.tar.xz -C deb/DEBIAN .
+    - echo "Creating data.tar.xz..."
+    - tar -cJf data.tar.xz -C deb --exclude=DEBIAN .
+    - echo "Creating debian-binary..."
+    - echo "2.0" > debian-binary
+    - echo "Building .deb package..."
+    - mkdir -p packages
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+    - rm -f debian-binary control.tar.xz data.tar.xz
+    - ls -l ./packages/${DEB_NAME}_amd64.deb
+    - echo "Current directory:$(pwd)"
+  artifacts:
+    name: "package-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
