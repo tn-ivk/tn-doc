@@ -1,6 +1,3 @@
-[submodule "tn.utils"]
-	path = tn.utils
-	url = https://git.tncpa.ru/orpovy/ivk/tn.utils.git
 [submodule "tn.docgeneral"]
 	path = tn.docgeneral
 	url = https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git

@@ -1,12 +1,12 @@
-﻿using System;
+﻿extern alias SystemDrawing;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-
+using PrinterSettings = SystemDrawing::System.Drawing.Printing.PrinterSettings;
 
 namespace TN_Doc.Models.Printer
 {

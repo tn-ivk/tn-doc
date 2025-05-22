@@ -1,634 +1,108 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <AssemblyVersion>1.2.4</AssemblyVersion>
-    <Version>1.2.4</Version>
+    <AssemblyVersion>1.3.1</AssemblyVersion>
+    <Version>1.3.1</Version>
   </PropertyGroup>
 
+  <!-- Исключение ненужных файлов -->
   <ItemGroup>
     <Compile Remove="wwwroot\lib\jquery-ui\**" />
     <Content Remove="wwwroot\lib\jquery-ui\**" />
     <EmbeddedResource Remove="wwwroot\lib\jquery-ui\**" />
     <None Remove="wwwroot\lib\jquery-ui\**" />
-    <None Update="Doc\Act_N_GOSTR50.2.040(G)_ShiftTime.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_MPR_MPR_GOSTR8.1011-2022(U5).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_MPR_PU_GOSTR8.1011-2022(U6).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_MI2816_GOSTR8.1011-2022%28F2%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_PP_GOSTR8.1011-2022%28F1%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_PR_PR_GOSTR8.1011-2022(U1).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_PR_PU_GOSTR8.1011-2022(U2).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_PV_GOSTR8.1011-2022(C).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_PP_Areom_GOSTR8.1011-2022(F3).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\GOSTR8.1011-2022\KMH_PW_GOSTR8.1011-2022(C).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_EAC.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_GOSTR50.2.040%28I%29_ShiftTime.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_GOSTR50.2.040%28I%29_ShiftTime_TR.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_GOSTR50.2.040(G).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_MI3532(15)_China.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_MI3532(14).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_MI3532(13).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Poverka1974\Poverka1974.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Poverka3267\Poverka3267.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Poverka3287\Poverka3287_AnnexA.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Poverka3287\Poverka3287_AnnexB.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Poverka3380\Poverka3380.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_Act_N_MI3532(18).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\_Act_N_GOSTR50.2.040(G).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Act_N_GOSTR50.2.040(G).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Poverka_MI3266(A).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="prutils\winprutil.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Remove="Doc\Act\ActParty_MI3532(19).frx" />
-    <Content Include="Doc\Act\ActParty_MI3532(19).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </ItemGroup>
+
+  <!-- Копирование Development-конфигураций только в Debug -->
+  <ItemGroup>
+    <Content Update="appsettings.Development.json;Cfg\CfgApp.Development.json;Cfg\Cfg.Development.json">
+      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
-    <Content Update="wwwroot\PDF\PDF.pdf">
+  </ItemGroup>
+
+  <!-- Общие файлы, копируемые всегда -->
+  <ItemGroup>
+    <None Include="appsettings.json;Config.xml;nlog.config;prutils\winprutil.exe;wwwroot\HTML\DocEditAct.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Update="changes.md">
+    </None>
+    <!-- Условное включение PDF.pdf, если файл существует -->
+    <None Include="wwwroot\PDF\PDF.pdf" Condition="Exists('wwwroot\PDF\PDF.pdf')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="changes.md">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <Content Update="Cfg\Passport\CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Update="Doc\Act_N_GOSTR50.2.040(G)(Export_Rus).frx">
+    <None Include="Doc\**\*.frx;Dll\*.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Doc\Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx">
+    <!-- Исключение Development-файлов из общего правила Cfg -->
+    <None Include="Cfg\**\*.json" Exclude="Cfg\CfgApp.Development.json;Cfg\Cfg.Development.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Update="Cfg\CfgEditPoverkaSikn425_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverkaSikn425_PR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Update="Doc\34_PoverkaSikn425_PR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\35_PoverkaSikn425_PR_PR_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\36_KMX_Sikn425_PR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\37_KMX_Sikn425_PR_PR_GOST8.1011(U5).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Content Update="nlog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="appsettings.Development.json">
-      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
-      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Cfg\CfgApp.Development.json">
-      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
-      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Cfg\Cfg.Development.json">
-      <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
-      <CopyToOutputDirectory Condition="'$(Configuration)' != 'Debug'">Never</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 
+  <!-- Статические файлы и библиотеки -->
   <ItemGroup>
-    <Compile Remove="Class\DocPassport.cs" />
-    <Compile Remove="Class\DocReport.cs" />
+    <None Include="wwwroot\js\signalr\dist\browser\signalr.js;wwwroot\js\signalr\dist\browser\signalr.js.map;wwwroot\js\signalr\dist\browser\signalr.min.js;wwwroot\js\signalr\dist\browser\signalr.min.js.map" />
+    <None Include="wwwroot\lib\PDFObject\.gitignore;wwwroot\lib\PDFObject\LICENSE.md;wwwroot\lib\PDFObject\pdfobject.js;wwwroot\lib\PDFObject\pdfobject.min.js;wwwroot\lib\PDFObject\readme.md" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="appsettings.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="01_Report_2022-05-05_Release_version.frx" />
-    <None Remove="Doc\03_KMH_PP_Areom_MI_3532-2015_2022-04-05_Release_version.frx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.js" />
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.js.map" />
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.min.js" />
-    <None Include="wwwroot\js\signalr\dist\browser\signalr.min.js.map" />
-    <None Include="wwwroot\lib\PDFObject\.gitignore" />
-    <None Include="wwwroot\lib\PDFObject\LICENSE.md" />
-    <None Include="wwwroot\lib\PDFObject\pdfobject.js" />
-    <None Include="wwwroot\lib\PDFObject\pdfobject.min.js" />
-    <None Include="wwwroot\lib\PDFObject\readme.md" />
-  </ItemGroup>
-
+  <!-- NuGet-пакеты -->
   <ItemGroup>
     <PackageReference Include="EncryptionLibrary" Version="1.0.1" />
-    <PackageReference Include="FastReport.Web.Skia" Version="2023.3.7" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="7.3.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="FastReport.Web.Skia" Version="2025.2.2" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.4.0" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.4" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.6" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.3" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.9" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.15" />
   </ItemGroup>
 
+  <!-- Алиас для System.Drawing.Common -->
   <ItemGroup>
-    <Content Update="Cfg\Cfg.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgAct.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditActNP.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditAct.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditActParty.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_MI2816_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_MI2816.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_MPR_MPR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_MPR_PU_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PP_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PP.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PP_Areom_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PR_PR_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PR_PU_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PV_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PW_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_UZR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka2816.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PV.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PW.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PP_Areom.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH3312_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH3312_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH3288_MPR_TPR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3272.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3267.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="Cfg\CfgJornal.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3312_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3312_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH3265_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH3265_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH3312_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH3312_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_MPR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_MPR_MPR_GostBinary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_MPR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditKMH_PR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka1974.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3151.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3151.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH3288_MPR_TPR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3265_UPR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3287.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3265_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3265_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3288.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3267.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3288.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3312_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka1974.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3272.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_MPR_TPR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3189.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgEditPoverka3380.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassportExport.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassportForActNP.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassport_EAC.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassport_GOSTR50.2.040%28G%29.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassport_GOSTR50.2.040%28I%29.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassport_MI3532%2813%29.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassport_MI3532%2814%29.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassport_MI3532(15)_China.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgEditPassport_MI3532%2815%29.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Passport\CfgPassport.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\Poverka3312_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3312_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_MPR_MPR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH3265_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3265_UPR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH3265_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3265_UPR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3265_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3380.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_PR_PR.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka2816.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_MI2816.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_PP_Areom.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_PR_PU.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_PP.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_PV.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgKMH_PW.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPassport.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgPoverka3287.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Cfg\CfgReport.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Reference Include="System.Drawing.Common">
+      <Aliases>SystemDrawing</Aliases>
+    </Reference>
+  </ItemGroup>
+
+  <!-- View-файлы -->
+  <ItemGroup>
     <Content Update="Views\Home\Index.cshtml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
-    <Content Update="Views\Home\Index_27092023.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\HTML\DocEditAct.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\HTML\DocEditPassport.html">
+    <Content Update="Views\Home\Index_27092023.cshtml;wwwroot\HTML\DocEditPassport.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Config.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\01_Report_2022-05-05_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\01_Report_2023-02-10_Release_version_%28Ust-Luga%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\02_KMH_PP_MI_3532-2015_Release_version_TDV.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\02_KMH_PP_MI_3532-2015_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\03_KMH_PP_Areom_MI_3532-2015_TDV.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\03_KMH_PP_Areom_MI_3532-2015.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\04_TableKMH_PW_TDV.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\04_TableKMH_PW.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\05_TableKMH_PV_TDV.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\05_TableKMH_PV.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\06_KMH_MI2816_Release_Version_TDV.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\06_KMH_MI2816_Release_Version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\07_KMH_PR_PR_%28TPR%29_Release_Version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\08_DocKMH_UZR_PU_(TPR).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\08_DocKMH_PR_PU_%28TPR%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_MI3532(15).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Poverka3267.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\25_DocMeasurementJornal_NP.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Act_NP_MI3275-2016(B).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\PassportExport.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Passport\Passport_GOSTR50.2.040%28I%29.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\09_Poverka2816_2022-04-13_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\10_Poverka3287_AnnexA_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\17_Poverka1974_(Ust-Luga).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\Act_N_MI3532(18).frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\13_Poverka3151_2022-05-11_Release-version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\14_Poverka3380_2022-05-13_Release-version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\15_Poverka3287_AnnexB_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\16_Poverka3189_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\17_Poverka1974.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\18_Poverka3265_PR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\19_Poverka3265_UPR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\20_Poverka3265_UPR_PR_Relase_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\21_Poverka3272_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\22_KMH_MPR_MPR_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\23_KMH_MPR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\24_KMH3265_UPR_PR_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\25_DocMeasurementJornal.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\26_Poverka3312_PR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\27_Poverka3312_UPR_PR_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\28_KMH3312_PR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\29_KMH3312_UPR_PR_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\30_KMH3265_PR_PU_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\31_Poverka3288_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\32_TableKMH3288_MPR_TPR_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\33_TableKMH3272_MPR_TPR_Release_version.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Doc\ActParty.frx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
+  <!-- Пустая папка -->
   <ItemGroup>
     <Folder Include="wwwroot\css\font-awesome\" />
   </ItemGroup>
 
+  <!-- Ссылки на проекты -->
   <ItemGroup>
     <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
     <ProjectReference Include="..\tn_toolsfastreport\TN_Tools\TN_Tools.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties cfg_4cfgapp_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" /></VisualStudio></ProjectExtensions>
-
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties cfg_4cfgapp_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" />
+    </VisualStudio>
+  </ProjectExtensions>
+  
 </Project>
