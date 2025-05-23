@@ -380,10 +380,10 @@ namespace TN_Doc.Controllers
             return (unixTimeBegin, unixTimeEnd);
         }
         
-        public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
+        public bool GetDoc(int IdDevice, IdDoc IdDoc, RequestListDocs request, int protocolNumber)
         {
-            _logger.LogDebug($"Отображение документа устройства с ИД: {IdDevice}, документа {IdDoc} c ИД: {id}");
-            if (id == 0)
+            _logger.LogDebug($"Отображение документа устройства с ИД: {IdDevice}, документа {IdDoc} c ИД: {request.Id}");
+            if (request.Id == 0)
             {
                 _logger.LogWarning($"Попытка отображения документа {IdDoc} с нулевым идентификатором");
                 return false;
@@ -415,16 +415,17 @@ namespace TN_Doc.Controllers
                 FR.Report.Load(templateFile.FullName);
                 var jsonDoc = IdDoc switch
                 {
-                    IdDoc.KMH_PP_Areom => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.KMH_PV => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.KMH_PW => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.Poverka2816 => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.KMH_MI2816 => doc.GetViewDoc(id, protocolNumber),
-                    _ => doc.GetViewDoc(id)
+                    IdDoc.KMH_PP_Areom => doc.GetViewDoc(request.Id, protocolNumber),
+                    IdDoc.KMH_PV => doc.GetViewDoc(request.Id, protocolNumber),
+                    IdDoc.KMH_PW => doc.GetViewDoc(request.Id, protocolNumber),
+                    IdDoc.Poverka2816 => doc.GetViewDoc(request.Id, protocolNumber),
+                    IdDoc.KMH_MI2816 => doc.GetViewDoc(request.Id, protocolNumber),
+                    IdDoc.ActProducer => doc.GetViewDoc(request),
+                    _ => doc.GetViewDoc(request.Id)
                 };
                 if (jsonDoc == null)
                 {
-                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}");
+                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {request.Id}");
                     return false;
                 }
                 FR.Report.SetParameterValue("JsonDoc", jsonDoc);

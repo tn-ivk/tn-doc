@@ -814,16 +814,36 @@ function GetData() {
 
 function GetDoc() {
     $('.FR').attr('src', '');
+
+    // Получаем данные выбранной строки
+    let rowData = table.row({ selected: true }).data();
+    console.log(rowData);
+    if (!rowData) {
+        console.log('Не выбрана строка документа!');
+        return;
+    }
+    
+    const requestListDocs = {
+        Id: rowData.id || rowData.Id || rowData.ID, 
+        DT: rowData.dt || rowData.DT,
+        Description: rowData.description || rowData.Description,
+        DirId: rowData.dirId || rowData.DirId,
+        BIKId: rowData.bikId || rowData.BIKId,
+        AdvancedProperties: rowData.advancedProperties || rowData.AdvancedProperties
+    };
+    console.log(requestListDocs);
     
     $.ajax(
         {
             async: true,
             url: 'Home/GetDoc',
             type: 'GET',
+            //contentType: 'application/json',
+            //data: JSON.stringify(requestListDocs),
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                id: currentId,
+                request: requestListDocs,
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
             success: function (data) {
