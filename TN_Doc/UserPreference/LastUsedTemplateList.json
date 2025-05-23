@@ -158,6 +158,10 @@
         {
           "IdDoc": 38,
           "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 39,
+          "LastTemplateId": 0
         }
       ]
     },
@@ -319,6 +323,10 @@
         {
           "IdDoc": 38,
           "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 39,
+          "LastTemplateId": 0
         }
       ]
     },
@@ -479,6 +487,10 @@
         },
         {
           "IdDoc": 38,
+          "LastTemplateId": 0
+        },
+        {
+          "IdDoc": 39,
           "LastTemplateId": 0
         }
       ]
