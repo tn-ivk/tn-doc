@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActProducer.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/23/2025 16:06:17" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActProducer.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/23/2025 16:33:12" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -204,26 +204,16 @@ namespace FastReport
       
     private void TableAdditionlInfo_ManualBuild(object sender, EventArgs e)
     {
-      /*
       // Setup Last Column width
-      TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
-         
-      string wholePart = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart;
-      int startIndexTon = wholePart.IndexOf(&quot; тон&quot;);
-      
-      if (startIndexTon != -1)
-        wholePart = wholePart.Remove(startIndexTon);        
-        
-      WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt; т.&quot;, wholePart);
+      TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;  
+      WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt; т.&quot;, doc.WholePart ?? string.Empty);
          
       //Draw static Rows
       TableAdditionlInfo.PrintRow(0);
       TableAdditionlInfo.PrintColumns();                                             
          
       //Fill &amp; Draw dynamic Rows
-      List &lt;string&gt; listGostIndex51858;
-      listGostIndex51858=DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.GostIndex51858.Where
-      (i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      var listGostIndex51858 = ActShifts.Select(x =&gt; x.GostIndex51858).Where(x =&gt; String.IsNullOrEmpty(x)).ToList();
          
       for (int n = 0; n &lt; listGostIndex51858.Count; n++)
       {
@@ -231,7 +221,6 @@ namespace FastReport
         TableAdditionlInfo.PrintRow(1);
         TableAdditionlInfo.PrintColumns();                                             
       }
-    */
     }
       
     public void  DrawTableSigners()
