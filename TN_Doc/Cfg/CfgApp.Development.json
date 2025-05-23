@@ -232,6 +232,26 @@
         },
         {
           "Use": true,
+          "IdDoc": 39,
+          "Name": "Акты по производителям",
+          "Description": "",
+          "PathToDocDll": "/Dll/ActProducer.dll",
+          "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+          "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Акт по производителю",
+              "Description": "Акт приема-сдачи по производителю",
+              "PathToDocTemplateFile": "/Doc/Act/Act_N_MI3532(18).frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
           "IdDoc": 3,
           "Name": "Журналы",
           "Description": "",

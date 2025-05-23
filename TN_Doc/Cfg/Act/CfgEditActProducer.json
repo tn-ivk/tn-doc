@@ -1,0 +1,205 @@
+﻿{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "ActNumber",
+      "Type": "text",
+      "Name": "Номер акта",
+      "RequiredFill": true
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": true,
+      "Key": "DelivePoint",
+      "Type": "text",
+      "Name": "Пункт приема сдачи нефти"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": true,
+      "Key": "Factory",
+      "Type": "text",
+      "Name": "Предприятие (владелец) ПСП"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": true,
+      "Key": "SIKN_Number",
+      "Type": "text",
+      "Name": "СИКН №"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "Delive_Factory",
+      "Type": "text",
+      "Name": "Уполномоченный представитель сдающей стороны"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "Delive_FIO",
+      "Type": "text",
+      "Name": "Фамилия И.О."
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": true,
+      "Key": "Delive_IOF",
+      "Type": "list",
+      "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "Delive_Lic_Date",
+      "Type": "text",
+      "Name": "Дата доверенности"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "Delive_Lic_Number",
+      "Type": "text",
+      "Name": "Номер доверенности"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": false,
+      "Key": "Receive_Factory",
+      "Type": "text",
+      "Name": "Уполномоченный представитель принимающей стороны"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": false,
+      "Key": "Receive_FIO",
+      "Type": "text",
+      "Name": "Фамилия И.О."
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "Receive_IOF",
+      "Type": "list",
+      "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": false,
+      "Key": "Receive_Lic_Date",
+      "Type": "text",
+      "Name": "Дата доверенности"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": false,
+      "Key": "Receive_Lic_Number",
+      "Type": "false",
+      "Name": "Номер доверенности"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "Oil_Name",
+      "Type": "text",
+      "Name": "Наименование нефтепродукта, марка, ГОСТ, ГОСТ Р"
+    },
+    {
+      "Id": 16,
+      "Use": true,
+      "Edit": true,
+      "Key": "Contract",
+      "Type": "text",
+      "Name": "Договор об оказании услуг по транспортировке, нефтепродукта №"
+    },
+    {
+      "Id": 17,
+      "Use": true,
+      "Edit": true,
+      "Key": "Route_Telegram",
+      "Type": "text",
+      "Name": "Маршрутная телеграмма №"
+    },
+    {
+      "Id": 18,
+      "Use": true,
+      "Edit": true,
+      "Key": "Refinery_Plant",
+      "Type": "text",
+      "Name": "НПЗ-производитель нефтепродукта"
+    },
+    {
+      "Id": 19,
+      "Use": true,
+      "Edit": true,
+      "Key": "Consignor",
+      "Type": "text",
+      "Name": "Грузоотправитель"
+    },
+    {
+      "Id": 20,
+      "Use": true,
+      "Edit": true,
+      "Key": "Consignee",
+      "Type": "text",
+      "Name": "Грузополучатель"
+    },
+    {
+      "Id": 21,
+      "Use": true,
+      "Edit": true,
+      "Key": "Destination",
+      "Type": "text",
+      "Name": "Пункт назначения"
+    },
+    {
+      "Id": 22,
+      "Use": true,
+      "Edit": true,
+      "Key": "Exporter_Importer",
+      "Type": "text",
+      "Name": "Экспортер (импортер)"
+    },
+    {
+      "Id": 23,
+      "Use": true,
+      "Edit": true,
+      "Key": "Declaration",
+      "Type": "text",
+      "Name": "Декларация на товары (ввозная, вывозная)"
+    },
+    {
+      "Id": 24,
+      "Use": true,
+      "Edit": true,
+      "Key": "TankerName",
+      "Type": "text",
+      "Name": "Название танкера"
+    },
+    {
+      "Id": 25,
+      "Use": true,
+      "Edit": true,
+      "Key": "TimeSchedule_Position",
+      "Type": "text",
+      "Name": "Графиковая позиция"
+    }
+  ]
+}
