@@ -473,10 +473,16 @@ namespace TN_Doc.Controllers
             }
         }
 
-        public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
+        public string GetDocEdit(int IdDevice, IdDoc IdDoc, string request)
         {
-            _logger.LogDebug($"Отображение формы редактирования документа устройства с ИД: {IdDevice}, документа {IdDoc} c ИД: {id}");
-            if (id == 0)
+            _logger.LogDebug($"Отображение формы редактирования документа {IdDoc} для устройства {IdDevice}");
+            var requestInfo = JsonConvert.DeserializeObject<RequestListDocs>(request);
+            if (requestInfo == null)
+            {
+                _logger.LogError("Не удалось десериализовать параметры запроса");
+                return string.Empty;
+            }
+            if (requestInfo.Id == 0)
             {
                 _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
                 return string.Empty;
@@ -488,7 +494,12 @@ namespace TN_Doc.Controllers
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
                 return string.Empty;
             }
-            return doc.GetEditDoc(id);
+            
+            return IdDoc switch
+            {
+                IdDoc.ActProducer => doc.GetEditDoc(requestInfo),
+                _ => doc.GetEditDoc(requestInfo.Id)
+            };
         }
 
         public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format)

@@ -695,28 +695,34 @@ function InitTableDocs() {
         });
 
     table.on('select', function (e, dt, type, indexes) {
-        if (type === 'row') {
-            var id = table.rows(indexes).data().pluck('id');
-            currentId = id[0];
-            requestDoc = {
-                Id: table.rows(indexes).data().pluck('id')[0],
-                DT: table.rows(indexes).data().pluck('dt')[0],
-                Description: table.rows(indexes).data().pluck('description')[0],
-                DirId: table.rows(indexes).data().pluck('dirId')[0],
-                BIKId: table.rows(indexes).data().pluck('bikId')[0],
-                AdvancedProperties: table.rows(indexes).data().pluck('advancedProperties')[0]
-            };
-            console.log(requestDoc);
-            
-            if ($('#ComboboxDocGUID').val() == 32) {
+        if (type !== 'row') return;
 
+        try {
+            const rowData = table.rows(indexes).data()[0];
+            if (!rowData) {
+                return;
+            }
+
+            currentId = rowData.id;
+            requestDoc = {
+                Id: rowData.id,
+                DT: rowData.dt,
+                Description: rowData.description,
+                DirId: rowData.dirId,
+                BIKId: rowData.bikId,
+                AdvancedProperties: rowData.advancedProperties || []
+            };
+            const comboboxValue = $('#ComboboxDocGUID').val();
+            if (comboboxValue === '32') {
                 let BIKId = 1;
                 let DirId = 0;
 
-                table.rows(indexes).data().pluck('advancedProperties')[0].forEach((item) => {
-                    if (item.key == 'BIKId') BIKId = item.value;
-                    else if (item.key == 'DirId') DirId = item.value;
-                });
+                if (Array.isArray(requestDoc.AdvancedProperties)) {
+                    requestDoc.AdvancedProperties.forEach((item) => {
+                        if (item.key === 'BIKId') BIKId = item.value;
+                        else if (item.key === 'DirId') DirId = item.value;
+                    });
+                }
 
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), BIKId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_DirId'), DirId, 2, 0);
@@ -725,6 +731,8 @@ function InitTableDocs() {
             } else {
                 GetDoc();
             }
+        } catch (error) {
+            console.error('Error in table select handler:', error);
         }
     });
 }
@@ -824,22 +832,6 @@ function GetData() {
 
 function GetDoc() {
     $('.FR').attr('src', '');
-
-    // Получаем данные выбранной строки
-    let rowData = table.row({ selected: true }).data();
-    if (!rowData) {
-        console.log('Не выбрана строка документа!');
-        return;
-    }
-    
-    const requestListDocs = {
-        Id: rowData.id || rowData.Id || rowData.ID, 
-        DT: rowData.dt || rowData.DT,
-        Description: rowData.description || rowData.Description,
-        DirId: rowData.dirId || rowData.DirId,
-        BIKId: rowData.bikId || rowData.BIKId,
-        AdvancedProperties: rowData.advancedProperties || rowData.AdvancedProperties
-    };
     
     $.ajax(
         {
@@ -849,7 +841,7 @@ function GetDoc() {
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                request: JSON.stringify(requestListDocs),
+                request: JSON.stringify(requestDoc),
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
             success: function (data) {
@@ -869,7 +861,7 @@ function GetDoc() {
 }
 
 function GetEditDoc() {
-    if(currentId == null) 
+    if(requestDoc == null) 
         return;
     
     $.ajax(
@@ -880,7 +872,7 @@ function GetEditDoc() {
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                id: currentId
+                request: JSON.stringify(requestDoc)
             },
             success: function (data) {
                 $('.FR').each(function () {
