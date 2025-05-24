@@ -33,6 +33,7 @@ var CurrentDeviceId;
 
 var table = null;
 var currentId = null;
+let requestDoc = null;
 var docTemplates = {};
 let isViewing = false;
 let isEditingDoc = false;
@@ -697,7 +698,16 @@ function InitTableDocs() {
         if (type === 'row') {
             var id = table.rows(indexes).data().pluck('id');
             currentId = id[0];
-
+            requestDoc = {
+                Id: table.rows(indexes).data().pluck('id')[0],
+                DT: table.rows(indexes).data().pluck('dt')[0],
+                Description: table.rows(indexes).data().pluck('description')[0],
+                DirId: table.rows(indexes).data().pluck('dirId')[0],
+                BIKId: table.rows(indexes).data().pluck('bikId')[0],
+                AdvancedProperties: table.rows(indexes).data().pluck('advancedProperties')[0]
+            };
+            console.log(requestDoc);
+            
             if ($('#ComboboxDocGUID').val() == 32) {
 
                 let BIKId = 1;
