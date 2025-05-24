@@ -3,7 +3,7 @@
     {
       "Id": 1,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "ActNumber",
       "Type": "text",
       "Name": "Номер акта",
@@ -12,7 +12,7 @@
     {
       "Id": 2,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "DelivePoint",
       "Type": "text",
       "Name": "Пункт приема сдачи нефти"
@@ -20,7 +20,7 @@
     {
       "Id": 3,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "Factory",
       "Type": "text",
       "Name": "Предприятие (владелец) ПСП"
@@ -28,7 +28,7 @@
     {
       "Id": 4,
       "Use": true,
-      "Edit": true,
+      "Edit": false,
       "Key": "SIKN_Number",
       "Type": "text",
       "Name": "СИКН №"
@@ -51,8 +51,8 @@
     },
     {
       "Id": 7,
-      "Use": true,
-      "Edit": true,
+      "Use": false,
+      "Edit": false,
       "Key": "Delive_IOF",
       "Type": "list",
       "Name": "И.О. Фамилия"
@@ -91,8 +91,8 @@
     },
     {
       "Id": 12,
-      "Use": true,
-      "Edit": true,
+      "Use": false,
+      "Edit": false,
       "Key": "Receive_IOF",
       "Type": "list",
       "Name": "И.О. Фамилия"
@@ -112,94 +112,6 @@
       "Key": "Receive_Lic_Number",
       "Type": "false",
       "Name": "Номер доверенности"
-    },
-    {
-      "Id": 15,
-      "Use": true,
-      "Edit": true,
-      "Key": "Oil_Name",
-      "Type": "text",
-      "Name": "Наименование нефтепродукта, марка, ГОСТ, ГОСТ Р"
-    },
-    {
-      "Id": 16,
-      "Use": true,
-      "Edit": true,
-      "Key": "Contract",
-      "Type": "text",
-      "Name": "Договор об оказании услуг по транспортировке, нефтепродукта №"
-    },
-    {
-      "Id": 17,
-      "Use": true,
-      "Edit": true,
-      "Key": "Route_Telegram",
-      "Type": "text",
-      "Name": "Маршрутная телеграмма №"
-    },
-    {
-      "Id": 18,
-      "Use": true,
-      "Edit": true,
-      "Key": "Refinery_Plant",
-      "Type": "text",
-      "Name": "НПЗ-производитель нефтепродукта"
-    },
-    {
-      "Id": 19,
-      "Use": true,
-      "Edit": true,
-      "Key": "Consignor",
-      "Type": "text",
-      "Name": "Грузоотправитель"
-    },
-    {
-      "Id": 20,
-      "Use": true,
-      "Edit": true,
-      "Key": "Consignee",
-      "Type": "text",
-      "Name": "Грузополучатель"
-    },
-    {
-      "Id": 21,
-      "Use": true,
-      "Edit": true,
-      "Key": "Destination",
-      "Type": "text",
-      "Name": "Пункт назначения"
-    },
-    {
-      "Id": 22,
-      "Use": true,
-      "Edit": true,
-      "Key": "Exporter_Importer",
-      "Type": "text",
-      "Name": "Экспортер (импортер)"
-    },
-    {
-      "Id": 23,
-      "Use": true,
-      "Edit": true,
-      "Key": "Declaration",
-      "Type": "text",
-      "Name": "Декларация на товары (ввозная, вывозная)"
-    },
-    {
-      "Id": 24,
-      "Use": true,
-      "Edit": true,
-      "Key": "TankerName",
-      "Type": "text",
-      "Name": "Название танкера"
-    },
-    {
-      "Id": 25,
-      "Use": true,
-      "Edit": true,
-      "Key": "TimeSchedule_Position",
-      "Type": "text",
-      "Name": "Графиковая позиция"
     }
   ]
 }
