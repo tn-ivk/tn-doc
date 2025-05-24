@@ -201,6 +201,108 @@ namespace Tests.DocModules
         }
 
         [Test]
+        public void SaveDoc_WithMultipleNotEditLabels_ShouldSkipAllNotEditValues()
+        {
+            // Arrange
+            var correctionData = new CorrectionData
+            {
+                DocID = 1,
+                Values = new List<EditData>
+                {
+                    new EditData { Key = "Passport.PassportID", Tag = "AdditionalInfo", Value = "123" },
+                    new EditData { Key = "TempCorrection", Tag = "Value", Value = "—" },
+                    new EditData { Key = "PressCorrection", Tag = "Value", Value = "—" },
+                    new EditData { Key = "DensCorrection", Tag = "Value", Value = "—" },
+                    new EditData { Key = "Dens15Correction", Tag = "Value", Value = "0.86" }
+                }
+            };
+
+            var jsonData = System.Text.Json.JsonSerializer.Serialize(correctionData);
+
+            // Act
+            var result = _docPassport.SaveDoc(jsonData);
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void SaveDoc_WithNotEditLabelAndEmptyValue_ShouldSkipBoth()
+        {
+            // Arrange
+            var correctionData = new CorrectionData
+            {
+                DocID = 1,
+                Values = new List<EditData>
+                {
+                    new EditData { Key = "Passport.PassportID", Tag = "AdditionalInfo", Value = "123" },
+                    new EditData { Key = "TempCorrection", Tag = "Value", Value = "—" },
+                    new EditData { Key = "PressCorrection", Tag = "Value", Value = "" },
+                    new EditData { Key = "DensCorrection", Tag = "Value", Value = "0.85" }
+                }
+            };
+
+            var jsonData = System.Text.Json.JsonSerializer.Serialize(correctionData);
+
+            // Act
+            var result = _docPassport.SaveDoc(jsonData);
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void SaveDoc_WithNotEditLabelInAdditionalInfo_ShouldProcessNormally()
+        {
+            // Arrange
+            var correctionData = new CorrectionData
+            {
+                DocID = 1,
+                Values = new List<EditData>
+                {
+                    new EditData { Key = "Passport.PassportID", Tag = "AdditionalInfo", Value = "123" },
+                    new EditData { Key = "Laboratory_Factory", Tag = "AdditionalInfo", Value = "—" },
+                    new EditData { Key = "AccrSertifNumber", Tag = "AdditionalInfo", Value = "ACC123" },
+                    new EditData { Key = "TempCorrection", Tag = "Value", Value = "25.5" }
+                }
+            };
+
+            var jsonData = System.Text.Json.JsonSerializer.Serialize(correctionData);
+
+            // Act
+            var result = _docPassport.SaveDoc(jsonData);
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void SaveDoc_WithNotEditLabelAndValidValue_ShouldProcessValidValue()
+        {
+            // Arrange
+            var correctionData = new CorrectionData
+            {
+                DocID = 1,
+                Values = new List<EditData>
+                {
+                    new EditData { Key = "Passport.PassportID", Tag = "AdditionalInfo", Value = "123" },
+                    new EditData { Key = "TempCorrection", Tag = "Value", Value = "—" },
+                    new EditData { Key = "PressCorrection", Tag = "Value", Value = "101.3" },
+                    new EditData { Key = "DensCorrection", Tag = "Value", Value = "0.85" },
+                    new EditData { Key = "Dens15Correction", Tag = "Value", Value = "—" }
+                }
+            };
+
+            var jsonData = System.Text.Json.JsonSerializer.Serialize(correctionData);
+
+            // Act
+            var result = _docPassport.SaveDoc(jsonData);
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
         public void DocUpdate_WithInvalidJson_ShouldNotThrowException()
         {
             Assert.DoesNotThrow(() => _docPassport.DocUpdate("invalid json"));
