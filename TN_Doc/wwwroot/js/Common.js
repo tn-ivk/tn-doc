@@ -817,7 +817,6 @@ function GetDoc() {
 
     // Получаем данные выбранной строки
     let rowData = table.row({ selected: true }).data();
-    console.log(rowData);
     if (!rowData) {
         console.log('Не выбрана строка документа!');
         return;
@@ -831,19 +830,16 @@ function GetDoc() {
         BIKId: rowData.bikId || rowData.BIKId,
         AdvancedProperties: rowData.advancedProperties || rowData.AdvancedProperties
     };
-    console.log(requestListDocs);
     
     $.ajax(
         {
             async: true,
             url: 'Home/GetDoc',
             type: 'GET',
-            //contentType: 'application/json',
-            //data: JSON.stringify(requestListDocs),
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                request: requestListDocs,
+                request: JSON.stringify(requestListDocs),
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
             success: function (data) {
