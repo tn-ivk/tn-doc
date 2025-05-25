@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\tn.docgeneral\Act\Act.csproj" />
       <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
       <ProjectReference Include="..\tn.docgeneral\Passport\Passport.csproj" />
       <ProjectReference Include="..\tn.docgeneral\tn.utils\TN.Utils\TN.Utils.csproj" />
