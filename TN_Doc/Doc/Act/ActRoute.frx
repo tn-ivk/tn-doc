@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/26/2025 19:31:26" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 02:17:00" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -65,43 +65,43 @@ namespace FastReport
       
     public void DrawTableHeader()
     {             
-      DateTime End =  tools.UnixTimestampToDatetime((long)DataIVK.TableResultActAndPassport.End);
+      DateTime End =  tools.UnixTimestampToDatetime((long)DataIVK.TableRouteActs.Route.RouteActDate);
       
-      ActNumberAndDate.Text = string.Format(&quot;Акт приема-сдачи нефти №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г. (сдача по СИКН)&quot;,  
-        DataIVK.TableResultActAndPassport.AdditionalInfo.ActNumber,
-        End);                            
+      ActNumberAndDate.Text = string.Format(&quot;Акт приема-сдачи нефти №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г. (МП №{2})&quot;,  
+        DataIVK.TableRouteActs.Route.RouteActNumber,
+        End,
+        DataIVK.TableRouteActs.RouteNumber);                            
          
-      DelivePoint.Text = string.Format("Пункт приема-сдачи нефти <u>{0}</u>", DataIVK.TableRouteActs.RouteData.DeliveryFactory);
-      Factory.Text = string.Format("Предприятие (владелец) ПСП <u>{0}</u>", DataIVK.TableRouteActs.RouteData.Factory);
-      SIKN_Number.Text = string.Format("СИКН № <u>{0}</u>", DataIVK.TableRouteActs.RouteData.SiknNumber);
-      Contract.Text = string.Format("Договор об оказании услуг по транспортировке нефти № <u>{0}</u>", DataIVK.TableRouteActs.RouteData.Contract);
-      Route_Telegram.Text = string.Format("Маршрутное поручение № <u>{0}</u>", DataIVK.TableRouteActs.RouteNumber);
-      Refinery_Plant.Text = string.Format("Производитель <u>{0}</u>", DataIVK.TableRouteActs.RouteData.Producer);
-      Consignor.Text = string.Format("Грузоотправитель <u>{0}</u>", DataIVK.TableRouteActs.RouteData.Consigner);
-      SubsurfaceUser.Text = string.Format("Недропользователь * <u>{0}</u>", DataIVK.TableRouteActs.RouteData.SubsurfaceUser);
-      FirstOwnerPetroleum.Text = string.Format("Первый владелец нефти <u>{0}</u>", DataIVK.TableRouteActs.RouteData.FirstOwner);
-      LastOwnerPetroleum.Text = string.Format("Последний владелец нефти <u>{0}</u>", DataIVK.TableRouteActs.RouteData.LastOwner);
-      Consignee.Text = string.Format("Грузополучатель <u>{0}</u>", DataIVK.TableRouteActs.RouteData.Consignees != null && DataIVK.TableRouteActs.RouteData.Consignees.Count > 0 ? DataIVK.TableRouteActs.RouteData.Consignees[0] : "");
-      Destination.Text = string.Format("Пункт назначения <u>{0}</u>", DataIVK.TableRouteActs.RouteData.DestinationPoint);
-      Exporter_Importer.Text = string.Format("Экспортер (импортер) * <u>{0}</u>", DataIVK.TableRouteActs.RouteData.Exporter);
-      Declaration.Text = string.Format("Таможенная декларация (ввозная, вывозная) * <u>{0}</u>", DataIVK.TableRouteActs.RouteData.CustomsDeclaration);
-      Delive_FIO.Text = string.Format("Уполномоченный представитель сдающей стороны, <u>{0}</u> (Фамилия И.О.)", DataIVK.TableRouteActs.RouteData.DeliveryFio);
-      Delive_Lic.Text = string.Format("действующий на основании доверенности от <u>{0}</u> № <u>{1}</u>", DataIVK.TableRouteActs.RouteData.DeliveryLicenseDate, DataIVK.TableRouteActs.RouteData.DeliveryLicenseNumber);
-      Receive_FIO.Text = string.Format("уполномоченный представитель принимающей стороны, <u>{0}</u> (Фамилия И.О.)", DataIVK.TableRouteActs.RouteData.ReceiveFio);
-      Receive_Lic.Text = string.Format("действующий на основании доверенности от <u>{0}</u> № <u>{1}</u>", DataIVK.TableRouteActs.RouteData.ReceiveLicenseDate, DataIVK.TableRouteActs.RouteData.ReceiveLicenseNumber);
+      DelivePoint.Text = string.Format(&quot;Пункт приема-сдачи нефти &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Delive_Factory);
+      Factory.Text = string.Format(&quot;Предприятие (владелец) ПСП &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Factory);
+      SIKN_Number.Text = string.Format(&quot;СИКН № &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.SIKN_Number);
+      Contract.Text = string.Format(&quot;Договор об оказании услуг по транспортировке нефти № &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Contract);
+      Route_Telegram.Text = string.Format(&quot;Маршрутное поручение № &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteNumber);
+      Refinery_Plant.Text = string.Format(&quot;Производитель &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Producer);
+      Consignor.Text = string.Format(&quot;Грузоотправитель &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Consigner);
+      SubsurfaceUser.Text = string.Format(&quot;Недропользователь * &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.SubsurfaceUser);
+      FirstOwnerPetroleum.Text = string.Format(&quot;Первый владелец нефти &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.FirstOwner);
+      LastOwnerPetroleum.Text = string.Format(&quot;Последний владелец нефти &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.LastOwner);
+      Consignee.Text = string.Format(&quot;Грузополучатель &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Consignees != null &amp;&amp; DataIVK.TableRouteActs.RouteData.Consignees.Count &gt; 0 ? DataIVK.TableRouteActs.RouteData.Consignees[0] : &quot;&quot;);
+      Destination.Text = string.Format(&quot;Пункт назначения &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.DestinationPoint);
+      Exporter_Importer.Text = string.Format(&quot;Экспортер (импортер) * &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Exporter);
+      Declaration.Text = string.Format(&quot;Таможенная декларация (ввозная, вывозная) * &lt;u&gt;{0}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.CustomsDeclaration);
+      Delive_FIO.Text = string.Format(&quot;Уполномоченный представитель сдающей стороны, &lt;u&gt;{0}&lt;/u&gt; (Фамилия И.О.)&quot;, DataIVK.TableRouteActs.RouteData.Delive_FIO);
+      Delive_Lic.Text = string.Format(&quot;действующий на основании доверенности от &lt;u&gt;{0}&lt;/u&gt; № &lt;u&gt;{1}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Delive_Lic_Date, DataIVK.TableRouteActs.RouteData.Delive_Lic_Number);
+      Receive_FIO.Text = string.Format(&quot;уполномоченный представитель принимающей стороны, &lt;u&gt;{0}&lt;/u&gt; (Фамилия И.О.)&quot;, DataIVK.TableRouteActs.RouteData.Receive_FIO);
+      Receive_Lic.Text = string.Format(&quot;действующий на основании доверенности от &lt;u&gt;{0}&lt;/u&gt; № &lt;u&gt;{1}&lt;/u&gt;&quot;, DataIVK.TableRouteActs.RouteData.Receive_Lic_Date, DataIVK.TableRouteActs.RouteData.Receive_Lic_Number);
     }
 
     private void TableAct_ManualBuild(object sender, EventArgs e)
     {
-      List&lt;TN.Doc.Act&gt; listShiftsData = new List&lt;TN.Doc.Act&gt; ();
-      listShiftsData.Add(DataIVK.TableResultActAndPassport.ResultActAndPassport.Act[0]);
+      List&lt;TN.Doc.ActShift&gt; listShiftsData = DataIVK.TableRouteActs.Route.ActShifts.Where(x =&gt; !string.IsNullOrEmpty(x.GostIndex51858)).ToList();
       
       if (Engine.FinalPass == true)
       {
-        DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(DataIVK.TableResultActAndPassport.Begin);
-        DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(DataIVK.TableResultActAndPassport.End);
+        //DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(DataIVK.TableResultActAndPassport.Begin);
+        //DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(DataIVK.TableResultActAndPassport.End);
         
-        Period.Text = $&quot;{Begin.ToShortDateString()} {Begin.ToString(&quot;HH:mm&quot;)}&lt;br&gt;{End.ToShortDateString()} {End.ToString(&quot;HH:mm&quot;)}&quot;;
+        //Period.Text = $&quot;{Begin.ToShortDateString()} {Begin.ToString(&quot;HH:mm&quot;)}&lt;br&gt;{End.ToShortDateString()} {End.ToString(&quot;HH:mm&quot;)}&quot;;
         
         Vol_LastShift.Text = tools.GetNormalizedValue(listShiftsData[0].Vol_LastShift);
         Mass_LastShift.Text = tools.GetNormalizedValue(listShiftsData[0].Mass_LastShift);         
@@ -115,9 +115,9 @@ namespace FastReport
         Density_correction.Text = tools.GetNormalizedValue(listShiftsData[0].Density_correction);     
         PassportID.Text = tools.GetNormalizedValue(listShiftsData[0].PassportID);     
         Balast_Mass_Frac.Text = tools.GetNormalizedValue(listShiftsData[0].Balast_Mass_Frac);             
-        Balast_Water.Text = tools.GetNormalizedValue(listShiftsData[0].Balast.Water);             
-        Balast_Chlorides.Text = tools.GetNormalizedValue(listShiftsData[0].Balast.Chlorides);             
-        Balast_Impurity.Text = tools.GetNormalizedValue(listShiftsData[0].Balast.Impurity);             
+        Balast_Water.Text = tools.GetNormalizedValue(listShiftsData[0].Ballast.Water);             
+        Balast_Chlorides.Text = tools.GetNormalizedValue(listShiftsData[0].Ballast.Chlorides);             
+        Balast_Impurity.Text = tools.GetNormalizedValue(listShiftsData[0].Ballast.Impurity);             
         Sulfur.Text = tools.GetNormalizedValue(listShiftsData[0].Sulfur);             
         Chloride_Salts.Text = tools.GetNormalizedValue(listShiftsData[0].Chloride_Salts);             
         Balast_Mass.Text = tools.GetNormalizedValue(listShiftsData[0].Balast_Mass);             
@@ -137,12 +137,7 @@ namespace FastReport
       // Setup Last Column width
       TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
          
-      string wholePart = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart;
-      int startIndexTon = wholePart.IndexOf(&quot; тон&quot;);
-      
-      if (startIndexTon != -1)
-        wholePart = wholePart.Remove(startIndexTon);        
-        
+      string wholePart = DataIVK.TableRouteActs.WholePart;
       WholePart.Text =  string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt; т.&quot;, wholePart);
          
       //Draw static Rows
@@ -150,7 +145,7 @@ namespace FastReport
       TableAdditionlInfo.PrintColumns();                                             
          
       GostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858-2002&quot;,  
-        DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858[0]);         
+        DataIVK.TableRouteActs.Route.ActShifts[0].GostIndex51858[0]);         
       
       TableAdditionlInfo.PrintRow(1);
       TableAdditionlInfo.PrintColumns();                                             
@@ -169,8 +164,8 @@ namespace FastReport
         }
       }
          
-      Delive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_IOF; 
-      Receive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_IOF; 
+      Delive_IOF.Text = DataIVK.TableRouteActs.RouteData.Delive_IOF; 
+      Receive_IOF.Text = DataIVK.TableRouteActs.RouteData.Receive_IOF; 
     }  
       
     private void PageFooter_BeforeLayout(object sender, EventArgs e)
