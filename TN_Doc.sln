@@ -97,7 +97,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonSikn425", "tn.docgene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActProducer", "tn.docgeneral\ActProducer\ActProducer.csproj", "{BECF6212-E36C-41A2-B990-42F2AAB9779D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActRoute", "ActRoute\ActRoute.csproj", "{56B97915-AF07-419A-B20D-036190CE1A0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActRoute", "tn.docgeneral\ActRoute\ActRoute.csproj", "{56B97915-AF07-419A-B20D-036190CE1A0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
