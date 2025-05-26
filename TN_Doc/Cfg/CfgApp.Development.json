@@ -265,7 +265,7 @@
               "Id": 0,
               "Name": "Акт по маршрутным поручениям",
               "Description": "Акт приема-сдачи по маршрутным поручениям",
-              "PathToDocTemplateFile": "/Doc/Act/ActRoute_N_MI3532(18).frx",
+              "PathToDocTemplateFile": "/Doc/Act/ActRoute.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json"
             }
           ]
@@ -1395,7 +1395,7 @@
               "Id": 0,
               "Name": "Акт по маршрутным поручениям",
               "Description": "Акт приема-сдачи по маршрутным поручениям",
-              "PathToDocTemplateFile": "/Doc/Act/ActRoute_N_MI3532(18).frx",
+              "PathToDocTemplateFile": "/Doc/Act/ActRoute.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json"
             }
           ]
@@ -2525,7 +2525,7 @@
               "Id": 0,
               "Name": "Акт по маршрутным поручениям",
               "Description": "Акт приема-сдачи по маршрутным поручениям",
-              "PathToDocTemplateFile": "/Doc/Act/ActRoute_N_MI3532(18).frx",
+              "PathToDocTemplateFile": "/Doc/Act/ActRoute.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json"
             }
           ]
