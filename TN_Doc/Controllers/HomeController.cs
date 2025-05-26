@@ -422,6 +422,7 @@ namespace TN_Doc.Controllers
                     IdDoc.Poverka2816 => doc.GetViewDoc(requestInfo.Id, protocolNumber),
                     IdDoc.KMH_MI2816 => doc.GetViewDoc(requestInfo.Id, protocolNumber),
                     IdDoc.ActProducer => doc.GetViewDoc(requestInfo),
+                    IdDoc.ActRoute => doc.GetViewDoc(requestInfo),
                     _ => doc.GetViewDoc(requestInfo.Id)
                 };
                 if (jsonDoc == null)
