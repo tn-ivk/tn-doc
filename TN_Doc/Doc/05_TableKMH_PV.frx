@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PV.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/26/2025 11:17:15" ReportInfo.CreatorVersion="2024.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_PV.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 02:58:40" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -85,11 +85,20 @@ namespace FastReport
       Laboratory_Name.Text = &quot;по результатам испытаний точечной пробы в &lt;u&gt;&quot; + DataIVK.TableKMH_PV.AdditionalInfo.Laboratory_Name;
       Place_Factory.Text = $&quot;{Header.FieldSIKN}{DataIVK.TableKMH_PV.AdditionalInfo.Place_SIKN_Name} {DataIVK.TableKMH_PV.AdditionalInfo.Place_PSP}&quot;;//  string.Format(&quot;{0} {1}&quot;, DataIVK.TableKMH_PV.AdditionalInfo.Place_SIKN_Name,DataIVK.TableKMH_PV.AdditionalInfo.Place_PSP);                 
       PV_Type.Text = DataIVK.TableKMH_PV.AdditionalInfo.PV_AddInfo[protocolNumber-1].PV_Type;  
-      PV_ManufNum.Text = DataIVK.TableKMH_PV.AdditionalInfo.PV_AddInfo[protocolNumber-1].PV_ManufNum;  
-      PV_CheckDate.Text = DataIVK.TableKMH_PV.AdditionalInfo.PV_AddInfo[protocolNumber-1].PV_CheckDate;  
+      PV_ManufNum.Text = DataIVK.TableKMH_PV.AdditionalInfo.PV_AddInfo[protocolNumber-1].PV_ManufNum;
+      var pvCheckDate = DataIVK.TableKMH_PV.AdditionalInfo.PV_AddInfo[protocolNumber-1].PV_CheckDate;
+      if(!string.IsNullOrEmpty(pvCheckDate) &amp;&amp; DateTime.TryParse(pvCheckDate, out _))
+        PV_CheckDate.Text = pvCheckDate;  
+      else
+        PV_CheckDate.Text = &quot;-&quot;;            
       LAB_Type.Text = DataIVK.TableKMH_PV.AdditionalInfo.LAB_Type ; 
       LAB_ManufNum.Text = DataIVK.TableKMH_PV.AdditionalInfo.LAB_ManufNum;
-      LAB_CheckDate.Text = DataIVK.TableKMH_PV.AdditionalInfo.LAB_CheckDate;
+      
+      var labCheckDate = DataIVK.TableKMH_PV.AdditionalInfo.LAB_CheckDate;
+      if(!string.IsNullOrEmpty(labCheckDate) &amp;&amp; DateTime.TryParse(labCheckDate, out _))
+        LAB_CheckDate.Text = labCheckDate;  
+      else
+        LAB_CheckDate.Text = &quot;-&quot;;
       Laboratory_Name2.Text = $&quot;{DataIVK.TableKMH_PV.AdditionalInfo.Laboratory_Name} {DataIVK.TableKMH_PV.AdditionalInfo.Place_PSP} {DataIVK.TableKMH_PV.AdditionalInfo.Place_Factory}&quot;;
     }
                
@@ -270,7 +279,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableSourceData" Top="246.48" Width="718.2" Height="117.18" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableSourceData" Top="247.01" Width="718.2" Height="117.18" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSourceData" Width="672.83" Height="117.18" FixedColumns="2">
         <TableColumn Name="Column116" Width="453.6"/>
         <TableColumn Name="Column141" Width="114.34"/>
@@ -302,7 +311,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableResults" Top="366.32" Width="718.2" Height="98.28">
+    <DataBand Name="DataBandTableResults" Top="367.39" Width="718.2" Height="98.28">
       <TableObject Name="TableResults" Width="606.79" Height="98.28">
         <TableColumn Name="Column129" Width="93.99"/>
         <TableColumn Name="Column130" Width="56.19"/>
@@ -354,7 +363,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="467.27" Width="718.2" Height="260.82" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="468.87" Width="718.2" Height="260.82" CanShrink="true">
       <TableObject Name="TableConclusion01" Top="22.68" Width="516.25" Height="52.92" FixedColumns="3">
         <TableColumn Name="Column176" Width="71.82"/>
         <TableColumn Name="Column177" Width="217.46" AutoSize="true"/>
@@ -452,7 +461,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="730.76" Width="718.2" Height="22.68" Visible="false" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand">
+    <PageFooterBand Name="PageFooter" Top="732.89" Width="718.2" Height="22.68" Visible="false" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
