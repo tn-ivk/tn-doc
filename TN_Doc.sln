@@ -97,6 +97,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonSikn425", "tn.docgene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActProducer", "tn.docgeneral\ActProducer\ActProducer.csproj", "{BECF6212-E36C-41A2-B990-42F2AAB9779D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActRoute", "ActRoute\ActRoute.csproj", "{56B97915-AF07-419A-B20D-036190CE1A0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -283,6 +285,10 @@ Global
 		{BECF6212-E36C-41A2-B990-42F2AAB9779D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BECF6212-E36C-41A2-B990-42F2AAB9779D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BECF6212-E36C-41A2-B990-42F2AAB9779D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56B97915-AF07-419A-B20D-036190CE1A0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56B97915-AF07-419A-B20D-036190CE1A0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56B97915-AF07-419A-B20D-036190CE1A0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56B97915-AF07-419A-B20D-036190CE1A0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -329,6 +335,7 @@ Global
 		{B8683560-7510-43B2-B2F5-C57DD3E585A5} = {A79F5BBE-7C16-45AC-A913-72CE81A1652F}
 		{A1E33A59-33C5-4E01-8107-E30076C6FF7C} = {A79F5BBE-7C16-45AC-A913-72CE81A1652F}
 		{BECF6212-E36C-41A2-B990-42F2AAB9779D} = {6628A906-CC10-41BE-9654-994DBC29DE7E}
+		{56B97915-AF07-419A-B20D-036190CE1A0E} = {6628A906-CC10-41BE-9654-994DBC29DE7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C891881-BE2D-4CF9-9A7D-BC5313F213B9}
