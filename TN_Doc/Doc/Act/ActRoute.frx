@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 14:40:37" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 19:44:18" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -95,33 +95,68 @@ namespace FastReport
     private void TableAct_ManualBuild(object sender, EventArgs e)
     {
       List&lt;TN.Doc.ActShift&gt; listShiftsData = DataIVK.TableRouteActs.Route.ActShifts.Where(x =&gt; !string.IsNullOrEmpty(x.GostIndex51858)).ToList();
-      
+      if(!listShiftsData.Any())
+        return;
+        
       if (Engine.FinalPass == true)
       {
-        DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(listShiftsData[0].Period.Begin);
-        DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(listShiftsData[0].Period.End);
+        // Calculate Dynamic Columns width
+        float widthDynamicCols=(
+          Page.PaperWidth-
+          Page.LeftMargin-
+          Page.RightMargin-
+          TableAct.Columns[0].Width/Units.Millimeters-
+          TableAct.Columns[1].Width/Units.Millimeters)
+          /listShiftsData.Count;         
+
+        // Insert Columns for Volumes  (V0) &amp; fill them headers with text
+        int indexColTemplate = ColumnTemplate.Index;
+        for (int i=1; i&lt;listShiftsData.Count; i++)
+        {
+          TableAct.Columns.Insert(indexColTemplate+1, new TableColumn());
+          
+          foreach(TableRow row in TableAct.Rows)
+            row[indexColTemplate+1].AssignAll(row[indexColTemplate]);
+        }
+            
+        // Setup Dynamic Columns Width
+        for (int i = indexColTemplate; i &lt; TableAct.ColumnCount; i++)                 
+        {
+          TableAct.Columns[i].Width = widthDynamicCols*Units.Millimeters;
+        }
+            
+        // Span Columns
+        TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
         
-        Period.Text = $&quot;{Begin.ToShortDateString()} {Begin.ToString(&quot;HH:mm&quot;)}&lt;br&gt;{End.ToShortDateString()} {End.ToString(&quot;HH:mm&quot;)}&quot;;
-        
-        Vol_LastShift.Text = listShiftsData[0].Vol_LastShift.ToString();
-        Mass_LastShift.Text = listShiftsData[0].Mass_LastShift.ToString();         
-        Vol_CurrShift.Text = listShiftsData[0].Vol_CurrShift.ToString();           
-        Mass_CurrShift.Text = listShiftsData[0].Mass_CurrShift.ToString();     
-        Vol_Gross.Text = listShiftsData[0].Vol_Gross.ToString();     
-        Mass_Gross.Text = listShiftsData[0].Mass_Gross.ToString();     
-        Temp.Text = listShiftsData[0].Temp.ToString(&quot;F1&quot;);     
-        Press.Text = listShiftsData[0].Press.ToString(&quot;F2&quot;);     
-        Density.Text = listShiftsData[0].Density.ToString(&quot;F1&quot;);     
-        Density_correction.Text = listShiftsData[0].Density_correction.ToString();     
-        PassportID.Text = listShiftsData[0].PassportID.ToString();     
-        Balast_Mass_Frac.Text = listShiftsData[0].Balast_Mass_Frac.ToString(&quot;F4&quot;);             
-        Balast_Water.Text = listShiftsData[0].Ballast.Water.ToString(&quot;F2&quot;);             
-        Balast_Chlorides.Text = listShiftsData[0].Ballast.Chlorides.ToString(&quot;F4&quot;);             
-        Balast_Impurity.Text = listShiftsData[0].Ballast.Impurity.ToString(&quot;F4&quot;);             
-        Sulfur.Text = listShiftsData[0].Sulfur.ToString(&quot;F2&quot;);             
-        Chloride_Salts.Text = listShiftsData[0].Chloride_Salts.ToString(&quot;F1&quot;);             
-        Balast_Mass.Text = listShiftsData[0].Balast_Mass.ToString();             
-        Net_Mass.Text = listShiftsData[0].Net_Mass.ToString();     
+        for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
+        {
+          DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(listShiftsData[i].Period.Begin);
+          DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(listShiftsData[i].Period.End);
+          
+          Period.Text = $&quot;{Begin.ToShortDateString()} {Begin.ToString(&quot;HH:mm&quot;)}&lt;br&gt;{End.ToShortDateString()} {End.ToString(&quot;HH:mm&quot;)}&quot;;
+          
+          TableAct[(2+i),1].Text = $&quot;{Begin.ToShortDateString()} {Begin.ToString(&quot;HH:mm&quot;)}&lt;br&gt;{End.ToShortDateString()} {End.ToString(&quot;HH:mm&quot;)}&quot;;
+          TableAct[(2+i),3].Text = listShiftsData[i].Vol_LastShift.ToString();
+          TableAct[(2+i),4].Text = listShiftsData[i].Mass_LastShift.ToString();
+          TableAct[(2+i),6].Text = listShiftsData[i].Vol_CurrShift.ToString();
+          TableAct[(2+i),7].Text = listShiftsData[i].Mass_CurrShift.ToString();
+          TableAct[(2+i),9].Text = listShiftsData[i].Vol_Gross.ToString();
+          TableAct[(2+i),10].Text = listShiftsData[i].Mass_Gross.ToString();
+          
+          TableAct[(2+i),11].Text = listShiftsData[i].Temp.ToString(&quot;F1&quot;);
+          TableAct[(2+i),12].Text = listShiftsData[i].Press.ToString(&quot;F2&quot;);
+          TableAct[(2+i),13].Text = listShiftsData[i].Density.ToString(&quot;F1&quot;);
+          TableAct[(2+i),14].Text = listShiftsData[i].Density_correction.ToString();
+          TableAct[(2+i),15].Text = listShiftsData[i].PassportID.ToString();
+          TableAct[(2+i),16].Text = listShiftsData[i].Balast_Mass_Frac.ToString(&quot;F4&quot;);
+          TableAct[(2+i),17].Text = listShiftsData[i].Ballast.Water.ToString(&quot;F2&quot;);
+          TableAct[(2+i),18].Text = listShiftsData[i].Ballast.Chlorides.ToString(&quot;F4&quot;);
+          TableAct[(2+i),19].Text = listShiftsData[i].Ballast.Impurity.ToString(&quot;F4&quot;);
+          TableAct[(2+i),20].Text = listShiftsData[i].Sulfur.ToString(&quot;F2&quot;);
+          TableAct[(2+i),21].Text = listShiftsData[i].Chloride_Salts.ToString(&quot;F1&quot;);
+          TableAct[(2+i),22].Text = listShiftsData[i].Balast_Mass.ToString();
+          TableAct[(2+i),23].Text = listShiftsData[i].Net_Mass.ToString();
+        }
       }
          
       //Draw rows
@@ -143,12 +178,17 @@ namespace FastReport
       //Draw static Rows
       TableAdditionlInfo.PrintRow(0);
       TableAdditionlInfo.PrintColumns();                                             
+    
+      //Fill &amp; Draw dynamic Rows
+      var listGostIndex51858 = DataIVK.TableRouteActs.Route.ActShifts.Select(x =&gt; x.GostIndex51858).Where(x =&gt; !String.IsNullOrEmpty(x)).ToList();
+      var distListGostIndex51858 = listGostIndex51858.Distinct().ToList();
          
-      GostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858-2002&quot;,  
-        DataIVK.TableRouteActs.Route.ActShifts[0].GostIndex51858[0]);         
-      
-      TableAdditionlInfo.PrintRow(1);
-      TableAdditionlInfo.PrintColumns();                                             
+      for (int n = 0; n &lt; distListGostIndex51858.Count; n++)
+      {
+        GostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  distListGostIndex51858[n]);
+        TableAdditionlInfo.PrintRow(1);
+        TableAdditionlInfo.PrintColumns();                                             
+      }
     }
       
     public void  DrawTableSigners()
