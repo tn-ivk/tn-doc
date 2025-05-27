@@ -232,6 +232,46 @@
         },
         {
           "Use": true,
+          "IdDoc": 39,
+          "Name": "Акты по производителям",
+          "Description": "",
+          "PathToDocDll": "/Dll/ActProducer.dll",
+          "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+          "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Акт по производителю",
+              "Description": "Акт приема-сдачи по производителю",
+              "PathToDocTemplateFile": "/Doc/Act/ActProducer_N_MI3532(18).frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 40,
+          "Name": "Акты по маршрутным поручениям",
+          "Description": "",
+          "PathToDocDll": "/Dll/ActRoute.dll",
+          "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+          "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Акт по маршрутным поручениям",
+              "Description": "Акт приема-сдачи по маршрутным поручениям",
+              "PathToDocTemplateFile": "/Doc/Act/ActRoute.frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
           "IdDoc": 3,
           "Name": "Журналы",
           "Description": "",
@@ -1322,6 +1362,46 @@
         },
         {
           "Use": true,
+          "IdDoc": 39,
+          "Name": "Акты по производителям",
+          "Description": "",
+          "PathToDocDll": "/Dll/ActProducer.dll",
+          "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+          "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Акт по производителю",
+              "Description": "Акт приема-сдачи по производителю",
+              "PathToDocTemplateFile": "/Doc/Act/ActProducer_N_MI3532(18).frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 40,
+          "Name": "Акты по маршрутным поручениям",
+          "Description": "",
+          "PathToDocDll": "/Dll/ActRoute.dll",
+          "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+          "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Акт по маршрутным поручениям",
+              "Description": "Акт приема-сдачи по маршрутным поручениям",
+              "PathToDocTemplateFile": "/Doc/Act/ActRoute.frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
           "IdDoc": 3,
           "Name": "Журналы",
           "Description": "",
@@ -2407,6 +2487,46 @@
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 39,
+          "Name": "Акты по производителям",
+          "Description": "",
+          "PathToDocDll": "/Dll/ActProducer.dll",
+          "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+          "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Акт по производителю",
+              "Description": "Акт приема-сдачи по производителю",
+              "PathToDocTemplateFile": "/Doc/Act/ActProducer_N_MI3532(18).frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActProducer.json"
+            }
+          ]
+        },
+        {
+          "Use": true,
+          "IdDoc": 40,
+          "Name": "Акты по маршрутным поручениям",
+          "Description": "",
+          "PathToDocDll": "/Dll/ActRoute.dll",
+          "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+          "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json",
+          "LastUsedTemplateId": 0,
+          "TemplateDocs": [
+            {
+              "Use": true,
+              "Id": 0,
+              "Name": "Акт по маршрутным поручениям",
+              "Description": "Акт приема-сдачи по маршрутным поручениям",
+              "PathToDocTemplateFile": "/Doc/Act/ActRoute.frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActRoute.json"
             }
           ]
         },

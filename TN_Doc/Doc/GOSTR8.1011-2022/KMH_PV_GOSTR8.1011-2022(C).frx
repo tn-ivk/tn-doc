@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="02/06/2025 16:01:50" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 11:12:56" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -86,12 +86,20 @@ namespace FastReport
           
       PV_Type.Text = jsonPV_AddInfo[&quot;PV_Type&quot;].ToString();
       PV_ManufNum.Text = jsonPV_AddInfo[&quot;PV_ManufNum&quot;].ToString();
-      PV_CheckDate.Text = jsonPV_AddInfo[&quot;PV_CheckDate&quot;].ToString();
+      var pvCheckDate = jsonPV_AddInfo[&quot;PV_CheckDate&quot;].ToString();
+      if(!string.IsNullOrEmpty(pvCheckDate) &amp;&amp; DateTime.TryParse(pvCheckDate, out _))
+        PV_CheckDate.Text = pvCheckDate;  
+      else
+        PV_CheckDate.Text = &quot;-&quot;;
       Delta_PV.Text = jsonTable1[&quot;Delta_PV&quot;].ToString().Replace('.',',');
                     
       LAB_Type.Text = JAdditionalInfo[&quot;LAB_Type&quot;].ToString();
       LAB_ManufNum.Text = JAdditionalInfo[&quot;LAB_ManufNum&quot;].ToString();
-      LAB_CheckDate.Text = JAdditionalInfo[&quot;LAB_CheckDate&quot;].ToString();
+      var labCheckDate = JAdditionalInfo[&quot;LAB_CheckDate&quot;].ToString();
+      if(!string.IsNullOrEmpty(labCheckDate) &amp;&amp; DateTime.TryParse(labCheckDate, out _))
+        LAB_CheckDate.Text = labCheckDate;  
+      else
+        LAB_CheckDate.Text = &quot;-&quot;;
       Delta_LAB.Text = jsonTable1[&quot;Delta_LAB&quot;].ToString().Replace('.',','); 
                 
       DeltaHeader.Text = KMH_TYPE == 0 ? &quot;|η&lt;sub&gt;п.вз&lt;/sub&gt; – η&lt;sub&gt;лаб&lt;/sub&gt;|&quot; : &quot;|ν&lt;sub&gt;п.вз&lt;/sub&gt; – ν&lt;sub&gt;лаб&lt;/sub&gt;|&quot;;
@@ -185,7 +193,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="98.5" Width="718.2" Height="141.75">
+    <DataBand Name="Data1" Top="97.7" Width="718.2" Height="141.75">
       <TableObject Name="Table1" Top="9.45" Width="718.2" Height="132.3">
         <TableColumn Name="Column181" Width="355.95"/>
         <TableColumn Name="Column182" Width="157.5"/>
@@ -222,7 +230,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="244.25" Width="718.2" Height="151.2">
+    <DataBand Name="Data2" Top="242.65" Width="718.2" Height="151.2">
       <TableObject Name="Table2" Top="9.45" Width="718.2" Height="141.75">
         <TableColumn Name="Column184" Width="85.05"/>
         <TableColumn Name="Column185" Width="122.85"/>
@@ -268,7 +276,7 @@ namespace FastReport
           <TableCell Name="Delta" Border.Lines="All" Text="Delta" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataFooter1" Top="399.45" Width="718.2" Height="56.7">
+      <DataFooterBand Name="DataFooter1" Top="397.05" Width="718.2" Height="56.7">
         <TableObject Name="Table5" Width="718.2" Height="37.8" PrintOnParent="true">
           <TableColumn Name="Column201" Width="259.86"/>
           <TableColumn Name="Column202" Width="458.34"/>
@@ -291,7 +299,7 @@ namespace FastReport
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="460.15" Width="718.2" Height="321.3" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="456.95" Width="718.2" Height="321.3" CanShrink="true">
       <TableObject Name="Table4" Top="9.45" Width="718.2" Height="85.05">
         <TableColumn Name="Column205" Width="718.2"/>
         <TableRow Name="Row142">

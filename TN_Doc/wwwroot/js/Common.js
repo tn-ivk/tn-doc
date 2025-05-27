@@ -33,6 +33,7 @@ var CurrentDeviceId;
 
 var table = null;
 var currentId = null;
+let requestDoc = null;
 var docTemplates = {};
 let isViewing = false;
 let isEditingDoc = false;
@@ -694,19 +695,34 @@ function InitTableDocs() {
         });
 
     table.on('select', function (e, dt, type, indexes) {
-        if (type === 'row') {
-            var id = table.rows(indexes).data().pluck('id');
-            currentId = id[0];
+        if (type !== 'row') return;
 
-            if ($('#ComboboxDocGUID').val() == 32) {
+        try {
+            const rowData = table.rows(indexes).data()[0];
+            if (!rowData) {
+                return;
+            }
 
+            currentId = rowData.id;
+            requestDoc = {
+                Id: rowData.id,
+                DT: rowData.dt,
+                Description: rowData.description,
+                DirId: rowData.dirId,
+                BIKId: rowData.bikId,
+                AdvancedProperties: rowData.advancedProperties || []
+            };
+            const comboboxValue = $('#ComboboxDocGUID').val();
+            if (comboboxValue === '32') {
                 let BIKId = 1;
                 let DirId = 0;
 
-                table.rows(indexes).data().pluck('advancedProperties')[0].forEach((item) => {
-                    if (item.key == 'BIKId') BIKId = item.value;
-                    else if (item.key == 'DirId') DirId = item.value;
-                });
+                if (Array.isArray(requestDoc.AdvancedProperties)) {
+                    requestDoc.AdvancedProperties.forEach((item) => {
+                        if (item.key === 'BIKId') BIKId = item.value;
+                        else if (item.key === 'DirId') DirId = item.value;
+                    });
+                }
 
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), BIKId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_DirId'), DirId, 2, 0);
@@ -715,6 +731,8 @@ function InitTableDocs() {
             } else {
                 GetDoc();
             }
+        } catch (error) {
+            console.error('Error in table select handler:', error);
         }
     });
 }
@@ -792,7 +810,9 @@ function GetData() {
             complete: function (data) {
                 if ($('#ComboboxDocGUID').val() == 0 ||
                     $('#ComboboxDocGUID').val() == 3 ||
-                    $('#ComboboxDocGUID').val() == 32) {
+                    $('#ComboboxDocGUID').val() == 32 ||
+                    $('#ComboboxDocGUID').val() == 39 ||
+                    $('#ComboboxDocGUID').val() == 40) {
                     $('#ButtonSave').prop('disabled', true);
                     isEditingDoc = false;
                     $('#viewModeButton').prop('hidden', true);
@@ -823,7 +843,7 @@ function GetDoc() {
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                id: currentId,
+                request: JSON.stringify(requestDoc),
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
             success: function (data) {
@@ -843,7 +863,7 @@ function GetDoc() {
 }
 
 function GetEditDoc() {
-    if(currentId == null) 
+    if(requestDoc == null) 
         return;
     
     $.ajax(
@@ -854,7 +874,7 @@ function GetEditDoc() {
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                id: currentId
+                request: JSON.stringify(requestDoc)
             },
             success: function (data) {
                 $('.FR').each(function () {
@@ -933,7 +953,7 @@ function ExportDoc() {
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                id: currentId,
+                request: JSON.stringify(requestDoc),
                 format: $('#ComboboxExportFormat').val()
             },
             success: function (data) {

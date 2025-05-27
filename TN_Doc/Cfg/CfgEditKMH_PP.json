@@ -1,0 +1,44 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "LastCleanDate_Ethal",
+      "Type": "text",
+      "Name": "Дата последней промывки (чистки) эталонного плотномера*\n* - указываетсся при условии что он установлен в БИК стационарно"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": true,
+      "Key": "ServiceStaffData",
+      "Type": "text",
+      "Name": "Сервисная организация (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryStaffData",
+      "Type": "text",
+      "Name": "Сдающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": true,
+      "Key": "RecievingStaffData",
+      "Type": "text",
+      "Name": "Принимающая сторона (должность, фамилия, инициалы)"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_KMH_Result",
+      "Type": "list",
+      "Name": "Заключение"
+    }
+  ]
+}

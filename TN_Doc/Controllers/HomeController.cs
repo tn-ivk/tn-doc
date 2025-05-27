@@ -380,12 +380,13 @@ namespace TN_Doc.Controllers
             return (unixTimeBegin, unixTimeEnd);
         }
         
-        public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
+        public bool GetDoc(int IdDevice, IdDoc IdDoc, string request, int protocolNumber)
         {
-            _logger.LogDebug($"Отображение документа устройства с ИД: {IdDevice}, документа {IdDoc} c ИД: {id}");
-            if (id == 0)
+            _logger.LogDebug($"Получение документа {IdDoc} для устройства {IdDevice}");
+            var requestInfo = JsonConvert.DeserializeObject<RequestListDocs>(request);
+            if (requestInfo == null)
             {
-                _logger.LogWarning($"Попытка отображения документа {IdDoc} с нулевым идентификатором");
+                _logger.LogError("Не удалось десериализовать параметры запроса");
                 return false;
             }
 
@@ -415,16 +416,18 @@ namespace TN_Doc.Controllers
                 FR.Report.Load(templateFile.FullName);
                 var jsonDoc = IdDoc switch
                 {
-                    IdDoc.KMH_PP_Areom => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.KMH_PV => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.KMH_PW => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.Poverka2816 => doc.GetViewDoc(id, protocolNumber),
-                    IdDoc.KMH_MI2816 => doc.GetViewDoc(id, protocolNumber),
-                    _ => doc.GetViewDoc(id)
+                    IdDoc.KMH_PP_Areom => doc.GetViewDoc(requestInfo.Id, protocolNumber),
+                    IdDoc.KMH_PV => doc.GetViewDoc(requestInfo.Id, protocolNumber),
+                    IdDoc.KMH_PW => doc.GetViewDoc(requestInfo.Id, protocolNumber),
+                    IdDoc.Poverka2816 => doc.GetViewDoc(requestInfo.Id, protocolNumber),
+                    IdDoc.KMH_MI2816 => doc.GetViewDoc(requestInfo.Id, protocolNumber),
+                    IdDoc.ActProducer => doc.GetViewDoc(requestInfo),
+                    IdDoc.ActRoute => doc.GetViewDoc(requestInfo),
+                    _ => doc.GetViewDoc(requestInfo.Id)
                 };
                 if (jsonDoc == null)
                 {
-                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}");
+                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {requestInfo.Id}");
                     return false;
                 }
                 FR.Report.SetParameterValue("JsonDoc", jsonDoc);
@@ -471,10 +474,16 @@ namespace TN_Doc.Controllers
             }
         }
 
-        public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
+        public string GetDocEdit(int IdDevice, IdDoc IdDoc, string request)
         {
-            _logger.LogDebug($"Отображение формы редактирования документа устройства с ИД: {IdDevice}, документа {IdDoc} c ИД: {id}");
-            if (id == 0)
+            _logger.LogDebug($"Отображение формы редактирования документа {IdDoc} для устройства {IdDevice}");
+            var requestInfo = JsonConvert.DeserializeObject<RequestListDocs>(request);
+            if (requestInfo == null)
+            {
+                _logger.LogError("Не удалось десериализовать параметры запроса");
+                return string.Empty;
+            }
+            if (requestInfo.Id == 0)
             {
                 _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
                 return string.Empty;
@@ -486,12 +495,23 @@ namespace TN_Doc.Controllers
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
                 return string.Empty;
             }
-            return doc.GetEditDoc(id);
+            
+            return IdDoc switch
+            {
+                IdDoc.ActProducer => doc.GetEditDoc(requestInfo),
+                _ => doc.GetEditDoc(requestInfo.Id)
+            };
         }
 
-        public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format)
+        public string ExportDoc(int IdDevice, IdDoc IdDoc, string request, string format)
         {         
-            _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}");
+            _logger.LogDebug($"Экспорт документа {IdDoc} для устройства {IdDevice}");
+            var requestInfo = JsonConvert.DeserializeObject<RequestListDocs>(request);
+            if (requestInfo == null)
+            {
+                _logger.LogError("Не удалось десериализовать параметры запроса");
+                return string.Empty;
+            }
             try
             {
                 var doc = LoadDocsModule(IdDevice, IdDoc);
@@ -507,17 +527,17 @@ namespace TN_Doc.Controllers
 
                 FR.Report.Load(doc.GetPathTemplateFile());
 
-                var jsonDoc = doc.GetViewDoc(id);
+                var jsonDoc = doc.GetViewDoc(requestInfo);
                 if (jsonDoc == null)
                 {
-                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}");
+                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {requestInfo.Id}");
                     return string.Empty;
                 }
 
                 FR.Report.SetParameterValue("JsonDoc", jsonDoc);
                 FR.Report.Prepare();
 
-                var exportFileName = JObject.Parse(doc.GetViewDoc(id).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
+                var exportFileName = JObject.Parse(doc.GetViewDoc(requestInfo).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
                 if (string.IsNullOrEmpty(exportFileName))
                 {
                     _logger.LogError($"Невозможно определить имя для экспортируемого файла");
