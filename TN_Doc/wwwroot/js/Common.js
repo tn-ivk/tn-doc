@@ -953,7 +953,7 @@ function ExportDoc() {
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
-                id: currentId,
+                request: JSON.stringify(requestDoc),
                 format: $('#ComboboxExportFormat').val()
             },
             success: function (data) {

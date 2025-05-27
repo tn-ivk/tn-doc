@@ -503,9 +503,15 @@ namespace TN_Doc.Controllers
             };
         }
 
-        public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format)
+        public string ExportDoc(int IdDevice, IdDoc IdDoc, string request, string format)
         {         
-            _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}");
+            _logger.LogDebug($"Экспорт документа {IdDoc} для устройства {IdDevice}");
+            var requestInfo = JsonConvert.DeserializeObject<RequestListDocs>(request);
+            if (requestInfo == null)
+            {
+                _logger.LogError("Не удалось десериализовать параметры запроса");
+                return string.Empty;
+            }
             try
             {
                 var doc = LoadDocsModule(IdDevice, IdDoc);
@@ -521,17 +527,17 @@ namespace TN_Doc.Controllers
 
                 FR.Report.Load(doc.GetPathTemplateFile());
 
-                var jsonDoc = doc.GetViewDoc(id);
+                var jsonDoc = doc.GetViewDoc(requestInfo);
                 if (jsonDoc == null)
                 {
-                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}");
+                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {requestInfo.Id}");
                     return string.Empty;
                 }
 
                 FR.Report.SetParameterValue("JsonDoc", jsonDoc);
                 FR.Report.Prepare();
 
-                var exportFileName = JObject.Parse(doc.GetViewDoc(id).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
+                var exportFileName = JObject.Parse(doc.GetViewDoc(requestInfo).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
                 if (string.IsNullOrEmpty(exportFileName))
                 {
                     _logger.LogError($"Невозможно определить имя для экспортируемого файла");
