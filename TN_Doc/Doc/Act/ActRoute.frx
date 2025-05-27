@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 11:59:15" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 14:40:37" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -103,25 +103,25 @@ namespace FastReport
         
         Period.Text = $&quot;{Begin.ToShortDateString()} {Begin.ToString(&quot;HH:mm&quot;)}&lt;br&gt;{End.ToShortDateString()} {End.ToString(&quot;HH:mm&quot;)}&quot;;
         
-        Vol_LastShift.Text = tools.GetNormalizedValue(listShiftsData[0].Vol_LastShift);
-        Mass_LastShift.Text = tools.GetNormalizedValue(listShiftsData[0].Mass_LastShift);         
-        Vol_CurrShift.Text = tools.GetNormalizedValue(listShiftsData[0].Vol_CurrShift);           
-        Mass_CurrShift.Text = tools.GetNormalizedValue(listShiftsData[0].Mass_CurrShift);     
-        Vol_Gross.Text = tools.GetNormalizedValue(listShiftsData[0].Vol_Gross);     
-        Mass_Gross.Text = tools.GetNormalizedValue(listShiftsData[0].Mass_Gross);     
-        Temp.Text = tools.GetNormalizedValue(listShiftsData[0].Temp);     
-        Press.Text = tools.GetNormalizedValue(listShiftsData[0].Press);     
-        Density.Text = tools.GetNormalizedValue(listShiftsData[0].Density);     
-        Density_correction.Text = tools.GetNormalizedValue(listShiftsData[0].Density_correction);     
-        PassportID.Text = tools.GetNormalizedValue(listShiftsData[0].PassportID);     
-        Balast_Mass_Frac.Text = tools.GetNormalizedValue(listShiftsData[0].Balast_Mass_Frac);             
-        Balast_Water.Text = tools.GetNormalizedValue(listShiftsData[0].Ballast.Water);             
-        Balast_Chlorides.Text = tools.GetNormalizedValue(listShiftsData[0].Ballast.Chlorides);             
-        Balast_Impurity.Text = tools.GetNormalizedValue(listShiftsData[0].Ballast.Impurity);             
-        Sulfur.Text = tools.GetNormalizedValue(listShiftsData[0].Sulfur);             
-        Chloride_Salts.Text = tools.GetNormalizedValue(listShiftsData[0].Chloride_Salts);             
-        Balast_Mass.Text = tools.GetNormalizedValue(listShiftsData[0].Balast_Mass);             
-        Net_Mass.Text = tools.GetNormalizedValue(listShiftsData[0].Net_Mass );     
+        Vol_LastShift.Text = listShiftsData[0].Vol_LastShift.ToString();
+        Mass_LastShift.Text = listShiftsData[0].Mass_LastShift.ToString();         
+        Vol_CurrShift.Text = listShiftsData[0].Vol_CurrShift.ToString();           
+        Mass_CurrShift.Text = listShiftsData[0].Mass_CurrShift.ToString();     
+        Vol_Gross.Text = listShiftsData[0].Vol_Gross.ToString();     
+        Mass_Gross.Text = listShiftsData[0].Mass_Gross.ToString();     
+        Temp.Text = listShiftsData[0].Temp.ToString(&quot;F1&quot;);     
+        Press.Text = listShiftsData[0].Press.ToString(&quot;F2&quot;);     
+        Density.Text = listShiftsData[0].Density.ToString(&quot;F1&quot;);     
+        Density_correction.Text = listShiftsData[0].Density_correction.ToString();     
+        PassportID.Text = listShiftsData[0].PassportID.ToString();     
+        Balast_Mass_Frac.Text = listShiftsData[0].Balast_Mass_Frac.ToString(&quot;F4&quot;);             
+        Balast_Water.Text = listShiftsData[0].Ballast.Water.ToString(&quot;F2&quot;);             
+        Balast_Chlorides.Text = listShiftsData[0].Ballast.Chlorides.ToString(&quot;F4&quot;);             
+        Balast_Impurity.Text = listShiftsData[0].Ballast.Impurity.ToString(&quot;F4&quot;);             
+        Sulfur.Text = listShiftsData[0].Sulfur.ToString(&quot;F2&quot;);             
+        Chloride_Salts.Text = listShiftsData[0].Chloride_Salts.ToString(&quot;F1&quot;);             
+        Balast_Mass.Text = listShiftsData[0].Balast_Mass.ToString();             
+        Net_Mass.Text = listShiftsData[0].Net_Mass.ToString();     
       }
          
       //Draw rows
