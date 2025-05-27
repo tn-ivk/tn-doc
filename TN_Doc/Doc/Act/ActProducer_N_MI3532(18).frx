@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActProducer.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 18:38:10" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActProducer.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 20:16:07" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -144,8 +144,8 @@ namespace FastReport
           TableAct[(2+i),6].Text = listShiftsData[i].Mass_LastShift.ToString();         
           TableAct[(2+i),8].Text = listShiftsData[i].Vol_CurrShift.ToString();           
           TableAct[(2+i),9].Text = listShiftsData[i].Mass_CurrShift.ToString();     
-          TableAct[(2+i),11].Text = listShiftsData[i].Vol_Gross.ToString();     
-          TableAct[(2+i),12].Text = listShiftsData[i].Mass_Gross.ToString();     
+          TableAct[(2+i),11].Text = (listShiftsData[i].Vol_Gross + listShiftsData[i].DebalanceVolume).ToString();     
+          TableAct[(2+i),12].Text = (listShiftsData[i].Mass_Gross + listShiftsData[i].DebalanceBrutto).ToString();     
           TableAct[(2+i),13].Text = listShiftsData[i].Temp.ToString(&quot;F1&quot;);     
           TableAct[(2+i),14].Text = listShiftsData[i].Press.ToString(&quot;F2&quot;);     
           TableAct[(2+i),15].Text = listShiftsData[i].Density.ToString(&quot;F1&quot;);     
@@ -158,7 +158,7 @@ namespace FastReport
           TableAct[(2+i),23].Text = listShiftsData[i].Sulfur.ToString(&quot;F2&quot;);             
           TableAct[(2+i),24].Text = listShiftsData[i].Chloride_Salts.ToString(&quot;F1&quot;);             
           TableAct[(2+i),25].Text = listShiftsData[i].Balast_Mass.ToString();             
-          TableAct[(2+i),26].Text = listShiftsData[i].Net_Mass.ToString();     
+          TableAct[(2+i),26].Text = (listShiftsData[i].Net_Mass + listShiftsData[i].DebalanceNetto).ToString();     
         }
       }
          
