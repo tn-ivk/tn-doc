@@ -470,7 +470,6 @@ function InitDocs() {
             async: false,
             url: 'Home/GetListDocs',
             type: 'GET',
-            //dataType: "json",
             data:
                 {
                     idDevice: $('#ComboboxDevice').val()
@@ -481,17 +480,7 @@ function InitDocs() {
                 });
             },
         });
-
-//    $('#ComboboxDocGUID').change(function ()
-//    {
-//        if (table != null) $('#DataTable').DataTable().clear().draw();
-//        //$('.FR').each(function () {
-//        //    $(this).attr('src', '');
-//        //});
-//        $('.FR').attr('src', '');
-
-//        InitTemplatesDoc();
-//    });
+    updateSaveBtnText();
 }
 
 function InitTemplatesDoc() {
@@ -725,11 +714,7 @@ function InitElement() {
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
     }
 
-    /**/
     InitDirEditorComponent();
-    /**/
-
-
     InitDevices();
     InitDocs();
     InitDatepickerBegin();
@@ -747,6 +732,7 @@ function InitElement() {
         InitProtocolNumber();
         
         $('#viewModeButton').prop('hidden', true);
+        updateSaveBtnText();
     });
     $('#ComboboxTemplateDoc').change(function () {
         SetIdTemplateDoc();
@@ -1456,5 +1442,23 @@ class LabDocumentInfo
         this.Type = pType;
         this.Number = pNumber;
         this.Date = pDate;
+    }
+}
+
+function updateSaveBtnText() {
+    const button = $('#ButtonSave');
+    const defaultText = 'Сохранить';
+    
+    if (!IsUsedElis) {
+        button.val(defaultText);
+        return;
+    }
+    
+    const docType = $('#ComboboxDocGUID').val();
+    // Типы документов 1, 2, 3 - акты и паспорта
+    if (docType == 1 || docType == 2 || docType == 3) {
+        button.val('Завершить редактирование и отправить');
+    } else {
+        button.val(defaultText);
     }
 }
