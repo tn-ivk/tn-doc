@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/27/2025 19:58:03" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/29/2025 15:45:40" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -205,7 +205,9 @@ namespace FastReport
       }
          
       Delive_IOF.Text = DataIVK.TableRouteActs.RouteData.Delive_IOF; 
-      Receive_IOF.Text = DataIVK.TableRouteActs.RouteData.Receive_IOF; 
+      Receive_IOF.Text = DataIVK.TableRouteActs.RouteData.Receive_IOF;
+      if (!string.IsNullOrEmpty(Footer.LabMIDensity))
+        LabMIDensity.Text = $&quot;*) заполняют при отказе поточного преобразователя плотности (определяют по {Footer.LabMIDensity})&quot;;
     }  
       
     private void PageFooter_BeforeLayout(object sender, EventArgs e)
@@ -379,7 +381,7 @@ namespace FastReport
           <TableCell Name="Density" Border.Lines="All" Text="Density" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" LineHeight="12" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row17" Height="17.95">
-          <TableCell Name="Cell331" Border.Lines="Bottom" Text="Поправка на плотность *" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" FirstTabOffset="3.78" LineHeight="12" TextRenderType="HtmlTags" ParagraphOffset="3.78"/>
+          <TableCell Name="Cell331" Border.Lines="Bottom" Text="Поправка на плотность                            *)" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" FirstTabOffset="3.78" LineHeight="12" TextRenderType="HtmlTags" ParagraphOffset="3.78"/>
           <TableCell Name="Cell74" Border.Lines="Left, Right, Bottom" Text="кг/м&lt;sup&gt; 3&lt;sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" LineHeight="12" TextRenderType="HtmlTags"/>
           <TableCell Name="Density_correction" Border.Lines="All" Text="Density_correction" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85" LineHeight="12" TextRenderType="HtmlTags"/>
         </TableRow>
@@ -430,18 +432,8 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandFootNote" Top="875.59" Width="718.2" Height="27.4" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableFootnote" Top="9.45" Width="714.38" Height="17.95" GrowToBottom="true">
-        <TableColumn Name="Column278" Width="714.38"/>
-        <TableRow Name="Row194" Height="17.95">
-          <TableCell Name="Cell1564" Text="* заполняют при отказе поточного преобразователя плотности (определяют по Р 50.2.075)" Padding="0, 0, 0, 2" Font="Arial, 8pt, style=Italic" FontWidthRatio="0.85" LineHeight="12">
-            <LineObject Name="Line2" Left="9.45" Width="75.6"/>
-          </TableCell>
-        </TableRow>
-      </TableObject>
-    </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="906.19" Width="718.2" Height="35.9" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableAdditionlInfo" Width="714.42" Height="35.9" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
+    <DataBand Name="DataBandAdditionlInfo" Top="875.59" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableAdditionlInfo" Top="9.45" Width="714.42" Height="35.9" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="714.42"/>
         <TableRow Name="Row195" Height="17.95">
           <TableCell Name="WholePart" Text="WholePart" Padding="0, 0, 0, 2" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" LineHeight="12" TextRenderType="HtmlTags"/>
@@ -451,8 +443,8 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="945.29" Width="718.2" Height="58.58" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="51.02" RepeatHeaders="false">
+    <ReportSummaryBand Name="ReportSummary" Top="926.04" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="69.92" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
         <TableColumn Name="Column6" Width="11.34"/>
@@ -482,18 +474,28 @@ namespace FastReport
           <TableCell Name="Cell81" Text="И.О. Фамилия" Padding="0, 0, 0, 0" HorzAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row191" Height="15.12">
-          <TableCell Name="Cell59" Text="М.П." Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell59" Text="М.П." Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85" ColSpan="4"/>
           <TableCell Name="Cell60" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell61" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1560" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85"/>
-          <TableCell Name="Cell82" Text="М.П." Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85"/>
+          <TableCell Name="Cell82" Text="М.П." Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85" ColSpan="4"/>
           <TableCell Name="Cell83" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell84" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell85" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt, style=Bold" FontWidthRatio="0.85"/>
         </TableRow>
+        <TableRow Name="Row212">
+          <TableCell Name="LabMIDensity" Text="*) заполняют при отказе поточного преобразователя плотности (определяют по МИ2153)" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="8"/>
+          <TableCell Name="Cell1601" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1602" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1603" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1604" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1605" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1606" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1607" Font="Arial, 10pt"/>
+        </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1007.07" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1021.85" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
