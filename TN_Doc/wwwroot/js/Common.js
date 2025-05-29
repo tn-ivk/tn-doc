@@ -470,7 +470,6 @@ function InitDocs() {
             async: false,
             url: 'Home/GetListDocs',
             type: 'GET',
-            //dataType: "json",
             data:
                 {
                     idDevice: $('#ComboboxDevice').val()
@@ -481,17 +480,7 @@ function InitDocs() {
                 });
             },
         });
-
-//    $('#ComboboxDocGUID').change(function ()
-//    {
-//        if (table != null) $('#DataTable').DataTable().clear().draw();
-//        //$('.FR').each(function () {
-//        //    $(this).attr('src', '');
-//        //});
-//        $('.FR').attr('src', '');
-
-//        InitTemplatesDoc();
-//    });
+    updateSaveBtnText();
 }
 
 function InitTemplatesDoc() {
@@ -725,11 +714,7 @@ function InitElement() {
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
     }
 
-    /**/
     InitDirEditorComponent();
-    /**/
-
-
     InitDevices();
     InitDocs();
     InitDatepickerBegin();
@@ -747,6 +732,7 @@ function InitElement() {
         InitProtocolNumber();
         
         $('#viewModeButton').prop('hidden', true);
+        updateSaveBtnText();
     });
     $('#ComboboxTemplateDoc').change(function () {
         SetIdTemplateDoc();
@@ -1457,4 +1443,23 @@ class LabDocumentInfo
         this.Number = pNumber;
         this.Date = pDate;
     }
+}
+
+function updateSaveBtnText() {
+    const button = $('#ButtonSave');
+    
+    $.ajax({
+        url: 'Home/GetSaveBtnText',
+        type: 'GET',
+        data: {
+            IdDevice: $('#ComboboxDevice').val(),
+            IdDoc: $('#ComboboxDocGUID').val()
+        },
+        success: function(text) {
+            button.val(text);
+        },
+        error: function() {
+            button.val('Сохранить');
+        }
+    });
 }
