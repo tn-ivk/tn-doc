@@ -1447,18 +1447,19 @@ class LabDocumentInfo
 
 function updateSaveBtnText() {
     const button = $('#ButtonSave');
-    const defaultText = 'Сохранить';
     
-    if (!IsUsedElis) {
-        button.val(defaultText);
-        return;
-    }
-    
-    const docType = $('#ComboboxDocGUID').val();
-    // Типы документов 1, 2, 3 - акты и паспорта
-    if (docType == 1 || docType == 2 || docType == 3) {
-        button.val('Завершить редактирование и отправить');
-    } else {
-        button.val(defaultText);
-    }
+    $.ajax({
+        url: 'Home/GetSaveBtnText',
+        type: 'GET',
+        data: {
+            IdDevice: $('#ComboboxDevice').val(),
+            IdDoc: $('#ComboboxDocGUID').val()
+        },
+        success: function(text) {
+            button.val(text);
+        },
+        error: function() {
+            button.val('Сохранить');
+        }
+    });
 }

@@ -657,6 +657,26 @@ namespace TN_Doc.Controllers
                 return String.Empty;
             }
         }
+
+        public string GetSaveBtnText(int IdDevice, IdDoc IdDoc)
+        {
+            _logger.LogDebug($"Получение текста кнопки сохранения для документа {IdDoc} для устройства {IdDevice}");
+            try
+            {
+                if (!IsUsedElis(IdDevice))
+                    return "Сохранить";
+
+                if (IdDoc is IdDoc.Act or IdDoc.Passport)
+                    return "Завершить редактирование и отправить";
+
+                return "Сохранить";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Ошибка получения текста кнопки сохранения для документа {IdDoc} для устройства {IdDevice}");
+                return "Сохранить";
+            }
+        }
         
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
