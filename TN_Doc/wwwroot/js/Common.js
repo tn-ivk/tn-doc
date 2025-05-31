@@ -642,6 +642,16 @@ function InitDatepickerEnd() {
     $('#DatepickerEnd').datepicker('setDate', dtEnd);
 }
 
+function GetDataWithSpinner() {
+    $('#ButtonGetData').prop('disabled', true);
+    $('#ButtonGetDataSpinner').prop('hidden', false);
+    $('#ButtonGetDataText').text('Загрузка данных...');
+
+    setTimeout(function() {
+        table.ajax.reload();
+    }, 10);
+}
+
 function InitTableDocs() {
     table = $('#DataTable').DataTable(
         {
@@ -654,10 +664,11 @@ function InitTableDocs() {
             language: languageDataTable,
             
             ajax: function (data, callback, settings) {
-                callback
-                (
-                    GetData()
-                );
+                callback(GetData());
+                
+                $('#ButtonGetData').prop('disabled', false);
+                $('#ButtonGetDataSpinner').prop('hidden', true);
+                $('#ButtonGetDataText').text('Получить данные');
             },
 
             columns:
@@ -669,7 +680,7 @@ function InitTableDocs() {
 
     table.on('select', function (e, dt, type, indexes) {
         if (type === 'row') {
-            var id = table.rows(indexes).data().pluck('id');
+            let id = table.rows(indexes).data().pluck('id');
             currentId = id[0];
 
             if ($('#ComboboxDocGUID').val() == 32) {
@@ -726,23 +737,6 @@ function InitElement() {
     $('#ComboboxProtocolNumber').change(function () {
         GetDoc();
     });
-}
-
-function GetDataWithSpinner() {
-    // Показываем спиннер
-    $('#ButtonGetData').prop('disabled', true);
-    $('#ButtonGetDataSpinner').prop('hidden', false);
-    $('#ButtonGetDataText').text('Загрузка данных...');
-    
-    // Даем браузеру время отрендерить спиннер
-    setTimeout(function() {
-        table.ajax.reload(function() {
-            // Скрываем спиннер после завершения загрузки
-            $('#ButtonGetData').prop('disabled', false);
-            $('#ButtonGetDataSpinner').prop('hidden', true);
-            $('#ButtonGetDataText').text('Получить данные');
-        });
-    }, 10);
 }
 
 function GetData() {
