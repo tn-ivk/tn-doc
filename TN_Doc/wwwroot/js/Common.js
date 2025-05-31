@@ -643,25 +643,16 @@ function InitDatepickerEnd() {
 }
 
 function InitTableDocs() {
-
     table = $('#DataTable').DataTable(
         {
             select: true,
             scrollY: '60vh',
             scrollCollapse: true,
             paging: false,
-
             info: false,
             ordering: false,
-
             language: languageDataTable,
-            //oLanguage: languageDataTable
-            //{
-            //    sSearch: 'Поиск',
-            //    sEmptyTable: 'Отсутствуют данные в таблице'
-            //}
-            //,
-
+            
             ajax: function (data, callback, settings) {
                 callback
                 (
@@ -672,14 +663,8 @@ function InitTableDocs() {
             columns:
                 [
                     {data: 'dt'},
-                    //{ data: function (data) { return moment(data.dt, "DD-MM-YYYYTHH:mm").format("DD.MM.YYYY HH:mm"); } },
                     {data: 'description'}
                 ],
-            //    columnDefs: [
-            //        {
-            //            targets: 0,
-            //            render: DataTable.render.date()
-            //        }]
         });
 
     table.on('select', function (e, dt, type, indexes) {
