@@ -728,6 +728,23 @@ function InitElement() {
     });
 }
 
+function GetDataWithSpinner() {
+    // Показываем спиннер
+    $('#ButtonGetData').prop('disabled', true);
+    $('#ButtonGetDataSpinner').prop('hidden', false);
+    $('#ButtonGetDataText').text('Загрузка данных...');
+    
+    // Даем браузеру время отрендерить спиннер
+    setTimeout(function() {
+        table.ajax.reload(function() {
+            // Скрываем спиннер после завершения загрузки
+            $('#ButtonGetData').prop('disabled', false);
+            $('#ButtonGetDataSpinner').prop('hidden', true);
+            $('#ButtonGetDataText').text('Получить данные');
+        });
+    }, 10);
+}
+
 function GetData() {
     var ret = null;
 

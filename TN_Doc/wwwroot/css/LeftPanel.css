@@ -91,7 +91,27 @@ input[type=number] {
 }
 
 .filterButton {
-    width: 150px;
+    width: 40%;
+    display: inline-flex;
+    background-color: #1b6ec2;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.filterButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.filterButton .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
 }
 
 /***************************************************/
