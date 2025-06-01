@@ -1497,3 +1497,10 @@ function updateSaveBtnText() {
         }
     });
 }
+
+function showError(message) {
+    const errorDialog = document.getElementById('errorDialog');
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorDialog.showModal();
+}
