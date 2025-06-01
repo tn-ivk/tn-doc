@@ -578,7 +578,7 @@ function InitPrinterName() {
         error: function (jqXHR, textStatus, errorThrown) {
             $combobox.hide();
             $printBtn.hide();
-            showError(`Ошибка при загрузке списка принтеров: ${textStatus} ${errorThrown}`);
+            //showError(`Ошибка при загрузке списка принтеров: ${textStatus} ${errorThrown}`);
         }
     });
 }
@@ -651,7 +651,7 @@ function GetDataWithSpinner() {
         $('#ButtonGetData').prop('disabled', false);
         $('#ButtonGetDataSpinner').prop('hidden', true);
         $('#ButtonGetDataText').text('Получить данные');
-        console.warn('Таймаут загрузки данных');
+        showError('Превышен таймаут загрузки данных');
     }, 60000);
 
     setTimeout(function() {
@@ -768,16 +768,18 @@ function InitElement() {
 }
 
 function GetData() {
-    var ret = null;
-    var hasError = false;
-
-    var DTBegin = $('#DatepickerBegin').datepicker('getDate');
-    var DTEnd = $('#DatepickerEnd').datepicker('getDate');
-
+    let ret = null;
+    let hasError = false;
+    let DTBegin = $('#DatepickerBegin').datepicker('getDate');
+    let DTEnd = $('#DatepickerEnd').datepicker('getDate');
+    let strDTBegin = "";
+    let strDTEnd = "";
     if (DTBegin == null || DTEnd == null) {
+        ret = [];
+        return {'data': ret};
     } else {
-        var strDTBegin = DTBegin.getDate() + '.' + (DTBegin.getMonth() + 1) + '.' + DTBegin.getFullYear();
-        var strDTEnd = DTEnd.getDate() + '.' + (DTEnd.getMonth() + 1) + '.' + DTEnd.getFullYear();
+        strDTBegin = DTBegin.getDate() + '.' + (DTBegin.getMonth() + 1) + '.' + DTBegin.getFullYear();
+        strDTEnd = DTEnd.getDate() + '.' + (DTEnd.getMonth() + 1) + '.' + DTEnd.getFullYear();
     }
 
     $.ajax(
@@ -799,7 +801,6 @@ function GetData() {
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 hasError = true;
-                showError(`Ошибка AJAX запроса: ${thrownError} ${xhr.status} ${xhr.statusText}`);
                 ret = [];
             },
             complete: function (data) {
@@ -821,13 +822,10 @@ function GetData() {
             }
         });
 
-    // Если была ошибка, генерируем исключение для обработки в InitTableDocs
     if (hasError) {
         throw new Error('Ошибка при загрузке данных с сервера');
     }
-
-    var data = {'data': ret};
-    return data;
+    return {'data': ret};
 }
 
 function GetDoc() {
@@ -1358,7 +1356,7 @@ function FillPassportDataElis() {
             }
         });
     } catch (error) {
-        showError(`Ошибка в FillPassportDataElis: ${error}`);
+        showError(`Ошибка заполнения данных ЕЛИС: ${error}`);
     }
 }
 
