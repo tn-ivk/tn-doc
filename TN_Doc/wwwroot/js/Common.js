@@ -578,7 +578,7 @@ function InitPrinterName() {
         error: function (jqXHR, textStatus, errorThrown) {
             $combobox.hide();
             $printBtn.hide();
-            showError('Ошибка при загрузке списка принтеров:', textStatus, errorThrown);
+            showError(`Ошибка при загрузке списка принтеров: ${textStatus} ${errorThrown}`);
         }
     });
 }
@@ -664,7 +664,7 @@ function GetDataWithSpinner() {
             $('#ButtonGetData').prop('disabled', false);
             $('#ButtonGetDataSpinner').prop('hidden', true);
             $('#ButtonGetDataText').text('Получить данные');
-            showError('Ошибка при обновлении таблицы:', error);
+            showError(`Ошибка при обновлении таблицы: ${error}`);
         }
     }, 10);
 }
@@ -689,7 +689,7 @@ function InitTableDocs() {
                     $('#ButtonGetDataSpinner').prop('hidden', true);
                     $('#ButtonGetDataText').text('Получить данные');
                 } catch (error) {
-                    showError('Ошибка при загрузке данных:', error);
+                    showError(`Ошибка при загрузке данных: ${error}`);
                     
                     $('#ButtonGetData').prop('disabled', false);
                     $('#ButtonGetDataSpinner').prop('hidden', true);
@@ -799,7 +799,7 @@ function GetData() {
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 hasError = true;
-                showError('Ошибка AJAX запроса:', thrownError, xhr.status, xhr.statusText);
+                showError(`Ошибка AJAX запроса: ${thrownError} ${xhr.status} ${xhr.statusText}`);
                 ret = [];
             },
             complete: function (data) {
@@ -1358,7 +1358,7 @@ function FillPassportDataElis() {
             }
         });
     } catch (error) {
-        showError("Ошибка в FillPassportDataElis:", error);
+        showError(`Ошибка в FillPassportDataElis: ${error}`);
     }
 }
 
