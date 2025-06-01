@@ -647,7 +647,7 @@ function GetDataWithSpinner() {
     $('#ButtonGetDataSpinner').prop('hidden', false);
     $('#ButtonGetDataText').text('Загрузка данных...');
 
-    var timeoutId = setTimeout(function() {
+    let timeoutId = setTimeout(function() {
         $('#ButtonGetData').prop('disabled', false);
         $('#ButtonGetDataSpinner').prop('hidden', true);
         $('#ButtonGetDataText').text('Получить данные');
@@ -657,11 +657,9 @@ function GetDataWithSpinner() {
     setTimeout(function() {
         try {
             table.ajax.reload(function() {
-                // Очищаем таймер защиты, если загрузка завершилась успешно
                 clearTimeout(timeoutId);
             });
         } catch (error) {
-            // Очищаем таймер защиты и скрываем спиннер в случае ошибки
             clearTimeout(timeoutId);
             $('#ButtonGetData').prop('disabled', false);
             $('#ButtonGetDataSpinner').prop('hidden', true);
@@ -684,22 +682,19 @@ function InitTableDocs() {
             
             ajax: function (data, callback, settings) {
                 try {
-                    var result = GetData();
+                    let result = GetData();
                     callback(result);
                     
-                    // Скрываем спиннер после успешной загрузки
                     $('#ButtonGetData').prop('disabled', false);
                     $('#ButtonGetDataSpinner').prop('hidden', true);
                     $('#ButtonGetDataText').text('Получить данные');
                 } catch (error) {
                     console.error('Ошибка при загрузке данных:', error);
                     
-                    // Скрываем спиннер в случае ошибки
                     $('#ButtonGetData').prop('disabled', false);
                     $('#ButtonGetDataSpinner').prop('hidden', true);
                     $('#ButtonGetDataText').text('Получить данные');
                     
-                    // Возвращаем пустые данные
                     callback({'data': []});
                 }
             },
