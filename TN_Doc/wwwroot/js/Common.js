@@ -647,8 +647,27 @@ function GetDataWithSpinner() {
     $('#ButtonGetDataSpinner').prop('hidden', false);
     $('#ButtonGetDataText').text('Загрузка данных...');
 
+    var timeoutId = setTimeout(function() {
+        $('#ButtonGetData').prop('disabled', false);
+        $('#ButtonGetDataSpinner').prop('hidden', true);
+        $('#ButtonGetDataText').text('Получить данные');
+        console.warn('Таймаут загрузки данных');
+    }, 60000);
+
     setTimeout(function() {
-        table.ajax.reload();
+        try {
+            table.ajax.reload(function() {
+                // Очищаем таймер защиты, если загрузка завершилась успешно
+                clearTimeout(timeoutId);
+            });
+        } catch (error) {
+            // Очищаем таймер защиты и скрываем спиннер в случае ошибки
+            clearTimeout(timeoutId);
+            $('#ButtonGetData').prop('disabled', false);
+            $('#ButtonGetDataSpinner').prop('hidden', true);
+            $('#ButtonGetDataText').text('Получить данные');
+            console.error('Ошибка при обновлении таблицы:', error);
+        }
     }, 10);
 }
 
@@ -664,11 +683,25 @@ function InitTableDocs() {
             language: languageDataTable,
             
             ajax: function (data, callback, settings) {
-                callback(GetData());
-                
-                $('#ButtonGetData').prop('disabled', false);
-                $('#ButtonGetDataSpinner').prop('hidden', true);
-                $('#ButtonGetDataText').text('Получить данные');
+                try {
+                    var result = GetData();
+                    callback(result);
+                    
+                    // Скрываем спиннер после успешной загрузки
+                    $('#ButtonGetData').prop('disabled', false);
+                    $('#ButtonGetDataSpinner').prop('hidden', true);
+                    $('#ButtonGetDataText').text('Получить данные');
+                } catch (error) {
+                    console.error('Ошибка при загрузке данных:', error);
+                    
+                    // Скрываем спиннер в случае ошибки
+                    $('#ButtonGetData').prop('disabled', false);
+                    $('#ButtonGetDataSpinner').prop('hidden', true);
+                    $('#ButtonGetDataText').text('Получить данные');
+                    
+                    // Возвращаем пустые данные
+                    callback({'data': []});
+                }
             },
 
             columns:
@@ -741,6 +774,7 @@ function InitElement() {
 
 function GetData() {
     var ret = null;
+    var hasError = false;
 
     var DTBegin = $('#DatepickerBegin').datepicker('getDate');
     var DTEnd = $('#DatepickerEnd').datepicker('getDate');
@@ -769,7 +803,11 @@ function GetData() {
                 ret = data;
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                // alert("Ошибка!");
+                hasError = true;
+                console.error('Ошибка AJAX запроса:', thrownError, xhr.status, xhr.statusText);
+                
+                // В случае ошибки возвращаем пустой массив данных
+                ret = [];
             },
             complete: function (data) {
                 if ($('#ComboboxDocGUID').val() == 0 ||
@@ -789,6 +827,11 @@ function GetData() {
                     $('#ButtonElis').prop('hidden', true);
             }
         });
+
+    // Если была ошибка, генерируем исключение для обработки в InitTableDocs
+    if (hasError) {
+        throw new Error('Ошибка при загрузке данных с сервера');
+    }
 
     var data = {'data': ret};
     return data;
