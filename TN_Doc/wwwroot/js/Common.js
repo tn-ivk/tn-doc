@@ -664,7 +664,7 @@ function GetDataWithSpinner() {
             $('#ButtonGetData').prop('disabled', false);
             $('#ButtonGetDataSpinner').prop('hidden', true);
             $('#ButtonGetDataText').text('Получить данные');
-            showError(`Ошибка при обновлении таблицы: ${error}`);
+            showError(`Ошибка при обновлении таблицы: ${error && error.message ? error.message : error}`);
         }
     }, 10);
 }
@@ -689,7 +689,7 @@ function InitTableDocs() {
                     $('#ButtonGetDataSpinner').prop('hidden', true);
                     $('#ButtonGetDataText').text('Получить данные');
                 } catch (error) {
-                    showError(`Ошибка при загрузке данных: ${error}`);
+                    showError(`Ошибка при загрузке данных: ${error && error.message ? error.message : error}`);
                     
                     $('#ButtonGetData').prop('disabled', false);
                     $('#ButtonGetDataSpinner').prop('hidden', true);
@@ -1356,7 +1356,7 @@ function FillPassportDataElis() {
             }
         });
     } catch (error) {
-        showError(`Ошибка заполнения данных ЕЛИС: ${error}`);
+        showError(`Ошибка заполнения данных ЕЛИС: ${error && error.message ? error.message : error}`);
     }
 }
 
