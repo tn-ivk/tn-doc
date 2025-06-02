@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/02/2025 13:15:52" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/02/2025 17:41:59" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -411,7 +411,51 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="409.45" Width="718.2" Height="479.01" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableHeader" Top="409.45" Width="718.2" Height="94.5">
+      <TableObject Name="Table1" Left="9.45" Width="330.75" Height="94.5">
+        <TableColumn Name="Column282"/>
+        <TableColumn Name="Column283"/>
+        <TableColumn Name="Column284"/>
+        <TableColumn Name="Column285"/>
+        <TableColumn Name="Column286"/>
+        <TableRow Name="Row215">
+          <TableCell Name="Cell1619" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1620" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1621" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1622" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1623" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row216">
+          <TableCell Name="Cell1624" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1625" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1626" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1627" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1628" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row217">
+          <TableCell Name="Cell1629" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1630" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1631" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1632" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1633" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row218">
+          <TableCell Name="Cell1634" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1635" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1636" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1637" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1638" Font="Arial, 10pt"/>
+        </TableRow>
+        <TableRow Name="Row219">
+          <TableCell Name="Cell1639" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1640" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1641" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1642" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1643" Font="Arial, 10pt"/>
+        </TableRow>
+      </TableObject>
+    </DataBand>
+    <DataBand Name="DataBandTableAct" Top="507.15" Width="718.2" Height="479.01" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="7.56" Width="472.5" Height="471.45" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="302.4"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -543,7 +587,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="891.66" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="989.36" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Top="9.45" Width="714.42" Height="35.9" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="714.42"/>
         <TableRow Name="Row195" Height="17.95">
@@ -554,7 +598,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="942.11" Width="718.2" Height="94.5" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="1039.81" Width="718.2" Height="96.38" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="88.82" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -616,7 +660,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1039.81" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1139.39" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
