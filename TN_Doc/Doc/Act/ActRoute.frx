@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/29/2025 17:28:40" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/02/2025 11:10:56" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -259,7 +259,7 @@ namespace FastReport
           <TableCell Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row3" Height="17.95">
-          <TableCell Name="Cell11" Text="Наименование пункта приема-сдачи нефти" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell11" Text="Пункт приема-сдачи нефти" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="DelivePoint" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="DelivePoint" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell12" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell13" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -267,7 +267,7 @@ namespace FastReport
           <TableCell Name="Cell15" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row4" Height="17.95">
-          <TableCell Name="Cell16" Text="Наименование предприятия - владельца ПСП" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell16" Text="Предприятие (владелец) ПСП" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Factory" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Factory" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell17" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell18" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -275,14 +275,6 @@ namespace FastReport
           <TableCell Name="Cell20" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row5" Height="17.95">
-          <TableCell Name="Cell26" Text="Договор об оказании услуг по транспортировке нефти №" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Contract" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
-          <TableCell Name="Cell27" VertAlign="Bottom" Font="Arial, 7pt"/>
-          <TableCell Name="Cell28" VertAlign="Bottom" Font="Arial, 7pt"/>
-          <TableCell Name="Cell29" VertAlign="Bottom" Font="Arial, 7pt"/>
-          <TableCell Name="Cell30" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-        </TableRow>
-        <TableRow Name="Row6" Height="17.95">
           <TableCell Name="Cell21" Text="СИКН №" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="SIKN_Number" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell22" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -290,9 +282,17 @@ namespace FastReport
           <TableCell Name="Cell24" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell25" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
+        <TableRow Name="Row6" Height="17.95">
+          <TableCell Name="Cell26" Text="Договор об оказании услуг по транспортировке нефти №" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Contract" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Contract" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Cell27" VertAlign="Bottom" Font="Arial, 7pt"/>
+          <TableCell Name="Cell28" VertAlign="Bottom" Font="Arial, 7pt"/>
+          <TableCell Name="Cell29" VertAlign="Bottom" Font="Arial, 7pt"/>
+          <TableCell Name="Cell30" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+        </TableRow>
         <TableRow Name="Row7" Height="17.95">
           <TableCell Name="Cell31" Text="Маршрутное поручение №" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Route_Telegram" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Route_Telegram" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Route_Telegram" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell32" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell33" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell34" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -300,7 +300,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row8" Height="17.95">
           <TableCell Name="Cell36" Text="Производитель" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Refinery_Plant" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Refinery_Plant" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Refinery_Plant" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell37" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell38" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell39" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -308,7 +308,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row9" Height="17.95">
           <TableCell Name="Cell41" Text="Грузоотправитель" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Consignor" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Consignor" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Consignor" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell42" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell43" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell44" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -316,7 +316,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row10" Height="17.95">
           <TableCell Name="Cell46" Text="Недропользователь                                      **)" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="SubsurfaceUser" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="SubsurfaceUser" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SubsurfaceUser" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell47" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell48" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell49" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -324,7 +324,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row11" Height="17.95">
           <TableCell Name="Cell51" Text="Первый владелец нефти" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="FirstOwnerPetroleum" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="FirstOwnerPetroleum" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="FirstOwnerPetroleum" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell52" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell53" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell54" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -332,7 +332,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row12" Height="17.95">
           <TableCell Name="Cell56" Text="Последний владелец нефти" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="LastOwnerPetroleum" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="LastOwnerPetroleum" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="LastOwnerPetroleum" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell57" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell58" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell59" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -340,7 +340,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row13" Height="17.95">
           <TableCell Name="Cell61" Text="Грузополучатель" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Consignee" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Consignee" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Consignee" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell62" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell63" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell64" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -348,7 +348,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row14" Height="17.95">
           <TableCell Name="Cell66" Text="Пункт назначения" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Destination" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Destination" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Destination" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell67" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell68" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell69" VertAlign="Bottom" Font="Arial, 7pt"/>
@@ -356,15 +356,15 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row15" Height="17.95">
           <TableCell Name="Cell71" Text="Экспортер (импортер)                                  **)" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Exporter_Importer" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Exporter_Importer" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Exporter_Importer" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell72" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell73" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell74" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell75" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row16" Height="17.95">
-          <TableCell Name="Cell76" Text="Номер грузовой таможенной декларация   **)" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
-          <TableCell Name="Declaration" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="SIKN_Number" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
+          <TableCell Name="Cell76" Text="Таможенная декларация (ввозная, вывозная)   **)" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Declaration" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="Declaration" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags" ColSpan="4"/>
           <TableCell Name="Cell77" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell78" VertAlign="Bottom" Font="Arial, 7pt"/>
           <TableCell Name="Cell79" VertAlign="Bottom" Font="Arial, 7pt"/>
