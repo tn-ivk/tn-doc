@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/02/2025 12:59:53" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/02/2025 13:15:52" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -71,11 +71,11 @@ namespace FastReport
         DataIVK.TableRouteActs.Route.RouteActNumber,
         End);                            
          
-      DelivePoint.Text = DataIVK.TableRouteActs.RouteData.Delive_Factory;
+      DelivePoint.Text = DataIVK.TableRouteActs.RouteData.Psp;
       Factory.Text = DataIVK.TableRouteActs.RouteData.Factory;
       SIKN_Number.Text = DataIVK.TableRouteActs.RouteData.SIKN_Number;
       Contract.Text = DataIVK.TableRouteActs.RouteData.Contract;
-      Route_Telegram.Text = DataIVK.TableRouteActs.RouteNumber;
+      Route_Telegram.Text = DataIVK.TableRouteActs.RouteData.RouteInstruction;
       Refinery_Plant.Text = DataIVK.TableRouteActs.RouteData.Producer;
       Consignor.Text = DataIVK.TableRouteActs.RouteData.Consigner;
       SubsurfaceUser.Text = DataIVK.TableRouteActs.RouteData.SubsurfaceUser;
