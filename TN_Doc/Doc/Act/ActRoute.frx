@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/02/2025 18:25:09" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 00:41:06" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -33,7 +33,7 @@ namespace FastReport
      
     private void Page_StartPage(object sender, EventArgs e)
     {   
-      //// Десериализация данных (формат json) из входного параметра - Json                         
+      // Десериализация данных (формат json) из входного параметра - Json                         
       string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
       Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
       settings.TypeNameHandling = TypeNameHandling.All;
@@ -75,7 +75,7 @@ namespace FastReport
       Factory.Text = DataIVK.TableRouteActs.RouteData.Factory;
       SIKN_Number.Text = DataIVK.TableRouteActs.RouteData.SIKN_Number;
       Contract.Text = DataIVK.TableRouteActs.RouteData.Contract;
-      Route_Telegram.Text = DataIVK.TableRouteActs.RouteData.RouteInstruction;
+      Route_Telegram.Text = DataIVK.TableRouteActs.RouteData.RouteInstructions[0];
       Refinery_Plant.Text = DataIVK.TableRouteActs.RouteData.Producer;
       Consignor.Text = DataIVK.TableRouteActs.RouteData.Consigner;
       SubsurfaceUser.Text = DataIVK.TableRouteActs.RouteData.SubsurfaceUser;
@@ -93,6 +93,136 @@ namespace FastReport
       Receive_Lic_Number.Text = DataIVK.TableRouteActs.RouteData.Receive_Lic_Number;
     }
 
+    private void TableHeader2_ManualBuild(object sender, EventArgs e)
+    {
+      if (Engine.FinalPass)
+      {
+        var data = DataIVK.TableRouteActs.RouteData;
+        
+        TableHeader2.Rows[0][0].Text = &quot;Пункт приема-сдачи нефти&quot;;
+        TableHeader2.Rows[0][1].Text = DataIVK.TableRouteActs.RouteData.Psp;
+        TableHeader2.Rows[0][1].ColSpan = 4;
+        AddSimpleRow(&quot;Предприятие (владелец) ПСП&quot;, data.Factory);
+        AddSimpleRow(&quot;СИКН №&quot;, data.SIKN_Number);
+        AddSimpleRow(&quot;Договор об оказании услуг по транспортировке нефти №&quot;, data.Contract);
+        // Добавляем маршрутные поручения
+        var routeInstructions = data.RouteInstructions.Where(x =&gt; !string.IsNullOrEmpty(x))?.ToList() ?? new List&lt;string&gt;();
+        for (int i = 0; i &lt; routeInstructions.Count(); i++)
+          AddSimpleRow(i == 0 ? &quot;Маршрутное поручение №&quot; : &quot;&quot;, routeInstructions[i]);         
+        AddSimpleRow(&quot;Производитель&quot;, data.Producer);
+        AddSimpleRow(&quot;Грузоотправитель&quot;, data.Consigner);
+        AddSimpleRow(&quot;Недропользователь                                      **)&quot;, data.SubsurfaceUser);
+        AddSimpleRow(&quot;Первый владелец нефти&quot;, data.FirstOwner);
+        AddSimpleRow(&quot;Последний владелец нефти&quot;, data.LastOwner);
+        var consignees = data.Consignees.Where(x =&gt; !string.IsNullOrEmpty(x))?.ToList() ?? new List&lt;string&gt;();
+        for (int i = 0; i &lt; consignees.Count(); i++)
+          AddSimpleRow(i == 0 ? &quot;Грузополучатель&quot; : &quot;&quot;, consignees[i]);                 
+        AddSimpleRow(&quot;Пункт назначения&quot;, data.DestinationPoint);
+        AddSimpleRow(&quot;Экспортер (импортер)                                  **)&quot;, data.Exporter);
+        AddSimpleRow(&quot;Таможенная декларация (ввозная, вывозная)   **)&quot;, data.CustomsDeclaration);
+        
+        AddSignerRow(&quot;Уполномоченный представитель сдающей стороны,&quot;, data.Delive_FIO, data.Delive_Lic_Date, data.Delive_Lic_Number, &quot;сдал, а&quot;);
+        AddSignerRow(&quot;уполномоченный представитель принимающей стороны,&quot;, data.Receive_FIO, data.Receive_Lic_Date, data.Receive_Lic_Number, &quot;принял&quot;);
+        AddLastRow(&quot;нефть следующего количества и качества:&quot;);
+      }
+     
+      for (int n = 0; n &lt; TableHeader2.RowCount; n++)
+      {
+          TableHeader2.PrintRow(n);
+          TableHeader2.PrintColumns();
+      }
+    }
+    
+    private void AddSimpleRow(string title, string val)
+    {
+      var sourceRow = TableHeader2.Rows[0];
+      TableRow row = new TableRow();
+      row.AssignAll(sourceRow);              
+      var cellTitle = new TableCell();
+      cellTitle.AssignAll(sourceRow[0]);         
+      cellTitle.Text = title;
+      row[0] = cellTitle;
+      var cellValue = new TableCell();
+      cellValue.AssignAll(sourceRow[1]);         
+      cellValue.Text = val;
+      cellValue.ColSpan = 4;
+      row[1] = cellValue;
+      TableHeader2.Rows.Add(row);
+    }
+    
+    private void AddSignerRow(string title, string fio, string licDate, string licNumber, string ext)
+    {
+      var sourceRow = TableHeader2.Rows[0];
+      TableRow row = new TableRow();
+      row.AssignAll(sourceRow);              
+      var cellTitle = new TableCell();
+      cellTitle.AssignAll(sourceRow[0]);         
+      cellTitle.Text = title;
+      row[0] = cellTitle;
+      var cellValue = new TableCell();
+      cellValue.AssignAll(sourceRow[1]);         
+      cellValue.Text = fio;
+      cellValue.ColSpan = 4;
+      row[1] = cellValue;
+      var cellExt = new TableCell();
+      cellExt.AssignAll(sourceRow[5]);         
+      cellExt.Text = &quot;(Фамилия И.О.)&quot;;
+      row[5] = cellExt;
+      TableHeader2.Rows.Add(row);
+      
+      row = new TableRow();
+      row.AssignAll(sourceRow);              
+      cellTitle = new TableCell();
+      cellTitle.AssignAll(sourceRow[0]);         
+      cellTitle.Text = &quot;действующий на основании доверенности&quot;;
+      row[0] = cellTitle;
+      
+      var cell = new TableCell();
+      cell.AssignAll(sourceRow[1]);         
+      cell.Text = &quot;от&quot;;
+      cell.ColSpan = 1;
+      cell.Border.Lines = BorderLines.None;
+      row[1] = cell;
+      
+      cell = new TableCell();
+      cell.AssignAll(sourceRow[2]);         
+      cell.Text = licDate;
+      row[2] = cell;
+      
+      cell = new TableCell();
+      cell.AssignAll(sourceRow[3]);         
+      cell.Text = &quot;№&quot;;
+      cell.Border.Lines = BorderLines.None;
+      row[3] = cell;
+      
+      cell = new TableCell();
+      cell.AssignAll(sourceRow[4]);         
+      cell.Text = licNumber;
+      row[4] = cell;
+      
+      cellExt = new TableCell();
+      cellExt.AssignAll(sourceRow[5]);         
+      cellExt.Text = ext;
+      row[5] = cellExt;
+      TableHeader2.Rows.Add(row);
+    }
+    
+    private void AddLastRow(string str)
+    {
+      var sourceRow = TableHeader2.Rows[0];
+      TableRow row = new TableRow();
+      row.AssignAll(sourceRow);              
+      var cell = new TableCell();
+      cell.AssignAll(sourceRow[0]);         
+      cell.Text = str;
+      row[0] = cell;
+      cell = new TableCell();
+      cell.ColSpan = 4;
+      row[1] = cell;
+      TableHeader2.Rows.Add(row);
+    }
+    
+    
     private void TableAct_ManualBuild(object sender, EventArgs e)
     {
       List&lt;TN.Doc.ActShift&gt; listShiftsData = DataIVK.TableRouteActs.Route.ActShifts.Where(x =&gt; !string.IsNullOrEmpty(x.GostIndex51858)).ToList();
@@ -411,25 +541,25 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableHeader" Top="409.45" Width="718.2" Height="56.7">
-      <TableObject Name="TableHeader2" Width="714.42" Height="18.9">
+    <DataBand Name="DataBandTableHeader" Top="409.45" Width="718.2" Height="18.9">
+      <TableObject Name="TableHeader2" Width="718.2" Height="17.77" ManualBuildEvent="TableHeader2_ManualBuild">
         <TableColumn Name="Column282" Width="277.83"/>
-        <TableColumn Name="Column283" Width="15.12"/>
+        <TableColumn Name="Column283" Width="18.9"/>
         <TableColumn Name="Column284" Width="189"/>
         <TableColumn Name="Column285" Width="26.46"/>
         <TableColumn Name="Column286" Width="120.96"/>
         <TableColumn Name="Column287" Width="85.05"/>
-        <TableRow Name="Row215">
-          <TableCell Name="Cell1619" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1620" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1621" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1622" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1623" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1644" Font="Arial, 10pt"/>
+        <TableRow Name="Row215" Height="17.77">
+          <TableCell Name="Cell1619" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1620" Border.Lines="Bottom" Border.BottomLine.Width="0.75" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1621" Border.Lines="Bottom" Border.BottomLine.Width="0.75" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1622" Border.Lines="Bottom" Border.BottomLine.Width="0.75" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1623" Border.Lines="Bottom" Border.BottomLine.Width="0.75" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1644" VertAlign="Bottom" Font="Arial, 9pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTableAct" Top="469.35" Width="718.2" Height="479.01" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="431.55" Width="718.2" Height="479.01" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="7.56" Width="472.5" Height="471.45" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="302.4"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -561,7 +691,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="951.56" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="913.76" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Top="9.45" Width="714.42" Height="35.9" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="714.42"/>
         <TableRow Name="Row195" Height="17.95">
@@ -572,7 +702,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="1002.01" Width="718.2" Height="96.38" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="964.21" Width="718.2" Height="96.38" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="88.82" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -634,7 +764,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1101.59" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1063.79" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
