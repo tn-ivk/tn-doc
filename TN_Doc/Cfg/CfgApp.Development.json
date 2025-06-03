@@ -784,7 +784,7 @@
           "Name": "Поверка МИ 1974-2004",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
           "PathToDocDll": "/Dll/Poverka1974_04.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -811,8 +811,8 @@
           "IdDoc": 39,
           "Name": "Поверка МИ 1974-1995",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1995",
-          "PathToDocDll": "/Dll/Poverka1974/Poverka1974_95.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocDll": "/Dll/Poverka1974_95.dll",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -832,7 +832,7 @@
           "Name": "Поверка МИ 1974-1989",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1989",
           "PathToDocDll": "/Dll/Poverka1974_89.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -1914,7 +1914,7 @@
           "Name": "Поверка МИ 1974-2004",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
           "PathToDocDll": "/Dll/Poverka1974_04.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -1941,8 +1941,8 @@
           "IdDoc": 39,
           "Name": "Поверка МИ 1974-1995",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1995",
-          "PathToDocDll": "/Dll/Poverka1974/Poverka1974_95.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocDll": "/Dll/Poverka1974_95.dll",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -1962,7 +1962,7 @@
           "Name": "Поверка МИ 1974-1989",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1989",
           "PathToDocDll": "/Dll/Poverka1974_89.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -3044,7 +3044,7 @@
           "Name": "Поверка МИ 1974-2004",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
           "PathToDocDll": "/Dll/Poverka1974_04.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -3071,8 +3071,8 @@
           "IdDoc": 39,
           "Name": "Поверка МИ 1974-1995",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1995",
-          "PathToDocDll": "/Dll/Poverka1974/Poverka1974_95.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocDll": "/Dll/Poverka1974_95.dll",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -3092,7 +3092,7 @@
           "Name": "Поверка МИ 1974-1989",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1989",
           "PathToDocDll": "/Dll/Poverka1974_89.dll",
-          "PathToDocConfigFile": "/Cfg/CfgPoverka1974.json",
+          "PathToDocConfigFile": "/Cfg/Poverka1974/CfgPoverka1974.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [

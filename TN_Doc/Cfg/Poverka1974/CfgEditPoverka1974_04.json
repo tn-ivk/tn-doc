@@ -1,0 +1,109 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_SIKN",
+      "Type": "text",
+      "Name": "Место проведения поверки"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_PSP",
+      "Type": "text",
+      "Name": "Пункт приема сдачи нефти"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": false,
+      "Key": "Place_Factory",
+      "Type": "text",
+      "Name": "Наименование организации"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_Type",
+      "Type": "text",
+      "Name": "ПР: Тип"
+    },
+    {
+      "Id": 5,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_FactoryNumber",
+      "Type": "text",
+      "Name": "ПР: Заводской №"
+    },
+    {
+      "Id": 6,
+      "Use": true,
+      "Edit": false,
+      "Key": "PR_LineName",
+      "Type": "text",
+      "Name": "Линия"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Type",
+      "Type": "text",
+      "Name": "ПУ: Тип"
+    },
+    {
+      "Id": 8,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_Category",
+      "Type": "text",
+      "Name": "ПУ: Разряд"
+    },
+    {
+      "Id": 9,
+      "Use": true,
+      "Edit": false,
+      "Key": "PU_FactoryNumber",
+      "Type": "text",
+      "Name": "ПУ: Заводской №"
+    },
+    {
+      "Id": 10,
+      "Use": true,
+      "Edit": false,
+      "Key": "OilType",
+      "Type": "text",
+      "Name": "Рабочая жидкость"
+    },
+    {
+      "Id": 11,
+      "Use": true,
+      "Edit": true,
+      "Key": "ProtokolNum",
+      "Type": "text",
+      "Name": "Номер протокола"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "ARM_Poverka_Result",
+      "Type": "list",
+      "Name": "Заключение: ПР к дальнейшей эксплуатации"
+    },
+    {
+      "Id": 13,
+      "Use": true,
+      "Edit": true,
+      "Key": "StaffData",
+      "Type": "text",
+      "Name": "И.О. Фамилия"
+    }
+  ]
+}
+
