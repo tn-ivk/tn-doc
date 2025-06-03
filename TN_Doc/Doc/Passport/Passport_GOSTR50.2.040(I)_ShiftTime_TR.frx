@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/23/2025 18:05:40" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 13:09:14" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -14,6 +14,7 @@ namespace FastReport
 {
   public class ReportScript
   {
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();
     JToken JDoc;
     JToken JSettings;
     JToken JTablePassport;
@@ -51,11 +52,11 @@ namespace FastReport
       
     public void DrawTableHeader()
     {         
-      DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;Begin&quot;]);
-      DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;End&quot;]);
+      DateTime Begin = tools.UnixTimestampToDatetime((long)JTablePassport[&quot;Begin&quot;]);
+      DateTime End = tools.UnixTimestampToDatetime((long)JTablePassport[&quot;End&quot;]);
          
-      DateTime SamplingPeriodBegin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;Begin&quot;]);
-      DateTime SamplingPeriodEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;End&quot;]);
+      DateTime SamplingPeriodBegin = tools.UnixTimestampToDatetime((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;Begin&quot;]);
+      DateTime SamplingPeriodEnd = tools.UnixTimestampToDatetime((long)JAdditionalData[&quot;PassportPeriodDt&quot;][&quot;End&quot;]);
       
       NumberAndDatePassport.Text = string.Format(&quot;№ &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г.&quot;, JResult[&quot;PassportId&quot;], Begin.ToShortDateString());
       DelivePoint.Text = $&quot;{JAdditionalData[&quot;DelivePoint&quot;]}&quot;;
@@ -224,7 +225,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="147.64" Width="718.2" Height="287.28" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="146.84" Width="718.2" Height="287.28" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="277.83" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="434.7"/>
@@ -316,7 +317,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="438.92" Width="718.2" Height="381.78" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="437.32" Width="718.2" Height="381.78" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="325.08">
         <TableColumn Name="Column29" Width="283.5"/>
         <TableColumn Name="Column31" Width="202.23"/>

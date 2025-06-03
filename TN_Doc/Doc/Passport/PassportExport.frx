@@ -64,8 +64,8 @@ namespace FastReport
       
     public void DrawTableHeader()
     {               
-      DateTime Begin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;Begin&quot;]);
-      DateTime End = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTablePassport[&quot;End&quot;]);
+      DateTime Begin = tools.UnixTimestampToDatetime((long)JTablePassport["Begin"]);
+      DateTime End = tools.UnixTimestampToDatetime((long)JTablePassport["End"]);
       
       NumberAndDatePassport.Text = string.Format(&quot;№ &lt;u&gt;{0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г.&quot;,
         JResult[&quot;PassportId&quot;], 
