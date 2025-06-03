@@ -343,7 +343,7 @@ namespace FastReport
   </Dictionary>
   <ReportPage Name="Page" Landscape="true" PaperWidth="210" PaperHeight="297" RawPaperSize="9" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage" LastPageSource="15" FirstPageSource="15">
     <ReportTitleBand Name="ReportTitle" Width="718.2" Height="37.8" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableHeader" Width="714.42" Height="36.85">
+      <TableObject Name="TableTitle" Width="714.42" Height="36.85">
         <TableColumn Name="Column1" Width="277.83"/>
         <TableColumn Name="Column2" Width="15.12"/>
         <TableColumn Name="Column274" Width="189"/>
