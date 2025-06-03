@@ -1186,7 +1186,6 @@ function SetClientToken() {
 
 }
 
-
 function DrawTablePassports(dataELIS) {
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
