@@ -72,15 +72,15 @@ namespace FastReport
         End);                            
     }
 
-    private void TableHeader2_ManualBuild(object sender, EventArgs e)
+    private void TableHeader_ManualBuild(object sender, EventArgs e)
     {
       if (Engine.FinalPass)
       {
         var data = DataIVK.TableRouteActs.RouteData;
         
-        TableHeader2.Rows[0][0].Text = &quot;Пункт приема-сдачи нефти&quot;;
-        TableHeader2.Rows[0][1].Text = DataIVK.TableRouteActs.RouteData.Psp;
-        TableHeader2.Rows[0][1].ColSpan = 4;
+        TableHeader.Rows[0][0].Text = &quot;Пункт приема-сдачи нефти&quot;;
+        TableHeader.Rows[0][1].Text = DataIVK.TableRouteActs.RouteData.Psp;
+        TableHeader.Rows[0][1].ColSpan = 4;
         AddSimpleRow(&quot;Предприятие (владелец) ПСП&quot;, data.Factory);
         AddSimpleRow(&quot;СИКН №&quot;, data.SIKN_Number);
         AddSimpleRow(&quot;Договор об оказании услуг по транспортировке нефти №&quot;, data.Contract);
@@ -105,16 +105,16 @@ namespace FastReport
         AddLastRow(&quot;нефть следующего количества и качества:&quot;);
       }
      
-      for (int n = 0; n &lt; TableHeader2.RowCount; n++)
+      for (int n = 0; n &lt; TableHeader.RowCount; n++)
       {
-          TableHeader2.PrintRow(n);
-          TableHeader2.PrintColumns();
+          TableHeader.PrintRow(n);
+          TableHeader.PrintColumns();
       }
     }
     
     private void AddSimpleRow(string title, string val)
     {
-      var sourceRow = TableHeader2.Rows[0];
+      var sourceRow = TableHeader.Rows[0];
       TableRow row = new TableRow();
       row.AssignAll(sourceRow);              
       var cellTitle = new TableCell();
@@ -126,12 +126,12 @@ namespace FastReport
       cellValue.Text = val;
       cellValue.ColSpan = 4;
       row[1] = cellValue;
-      TableHeader2.Rows.Add(row);
+      TableHeader.Rows.Add(row);
     }
     
     private void AddSignerRow(string title, string fio, string licDate, string licNumber, string ext)
     {
-      var sourceRow = TableHeader2.Rows[0];
+      var sourceRow = TableHeader.Rows[0];
       TableRow row = new TableRow();
       row.AssignAll(sourceRow);              
       var cellTitle = new TableCell();
@@ -147,7 +147,7 @@ namespace FastReport
       cellExt.AssignAll(sourceRow[5]);         
       cellExt.Text = &quot;(Фамилия И.О.)&quot;;
       row[5] = cellExt;
-      TableHeader2.Rows.Add(row);
+      TableHeader.Rows.Add(row);
       
       row = new TableRow();
       row.AssignAll(sourceRow);              
@@ -183,12 +183,12 @@ namespace FastReport
       cellExt.AssignAll(sourceRow[5]);         
       cellExt.Text = ext;
       row[5] = cellExt;
-      TableHeader2.Rows.Add(row);
+      TableHeader.Rows.Add(row);
     }
     
     private void AddLastRow(string str)
     {
-      var sourceRow = TableHeader2.Rows[0];
+      var sourceRow = TableHeader.Rows[0];
       TableRow row = new TableRow();
       row.AssignAll(sourceRow);              
       var cell = new TableCell();
@@ -198,7 +198,7 @@ namespace FastReport
       cell = new TableCell();
       cell.ColSpan = 4;
       row[1] = cell;
-      TableHeader2.Rows.Add(row);
+      TableHeader.Rows.Add(row);
     }
     
     
@@ -369,7 +369,7 @@ namespace FastReport
       </TableObject>
     </ReportTitleBand>
     <DataBand Name="DataBandTableHeader" Top="41" Width="718.2" Height="18.9">
-      <TableObject Name="TableHeader2" Width="718.2" Height="17.77" ManualBuildEvent="TableHeader2_ManualBuild">
+      <TableObject Name="TableHeader" Width="718.2" Height="17.77" ManualBuildEvent="TableHeader_ManualBuild">
         <TableColumn Name="Column282" Width="277.83"/>
         <TableColumn Name="Column283" Width="18.9"/>
         <TableColumn Name="Column284" Width="189"/>
