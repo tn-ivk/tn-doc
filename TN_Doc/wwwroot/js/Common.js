@@ -1214,9 +1214,6 @@ function DrawTablePassports(dataELIS) {
     });
 }
 
-function SetDataLocalStorage() {
-}
-
 function ResetPassportDataElis() {
     $('#info').text('');
     StateButtonGetElisData(false);
