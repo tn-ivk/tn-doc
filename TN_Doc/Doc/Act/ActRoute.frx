@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 01:12:13" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;ActRoute.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 09:45:04" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -66,7 +66,7 @@ namespace FastReport
     public void DrawTableTitle()
     {
         ActNumberAndDate.Text = string.Format(
-            "Акт приема-сдачи нефти №<u> {0}</u> от <u>{1:dd.MM.yyyy}</u> г. (сдача по СИКН)",
+            &quot;Акт приема-сдачи нефти №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г. (сдача по СИКН)&quot;,
             DataIVK.TableRouteActs.Route.RouteActNumber,
             tools.UnixTimestampToDatetime((long)DataIVK.TableRouteActs.Route.RouteActDate)
         );
@@ -77,28 +77,25 @@ namespace FastReport
         if (!Engine.FinalPass)
             return;
 
-        // --- Получаем данные и шаблон строки ---
         var routeData = DataIVK.TableRouteActs.RouteData;
         var templateRow = TableHeader.Rows[0];
 
-        // --- Первая строка (ручная правка) ---
-        TableHeader.Rows[0][0].Text = "Пункт приема-сдачи нефти";
+        TableHeader.Rows[0][0].Text = &quot;Пункт приема-сдачи нефти&quot;;
         TableHeader.Rows[0][1].Text = routeData.Psp;
         TableHeader.Rows[0][1].ColSpan = 4;
 
-        // --- Простые строки ---
         var simpleRows = new[] {
-            ("Предприятие (владелец) ПСП", routeData.Factory),
-            ("СИКН №", routeData.SIKN_Number),
-            ("Договор об оказании услуг по транспортировке нефти №", routeData.Contract),
-            ("Производитель", routeData.Producer),
-            ("Грузоотправитель", routeData.Consigner),
-            ("Недропользователь                                      **)", routeData.SubsurfaceUser),
-            ("Первый владелец нефти", routeData.FirstOwner),
-            ("Последний владелец нефти", routeData.LastOwner),
-            ("Пункт назначения", routeData.DestinationPoint),
-            ("Экспортер (импортер)                                  **)", routeData.Exporter),
-            ("Таможенная декларация (ввозная, вывозная)   **)", routeData.CustomsDeclaration)
+            (&quot;Предприятие (владелец) ПСП&quot;, routeData.Factory),
+            (&quot;СИКН №&quot;, routeData.SIKN_Number),
+            (&quot;Договор об оказании услуг по транспортировке нефти №&quot;, routeData.Contract),
+            (&quot;Производитель&quot;, routeData.Producer),
+            (&quot;Грузоотправитель&quot;, routeData.Consigner),
+            (&quot;Недропользователь                                      **)&quot;, routeData.SubsurfaceUser),
+            (&quot;Первый владелец нефти&quot;, routeData.FirstOwner),
+            (&quot;Последний владелец нефти&quot;, routeData.LastOwner),
+            (&quot;Пункт назначения&quot;, routeData.DestinationPoint),
+            (&quot;Экспортер (импортер)                                  **)&quot;, routeData.Exporter),
+            (&quot;Таможенная декларация (ввозная, вывозная)   **)&quot;, routeData.CustomsDeclaration)
         };
         foreach (var (title, value) in simpleRows)
         {
@@ -116,17 +113,16 @@ namespace FastReport
             TableHeader.Rows.Add(newRow);
         }
 
-        // --- Маршрутные поручения ---
-        var routeInstructions = routeData.RouteInstructions?.Where(x => !string.IsNullOrEmpty(x)).ToList();
-        if (routeInstructions != null && routeInstructions.Count > 0)
+        var routeInstructions = routeData.RouteInstructions?.Where(x =&gt; !string.IsNullOrEmpty(x)).ToList();
+        if (routeInstructions != null &amp;&amp; routeInstructions.Count &gt; 0)
         {
-            for (int i = 0; i < routeInstructions.Count; i++)
+            for (int i = 0; i &lt; routeInstructions.Count; i++)
             {
                 var newRow = new TableRow();
                 newRow.AssignAll(templateRow);
                 var cellTitle = new TableCell();
                 cellTitle.AssignAll(templateRow[0]);
-                cellTitle.Text = (i == 0) ? "Маршрутное поручение №" : "";
+                cellTitle.Text = (i == 0) ? &quot;Маршрутное поручение №&quot; : &quot;&quot;;
                 newRow[0] = cellTitle;
                 var cellValue = new TableCell();
                 cellValue.AssignAll(templateRow[1]);
@@ -137,17 +133,16 @@ namespace FastReport
             }
         }
 
-        // --- Грузополучатели ---
-        var consignees = routeData.Consignees?.Where(x => !string.IsNullOrEmpty(x)).ToList();
-        if (consignees != null && consignees.Count > 0)
+        var consignees = routeData.Consignees?.Where(x =&gt; !string.IsNullOrEmpty(x)).ToList();
+        if (consignees != null &amp;&amp; consignees.Count &gt; 0)
         {
-            for (int i = 0; i < consignees.Count; i++)
+            for (int i = 0; i &lt; consignees.Count; i++)
             {
                 var newRow = new TableRow();
                 newRow.AssignAll(templateRow);
                 var cellTitle = new TableCell();
                 cellTitle.AssignAll(templateRow[0]);
-                cellTitle.Text = (i == 0) ? "Грузополучатель" : "";
+                cellTitle.Text = (i == 0) ? &quot;Грузополучатель&quot; : &quot;&quot;;
                 newRow[0] = cellTitle;
                 var cellValue = new TableCell();
                 cellValue.AssignAll(templateRow[1]);
@@ -158,10 +153,9 @@ namespace FastReport
             }
         }
 
-        // --- Подписанты ---
         var signers = new[] {
-            ("Уполномоченный представитель сдающей стороны,", routeData.Delive_FIO, routeData.Delive_Lic_Date, routeData.Delive_Lic_Number, "сдал, а"),
-            ("уполномоченный представитель принимающей стороны,", routeData.Receive_FIO, routeData.Receive_Lic_Date, routeData.Receive_Lic_Number, "принял")
+            (&quot;Уполномоченный представитель сдающей стороны,&quot;, routeData.Delive_FIO, routeData.Delive_Lic_Date, routeData.Delive_Lic_Number, &quot;сдал, а&quot;),
+            (&quot;уполномоченный представитель принимающей стороны,&quot;, routeData.Receive_FIO, routeData.Receive_Lic_Date, routeData.Receive_Lic_Number, &quot;принял&quot;)
         };
         foreach (var (title, fio, licDate, licNumber, ext) in signers)
         {
@@ -179,7 +173,7 @@ namespace FastReport
             newRow[1] = cellValue;
             var cellExt = new TableCell();
             cellExt.AssignAll(templateRow[5]);
-            cellExt.Text = "(Фамилия И.О.)";
+            cellExt.Text = &quot;(Фамилия И.О.)&quot;;
             newRow[5] = cellExt;
             TableHeader.Rows.Add(newRow);
 
@@ -188,11 +182,11 @@ namespace FastReport
             newRow.AssignAll(templateRow);
             cellTitle = new TableCell();
             cellTitle.AssignAll(templateRow[0]);
-            cellTitle.Text = "действующий на основании доверенности";
+            cellTitle.Text = &quot;действующий на основании доверенности&quot;;
             newRow[0] = cellTitle;
             var cell = new TableCell();
             cell.AssignAll(templateRow[1]);
-            cell.Text = "от";
+            cell.Text = &quot;от&quot;;
             cell.ColSpan = 1;
             cell.Border.Lines = BorderLines.None;
             newRow[1] = cell;
@@ -202,7 +196,7 @@ namespace FastReport
             newRow[2] = cell;
             cell = new TableCell();
             cell.AssignAll(templateRow[3]);
-            cell.Text = "№";
+            cell.Text = &quot;№&quot;;
             cell.Border.Lines = BorderLines.None;
             newRow[3] = cell;
             cell = new TableCell();
@@ -216,13 +210,12 @@ namespace FastReport
             TableHeader.Rows.Add(newRow);
         }
 
-        // --- Финальная строка ---
         {
             var newRow = new TableRow();
             newRow.AssignAll(templateRow);
             var cell = new TableCell();
             cell.AssignAll(templateRow[0]);
-            cell.Text = "нефть следующего количества и качества:";
+            cell.Text = &quot;нефть следующего количества и качества:&quot;;
             newRow[0] = cell;
             cell = new TableCell();
             cell.ColSpan = 4;
@@ -231,7 +224,7 @@ namespace FastReport
         }
 
         // --- Печать всех строк ---
-        for (int n = 0; n < TableHeader.RowCount; n++)
+        for (int n = 0; n &lt; TableHeader.RowCount; n++)
         {
             TableHeader.PrintRow(n);
             TableHeader.PrintColumns();
