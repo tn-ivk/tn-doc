@@ -59,11 +59,11 @@ namespace FastReport
       Page.RightMargin = General.PageSettings.RightMargin;
          
       // Запуск отрисовки таблиц на странице отчета
-      DrawTableHeader();
+      DrawTableTitle();
       DrawTableSigners();
     }
       
-    public void DrawTableHeader()
+    public void DrawTableTitle()
     {             
       DateTime End =  tools.UnixTimestampToDatetime((long)DataIVK.TableRouteActs.Route.RouteActDate);
       
