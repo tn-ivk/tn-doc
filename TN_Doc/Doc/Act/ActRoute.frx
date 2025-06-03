@@ -64,12 +64,12 @@ namespace FastReport
     }
       
     public void DrawTableTitle()
-    {             
-      DateTime End =  tools.UnixTimestampToDatetime((long)DataIVK.TableRouteActs.Route.RouteActDate);
-      
-      ActNumberAndDate.Text = string.Format(&quot;Акт приема-сдачи нефти №&lt;u&gt; {0}&lt;/u&gt; от &lt;u&gt;{1:dd.MM.yyyy}&lt;/u&gt; г. (сдача по СИКН)&quot;,  
-        DataIVK.TableRouteActs.Route.RouteActNumber,
-        End);                            
+    {
+        ActNumberAndDate.Text = string.Format(
+            "Акт приема-сдачи нефти №<u> {0}</u> от <u>{1:dd.MM.yyyy}</u> г. (сдача по СИКН)",
+            DataIVK.TableRouteActs.Route.RouteActNumber,
+            tools.UnixTimestampToDatetime((long)DataIVK.TableRouteActs.Route.RouteActDate)
+        );
     }
 
     private void TableHeader_ManualBuild(object sender, EventArgs e)
