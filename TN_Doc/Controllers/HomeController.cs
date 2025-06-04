@@ -193,8 +193,7 @@ namespace TN_Doc.Controllers
         /// <param name="idTemplateDoc">Id открытого документа</param>
         public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int idTemplateDoc)
         {
-            if (_appConfig.SetLastUsedTemplateId(IdDevice, IdDoc, idTemplateDoc))
-                _appConfig.SetLastUsedTemplateList();
+            _appConfig.SetLastUsedTemplateId(IdDevice, IdDoc, idTemplateDoc);
         }
         
         public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
