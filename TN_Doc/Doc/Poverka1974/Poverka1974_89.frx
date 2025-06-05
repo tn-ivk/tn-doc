@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 19:21:26" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/05/2025 14:41:40" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -18,30 +18,34 @@ using FastReport.Utils;
 using System.Linq;
 using Newtonsoft.Json;
 using TN.DocData;
+using TN.Doc;
 
 namespace FastReport
 {
   public class ReportScript
   {
-    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  // классы отчета    
-    TN.Doc.Doc doc; // данные из входного параметра
+    TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  
+    TN.Doc.Doc doc; 
     TN.DocData.General General;
     TN.Doc.HeaderDoc Header;
     TN.Doc.DataDoc SettingsData;
     TN.Doc.FooterDoc Footer;
     TN.Doc.DictionarysDoc Dictionarys;
     TN.Doc.DataIVKDoc DataIVK;   
-      
-    List &lt;string&gt; listTable1Detectors;
-    List &lt;string&gt; listTable1V0;
-    List &lt;string&gt; listTeta_Sum0;
-    List &lt;string&gt; listTeta_V0;
+    Protokol Protokol;
+    AdditionalInfo AdditionalInfo;
+    
+    List&lt;string&gt; listTable1Detectors;
+    List&lt;string&gt; listTable1V0;
+    List&lt;string&gt; listTeta_Sum0;
+    List&lt;string&gt; listTeta_V0;
 
     Dictionary&lt;string,string&gt; dictTable1SourceData;
       
-    List &lt;TN.Doc.Table2&gt; listTable2Results;
-    List &lt;TN.Doc.Table3&gt; listTable3Results;
-    List &lt;TN.Doc.Table4&gt; listTable4Results;
+    List&lt;Table2&gt; listTable2;
+    List&lt;Table2_Series&gt; listTable2Series;
+    List&lt;Table3_SortedPoints&gt; listTable3SortedPoints;
+    List&lt;Table3_Subrange&gt; listTable3Subrange;
 
     private void Page_StartPage(object sender, EventArgs e)
     {
@@ -57,10 +61,11 @@ namespace FastReport
       Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
       Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
       DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
+      Protokol = DataIVK.TablePoverka1974.Protokol;
+      AdditionalInfo = DataIVK.TablePoverka1974.AdditionalInfo;
       
-      //// === Настройки страницы 
-      // Ширина и высота (в мм)
-         
+      // === Настройки страницы 
+      // Ширина и высота (в мм)  
       Page.PaperHeight = General.PageSettings.PaperHeight;
       Page.PaperWidth= General.PageSettings.PaperWidth;
       //Page.Border.Lines = BorderLines.All;
@@ -71,8 +76,8 @@ namespace FastReport
       Page.LeftMargin = General.PageSettings.LeftMargin;
       Page.RightMargin = General.PageSettings.RightMargin;
                                                                 
-      //// ==== Get Data from classes
-      listTable1Detectors = DataIVK.TablePoverka1974.Protokol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 | ! i.Contains(&quot;&quot;)).ToList();
+      // ==== Get Data from classes
+      listTable1Detectors = DataIVK.TablePoverka1974.Protokol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 | !string.IsNullOrEmpty(i)).ToList();
       listTable1V0 = DataIVK.TablePoverka1974.Protokol.Table1.V0.Where(i =&gt; ! i.Contains(&quot;-&quot;) | ! i.Contains(&quot;&quot;)).ToList();
       listTeta_Sum0 = DataIVK.TablePoverka1974.Protokol.Table1.Teta_Sum0.Where(i =&gt; ! i.Contains(&quot;-&quot;) | ! i.Contains(&quot;&quot;)).ToList();
       listTeta_V0 = DataIVK.TablePoverka1974.Protokol.Table1.Teta_V0.Where(i =&gt; ! i.Contains(&quot;-&quot;) | ! i.Contains(&quot;&quot;)).ToList();
@@ -80,7 +85,6 @@ namespace FastReport
       // Get data for Table 1 to Dictionary
       dictTable1SourceData = new Dictionary&lt;string,string&gt; ();
          
-      //TODO dictTable1SourceData = typeof(TN_DocPover_MI3189.Table1).GetProperties().Where(x =&gt;! x.Name.Contains(&quot;DetName&quot;)) &amp; (z =&gt;! z.Name.Contains(&quot;V0&quot;)).ToDictionary(x =&gt; x.Name, x =&gt; x.GetValue(protocol.Doc.DataIVK.TablePoverka3189.Protokol.Table1));
       foreach (var propertyInfo in DataIVK.TablePoverka1974.Protokol.Table1.GetType().GetProperties())
       {
         var propertyValue = propertyInfo.GetValue(DataIVK.TablePoverka1974.Protokol.Table1);
@@ -89,14 +93,17 @@ namespace FastReport
           dictTable1SourceData.Add(propertyInfo.Name, propertyInfo.GetValue(DataIVK.TablePoverka1974.Protokol.Table1).ToString());
         }
       }
-      listTable2Results = DataIVK.TablePoverka1974.Protokol.Table2.Where(i =&gt; i.Activated==1).ToList();
-      listTable3Results = DataIVK.TablePoverka1974.Protokol.Table3.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
-      listTable4Results = DataIVK.TablePoverka1974.Protokol.Table4.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      listTable2 = Protokol.Table2.Where(i =&gt; i.Activated == 1)?.ToList() ?? new List&lt;Table2&gt;();
+      listTable2Series = Protokol.Table2_Series.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table2_Series&gt;();
+      listTable3SortedPoints = Protokol.Table3_SortedPoints.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_SortedPoints&gt;();
+      listTable3Subrange = Protokol.Table3_Subrange.Where(i =&gt; !String.IsNullOrEmpty(i.SubrangeIndx) &amp;&amp; !i.SubrangeIndx.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_Subrange&gt;();
     
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();    
-      DrawTableConclusion();
+      //DrawTableConclusion();
+      
     }
+      
     #region //Имхо лишний метод
     private void PrintTable(TableObject table)
     {
@@ -114,7 +121,7 @@ namespace FastReport
       TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
          
       // Fill table with data   
-      ProtokolNum.Text = &quot;П Р О Т О К О Л  № &quot; + DataIVK.TablePoverka1974.AdditionalInfo.ProtokolNum;
+      ProtokolNum.Text = &quot;П Р О Т О К О Л  № &quot; + AdditionalInfo.ProtokolNum;
       Place_SIKN.Text = DataIVK.TablePoverka1974.AdditionalInfo.Place_SIKN;
       Place_PSP.Text = DataIVK.TablePoverka1974.AdditionalInfo.Place_PSP;
       PR_Type.Text = DataIVK.TablePoverka1974.AdditionalInfo.PR_Type;
@@ -125,14 +132,14 @@ namespace FastReport
       PU_Category.Text = DataIVK.TablePoverka1974.AdditionalInfo.PU_Category;
       PU_FactoryNumber.Text = DataIVK.TablePoverka1974.AdditionalInfo.PU_FactoryNumber;
       Place_FactoryPU.Text = DataIVK.TablePoverka1974.AdditionalInfo.Place_Factory; 
-      OilType.Text = DataIVK.TablePoverka1974.AdditionalInfo.OilType;
       ViscMin.Text = DataIVK.TablePoverka1974.Protokol.ViscMin;
       ViscMax.Text = DataIVK.TablePoverka1974.Protokol.ViscMax;
       Water.Text = &quot;-&quot;;     
     }
               
     private void Table1SourceData_ManualBuild(object sender, EventArgs e)
-    {                                                                                                                          
+    { 
+      /*
       //Setup Columns width                                                                                           
       //int sumDynamicCols=Table1SourceData.ColumnCount;                                                                                                                                
       //float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                                                       
@@ -191,11 +198,12 @@ namespace FastReport
         Table1SourceData.PrintColumns();  
       }         
       // MessageBox.Show(&quot;Here&quot;);
-
+       */
     }
       
     private void Table2Results_ManualBuild(object sender, EventArgs e)
-    {           
+    {
+      /*
       //Setup Columns width
       int sumDynamicCols=Table2Results.ColumnCount;
       float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
@@ -231,11 +239,11 @@ namespace FastReport
         Table2Results.PrintRow(4);     
         Table2Results.PrintColumns();  
       }
-    }
+c    }
 
     private void Table2ResultsEnding_ManualBuild(object sender, EventArgs e)
     {
-     
+      /*
       //Setup Columns widths as previous table
          
       for (int i = 0; i &lt; (Table2ResultsEnding.ColumnCount-1); i++)
@@ -262,11 +270,13 @@ namespace FastReport
         Table2ResultsEnding.PrintRow(4);     
         Table2ResultsEnding.PrintColumns();  
       }
-              
+      */
+        
     }
       
     private void Table3Results_ManualBuild(object sender, EventArgs e)
     {
+      /*
       //Setup Columns width
       int sumDynamicCols=Table3Results.ColumnCount;
       float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
@@ -297,7 +307,7 @@ namespace FastReport
         Table3Results.PrintRow(3);     
         Table3Results.PrintColumns();  
       }
-         
+        */ 
     }
 
     private void DataBandTable3Results_BeforePrint(object sender, EventArgs e)
@@ -313,7 +323,8 @@ namespace FastReport
     }
     
     private void Table4Results_ManualBuild(object sender, EventArgs e)
-    {     
+    { 
+      /*
       //Setup Columns width
       int sumDynamicCols=Table4Results.ColumnCount;
       float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
@@ -345,12 +356,12 @@ namespace FastReport
         Table4Results.PrintRow(3);                                                                                                                                                                                  
         Table4Results.PrintColumns();       
       }
-         
+      */   
     }
       
     private void Table5Results_ManualBuild(object sender, EventArgs e)
     {
-      
+      /*
       if (DataIVK.TablePoverka1974.Protokol.CfgTables.GHType==1)
       
       {
@@ -378,11 +389,13 @@ namespace FastReport
          
         Table5Results.PrintRow(3);                                                                                                                                                                                  
         Table5Results.PrintColumns();      
-      }    
+      } 
+*/   
     }
 
     private void Table6ApproximationEquations_ManualBuild(object sender, EventArgs e)
     { 
+      /*
       if (DataIVK.TablePoverka1974.Protokol.CfgTables.Parabola!=0)
       {
         List &lt;TN.Doc.Parabola&gt; listParabolaTable6;      
@@ -409,6 +422,7 @@ namespace FastReport
           Table6ApproximationEquations.PrintColumns();                                                
         }       
       }
+*/ 
     }
 
     public void  DrawTableConclusion()
@@ -523,8 +537,8 @@ namespace FastReport
         <TableColumn Name="Column306" AutoSize="true"/>
         <TableColumn Name="Column307" Width="26.46"/>
         <TableRow Name="Row158">
-          <TableCell Name="Cell1180" Text="Рабочая жидкость" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="OilType" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="OilType" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1180" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="OilType" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1460" Text="Вязкость при поверке: мин" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="ViscMin" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="ViscMin" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.9"/>
           <TableCell Name="Cell1584" Text="сСт, макс" VertAlign="Bottom" Font="Arial, 7pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
