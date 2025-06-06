@@ -150,7 +150,7 @@ namespace FastReport
           TableAct[(2+i),13].Text = listShiftsData[i].Temp.ToString(&quot;F1&quot;);     
           TableAct[(2+i),14].Text = listShiftsData[i].Press.ToString(&quot;F2&quot;);     
           TableAct[(2+i),15].Text = listShiftsData[i].Density.ToString(&quot;F1&quot;);     
-          TableAct[(2+i),16].Text = listShiftsData[i].Density_correction.ToString();     
+          TableAct[(2+i),16].Text = (listShiftsData[i].Density_correction == 0.0 ? &quot;-&quot; : listShiftsData[i].Density_correction.ToString());    
           TableAct[(2+i),17].Text = listShiftsData[i].PassportID.ToString();     
           TableAct[(2+i),18].Text = listShiftsData[i].Balast_Mass_Frac.ToString(&quot;F4&quot;);             
           TableAct[(2+i),20].Text = listShiftsData[i].Ballast.Water.ToString(&quot;F2&quot;);             
