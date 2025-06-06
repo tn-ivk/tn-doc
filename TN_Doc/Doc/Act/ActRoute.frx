@@ -81,7 +81,7 @@ namespace FastReport
         var templateRow = TableHeader.Rows[0];
 
         TableHeader.Rows[0][0].Text = &quot;Пункт приема-сдачи нефти&quot;;
-        TableHeader.Rows[0][1].Text = routeData.Psp;
+        TableHeader.Rows[0][1].Text = &quot;\&quot;Холмогоры\&quot;&quot;;
         TableHeader.Rows[0][1].ColSpan = 4;
 
         AddSimpleRow(templateRow, &quot;Предприятие (владелец) ПСП&quot;, routeData.Factory);
