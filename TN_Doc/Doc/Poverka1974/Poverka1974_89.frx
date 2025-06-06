@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/06/2025 14:45:03" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/06/2025 15:35:53" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -141,59 +141,104 @@ namespace FastReport
         Table1SourceData.PrintColumns();                                                                                                           
       }
       
-      //listTable1Detectors = Protocol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 | !string.IsNullOrEmpty(i)).ToList();
+      if (Protocol.CfgTables.PUDetNum == 2)
+      {
+        //ТПУ имеет один калиброванный участок
+        ShowSourceDataWithOneRow();
+      }
+      else if (Protocol.CfgTables.PUDetNum == 4)
+      {
+        //ТПУ имеет несколько калиброванный участок
+        ShowSourceDataWithManyRow();
+      }
+      // В ином случае оставляем таблицу не заполненной
+    }
+      
+    private void ShowSourceDataWithOneRow()
+    {
+      var v0 = Protocol.Table1.V0.FirstOrDefault(x =&gt; !string.IsNullOrEmpty(x)) ?? &quot;-&quot;;
+      if (Protocol.CfgTables.PUType == 1)
+      {
+        V12.Text = tools.GetNormalizedValue(v0);
+        V21.Text = &quot;-&quot;;
+        V0.Text = &quot;-&quot;;
+      }
+      else
+      {
+        V12.Text = &quot;-&quot;;
+        V21.Text = &quot;-&quot;;
+        V0.Text = tools.GetNormalizedValue(v0);
+      }
+        
+      // Заполнение общих параметров
+      m_D.Text = tools.GetNormalizedValue(Protocol.Table1.m_D);                               
+      m_S.Text = tools.GetNormalizedValue(Protocol.Table1.m_S);                                    
+      m_E.Text = tools.GetNormalizedValue(Protocol.Table1.m_E);                                        
+      Alpha_t.Text = tools.GetNormalizedValue(Protocol.Table1.Alpha_t);                                    
+      Dens.Text = tools.GetNormalizedValue(Protocol.Table1.Dens);                                            
+      Beta.Text = tools.GetNormalizedValue(Protocol.Table1.Beta);
+      Gamma.Text = tools.GetNormalizedValue(Protocol.Table1.Gamma);
+      Teta_Sum0.Text = tools.GetNormalizedValue(Protocol.Table1.Teta_Sum0.FirstOrDefault(x =&gt; !string.IsNullOrEmpty(x)) ?? &quot;-&quot;);
+      Teta_t.Text = tools.GetNormalizedValue(Protocol.Table1.Teta_t);
+      Teta_V0.Text = tools.GetNormalizedValue(Protocol.Table1.Teta_V0.FirstOrDefault(x =&gt; !string.IsNullOrEmpty(x)) ?? &quot;-&quot;);
+      T095.Text = tools.GetNormalizedValue(Protocol.Table1.t095);
+        
+      // Печатаем одну строку данных
+      Table1SourceData.PrintRow(1);     
+      Table1SourceData.PrintColumns();
+    }
+    
+    private void ShowSourceDataWithManyRow()
+    {
+      Table1FirstColTitle.Text = &quot;Детек-&lt;br&gt;торы&quot;;
+      Table1SourceData.Columns[1].Visible = false;
+      
+      listTable1Detectors = Protocol.Table1.DetName.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
       listTable1V0 = Protocol.Table1.V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
       listTeta_Sum0 = Protocol.Table1.Teta_Sum0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
       listTeta_V0 = Protocol.Table1.Teta_V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
         
-      
-      //Fill table with data                                                                                                                                              
-      for (int n = 0; n &lt; (listTable1Detectors.Count); n++)                                                                     
+      // Заполнение таблицы для каждого детектора
+      for (int n = 0; n &lt; listTable1Detectors.Count; n++)                                                                     
       {                                                                                                                                                    
-        //DetName.Text =  listTable1Detectors[n];
-        V12.Text =  tools.GetNormalizedValue(listTable1V0[n]);
-        V21.Text =  tools.GetNormalizedValue(listTable1V0[n]);
-        V0.Text =  tools.GetNormalizedValue(listTable1V0[n]);                                                                        
-        
+        DetName.Text = listTable1Detectors[n];                                                                                       
+        V0.Text = tools.GetNormalizedValue(listTable1V0[n]);
         m_D.Text = tools.GetNormalizedValue(Protocol.Table1.m_D);                               
         m_S.Text = tools.GetNormalizedValue(Protocol.Table1.m_S);                                    
         m_E.Text = tools.GetNormalizedValue(Protocol.Table1.m_E);                                        
         Alpha_t.Text = tools.GetNormalizedValue(Protocol.Table1.Alpha_t);                                    
         Dens.Text = tools.GetNormalizedValue(Protocol.Table1.Dens);                                            
         Beta.Text = tools.GetNormalizedValue(Protocol.Table1.Beta);
-        Gamma.Text = tools.GetNormalizedValue(Protocol.Table1.Gamma);
-        
-        Teta_Sum0.Text = tools.GetNormalizedValue(listTeta_Sum0[n]);                                                                                                                
-        Teta_t.Text = tools.GetNormalizedValue(listTeta_t[n]);
-        Teta_V0.Text = tools.GetNormalizedValue(listTeta_V0[n]);  
-        
+        Gamma.Text = tools.GetNormalizedValue(Protocol.Table1.Gamma);  
+        Teta_Sum0.Text = (n &lt; listTeta_Sum0.Count) ? tools.GetNormalizedValue(listTeta_Sum0[n]) : &quot;-&quot;;    
+        Teta_t.Text = tools.GetNormalizedValue(Protocol.Table1.Teta_t);
+        Teta_V0.Text = (n &lt; listTeta_V0.Count) ? tools.GetNormalizedValue(listTeta_V0[n]) : &quot;-&quot;;
         T095.Text = tools.GetNormalizedValue(Protocol.Table1.t095);
-        
-        //RowSpans                                                                                                              
-        for (int i = 0; i &lt; (Table1SourceData.ColumnCount); i++)                                                              
+          
+        // RowSpans для общих параметров                                                                                                              
+        for (int i = 0; i &lt; Table1SourceData.ColumnCount; i++)                                                              
         {                                                                                                                                                            
           switch(i)                                                                                                                                                  
           {                                                                                                                                                                
-            case 2:                                                                                                                                                       
-            case 3:                                                                                                           
-            case 4:                                                                                                                  
-            case 5:  
-            case 8:  
-            case 9:  
-            case 10:  
-            case 11:  
-            case 12:  
-            case 13:  
-              Table1SourceData[i,4].RowSpan =  listTable1Detectors.Count;
-              break;  
+            case 2:  // m_D
+            case 3:  // m_S                                                                                                           
+            case 4:  // m_E                                                                                                                  
+            case 5:  // Alpha_t
+            case 8:  // Beta
+            case 9:  // Gamma 
+            case 10: // (другое общее поле)
+            case 11: // (другое общее поле)
+            case 12: // (другое общее поле)
+            case 13: // T095
+              Table1SourceData[i,4].RowSpan = listTable1Detectors.Count;
+            break;  
           }
         }
-            
+              
         Table1SourceData.PrintRow(4);     
         Table1SourceData.PrintColumns();  
-      }         
+      }
     }
-      
     private void Table2Results_ManualBuild(object sender, EventArgs e)
     {
       /*
@@ -515,8 +560,8 @@ c    }
     </ReportTitleBand>
     <DataBand Name="DataBandTable1SourceData" Top="121.03" Width="718.2" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="717.5" Height="86.94" FixedRows="3" ManualBuildEvent="Table1SourceData_ManualBuild">
-        <TableColumn Name="Column4" Width="49.9"/>
-        <TableColumn Name="Column5" Width="49.9"/>
+        <TableColumn Name="Column1" Width="49.9"/>
+        <TableColumn Name="Column2" Width="49.9"/>
         <TableColumn Name="Column6" Width="49.9"/>
         <TableColumn Name="Column7" Width="49.9"/>
         <TableColumn Name="Column8" Width="49.9"/>
@@ -546,7 +591,7 @@ c    }
           <TableCell Name="Cell1400" Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row4" Height="30.24" AutoSize="true">
-          <TableCell Name="Cell14" Border.Lines="All" Text="V&lt;sub&gt;0(1-2)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Table1FirstColTitle" Border.Lines="All" Text="V&lt;sub&gt;0(1-2)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell15" Border.Lines="All" Text="V&lt;sub&gt;0(2-1)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell16" Border.Lines="All" Text="V&lt;sub&gt;0(1-2-1)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell17" Border.Lines="All" Text="Д,&lt;br&gt;мм" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
