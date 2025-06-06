@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/06/2025 10:47:07" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/06/2025 11:43:30" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -32,7 +32,7 @@ namespace FastReport
     TN.Doc.FooterDoc Footer;
     TN.Doc.DictionarysDoc Dictionarys;
     TN.Doc.DataIVKDoc DataIVK;   
-    TN.Doc.Protokol Protokol;
+    TN.Doc.Protocol Protocol;
     TN.Doc.AdditionalInfo AdditionalInfo;
     
     List&lt;string&gt; listTable1Detectors;
@@ -61,7 +61,7 @@ namespace FastReport
       Footer = (TN.Doc.FooterDoc) doc.Doc.Settings.Footer;
       Dictionarys = (TN.Doc.DictionarysDoc) doc.Doc.Settings.Dictionarys;  
       DataIVK = (TN.Doc.DataIVKDoc) doc.Doc.DataIVK;
-      Protokol = DataIVK.TablePoverka1974.Protokol;
+      Protocol = DataIVK.TablePoverka1974.Protocol;
       AdditionalInfo = DataIVK.TablePoverka1974.AdditionalInfo;
       
       // === Настройки страницы 
@@ -79,18 +79,18 @@ namespace FastReport
       // Get data for Table 1 to Dictionary
       dictTable1SourceData = new Dictionary&lt;string,string&gt; ();
          
-      foreach (var propertyInfo in DataIVK.TablePoverka1974.Protokol.Table1.GetType().GetProperties())
+      foreach (var propertyInfo in DataIVK.TablePoverka1974.Protocol.Table1.GetType().GetProperties())
       {
-        var propertyValue = propertyInfo.GetValue(DataIVK.TablePoverka1974.Protokol.Table1);
+        var propertyValue = propertyInfo.GetValue(DataIVK.TablePoverka1974.Protocol.Table1);
         if (propertyValue is string)
         {
-          dictTable1SourceData.Add(propertyInfo.Name, propertyInfo.GetValue(DataIVK.TablePoverka1974.Protokol.Table1).ToString());
+          dictTable1SourceData.Add(propertyInfo.Name, propertyInfo.GetValue(DataIVK.TablePoverka1974.Protocol.Table1).ToString());
         }
       }
-      listTable2 = Protokol.Table2.Where(i =&gt; i.Activated == 1)?.ToList() ?? new List&lt;Table2&gt;();
-      listTable2Series = Protokol.Table2_Series.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table2_Series&gt;();
-      listTable3SortedPoints = Protokol.Table3_SortedPoints.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_SortedPoints&gt;();
-      listTable3Subrange = Protokol.Table3_Subrange.Where(i =&gt; !String.IsNullOrEmpty(i.SubrangeIndx) &amp;&amp; !i.SubrangeIndx.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_Subrange&gt;();
+      listTable2 = Protocol.Table2.Where(i =&gt; i.Activated == 1)?.ToList() ?? new List&lt;Table2&gt;();
+      listTable2Series = Protocol.Table2_Series.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table2_Series&gt;();
+      listTable3SortedPoints = Protocol.Table3_SortedPoints.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_SortedPoints&gt;();
+      listTable3Subrange = Protocol.Table3_Subrange.Where(i =&gt; !String.IsNullOrEmpty(i.SubrangeIndx) &amp;&amp; !i.SubrangeIndx.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_Subrange&gt;();
     
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();    
@@ -115,14 +115,14 @@ namespace FastReport
       TableHeader01.Columns[0].Width = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
          
       // Fill table with data   
-      ProtokolNum.Text = &quot;П Р О Т О К О Л  № &quot; + AdditionalInfo.ProtokolNum;
+      ProtocolNum.Text = &quot;П Р О Т О К О Л  № &quot; + AdditionalInfo.ProtocolNum;
       PR_Type.Text = AdditionalInfo.PR_Type;
       PR_FactoryNumber.Text = AdditionalInfo.PR_FactoryNumber;
-      ViscBegin.Text = Protokol.ViscBegin;
-      ViscEnd.Text = Protokol.ViscEnd;
+      ViscBegin.Text = Protocol.ViscBegin;
+      ViscEnd.Text = Protocol.ViscEnd;
       Place_SIKN.Text = $&quot;{AdditionalInfo.Place_SIKN} {AdditionalInfo.Place_PSP}&quot;;
       PU_Type.Text = $&quot;{AdditionalInfo.PU_Type} заводской №{AdditionalInfo.PU_FactoryNumber}&quot;;
-      TempAvg.Text = Protokol.Table3_TotalRange.TempAvg;
+      TempAvg.Text = Protocol.Table3_TotalRange.TempAvg;
     }
               
     private void Table1SourceData_ManualBuild(object sender, EventArgs e)
@@ -141,17 +141,10 @@ namespace FastReport
         Table1SourceData.PrintColumns();                                                                                                           
       }
       
-      //listTable1Detectors = Protokol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 | !string.IsNullOrEmpty(i)).ToList();
-      listTable1V0 = Protokol.Table1.V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
-      listTeta_Sum0 = Protokol.Table1.Teta_Sum0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
-      listTeta_V0 = Protokol.Table1.Teta_V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
-      var listDetectors = Protokol.Table1.DetName
-        .Select(x =&gt; new 
-        {
-          DetName = x.DetName,
-          
-        })  
-      .Where(i =&gt; !string.IsNullOrEmpty(i))
+      //listTable1Detectors = Protocol.Table1.DetName.Where(i =&gt; i.Length &gt; 1 | !string.IsNullOrEmpty(i)).ToList();
+      listTable1V0 = Protocol.Table1.V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
+      listTeta_Sum0 = Protocol.Table1.Teta_Sum0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
+      listTeta_V0 = Protocol.Table1.Teta_V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
         
       
       //Fill table with data                                                                                                                                              
@@ -162,19 +155,19 @@ namespace FastReport
         V21.Text =  tools.GetNormalizedValue(listTable1V0[n]);
         V0.Text =  tools.GetNormalizedValue(listTable1V0[n]);                                                                        
         
-        m_D.Text = tools.GetNormalizedValue(Protokol.Table1.m_D);                               
-        m_S.Text = tools.GetNormalizedValue(Protokol.Table1.m_S);                                    
-        m_E.Text = tools.GetNormalizedValue(Protokol.Table1.m_E);                                        
-        Alpha_t.Text = tools.GetNormalizedValue(Protokol.Table1.Alpha_t);                                    
-        Dens.Text = tools.GetNormalizedValue(Protokol.Table1.Dens);                                            
-        Beta.Text = tools.GetNormalizedValue(Protokol.Table1.Beta);
-        Gamma.Text = tools.GetNormalizedValue(Protokol.Table1.Gamma);
+        m_D.Text = tools.GetNormalizedValue(Protocol.Table1.m_D);                               
+        m_S.Text = tools.GetNormalizedValue(Protocol.Table1.m_S);                                    
+        m_E.Text = tools.GetNormalizedValue(Protocol.Table1.m_E);                                        
+        Alpha_t.Text = tools.GetNormalizedValue(Protocol.Table1.Alpha_t);                                    
+        Dens.Text = tools.GetNormalizedValue(Protocol.Table1.Dens);                                            
+        Beta.Text = tools.GetNormalizedValue(Protocol.Table1.Beta);
+        Gamma.Text = tools.GetNormalizedValue(Protocol.Table1.Gamma);
         
         Teta_Sum0.Text = tools.GetNormalizedValue(listTeta_Sum0[n]);                                                                                                                
         Teta_t.Text = tools.GetNormalizedValue(listTeta_t[n]);
         Teta_V0.Text = tools.GetNormalizedValue(listTeta_V0[n]);  
         
-        T095.Text = tools.GetNormalizedValue(Protokol.Table1.t095);
+        T095.Text = tools.GetNormalizedValue(Protocol.Table1.t095);
         
         //RowSpans                                                                                                              
         for (int i = 0; i &lt; (Table1SourceData.ColumnCount); i++)                                                              
@@ -199,7 +192,7 @@ namespace FastReport
         Table1SourceData.PrintRow(4);     
         Table1SourceData.PrintColumns();  
       }         
-      }
+    }
       
     private void Table2Results_ManualBuild(object sender, EventArgs e)
     {
@@ -362,7 +355,7 @@ c    }
     private void Table5Results_ManualBuild(object sender, EventArgs e)
     {
       /*
-      if (DataIVK.TablePoverka1974.Protokol.CfgTables.GHType==1)
+      if (DataIVK.TablePoverka1974.Protocol.CfgTables.GHType==1)
       
       {
         int sumDynamicCols=Table5Results.ColumnCount;
@@ -379,13 +372,13 @@ c    }
           Table5Results.PrintColumns();                                             
         }
          
-        Q_min5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protokol.Table5.Q_min);        
-        Q_max5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protokol.Table5.Q_max);        
-        e5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protokol.Table5.e);        
-        Theta_A5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protokol.Table5.Theta_A);        
-        Theta_Sum5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protokol.Table5.Theta_Sum);        
-        Delta5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protokol.Table5.Delta);        
-        K5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protokol.Table5.K);        
+        Q_min5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protocol.Table5.Q_min);        
+        Q_max5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protocol.Table5.Q_max);        
+        e5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protocol.Table5.e);        
+        Theta_A5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protocol.Table5.Theta_A);        
+        Theta_Sum5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protocol.Table5.Theta_Sum);        
+        Delta5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protocol.Table5.Delta);        
+        K5.Text =  tools.GetNormalizedValue(DataIVK.TablePoverka1974.Protocol.Table5.K);        
          
         Table5Results.PrintRow(3);                                                                                                                                                                                  
         Table5Results.PrintColumns();      
@@ -396,10 +389,10 @@ c    }
     private void Table6ApproximationEquations_ManualBuild(object sender, EventArgs e)
     { 
       /*
-      if (DataIVK.TablePoverka1974.Protokol.CfgTables.Parabola!=0)
+      if (DataIVK.TablePoverka1974.Protocol.CfgTables.Parabola!=0)
       {
         List &lt;TN.Doc.Parabola&gt; listParabolaTable6;      
-        listParabolaTable6 = DataIVK.TablePoverka1974.Protokol.Parabola.Where(i =&gt; ! i.fv_begin.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.fv_begin) == false).ToList();
+        listParabolaTable6 = DataIVK.TablePoverka1974.Protocol.Parabola.Where(i =&gt; ! i.fv_begin.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.fv_begin) == false).ToList();
 
         //Drawing Fixed rows
         for (int n = 0; n &lt; Table6ApproximationEquations.FixedRows; n++)                                                            
