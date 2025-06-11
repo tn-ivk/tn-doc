@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/12/2025 00:06:31" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/12/2025 01:29:23" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -41,9 +41,6 @@ namespace FastReport
 
     Dictionary&lt;string,string&gt; dictTable1SourceData;
       
-    List&lt;Table3_SortedPoints&gt; listTable3SortedPoints;
-    List&lt;Table3_Subrange&gt; listTable3Subrange;
-
     private void Page_StartPage(object sender, EventArgs e)
     {
       // Десериализация данных (формат json) из входного параметра - Json                         
@@ -84,9 +81,7 @@ namespace FastReport
           dictTable1SourceData.Add(propertyInfo.Name, propertyInfo.GetValue(DataIVK.TablePoverka1974.Protocol.Table1).ToString());
         }
       }
-      //listTable3SortedPoints = Protocol.Table3_SortedPoints.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_SortedPoints&gt;();
-      //listTable3Subrange = Protocol.Table3_Subrange.Where(i =&gt; !String.IsNullOrEmpty(i.SubrangeIndx) &amp;&amp; !i.SubrangeIndx.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_Subrange&gt;();
-    
+      
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();    
       DrawTableConclusion();
@@ -311,38 +306,35 @@ namespace FastReport
       
     private void Table3Results_ManualBuild(object sender, EventArgs e)
     {
-      /*
-      //Setup Columns width
-      int sumDynamicCols=Table3Results.ColumnCount;
-      float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-      for (int w = 0; w &lt; (Table3Results.ColumnCount); w++)                 
-      {
-        Table3Results.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-      }      
-         
-      //Draw Fixed rows 
       for (int n = 0; n &lt; Table3Results.FixedRows; n++)
       {
         Table3Results.PrintRow(n);
         Table3Results.PrintColumns();                                             
       }
-             
+      
+      var listTable3SortedPoints = Protocol.Table3_SortedPoints.Where(i =&gt; !String.IsNullOrEmpty(i.Point) &amp;&amp; !i.Point.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_SortedPoints&gt;();
+      var listTable3Subrange = Protocol.Table3_Subrange.Where(i =&gt; !String.IsNullOrEmpty(i.SubrangeIndx) &amp;&amp; !i.SubrangeIndx.Contains(&quot;-&quot;))?.ToList() ?? new List&lt;Table3_Subrange&gt;();
+      
       //Fill table with data
-      for (int n = 0; n &lt; (listTable3Results.Count); n++)
+      for (int n = 0; n &lt; (listTable3SortedPoints.Count); n++)
       {
-        Point3.Text =  listTable3Results[n].Point;
-        Q_j.Text = tools.GetNormalizedValue(listTable3Results[n].Q_j);
-        f_j.Text = tools.GetNormalizedValue(listTable3Results[n].f_j);
-        K_j.Text = tools.GetNormalizedValue(listTable3Results[n].K_j);
-        S_j.Text =tools.GetNormalizedValue( listTable3Results[n].S_j);
-        e_j.Text =tools.GetNormalizedValue( listTable3Results[n].e_j);
-        Teta_Sum_j.Text =tools.GetNormalizedValue( listTable3Results[n].Teta_Sum_j);
-        Delta_j.Text =tools.GetNormalizedValue( listTable3Results[n].Delta_j);            
+        Point.Text =  listTable3SortedPoints[n].Point;
+        Q_j.Text = tools.GetNormalizedValue(listTable3SortedPoints[n].Q_j);
+        f_j.Text = tools.GetNormalizedValue(listTable3SortedPoints[n].f_j);
+        K_j.Text = tools.GetNormalizedValue(listTable3SortedPoints[n].K_j);
+        Vol_j.Text =tools.GetNormalizedValue(listTable3SortedPoints[n].Vol_j);
+        K_d.Text =tools.GetNormalizedValue(&quot;-&quot;);
+        //var subrange = listTable3Subrange.FirstOrDefault(x =&gt; Q_j &gt;= x.Q_min &amp;&amp; 
+        Flow.Text =tools.GetNormalizedValue(&quot;-&quot;);
+        K_dd.Text =tools.GetNormalizedValue(&quot;-&quot;);
+        SK_j.Text =tools.GetNormalizedValue(listTable3SortedPoints[n].SK_j);
+        Teta_Sum.Text =tools.GetNormalizedValue(&quot;-&quot;);
+        Teta_Sum_j.Text =tools.GetNormalizedValue(listTable3SortedPoints[n].Teta_Sum_j);
+        Delta_j.Text =tools.GetNormalizedValue(listTable3SortedPoints[n].Delta_j);            
 
         Table3Results.PrintRow(3);     
         Table3Results.PrintColumns();  
       }
-        */ 
     }
 
     private void DataBandTable3Results_BeforePrint(object sender, EventArgs e)
@@ -555,7 +547,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1SourceData" Top="121.03" Width="718.2" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable1SourceData" Top="120.41" Width="718.2" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="717.49" Height="102.06" FixedRows="3" ManualBuildEvent="Table1SourceData_ManualBuild">
         <TableColumn Name="Column1" MinWidth="49.14" Width="49.9"/>
         <TableColumn Name="Column2" MinWidth="49.14" Width="49.9"/>
@@ -637,7 +629,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2Results" Top="234.49" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable2Results" Top="233.25" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table2Results" Top="7.56" Width="718.17" Height="105.84" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2Results_ManualBuild">
         <TableColumn Name="Column158" Width="69.17"/>
         <TableColumn Name="Column159" Width="60.48"/>
@@ -711,18 +703,21 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3Results" Top="351.74" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" BeforePrintEvent="DataBandTable3Results_BeforePrint" CanBreak="true">
-      <TableObject Name="Table3Results" Top="7.56" Width="604.8" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table3Results_ManualBuild">
-        <TableColumn Name="Column33" Width="75.6"/>
-        <TableColumn Name="Column34" Width="75.6"/>
-        <TableColumn Name="Column35" Width="75.6"/>
-        <TableColumn Name="Column36" Width="75.6"/>
-        <TableColumn Name="Column37" Width="75.6"/>
-        <TableColumn Name="Column38" Width="75.6"/>
-        <TableColumn Name="Column39" Width="75.6"/>
-        <TableColumn Name="Column91" Width="75.6"/>
+    <DataBand Name="DataBandTable3Results" Top="349.88" Width="718.2" Height="113.4" CanGrow="true" CanShrink="true" BeforePrintEvent="DataBandTable3Results_BeforePrint" CanBreak="true">
+      <TableObject Name="Table3Results" Top="7.56" Width="717.48" Height="105.84" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table3Results_ManualBuild">
+        <TableColumn Name="Column33" Width="83.16"/>
+        <TableColumn Name="Column34" Width="61.24"/>
+        <TableColumn Name="Column35" Width="61.24"/>
+        <TableColumn Name="Column36" Width="61.24"/>
+        <TableColumn Name="Column37" Width="61.24"/>
+        <TableColumn Name="Column38" Width="61.24"/>
+        <TableColumn Name="Column39" Width="83.16"/>
+        <TableColumn Name="Column91" Width="61.24"/>
+        <TableColumn Name="Column369" Width="61.24"/>
+        <TableColumn Name="Column370" Width="61.24"/>
+        <TableColumn Name="Column371" Width="61.24"/>
         <TableRow Name="Row137">
-          <TableCell Name="Cell962" Text="Результаты поверки" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags" ColSpan="8"/>
+          <TableCell Name="Cell962" Text="Результаты поверки" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags" ColSpan="11"/>
           <TableCell Name="Cell963" Font="Arial, 10pt"/>
           <TableCell Name="Cell964" Font="Arial, 10pt"/>
           <TableCell Name="Cell965" Font="Arial, 10pt"/>
@@ -730,40 +725,52 @@ namespace FastReport
           <TableCell Name="Cell967" Font="Arial, 10pt"/>
           <TableCell Name="Cell968" Font="Arial, 10pt"/>
           <TableCell Name="Cell969" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1776" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1780" Font="Arial, 10pt"/>
+          <TableCell Name="Cell1784" Font="Arial, 10pt"/>
         </TableRow>
-        <TableRow Name="Row10" Height="30.24">
-          <TableCell Name="Cell123" Border.Lines="All" Text="№ точки (j)" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell124" Border.Lines="All" Text="Q &lt;sub&gt;j&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;/ч" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell125" Border.Lines="All" Text="f&lt;sub&gt; j &lt;/sub&gt;(f/ν)&lt;sub&gt;j&lt;/sub&gt;,&lt;br&gt;Гц(Гц/сСт)" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell126" Border.Lines="All" Text="K &lt;sub&gt;j&lt;/sub&gt;,&lt;br&gt;имп/м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell127" Border.Lines="All" Text="S&lt;sub&gt; j&lt;/sub&gt;,&lt;br&gt;%" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell148" Border.Lines="All" Text="ε&lt;sub&gt; j&lt;/sub&gt;,&lt;br&gt;%" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell149" Border.Lines="All" Text="Θ &lt;sub&gt;∑j&lt;/sub&gt;,&lt;br&gt;%" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell445" Border.Lines="All" Text="δ &lt;sub&gt;j&lt;/sub&gt;,&lt;br&gt;%" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+        <TableRow Name="Row10" Height="49.14">
+          <TableCell Name="Cell123" Border.Lines="All" Text="Номер точки&lt;br&gt;диапазона,&lt;br&gt;(j)" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell124" Border.Lines="All" Text="Q &lt;sub&gt;j&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;/ч (%)" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell125" Border.Lines="All" Text="f,&lt;br&gt;Гц" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell126" Border.Lines="All" Text="K &lt;sub&gt;j&lt;/sub&gt;,&lt;br&gt;имп/м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell127" Border.Lines="All" Text="V&lt;sub&gt; j&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell148" Border.Lines="All" Text="K &lt;sub&gt;Д&lt;/sub&gt;,&lt;br&gt;имп/м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell149" Border.Lines="All" Text="Поддиапазон&lt;br&gt;расходов" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell445" Border.Lines="All" Text="K &lt;sub&gt;ДД&lt;/sub&gt;,&lt;br&gt;имп/м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1777" Border.Lines="All" Text="S&lt;sub&gt; o&lt;/sub&gt;(Δ),&lt;br&gt;%" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1781" Border.Lines="All" Text="Θ &lt;sub&gt;∑&lt;/sub&gt;,&lt;br&gt;%" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1785" Border.Lines="All" Text="Δ &lt;sub&gt;o&lt;/sub&gt;,&lt;br&gt;%" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
         </TableRow>
-        <TableRow Name="Row11" Height="15.12">
-          <TableCell Name="Cell128" Border.Lines="All" Text="1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell129" Border.Lines="All" Text="2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell130" Border.Lines="All" Text="3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell131" Border.Lines="All" Text="4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell132" Border.Lines="All" Text="5" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell151" Border.Lines="All" Text="6" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell152" Border.Lines="All" Text="7" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell446" Border.Lines="All" Text="8" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+        <TableRow Name="Row11">
+          <TableCell Name="Cell128" Border.Lines="All" Text="1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell129" Border.Lines="All" Text="2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell130" Border.Lines="All" Text="3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell131" Border.Lines="All" Text="4" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell132" Border.Lines="All" Text="5" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell151" Border.Lines="All" Text="6" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell152" Border.Lines="All" Text="7" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell446" Border.Lines="All" Text="8" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1778" Border.Lines="All" Text="9" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1782" Border.Lines="All" Text="10" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1786" Border.Lines="All" Text="11" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
         </TableRow>
-        <TableRow Name="baseRowTable3Results" Height="15.12">
-          <TableCell Name="Point3" Border.Lines="All" Text="Point3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Q_j" Border.Lines="All" Text="Q_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="f_j" Border.Lines="All" Text="f_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="K_j" Border.Lines="All" Text="K_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="S_j" Border.Lines="All" Text="S_j" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="3" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="e_j" Border.Lines="All" Text="e_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Teta_Sum_j" Border.Lines="All" Text="Teta_Sum_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Delta_j" Border.Lines="All" Text="Delta_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+        <TableRow Name="baseRowTable3Results">
+          <TableCell Name="Point" Border.Lines="All" Text="Point" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Q_j" Border.Lines="All" Text="Q_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="f_j" Border.Lines="All" Text="f_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_j" Border.Lines="All" Text="K_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Vol_j" Border.Lines="All" Text="Vol_j" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_d" Border.Lines="All" Text="K_d" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Flow" Border.Lines="All" Text="Flow" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="K_dd" Border.Lines="All" Text="K_dd" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="SK_j" Border.Lines="All" Text="SK_j" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Teta_Sum" Border.Lines="All" Text="Teta_Sum" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1787" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4Results" Top="442.52" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4Results" Top="466.5" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4Results" Top="7.56" Width="544.32" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4Results_ManualBuild">
         <TableColumn Name="Column41" Width="68.04"/>
         <TableColumn Name="Column42" Width="68.04"/>
@@ -815,7 +822,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable5Results" Top="533.31" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable5Results" Top="556.67" Width="718.2" Height="86.94" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table5Results" Top="7.56" Width="476.28" Height="79.38" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table5Results_ManualBuild">
         <TableColumn Name="Column253" Width="68.04"/>
         <TableColumn Name="Column254" Width="68.04"/>
@@ -862,7 +869,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable6ApproximationEquations" Top="624.1" Width="718.2" Height="122.85">
+    <DataBand Name="DataBandTable6ApproximationEquations" Top="646.83" Width="718.2" Height="122.85">
       <TableObject Name="Table6ApproximationEquations" Top="7.56" Width="538.68" Height="102.06" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table6ApproximationEquations_ManualBuild">
         <TableColumn Name="Column356" Width="89.78"/>
         <TableColumn Name="Column357" Width="89.78"/>
@@ -912,7 +919,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="750.79" Width="718.2" Height="102.06" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="772.91" Width="718.2" Height="102.06" CanShrink="true">
       <TableObject Name="TableConclusion1" Top="7.56" Width="563.22" Height="37.8" GrowToBottom="true">
         <TableColumn Name="Column178" Width="393.12"/>
         <TableColumn Name="Column236" MinWidth="170.1" Width="170.1" AutoSize="true"/>
@@ -950,7 +957,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="856.7" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="878.2" Width="718.2" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
