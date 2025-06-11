@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/12/2025 00:03:14" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/12/2025 00:06:31" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -307,39 +307,6 @@ namespace FastReport
       
       Table2Results.PrintRow(4);     
       Table2Results.PrintColumns();
-    }
-    
-    private void Table2ResultsEnding_ManualBuild(object sender, EventArgs e)
-    {
-      /*
-      //Setup Columns widths as previous table
-         
-      for (int i = 0; i &lt; (Table2ResultsEnding.ColumnCount-1); i++)
-      {          
-        Table2ResultsEnding.Columns[i].Width =  Table2Results.Columns[i].Width;
-      }
-         
-         
-      //Draw Fixed rows
-      for (int n = 0; n &lt; Table2ResultsEnding.FixedRows; n++)
-      {
-        Table2ResultsEnding.PrintRow(n);
-        Table2ResultsEnding.PrintColumns();                                             
-      }
-              
-      //Fill table with data
-      for (int n = 0; n &lt; (listTable2Results.Count); n++)
-      {
-        Ser2_2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2Results[n].Ser, listTable2Results[n].Row);
-        Dens_ji.Text = tools.GetNormalizedValue(listTable2Results[n].Dens_ji);
-        DensTemp_ji.Text =  tools.GetNormalizedValue(listTable2Results[n].DensTemp_ji);                                                                     
-        KinVisc_ji.Text =  tools.GetNormalizedValue(listTable2Results[n].KinVisc_ji);
-  
-        Table2ResultsEnding.PrintRow(4);     
-        Table2ResultsEnding.PrintColumns();  
-      }
-      */
-        
     }
       
     private void Table3Results_ManualBuild(object sender, EventArgs e)
