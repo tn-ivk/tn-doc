@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/16/2025 00:38:26" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;CommonPoverka1974.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/16/2025 02:03:47" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -16,23 +16,24 @@ using FastReport.Table;
 using FastReport.Utils;
 using System.Linq;
 using Newtonsoft.Json;
-using TN.DocData;
 using TN.Doc;
+using TN.DocData;
+using TN.Doc.Poverka1974_89;
 
 namespace FastReport
 {
   public class ReportScript
   {
     TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();  
-    TN.Doc.Doc doc; 
+    TN.Doc.Poverka1974_89.Doc doc; 
     TN.DocData.General General;
     TN.Doc.HeaderDoc Header;
     TN.Doc.DataDoc SettingsData;
     TN.Doc.FooterDoc Footer;
     TN.Doc.DictionarysDoc Dictionarys;
-    TN.Doc.DataIVKDoc DataIVK;   
-    TN.Doc.Protocol Protocol;
-    TN.Doc.AdditionalInfo AdditionalInfo;
+    TN.Doc.Poverka1974_89.DataIVKDoc DataIVK;   
+    TN.Doc.Poverka1974_89.Protocol Protocol;
+    TN.Doc.Poverka1974_89.AdditionalInfo AdditionalInfo;
     
     private void Page_StartPage(object sender, EventArgs e)
     {
@@ -41,13 +42,13 @@ namespace FastReport
       Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
       settings.TypeNameHandling = TypeNameHandling.All;
 
-      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Doc&gt;(json, settings);
+      doc = JsonConvert.DeserializeObject&lt;TN.Doc.Poverka1974_89.Doc&gt;(json, settings);
       General = (TN.DocData.General)doc.Doc.Settings.General;
       Header = (TN.Doc.HeaderDoc)doc.Doc.Settings.Header;
       SettingsData = (TN.Doc.DataDoc)doc.Doc.Settings.Data;
       Footer = (TN.Doc.FooterDoc)doc.Doc.Settings.Footer;
       Dictionarys = (TN.Doc.DictionarysDoc)doc.Doc.Settings.Dictionarys;  
-      DataIVK = (TN.Doc.DataIVKDoc)doc.Doc.DataIVK;
+      DataIVK = (TN.Doc.Poverka1974_89.DataIVKDoc)doc.Doc.DataIVK;
       Protocol = DataIVK.TablePoverka1974.Protocol;
       AdditionalInfo = DataIVK.TablePoverka1974.AdditionalInfo;
       
