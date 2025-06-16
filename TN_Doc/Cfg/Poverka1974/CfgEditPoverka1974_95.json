@@ -18,7 +18,7 @@
     },
     {
       "Id": 3,
-      "Use": true,
+      "Use": false,
       "Edit": false,
       "Key": "Place_Factory",
       "Type": "text",
@@ -42,7 +42,7 @@
     },
     {
       "Id": 6,
-      "Use": true,
+      "Use": false,
       "Edit": false,
       "Key": "PR_LineName",
       "Type": "text",
@@ -58,7 +58,7 @@
     },
     {
       "Id": 8,
-      "Use": true,
+      "Use": false,
       "Edit": false,
       "Key": "PU_Category",
       "Type": "text",
@@ -74,7 +74,7 @@
     },
     {
       "Id": 10,
-      "Use": true,
+      "Use": false,
       "Edit": false,
       "Key": "OilType",
       "Type": "text",
@@ -90,7 +90,7 @@
     },
     {
       "Id": 12,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "ARM_Poverka_Result",
       "Type": "list",

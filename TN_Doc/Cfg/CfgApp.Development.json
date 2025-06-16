@@ -842,7 +842,7 @@
               "Name": "Поверка МИ 1974-1989",
               "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1989",
               "PathToDocTemplateFile": "/Doc/Poverka1974/Poverka1974_89.frx",
-              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka1974_89.json"
+              "PathToDocEditConfigFile": "/Cfg/Poverka1974/CfgEditPoverka1974_89.json"
             }
           ]
         },
@@ -1972,7 +1972,7 @@
               "Name": "Поверка МИ 1974-1989",
               "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1989",
               "PathToDocTemplateFile": "/Doc/Poverka1974/Poverka1974_89.frx",
-              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka1974_89.json"
+              "PathToDocEditConfigFile": "/Cfg/Poverka1974/CfgEditPoverka1974_89.json"
             }
           ]
         },
@@ -3102,7 +3102,7 @@
               "Name": "Поверка МИ 1974-1989",
               "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-1989",
               "PathToDocTemplateFile": "/Doc/Poverka1974/Poverka1974_89.frx",
-              "PathToDocEditConfigFile": "/Cfg/CfgEditPoverka1974_89.json"
+              "PathToDocEditConfigFile": "/Cfg/Poverka1974/CfgEditPoverka1974_89.json"
             }
           ]
         },
