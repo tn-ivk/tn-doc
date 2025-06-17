@@ -7,69 +7,71 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
 using TN_Doc.Extensions;
+using TN_Doc.Models.Services;
 using TN.Doc;
 
-namespace TN_Doc
+namespace TN_Doc;
+
+public class Startup
 {
-	public class Startup
+	public Startup(IConfiguration configuration)
 	{
-		public Startup(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
+		Configuration = configuration;
+	}
 
-		public IConfiguration Configuration { get; }
+	public IConfiguration Configuration { get; }
 
-		// This method gets called by the runtime. Use this method to add services to the container.
-		public void ConfigureServices(IServiceCollection services)
+	// This method gets called by the runtime. Use this method to add services to the container.
+	public void ConfigureServices(IServiceCollection services)
+	{
+		services.AddLogging(builder =>
 		{
-			services.AddCors(options => options.AddPolicy("CorsPolicy",
-				builder =>
-				{
-					builder.AllowAnyHeader()
-						.AllowAnyMethod()
-						//.AllowAnyOrigin()
-						.SetIsOriginAllowed((host) => true)
-						.AllowCredentials();
-				}));
+			var logLevel = Configuration.GetValue<string>("Logging:LogLevel:Default");
+			LogManager.Configuration.Variables["logLevel"] = logLevel;
+			LogManager.Configuration.Variables["logDirectory"] = LoggingPathService.GetLogDirectory();
+
+			builder.ClearProviders();
+			builder.AddNLog();
+		});
+		
+		services.AddCors(options => options.AddPolicy("CorsPolicy",
+			builder =>
+			{
+				builder.AllowAnyHeader()
+					.AllowAnyMethod()
+					//.AllowAnyOrigin()
+					.SetIsOriginAllowed((host) => true)
+					.AllowCredentials();
+			}));
 #if RELEASE
-			services.ConfigAppDirectory();
+		services.ConfigAppDirectory();
 #endif
-			services.AddAppInfoProvider();
-			services.AddPrinters();
-			services.AddPrinterService();
-			services.AddControllersWithViews();
-			services.AddDbContext<DocGeneral>();
-			services.AddLogging(builder =>
-			{
-				var logLevel = Configuration.GetValue<string>("Logging:LogLevel:Default");
-				LogManager.Configuration.Variables["logLevel"] = logLevel;
-				builder.ClearProviders();
-				builder.AddNLog();
-			});
-			
-		}
+		services.AddAppInfoProvider();
+		services.AddPrinters();
+		services.AddPrinterService();
+		services.AddControllersWithViews();
+		services.AddDbContext<DocGeneral>();
+	}
 
-		// This method gets called by the runtime. Use this method to configure
-		// the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+	// This method gets called by the runtime. Use this method to configure
+	// the HTTP request pipeline.
+	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+	{
+		if (env.IsDevelopment())
 		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-			else
-			{
-				app.UseExceptionHandler("/Home/Error");
-				app.UseHsts();
-			}
-
-			app.UseStaticFiles();
-			app.UseRouting();
-
-			app.UseCors("CorsPolicy");
-
-			app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}"); });
+			app.UseDeveloperExceptionPage();
 		}
+		else
+		{
+			app.UseExceptionHandler("/Home/Error");
+			app.UseHsts();
+		}
+
+		app.UseStaticFiles();
+		app.UseRouting();
+
+		app.UseCors("CorsPolicy");
+
+		app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}"); });
 	}
 }
