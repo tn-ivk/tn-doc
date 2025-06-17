@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;CommonPoverka1974.dll&#13;&#10;Poverka1974_95.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/17/2025 22:21:14" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;CommonPoverka1974.dll&#13;&#10;Poverka1974_95.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/17/2025 22:55:44" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -154,8 +154,12 @@ namespace FastReport
       for(int i=0; i &lt; colWidth.Length; i++)
         totalColWidth +=colWidth[i];        
       var widthDynamicCol = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/totalColWidth;                                                       
-      for (int w = 0; w &lt; Table1SourceData.ColumnCount; w++)                                                                                                                                       
+      for (int w = 0, num = 1; w &lt; Table1SourceData.ColumnCount; w++)
+      {
         Table1SourceData.Columns[w].Width = (float)(widthDynamicCol * colWidth[w] * Units.Millimeters);
+        if(colWidth[w] &gt; 0)
+          Table1NumRow[w].Text = $&quot;{num++}&quot;;
+      }
       
       var listTable1Detectors = Protocol.Table1.DetName.Where(i =&gt; !string.IsNullOrEmpty(i)).ToList();
       var listTable1V0 = Protocol.Table1.V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
@@ -486,7 +490,7 @@ namespace FastReport
           <TableCell Name="Cell1405" Border.Lines="All" Text="Θ &lt;sub&gt;V0&lt;/sub&gt;,&lt;br&gt;%" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1406" Border.Lines="All" Text="t&lt;sub&gt; 0,95&lt;/sub&gt;&lt;br&gt; " Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
         </TableRow>
-        <TableRow Name="Row5" Height="20.79">
+        <TableRow Name="Table1NumRow" Height="20.79">
           <TableCell Name="Cell19" Border.Lines="All" Text="1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell20" Border.Lines="All" Text="2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell21" Border.Lines="All" Text="3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
