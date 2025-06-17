@@ -75,23 +75,46 @@ input[type=number] {
     height: 100%;
 }
 
-/*table,*/
-/*td {*/
-/*    border: 0px solid black;*/
-/*    border-collapse: collapse;*/
-/*    !*vertical-align: middle;*!*/
-/*}*/
-
-.filterSelect {
+select.filterSelect {
     width: 100%;
+    color: black !important;
+    padding: 0px 5px;
+    border: 1px solid #ccc;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 .filterDatepicker {
-    width: 100%
+    width: 100%;
+    color: black !important;
+    padding: 0px 5px;
+    border: 1px solid #ccc;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 .filterButton {
-    width: 150px;
+    width: 40%;
+    display: inline-flex;
+    background-color: #1b6ec2;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.filterButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.filterButton .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
 }
 
 /***************************************************/
@@ -290,5 +313,23 @@ select.invalid-cell-content {
 
 .padding-one-px-top {
     padding-top: 1px;
+}
+
+/* Стили для строки поиска DataTables */
+#DataTable_filter label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+}
+#DataTable_filter label input[type="search"] {
+    width: 350px;
+    margin-left: 8px;
+    display: inline-block;
+}
+#DataTable_filter label span {
+    min-width: 60px;
+    text-align: left;
+    margin-right: 0.5em;
 }
 

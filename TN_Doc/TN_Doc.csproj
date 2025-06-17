@@ -5,8 +5,9 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <AssemblyVersion>1.3.2</AssemblyVersion>
-    <Version>1.3.2</Version>
+    <Version>1.3.3</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
   </PropertyGroup>
 
   <!-- Исключение ненужных файлов -->
@@ -15,6 +16,18 @@
     <Content Remove="wwwroot\lib\jquery-ui\**" />
     <EmbeddedResource Remove="wwwroot\lib\jquery-ui\**" />
     <None Remove="wwwroot\lib\jquery-ui\**" />
+    <None Update="Doc\Poverka1974\Poverka1974_04.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka1974\Poverka1974_89.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka1974\Poverka1974_95.frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Doc\Poverka1974\17_Poverka1974_(Ust-Luga).frx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <!-- Копирование Development-конфигураций только в Debug -->

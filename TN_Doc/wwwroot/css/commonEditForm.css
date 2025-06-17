@@ -86,17 +86,17 @@ select:focus {
 
 /* Стили для таблицы AdditionalInfo */
 #AdditionalInfo {
-    width: 90%;
-    table-layout: fixed;
+    width: 100%;
+    table-layout: auto;
 }
 
 #AdditionalInfo td:first-child {
-    width: 50%;
     text-align: left;
+    white-space: nowrap;
 }
 
 #AdditionalInfo td:last-child {
-    width: 50%;
+    width: 100%;
     text-align: left;
 }
 
@@ -105,4 +105,10 @@ select:focus {
     width: 100%;
     box-sizing: border-box;
     text-align: left;
+}
+
+#AdditionalInfo td,
+#AdditionalInfo th {
+    padding-left: 10px;
+    padding-right: 10px;
 }

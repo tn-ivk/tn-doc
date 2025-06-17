@@ -470,7 +470,6 @@ function InitDocs() {
             async: false,
             url: 'Home/GetListDocs',
             type: 'GET',
-            //dataType: "json",
             data:
                 {
                     idDevice: $('#ComboboxDevice').val()
@@ -481,17 +480,7 @@ function InitDocs() {
                 });
             },
         });
-
-//    $('#ComboboxDocGUID').change(function ()
-//    {
-//        if (table != null) $('#DataTable').DataTable().clear().draw();
-//        //$('.FR').each(function () {
-//        //    $(this).attr('src', '');
-//        //});
-//        $('.FR').attr('src', '');
-
-//        InitTemplatesDoc();
-//    });
+    updateSaveBtnText();
 }
 
 function InitTemplatesDoc() {
@@ -589,7 +578,7 @@ function InitPrinterName() {
         error: function (jqXHR, textStatus, errorThrown) {
             $combobox.hide();
             $printBtn.hide();
-            console.error('Ошибка при загрузке списка принтеров:', textStatus, errorThrown);
+            //showError(`Ошибка при загрузке списка принтеров: ${textStatus} ${errorThrown}`);
         }
     });
 }
@@ -653,49 +642,73 @@ function InitDatepickerEnd() {
     $('#DatepickerEnd').datepicker('setDate', dtEnd);
 }
 
-function InitTableDocs() {
+function GetDataWithSpinner() {
+    $('#ButtonGetData').prop('disabled', true);
+    $('#ButtonGetDataSpinner').prop('hidden', false);
+    $('#ButtonGetDataText').text('Загрузка данных...');
 
+    let timeoutId = setTimeout(function() {
+        $('#ButtonGetData').prop('disabled', false);
+        $('#ButtonGetDataSpinner').prop('hidden', true);
+        $('#ButtonGetDataText').text('Получить данные');
+        showError('Превышен таймаут загрузки данных');
+    }, 60000);
+
+    setTimeout(function() {
+        try {
+            table.ajax.reload(function() {
+                clearTimeout(timeoutId);
+            });
+        } catch (error) {
+            clearTimeout(timeoutId);
+            $('#ButtonGetData').prop('disabled', false);
+            $('#ButtonGetDataSpinner').prop('hidden', true);
+            $('#ButtonGetDataText').text('Получить данные');
+            showError(`Ошибка при обновлении таблицы: ${error && error.message ? error.message : error}`);
+        }
+    }, 10);
+}
+
+function InitTableDocs() {
     table = $('#DataTable').DataTable(
         {
             select: true,
             scrollY: '60vh',
             scrollCollapse: true,
             paging: false,
-
             info: false,
             ordering: false,
-
             language: languageDataTable,
-            //oLanguage: languageDataTable
-            //{
-            //    sSearch: 'Поиск',
-            //    sEmptyTable: 'Отсутствуют данные в таблице'
-            //}
-            //,
-
+            
             ajax: function (data, callback, settings) {
-                callback
-                (
-                    GetData()
-                );
+                try {
+                    let result = GetData();
+                    callback(result);
+                    
+                    $('#ButtonGetData').prop('disabled', false);
+                    $('#ButtonGetDataSpinner').prop('hidden', true);
+                    $('#ButtonGetDataText').text('Получить данные');
+                } catch (error) {
+                    showError(`Ошибка при загрузке данных: ${error && error.message ? error.message : error}`);
+                    
+                    $('#ButtonGetData').prop('disabled', false);
+                    $('#ButtonGetDataSpinner').prop('hidden', true);
+                    $('#ButtonGetDataText').text('Получить данные');
+                    
+                    callback({'data': []});
+                }
             },
 
             columns:
                 [
                     {data: 'dt'},
-                    //{ data: function (data) { return moment(data.dt, "DD-MM-YYYYTHH:mm").format("DD.MM.YYYY HH:mm"); } },
                     {data: 'description'}
                 ],
-            //    columnDefs: [
-            //        {
-            //            targets: 0,
-            //            render: DataTable.render.date()
-            //        }]
         });
 
     table.on('select', function (e, dt, type, indexes) {
         if (type === 'row') {
-            var id = table.rows(indexes).data().pluck('id');
+            let id = table.rows(indexes).data().pluck('id');
             currentId = id[0];
 
             if ($('#ComboboxDocGUID').val() == 32) {
@@ -725,11 +738,7 @@ function InitElement() {
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
     }
 
-    /**/
     InitDirEditorComponent();
-    /**/
-
-
     InitDevices();
     InitDocs();
     InitDatepickerBegin();
@@ -747,6 +756,7 @@ function InitElement() {
         InitProtocolNumber();
         
         $('#viewModeButton').prop('hidden', true);
+        updateSaveBtnText();
     });
     $('#ComboboxTemplateDoc').change(function () {
         SetIdTemplateDoc();
@@ -758,15 +768,18 @@ function InitElement() {
 }
 
 function GetData() {
-    var ret = null;
-
-    var DTBegin = $('#DatepickerBegin').datepicker('getDate');
-    var DTEnd = $('#DatepickerEnd').datepicker('getDate');
-
+    let ret = null;
+    let hasError = false;
+    let DTBegin = $('#DatepickerBegin').datepicker('getDate');
+    let DTEnd = $('#DatepickerEnd').datepicker('getDate');
+    let strDTBegin = "";
+    let strDTEnd = "";
     if (DTBegin == null || DTEnd == null) {
+        ret = [];
+        return {'data': ret};
     } else {
-        var strDTBegin = DTBegin.getDate() + '.' + (DTBegin.getMonth() + 1) + '.' + DTBegin.getFullYear();
-        var strDTEnd = DTEnd.getDate() + '.' + (DTEnd.getMonth() + 1) + '.' + DTEnd.getFullYear();
+        strDTBegin = DTBegin.getDate() + '.' + (DTBegin.getMonth() + 1) + '.' + DTBegin.getFullYear();
+        strDTEnd = DTEnd.getDate() + '.' + (DTEnd.getMonth() + 1) + '.' + DTEnd.getFullYear();
     }
 
     $.ajax(
@@ -787,7 +800,8 @@ function GetData() {
                 ret = data;
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                // alert("Ошибка!");
+                hasError = true;
+                ret = [];
             },
             complete: function (data) {
                 if ($('#ComboboxDocGUID').val() == 0 ||
@@ -808,8 +822,10 @@ function GetData() {
             }
         });
 
-    var data = {'data': ret};
-    return data;
+    if (hasError) {
+        throw new Error('Ошибка при загрузке данных с сервера');
+    }
+    return {'data': ret};
 }
 
 function GetDoc() {
@@ -1170,7 +1186,6 @@ function SetClientToken() {
 
 }
 
-
 function DrawTablePassports(dataELIS) {
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
@@ -1196,9 +1211,6 @@ function DrawTablePassports(dataELIS) {
         });
         element.append(li);
     });
-}
-
-function SetDataLocalStorage() {
 }
 
 function ResetPassportDataElis() {
@@ -1340,7 +1352,7 @@ function FillPassportDataElis() {
             }
         });
     } catch (error) {
-        console.error("Ошибка в FillPassportDataElis:", error);
+        showError(`Ошибка заполнения данных ЕЛИС: ${error && error.message ? error.message : error}`);
     }
 }
 
@@ -1457,4 +1469,30 @@ class LabDocumentInfo
         this.Number = pNumber;
         this.Date = pDate;
     }
+}
+
+function updateSaveBtnText() {
+    const button = $('#ButtonSave');
+    
+    $.ajax({
+        url: 'Home/GetSaveBtnText',
+        type: 'GET',
+        data: {
+            IdDevice: $('#ComboboxDevice').val(),
+            IdDoc: $('#ComboboxDocGUID').val()
+        },
+        success: function(text) {
+            button.val(text);
+        },
+        error: function() {
+            button.val('Сохранить');
+        }
+    });
+}
+
+function showError(message) {
+    const errorDialog = document.getElementById('errorDialog');
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorDialog.showModal();
 }

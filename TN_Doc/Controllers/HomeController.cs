@@ -193,8 +193,7 @@ namespace TN_Doc.Controllers
         /// <param name="idTemplateDoc">Id открытого документа</param>
         public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int idTemplateDoc)
         {
-            if (_appConfig.SetLastUsedTemplateId(IdDevice, IdDoc, idTemplateDoc))
-                _appConfig.SetLastUsedTemplateList();
+            _appConfig.SetLastUsedTemplateId(IdDevice, IdDoc, idTemplateDoc);
         }
         
         public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
@@ -655,6 +654,26 @@ namespace TN_Doc.Controllers
             {
                 _logger.LogError(ex, $"Ошибка получения списка неразрешенных символов для устройства {IdDevice}");
                 return String.Empty;
+            }
+        }
+
+        public string GetSaveBtnText(int IdDevice, IdDoc IdDoc)
+        {
+            _logger.LogDebug($"Получение текста кнопки сохранения для документа {IdDoc} для устройства {IdDevice}");
+            try
+            {
+                if (!IsUsedElis(IdDevice))
+                    return "Сохранить";
+
+                if (IdDoc is IdDoc.Act or IdDoc.Passport)
+                    return "Завершить редактирование и отправить";
+
+                return "Сохранить";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Ошибка получения текста кнопки сохранения для документа {IdDoc} для устройства {IdDevice}");
+                return "Сохранить";
             }
         }
         

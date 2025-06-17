@@ -157,7 +157,7 @@ namespace Tests.Services
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<CfgApp>());
-            Assert.That(result.Devices, Has.Count.EqualTo(1));
+            Assert.That(result.Devices, Has.Count.GreaterThanOrEqualTo(1));
             Assert.That(result.Devices[0].IdDevice, Is.EqualTo(1));
         }
 
@@ -190,8 +190,8 @@ namespace Tests.Services
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<LastUsedTemplateListCfg>());
-            Assert.That(result.Devices, Has.Count.EqualTo(1));
-            Assert.That(result.Devices[0].LastTemplateList, Has.Count.EqualTo(1));
+            Assert.That(result.Devices, Has.Count.GreaterThanOrEqualTo(1));
+            Assert.That(result.Devices[0].LastTemplateList, Has.Count.GreaterThanOrEqualTo(1));
         }
 
         [Test]

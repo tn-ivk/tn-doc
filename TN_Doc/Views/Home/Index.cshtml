@@ -48,8 +48,10 @@
                         </tr>
                         <tr>
                             <td height="25" colspan="2" align="right">
-                                <input class="filterButton" id="ButtonGetData" type="button" value="Получить данные"
-                                       onclick="table.ajax.reload()">
+                                <button class="filterButton" id="ButtonGetData" type="button" onclick="GetDataWithSpinner()">
+                                    <span id="ButtonGetDataSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+                                    <span id="ButtonGetDataText">Получить данные</span>
+                                </button>
                             </td>
                         </tr>
                         <tr>
@@ -95,7 +97,7 @@
                             </td>
                             <td id="editPanel" align="right" hidden>
                                 <input id="ButtonElis" type="button" value="Запросить данные из ЕЛИС" data-toggle="modal" data-target="#elis" onclick="OpenElisDialog()" hidden>
-                                <input id="ButtonSave" type="button" value="Завершить редактирование и отправить" onclick="SaveDoc()">
+                                <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
                             </td>
                         </tr>
                         <tr>
