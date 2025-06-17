@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;CommonPoverka1974.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/16/2025 13:46:26" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;CommonPoverka1974.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/17/2025 21:15:28" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -97,12 +97,6 @@ namespace FastReport
               
     private void Table1SourceData_ManualBuild(object sender, EventArgs e)
     { 
-      for (int n = 0; n &lt; Table1SourceData.FixedRows; n++)                                                                            
-      {                                                                                                                                                                     
-        Table1SourceData.PrintRow(n);                                                                                                                
-        Table1SourceData.PrintColumns();                                                                                                           
-      }
-      
       if (Protocol.CfgTables.PUDetNum == 2)
       {
         //ТПУ имеет один калиброванный участок
@@ -118,6 +112,7 @@ namespace FastReport
       
     private void ShowSourceDataWithOneRow()
     {
+      PrintFixedRow(Table1SourceData);
       var v0 = Protocol.Table1.V0.FirstOrDefault(x =&gt; !string.IsNullOrEmpty(x)) ?? &quot;-&quot;;
       if (Protocol.CfgTables.PUType == 1)
       {
@@ -152,15 +147,23 @@ namespace FastReport
     
     private void ShowSourceDataWithManyRow()
     {
-      Table1FirstColTitle.Text = &quot;Детек-&lt;br&gt;торы&quot;;
-      Table1SourceData.Columns[1].Visible = false;
-      
-      var listTable1Detectors = Protocol.Table1.DetName.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
+      Table1V12Title.Text = &quot;Детек-&lt;br&gt;торы&quot;;
+      Table1V0Title.Text = &quot;V&lt;sub&gt;0&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;&quot;;
+      var colWidth = new [] { 1.0, 0, 1.0, 1.2, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 }; 
+      var totalColWidth = 0.0;
+      for(int i=0; i &lt; colWidth.Length; i++)
+        totalColWidth +=colWidth[i];        
+      var widthDynamicCol = (Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/totalColWidth;                                                       
+      for (int w = 0; w &lt; Table1SourceData.ColumnCount; w++)                                                                                                                                       
+        Table1SourceData.Columns[w].Width = (float)(widthDynamicCol * colWidth[w] * Units.Millimeters);
+          
+      var listTable1Detectors = Protocol.Table1.DetName.Where(i =&gt; !string.IsNullOrEmpty(i)).ToList();
       var listTable1V0 = Protocol.Table1.V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
       var listTeta_Sum0 = Protocol.Table1.Teta_Sum0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
       var listTeta_V0 = Protocol.Table1.Teta_V0.Where(i =&gt; !string.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
         
-      // Заполнение таблицы для каждого детектора
+      PrintFixedRow(Table1SourceData);
+                                                           
       for (int n = 0; n &lt; listTable1Detectors.Count; n++)                                                                     
       {                                                                                                                                                    
         V12.Text = listTable1Detectors[n];                                                                                       
@@ -177,28 +180,35 @@ namespace FastReport
         Teta_V0.Text = (n &lt; listTeta_V0.Count) ? tools.GetNormalizedValue(listTeta_V0[n]) : &quot;-&quot;;
         T095.Text = tools.GetNormalizedValue(Protocol.Table1.t095);
           
-        // RowSpans для общих параметров                                                                                                              
+        // RowSpans для общих параметров
         for (int i = 0; i &lt; Table1SourceData.ColumnCount; i++)                                                              
         {                                                                                                                                                            
           switch(i)                                                                                                                                                  
           {                                                                                                                                                                
-            case 2:  // m_D
-            case 3:  // m_S                                                                                                           
-            case 4:  // m_E                                                                                                                  
-            case 5:  // Alpha_t
+            case 3:  // m_D
+            case 4:  // m_S                                                                                                           
+            case 5:  // m_E                                                                                                                  
+            case 6:  // Alpha_t
+            case 7:  // Dens
             case 8:  // Beta
             case 9:  // Gamma 
-            case 10: // (другое общее поле)
-            case 11: // (другое общее поле)
-            case 12: // (другое общее поле)
+            case 11: // Teta_t
             case 13: // T095
-              Table1SourceData[i,4].RowSpan = listTable1Detectors.Count;
-            break;  
+              Table1SourceData[i,3].RowSpan = listTable1Detectors.Count;
+              break;  
           }
         }
-              
-        Table1SourceData.PrintRow(4);     
+        Table1SourceData.PrintRow(3);     
         Table1SourceData.PrintColumns();  
+      }
+    }
+    
+    private void PrintFixedRow(TableObject table)
+    {
+      for (int n = 0; n &lt; table.FixedRows; n++)                                                                            
+      {                                                                                                                                                                     
+        table.PrintRow(n);                                                                                                                
+        table.PrintColumns();                                                                                                           
       }
     }
     
@@ -429,20 +439,20 @@ namespace FastReport
     </ReportTitleBand>
     <DataBand Name="DataBandTable1SourceData" Top="120.41" Width="718.2" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="717.49" Height="102.06" FixedRows="3" ManualBuildEvent="Table1SourceData_ManualBuild">
-        <TableColumn Name="Column1" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column2" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column6" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column7" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column8" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column9" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column10" MinWidth="49.14" Width="59.72"/>
-        <TableColumn Name="Column11" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column260" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column261" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column262" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column263" MinWidth="49.14" Width="58.97"/>
-        <TableColumn Name="Column264" MinWidth="49.14" Width="49.9"/>
-        <TableColumn Name="Column265" MinWidth="49.14" Width="49.9"/>
+        <TableColumn Name="Column1" Width="49.9"/>
+        <TableColumn Name="Column2" Width="49.9"/>
+        <TableColumn Name="Column6" Width="49.9"/>
+        <TableColumn Name="Column7" Width="49.9"/>
+        <TableColumn Name="Column8" Width="49.9"/>
+        <TableColumn Name="Column9" Width="49.9"/>
+        <TableColumn Name="Column10" Width="59.72"/>
+        <TableColumn Name="Column11" Width="49.9"/>
+        <TableColumn Name="Column260" Width="49.9"/>
+        <TableColumn Name="Column261" Width="49.9"/>
+        <TableColumn Name="Column262" Width="49.9"/>
+        <TableColumn Name="Column263" Width="58.97"/>
+        <TableColumn Name="Column264" Width="49.9"/>
+        <TableColumn Name="Column265" Width="49.9"/>
         <TableRow Name="Row139" Height="20.79">
           <TableCell Name="Cell981" Text="Исходные данные" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="14"/>
           <TableCell Name="Cell982" Font="Arial, 10pt"/>
@@ -460,9 +470,9 @@ namespace FastReport
           <TableCell Name="Cell1400" Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row4" Height="39.69" AutoSize="true">
-          <TableCell Name="Table1FirstColTitle" Border.Lines="All" Text="V&lt;sub&gt;0(1-2)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Table1V12Title" Border.Lines="All" Text="V&lt;sub&gt;0(1-2)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell15" Border.Lines="All" Text="V&lt;sub&gt;0(2-1)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell16" Border.Lines="All" Text="V&lt;sub&gt;0(1-2-1)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Table1V0Title" Border.Lines="All" Text="V&lt;sub&gt;0(1-2-1)&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell17" Border.Lines="All" Text="Д,&lt;br&gt;мм" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell18" Border.Lines="All" Text="S,&lt;br&gt;мм" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell39" Border.Lines="All" Text="E,&lt;br&gt;МПа" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" LineHeight="14" TextRenderType="HtmlTags"/>
