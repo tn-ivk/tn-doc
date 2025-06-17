@@ -11,7 +11,6 @@ namespace TN_Doc.Models.Services
     {
         private const string LinuxLogDirectory = "/var/log/TN_Doc";
         private const string WindowsLogDirectory = "logs";
-        private const string ApplicationName = "TN_Doc";
         
         private readonly ILogger<LoggingPathService> _logger;
 
@@ -21,15 +20,9 @@ namespace TN_Doc.Models.Services
         /// <returns>Полный путь к директории логов</returns>
         public static string GetLogDirectory()
         {
-            if (IsLinux())
-            {
-                return LinuxLogDirectory;
-            }
-            else
-            {
+            return IsLinux() ? LinuxLogDirectory :
                 // Для Windows используем относительный путь от базовой директории приложения
-                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, WindowsLogDirectory);
-            }
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, WindowsLogDirectory);
         }
 
         /// <summary>
@@ -58,7 +51,6 @@ namespace TN_Doc.Models.Services
                     return true;
                 
                 Directory.CreateDirectory(logDirectory);
-
                 return true;
             }
             catch

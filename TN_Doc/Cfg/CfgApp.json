@@ -1119,7 +1119,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.11",
+          "Server": "192.168.19.11",
           "Userid": "user",
           "Password": "$1$83F+qTyYmHOfVHKPsApmT1xgFnO64A/lEkxNn9k8VKs=",
           "Database": "IVK_TN_01",
@@ -1128,7 +1128,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.139",
+          "Server": "192.168.19.139",
           "Userid": "user",
           "Password": "$1$cA34ZrL19FeEuzhyvEmZvAzFAfLBIivo3/LKZfbfoVg=",
           "Database": "IVK_TN_01",
@@ -2249,7 +2249,7 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.233.12",
+          "Server": "192.168.19.12",
           "Userid": "user",
           "Password": "$1$lWYmN8fbjJBXRxMriPw5JLsfa6PbyzBcZthtH5hRJQ8=",
           "Database": "IVK_TN_01",
@@ -2258,7 +2258,7 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.233.140",
+          "Server": "192.168.19.140",
           "Userid": "user",
           "Password": "$1$Da1vbiUU2jMTiRqMJKHD4Yh0s0CDqJg2IBl47HuEx8c=",
           "Database": "IVK_TN_01",
@@ -3379,7 +3379,7 @@
         {
           "Use": true,
           "GuidDevice": 2,
-          "Server": "192.168.233.13",
+          "Server": "192.168.19.13",
           "Userid": "user",
           "Password": "$1$tMxr/hnj4vSosbFKfg4zl3FS3gSxe/whDp4SZFPTL+I=",
           "Database": "IVK_TN_01",
@@ -3388,7 +3388,7 @@
         {
           "Use": true,
           "GuidDevice": 2,
-          "Server": "192.168.233.141",
+          "Server": "192.168.19.141",
           "Userid": "user",
           "Password": "$1$KqBhyXeSlR25iUyUR3ohFnwoNEgBmaK494RV6WyP4NI=",
           "Database": "IVK_TN_01",
