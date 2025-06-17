@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using NLog;
+using TN_Doc.Models.Services;
 
 namespace TN_Doc
 {
@@ -13,6 +14,9 @@ namespace TN_Doc
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            // Инициализация конфигурации логирования перед созданием логгера
+            InitializeLogging();
+            
             var logger = LogManager.GetCurrentClassLogger();
             try
             {
@@ -51,5 +55,27 @@ namespace TN_Doc
         /// </returns>
         private static bool IsHostOsWindows() => Environment.OSVersion.Platform != PlatformID.Unix &&
                                              Environment.OSVersion.Platform != PlatformID.MacOSX;
+
+        /// <summary>
+        /// Инициализация конфигурации логирования
+        /// Устанавливает переменную окружения для NLog с корректным путем к логам
+        /// </summary>
+        private static void InitializeLogging()
+        {
+            try
+            {
+                // Создаем директорию для логов если она не существует
+                LoggingPathService.EnsureLogDirectoryExists();
+                
+                // Устанавливаем переменную окружения для использования в NLog конфигурации
+                Environment.SetEnvironmentVariable("TNLOG_DIRECTORY", LoggingPathService.GetLogDirectory());
+                Environment.SetEnvironmentVariable("TNLOG_INTERNAL_FILE", LoggingPathService.GetInternalLogPath());
+            }
+            catch
+            {
+                // В случае ошибки используем стандартное поведение NLog
+                // Ошибка будет записана в внутренние логи NLog
+            }
+        }
     }
 }
