@@ -903,7 +903,7 @@ function _validateEditCell(cell, type) {
             }
         }
     } else if (type === 'number') {
-        if (!/^\d+$/.test(value)) {
+        if (!/^[+-]?\d*([.,])?\d+$/.test(value)) {
             isValid = false;
             $(input).addClass('invalid-cell-content')
                    .attr('title', 'Введите числовое значение');
