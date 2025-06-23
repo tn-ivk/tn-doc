@@ -246,9 +246,11 @@ function _renderAndAddHandlerUserTable() {
         deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
 
         let actionCell = document.createElement('td');
+        actionCell.classList.add('action-buttons-cell');
+        editDivElement.firstChild.classList.add('action-btn');
+        deleteDivElement.firstChild.classList.add('action-btn');
         actionCell.appendChild(editDivElement);
         actionCell.appendChild(deleteDivElement);
-
         row.appendChild(actionCell);
         table.append(row)
     }
@@ -1831,10 +1833,13 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
         
         // Столбец "Действия"
         let actionCell = document.createElement('td');
+        actionCell.classList.add('action-buttons-cell');
         let editDivElement = document.createElement('div');
         editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
         let deleteDivElement = document.createElement('div');
         deleteDivElement.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+        editDivElement.firstChild.classList.add('action-btn');
+        deleteDivElement.firstChild.classList.add('action-btn');
         actionCell.appendChild(editDivElement);
         actionCell.appendChild(deleteDivElement);
         _addCellStyle(actionCell);
