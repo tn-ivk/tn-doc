@@ -11,14 +11,14 @@
 
 .parameter-selector label {
     font-weight: bold;
-    font-size: 14px;
+    font-size: var(--dictionary-font-size);
     white-space: nowrap;
     margin: 0 10px 0 0;
 }
 
 .parameter-select {
     flex: 1;
-    font-size: 14px;
+    font-size: var(--dictionary-font-size);
     padding: 5px 10px;
     border: 1px solid #ced4da;
     border-radius: 3px;

@@ -8,7 +8,7 @@
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-    font-size: 16px;
+    font-size: var(--dictionary-font-size);
     background: #fff;
 }
 
@@ -23,7 +23,7 @@
     text-align: center;
     padding: 0.7em 1em;
     border: 1px solid #c3d7f7;
-    font-size: 16px;
+    font-size: var(--dictionary-font-size);
 }
 
 .dictionaries-table td,
@@ -35,7 +35,7 @@
     padding: 0.6em 1em;
     text-align: center;
     vertical-align: middle;
-    font-size: 15px;
+    font-size: var(--dictionary-font-size);
     background: #fff;
     transition: background 0.2s;
 }

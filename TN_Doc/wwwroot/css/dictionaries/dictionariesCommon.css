@@ -1,5 +1,9 @@
 /* Общие layout-стили для справочников */
 
+:root {
+    --dictionary-font-size: 14px;
+}
+
 .qp-dir-item, .dir-item {
     height: 80vh !important;
 } 
