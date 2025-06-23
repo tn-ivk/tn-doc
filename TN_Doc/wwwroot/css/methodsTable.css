@@ -2,8 +2,6 @@
 
 /* Стили для навигации по параметрам методов испытаний */
 .parameter-navigation {
-    display: flex;
-    flex-direction: column;
     margin-bottom: 15px;
     padding: 10px;
     background-color: #f8f9fa;
