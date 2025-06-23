@@ -18,7 +18,7 @@
     color: #222;
     background: transparent;
     border: none;
-    border-radius: 0;
+    border-radius: 4px;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
     user-select: none;
@@ -29,11 +29,13 @@
     background: #407cff;
     color: #fff;
     font-weight: bold;
+    border-radius: 4px;
 }
 
 .side-menu-list .side-menu-item:hover:not(.active) {
     background: #e6f0ff;
     color: #174ea6;
+    border-radius: 4px;
 }
 
 /* Для совместимости с Bootstrap list-group */
@@ -44,7 +46,7 @@
 
 .list-group.side-menu-list .list-group-item.side-menu-item {
     border: none;
-    border-radius: 0;
+    border-radius: 4px;
     background: transparent;
     font-size: 17px;
     color: #222;
@@ -57,9 +59,11 @@
     background: #407cff;
     color: #fff;
     font-weight: bold;
+    border-radius: 4px;
 }
 
 .list-group.side-menu-list .list-group-item.side-menu-item:hover:not(.active) {
     background: #e6f0ff;
     color: #174ea6;
+    border-radius: 4px;
 } 
