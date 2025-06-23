@@ -444,5 +444,6 @@ Desktop.ini
 
 CLAUDE.md
 .claude/*
+/TN_Doc/.claude/*
 
 /Tests/
