@@ -1,0 +1,84 @@
+/* Универсальные стили для таблиц справочников (Группы пользователей, Доверенности, Пользователи, Методы испытаний) */
+
+.dictionaries-table,
+.user-group-table,
+.licences-table,
+.users-table,
+.qp-method-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    background: #fff;
+}
+
+.dictionaries-table th,
+.user-group-table th,
+.licences-table th,
+.users-table th,
+.qp-method-table th {
+    background: #e6f0ff;
+    color: #174ea6;
+    font-weight: bold;
+    text-align: center;
+    padding: 0.7em 1em;
+    border: 1px solid #c3d7f7;
+    font-size: 16px;
+}
+
+.dictionaries-table td,
+.user-group-table td,
+.licences-table td,
+.users-table td,
+.qp-method-table td {
+    border: 1px solid #e0e0e0;
+    padding: 0.6em 1em;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 15px;
+    background: #fff;
+    transition: background 0.2s;
+}
+
+.dictionaries-table tr.data-row:hover,
+.user-group-table tr.data-row:hover,
+.licences-table tr.data-row:hover,
+.users-table tr.data-row:hover,
+.qp-method-table tr.data-row:hover {
+    background: #f5faff;
+}
+
+.dictionaries-table tr.data-row,
+.user-group-table tr.data-row,
+.licences-table tr.data-row,
+.users-table tr.data-row,
+.qp-method-table tr.data-row {
+    transition: background 0.2s;
+}
+
+.dictionaries-table thead tr,
+.user-group-table thead tr,
+.licences-table thead tr,
+.users-table thead tr,
+.qp-method-table thead tr {
+    background: #e6f0ff;
+}
+
+/* Центрирование чекбоксов и иконок */
+.dictionaries-table td i,
+.user-group-table td i,
+.licences-table td i,
+.users-table td i,
+.qp-method-table td i {
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+/* Стили для пустых ячеек */
+.dictionaries-table td:empty,
+.user-group-table td:empty,
+.licences-table td:empty,
+.users-table td:empty,
+.qp-method-table td:empty {
+    background: #fafbfc;
+} 

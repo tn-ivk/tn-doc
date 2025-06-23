@@ -1,6 +1,4 @@
-/* Стили для таблицы Методы испытаний с группировкой по параметрам */
-
-/* Стили для навигации по параметрам методов испытаний */
+/* Стили для навигации по параметрам методов испытаний и контейнеров */
 .parameter-navigation {
     margin-bottom: 15px;
     padding: 5px;
@@ -37,9 +35,16 @@
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-/* Контейнер для таблиц методов */
 .methods-tables-container {
     position: relative;
+}
+
+.parameter-table-wrapper {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.parameter-table-wrapper.d-none {
+    display: none;
 }
 
 /* Стили для обёртки таблицы параметра */
