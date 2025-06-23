@@ -980,8 +980,8 @@ function _addValidationHandlers(row) {
             };
         } else if (row.closest('.qp-method-table')) {
             rowMap = {
-                0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 
-                4: 'number', 5: 'text', 6: 'ignore'
+                0: 'bool', 1: 'text', 2: 'bool', 
+                3: 'number', 4: 'text', 5: 'ignore'
             };
         } else {
             return; // Если таблица не распознана, выходим
@@ -1608,11 +1608,33 @@ function _addBtnToAddQp(qpId) {
             item = event.target.closest('button');
         }
         let qpId = item.dataset.qpId;
+        
+        // Получаем текущий выбранный параметр
+        let currentParameterId = item.dataset.currentParameterId;
+        if (!currentParameterId) {
+            // Если параметр не установлен, берем первый доступный
+            let selector = document.querySelector(`[data-qp-id="${qpId}"] .parameter-select`);
+            if (selector && selector.options.length > 0) {
+                currentParameterId = parseInt(selector.value);
+            } else {
+                alert('Нет доступных параметров для добавления метода');
+                return;
+            }
+        }
+        
         let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0 ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
             return accumId > curId ? accumId : curId;
         }) ['Id'] : 1;
+        
+        // Создаем новый метод с привязкой к текущему параметру
         qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
-            Id: maxId + 1, Use: false, IdParameter: 0, Name: '', LimitValueActivate: false, LimitValue: 0, LimitValueString: ''
+            Id: maxId + 1, 
+            Use: false, 
+            IdParameter: parseInt(currentParameterId), 
+            Name: '', 
+            LimitValueActivate: false, 
+            LimitValue: 0, 
+            LimitValueString: ''
         });
 
         _clearQpsConfig();
@@ -1633,9 +1655,15 @@ function _addBtnToAddQp(qpId) {
         let li = document.querySelector('li[data-target="' + '#qpId' + item.dataset.qpId + '"]');
         li.classList.add('active');
         document.querySelector(li.dataset.target).classList.remove('d-none');
-        _scrollToBottomTable(li.dataset.target + ' > .table-container > .table-content');
         
-        let lastRow = document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild;
+        // Переключаемся на таблицу нужного параметра
+        _switchParameterTable(qpId, parseInt(currentParameterId));
+        
+        // Находим текущую видимую таблицу и последнюю строку в ней
+        let visibleTable = document.querySelector(`[data-qp-id="${qpId}"] .parameter-table-wrapper:not(.d-none) table`);
+        if (!visibleTable) return;
+        
+        let lastRow = visibleTable.lastChild;
         let itemBtn = lastRow.querySelector('.edit-methods-btn');
         if (!itemBtn || !lastRow) return;
         
@@ -1673,31 +1701,96 @@ function _clearQpsConfig() {
 }
 
 /*
-* Рендеринг методов паспортов качества 
+* Рендеринг методов паспортов качества с группировкой по параметрам
 */
 function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
+    let methods = qps["Methods"];
+    let parameters = qps["Parameters"];
+    if (!methods || !parameters) return;
+
+    // Создаем контейнер для навигации по параметрам
+    let navigationDiv = document.createElement('div');
+    navigationDiv.classList.add('parameter-navigation', 'mb-3');
+    baseDiv.appendChild(navigationDiv);
+    
+    // Создаем выпадающий список параметров
+    _renderParameterSelector(counter, qps, navigationDiv);
+    
+    // Группируем методы по параметрам
+    let methodsByParameter = _groupMethodsByParameter(methods, parameters);
+    
+    // Создаем контейнер для таблиц
+    let tablesContainer = document.createElement('div');
+    tablesContainer.classList.add('methods-tables-container');
+    tablesContainer.dataset.qpId = counter;
+    baseDiv.appendChild(tablesContainer);
+    
+    // Создаем таблицу для каждого параметра
+    for (let [parameterId, parameterMethods] of Object.entries(methodsByParameter)) {
+        let parameter = parameters.find(p => p.Id === parseInt(parameterId));
+        if (!parameter) continue;
+        
+        _createParameterMethodsTable(counter, parameter, parameterMethods, tablesContainer);
+    }
+    
+    // Показываем первую таблицу по умолчанию
+    _showFirstParameterTable(tablesContainer);
+}
+
+/*
+* Группировка методов по параметрам
+*/
+function _groupMethodsByParameter(methods, parameters) {
+    let methodsByParameter = {};
+    
+    for (let method of methods) {
+        let parameterId = method['IdParameter'] || 0;
+        if (!methodsByParameter[parameterId]) {
+            methodsByParameter[parameterId] = [];
+        }
+        methodsByParameter[parameterId].push(method);
+    }
+    
+    return methodsByParameter;
+}
+
+/*
+* Создание таблицы методов для конкретного параметра
+*/
+function _createParameterMethodsTable(qpId, parameter, methods, container) {
+    let tableWrapper = document.createElement('div');
+    tableWrapper.classList.add('parameter-table-wrapper', 'd-none');
+    tableWrapper.dataset.parameterId = parameter.Id;
+    container.appendChild(tableWrapper);
+    
     let methodsTable = document.createElement('table');
     methodsTable.classList.add('table', 'table-bordered', 'inner-item-center', 'qp-method-table');
-    methodsTable.dataset.qpId = counter;
-    baseDiv.appendChild(methodsTable);
+    methodsTable.dataset.qpId = qpId;
+    methodsTable.dataset.parameterId = parameter.Id;
+    tableWrapper.appendChild(methodsTable);
+    
+    // Создание заголовка таблицы (без колонки "Параметр")
     let tbMethodsHead = document.createElement('thead');
     methodsTable.appendChild(tbMethodsHead);
     let hRow = document.createElement('tr');
     hRow.classList.add('table-primary');
     tbMethodsHead.appendChild(hRow);
+    
     hRow.appendChild(_createTableColumnHeader("Активен"));
     hRow.appendChild(_createTableColumnHeader("Метод"));
-    hRow.appendChild(_createTableColumnHeader("Параметр"));
     hRow.appendChild(_createTableColumnHeader("Контроль мин. значения"));
     hRow.appendChild(_createTableColumnHeader("Мин. значение"));
     hRow.appendChild(_createTableColumnHeader("Сообщение"));
     hRow.appendChild(_createTableColumnHeader("Действия"));
-    let methods = qps["Methods"];
-    if (!methods) return;
+    
+    // Создание строк для методов данного параметра
     for (let method of methods) {
         let row = document.createElement('tr');
         row.classList.add('data-row');
         row.dataset.id = method['Id'];
+        row.dataset.parameterId = parameter.Id;
+        
+        // Столбец "Активен"
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(method['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
@@ -1706,17 +1799,14 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
         usedTd.appendChild(usedSquare);
         _addCellStyle(usedTd)
         row.appendChild(usedTd);
+        
+        // Столбец "Метод"
         let methodName = document.createElement('td');
         methodName.innerText = method['Name'];
         _addCellStyle(methodName);
         row.appendChild(methodName);
-        let paramsArray = qps["Parameters"];
-        let param = paramsArray.filter(item => item["Id"] === method["IdParameter"])[0];
-        let paramCell = document.createElement('td')
-        _addCellStyle(paramCell)
-        paramCell.innerText = param ? param["Name"] : " - ";
-        paramCell.dataset.paramId = param ? param["Id"] : 0;
-        row.appendChild(paramCell);
+        
+        // Столбец "Контроль мин. значения"
         let limitActive = document.createElement('i')
         limitActive.classList.add('fa');
         limitActive.classList.add(method['LimitValueActivate'] === true ? 'fa-check-square-o' : 'fa-square-o');
@@ -1725,14 +1815,20 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
         limitActiveCell.appendChild(limitActive);
         _addCellStyle(limitActiveCell)
         row.appendChild(limitActiveCell);
+        
+        // Столбец "Мин. значение"
         let LimitValueCell = document.createElement('td');
         LimitValueCell.innerText = method['LimitValue'];
         _addCellStyle(LimitValueCell);
         row.appendChild(LimitValueCell);
+        
+        // Столбец "Сообщение"
         let LimitValueStringCell = document.createElement('td');
         LimitValueStringCell.innerText = !method['LimitValueString'] ? '-' : method['LimitValueString'];
         _addCellStyle(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
+        
+        // Столбец "Действия"
         let actionCell = document.createElement('td');
         let editDivElement = document.createElement('div');
         editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
@@ -1743,6 +1839,101 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
         _addCellStyle(actionCell);
         row.appendChild(actionCell)
         methodsTable.appendChild(row);
+    }
+}
+
+/*
+* Создание выпадающего списка для выбора параметра
+*/
+function _renderParameterSelector(qpId, qps, container) {
+    let selectorDiv = document.createElement('div');
+    selectorDiv.classList.add('parameter-selector');
+    
+    let label = document.createElement('label');
+    label.textContent = 'Параметр:';
+    label.classList.add('form-label', 'me-3');
+    selectorDiv.appendChild(label);
+    
+    let select = document.createElement('select');
+    select.classList.add('form-select', 'parameter-select');
+    select.dataset.qpId = qpId;
+    selectorDiv.appendChild(select);
+    
+    // Получаем уникальные параметры из методов
+    let parameters = qps["Parameters"];
+    let methods = qps["Methods"];
+    let usedParameterIds = [...new Set(methods.map(m => m.IdParameter))];
+    
+    // Добавляем опции для каждого используемого параметра
+    for (let parameterId of usedParameterIds) {
+        let parameter = parameters.find(p => p.Id === parameterId);
+        if (!parameter) continue;
+        
+        let option = document.createElement('option');
+        option.value = parameterId;
+        option.textContent = parameter.Name || `Параметр ${parameterId}`;
+        select.appendChild(option);
+    }
+    
+    // Обработчик изменения выбора параметра
+    select.addEventListener('change', function(e) {
+        _switchParameterTable(qpId, parseInt(e.target.value));
+    });
+    
+    container.appendChild(selectorDiv);
+}
+
+/*
+* Переключение между таблицами параметров
+*/
+function _switchParameterTable(qpId, parameterId) {
+    let container = document.querySelector(`[data-qp-id="${qpId}"] .methods-tables-container`);
+    if (!container) return;
+    
+    // Скрываем все таблицы
+    let allTables = container.querySelectorAll('.parameter-table-wrapper');
+    allTables.forEach(table => {
+        table.classList.add('d-none');
+    });
+    
+    // Показываем таблицу для выбранного параметра
+    let selectedTable = container.querySelector(`[data-parameter-id="${parameterId}"]`);
+    if (selectedTable) {
+        selectedTable.classList.remove('d-none');
+    }
+    
+    // Обновляем кнопку "Добавить" для текущего параметра
+    _updateAddButtonForParameter(qpId, parameterId);
+}
+
+/*
+* Показать первую таблицу по умолчанию
+*/
+function _showFirstParameterTable(container) {
+    let firstTable = container.querySelector('.parameter-table-wrapper');
+    if (firstTable) {
+        firstTable.classList.remove('d-none');
+        
+        // Обновляем селектор
+        let qpId = container.dataset.qpId;
+        let parameterId = firstTable.dataset.parameterId;
+        let selector = document.querySelector(`[data-qp-id="${qpId}"] .parameter-select`);
+        if (selector) {
+            selector.value = parameterId;
+        }
+        
+        // Обновляем кнопку добавления
+        _updateAddButtonForParameter(qpId, parseInt(parameterId));
+    }
+}
+
+/*
+* Обновление кнопки "Добавить" для текущего параметра
+*/
+function _updateAddButtonForParameter(qpId, parameterId) {
+    let addButton = document.querySelector(`[data-qp-id="${qpId}"] .add-qp-btn`);
+    if (addButton) {
+        addButton.dataset.currentParameterId = parameterId;
     }
 }
 
@@ -1846,7 +2037,7 @@ function _editQpMethod(row, itemBtn) {
     if (!row || !itemBtn) return;
     
     let rowMap = {
-        0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
+        0: 'bool', 1: 'text', 2: 'bool', 3: 'number', 4: 'text', 5: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
@@ -1951,10 +2142,10 @@ function _getCurrentQpMethodState(rowItem) {
     return {
         use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
         name: cells[1].textContent.trim(),
-        paramId: cells[2].dataset.paramId || "0",
-        limitValueActivate: cells[3].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-        limitValue: cells[4].textContent.trim(),
-        limitValueString: cells[5].textContent.trim()
+        paramId: rowItem.dataset.parameterId || "0",
+        limitValueActivate: cells[2].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        limitValue: cells[3].textContent.trim(),
+        limitValueString: cells[4].textContent.trim()
     };
 }
 
@@ -1988,7 +2179,7 @@ function _cancelEditQpMethod(rowItem, itemId) {
     }
 
     let rowMap = {
-        0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
+        0: 'bool', 1: 'text', 2: 'bool', 3: 'number', 4: 'text', 5: 'ignore'
     };
     
     // Восстанавливаем предыдущее состояние
@@ -2039,22 +2230,19 @@ function _restoreQpMethodState(rowItem, previousState) {
     // Восстанавливаем название метода
     cells[1].textContent = previousState.name;
     
-    // Восстанавливаем параметр
-    const param = qpCfgsDictionaries['QpsInfo'][Number(rowItem.closest('table').dataset.qpId)]['Parameters']
-        .find(p => p.Id === Number(previousState.paramId));
-    cells[2].textContent = param ? param.Name : "Параметр не выбран";
-    cells[2].dataset.paramId = previousState.paramId;
+    // Параметр теперь хранится в dataset строки (колонка удалена)
+    rowItem.dataset.parameterId = previousState.paramId;
     
-    // Восстанавливаем флаг контроля минимального значения
+    // Восстанавливаем флаг контроля минимального значения (теперь индекс 2)
     const limitIcon = document.createElement('i');
     limitIcon.classList.add('fa', previousState.limitValueActivate ? 'fa-check-square-o' : 'fa-square-o');
     limitIcon.ariaHidden = true;
-    cells[3].innerHTML = '';
-    cells[3].appendChild(limitIcon);
+    cells[2].innerHTML = '';
+    cells[2].appendChild(limitIcon);
     
-    // Восстанавливаем минимальное значение и сообщение
-    cells[4].textContent = previousState.limitValue;
-    cells[5].textContent = previousState.limitValueString;
+    // Восстанавливаем минимальное значение и сообщение (индексы сдвинулись)
+    cells[3].textContent = previousState.limitValue;
+    cells[4].textContent = previousState.limitValueString;
 }
 
 /*
@@ -2077,31 +2265,23 @@ function _applyQpMethodsChanged(rowItem, itemId, qpId) {
     // Имя метода
     const nameInput = cells[1].querySelector('input');
     updatedObject['Name'] = nameInput ? nameInput.value : cells[1].textContent;
-    // Параметр
-    const paramSelect = cells[2].querySelector('select');
-    if (paramSelect) {
-        updatedObject['IdParameter'] = Number(paramSelect.value);
-    } else {
-        let parameter = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[2].textContent)[0];
-        if (parameter) {
-            updatedObject['IdParameter'] = parameter['Id'];
-        } else {
-            updatedObject['IdParameter'] = 0;
-        }
+    // Параметр берем из dataset строки (поскольку колонка "Параметр" удалена)
+    if (rowItem.dataset.parameterId) {
+        updatedObject['IdParameter'] = Number(rowItem.dataset.parameterId);
     }
-    // Контроль мин. значения
-    const limitCheckbox = cells[3].querySelector('input[type="checkbox"]');
+    // Контроль мин. значения (теперь индекс 2 вместо 3)
+    const limitCheckbox = cells[2].querySelector('input[type="checkbox"]');
     if (limitCheckbox) {
         updatedObject['LimitValueActivate'] = limitCheckbox.checked;
     } else {
-        updatedObject['LimitValueActivate'] = cells[3].childNodes[0].classList.contains('fa-check-square-o');
+        updatedObject['LimitValueActivate'] = cells[2].childNodes[0].classList.contains('fa-check-square-o');
     }
-    // Мин. значение
-    const limitValueInput = cells[4].querySelector('input');
-    updatedObject['LimitValue'] = limitValueInput ? Number.parseFloat(limitValueInput.value.replaceAll(',', '.')) : Number.parseFloat(cells[4].textContent.replaceAll(',', '.'));
-    // Сообщение
-    const msgInput = cells[5].querySelector('input');
-    let msg = msgInput ? msgInput.value : cells[5].textContent;
+    // Мин. значение (теперь индекс 3 вместо 4)
+    const limitValueInput = cells[3].querySelector('input');
+    updatedObject['LimitValue'] = limitValueInput ? Number.parseFloat(limitValueInput.value.replaceAll(',', '.')) : Number.parseFloat(cells[3].textContent.replaceAll(',', '.'));
+    // Сообщение (теперь индекс 4 вместо 5)
+    const msgInput = cells[4].querySelector('input');
+    let msg = msgInput ? msgInput.value : cells[4].textContent;
     if (!msg) {
         updatedObject['LimitValueString'] = '-';
     } else {
