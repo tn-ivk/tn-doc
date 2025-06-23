@@ -3,10 +3,7 @@
 /* Стили для навигации по параметрам методов испытаний */
 .parameter-navigation {
     margin-bottom: 15px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
+    padding: 5px;
 }
 
 .parameter-selector {
