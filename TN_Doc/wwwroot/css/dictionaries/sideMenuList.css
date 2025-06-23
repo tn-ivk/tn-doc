@@ -26,8 +26,8 @@
 
 .side-menu-list .side-menu-item.active,
 .side-menu-list .side-menu-item:active {
-    background: #407cff;
-    color: #fff;
+    background: var(--dictionary-active-bg);
+    color: var(--dictionary-active-color);
     font-weight: bold;
     border-radius: 4px;
 }
@@ -56,8 +56,8 @@
 
 .list-group.side-menu-list .list-group-item.side-menu-item.active,
 .list-group.side-menu-list .list-group-item.side-menu-item:active {
-    background: #407cff;
-    color: #fff;
+    background: var(--dictionary-active-bg);
+    color: var(--dictionary-active-color);
     font-weight: bold;
     border-radius: 4px;
 }
