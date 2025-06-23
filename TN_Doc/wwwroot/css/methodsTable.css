@@ -67,3 +67,18 @@
     border-color: #0a58ca;
 }
 
+/* Стили для столбца действий */
+.qp-method-table td:last-child {
+    text-align: center;
+}
+
+.qp-method-table td:last-child div {
+    display: inline-block;
+    margin: 5px 2px;
+}
+
+.qp-method-table td:last-child button {
+    display: inline-block;
+    margin: 5px 2px;
+}
+
