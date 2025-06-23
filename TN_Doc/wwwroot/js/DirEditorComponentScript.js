@@ -1613,7 +1613,8 @@ function _addBtnToAddQp(qpId) {
         let currentParameterId = item.dataset.currentParameterId;
         if (!currentParameterId) {
             // Если параметр не установлен, берем первый доступный
-            let selector = document.querySelector(`[data-qp-id="${qpId}"] .parameter-select`);
+            let container = document.querySelector(`.methods-tables-container[data-qp-id="${qpId}"]`);
+            let selector = container ? container.parentElement.querySelector('.parameter-select') : null;
             if (selector && selector.options.length > 0) {
                 currentParameterId = parseInt(selector.value);
             } else {
@@ -1723,6 +1724,7 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
     let tablesContainer = document.createElement('div');
     tablesContainer.classList.add('methods-tables-container');
     tablesContainer.dataset.qpId = counter;
+    console.log('Создан контейнер таблиц с qpId:', counter);
     baseDiv.appendChild(tablesContainer);
     
     // Создаем таблицу для каждого параметра
@@ -1758,9 +1760,11 @@ function _groupMethodsByParameter(methods, parameters) {
 * Создание таблицы методов для конкретного параметра
 */
 function _createParameterMethodsTable(qpId, parameter, methods, container) {
+    console.log('Создаем таблицу для параметра:', parameter.Id, 'с названием:', parameter.Name);
     let tableWrapper = document.createElement('div');
     tableWrapper.classList.add('parameter-table-wrapper', 'd-none');
     tableWrapper.dataset.parameterId = parameter.Id;
+    console.log('Установлен data-parameter-id:', parameter.Id);
     container.appendChild(tableWrapper);
     
     let methodsTable = document.createElement('table');
@@ -1876,6 +1880,8 @@ function _renderParameterSelector(qpId, qps, container) {
     
     // Обработчик изменения выбора параметра
     select.addEventListener('change', function(e) {
+        console.log('Комбобокс изменен. Новое значение:', e.target.value);
+        console.log('qpId для переключения:', qpId);
         _switchParameterTable(qpId, parseInt(e.target.value));
     });
     
@@ -1886,19 +1892,36 @@ function _renderParameterSelector(qpId, qps, container) {
 * Переключение между таблицами параметров
 */
 function _switchParameterTable(qpId, parameterId) {
-    let container = document.querySelector(`[data-qp-id="${qpId}"] .methods-tables-container`);
-    if (!container) return;
+    console.log('_switchParameterTable вызвана с параметрами:', { qpId, parameterId });
+    
+    // Попробуем найти контейнер по data-qp-id
+    let container = document.querySelector(`.methods-tables-container[data-qp-id="${qpId}"]`);
+    console.log('Найден контейнер:', container);
+    if (!container) {
+        console.error('Контейнер не найден для qpId:', qpId);
+        // Дополнительная отладка - покажем все доступные контейнеры
+        let allContainers = document.querySelectorAll('.methods-tables-container');
+        console.log('Все доступные контейнеры:', Array.from(allContainers).map(c => c.dataset.qpId));
+        return;
+    }
     
     // Скрываем все таблицы
     let allTables = container.querySelectorAll('.parameter-table-wrapper');
-    allTables.forEach(table => {
+    console.log('Найдено таблиц:', allTables.length);
+    allTables.forEach((table, index) => {
+        console.log(`Скрываем таблицу ${index}, parameterId: ${table.dataset.parameterId}`);
         table.classList.add('d-none');
     });
     
     // Показываем таблицу для выбранного параметра
     let selectedTable = container.querySelector(`[data-parameter-id="${parameterId}"]`);
+    console.log('Выбранная таблица для parameterId', parameterId, ':', selectedTable);
     if (selectedTable) {
+        console.log('Показываем выбранную таблицу');
         selectedTable.classList.remove('d-none');
+    } else {
+        console.error('Таблица для parameterId', parameterId, 'не найдена');
+        console.log('Доступные parameterId:', Array.from(allTables).map(t => t.dataset.parameterId));
     }
     
     // Обновляем кнопку "Добавить" для текущего параметра
@@ -1916,7 +1939,8 @@ function _showFirstParameterTable(container) {
         // Обновляем селектор
         let qpId = container.dataset.qpId;
         let parameterId = firstTable.dataset.parameterId;
-        let selector = document.querySelector(`[data-qp-id="${qpId}"] .parameter-select`);
+        // Ищем селектор в родительском элементе контейнера
+        let selector = container.parentElement.querySelector('.parameter-select');
         if (selector) {
             selector.value = parameterId;
         }
@@ -1930,7 +1954,7 @@ function _showFirstParameterTable(container) {
 * Обновление кнопки "Добавить" для текущего параметра
 */
 function _updateAddButtonForParameter(qpId, parameterId) {
-    let addButton = document.querySelector(`[data-qp-id="${qpId}"] .add-qp-btn`);
+    let addButton = document.querySelector(`.add-qp-btn[data-qp-id="${qpId}"]`);
     if (addButton) {
         addButton.dataset.currentParameterId = parameterId;
     }
