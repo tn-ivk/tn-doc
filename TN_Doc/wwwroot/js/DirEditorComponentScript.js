@@ -1724,7 +1724,6 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
     let tablesContainer = document.createElement('div');
     tablesContainer.classList.add('methods-tables-container');
     tablesContainer.dataset.qpId = counter;
-    console.log('Создан контейнер таблиц с qpId:', counter);
     baseDiv.appendChild(tablesContainer);
     
     // Создаем таблицу для каждого параметра
@@ -1760,11 +1759,9 @@ function _groupMethodsByParameter(methods, parameters) {
 * Создание таблицы методов для конкретного параметра
 */
 function _createParameterMethodsTable(qpId, parameter, methods, container) {
-    console.log('Создаем таблицу для параметра:', parameter.Id, 'с названием:', parameter.Name);
     let tableWrapper = document.createElement('div');
     tableWrapper.classList.add('parameter-table-wrapper', 'd-none');
     tableWrapper.dataset.parameterId = parameter.Id;
-    console.log('Установлен data-parameter-id:', parameter.Id);
     container.appendChild(tableWrapper);
     
     let methodsTable = document.createElement('table');
@@ -1880,8 +1877,6 @@ function _renderParameterSelector(qpId, qps, container) {
     
     // Обработчик изменения выбора параметра
     select.addEventListener('change', function(e) {
-        console.log('Комбобокс изменен. Новое значение:', e.target.value);
-        console.log('qpId для переключения:', qpId);
         _switchParameterTable(qpId, parseInt(e.target.value));
     });
     
@@ -1892,36 +1887,19 @@ function _renderParameterSelector(qpId, qps, container) {
 * Переключение между таблицами параметров
 */
 function _switchParameterTable(qpId, parameterId) {
-    console.log('_switchParameterTable вызвана с параметрами:', { qpId, parameterId });
-    
-    // Попробуем найти контейнер по data-qp-id
     let container = document.querySelector(`.methods-tables-container[data-qp-id="${qpId}"]`);
-    console.log('Найден контейнер:', container);
-    if (!container) {
-        console.error('Контейнер не найден для qpId:', qpId);
-        // Дополнительная отладка - покажем все доступные контейнеры
-        let allContainers = document.querySelectorAll('.methods-tables-container');
-        console.log('Все доступные контейнеры:', Array.from(allContainers).map(c => c.dataset.qpId));
-        return;
-    }
+    if (!container) return;
     
     // Скрываем все таблицы
     let allTables = container.querySelectorAll('.parameter-table-wrapper');
-    console.log('Найдено таблиц:', allTables.length);
-    allTables.forEach((table, index) => {
-        console.log(`Скрываем таблицу ${index}, parameterId: ${table.dataset.parameterId}`);
+    allTables.forEach(table => {
         table.classList.add('d-none');
     });
     
     // Показываем таблицу для выбранного параметра
     let selectedTable = container.querySelector(`[data-parameter-id="${parameterId}"]`);
-    console.log('Выбранная таблица для parameterId', parameterId, ':', selectedTable);
     if (selectedTable) {
-        console.log('Показываем выбранную таблицу');
         selectedTable.classList.remove('d-none');
-    } else {
-        console.error('Таблица для parameterId', parameterId, 'не найдена');
-        console.log('Доступные parameterId:', Array.from(allTables).map(t => t.dataset.parameterId));
     }
     
     // Обновляем кнопку "Добавить" для текущего параметра
