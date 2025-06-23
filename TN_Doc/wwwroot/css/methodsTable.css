@@ -2,36 +2,36 @@
 
 /* Стили для навигации по параметрам методов испытаний */
 .parameter-navigation {
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
+    margin-bottom: 15px !important;
+    padding: 10px !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 5px !important;
 }
 
 .parameter-selector {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex !important;
+    align-items: center !important;
 }
 
 .parameter-selector label {
-    font-weight: bold;
-    font-size: 14px;
-    margin: 0;
-    white-space: nowrap;
-    margin-right: 10px;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    margin-right: 10px !important;
 }
 
 .parameter-select {
-    flex: 1;
-    font-size: 14px;
-    padding: 5px 10px;
-    border: 1px solid #ced4da;
-    border-radius: 3px;
-    background-color: white;
-    box-sizing: border-box;
-    min-width: 0;
+    flex: 1 !important;
+    font-size: 14px !important;
+    padding: 5px 10px !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 3px !important;
+    background-color: white !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    width: 100% !important;
 }
 
 .parameter-select:focus {

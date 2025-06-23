@@ -1851,11 +1851,10 @@ function _renderParameterSelector(qpId, qps, container) {
     
     let label = document.createElement('label');
     label.textContent = 'Параметр:';
-    label.classList.add('form-label', 'me-3');
     selectorDiv.appendChild(label);
     
     let select = document.createElement('select');
-    select.classList.add('form-select', 'parameter-select');
+    select.classList.add('parameter-select');
     select.dataset.qpId = qpId;
     selectorDiv.appendChild(select);
     
