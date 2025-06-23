@@ -65,6 +65,11 @@
 .qp-method-table thead th {
     color: black;
     border-color: #0a58ca;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    padding: 0.5vh 1vh;
+    text-align: center;
+    vertical-align: middle;
 }
 
 /* Стили для столбца действий */
@@ -74,11 +79,45 @@
 
 .qp-method-table td:last-child div {
     display: inline-block;
-    margin: 5px 2px;
+    margin: 0 2px;
 }
 
 .qp-method-table td:last-child button {
     display: inline-block;
-    margin: 5px 2px;
+    margin: 0;
+    border: 1px solid;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.qp-method-table td:last-child button.btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.qp-method-table td:last-child button.btn-outline-primary:hover {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.qp-method-table td:last-child button.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.qp-method-table td:last-child button.btn-outline-danger:hover {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
 }
 
