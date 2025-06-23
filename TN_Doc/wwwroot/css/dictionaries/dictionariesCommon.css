@@ -1,0 +1,5 @@
+/* Общие layout-стили для справочников */
+
+.qp-dir-item, .dir-item {
+    height: 70vh !important;
+} 
