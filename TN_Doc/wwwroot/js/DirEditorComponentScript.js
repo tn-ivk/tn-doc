@@ -1501,7 +1501,7 @@ function _renderQpConfigs() {
     let counter = 0;
     for (let qp of qpCfgsDictionaries["QpsInfo"]) {
         let liItem = document.createElement('li');
-        liItem.classList.add("list-group-item");
+        liItem.classList.add('list-group-item', 'side-menu-item');
         liItem.textContent = qp["Name"];
         liItem.dataset.target = "#qpId" + counter;
         qpList.append(liItem)
