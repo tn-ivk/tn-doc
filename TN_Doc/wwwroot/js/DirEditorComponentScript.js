@@ -1109,6 +1109,23 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
             let newNumNode = document.createTextNode(previewNode.value.replaceAll('.', ','));
             cell.replaceChild(newNumNode, cell.childNodes[0])
             break;
+        // Добавлено: возвращаем иконку для "Контроль мин. значения" и "Применять по умолчанию"
+        case 'qp-method-limit':
+            let cb = cell.querySelector('input[type="checkbox"]');
+            let icon = document.createElement('i');
+            icon.classList.add('fa');
+            icon.classList.add(cb && cb.checked ? 'fa-check-square-o' : 'fa-square-o');
+            icon.ariaHidden = true;
+            cell.replaceChild(icon, cell.childNodes[0]);
+            break;
+        case 'qp-method-default':
+            let cbDef = cell.querySelector('input[type="checkbox"].default-method-checkbox');
+            let iconDef = document.createElement('i');
+            iconDef.classList.add('fa');
+            iconDef.classList.add(cbDef && cbDef.checked ? 'fa-check-square-o' : 'fa-square-o');
+            iconDef.ariaHidden = true;
+            cell.replaceChild(iconDef, cell.childNodes[0]);
+            break;
         default:
             break
     }
@@ -1121,6 +1138,19 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
 */
 function _convertStableRowToEditRow(row, rowMap) {
     let cells = row.querySelectorAll('td');
+    // Для таблицы методов паспорта качества используем специальную карту типов
+    if (row.closest('.qp-method-table')) {
+        // Индексы: 0 - Активен, 1 - Метод, 2 - Контроль мин. значения, 3 - Мин. значение, 4 - Сообщение, 5 - Применять по умолчанию, 6 - Действия
+        rowMap = {
+            0: 'bool',
+            1: 'text',
+            2: 'qp-method-limit',
+            3: 'number',
+            4: 'text',
+            5: 'qp-method-default',
+            6: 'ignore'
+        };
+    }
     for (let i = 0; i < cells.length; i++) {
         _convertStableCellToEditCell(cells[i], rowMap[i])
     }
@@ -1231,6 +1261,24 @@ function _convertStableCellToEditCell(cell, type) {
             if (previewNode) {
                 cell.replaceChild(newElement, previewNode)
             } else cell.append(newElement);
+            break;
+        // Добавлено: чекбокс для "Контроль мин. значения" (индекс 2) и "Применять по умолчанию" (индекс 5)
+        case 'qp-method-limit':
+            // Контроль мин. значения
+            let icon = cell.querySelector('i');
+            let cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = icon && icon.classList.contains('fa-check-square-o');
+            cell.replaceChild(cb, cell.childNodes[0]);
+            break;
+        case 'qp-method-default':
+            // Применять по умолчанию
+            let iconDef = cell.querySelector('i');
+            let cbDef = document.createElement('input');
+            cbDef.type = 'checkbox';
+            cbDef.classList.add('default-method-checkbox');
+            cbDef.checked = iconDef && iconDef.classList.contains('fa-check-square-o');
+            cell.replaceChild(cbDef, cell.childNodes[0]);
             break;
         default:
             break
@@ -1803,7 +1851,6 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
     
     // Создание строк для методов данного параметра
     for (let method of methods) {
-        // Гарантируем наличие поля IsDefault
         if (typeof method.IsDefault === 'undefined') method.IsDefault = false;
         let row = document.createElement('tr');
         row.classList.add('data-row');
@@ -1823,7 +1870,7 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
         methodName.innerText = method['Name'];
         _addCellStyle(methodName);
         row.appendChild(methodName);
-        // Контроль мин. значения
+        // Контроль мин. значения (только иконка, чекбокс будет в режиме редактирования)
         let limitActive = document.createElement('i')
         limitActive.classList.add('fa');
         limitActive.classList.add(method['LimitValueActivate'] === true ? 'fa-check-square-o' : 'fa-square-o');
@@ -1842,38 +1889,13 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
         LimitValueStringCell.innerText = !method['LimitValueString'] ? '-' : method['LimitValueString'];
         _addCellStyle(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
-        // Применять по умолчанию (новая колонка)
+        // Применять по умолчанию (только иконка, чекбокс будет в режиме редактирования)
         let defaultCell = document.createElement('td');
-        let defaultCheckbox = document.createElement('input');
-        defaultCheckbox.type = 'checkbox';
-        defaultCheckbox.checked = !!method.IsDefault;
-        defaultCheckbox.classList.add('default-method-checkbox');
-        defaultCheckbox.style.cursor = 'pointer';
-        // Стилизация под чекбокс как в "Контроль мин. значения"
-        defaultCheckbox.style.width = '1.2em';
-        defaultCheckbox.style.height = '1.2em';
-        defaultCheckbox.addEventListener('click', function(e) {
-            let table = row.closest('table');
-            let paramId = Number(row.dataset.parameterId);
-            let qpId = Number(table.dataset.qpId);
-            let methodsArr = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].filter(m => m.IdParameter === paramId);
-            if (this.checked) {
-                // Снимаем все остальные
-                methodsArr.forEach(m => m.IsDefault = false);
-                method.IsDefault = true;
-                // Обновляем UI
-                let rows = table.querySelectorAll('tr.data-row');
-                rows.forEach(r => {
-                    if (Number(r.dataset.id) !== method.Id) {
-                        let cb = r.querySelector('input.default-method-checkbox');
-                        if (cb) cb.checked = false;
-                    }
-                });
-            } else {
-                method.IsDefault = false;
-            }
-        });
-        defaultCell.appendChild(defaultCheckbox);
+        let defaultIcon = document.createElement('i');
+        defaultIcon.classList.add('fa');
+        defaultIcon.classList.add(method.IsDefault ? 'fa-check-square-o' : 'fa-square-o');
+        defaultIcon.ariaHidden = true;
+        defaultCell.appendChild(defaultIcon);
         _addCellStyle(defaultCell);
         row.appendChild(defaultCell);
         // Действия
