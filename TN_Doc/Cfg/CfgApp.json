@@ -89,7 +89,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 2,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
@@ -1251,7 +1251,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 2,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
@@ -2413,7 +2413,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
             },
             {
-              "Use": true,
+              "Use": false,
               "Id": 2,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
