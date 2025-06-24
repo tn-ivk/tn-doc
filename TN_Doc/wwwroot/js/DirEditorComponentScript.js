@@ -2651,9 +2651,11 @@ function _renderUserGroupSelector() {
         let usersSection = document.querySelector('#users');
         container = document.createElement('div');
         container.id = 'users-group-selector-container';
+        container.classList.add('parameter-navigation');
         usersSection.prepend(container);
     } else {
         container.innerHTML = '';
+        container.classList.add('parameter-navigation');
     }
     // Создаём обёртку для label и select
     let selectorDiv = document.createElement('div');
