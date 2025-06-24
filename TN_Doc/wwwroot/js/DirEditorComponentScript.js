@@ -135,16 +135,20 @@ function _renderAndAddHandlerLicencesTable() {
         row.appendChild(dateCell);
 
         let actionCell = document.createElement('td');
+        actionCell.classList.add('action-buttons-cell');
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1'));
+        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1');
+        editBtn.classList.add('action-btn');
+        editDivElement.appendChild(editBtn);
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+        let deleteBtn = _createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', '');
+        deleteBtn.classList.add('action-btn');
+        deleteDivElement.appendChild(deleteBtn);
         actionCell.appendChild(editDivElement);
         actionCell.appendChild(deleteDivElement);
         row.appendChild(actionCell);
         table.append(row)
     }
-
 }
 
 /*
