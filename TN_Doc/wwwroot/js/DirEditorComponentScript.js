@@ -281,6 +281,7 @@ function _addCellStyle(cell) {
 function _createDeleteUserBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.classList.add('delete-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
         _deleteSelectedRowHandler(e, 'Users');
     });
@@ -296,6 +297,7 @@ function _createDeleteUserBtn(faClass, buttonClass, margin) {
 function _createDeleteLicenseBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.classList.add('delete-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
         _cleatUserLicId(e)
         _deleteSelectedRowHandler(e, 'Licenses');
@@ -352,6 +354,7 @@ function _createEditLicensesButton(faClass, buttonClass) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-licences-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
         let itemBtn;
         if (e.target.tagName === 'I') {
@@ -377,6 +380,7 @@ function _createEditUsersButton(faClass, buttonClass) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-user-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
         let itemBtn;
         if (e.target.tagName === 'I') {
@@ -399,8 +403,9 @@ function _createEditUsersButton(faClass, buttonClass) {
     @param margin - конфигурация отсутупов
 */
 function _createCancelEditButton(faClass, buttonClass) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass);
+    let btn = _createWithOnlyImgButton(faClass, 'btn-outline-danger');
     btn.classList.add('cancel-edit-btn');
+    btn.classList.add('action-btn'); // обязательно для кастомных стилей!
     btn.addEventListener('click', function (e) {
         let itemBtn;
         if (e.target.tagName === 'I') {
@@ -411,7 +416,6 @@ function _createCancelEditButton(faClass, buttonClass) {
         let rowItem = itemBtn.closest('tr')
         let itemId = Number(rowItem.dataset.id);
         if (!itemId) return;
-        
         // Определяем тип таблицы и вызываем соответствующую функцию отмены
         if (rowItem.closest('.users-table')) {
             _cancelEditUser(rowItem, itemId);
@@ -421,7 +425,7 @@ function _createCancelEditButton(faClass, buttonClass) {
             _cancelEditQpMethod(rowItem, itemId);
         }
     });
-    return btn
+    return btn;
 }
 
 /*
@@ -2015,8 +2019,9 @@ function _updateAddButtonForParameter(qpId, parameterId) {
     Создание кнопки удаления методов из паспортов качества
 */
 function _createDeleteQpMethodsBtn(faClass, buttonClass) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass);
+    let btn = _createWithOnlyImgButton(faClass, 'btn-outline-danger');
     btn.classList.add('delete-btn');
+    btn.classList.add('action-btn'); // обязательно для кастомных стилей!
     btn.addEventListener('click', function(e) {
         let row = e.target.closest('tr');
         if (!row) return;
@@ -2035,33 +2040,16 @@ function _createDeleteQpMethodsBtn(faClass, buttonClass) {
     Создание кнопки редактирования методов
 */
 function _createEditQpMethodsBtn(faClass, buttonClass) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass);
+    let btn = _createWithOnlyImgButton(faClass, 'btn-outline-primary');
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-methods-btn');
-    
-    // Обновляем иконку в зависимости от режима
-    const updateIcon = () => {
-        const icon = btn.querySelector('i');
-        if (icon) {
-            icon.className = 'fa';
-            icon.classList.add(btn.dataset.mode === 'stable' ? 'fa-lock' : 'fa-unlock');
-        }
-    };
-    
-    // Обновляем иконку при изменении режима
-    const observer = new MutationObserver(updateIcon);
-    observer.observe(btn, { attributes: true, attributeFilter: ['data-mode'] });
-    
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function(e) {
         let item = e.target.tagName === 'I' ? e.target.closest('button') : e.target;
         let row = item.closest('tr');
         if (!row) return;
         _editQpMethod(row, item);
     });
-    
-    // Инициализируем иконку
-    updateIcon();
-    
     return btn;
 }
 
