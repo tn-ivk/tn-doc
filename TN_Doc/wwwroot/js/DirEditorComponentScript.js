@@ -38,7 +38,10 @@ function _renderAppDictionaries() {
     _addDitctionariesHandler();
     _renderUserGroupsRowTable();
     _renderAndAddHandlerLicencesTable();
-    _renderAndAddHandlerUserTable();
+    _renderUserGroupSelector();
+    let selector = document.querySelector('#users-group-selector');
+    let selectedGroupId = selector ? Number(selector.value) : (appDictionaries['UsersGroup'][0]?.Id || 1);
+    _renderAndAddHandlerUserTable(selectedGroupId);
     _addLicHandler();
     _addUserHandler();
 }
@@ -154,12 +157,19 @@ function _renderAndAddHandlerLicencesTable() {
 /*
     Отрисовка таблицы пользователей.
 */
-function _renderAndAddHandlerUserTable() {
+function _renderAndAddHandlerUserTable(selectedGroupId) {
     let table = document.querySelector('.users-table');
-    let usersGroups = appDictionaries['UsersGroup'];
     let licences = appDictionaries['Licenses'];
-    for (let user of appDictionaries['Users']) {
-
+    // Если не передан selectedGroupId, берём первый из списка
+    if (typeof selectedGroupId === 'undefined' || selectedGroupId === null) {
+        let selector = document.querySelector('#users-group-selector');
+        if (selector) selectedGroupId = Number(selector.value);
+        else if (appDictionaries['UsersGroup'].length > 0) selectedGroupId = appDictionaries['UsersGroup'][0].Id;
+        else selectedGroupId = 1;
+    }
+    // Оставляем только пользователей выбранной группы
+    let users = appDictionaries['Users'].filter(u => u['IdGroup'] === selectedGroupId);
+    for (let user of users) {
         let row = document.createElement('tr')
         row.classList.add('data-row')
         row.dataset.id = user['Id'];
@@ -173,10 +183,7 @@ function _renderAndAddHandlerUserTable() {
         _addCellStyle(usedCell);
         row.appendChild(usedCell);
 
-        let groupNameCell = document.createElement('td');
-        groupNameCell.innerText = usersGroups.filter(group => group['Id'] === user['IdGroup'])[0]['Name'];
-        _addCellStyle(groupNameCell);
-        row.appendChild(groupNameCell);
+        // Удаляем колонку "Группа" (теперь она в селекторе)
 
         let surnameCell = document.createElement('td');
         surnameCell.innerText = user.F;
@@ -205,7 +212,6 @@ function _renderAndAddHandlerUserTable() {
 
         let licCell = document.createElement('td');
         _addCellStyle(licCell);
-
         let licItem = licences.filter(lic => lic['Id'] === user['LicId'])[0];
         if (licItem) {
             licCell.innerText = `${licItem['LicensesNumber']}`;
@@ -245,10 +251,8 @@ function _renderAndAddHandlerUserTable() {
 
         let editDivElement = document.createElement('div');
         editDivElement.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary'));
-
         let deleteDivElement = document.createElement('div');
         deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
-
         let actionCell = document.createElement('td');
         actionCell.classList.add('action-buttons-cell');
         editDivElement.firstChild.classList.add('action-btn');
@@ -1307,13 +1311,15 @@ function _addLicHandler() {
 */
 function _addUserHandler() {
     document.querySelector('.add-user-btn').addEventListener('click', function () {
+        let selector = document.querySelector('#users-group-selector');
+        let selectedGroupId = selector ? Number(selector.value) : (appDictionaries['UsersGroup'][0]?.Id || 1);
         let maxId = appDictionaries['Users'].length !== 0 ? appDictionaries['Users'].reduce((aid, cid) => {
             return aid > cid ? aid : cid;
         })['Id'] : 0;
         appDictionaries['Users'].push({
             Use: false,
             Id: maxId + 1, 
-            IdGroup: 1,
+            IdGroup: selectedGroupId,
             F: "",
             I: "", 
             O: "", 
@@ -1324,7 +1330,7 @@ function _addUserHandler() {
             UseShortFullNameForm:true,
         })
         _clearRowTable('.users-table')
-        _renderAndAddHandlerUserTable();
+        _renderAndAddHandlerUserTable(selectedGroupId);
         _scrollToBottomTable(' #users >.table-container> .table-content');
 
         let lastRow = document.querySelector('.users-table').lastChild;
@@ -2636,5 +2642,40 @@ function _cancelEditLicence(rowItem, itemId) {
     // Добавляем кнопки просмотра
     editDiv.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary'));
     deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger'));
+}
+
+// 1. Функция рендера комбобокса выбора группы
+function _renderUserGroupSelector() {
+    let container = document.querySelector('#users-group-selector-container');
+    if (!container) {
+        let usersSection = document.querySelector('#users');
+        container = document.createElement('div');
+        container.id = 'users-group-selector-container';
+        usersSection.prepend(container);
+    } else {
+        container.innerHTML = '';
+    }
+    // Создаём обёртку для label и select
+    let selectorDiv = document.createElement('div');
+    selectorDiv.classList.add('parameter-selector');
+    let label = document.createElement('label');
+    label.textContent = 'Группа:';
+    label.setAttribute('for', 'users-group-selector');
+    selectorDiv.appendChild(label);
+    let select = document.createElement('select');
+    select.id = 'users-group-selector';
+    select.classList.add('parameter-select');
+    for (let group of appDictionaries['UsersGroup']) {
+        let option = document.createElement('option');
+        option.value = group.Id;
+        option.textContent = group.Name;
+        select.appendChild(option);
+    }
+    selectorDiv.appendChild(select);
+    container.appendChild(selectorDiv);
+    select.addEventListener('change', function() {
+        _clearRowTable('.users-table');
+        _renderAndAddHandlerUserTable(Number(this.value));
+    });
 }
 
