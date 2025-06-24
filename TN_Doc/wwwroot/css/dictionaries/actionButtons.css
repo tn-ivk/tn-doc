@@ -2,16 +2,33 @@
 
 .action-buttons-cell {
     text-align: center;
+    white-space: nowrap;
+    padding-left: 0;
+    padding-right: 0;
+    width: 1%;
+}
+
+/* Заголовок колонки действий */
+.action-buttons-header {
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 0;
+    padding-right: 0;
+    width: 1%;
 }
 
 .action-buttons-cell div {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     margin: 0 2px;
+    vertical-align: middle;
 }
 
 .action-btn {
-    display: inline-block;
-    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
     border: 1px solid;
     border-radius: 0.375rem;
     padding: 0.375rem 0.75rem;

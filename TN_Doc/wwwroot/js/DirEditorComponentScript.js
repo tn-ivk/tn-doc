@@ -1788,7 +1788,9 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
     hRow.appendChild(_createTableColumnHeader("Контроль мин. значения"));
     hRow.appendChild(_createTableColumnHeader("Мин. значение"));
     hRow.appendChild(_createTableColumnHeader("Сообщение"));
-    hRow.appendChild(_createTableColumnHeader("Действия"));
+    let actionsTh = _createTableColumnHeader("Действия");
+    actionsTh.classList.add('action-buttons-header');
+    hRow.appendChild(actionsTh);
     
     // Создание строк для методов данного параметра
     for (let method of methods) {
