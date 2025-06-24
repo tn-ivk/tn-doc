@@ -382,6 +382,8 @@ function _createEditUsersButton(faClass, buttonClass) {
     btn.classList.add('edit-user-btn');
     btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         let itemBtn;
         if (e.target.tagName === 'I') {
             itemBtn = e.target.closest('button')
@@ -407,6 +409,8 @@ function _createCancelEditButton(faClass, buttonClass) {
     btn.classList.add('cancel-edit-btn');
     btn.classList.add('action-btn'); // обязательно для кастомных стилей!
     btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         let itemBtn;
         if (e.target.tagName === 'I') {
             itemBtn = e.target.closest('button')
@@ -524,18 +528,38 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         
         // Меняем кнопки
         let actionCell = rowItem.querySelector('td:last-child');
+        
+        // Удаляем лишние элементы (например, checkbox) из action-ячейки
+        let extraElements = actionCell.querySelectorAll('input, span, i:not(button i)');
+        extraElements.forEach(element => element.remove());
+        
+        // Проверяем количество div и создаем недостающие
+        let divs = actionCell.querySelectorAll('div');
+        if (divs.length < 2) {
+            // Очищаем action-ячейку и создаем структуру заново
+            actionCell.innerHTML = '';
+            
+            // Создаем editDiv
+            let editDiv = document.createElement('div');
+            actionCell.appendChild(editDiv);
+            
+            // Создаем deleteDiv
+            let deleteDiv = document.createElement('div');
+            actionCell.appendChild(deleteDiv);
+        }
+        
         let editDiv = actionCell.querySelector('div:first-child');
         let deleteDiv = actionCell.querySelector('div:last-child');
         
         // Удаляем текущие кнопки
-        editDiv.innerHTML = '';
-        deleteDiv.innerHTML = '';
+        if (editDiv) editDiv.innerHTML = '';
+        if (deleteDiv) deleteDiv.innerHTML = '';
         
         // Добавляем кнопки редактирования
         let editBtn = _createEditUsersButton('fa-unlock', 'btn-outline-primary');
         editBtn.dataset.mode = 'edit';
-        editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger'));
+        if (editDiv) editDiv.appendChild(editBtn);
+        if (deleteDiv) deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger'));
         
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
@@ -561,18 +585,38 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         
         // Меняем кнопки обратно
         let actionCell = rowItem.querySelector('td:last-child');
+        
+        // Удаляем лишние элементы из action-ячейки
+        let extraElements = actionCell.querySelectorAll('input, span, i:not(button i)');
+        extraElements.forEach(element => element.remove());
+        
+        // Проверяем количество div и создаем недостающие
+        let divs = actionCell.querySelectorAll('div');
+        if (divs.length < 2) {
+            // Очищаем action-ячейку и создаем структуру заново
+            actionCell.innerHTML = '';
+            
+            // Создаем editDiv
+            let editDiv = document.createElement('div');
+            actionCell.appendChild(editDiv);
+            
+            // Создаем deleteDiv
+            let deleteDiv = document.createElement('div');
+            actionCell.appendChild(deleteDiv);
+        }
+        
         let editDiv = actionCell.querySelector('div:first-child');
         let deleteDiv = actionCell.querySelector('div:last-child');
         
         // Удаляем текущие кнопки
-        editDiv.innerHTML = '';
-        deleteDiv.innerHTML = '';
+        if (editDiv) editDiv.innerHTML = '';
+        if (deleteDiv) deleteDiv.innerHTML = '';
         
         // Добавляем кнопки просмотра
         let editBtn = _createEditUsersButton('fa-lock', 'btn-outline-primary');
         editBtn.dataset.mode = 'stable';
-        editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
+        if (editDiv) editDiv.appendChild(editBtn);
+        if (deleteDiv) deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
     }
 }
 
