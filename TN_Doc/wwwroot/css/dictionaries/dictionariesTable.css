@@ -112,4 +112,26 @@
 .users-table tr:last-child td,
 .qp-method-table tr:last-child td {
     border-bottom: none;
+}
+
+.group-selector-wrapper {
+    flex: 0 0 auto;
+    margin-bottom: 10px;
+}
+.table-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+.table-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+.table-bottom-menu {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
 } 
