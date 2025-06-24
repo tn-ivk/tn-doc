@@ -137,11 +137,11 @@ function _renderAndAddHandlerLicencesTable() {
         let actionCell = document.createElement('td');
         actionCell.classList.add('action-buttons-cell');
         let editDivElement = document.createElement('div');
-        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary');
         editBtn.classList.add('action-btn');
         editDivElement.appendChild(editBtn);
         let deleteDivElement = document.createElement('div');
-        let deleteBtn = _createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', '');
+        let deleteBtn = _createDeleteLicenseBtn('fa-trash', 'btn-outline-danger');
         deleteBtn.classList.add('action-btn');
         deleteDivElement.appendChild(deleteBtn);
         actionCell.appendChild(editDivElement);
@@ -244,10 +244,10 @@ function _renderAndAddHandlerUserTable() {
         row.appendChild(shortFormCell);
 
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
+        editDivElement.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary'));
 
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
+        deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
 
         let actionCell = document.createElement('td');
         actionCell.classList.add('action-buttons-cell');
@@ -344,8 +344,8 @@ function _deleteSelectedRowHandler(e, arrayName) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createEditLicensesButton(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createEditLicensesButton(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-licences-btn');
     btn.addEventListener('click', function (e) {
@@ -369,8 +369,8 @@ function _createEditLicensesButton(faClass, buttonClass, margin) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createEditUsersButton(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createEditUsersButton(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-user-btn');
     btn.addEventListener('click', function (e) {
@@ -394,8 +394,8 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createCancelEditButton(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createCancelEditButton(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.classList.add('cancel-edit-btn');
     btn.addEventListener('click', function (e) {
         let itemBtn;
@@ -477,8 +477,8 @@ function _cancelEditUser(rowItem, itemId) {
     deleteDiv.innerHTML = '';
     
     // Добавляем кнопки просмотра
-    editDiv.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
-    deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
+    editDiv.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary'));
+    deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
 }
 
 /*
@@ -524,10 +524,10 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         deleteDiv.innerHTML = '';
         
         // Добавляем кнопки редактирования
-        let editBtn = _createEditUsersButton('fa-unlock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditUsersButton('fa-unlock', 'btn-outline-primary');
         editBtn.dataset.mode = 'edit';
         editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger', ''));
+        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger'));
         
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
@@ -561,10 +561,10 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         deleteDiv.innerHTML = '';
         
         // Добавляем кнопки просмотра
-        let editBtn = _createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditUsersButton('fa-lock', 'btn-outline-primary');
         editBtn.dataset.mode = 'stable';
         editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
+        deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
     }
 }
 
@@ -689,10 +689,10 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
         deleteDiv.innerHTML = '';
         
         // Добавляем кнопки редактирования
-        let editBtn = _createEditLicensesButton('fa-unlock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditLicensesButton('fa-unlock', 'btn-outline-primary');
         editBtn.dataset.mode = 'edit';
         editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger', ''));
+        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger'));
         
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
@@ -726,10 +726,10 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
         deleteDiv.innerHTML = '';
         
         // Добавляем кнопки просмотра
-        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary');
         editBtn.dataset.mode = 'stable';
         editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+        deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger'));
         
         // Обновляем таблицу пользователей
         _clearRowTable('.users-table');
@@ -1841,9 +1841,9 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
         let actionCell = document.createElement('td');
         actionCell.classList.add('action-buttons-cell');
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
+        editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary'));
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+        deleteDivElement.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger'));
         editDivElement.firstChild.classList.add('action-btn');
         deleteDivElement.firstChild.classList.add('action-btn');
         actionCell.appendChild(editDivElement);
@@ -1953,8 +1953,8 @@ function _updateAddButtonForParameter(qpId, parameterId) {
 /*
     Создание кнопки удаления методов из паспортов качества
 */
-function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createDeleteQpMethodsBtn(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.classList.add('delete-btn');
     btn.addEventListener('click', function(e) {
         let row = e.target.closest('tr');
@@ -1973,8 +1973,8 @@ function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
 /*
     Создание кнопки редактирования методов
 */
-function _createEditQpMethodsBtn(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createEditQpMethodsBtn(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-methods-btn');
     
@@ -2090,11 +2090,11 @@ function _editQpMethod(row, itemBtn) {
             deleteDiv.innerHTML = '';
             
             // Добавляем кнопки редактирования
-            let editBtn = _createEditQpMethodsBtn('fa-unlock', 'btn-outline-primary', 'me-1');
+            let editBtn = _createEditQpMethodsBtn('fa-unlock', 'btn-outline-primary');
             editBtn.dataset.mode = 'edit';
             editDiv.appendChild(editBtn);
             
-            let cancelBtn = _createCancelEditButton('fa-times', 'btn-outline-danger', '');
+            let cancelBtn = _createCancelEditButton('fa-times', 'btn-outline-danger');
             deleteDiv.appendChild(cancelBtn);
         }
         
@@ -2132,11 +2132,11 @@ function _editQpMethod(row, itemBtn) {
             deleteDiv.innerHTML = '';
             
             // Добавляем кнопки просмотра
-            let editBtn = _createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1');
+            let editBtn = _createEditQpMethodsBtn('fa-lock', 'btn-outline-primary');
             editBtn.dataset.mode = 'stable';
             editDiv.appendChild(editBtn);
             
-            let deleteBtn = _createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', '');
+            let deleteBtn = _createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger');
             deleteDiv.appendChild(deleteBtn);
         }
         
@@ -2221,7 +2221,7 @@ function _cancelEditQpMethod(rowItem, itemId) {
     
     // Добавляем кнопки просмотра
     editDiv.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
-    deleteDiv.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+    deleteDiv.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', '0 2px'));
 }
 
 /*
@@ -2374,7 +2374,7 @@ function _modificateElementClasses(selector, className, isRemove) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createWithOnlyImgButton(faClass, buttonClass, margin) {
+function _createWithOnlyImgButton(faClass, buttonClass) {
     let img = document.createElement('i');
     img.classList.add('fa');
     if (typeof faClass === 'string') {
@@ -2404,7 +2404,6 @@ function _createWithOnlyImgButton(faClass, buttonClass, margin) {
         }
     }
     btn.appendChild(img);
-    btn.style.margin = margin;
     btn.style.alignSelf = 'center';
     return btn;
 }
@@ -2635,7 +2634,7 @@ function _cancelEditLicence(rowItem, itemId) {
     deleteDiv.innerHTML = '';
     
     // Добавляем кнопки просмотра
-    editDiv.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1'));
-    deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+    editDiv.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary'));
+    deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger'));
 }
 
