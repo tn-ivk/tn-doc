@@ -6,10 +6,15 @@
 .users-table,
 .qp-method-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-family: Arial, sans-serif;
     font-size: var(--dictionary-font-size);
     background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px 0 rgba(27, 110, 194, 0.08), 0 1.5px 4px 0 rgba(27, 110, 194, 0.06);
+    overflow: hidden;
+    border: 1px solid #e0e6ef;
 }
 
 .dictionaries-table th,
@@ -22,8 +27,23 @@
     font-weight: bold;
     text-align: center;
     padding: 0.7em 1em;
-    border: 1px solid #c3d7f7;
+    border: none;
     font-size: var(--dictionary-font-size);
+}
+
+.dictionaries-table thead tr th:first-child,
+.user-group-table thead tr th:first-child,
+.licences-table thead tr th:first-child,
+.users-table thead tr th:first-child,
+.qp-method-table thead tr th:first-child {
+    border-top-left-radius: 12px;
+}
+.dictionaries-table thead tr th:last-child,
+.user-group-table thead tr th:last-child,
+.licences-table thead tr th:last-child,
+.users-table thead tr th:last-child,
+.qp-method-table thead tr th:last-child {
+    border-top-right-radius: 12px;
 }
 
 .dictionaries-table td,
@@ -31,7 +51,8 @@
 .licences-table td,
 .users-table td,
 .qp-method-table td {
-    border: 1px solid #e0e0e0;
+    border: none;
+    border-bottom: 1px solid #e0e6ef;
     padding: 0.6em 1em;
     text-align: center;
     vertical-align: middle;
@@ -46,6 +67,7 @@
 .users-table tr.data-row:hover,
 .qp-method-table tr.data-row:hover {
     background: #f5faff;
+    transition: background 0.2s;
 }
 
 .dictionaries-table tr.data-row,
@@ -81,4 +103,13 @@
 .users-table td:empty,
 .qp-method-table td:empty {
     background: #fafbfc;
+}
+
+/* Убираем нижнюю границу у последней строки */
+.dictionaries-table tr:last-child td,
+.user-group-table tr:last-child td,
+.licences-table tr:last-child td,
+.users-table tr:last-child td,
+.qp-method-table tr:last-child td {
+    border-bottom: none;
 } 
