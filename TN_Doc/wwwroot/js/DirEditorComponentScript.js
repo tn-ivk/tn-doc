@@ -1647,7 +1647,8 @@ function _addBtnToAddQp(qpId) {
             Name: '', 
             LimitValueActivate: false, 
             LimitValue: 0, 
-            LimitValueString: ''
+            LimitValueString: '',
+            IsDefault: false // Новое поле
         });
 
         _clearQpsConfig();
@@ -1794,18 +1795,21 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
     hRow.appendChild(_createTableColumnHeader("Контроль мин. значения"));
     hRow.appendChild(_createTableColumnHeader("Мин. значение"));
     hRow.appendChild(_createTableColumnHeader("Сообщение"));
+    // Новая колонка
+    hRow.appendChild(_createTableColumnHeader("Применять по умолчанию"));
     let actionsTh = _createTableColumnHeader("Действия");
     actionsTh.classList.add('action-buttons-header');
     hRow.appendChild(actionsTh);
     
     // Создание строк для методов данного параметра
     for (let method of methods) {
+        // Гарантируем наличие поля IsDefault
+        if (typeof method.IsDefault === 'undefined') method.IsDefault = false;
         let row = document.createElement('tr');
         row.classList.add('data-row');
         row.dataset.id = method['Id'];
         row.dataset.parameterId = parameter.Id;
-        
-        // Столбец "Активен"
+        // Активен
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(method['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
@@ -1814,14 +1818,12 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
         usedTd.appendChild(usedSquare);
         _addCellStyle(usedTd)
         row.appendChild(usedTd);
-        
-        // Столбец "Метод"
+        // Метод
         let methodName = document.createElement('td');
         methodName.innerText = method['Name'];
         _addCellStyle(methodName);
         row.appendChild(methodName);
-        
-        // Столбец "Контроль мин. значения"
+        // Контроль мин. значения
         let limitActive = document.createElement('i')
         limitActive.classList.add('fa');
         limitActive.classList.add(method['LimitValueActivate'] === true ? 'fa-check-square-o' : 'fa-square-o');
@@ -1830,20 +1832,51 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
         limitActiveCell.appendChild(limitActive);
         _addCellStyle(limitActiveCell)
         row.appendChild(limitActiveCell);
-        
-        // Столбец "Мин. значение"
+        // Мин. значение
         let LimitValueCell = document.createElement('td');
         LimitValueCell.innerText = method['LimitValue'];
         _addCellStyle(LimitValueCell);
         row.appendChild(LimitValueCell);
-        
-        // Столбец "Сообщение"
+        // Сообщение
         let LimitValueStringCell = document.createElement('td');
         LimitValueStringCell.innerText = !method['LimitValueString'] ? '-' : method['LimitValueString'];
         _addCellStyle(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
-        
-        // Столбец "Действия"
+        // Применять по умолчанию (новая колонка)
+        let defaultCell = document.createElement('td');
+        let defaultCheckbox = document.createElement('input');
+        defaultCheckbox.type = 'checkbox';
+        defaultCheckbox.checked = !!method.IsDefault;
+        defaultCheckbox.classList.add('default-method-checkbox');
+        defaultCheckbox.style.cursor = 'pointer';
+        // Стилизация под чекбокс как в "Контроль мин. значения"
+        defaultCheckbox.style.width = '1.2em';
+        defaultCheckbox.style.height = '1.2em';
+        defaultCheckbox.addEventListener('click', function(e) {
+            let table = row.closest('table');
+            let paramId = Number(row.dataset.parameterId);
+            let qpId = Number(table.dataset.qpId);
+            let methodsArr = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].filter(m => m.IdParameter === paramId);
+            if (this.checked) {
+                // Снимаем все остальные
+                methodsArr.forEach(m => m.IsDefault = false);
+                method.IsDefault = true;
+                // Обновляем UI
+                let rows = table.querySelectorAll('tr.data-row');
+                rows.forEach(r => {
+                    if (Number(r.dataset.id) !== method.Id) {
+                        let cb = r.querySelector('input.default-method-checkbox');
+                        if (cb) cb.checked = false;
+                    }
+                });
+            } else {
+                method.IsDefault = false;
+            }
+        });
+        defaultCell.appendChild(defaultCheckbox);
+        _addCellStyle(defaultCell);
+        row.appendChild(defaultCell);
+        // Действия
         let actionCell = document.createElement('td');
         actionCell.classList.add('action-buttons-cell');
         let editDivElement = document.createElement('div');
@@ -2163,7 +2196,8 @@ function _getCurrentQpMethodState(rowItem) {
         paramId: rowItem.dataset.parameterId || "0",
         limitValueActivate: cells[2].querySelector('i')?.classList.contains('fa-check-square-o') || false,
         limitValue: cells[3].textContent.trim(),
-        limitValueString: cells[4].textContent.trim()
+        limitValueString: cells[4].textContent.trim(),
+        isDefault: cells[5].querySelector('input[type="checkbox"].default-method-checkbox')?.checked || false
     };
 }
 
@@ -2261,6 +2295,11 @@ function _restoreQpMethodState(rowItem, previousState) {
     // Восстанавливаем минимальное значение и сообщение (индексы сдвинулись)
     cells[3].textContent = previousState.limitValue;
     cells[4].textContent = previousState.limitValueString;
+    // Восстанавливаем чекбокс IsDefault (индекс 5)
+    if (cells[5]) {
+        let cb = cells[5].querySelector('input[type="checkbox"].default-method-checkbox');
+        if (cb) cb.checked = !!previousState.isDefault;
+    }
 }
 
 /*
@@ -2304,6 +2343,16 @@ function _applyQpMethodsChanged(rowItem, itemId, qpId) {
         updatedObject['LimitValueString'] = '-';
     } else {
         updatedObject['LimitValueString'] = msg;
+    }
+    // Новая колонка IsDefault (индекс 5)
+    const defaultCheckbox = cells[5].querySelector('input[type="checkbox"].default-method-checkbox');
+    let paramId = updatedObject.IdParameter;
+    let methodsArr = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].filter(m => m.IdParameter === paramId);
+    if (defaultCheckbox && defaultCheckbox.checked) {
+        methodsArr.forEach(m => m.IsDefault = false);
+        updatedObject.IsDefault = true;
+    } else {
+        updatedObject.IsDefault = false;
     }
 }
 
