@@ -140,8 +140,12 @@ select:focus {
     padding-left: 8px;
 }
 
-#Edit td:nth-child(3) select { 
-    width: 100%; 
+#Edit input {
+    width: 95%;
+}
+
+#Edit select {
+    width: 98%;
 }
 
 #Edit td:nth-child(4),
