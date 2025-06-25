@@ -1313,6 +1313,9 @@ function FillPassportDataElis() {
                             printValueInput.setAttribute('data-elis-filled', 'true');
                             printValueInput.value = root[currentKey].valueString;
                             item.parentNode.appendChild(printValueInput);
+                            
+                            // Обновляем колонку "Печать" в таблице
+                            updatePrintColumn(item.dataset.key, root[currentKey].valueString);
                         }
                         break;
                     default:
@@ -1323,7 +1326,20 @@ function FillPassportDataElis() {
                     item.oninput();
                 }
                 item.setAttribute("data-elis-filled", "true");
+                
+                // Применяем зеленую подсветку к элементу и его ячейке
+                applyElisHighlight(item);
+                
                 item.addEventListener("input", ManualCorrect, {once:true});
+                
+                // Добавляем постоянный обработчик для полей Value для обновления колонки "Печать"
+                if (item.dataset.tag === 'Value') {
+                    item.addEventListener("input", function(e) {
+                        if (e.target.getAttribute('data-elis-filled') === 'false') {
+                            updatePrintColumnFromInput(e.target);
+                        }
+                    });
+                }
             }
 
             if (item.nodeName === 'SELECT') {
@@ -1361,11 +1377,62 @@ function FillPassportDataElis() {
                         break;
                 }
                 item.setAttribute("data-elis-filled", "true");
+                
+                // Применяем зеленую подсветку к элементу и его ячейке
+                applyElisHighlight(item);
+                
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
     } catch (error) {
         showError(`Ошибка заполнения данных ЕЛИС: ${error && error.message ? error.message : error}`);
+    }
+}
+
+// Функция для обновления колонки "Печать" в таблице
+function updatePrintColumn(parameterKey, printValue) {
+    try {
+        let iframe = document.querySelector('.FR');
+        let table = iframe.contentWindow.document.querySelector('#Edit tbody');
+        
+        if (!table) return;
+        
+        // Ищем строку с соответствующим параметром
+        let rows = table.querySelectorAll('tr');
+        for (let row of rows) {
+            // Ищем элемент с нужным data-key в строке
+            let valueInput = row.querySelector(`[data-key="${parameterKey}"][data-tag="Value"]`);
+            if (valueInput) {
+                // Находим ячейку "Печать" (последняя ячейка в строке)
+                let printCell = row.cells[row.cells.length - 1];
+                if (printCell) {
+                    printCell.textContent = printValue;
+                    printCell.style.backgroundColor = '#8fd19e';
+                    console.log(`Обновлена колонка "Печать" для ${parameterKey}: ${printValue}`);
+                }
+                break;
+            }
+        }
+    } catch (error) {
+        console.error('Ошибка обновления колонки "Печать":', error);
+    }
+}
+
+// Функция для применения зеленой подсветки к элементам, заполненным из ЕЛИС
+function applyElisHighlight(element) {
+    try {
+        // Добавляем CSS класс к самому элементу
+        element.classList.add('elis-filled-input');
+        
+        // Находим родительскую ячейку и добавляем к ней класс
+        let parentCell = element.closest('td');
+        if (parentCell) {
+            parentCell.classList.add('elis-filled-cell');
+        }
+        
+        console.log(`Применена зеленая подсветка к элементу: ${element.id || element.dataset.key}`);
+    } catch (error) {
+        console.error('Ошибка применения подсветки:', error);
     }
 }
 
@@ -1385,6 +1452,57 @@ function ManualCorrect(event) {
     if(!event) return;
     if(event.target.hasAttribute("data-elis-filled")) {
         event.target.setAttribute("data-elis-filled", "false");
+        
+        // Убираем зеленую подсветку
+        removeElisHighlight(event.target);
+        
+        // Если это поле значения, обновляем колонку "Печать"
+        if (event.target.dataset.tag === 'Value') {
+            updatePrintColumnFromInput(event.target);
+        }
+    }
+}
+
+// Функция для обновления колонки "Печать" при ручном изменении значения
+function updatePrintColumnFromInput(valueInput) {
+    try {
+        let iframe = document.querySelector('.FR');
+        let table = iframe.contentWindow.document.querySelector('#Edit tbody');
+        
+        if (!table) return;
+        
+        // Находим строку с этим элементом
+        let row = valueInput.closest('tr');
+        if (!row) return;
+        
+        // Находим ячейку "Печать" (последняя ячейка в строке)
+        let printCell = row.cells[row.cells.length - 1];
+        if (printCell) {
+            // Обновляем значение на введенное пользователем
+            printCell.textContent = valueInput.value || '-';
+            printCell.style.backgroundColor = ''; // Убираем зеленую подсветку
+            console.log(`Обновлена колонка "Печать" после ручного изменения ${valueInput.dataset.key}: ${valueInput.value}`);
+        }
+    } catch (error) {
+        console.error('Ошибка обновления колонки "Печать" при ручном изменении:', error);
+    }
+}
+
+// Функция для удаления зеленой подсветки
+function removeElisHighlight(element) {
+    try {
+        // Убираем CSS класс с самого элемента
+        element.classList.remove('elis-filled-input');
+        
+        // Находим родительскую ячейку и убираем с неё класс
+        let parentCell = element.closest('td');
+        if (parentCell) {
+            parentCell.classList.remove('elis-filled-cell');
+        }
+        
+        console.log(`Убрана зеленая подсветка с элемента: ${element.id || element.dataset.key}`);
+    } catch (error) {
+        console.error('Ошибка удаления подсветки:', error);
     }
 }
 
