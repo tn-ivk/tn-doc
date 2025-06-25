@@ -113,3 +113,50 @@ select:focus {
     padding-right: 10px;
 }
 
+/* Стили для основной таблицы редактирования */
+#Edit {
+    width: 100%;
+    table-layout: fixed; /* Фиксированная ширина для контроля колонок */
+}
+
+/* Ширины колонок таблицы редактирования */
+#Edit th:nth-child(1) { width: 40px; }    /* Н */
+#Edit th:nth-child(2) { width: 35%; }     /* Наименование показателя */
+#Edit th:nth-child(3) { width: 20%; }     /* Метод испытаний */
+#Edit th:nth-child(4) { width: 10%; }     /* Измерение ИВК */
+#Edit th:nth-child(5) { width: 15%; }     /* Номер документа (ЕЛИС) */
+#Edit th:nth-child(6) { width: 10%; }     /* Измерение ХАЛ */
+#Edit th:nth-child(7) { width: 10%; }     /* Результат */
+#Edit th:nth-child(8) { width: 10%; }     /* Печать */
+
+/* Стили для ячеек данных */
+#Edit td:nth-child(1) { 
+    text-align: center; 
+    width: 40px;
+}
+
+#Edit td:nth-child(2) { 
+    text-align: left; 
+    padding-left: 8px;
+}
+
+#Edit td:nth-child(3) select { 
+    width: 100%; 
+}
+
+#Edit td:nth-child(4),
+#Edit td:nth-child(5),
+#Edit td:nth-child(6),
+#Edit td:nth-child(7),
+#Edit td:nth-child(8) { 
+    text-align: center; 
+}
+
+/* Стили для таблицы БЕЗ колонки ЕЛИС (когда ЕЛИС отключен) */
+body:not(.elis-enabled) #Edit th:nth-child(1) { width: 40px; }    /* Н */
+body:not(.elis-enabled) #Edit th:nth-child(2) { width: 40%; }     /* Наименование показателя */
+body:not(.elis-enabled) #Edit th:nth-child(3) { width: 25%; }     /* Метод испытаний */
+body:not(.elis-enabled) #Edit th:nth-child(4) { width: 10%; }     /* Измерение ИВК */
+body:not(.elis-enabled) #Edit th:nth-child(5) { width: 12%; }     /* Измерение ХАЛ */
+body:not(.elis-enabled) #Edit th:nth-child(6) { width: 10%; }     /* Результат */
+body:not(.elis-enabled) #Edit th:nth-child(7) { width: 13%; }     /* Печать */
