@@ -46,6 +46,7 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 let param = {};
                 param["Key"] = $(this).attr('data-key');
                 param["Tag"] = $(this).attr('data-tag');
+                param["ElisFilled"] = $(this).attr('data-elis-filled') === 'true';
                 if ($(this)[0].nodeName == "SELECT") {
                     if ($(this)[0].selectedIndex == -1)
                         param["Value"] = "";

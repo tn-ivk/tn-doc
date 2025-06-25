@@ -1446,8 +1446,9 @@ class Metod
     LimitValueActivate;
     LimitValue;
     LimitValueString;
+    IsDefault;
 
-    constructor(pId, pUse, pIdParameter, pName, pLimitValueActivate, pLimitValue, pLimitValueString) {
+    constructor(pId, pUse, pIdParameter, pName, pLimitValueActivate, pLimitValue, pLimitValueString, pIsDefault) {
         this.Id = pId;
         this.Use = pUse;
         this.IdParameter = pIdParameter;
@@ -1455,6 +1456,7 @@ class Metod
         this.LimitValueActivate = pLimitValueActivate;
         this.LimitValue = pLimitValue;
         this.LimitValueString = pLimitValueString;
+        this.IsDefault = pIsDefault;
     }
 }
 
