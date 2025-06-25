@@ -1172,6 +1172,12 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
             iconDef.classList.add('fa');
             iconDef.classList.add(cbDef && cbDef.checked ? 'fa-check-square-o' : 'fa-square-o');
             iconDef.ariaHidden = true;
+            
+            // Добавляем обработчик для взаимоисключающих чекбоксов
+            cbDef.addEventListener('change', function(e) {
+                _handleDefaultMethodCheckboxChange(e.target);
+            });
+            
             cell.replaceChild(iconDef, cell.childNodes[0]);
             break;
         default:
@@ -1326,6 +1332,12 @@ function _convertStableCellToEditCell(cell, type) {
             cbDef.type = 'checkbox';
             cbDef.classList.add('default-method-checkbox');
             cbDef.checked = iconDef && iconDef.classList.contains('fa-check-square-o');
+            
+            // Добавляем обработчик для взаимоисключающих чекбоксов
+            cbDef.addEventListener('change', function(e) {
+                _handleDefaultMethodCheckboxChange(e.target);
+            });
+            
             cell.replaceChild(cbDef, cell.childNodes[0]);
             break;
         default:
@@ -2351,8 +2363,12 @@ function _restoreQpMethodState(rowItem, previousState) {
     cells[4].textContent = previousState.limitValueString;
     // Восстанавливаем чекбокс IsDefault (индекс 5)
     if (cells[5]) {
-        let cb = cells[5].querySelector('input[type="checkbox"].default-method-checkbox');
-        if (cb) cb.checked = !!previousState.isDefault;
+        // Создаем иконку для отображения в стабильном режиме
+        let defaultIcon = document.createElement('i');
+        defaultIcon.classList.add('fa', previousState.isDefault ? 'fa-check-square-o' : 'fa-square-o');
+        defaultIcon.ariaHidden = true;
+        cells[5].innerHTML = '';
+        cells[5].appendChild(defaultIcon);
     }
 }
 
@@ -2400,13 +2416,34 @@ function _applyQpMethodsChanged(rowItem, itemId, qpId) {
     }
     // Новая колонка IsDefault (индекс 5)
     const defaultCheckbox = cells[5].querySelector('input[type="checkbox"].default-method-checkbox');
-    let paramId = updatedObject.IdParameter;
-    let methodsArr = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].filter(m => m.IdParameter === paramId);
-    if (defaultCheckbox && defaultCheckbox.checked) {
-        methodsArr.forEach(m => m.IsDefault = false);
-        updatedObject.IsDefault = true;
+    
+    // Обрабатываем состояние чекбокса "Применять по умолчанию"
+    if (defaultCheckbox) {
+        updatedObject.IsDefault = defaultCheckbox.checked;
+        
+        // Если чекбокс установлен, убеждаемся что у других методов этого параметра сброшен флаг IsDefault
+        // (это уже должно быть сделано обработчиком _handleDefaultMethodCheckboxChange в режиме реального времени,
+        // но добавляем для надежности)
+        if (defaultCheckbox.checked) {
+            let paramId = updatedObject.IdParameter;
+            let methodsArr = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].filter(m => m.IdParameter === paramId && m.Id !== itemId);
+            methodsArr.forEach(m => m.IsDefault = false);
+        }
     } else {
-        updatedObject.IsDefault = false;
+        // Если чекбокс не найден (например, в стабильном режиме), читаем из иконки
+        let paramId = updatedObject.IdParameter;
+        let methodsArr = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].filter(m => m.IdParameter === paramId);
+        
+        // Проверяем иконку в ячейке
+        let icon = cells[5].querySelector('i');
+        let isDefault = icon && icon.classList.contains('fa-check-square-o');
+        
+        if (isDefault) {
+            methodsArr.forEach(m => m.IsDefault = false);
+            updatedObject.IsDefault = true;
+        } else {
+            updatedObject.IsDefault = false;
+        }
     }
 }
 
@@ -2781,6 +2818,44 @@ function _renderUserGroupSelector() {
     select.addEventListener('change', function() {
         _clearRowTable('.users-table');
         _renderAndAddHandlerUserTable(Number(this.value));
+    });
+}
+
+/*
+    Обработчик изменения чекбокса "Применять по умолчанию"
+    Обеспечивает взаимоисключающее поведение - только один чекбокс может быть активен для каждого параметра
+    @param checkbox - измененный чекбокс
+*/
+function _handleDefaultMethodCheckboxChange(checkbox) {
+    if (!checkbox.checked) {
+        // Если чекбокс снят, ничего не делаем
+        return;
+    }
+    
+    // Находим строку таблицы
+    let row = checkbox.closest('tr');
+    if (!row) return;
+    
+    // Находим таблицу
+    let table = row.closest('table');
+    if (!table) return;
+    
+    // Получаем ID параметра из dataset строки
+    let currentParameterId = row.dataset.parameterId;
+    if (!currentParameterId) return;
+    
+    // Находим все строки в таблице с тем же параметром
+    let allRows = table.querySelectorAll('tr[data-parameter-id="' + currentParameterId + '"]');
+    
+    // Снимаем флаги "Применять по умолчанию" у всех других методов этого параметра
+    allRows.forEach(function(otherRow) {
+        if (otherRow === row) return; // Пропускаем текущую строку
+        
+        // Находим чекбокс "Применять по умолчанию" в строке (последний чекбокс с классом default-method-checkbox)
+        let otherCheckbox = otherRow.querySelector('input[type="checkbox"].default-method-checkbox');
+        if (otherCheckbox) {
+            otherCheckbox.checked = false;
+        }
     });
 }
 
