@@ -1,6 +1,11 @@
 # Список изменений:
 ## Версия 1.3.6:
-    -
+    - Доработки шаблонов паспартов по Р 50.2.040 - мелкие правки сносок
+        - Passport_GOSTR50.2.040(G).frx
+        - Passport_GOSTR50.2.040(G)(Export_Rus).frx
+        - Passport_GOSTR50.2.040(I).frx
+        - Passport_GOSTR50.2.040(I)_ShiftTime.frx
+        - Passport_GOSTR50.2.040(I)_ShiftTime_TR.frx
 
 ## Версия 1.3.5:
     - 🐞 Исправлена загрузка списка документов для устройств ИВК-2, ИВК-3
