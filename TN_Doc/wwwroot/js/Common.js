@@ -1301,6 +1301,19 @@ function FillPassportDataElis() {
                     case 'Value':
                         item.value = root[currentKey].value;
                         FixedElisData(item);
+                        
+                        // Заполняем поле "печать" данными ValueString из ЕЛИС
+                        if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
+                            // Создаем скрытое поле для передачи ValueString в колонку "Печать"
+                            let printValueInput = document.createElement('input');
+                            printValueInput.type = 'hidden';
+                            printValueInput.setAttribute('data-key', item.dataset.key);
+                            printValueInput.setAttribute('data-tag', 'PrintValue');
+                            printValueInput.setAttribute('data-edit', '1');
+                            printValueInput.setAttribute('data-elis-filled', 'true');
+                            printValueInput.value = root[currentKey].valueString;
+                            item.parentNode.appendChild(printValueInput);
+                        }
                         break;
                     default:
                         break;
