@@ -11,6 +11,36 @@
         #AdditionalInfo {
             margin-bottom: 20px;
         }
+        
+        /* Стили для редактируемых полей печати */
+        .print-cell-input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: center;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 2px;
+            outline: none;
+        }
+        
+        .print-cell-input:focus {
+            outline: none;
+            background: #f8f9fa;
+        }
+        
+        .print-cell-input.correct-value {
+            color: inherit;
+        }
+        
+        .print-cell-input.incorrect-value {
+            color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .print-cell-editable {
+            padding: 0;
+        }
     </style>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
@@ -146,6 +176,54 @@
                 $('#' + element.id).tooltip("disable");
             }
         }
+        
+        function TogglePrintCellEditable(selectElement) {
+            try {
+                // Получаем выбранную опцию
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                if (!selectedOption) return;
+                
+                // Получаем данные методики
+                const metodData = selectedOption.getAttribute('data-metod');
+                if (!metodData) return;
+                
+                const metod = JSON.parse(metodData);
+                const parameterKey = selectElement.getAttribute('data-key');
+                
+                // Находим соответствующую ячейку печати
+                const printCell = document.querySelector(`[data-parameter-key="${parameterKey}"]`);
+                if (!printCell) return;
+                
+                const printValue = printCell.getAttribute('data-print-value') || printCell.textContent;
+                
+                if (metod.LimitValueActivate === true) {
+                    // Делаем ячейку редактируемой
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'print-cell-input correct-value';
+                    input.value = printValue;
+                    input.setAttribute('data-edit', '1');
+                    input.setAttribute('data-key', parameterKey);
+                    input.setAttribute('data-tag', 'PrintValue');
+                    input.setAttribute('title', '');
+                    input.setAttribute('oninput', 'InputStringCheck(this)');
+                    
+                    printCell.innerHTML = '';
+                    printCell.appendChild(input);
+                    printCell.classList.remove('manual-input--disabled');
+                    printCell.classList.add('print-cell-editable');
+                } else {
+                    // Делаем ячейку нередактируемой
+                    printCell.innerHTML = printValue;
+                    printCell.classList.add('manual-input--disabled');
+                    printCell.classList.remove('print-cell-editable');
+                }
+                
+                SendingMessageStateButtonSave();
+            } catch (error) {
+                console.error('Ошибка в TogglePrintCellEditable:', error);
+            }
+        }
     </script>
 </head>
 <body>
@@ -188,6 +266,12 @@
             if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
                 element.oninput();
             }
+        });
+
+        // Инициализация состояния ячеек печати
+        const metodSelects = document.querySelectorAll('select[data-tag="Metod"]');
+        metodSelects.forEach(select => {
+            TogglePrintCellEditable(select);
         });
     });
     

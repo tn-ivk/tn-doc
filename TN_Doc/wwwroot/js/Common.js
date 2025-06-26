@@ -1397,21 +1397,26 @@ function updatePrintColumn(parameterKey, printValue) {
         
         if (!table) return;
         
-        // Ищем строку с соответствующим параметром
-        let rows = table.querySelectorAll('tr');
-        for (let row of rows) {
-            // Ищем элемент с нужным data-key в строке
-            let valueInput = row.querySelector(`[data-key="${parameterKey}"][data-tag="Value"]`);
-            if (valueInput) {
-                // Находим ячейку "Печать" (последняя ячейка в строке)
-                let printCell = row.cells[row.cells.length - 1];
-                if (printCell) {
-                    printCell.textContent = printValue;
-                    printCell.style.backgroundColor = '#8fd19e';
-                    console.log(`Обновлена колонка "Печать" для ${parameterKey}: ${printValue}`);
-                }
-                break;
+        // Находим ячейку печати по data-parameter-key
+        let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
+        if (printCell) {
+            // Обновляем data-print-value
+            printCell.setAttribute('data-print-value', printValue);
+            
+            // Проверяем, есть ли редактируемое поле внутри ячейки
+            let printInput = printCell.querySelector('.print-cell-input');
+            if (printInput) {
+                // Обновляем значение в редактируемом поле
+                printInput.value = printValue;
+                printInput.style.backgroundColor = '#8fd19e';
+                printInput.setAttribute("data-elis-filled", "true");
+                applyElisHighlight(printInput);
+            } else {
+                // Обновляем значение в нередактируемой ячейке
+                printCell.textContent = printValue;
+                printCell.style.backgroundColor = '#8fd19e';
             }
+            console.log(`Обновлена колонка "Печать" для ${parameterKey}: ${printValue}`);
         }
     } catch (error) {
         console.error('Ошибка обновления колонки "Печать":', error);
@@ -1467,21 +1472,28 @@ function ManualCorrect(event) {
 function updatePrintColumnFromInput(valueInput) {
     try {
         let iframe = document.querySelector('.FR');
-        let table = iframe.contentWindow.document.querySelector('#Edit tbody');
+        let parameterKey = valueInput.dataset.key;
         
-        if (!table) return;
-        
-        // Находим строку с этим элементом
-        let row = valueInput.closest('tr');
-        if (!row) return;
-        
-        // Находим ячейку "Печать" (последняя ячейка в строке)
-        let printCell = row.cells[row.cells.length - 1];
+        // Находим ячейку печати по data-parameter-key
+        let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
         if (printCell) {
-            // Обновляем значение на введенное пользователем
-            printCell.textContent = valueInput.value || '-';
-            printCell.style.backgroundColor = ''; // Убираем зеленую подсветку
-            console.log(`Обновлена колонка "Печать" после ручного изменения ${valueInput.dataset.key}: ${valueInput.value}`);
+            // Обновляем data-print-value
+            printCell.setAttribute('data-print-value', valueInput.value || '-');
+            
+            // Проверяем, есть ли редактируемое поле внутри ячейки
+            let printInput = printCell.querySelector('.print-cell-input');
+            if (printInput) {
+                // Обновляем значение в редактируемом поле
+                printInput.value = valueInput.value || '-';
+                printInput.style.backgroundColor = ''; // Убираем зеленую подсветку
+                printInput.setAttribute("data-elis-filled", "false");
+                removeElisHighlight(printInput);
+            } else {
+                // Обновляем значение в нередактируемой ячейке
+                printCell.textContent = valueInput.value || '-';
+                printCell.style.backgroundColor = ''; // Убираем зеленую подсветку
+            }
+            console.log(`Обновлена колонка "Печать" после ручного изменения ${parameterKey}: ${valueInput.value}`);
         }
     } catch (error) {
         console.error('Ошибка обновления колонки "Печать" при ручном изменении:', error);
