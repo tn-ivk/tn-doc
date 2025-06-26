@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 13:08:34" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/26/2025 15:25:04" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -155,11 +155,10 @@ namespace FastReport
 
       if ((bool)metod[&quot;Metod&quot;][&quot;LimitValueActivate&quot;])
       {
-        if (!float.TryParse(result, out float value)) return result; //value = 0.0f;
-
-        float limitValue = (float)metod[&quot;Metod&quot;][&quot;LimitValue&quot;];
-
-        result = value &lt; limitValue ? $&quot;{metod[&quot;Metod&quot;][&quot;LimitValueString&quot;]}&quot; : result;
+        //if (!float.TryParse(result, out float value)) return result; //value = 0.0f;
+        //float limitValue = (float)metod[&quot;Metod&quot;][&quot;LimitValue&quot;];
+        //result = value &lt; limitValue ? $&quot;{metod[&quot;Metod&quot;][&quot;LimitValueString&quot;]}&quot; : result;
+        result = $&quot;{metod[&quot;Value&quot;]}&quot;;
       }
 
       return result;
@@ -225,7 +224,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="146.84" Width="718.2" Height="287.28" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="146.87" Width="718.2" Height="287.28" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="277.83" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="434.7"/>
@@ -317,7 +316,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="437.32" Width="718.2" Height="315.63" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="437.37" Width="718.2" Height="315.63" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="306.18">
         <TableColumn Name="Column29" Width="283.5"/>
         <TableColumn Name="Column31" Width="202.23"/>
