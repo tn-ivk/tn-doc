@@ -6,9 +6,9 @@
       "General": {
         "ObjType": 1,
         "NefType": 1,
-        "NumberDensitometers": 1,
+        "NumberDensitometers": 2,
         "NumberViscometers": 1,
-        "NumberWatermetrs": 1,
+        "NumberWatermetrs": 2,
         "PageSettings": {
           "PaperWidth": 210,
           "PaperHeight": 297,
@@ -35,6 +35,8 @@
             "Factory": "",
             "Post": "Старший лаборант",
             "LicId": 0,
+            "FIO": "Горбачев С.В.",
+            "IOF": "С.В. Горбачев",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
@@ -49,6 +51,8 @@
             "Factory": "ООО \"Сдающая сторона\"",
             "Post": "Оператор товарный",
             "LicId": 1,
+            "FIO": "Попов И.Ф.",
+            "IOF": "И.Ф. Попов",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
@@ -63,6 +67,8 @@
             "Factory": "ООО \"Сдающая сторона\"",
             "Post": "Начальник ПСП",
             "LicId": 2,
+            "FIO": "Власов Г.Е.",
+            "IOF": "Г.Е. Власов",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
@@ -77,6 +83,8 @@
             "Factory": "ООО \"Сдающая сторона\"",
             "Post": "Оператор",
             "LicId": 1,
+            "FIO": "Колесников Ф.А.",
+            "IOF": "Ф.А. Колесников",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
@@ -91,6 +99,8 @@
             "Factory": "ООО \"Принимающая сторона\"",
             "Post": "Оператор товарный",
             "LicId": 4,
+            "FIO": "Никитин К.А.",
+            "IOF": "К.А. Никитин",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
@@ -105,6 +115,8 @@
             "Factory": "ООО \"Принимающая сторона\"",
             "Post": "Начальник ПСП",
             "LicId": 5,
+            "FIO": "Игнатьев А.Д.",
+            "IOF": "А.Д. Игнатьев",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
@@ -119,6 +131,8 @@
             "Factory": "ООО \"Принимающая сторона\"",
             "Post": "Оператор",
             "LicId": 6,
+            "FIO": "Леонов М.И.",
+            "IOF": "М.И. Леонов",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
@@ -126,16 +140,18 @@
           {
             "Use": true,
             "Id": 10,
-            "IdGroup": 3,
-            "F": "王",
-            "I": "华丽",
-            "O": "",
-            "Factory": "ООО Китай",
-            "Post": "Инженер",
-            "UseFullNameSeparator": false,
-            "UseFullNameWhiteSpace": false,
-            "UseShortFullNameForm": false,
-            "LicId": 6
+            "IdGroup": 2,
+            "F": "Шаргодаров",
+            "I": "Игорь",
+            "O": "Андреевич",
+            "Factory": "ПАО \"ЛУКОЙЛ\"",
+            "Post": "Начальник РП ЦППН",
+            "LicId": 2,
+            "FIO": "Шаргодаров И.А.",
+            "IOF": "И.А. Шаргодаров",
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true
           }
         ],
         "UsersGroup": [
@@ -162,46 +178,52 @@
         ],
         "Licenses": [
           {
+            "Use": true,
             "Id": 1,
-            "Use": true,
-            "LicensesDate": "01.01.2024",
-            "LicensesNumber": "ДОВ/10/123/71"
+            "LicensesNumber": "ДОВ/10/123/71",
+            "LicensesDate": "01.01.2024"
           },
           {
+            "Use": true,
             "Id": 2,
-            "Use": true,
-            "LicensesDate": "01.01.2024",
-            "LicensesNumber": "ДОВ/10/123/72"
+            "LicensesNumber": "ДОВ/10/123/72",
+            "LicensesDate": "01.01.2024"
           },
           {
+            "Use": true,
             "Id": 3,
-            "Use": true,
-            "LicensesDate": "01.01.2024",
-            "LicensesNumber": "ДОВ/10/123/73"
+            "LicensesNumber": "ДОВ/10/123/73",
+            "LicensesDate": "01.01.2024"
           },
           {
+            "Use": true,
             "Id": 4,
-            "Use": true,
-            "LicensesDate": "10.01.2024",
-            "LicensesNumber": "ДОВ/88/542/21"
+            "LicensesNumber": "ДОВ/88/542/21",
+            "LicensesDate": "10.01.2024"
           },
           {
+            "Use": true,
             "Id": 5,
-            "Use": true,
-            "LicensesDate": "10.01.2024",
-            "LicensesNumber": "ДОВ/88/542/22"
+            "LicensesNumber": "ДОВ/88/542/22",
+            "LicensesDate": "10.01.2024"
           },
           {
+            "Use": true,
             "Id": 6,
-            "Use": true,
-            "LicensesDate": "10.01.2024",
-            "LicensesNumber": "ДОВ/88/542/23"
+            "LicensesNumber": "ДОВ/88/542/23",
+            "LicensesDate": "10.01.2024"
           },
           {
-            "Id": 7,
             "Use": true,
-            "LicensesDate": "01.11.2024",
-            "LicensesNumber": "ДОВ/88/542/24"
+            "Id": 7,
+            "LicensesNumber": "ДОВ/88/542/24",
+            "LicensesDate": "01.11.2024"
+          },
+          {
+            "Use": true,
+            "Id": 8,
+            "LicensesNumber": "Д-7049",
+            "LicensesDate": "06.12.2024"
           }
         ],
         "BIKs": [

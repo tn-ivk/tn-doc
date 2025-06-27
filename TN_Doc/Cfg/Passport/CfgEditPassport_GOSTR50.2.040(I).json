@@ -341,6 +341,186 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-"
+    },
+    {
+      "Id": 39,
+      "Use": true,
+      "IdParameter": 1,
+      "Name": "ФР.1.29.2016.22858",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 40,
+      "Use": true,
+      "IdParameter": 2,
+      "Name": "ФР.1.29.2016.22858",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 41,
+      "Use": true,
+      "IdParameter": 3,
+      "Name": "ФР.1.29.2016.22858",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 42,
+      "Use": true,
+      "IdParameter": 4,
+      "Name": "ФР.1.29.2016.22858",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 43,
+      "Use": true,
+      "IdParameter": 5,
+      "Name": "ФР.1.29.2016.22858",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 44,
+      "Use": true,
+      "IdParameter": 6,
+      "Name": "ФР.1.29.2016.22858",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 45,
+      "Use": true,
+      "IdParameter": 7,
+      "Name": "ГОСТ 21534-2021 (Метод А, часть 1)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 46,
+      "Use": true,
+      "IdParameter": 8,
+      "Name": "ГОСТ 21534-2021 (Метод А, часть 1)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 47,
+      "Use": true,
+      "IdParameter": 9,
+      "Name": "ГОСТ 6370-2018",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 48,
+      "Use": true,
+      "IdParameter": 10,
+      "Name": "ГОСТ Р 51947-2002",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 49,
+      "Use": true,
+      "IdParameter": 11,
+      "Name": "ASTM D 323-20a (Процедура В)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 50,
+      "Use": true,
+      "IdParameter": 12,
+      "Name": "ASTM D 323-20a (Процедура В)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 51,
+      "Use": true,
+      "IdParameter": 13,
+      "Name": "ГОСТ 2177-99 (Метод Б)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 52,
+      "Use": true,
+      "IdParameter": 14,
+      "Name": "ГОСТ 2177-99 (Метод Б)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 53,
+      "Use": true,
+      "IdParameter": 16,
+      "Name": "ГОСТ 11851-2018 (Метод  А)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 54,
+      "Use": true,
+      "IdParameter": 17,
+      "Name": "ГОСТ Р 50802-2021",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 55,
+      "Use": true,
+      "IdParameter": 18,
+      "Name": "ГОСТ Р 50802-2021",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 56,
+      "Use": true,
+      "IdParameter": 19,
+      "Name": "ГОСТ Р 52247-2021 (Метод В)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 57,
+      "Use": true,
+      "IdParameter": 13,
+      "Name": "ГОСТ 2177-99 (Метод Б)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
+    },
+    {
+      "Id": 58,
+      "Use": true,
+      "IdParameter": 14,
+      "Name": "ГОСТ 2177-99 (Метод Б)",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "-"
     }
   ],
   "Parameters": [

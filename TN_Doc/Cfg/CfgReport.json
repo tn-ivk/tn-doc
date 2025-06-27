@@ -6,9 +6,9 @@
       "General": {
         "ObjType": 1,
         "NefType": 1,
-        "NumberDensitometers": 1,
+        "NumberDensitometers": 2,
         "NumberViscometers": 1,
-        "NumberWatermetrs": 1,
+        "NumberWatermetrs": 2,
         "PageSettings": {
           "PaperWidth": 297,
           "PaperHeight": 210,
@@ -60,13 +60,13 @@
               "Key": "DensPress"
             },
             {
-              "Visible": true,
+              "Visible": false,
               "Name": "Динам. вязкость",
               "SI": "мПа·с (сП)",
               "Key": "DynamicVisc"
             },
             {
-              "Visible": true,
+              "Visible": false,
               "Name": "Кинем. вязкость",
               "SI": "мм²/с (сСт)",
               "Key": "KinemVisc"
@@ -90,7 +90,7 @@
               "Key": "MasWater"
             },
             {
-              "Visible": true,
+              "Visible": false,
               "Name": "Массовая доля серы",
               "SI": "%",
               "Key": "MasSulphur"
