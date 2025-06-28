@@ -123,13 +123,13 @@ namespace TN_Doc.Controllers
             return dbName;
         }
 
-        public List<ListItem> GetListDocs(int deviceId)
+        public List<ListItem> GetListDocs(int IdDevice)
         {
-            _logger.LogDebug($"Загрузка списка документов");
-            var device = _cfgApp.Devices.FirstOrDefault(x => x.IdDevice == deviceId);
+            _logger.LogDebug($"Загрузка списка документов для устройства с идентификатором {IdDevice}");
+            var device = _cfgApp.Devices.FirstOrDefault(x => x.IdDevice == IdDevice);
             if (device is null)
             {
-                _logger.LogError($"В конфигурации отсутствует устройства с идентификатором {deviceId}");
+                _logger.LogError($"В конфигурации отсутствует устройства с идентификатором {IdDevice}");
                 return new List<ListItem>();
             }
 
@@ -137,7 +137,7 @@ namespace TN_Doc.Controllers
                 .ToList();
             if (!usedDocs.Any())
             {
-                _logger.LogError($"Устройство не имеет документов");
+                _logger.LogError($"Устройство {device.Name} не имеет документов");
                 return new List<ListItem>();
             }
             var list = usedDocs.Select(u => new ListItem { Id = (int)u.IdDoc, Name = u.Name })
