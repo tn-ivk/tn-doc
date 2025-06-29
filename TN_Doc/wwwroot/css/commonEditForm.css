@@ -45,8 +45,10 @@ Edit {
     border: 1px solid transparent;
 }
 
-.incorrect-value {
-    border: 2px solid rgb(255, 105, 105);
+/* Увеличиваем специфичность для гарантированного применения красной рамки */
+input.incorrect-value,
+select.incorrect-value {
+    border: 2px solid rgb(255, 105, 105) !important;
 }
 
 .manual-input--disabled{
@@ -112,3 +114,77 @@ select:focus {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+/* Стили для основной таблицы редактирования */
+#Edit {
+    width: 100%;
+    table-layout: fixed; /* Фиксированная ширина для контроля колонок */
+}
+
+/* Ширины колонок таблицы редактирования */
+
+/* Базовые ширины (для случая с ЕЛИС) */
+#Edit .col-num { width: 20px; }
+#Edit .col-name { width: 37%; }
+#Edit .col-method { width: 19%; }
+#Edit .col-ivk { width: 8%; }
+#Edit .col-elis { width: 8%; }
+#Edit .col-hal { width: 8%; }
+#Edit .col-result-value { width: 8%; }
+#Edit .col-result-text { width: 8%; }
+
+/* Ширины для случая БЕЗ ЕЛИС (когда колонка скрыта) */
+#Edit.no-elis .col-num { width: 20px; }
+#Edit.no-elis .col-name { width: 45%; }
+#Edit.no-elis .col-method { width: 27%; }
+#Edit.no-elis .col-ivk { width: 8%; }
+#Edit.no-elis .col-elis { width: 0%; }        /* Скрываем колонку ЕЛИС */
+#Edit.no-elis .col-hal { width: 8%; }
+#Edit.no-elis .col-result-value { width: 8%; }
+#Edit.no-elis .col-result-text { width: 8%; }
+
+/* Стили для ячеек данных */
+#Edit td:nth-child(1) { 
+    text-align: center; 
+}
+
+#Edit td:nth-child(2) { 
+    text-align: left; 
+    padding-left: 8px;
+}
+
+#Edit input {
+    width: 95%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+#Edit select {
+    width: 98%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+#Edit td:nth-child(4),
+#Edit td:nth-child(5),
+#Edit td:nth-child(6),
+#Edit td:nth-child(7),
+#Edit td:nth-child(8) { 
+    text-align: center; 
+}
+
+/* Специальные стили для колонки "Измерение ХАЛ" */
+#Edit td:nth-child(6) input {
+    width: 92%;
+    font-size: 13px;
+    padding: 2px 4px;
+}
+
+/* Для колонки без ЕЛИС - "Измерение ХАЛ" становится 5-й */
+body:not(.elis-enabled) #Edit td:nth-child(5) input {
+    width: 92%;
+    font-size: 13px;
+    padding: 2px 4px;
+}
+
+/* Случай без ЕЛИС теперь обрабатывается через JavaScript и CSS класс .no-elis */

@@ -6,6 +6,44 @@
 
     <link rel="stylesheet" href="/css/commonEditForm.css">
     <link rel="stylesheet" href="/css/elisEditForm.css">
+    
+    <style>
+        #AdditionalInfo {
+            margin-bottom: 20px;
+        }
+        
+        /* Стили для редактируемых полей печати */
+        .print-cell-input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: center;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 2px;
+            outline: none;
+            box-sizing: border-box;
+            margin: 0;
+        }
+        
+        .print-cell-input:focus {
+            outline: none;
+            background: #f8f9fa;
+        }
+        
+        .print-cell-input.correct-value {
+            color: inherit;
+        }
+        
+        .print-cell-input.incorrect-value {
+            color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .print-cell-editable {
+            padding: 0;
+        }
+    </style>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
@@ -16,6 +54,16 @@
 
         let dictionaries;
         let invalidChars;
+        let idCounter = 0;
+
+        // Функция для генерации уникальных ID
+        function generateUniqueId(prefix) {
+            idCounter++;
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substr(2, 9);
+            const uniquePart = `${idCounter}_${random}`;
+            return `${prefix}_${timestamp}_${uniquePart}`;
+        }
 
         function UserChangeEvent(selectObject) {
             if (selectObject.name == "Laboratory_IOF") {
@@ -128,16 +176,213 @@
         }
 
         function updateTooltip(element) {
+            // Проверяем наличие id у элемента перед использованием jQuery селектора
+            if (!element.id) {
+                return;
+            }
+            
+            const $element = $('#' + element.id);
+            
+            // Проверяем, инициализирован ли tooltip для элемента
+            if (!$element.hasClass('ui-tooltip-trigger') && !$element.data('ui-tooltip')) {
+                // Инициализируем tooltip для элемента
+                $element.tooltip();
+            }
+            
             if(element.classList.contains("incorrect-value"))
             {
-                $('#' + element.id)
-                    .tooltip("enable")
+                $element.tooltip("enable")
                     .tooltip("option", "content", element.getAttribute("title"));  
             }
             
             if(element.classList.contains("correct-value"))
             {
-                $('#' + element.id).tooltip("disable");
+                $element.tooltip("disable");
+            }
+        }
+        
+        function TogglePrintCellEditable(selectElement) {
+            try {
+                // Получаем выбранную опцию
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                if (!selectedOption) {
+                    return;
+                }
+                
+                // Получаем данные методики
+                const metodData = selectedOption.getAttribute('data-metod');
+                if (!metodData) {
+                    return;
+                }
+                
+                const metod = JSON.parse(metodData);
+                const parameterKey = selectElement.getAttribute('data-key');
+                
+                // Находим соответствующую ячейку печати
+                const printCell = document.querySelector(`[data-parameter-key="${parameterKey}"]`);
+                if (!printCell) {
+                    return;
+                }
+                
+                // Пересчитываем значение на основе методики и текущего значения ХАЛ
+                const calculatedValue = calculatePrintValue(parameterKey, metod);
+                
+                // Получаем значение из поля "Измерение ХАЛ"
+                const halInput = document.querySelector(`input[data-key="${parameterKey}"][data-tag="Value"]`);
+                const halValue = halInput ? parseFloat(halInput.value.replace(',', '.')) : NaN;
+                
+                if (metod.LimitValueActivate === true && !isNaN(halValue) && halValue < metod.LimitValue) {
+                    // Проверяем, содержит ли ячейка данные из ЕЛИС или поле ХАЛ заполнено из ЕЛИС
+                    const isElisHalData = halInput && halInput.getAttribute('data-elis-filled') === 'true';
+                    // Ищем скрытое поле во всем документе, а не только в родителе
+                    const printValueInput = document.querySelector(`input[data-key="${parameterKey}"][data-tag="PrintValue"][type="hidden"]`);
+                    const hasElisValueString = printValueInput && printValueInput.value && isElisHalData;
+                    const hasElisData = (printCell.hasAttribute('data-elis-filled') && 
+                                       printCell.getAttribute('data-elis-filled') === 'true') ||
+                                      printCell.classList.contains('elis-filled-cell') ||
+                                      isElisHalData || hasElisValueString;
+                    
+                    // Делаем ячейку редактируемой
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'print-cell-input correct-value';
+                    input.value = calculatedValue;
+                    input.id = generateUniqueId('print');
+                    input.setAttribute('data-edit', '1');
+                    input.setAttribute('data-key', parameterKey);
+                    input.setAttribute('data-tag', 'PrintValue');
+                    input.setAttribute('title', '');
+                    
+                    // Устанавливаем правильное значение data-elis-filled
+                    if (hasElisData) {
+                        input.setAttribute('data-elis-filled', 'true');
+                    } else {
+                        input.setAttribute('data-elis-filled', 'false');
+                    }
+                    
+                    input.setAttribute('oninput', 'InputStringCheck(this)');
+                    
+                    printCell.innerHTML = '';
+                    printCell.appendChild(input);
+                    printCell.classList.remove('manual-input--disabled');
+                    printCell.classList.add('print-cell-editable');
+                    
+                    // Обновляем data-print-value
+                    printCell.setAttribute('data-print-value', calculatedValue);
+                    
+                    // Если данные из ЕЛИС, применяем зеленую подсветку к новому элементу
+                    if (hasElisData) {
+                        input.style.backgroundColor = '#8fd19e';
+                        input.classList.add('elis-filled-input');
+                        printCell.classList.add('elis-filled-cell');
+                        printCell.style.backgroundColor = '#8fd19e';
+                    }
+                    
+                    // Инициализируем tooltip для нового элемента
+                    $(input).tooltip();
+                    
+                    // Добавляем обработчик ManualCorrect для сброса подсветки при ручном редактировании
+                    if (window.parent.ManualCorrect) {
+                        input.addEventListener("input", window.parent.ManualCorrect, {once:true});
+                    }
+                } else {
+                    // Ячейка НЕ редактируемая: LimitValueActivate=false ИЛИ значение ХАЛ >= LimitValue
+                    // Проверяем, содержит ли ячейка данные из ЕЛИС или поле ХАЛ заполнено из ЕЛИС
+                    const isElisHalData = halInput && halInput.getAttribute('data-elis-filled') === 'true';
+                    // Ищем скрытое поле во всем документе, а не только в родителе
+                    const printValueInput = document.querySelector(`input[data-key="${parameterKey}"][data-tag="PrintValue"][type="hidden"]`);
+                    const hasElisValueString = printValueInput && printValueInput.value && isElisHalData;
+                    const hasElisData = (printCell.hasAttribute('data-elis-filled') && 
+                                       printCell.getAttribute('data-elis-filled') === 'true') ||
+                                      printCell.classList.contains('elis-filled-cell') ||
+                                      isElisHalData || hasElisValueString;
+                    
+                    // Делаем ячейку нередактируемой
+                    printCell.innerHTML = calculatedValue;
+                    printCell.classList.add('manual-input--disabled');
+                    printCell.classList.remove('print-cell-editable');
+                    
+                    // Устанавливаем правильное значение data-elis-filled
+                    if (hasElisData) {
+                        printCell.setAttribute('data-elis-filled', 'true');
+                        // Применяем зеленую подсветку для нередактируемой ячейки
+                        printCell.style.backgroundColor = '#8fd19e';
+                        printCell.classList.add('elis-filled-cell');
+                    } else {
+                        printCell.setAttribute('data-elis-filled', 'false');
+                        printCell.style.backgroundColor = '';
+                        printCell.classList.remove('elis-filled-cell');
+                    }
+                    
+                    // Обновляем data-print-value
+                    printCell.setAttribute('data-print-value', calculatedValue);
+                }
+                
+                SendingMessageStateButtonSave();
+            } catch (error) {
+                console.error('Ошибка в TogglePrintCellEditable:', error);
+            }
+        }
+
+        // Функция для пересчета значения колонки "Результат-Текст" на основе методики и значения ХАЛ
+        function calculatePrintValue(parameterKey, metod) {
+            try {
+                // Находим поле "Измерение ХАЛ" для данного параметра
+                const halInput = document.querySelector(`input[data-key="${parameterKey}"][data-tag="Value"]`);
+                if (!halInput || !halInput.value) {
+                    return '-';
+                }
+                
+                // Проверяем, есть ли скрытое поле с данными ЕЛИС (ValueString)
+                const printValueInput = document.querySelector(`input[data-key="${parameterKey}"][data-tag="PrintValue"][type="hidden"]`);
+                if (printValueInput && printValueInput.value && halInput.getAttribute('data-elis-filled') === 'true') {
+                    // Если есть данные ValueString из ЕЛИС, используем их
+                    return printValueInput.value;
+                }
+                
+                const halValue = parseFloat(halInput.value.replace(',', '.'));
+                if (isNaN(halValue)) {
+                    return '-';
+                }
+                
+                // Если у методики активирован LimitValueActivate и значение меньше лимита
+                if (metod && metod.LimitValueActivate && halValue < metod.LimitValue) {
+                    return metod.LimitValueString || '-';
+                }
+                
+                // Иначе возвращаем само значение ХАЛ
+                return halInput.value;
+            } catch (error) {
+                console.error('Ошибка в calculatePrintValue:', error);
+                return '-';
+            }
+        }
+
+        // Функция для обновления колонки "Результат-Текст" при изменении поля "Измерение ХАЛ"
+        function updatePrintValueOnHalChange(halInput) {
+            try {
+                const parameterKey = halInput.getAttribute('data-key');
+                if (!parameterKey) return;
+                
+                // Находим соответствующий select методики
+                const metodSelect = document.querySelector(`select[data-key="${parameterKey}"][data-tag="Metod"]`);
+                if (!metodSelect) return;
+                
+                // Получаем данные текущей методики
+                const selectedOption = metodSelect.options[metodSelect.selectedIndex];
+                if (!selectedOption) return;
+                
+                const metodData = selectedOption.getAttribute('data-metod');
+                if (!metodData) return;
+                
+                const metod = JSON.parse(metodData);
+                
+                // Проверяем нужно ли обновить режим редактирования ячейки (editable/readonly)
+                // TogglePrintCellEditable автоматически пересчитает и обновит значение и статус
+                TogglePrintCellEditable(metodSelect);
+                
+            } catch (error) {
+                console.error('Ошибка в updatePrintValueOnHalChange:', error);
             }
         }
     </script>
@@ -153,6 +398,16 @@
     </table>
 
     <table id="Edit">
+        <colgroup>
+            <col class="col-num">
+            <col class="col-name">
+            <col class="col-method">
+            <col class="col-ivk">
+            <col class="col-elis">
+            <col class="col-hal">
+            <col class="col-result-value">
+            <col class="col-result-text">
+        </colgroup>
         <thead>
         </thead>
 
@@ -177,18 +432,45 @@
                 event.preventDefault();  // Отключаем изменение значения колесиком мыши
             });
         });
+        
         const elementsWithOnInput = document.querySelectorAll('[oninput]');
         elementsWithOnInput.forEach(element => {
             if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
                 element.oninput();
             }
         });
+
+        // Инициализация состояния ячеек печати
+        const metodSelects = document.querySelectorAll('select[data-tag="Metod"]');
+        metodSelects.forEach(select => {
+            TogglePrintCellEditable(select);
+        });
+        
+        // Автоматическое определение наличия ЕЛИС и применение соответствующего класса
+        setupTableLayout();
     });
+    
+    function setupTableLayout() {
+        const table = document.getElementById('Edit');
+        if (!table) return;
+        
+        // Проверяем наличие колонки "Номер документа" в заголовках
+        const hasElisColumn = table.querySelector('th') && 
+                            Array.from(table.querySelectorAll('th')).some(th => 
+                                th.textContent.includes('Номер документа'));
+        
+        // Добавляем соответствующий класс к таблице
+        if (!hasElisColumn) {
+            table.classList.add('no-elis');
+        } else {
+            table.classList.remove('no-elis');
+        }
+    }
     
     function CheckElisInput(){
         const elements = document.querySelectorAll('.elis-data');
         if( elements.length===0){
-            return
+            return;
         }
         for(const input of elements){
         }
