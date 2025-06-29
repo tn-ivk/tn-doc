@@ -163,7 +163,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 7,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -264,18 +264,18 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.234.101",
+          "Server": "192.168.233.101",
           "Userid": "user",
-          "Password": "$1$qKPo3xX3PrdmoZkWqf0yh1oen/5NjGX1js0YGKVJEnQ=",
+          "Password": "$1$Ci9530DG0Z0JuGOqNAJlJA8pdZnxKjKlosnIEBG2xI0=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.234.201",
+          "Server": "192.168.233.201",
           "Userid": "user",
-          "Password": "$1$X7noOuFUE8USpWDfqq9otQeLnrClFWcgFbu+Dtvgo/U=",
+          "Password": "$1$VrFb117lm4O4YMmHR5VtRAiQvc+weiSTmY4VM0FjwPo=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
@@ -296,7 +296,7 @@
         "DaSettings": {
           "StartPrefix": "Root.PLC1.IVK_TN_01",
           "Host": "localhost",
-          "ProgId": "psregulopcda_01",
+          "ProgId": "psregulopcda",
           "UpdateRate": 500
         },
         "UaSettings": {
@@ -377,7 +377,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 5,
           "TemplateDocs": [
             {
               "Use": false,
@@ -469,7 +469,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -545,7 +545,7 @@
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 1,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -570,18 +570,18 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.234.102",
+          "Server": "192.168.233.102",
           "Userid": "user",
-          "Password": "$1$vM9rWXncphm13huA8gFan7YFMfXu96n6wyBCdkNQKVQ=",
+          "Password": "$1$mYKxjnJjxr2FDZQrPgowGNnHRN5xqXDJ2kToi/vp1+Q=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.234.202",
+          "Server": "192.168.233.202",
           "Userid": "user",
-          "Password": "$1$HkIP5SnMcJYDiu5K6QwzkvJPlxN+gXQbA2v+m5SZiFg=",
+          "Password": "$1$/lRJ04BPyX9pVW3AyuC86RK4XM4HrpqNTPPYz6E4fTw=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
@@ -602,7 +602,7 @@
         "DaSettings": {
           "StartPrefix": "Root.PLC2.IVK_TN_01",
           "Host": "localhost",
-          "ProgId": "psregulopcda_01",
+          "ProgId": "psregulopcda",
           "UpdateRate": 500
         },
         "UaSettings": {
@@ -622,7 +622,7 @@
   "Elis": {
     "Use": true,
     "OstKey": "4",
-    "SiknKey": "J-00282",
+    "SiknKey": "J-00574",
     "ClientName": "clientName",
     "ClientToken": ""
   },

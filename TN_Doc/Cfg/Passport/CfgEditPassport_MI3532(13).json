@@ -557,6 +557,7 @@
       "ElisAlias": [
         "pointDeliveryName"
       ],
+      "RequiredFill": true,
       "Type": "text",
       "Name": "Пункт приема сдачи нефти"
     },
@@ -688,7 +689,7 @@
     },
     {
       "Id": 16,
-      "Use": false,
+      "Use": true,
       "Key": "TankerName",
       "Type": "text",
       "Name": "Название танкера"
@@ -702,8 +703,7 @@
         "protocolNumber"
       ],
       "Type": "text",
-      "Name": "Номер протокола испытаний ЕЛИС",
-      "Edit": false
+      "Name": "Номер протокола испытаний ЕЛИС"
     }
   ]
 }
