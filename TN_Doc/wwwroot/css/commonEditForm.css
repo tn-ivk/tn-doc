@@ -45,8 +45,10 @@ Edit {
     border: 1px solid transparent;
 }
 
-.incorrect-value {
-    border: 2px solid rgb(255, 105, 105);
+/* Увеличиваем специфичность для гарантированного применения красной рамки */
+input.incorrect-value,
+select.incorrect-value {
+    border: 2px solid rgb(255, 105, 105) !important;
 }
 
 .manual-input--disabled{
