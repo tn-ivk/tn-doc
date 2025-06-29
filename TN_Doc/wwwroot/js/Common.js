@@ -1457,7 +1457,10 @@ function FixedElisData(object) {
 
 //Сброс подсветки данных при ручной корректировки
 function ManualCorrect(event) {
-    if(!event) return;
+    if(!event) {
+        return;
+    }
+    
     if(event.target.hasAttribute("data-elis-filled")) {
         event.target.setAttribute("data-elis-filled", "false");
         
@@ -1508,10 +1511,16 @@ function removeElisHighlight(element) {
         // Убираем CSS класс с самого элемента
         element.classList.remove('elis-filled-input');
         
+        // Убираем inline стиль backgroundColor с элемента
+        element.style.backgroundColor = '';
+        
         // Находим родительскую ячейку и убираем с неё класс
         let parentCell = element.closest('td');
         if (parentCell) {
             parentCell.classList.remove('elis-filled-cell');
+            
+            // Убираем inline стиль backgroundColor с родительской ячейки
+            parentCell.style.backgroundColor = '';
         }
     } catch (error) {
         console.error('Ошибка удаления подсветки:', error);

@@ -217,6 +217,11 @@
                 const printValue = printCell.getAttribute('data-print-value') || printCell.textContent;
                 
                 if (metod.LimitValueActivate === true) {
+                    // Проверяем, содержит ли ячейка данные из ЕЛИС (зеленая подсветка)
+                    const hasElisData = printCell.style.backgroundColor === 'rgb(143, 209, 158)' || 
+                                      printCell.style.backgroundColor === '#8fd19e' ||
+                                      printCell.classList.contains('elis-filled-cell');
+                    
                     // Делаем ячейку редактируемой
                     const input = document.createElement('input');
                     input.type = 'text';
@@ -227,6 +232,14 @@
                     input.setAttribute('data-key', parameterKey);
                     input.setAttribute('data-tag', 'PrintValue');
                     input.setAttribute('title', '');
+                    
+                    // Устанавливаем правильное значение data-elis-filled
+                    if (hasElisData) {
+                        input.setAttribute('data-elis-filled', 'true');
+                    } else {
+                        input.setAttribute('data-elis-filled', 'false');
+                    }
+                    
                     input.setAttribute('oninput', 'InputStringCheck(this)');
                     
                     printCell.innerHTML = '';
@@ -234,8 +247,23 @@
                     printCell.classList.remove('manual-input--disabled');
                     printCell.classList.add('print-cell-editable');
                     
+                    // Если данные из ЕЛИС, применяем зеленую подсветку к новому элементу
+                    if (hasElisData) {
+                        input.style.backgroundColor = '#8fd19e';
+                        input.classList.add('elis-filled-input');
+                        printCell.classList.add('elis-filled-cell');
+                        printCell.style.backgroundColor = '#8fd19e';
+                    }
+                    
                     // Инициализируем tooltip для нового элемента
                     $(input).tooltip();
+                    
+                    // Добавляем обработчик ManualCorrect для сброса подсветки при ручном редактировании
+                    if (window.parent.ManualCorrect) {
+                        input.addEventListener("input", window.parent.ManualCorrect, {once:true});
+                    } else {
+                        console.error('[TogglePrintCellEditable] ОШИБКА: window.parent.ManualCorrect не найден!');
+                    }
                 } else {
                     // Делаем ячейку нередактируемой
                     printCell.innerHTML = printValue;
@@ -245,7 +273,7 @@
                 
                 SendingMessageStateButtonSave();
             } catch (error) {
-                console.error('[TogglePrintCellEditable] Ошибка в TogglePrintCellEditable:', error);
+                console.error('[TogglePrintCellEditable] КРИТИЧЕСКАЯ ОШИБКА:', error);
             }
         }
     </script>
