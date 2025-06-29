@@ -1219,22 +1219,15 @@ function ResetPassportDataElis() {
 }
 function FillPassportDataElis() {
     try {
-        console.log('[FillPassportDataElis] Начало заполнения данными из ЕЛИС');
-        
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let labInfo = JSON.parse(localStorage.labInfo);
-        console.log('[FillPassportDataElis] dataPassport:', dataPassport);
-        console.log('[FillPassportDataElis] labInfo:', labInfo);
         
         let iframe = document.querySelector('.FR');
-        console.log('[FillPassportDataElis] iframe:', iframe);
         
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
-        console.log('[FillPassportDataElis] Найдено ЕЛИС элементов:', elisNodes.length);
         
         // Добавляем данные о представителе лаборатории из Signers
         if (dataPassport.signers?.laboratory) {
-            console.log('[FillPassportDataElis] Добавляем данные подписанта лаборатории:', dataPassport.signers.laboratory);
             // Добавляем данные в dataPassport для обратной совместимости
             dataPassport.chiefLabShortSign = dataPassport.signers.laboratory.iof;
             dataPassport.chiefLabPosition = dataPassport.signers.laboratory.post;
@@ -1242,17 +1235,12 @@ function FillPassportDataElis() {
         }
 
         elisNodes.forEach((item, index, array) => {
-            console.log(`[FillPassportDataElis] Обработка элемента ${index + 1}/${array.length}:`, item);
-            console.log(`[FillPassportDataElis] Элемент ID: ${item.id}, Tag: ${item.tagName}, DataTag: ${item.dataset.tag}`);
-            
             let itemKeys = item.dataset.elisAlias?.split('|');
-            console.log(`[FillPassportDataElis] itemKeys из elisAlias:`, itemKeys);
             
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
                 if (itemKeys.includes(key)) {
-                    console.log(`[FillPassportDataElis] Найден ключ в dataPassport.parameters: ${key}`);
                     root = dataPassport.parameters
                     for (let iKey of itemKeys) {
                         if (iKey === key) { 
@@ -1265,10 +1253,8 @@ function FillPassportDataElis() {
             }
 
             if (root === null) {
-                console.log(`[FillPassportDataElis] Поиск ключа в dataPassport`);
                 for (let key in dataPassport) {
                     if (itemKeys.includes(key)) {
-                        console.log(`[FillPassportDataElis] Найден ключ в dataPassport: ${key}`);
                         root = dataPassport
                         for (let iKey of itemKeys) {
                             if (iKey === key) {
@@ -1282,10 +1268,8 @@ function FillPassportDataElis() {
             }
 
             if (root === null) {
-                console.log(`[FillPassportDataElis] Поиск ключа в labInfo`);
                 for (let key in labInfo) {
                     if (itemKeys.includes(key)) {
-                        console.log(`[FillPassportDataElis] Найден ключ в labInfo: ${key}`);
                         root = labInfo
                         for (let iKey of itemKeys) {
                             if (iKey === key) {
@@ -1299,43 +1283,30 @@ function FillPassportDataElis() {
             }
 
             if (root === null) {
-                console.warn(`[FillPassportDataElis] Ключ не найден ни в одном источнике для элемента:`, item);
-                console.warn(`[FillPassportDataElis] Искомые ключи:`, itemKeys);
                 return;
             }
-            
-            console.log(`[FillPassportDataElis] Найден источник данных. currentKey: ${currentKey}, root type:`, typeof root);
 
             if (item.nodeName === 'INPUT') {
-                console.log(`[FillPassportDataElis] Обработка INPUT элемента. Tag: ${item.dataset.tag}, Type: ${item.type}`);
                 switch (item.dataset.tag) {
                     case 'AdditionalInfo':
-                        console.log(`[FillPassportDataElis] Заполнение AdditionalInfo. Значение:`, root[currentKey]);
                         if(item.type === 'datetime-local') {
                             item.value = moment(root[currentKey]).format('YYYY-MM-DD HH:mm:ss');
-                            console.log(`[FillPassportDataElis] Установлено datetime значение: ${item.value}`);
                         }
                         else {
                             item.value = root[currentKey];
-                            console.log(`[FillPassportDataElis] Установлено текстовое значение: ${item.value}`);
                         }
                         break;
                     case 'DocNum':
-                        console.log(`[FillPassportDataElis] Заполнение DocNum. Документ:`, root[currentKey]);
                         item.value = root[currentKey].documentNumber;
-                        console.log(`[FillPassportDataElis] Установлен номер документа: ${item.value}`);
                         if(item.hasAttribute("data-document"))
                             item.setAttribute("data-document", JSON.stringify(new LabDocumentInfo(root[currentKey].documentType, root[currentKey].documentNumber, root[currentKey].documentDate)));
                         break;
                     case 'Value':
-                        console.log(`[FillPassportDataElis] Заполнение Value. Данные:`, root[currentKey]);
                         item.value = root[currentKey].value;
-                        console.log(`[FillPassportDataElis] Установлено значение: ${item.value}`);
                         FixedElisData(item);
                         
                         // Заполняем поле "печать" данными ValueString из ЕЛИС
                         if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
-                            console.log(`[FillPassportDataElis] Обнаружено различие в valueString и value. ValueString: ${root[currentKey].valueString}, Value: ${root[currentKey].value}`);
                             // Создаем скрытое поле для передачи ValueString в колонку "Печать"
                             let printValueInput = document.createElement('input');
                             printValueInput.type = 'hidden';
@@ -1346,44 +1317,33 @@ function FillPassportDataElis() {
                             printValueInput.value = root[currentKey].valueString;
                             item.parentNode.appendChild(printValueInput);
                             
-                            console.log(`[FillPassportDataElis] Создано скрытое поле PrintValue: ${printValueInput.value}`);
-                            
                             // Обновляем колонку "Печать" в таблице
                             updatePrintColumn(item.dataset.key, root[currentKey].valueString);
                         }
                         break;
-                    default:
-                        console.warn(`[FillPassportDataElis] Неизвестный тип тега для INPUT: ${item.dataset.tag}`);
-                        break;
                 }
                 
                 if(item.hasAttribute("oninput")){
-                    console.log(`[FillPassportDataElis] Вызов oninput для INPUT элемента`);
                     item.oninput();
                 }
                 item.setAttribute("data-elis-filled", "true");
                 
                 // Применяем зеленую подсветку к элементу и его ячейке
                 applyElisHighlight(item);
-                console.log(`[FillPassportDataElis] Применена зеленая подсветка для INPUT элемента: ${item.id || item.dataset.key}`);
                 
                 item.addEventListener("input", ManualCorrect, {once:true});
                 
                 // Добавляем постоянный обработчик для полей Value для обновления колонки "Печать"
                 if (item.dataset.tag === 'Value') {
-                    console.log(`[FillPassportDataElis] Добавлен обработчик input для поля Value: ${item.dataset.key}`);
                     item.addEventListener("input", function(e) {
                         if (e.target.getAttribute('data-elis-filled') === 'false') {
                             updatePrintColumnFromInput(e.target);
                         }
                     });
                 }
-                
-                console.log(`[FillPassportDataElis] Завершена обработка INPUT элемента: ${item.id || item.dataset.key}`);
             }
 
             if (item.nodeName === 'SELECT') {
-                console.log(`[FillPassportDataElis] Обработка SELECT элемента. Tag: ${item.dataset.tag}`);
                 item.contains = function (value) {
                     for (var i = 0, l = this.options.length; i < l; i++) {
                         if (this.options[i].text === value) {
@@ -1393,37 +1353,26 @@ function FillPassportDataElis() {
                     return false;
                 }
                 let obj = root[currentKey];
-                console.log(`[FillPassportDataElis] Данные для SELECT:`, obj);
                 switch(item.dataset.tag)
                 {
                     case 'AdditionalInfo': 
-                        console.log(`[FillPassportDataElis] Заполнение SELECT AdditionalInfo значением: ${obj}`);
                         //Проверяем наличие значения в списке, если нет, добавляем.
                         if (!item.contains(obj)) {
-                            console.log(`[FillPassportDataElis] Добавляем новое значение в список: ${obj}`);
                             item.append(new Option(obj, obj));
                         }
-                        item.value = obj;
-                        console.log(`[FillPassportDataElis] Установлено значение SELECT: ${item.value}`);            
+                        item.value = obj;           
                         break;
                     case 'Metod': 
-                        console.log(`[FillPassportDataElis] Заполнение SELECT Metod. testMethodName: ${obj.testMethodName}`);
                         const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat()
                         const limitValue = parseFloat(obj.value) + 0.1
                         let metod = new Metod(0,true, 0, obj.testMethodName, flag, limitValue, obj.valueString);
-                        console.log(`[FillPassportDataElis] Создан объект Metod:`, metod);
 
                         //Проверяем наличие значения в списке, если нет, добавляем.
                         if (!item.contains(obj.testMethodName)) {
-                            console.log(`[FillPassportDataElis] Добавляем новый метод в список: ${obj.testMethodName}`);
                             item.append(new Option(obj.testMethodName, obj.testMethodName));
                         }
                         item.value = obj.testMethodName;
                         item.options[item.selectedIndex].setAttribute("data-metod", JSON.stringify(metod));
-                        console.log(`[FillPassportDataElis] Установлен метод: ${item.value}`);
-                        break;
-                    default: 
-                        console.warn(`[FillPassportDataElis] Неизвестный тип тега для SELECT: ${item.dataset.tag}`);
                         break;
                 }
                 item.setAttribute("data-elis-filled", "true");
@@ -1432,29 +1381,16 @@ function FillPassportDataElis() {
                 applyElisHighlight(item);
                 
                 item.addEventListener("input", ManualCorrect, {once:true});
-                
-                console.log(`[FillPassportDataElis] Завершена обработка SELECT элемента: ${item.id || item.dataset.key}`);
             }
-            
-            console.log(`[FillPassportDataElis] Завершена обработка элемента ${index + 1}: ${item.id || item.dataset.key}`);
         });
-        
-        console.log(`[FillPassportDataElis] Обработка всех элементов завершена. Всего обработано: ${elisNodes.length}`);
         
         // Обновляем состояние ячеек печати для заполненных методов
-        console.log(`[FillPassportDataElis] Обновление состояния ячеек печати для заполненных методов`);
         const metodSelects = iframe.contentWindow.document.querySelectorAll('select[data-tag="Metod"][data-elis-filled="true"]');
-        console.log(`[FillPassportDataElis] Найдено заполненных SELECT'ов методов: ${metodSelects.length}`);
         
         metodSelects.forEach(select => {
-            console.log(`[FillPassportDataElis] Вызов TogglePrintCellEditable для select: ${select.id}`);
             iframe.contentWindow.TogglePrintCellEditable(select);
         });
-        
-        console.log(`[FillPassportDataElis] Функция заполнения данными из ЕЛИС завершена успешно`);
     } catch (error) {
-        console.error(`[FillPassportDataElis] Ошибка в FillPassportDataElis:`, error);
-        console.error(`[FillPassportDataElis] Stack trace:`, error.stack);
         showError(`Ошибка заполнения данных ЕЛИС: ${error && error.message ? error.message : error}`);
     }
 }
@@ -1486,7 +1422,6 @@ function updatePrintColumn(parameterKey, printValue) {
                 printCell.textContent = printValue;
                 printCell.style.backgroundColor = '#8fd19e';
             }
-            console.log(`Обновлена колонка "Печать" для ${parameterKey}: ${printValue}`);
         }
     } catch (error) {
         console.error('Ошибка обновления колонки "Печать":', error);
@@ -1504,8 +1439,6 @@ function applyElisHighlight(element) {
         if (parentCell) {
             parentCell.classList.add('elis-filled-cell');
         }
-        
-        console.log(`Применена зеленая подсветка к элементу: ${element.id || element.dataset.key}`);
     } catch (error) {
         console.error('Ошибка применения подсветки:', error);
     }
@@ -1563,7 +1496,6 @@ function updatePrintColumnFromInput(valueInput) {
                 printCell.textContent = valueInput.value || '-';
                 printCell.style.backgroundColor = ''; // Убираем зеленую подсветку
             }
-            console.log(`Обновлена колонка "Печать" после ручного изменения ${parameterKey}: ${valueInput.value}`);
         }
     } catch (error) {
         console.error('Ошибка обновления колонки "Печать" при ручном изменении:', error);
@@ -1581,8 +1513,6 @@ function removeElisHighlight(element) {
         if (parentCell) {
             parentCell.classList.remove('elis-filled-cell');
         }
-        
-        console.log(`Убрана зеленая подсветка с элемента: ${element.id || element.dataset.key}`);
     } catch (error) {
         console.error('Ошибка удаления подсветки:', error);
     }
