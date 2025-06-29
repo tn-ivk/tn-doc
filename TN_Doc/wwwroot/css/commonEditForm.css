@@ -120,19 +120,30 @@ select:focus {
 }
 
 /* Ширины колонок таблицы редактирования */
-#Edit th:nth-child(1) { width: 25px; }    /* № */
-#Edit th:nth-child(2) { width: 36%; }     /* Наименование показателя */
-#Edit th:nth-child(3) { width: 20%; }     /* Метод испытаний */
-#Edit th:nth-child(4) { width: 8%; }      /* Измерение ИВК */
-#Edit th:nth-child(5) { width: 8%; }      /* Номер документа (ЕЛИС) */
-#Edit th:nth-child(6) { width: 14%; }     /* Измерение ХАЛ */
-#Edit th:nth-child(7) { width: 7%; }      /* Результат */
-#Edit th:nth-child(8) { width: 7%; }      /* Печать */
+
+/* Базовые ширины (для случая с ЕЛИС) */
+#Edit .col-num { width: 25px; }
+#Edit .col-name { width: 30%; }
+#Edit .col-method { width: 16%; }
+#Edit .col-ivk { width: 8%; }
+#Edit .col-elis { width: 8%; }
+#Edit .col-hal { width: 10%; }
+#Edit .col-result-value { width: 12%; }
+#Edit .col-result-text { width: 12%; }
+
+/* Ширины для случая БЕЗ ЕЛИС (когда колонка скрыта) */
+#Edit.no-elis .col-num { width: 25px; }
+#Edit.no-elis .col-name { width: 38%; }
+#Edit.no-elis .col-method { width: 24%; }
+#Edit.no-elis .col-ivk { width: 8%; }
+#Edit.no-elis .col-elis { width: 0%; }        /* Скрываем колонку ЕЛИС */
+#Edit.no-elis .col-hal { width: 10%; }
+#Edit.no-elis .col-result-value { width: 12%; }
+#Edit.no-elis .col-result-text { width: 12%; }
 
 /* Стили для ячеек данных */
 #Edit td:nth-child(1) { 
     text-align: center; 
-    width: 25px;
 }
 
 #Edit td:nth-child(2) { 
@@ -174,11 +185,4 @@ body:not(.elis-enabled) #Edit td:nth-child(5) input {
     padding: 2px 4px;
 }
 
-/* Стили для таблицы БЕЗ колонки ЕЛИС (когда ЕЛИС отключен) */
-body:not(.elis-enabled) #Edit th:nth-child(1) { width: 25px; }    /* № */
-body:not(.elis-enabled) #Edit th:nth-child(2) { width: 44%; }     /* Наименование показателя */
-body:not(.elis-enabled) #Edit th:nth-child(3) { width: 25%; }     /* Метод испытаний */
-body:not(.elis-enabled) #Edit th:nth-child(4) { width: 8%; }      /* Измерение ИВК */
-body:not(.elis-enabled) #Edit th:nth-child(5) { width: 14%; }     /* Измерение ХАЛ */
-body:not(.elis-enabled) #Edit th:nth-child(6) { width: 7%; }      /* Результат */
-body:not(.elis-enabled) #Edit th:nth-child(7) { width: 8%; }      /* Печать */
+/* Случай без ЕЛИС теперь обрабатывается через JavaScript и CSS класс .no-elis */

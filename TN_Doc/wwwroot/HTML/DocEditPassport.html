@@ -299,6 +299,16 @@
     </table>
 
     <table id="Edit">
+        <colgroup>
+            <col class="col-num">
+            <col class="col-name">
+            <col class="col-method">
+            <col class="col-ivk">
+            <col class="col-elis">
+            <col class="col-hal">
+            <col class="col-result-value">
+            <col class="col-result-text">
+        </colgroup>
         <thead>
         </thead>
 
@@ -335,7 +345,27 @@
         metodSelects.forEach(select => {
             TogglePrintCellEditable(select);
         });
+        
+        // Автоматическое определение наличия ЕЛИС и применение соответствующего класса
+        setupTableLayout();
     });
+    
+    function setupTableLayout() {
+        const table = document.getElementById('Edit');
+        if (!table) return;
+        
+        // Проверяем наличие колонки "Номер документа" в заголовках
+        const hasElisColumn = table.querySelector('th') && 
+                            Array.from(table.querySelectorAll('th')).some(th => 
+                                th.textContent.includes('Номер документа'));
+        
+        // Добавляем соответствующий класс к таблице
+        if (!hasElisColumn) {
+            table.classList.add('no-elis');
+        } else {
+            table.classList.remove('no-elis');
+        }
+    }
     
     function CheckElisInput(){
         const elements = document.querySelectorAll('.elis-data');
