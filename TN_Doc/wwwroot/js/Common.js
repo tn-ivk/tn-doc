@@ -1224,7 +1224,7 @@ function FillPassportDataElis() {
         
         let iframe = document.querySelector('.FR');
         
-        let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
+        let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data');
         
         // Добавляем данные о представителе лаборатории из Signers
         if (dataPassport.signers?.laboratory) {
@@ -1241,7 +1241,7 @@ function FillPassportDataElis() {
             let currentKey = "";
             for (let key in dataPassport.parameters) {
                 if (itemKeys.includes(key)) {
-                    root = dataPassport.parameters
+                    root = dataPassport.parameters;
                     for (let iKey of itemKeys) {
                         if (iKey === key) { 
                             currentKey = key;
@@ -1255,7 +1255,7 @@ function FillPassportDataElis() {
             if (root === null) {
                 for (let key in dataPassport) {
                     if (itemKeys.includes(key)) {
-                        root = dataPassport
+                        root = dataPassport;
                         for (let iKey of itemKeys) {
                             if (iKey === key) {
                                 currentKey = key;
@@ -1270,7 +1270,7 @@ function FillPassportDataElis() {
             if (root === null) {
                 for (let key in labInfo) {
                     if (itemKeys.includes(key)) {
-                        root = labInfo
+                        root = labInfo;
                         for (let iKey of itemKeys) {
                             if (iKey === key) {
                                 currentKey = key;
@@ -1307,7 +1307,6 @@ function FillPassportDataElis() {
                         
                         // Заполняем поле "печать" данными ValueString из ЕЛИС
                         if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
-                            console.log(`[FillPassportDataElis] Создаем скрытое поле для ${item.dataset.key}, ValueString: ${root[currentKey].valueString}, Value: ${root[currentKey].value}`);
                             // Создаем скрытое поле для передачи ValueString в колонку "Печать"
                             let printValueInput = document.createElement('input');
                             printValueInput.type = 'hidden';
@@ -1317,9 +1316,6 @@ function FillPassportDataElis() {
                             printValueInput.setAttribute('data-elis-filled', 'true');
                             printValueInput.value = root[currentKey].valueString;
                             item.parentNode.appendChild(printValueInput);
-                            console.log(`[FillPassportDataElis] Скрытое поле создано и добавлено в DOM`);
-                        } else {
-                            console.log(`[FillPassportDataElis] Скрытое поле НЕ создано для ${item.dataset.key}. ValueString: ${root[currentKey].valueString}, Value: ${root[currentKey].value}`);
                         }
                         break;
                 }
@@ -1329,18 +1325,7 @@ function FillPassportDataElis() {
                 }
                 item.setAttribute("data-elis-filled", "true");
                 
-                // Отладочная информация для полей Value
-                if (item.dataset.tag === 'Value') {
-                    console.log(`[FillPassportDataElis] Поле ХАЛ заполнено: ${item.dataset.key}, значение: ${item.value}, data-elis-filled: ${item.getAttribute('data-elis-filled')}`);
-                    
-                    // Проверяем, есть ли скрытое поле с ValueString
-                    const printValueInput = iframe.contentWindow.document.querySelector(`input[data-key="${item.dataset.key}"][data-tag="PrintValue"][type="hidden"]`);
-                    if (printValueInput) {
-                        console.log(`[FillPassportDataElis] Найдено скрытое поле для ${item.dataset.key}: ${printValueInput.value}`);
-                    } else {
-                        console.log(`[FillPassportDataElis] Скрытое поле НЕ найдено для ${item.dataset.key}`);
-                    }
-                }
+
                 
                 // Применяем зеленую подсветку к элементу и его ячейке
                 applyElisHighlight(item);
@@ -1377,8 +1362,8 @@ function FillPassportDataElis() {
                         item.value = obj;           
                         break;
                     case 'Metod': 
-                        const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat()
-                        const limitValue = parseFloat(obj.value) + 0.1
+                        const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat();
+                        const limitValue = parseFloat(obj.value) + 0.1;
                         let metod = new Metod(0,true, 0, obj.testMethodName, flag, limitValue, obj.valueString);
 
                         //Проверяем наличие значения в списке, если нет, добавляем.
@@ -1401,10 +1386,7 @@ function FillPassportDataElis() {
         // Обновляем состояние ячеек печати для заполненных методов
         const metodSelects = iframe.contentWindow.document.querySelectorAll('select[data-tag="Metod"][data-elis-filled="true"]');
         
-        console.log(`[FillPassportDataElis] Найдено ${metodSelects.length} заполненных методов из ЕЛИС`);
-        
         metodSelects.forEach(select => {
-            console.log(`[FillPassportDataElis] Вызываем TogglePrintCellEditable для ${select.getAttribute('data-key')}`);
             iframe.contentWindow.TogglePrintCellEditable(select);
         });
     } catch (error) {
@@ -1412,45 +1394,9 @@ function FillPassportDataElis() {
     }
 }
 
-// Функция для обновления колонки "Печать" в таблице
-function updatePrintColumn(parameterKey, printValue) {
-    try {
-        let iframe = document.querySelector('.FR');
-        let table = iframe.contentWindow.document.querySelector('#Edit tbody');
-        
-        if (!table) return;
-        
-        // Находим ячейку печати по data-parameter-key
-        let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
-        if (printCell) {
-            // Обновляем data-print-value и устанавливаем флаг ЕЛИС
-            printCell.setAttribute('data-print-value', printValue);
-            printCell.setAttribute('data-elis-filled', 'true');
-            
-            // Проверяем, есть ли редактируемое поле внутри ячейки
-            let printInput = printCell.querySelector('.print-cell-input');
-            if (printInput) {
-                // Обновляем значение в редактируемом поле
-                printInput.value = printValue;
-                printInput.style.backgroundColor = '#8fd19e';
-                printInput.setAttribute("data-elis-filled", "true");
-                applyElisHighlight(printInput);
-            } else {
-                // Обновляем значение в нередактируемой ячейке
-                printCell.textContent = printValue;
-                printCell.style.backgroundColor = '#8fd19e';
-            }
-        }
-    } catch (error) {
-        console.error('Ошибка обновления колонки "Печать":', error);
-    }
-}
-
 // Функция для применения зеленой подсветки к элементам, заполненным из ЕЛИС
 function applyElisHighlight(element) {
     try {
-        console.log(`[applyElisHighlight] Применяем подсветку к элементу: ${element.dataset.key || element.id || 'без ключа'}, тег: ${element.dataset.tag || 'без тега'}`);
-        
         // Добавляем CSS класс к самому элементу
         element.classList.add('elis-filled-input');
         
@@ -1458,12 +1404,31 @@ function applyElisHighlight(element) {
         let parentCell = element.closest('td');
         if (parentCell) {
             parentCell.classList.add('elis-filled-cell');
-            console.log(`[applyElisHighlight] CSS класс добавлен к родительской ячейке`);
-        } else {
-            console.log(`[applyElisHighlight] Родительская ячейка не найдена`);
         }
     } catch (error) {
         console.error('Ошибка применения подсветки:', error);
+    }
+}
+
+// Функция для удаления зеленой подсветки
+function removeElisHighlight(element) {
+    try {
+        // Убираем CSS класс с самого элемента
+        element.classList.remove('elis-filled-input');
+        
+        // Убираем inline стиль backgroundColor с элемента
+        element.style.backgroundColor = '';
+        
+        // Находим родительскую ячейку и убираем с неё класс
+        let parentCell = element.closest('td');
+        if (parentCell) {
+            parentCell.classList.remove('elis-filled-cell');
+            
+            // Убираем inline стиль backgroundColor с родительской ячейки
+            parentCell.style.backgroundColor = '';
+        }
+    } catch (error) {
+        console.error('Ошибка удаления подсветки:', error);
     }
 }
 
@@ -1472,7 +1437,7 @@ function FixedElisData(object) {
     if(!object) return;
     if(!object.hasAttribute('data-roundValue')) return;
     const f = x => ((x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0));
-    if (f(object) >= object.getAttribute('data-roundValue')) return;
+    if (f(object.value) >= object.getAttribute('data-roundValue')) return;
         
     const num = parseFloat(object.value.replace(",", "."));
     object.value = num.toFixed(object.getAttribute('data-roundValue'));
@@ -1535,28 +1500,6 @@ function updatePrintColumnFromInput(valueInput) {
         }
     } catch (error) {
         console.error('Ошибка обновления колонки "Печать" при ручном изменении:', error);
-    }
-}
-
-// Функция для удаления зеленой подсветки
-function removeElisHighlight(element) {
-    try {
-        // Убираем CSS класс с самого элемента
-        element.classList.remove('elis-filled-input');
-        
-        // Убираем inline стиль backgroundColor с элемента
-        element.style.backgroundColor = '';
-        
-        // Находим родительскую ячейку и убираем с неё класс
-        let parentCell = element.closest('td');
-        if (parentCell) {
-            parentCell.classList.remove('elis-filled-cell');
-            
-            // Убираем inline стиль backgroundColor с родительской ячейки
-            parentCell.style.backgroundColor = '';
-        }
-    } catch (error) {
-        console.error('Ошибка удаления подсветки:', error);
     }
 }
 

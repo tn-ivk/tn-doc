@@ -479,6 +479,7 @@
                 event.preventDefault();  // Отключаем изменение значения колесиком мыши
             });
         });
+        
         const elementsWithOnInput = document.querySelectorAll('[oninput]');
         elementsWithOnInput.forEach(element => {
             if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
@@ -516,7 +517,7 @@
     function CheckElisInput(){
         const elements = document.querySelectorAll('.elis-data');
         if( elements.length===0){
-            return
+            return;
         }
         for(const input of elements){
         }
