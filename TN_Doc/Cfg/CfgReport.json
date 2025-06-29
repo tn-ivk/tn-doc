@@ -13,7 +13,7 @@
           "PaperWidth": 297,
           "PaperHeight": 210,
           "TopMargin": 10,
-          "BottomMargin": 10,
+          "BottomMargin": 5,
           "LeftMargin": 10,
           "RightMargin": 10
         },
@@ -25,81 +25,81 @@
         "NameIVK": "ИВК-1"
       },
       "Data": {
-        "ShowInvalidValues": true,
+        "ShowInvalidValues": false,
         "TableBIK": {
           "Visible": true,
           "Parameters": [
             {
               "Visible": true,
-              "Name": "Плотность",
+              "Name": "ПЛОТНОСТЬ",
               "SI": "кг/м³",
               "Key": "Dens"
             },
             {
               "Visible": true,
-              "Name": "Плотность при 15°C",
+              "Name": "ПЛОТНОСТЬ ПРИ 15°C",
               "SI": "кг/м³",
               "Key": "Dens15"
             },
             {
               "Visible": true,
-              "Name": "Плотность при 20°C",
+              "Name": "ПЛОТНОСТЬ ПРИ 20°C",
               "SI": "кг/м³",
               "Key": "Dens20"
             },
             {
               "Visible": true,
-              "Name": "Темпер. плотномера",
-              "SI": "°C",
-              "Key": "DensTemp"
-            },
-            {
-              "Visible": true,
-              "Name": "Давление плотномера",
-              "SI": "МПа",
-              "Key": "DensPress"
-            },
-            {
-              "Visible": true,
-              "Name": "Динам. вязкость",
+              "Name": "ДИНАМ. ВЯЗКОСТЬ",
               "SI": "мПа·с (сП)",
               "Key": "DynamicVisc"
             },
             {
               "Visible": true,
-              "Name": "Кинем. вязкость",
+              "Name": "КИНЕМ. ВЯЗКОСТЬ",
               "SI": "мм²/с (сСт)",
               "Key": "KinemVisc"
             },
             {
-              "Visible": false,
-              "Name": "Темпер. вискозиметра",
-              "SI": "°C",
-              "Key": "ViscTemp"
+              "Visible": true,
+              "Name": "РАСХОД",
+              "SI": "м³/ч",
+              "Key": "Flow"
             },
             {
               "Visible": true,
-              "Name": "Объемная доля воды",
+              "Name": "ОБЪЕМНАЯ ДОЛЯ ВОДЫ",
               "SI": "%",
               "Key": "VolWater"
             },
             {
               "Visible": true,
-              "Name": "Массовая доля воды",
+              "Name": "МАССОВАЯ ДОЛЯ ВОДЫ",
               "SI": "%",
               "Key": "MasWater"
             },
             {
               "Visible": true,
-              "Name": "Массовая доля серы",
+              "Name": "МАССОВАЯ ДОЛЯ СЕРЫ",
               "SI": "%",
               "Key": "MasSulphur"
             },
             {
               "Visible": true,
-              "Name": "Расход",
-              "SI": "м³/ч",
-              "Key": "Flow"
+              "Name": "ТЕМПЕР. ПЛОТНОМЕРА",
+              "SI": "°C",
+              "Key": "DensTemp"
+            },
+            {
+              "Visible": true,
+              "Name": "ДАВЛЕНИЕ ПЛОТНОМЕРА",
+              "SI": "МПа",
+              "Key": "DensPress"
+            },
+            {
+              "Visible": true,
+              "Name": "ТЕМПЕР. ВИСКОЗИМЕТРА",
+              "SI": "°C",
+              "Key": "ViscTemp"
             }
           ]
         },
@@ -273,7 +273,7 @@
             "ShortName": "Отчет за м"
           },
           {
-            "Use": true,
+            "Use": false,
             "Id": 5,
             "Name": "Отчет за ТКО",
             "ShortName": "Отчет за ТКО"
@@ -289,27 +289,27 @@
               {
                 "Id": 1,
                 "Name": "Отчет за два часа",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 2,
                 "Name": "Отчет за смену",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 3,
                 "Name": "Отчет за сутки",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 4,
                 "Name": "Отчет за месяц",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 5,
                 "Name": "Отчет за время ведения ТКО",
-                "Visible": true
+                "Visible": false
               }
             ]
           },
@@ -320,27 +320,27 @@
               {
                 "Id": 1,
                 "Name": "Отчет за два часа",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 2,
                 "Name": "Отчет за смену",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 3,
                 "Name": "Отчет за сутки",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 4,
                 "Name": "Отчет за месяц",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 5,
                 "Name": "Отчет за время ведения ТКО",
-                "Visible": true
+                "Visible": false
               }
             ]
           },
@@ -351,27 +351,27 @@
               {
                 "Id": 1,
                 "Name": "Отчет за два часа",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 2,
                 "Name": "Отчет за смену",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 3,
                 "Name": "Отчет за сутки",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 4,
                 "Name": "Отчет за месяц",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 5,
                 "Name": "Отчет за время ведения ТКО",
-                "Visible": false
+                "Visible": true
               }
             ]
           }
