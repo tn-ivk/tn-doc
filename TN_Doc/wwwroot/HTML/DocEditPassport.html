@@ -54,6 +54,16 @@
 
         let dictionaries;
         let invalidChars;
+        let idCounter = 0;
+
+        // Функция для генерации уникальных ID
+        function generateUniqueId(prefix) {
+            idCounter++;
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substr(2, 9);
+            const uniquePart = `${idCounter}_${random}`;
+            return `${prefix}_${timestamp}_${uniquePart}`;
+        }
 
         function UserChangeEvent(selectObject) {
             if (selectObject.name == "Laboratory_IOF") {
@@ -227,7 +237,7 @@
                     input.type = 'text';
                     input.className = 'print-cell-input correct-value';
                     input.value = printValue;
-                    input.id = `print_${parameterKey}_${Date.now()}`;
+                    input.id = generateUniqueId('print');
                     input.setAttribute('data-edit', '1');
                     input.setAttribute('data-key', parameterKey);
                     input.setAttribute('data-tag', 'PrintValue');
