@@ -181,24 +181,44 @@
         
         function TogglePrintCellEditable(selectElement) {
             try {
+                console.log('[TogglePrintCellEditable] Начало работы функции');
+                console.log('[TogglePrintCellEditable] selectElement:', selectElement);
+                
                 // Получаем выбранную опцию
                 const selectedOption = selectElement.options[selectElement.selectedIndex];
-                if (!selectedOption) return;
+                console.log('[TogglePrintCellEditable] selectedOption:', selectedOption);
+                if (!selectedOption) {
+                    console.warn('[TogglePrintCellEditable] Выбранная опция не найдена');
+                    return;
+                }
                 
                 // Получаем данные методики
                 const metodData = selectedOption.getAttribute('data-metod');
-                if (!metodData) return;
+                console.log('[TogglePrintCellEditable] metodData (raw):', metodData);
+                if (!metodData) {
+                    console.warn('[TogglePrintCellEditable] Данные методики не найдены в атрибуте data-metod');
+                    return;
+                }
                 
                 const metod = JSON.parse(metodData);
                 const parameterKey = selectElement.getAttribute('data-key');
+                console.log('[TogglePrintCellEditable] metod:', metod);
+                console.log('[TogglePrintCellEditable] parameterKey:', parameterKey);
+                console.log('[TogglePrintCellEditable] LimitValueActivate:', metod.LimitValueActivate);
                 
                 // Находим соответствующую ячейку печати
                 const printCell = document.querySelector(`[data-parameter-key="${parameterKey}"]`);
-                if (!printCell) return;
+                console.log('[TogglePrintCellEditable] printCell:', printCell);
+                if (!printCell) {
+                    console.warn('[TogglePrintCellEditable] Ячейка печати не найдена для параметра:', parameterKey);
+                    return;
+                }
                 
                 const printValue = printCell.getAttribute('data-print-value') || printCell.textContent;
+                console.log('[TogglePrintCellEditable] printValue:', printValue);
                 
                 if (metod.LimitValueActivate === true) {
+                    console.log('[TogglePrintCellEditable] Делаем ячейку редактируемой');
                     // Делаем ячейку редактируемой
                     const input = document.createElement('input');
                     input.type = 'text';
@@ -210,20 +230,29 @@
                     input.setAttribute('title', '');
                     input.setAttribute('oninput', 'InputStringCheck(this)');
                     
+                    console.log('[TogglePrintCellEditable] Создан input элемент:', input);
+                    
                     printCell.innerHTML = '';
                     printCell.appendChild(input);
                     printCell.classList.remove('manual-input--disabled');
                     printCell.classList.add('print-cell-editable');
+                    
+                    console.log('[TogglePrintCellEditable] Ячейка переведена в редактируемый режим');
                 } else {
+                    console.log('[TogglePrintCellEditable] Делаем ячейку нередактируемой');
                     // Делаем ячейку нередактируемой
                     printCell.innerHTML = printValue;
                     printCell.classList.add('manual-input--disabled');
                     printCell.classList.remove('print-cell-editable');
+                    
+                    console.log('[TogglePrintCellEditable] Ячейка переведена в нередактируемый режим');
                 }
                 
                 SendingMessageStateButtonSave();
+                console.log('[TogglePrintCellEditable] Функция завершена успешно');
             } catch (error) {
-                console.error('Ошибка в TogglePrintCellEditable:', error);
+                console.error('[TogglePrintCellEditable] Ошибка в TogglePrintCellEditable:', error);
+                console.error('[TogglePrintCellEditable] Stack trace:', error.stack);
             }
         }
     </script>
