@@ -166,16 +166,29 @@
         }
 
         function updateTooltip(element) {
+            // Проверяем наличие id у элемента перед использованием jQuery селектора
+            if (!element.id) {
+                console.warn('Элемент не имеет id, пропускаем tooltip:', element);
+                return;
+            }
+            
+            const $element = $('#' + element.id);
+            
+            // Проверяем, инициализирован ли tooltip для элемента
+            if (!$element.hasClass('ui-tooltip-trigger') && !$element.data('ui-tooltip')) {
+                // Инициализируем tooltip для элемента
+                $element.tooltip();
+            }
+            
             if(element.classList.contains("incorrect-value"))
             {
-                $('#' + element.id)
-                    .tooltip("enable")
+                $element.tooltip("enable")
                     .tooltip("option", "content", element.getAttribute("title"));  
             }
             
             if(element.classList.contains("correct-value"))
             {
-                $('#' + element.id).tooltip("disable");
+                $element.tooltip("disable");
             }
         }
         
@@ -224,6 +237,7 @@
                     input.type = 'text';
                     input.className = 'print-cell-input correct-value';
                     input.value = printValue;
+                    input.id = `print_${parameterKey}_${Date.now()}`;
                     input.setAttribute('data-edit', '1');
                     input.setAttribute('data-key', parameterKey);
                     input.setAttribute('data-tag', 'PrintValue');
@@ -236,6 +250,9 @@
                     printCell.appendChild(input);
                     printCell.classList.remove('manual-input--disabled');
                     printCell.classList.add('print-cell-editable');
+                    
+                    // Инициализируем tooltip для нового элемента
+                    $(input).tooltip();
                     
                     console.log('[TogglePrintCellEditable] Ячейка переведена в редактируемый режим');
                 } else {
