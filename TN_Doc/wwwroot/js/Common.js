@@ -1217,6 +1217,57 @@ function ResetPassportDataElis() {
     $('#info').text('');
     StateButtonGetElisData(false);
 }
+
+// Функция для форматирования ФИО в формат "И. О. Фамилия"
+// Пример: {givenName: "Иван", middleName: "Петрович", familyName: "Сидоров"} -> "И. П. Сидоров"
+function formatLabRepresentativeName(laboratory) {
+    console.log(`[formatLabRepresentativeName] Входные данные лаборатории:`, laboratory);
+    
+    if (!laboratory) {
+        console.log(`[formatLabRepresentativeName] Данные лаборатории отсутствуют, возвращаем пустую строку`);
+        return '';
+    }
+    
+    // Если есть новые поля, используем их
+    if (laboratory.givenName && laboratory.familyName) {
+        console.log(`[formatLabRepresentativeName] Используем новый формат ФИО:`);
+        console.log(`[formatLabRepresentativeName] - givenName: "${laboratory.givenName}"`);
+        console.log(`[formatLabRepresentativeName] - middleName: "${laboratory.middleName || 'не указано'}"`);
+        console.log(`[formatLabRepresentativeName] - familyName: "${laboratory.familyName}"`);
+        
+        let formatted = '';
+        
+        // Добавляем первую букву имени с точкой
+        if (laboratory.givenName) {
+            const initial = laboratory.givenName.charAt(0).toUpperCase() + '. ';
+            formatted += initial;
+            console.log(`[formatLabRepresentativeName] Добавлена инициал имени: "${initial}"`);
+        }
+        
+        // Добавляем первую букву отчества с точкой
+        if (laboratory.middleName) {
+            const initial = laboratory.middleName.charAt(0).toUpperCase() + '. ';
+            formatted += initial;
+            console.log(`[formatLabRepresentativeName] Добавлена инициал отчества: "${initial}"`);
+        }
+        
+        // Добавляем полную фамилию
+        if (laboratory.familyName) {
+            formatted += laboratory.familyName;
+            console.log(`[formatLabRepresentativeName] Добавлена фамилия: "${laboratory.familyName}"`);
+        }
+        
+        const result = formatted.trim();
+        console.log(`[formatLabRepresentativeName] ✅ Результат нового формата: "${result}"`);
+        return result;
+    }
+    
+    // Fallback к старому полю iof, если новые поля отсутствуют
+    const fallbackResult = laboratory.iof || '';
+    console.log(`[formatLabRepresentativeName] ⚠️ Используем старое поле IOF: "${fallbackResult}"`);
+    return fallbackResult;
+}
+
 function FillPassportDataElis() {
     try {
         let dataPassport = JSON.parse(localStorage.dataPassport);
@@ -1228,10 +1279,23 @@ function FillPassportDataElis() {
         
         // Добавляем данные о представителе лаборатории из Signers
         if (dataPassport.signers?.laboratory) {
-            // Добавляем данные в dataPassport для обратной совместимости
-            dataPassport.chiefLabShortSign = dataPassport.signers.laboratory.iof;
+            console.log(`[FillPassportDataElis] ===== ОБРАБОТКА ДАННЫХ ПРЕДСТАВИТЕЛЯ ЛАБОРАТОРИИ =====`);
+            console.log(`[FillPassportDataElis] Исходные данные laboratory:`, dataPassport.signers.laboratory);
+            
+            // Формируем ИОФ в новом формате "И. О. Фамилия"
+            dataPassport.chiefLabShortSign = formatLabRepresentativeName(dataPassport.signers.laboratory);
+            console.log(`[FillPassportDataElis] ✅ Сформированное ИОФ: "${dataPassport.chiefLabShortSign}"`);
+            
             dataPassport.chiefLabPosition = dataPassport.signers.laboratory.post;
             dataPassport.chiefLabOrganization = dataPassport.signers.laboratory.company;
+            
+            console.log(`[FillPassportDataElis] Установленные значения для обратной совместимости:`);
+            console.log(`[FillPassportDataElis] - chiefLabShortSign: "${dataPassport.chiefLabShortSign}"`);
+            console.log(`[FillPassportDataElis] - chiefLabPosition: "${dataPassport.chiefLabPosition}"`);
+            console.log(`[FillPassportDataElis] - chiefLabOrganization: "${dataPassport.chiefLabOrganization}"`);
+            console.log(`[FillPassportDataElis] ===== КОНЕЦ ОБРАБОТКИ ДАННЫХ ПРЕДСТАВИТЕЛЯ ЛАБОРАТОРИИ =====`);
+        } else {
+            console.log(`[FillPassportDataElis] ⚠️ Данные представителя лаборатории (signers.laboratory) отсутствуют`);
         }
 
         elisNodes.forEach((item, index, array) => {
