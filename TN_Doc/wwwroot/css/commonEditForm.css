@@ -121,11 +121,11 @@ select:focus {
 
 /* Ширины колонок таблицы редактирования */
 #Edit th:nth-child(1) { width: 40px; }    /* Н */
-#Edit th:nth-child(2) { width: 38%; }     /* Наименование показателя */
-#Edit th:nth-child(3) { width: 22%; }     /* Метод испытаний */
+#Edit th:nth-child(2) { width: 36%; }     /* Наименование показателя */
+#Edit th:nth-child(3) { width: 20%; }     /* Метод испытаний */
 #Edit th:nth-child(4) { width: 8%; }      /* Измерение ИВК */
-#Edit th:nth-child(5) { width: 10%; }     /* Номер документа (ЕЛИС) */
-#Edit th:nth-child(6) { width: 8%; }      /* Измерение ХАЛ */
+#Edit th:nth-child(5) { width: 8%; }      /* Номер документа (ЕЛИС) */
+#Edit th:nth-child(6) { width: 14%; }     /* Измерение ХАЛ */
 #Edit th:nth-child(7) { width: 7%; }      /* Результат */
 #Edit th:nth-child(8) { width: 7%; }      /* Печать */
 
@@ -142,10 +142,14 @@ select:focus {
 
 #Edit input {
     width: 95%;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 #Edit select {
     width: 98%;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 #Edit td:nth-child(4),
@@ -156,11 +160,25 @@ select:focus {
     text-align: center; 
 }
 
+/* Специальные стили для колонки "Измерение ХАЛ" */
+#Edit td:nth-child(6) input {
+    width: 92%;
+    font-size: 13px;
+    padding: 2px 4px;
+}
+
+/* Для колонки без ЕЛИС - "Измерение ХАЛ" становится 5-й */
+body:not(.elis-enabled) #Edit td:nth-child(5) input {
+    width: 92%;
+    font-size: 13px;
+    padding: 2px 4px;
+}
+
 /* Стили для таблицы БЕЗ колонки ЕЛИС (когда ЕЛИС отключен) */
 body:not(.elis-enabled) #Edit th:nth-child(1) { width: 40px; }    /* Н */
-body:not(.elis-enabled) #Edit th:nth-child(2) { width: 48%; }     /* Наименование показателя */
-body:not(.elis-enabled) #Edit th:nth-child(3) { width: 27%; }     /* Метод испытаний */
+body:not(.elis-enabled) #Edit th:nth-child(2) { width: 44%; }     /* Наименование показателя */
+body:not(.elis-enabled) #Edit th:nth-child(3) { width: 25%; }     /* Метод испытаний */
 body:not(.elis-enabled) #Edit th:nth-child(4) { width: 8%; }      /* Измерение ИВК */
-body:not(.elis-enabled) #Edit th:nth-child(5) { width: 8%; }      /* Измерение ХАЛ */
+body:not(.elis-enabled) #Edit th:nth-child(5) { width: 14%; }     /* Измерение ХАЛ */
 body:not(.elis-enabled) #Edit th:nth-child(6) { width: 7%; }      /* Результат */
 body:not(.elis-enabled) #Edit th:nth-child(7) { width: 8%; }      /* Печать */
