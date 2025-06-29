@@ -122,24 +122,24 @@ select:focus {
 /* Ширины колонок таблицы редактирования */
 
 /* Базовые ширины (для случая с ЕЛИС) */
-#Edit .col-num { width: 25px; }
-#Edit .col-name { width: 30%; }
-#Edit .col-method { width: 16%; }
+#Edit .col-num { width: 20px; }
+#Edit .col-name { width: 37%; }
+#Edit .col-method { width: 19%; }
 #Edit .col-ivk { width: 8%; }
 #Edit .col-elis { width: 8%; }
-#Edit .col-hal { width: 10%; }
-#Edit .col-result-value { width: 12%; }
-#Edit .col-result-text { width: 12%; }
+#Edit .col-hal { width: 8%; }
+#Edit .col-result-value { width: 8%; }
+#Edit .col-result-text { width: 8%; }
 
 /* Ширины для случая БЕЗ ЕЛИС (когда колонка скрыта) */
-#Edit.no-elis .col-num { width: 25px; }
-#Edit.no-elis .col-name { width: 38%; }
-#Edit.no-elis .col-method { width: 24%; }
+#Edit.no-elis .col-num { width: 20px; }
+#Edit.no-elis .col-name { width: 45%; }
+#Edit.no-elis .col-method { width: 27%; }
 #Edit.no-elis .col-ivk { width: 8%; }
 #Edit.no-elis .col-elis { width: 0%; }        /* Скрываем колонку ЕЛИС */
-#Edit.no-elis .col-hal { width: 10%; }
-#Edit.no-elis .col-result-value { width: 12%; }
-#Edit.no-elis .col-result-text { width: 12%; }
+#Edit.no-elis .col-hal { width: 8%; }
+#Edit.no-elis .col-result-value { width: 8%; }
+#Edit.no-elis .col-result-text { width: 8%; }
 
 /* Стили для ячеек данных */
 #Edit td:nth-child(1) { 
