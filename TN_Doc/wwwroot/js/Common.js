@@ -1406,8 +1406,9 @@ function updatePrintColumn(parameterKey, printValue) {
         // Находим ячейку печати по data-parameter-key
         let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
         if (printCell) {
-            // Обновляем data-print-value
+            // Обновляем data-print-value и устанавливаем флаг ЕЛИС
             printCell.setAttribute('data-print-value', printValue);
+            printCell.setAttribute('data-elis-filled', 'true');
             
             // Проверяем, есть ли редактируемое поле внутри ячейки
             let printInput = printCell.querySelector('.print-cell-input');
@@ -1483,8 +1484,9 @@ function updatePrintColumnFromInput(valueInput) {
         // Находим ячейку печати по data-parameter-key
         let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
         if (printCell) {
-            // Обновляем data-print-value
+            // Обновляем data-print-value и сбрасываем флаг ЕЛИС
             printCell.setAttribute('data-print-value', valueInput.value || '-');
+            printCell.setAttribute('data-elis-filled', 'false');
             
             // Проверяем, есть ли редактируемое поле внутри ячейки
             let printInput = printCell.querySelector('.print-cell-input');

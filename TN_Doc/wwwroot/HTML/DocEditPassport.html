@@ -217,9 +217,9 @@
                 const printValue = printCell.getAttribute('data-print-value') || printCell.textContent;
                 
                 if (metod.LimitValueActivate === true) {
-                    // Проверяем, содержит ли ячейка данные из ЕЛИС (зеленая подсветка)
-                    const hasElisData = printCell.style.backgroundColor === 'rgb(143, 209, 158)' || 
-                                      printCell.style.backgroundColor === '#8fd19e' ||
+                    // Проверяем, содержит ли ячейка данные из ЕЛИС
+                    const hasElisData = printCell.hasAttribute('data-elis-filled') && 
+                                      printCell.getAttribute('data-elis-filled') === 'true' ||
                                       printCell.classList.contains('elis-filled-cell');
                     
                     // Делаем ячейку редактируемой
