@@ -97,6 +97,7 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
             });
 
         if (DocGUID == 1) {
+            const wt = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag));
             const lastResult = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
             WriteTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassport', PrefixTag), true, 2, 0);
 

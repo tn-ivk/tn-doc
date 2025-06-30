@@ -722,7 +722,7 @@ function InitTableDocs() {
                 });
 
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), BIKId, 2, 0);
-                WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_DirId'), DirId, 2, 0);
+                //WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_DirId'), DirId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_OnlineReportType'), currentId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport'), true, 2, 0);
             } else {
@@ -733,6 +733,11 @@ function InitTableDocs() {
 }
 
 function InitElement() {
+    $('#ButtonPrint').hide();
+    $('#ComboboxPrinterName').hide();
+    $('#ButtonExport').hide();
+    $('#ComboboxExportFormat').hide();
+    
      let iframe = document.querySelector('.FR');
      iframe.onload = function(){
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data')
@@ -745,8 +750,8 @@ function InitElement() {
     InitDatepickerEnd();
     InitTableDocs();
     InitTemplatesDoc();
-    InitPrinterName();
-    InitExportFormat();
+    //InitPrinterName();
+    //InitExportFormat();
     InitProtocolNumber();
     $('#ComboboxDocGUID').change(function () {
         if (table != null) $('#DataTable').DataTable().clear().draw();
@@ -844,7 +849,8 @@ function GetDoc() {
             },
             success: function (data) {
                 if (data)
-                    $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
+                    $('.FR').attr('src', '/PDF/PDF.pdf#view=FitH');
+                    //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
 
                 $('#viewPanel').prop('hidden', false);
                 $('#editPanel').prop('hidden', true);
@@ -1033,6 +1039,7 @@ function GetElisData() {
 
     if (clientToken == null) {
         $('#info').html('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
+        $.post("Elis/ErrorMessage/", {msg:"Не удалось получить токен для TN.ElisConnector"});
         return;
     }
     const periodDocument = GetPeriodDocument();
