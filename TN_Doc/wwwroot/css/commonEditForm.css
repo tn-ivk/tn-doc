@@ -124,7 +124,7 @@ select:focus {
 /* Ширины колонок таблицы редактирования */
 
 /* Базовые ширины (для случая с колонкой Документы) */
-#Edit .col-num { width: 20px; }
+#Edit .col-num { width: 25px; }
 #Edit .col-name { width: 37%; }
 #Edit .col-method { width: 19%; }
 #Edit .col-ivk { width: 8%; }
@@ -134,7 +134,7 @@ select:focus {
 #Edit .col-result-text { width: 8%; }
 
 /* Ширины для случая БЕЗ колонки Документы (когда колонка скрыта) */
-#Edit.no-elis .col-num { width: 20px; }
+#Edit.no-elis .col-num { width: 25px; }
 #Edit.no-elis .col-name { width: 45%; }
 #Edit.no-elis .col-method { width: 27%; }
 #Edit.no-elis .col-ivk { width: 8%; }
