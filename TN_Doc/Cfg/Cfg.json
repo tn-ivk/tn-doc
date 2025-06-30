@@ -32,12 +32,14 @@
             "F": "Низаева",
             "I": "Эльвира",
             "O": "Венеровна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Низаева Э.В.",
+            "IOF": "Э.В. Низаева",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -46,12 +48,14 @@
             "F": "Сагутдинова",
             "I": "Гульшат",
             "O": "Мунировна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Сагутдинова Г.М.",
+            "IOF": "Г.М. Сагутдинова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -60,12 +64,14 @@
             "F": "Валиева",
             "I": "Альбина",
             "O": "Халиловна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Валиева А.Х.",
+            "IOF": "А.Х. Валиева",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -74,12 +80,14 @@
             "F": "Ярова",
             "I": "Эльза",
             "O": "Ильгизовна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Ярова Э.И.",
+            "IOF": "Э.И. Ярова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -88,12 +96,14 @@
             "F": "Сафаргалиева",
             "I": "Диана",
             "O": "Дамировна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Сафаргалиева Д.Д.",
+            "IOF": "Д.Д. Сафаргалиева",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -102,12 +112,14 @@
             "F": "Галимова",
             "I": "Зарема",
             "O": "Ирековна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Галимова З.И.",
+            "IOF": "З.И. Галимова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -116,12 +128,14 @@
             "F": "Кулимбетова",
             "I": "Вероника",
             "O": "Викторовна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Кулимбетова В.В.",
+            "IOF": "В.В. Кулимбетова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -130,12 +144,14 @@
             "F": "Рахматуллина",
             "I": "Земфира",
             "O": "Фазулловна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Рахматуллина З.Ф.",
+            "IOF": "З.Ф. Рахматуллина",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -144,12 +160,14 @@
             "F": "Калимуллина",
             "I": "Ляйсан",
             "O": "Амирьяновна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Калимуллина Л.А.",
+            "IOF": "Л.А. Калимуллина",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -158,12 +176,14 @@
             "F": "Ибраева",
             "I": "Эльнара",
             "O": "Альбертовна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Ибраева Э.А.",
+            "IOF": "Э.А. Ибраева",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -172,12 +192,14 @@
             "F": "Кильмаматова",
             "I": "Лилия",
             "O": "Ильаровна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Кильмаматова Л.И.",
+            "IOF": "Л.И. Кильмаматова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -186,12 +208,14 @@
             "F": "Дачникова",
             "I": "Анастасия",
             "O": "Алексеевна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Дачникова А.А.",
+            "IOF": "А.А. Дачникова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -200,12 +224,14 @@
             "F": "Гарина",
             "I": "Анна",
             "O": "Ивановна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Гарина А.И.",
+            "IOF": "А.И. Гарина",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -214,12 +240,14 @@
             "F": "Кузьмина",
             "I": "Светлана",
             "O": "Александровна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Кузьмина С.А.",
+            "IOF": "С.А. Кузьмина",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -230,10 +258,12 @@
             "O": "Залифовна",
             "Factory": "АО «Транснефть -Урал»",
             "Post": "Оператор товарный",
+            "LicId": 0,
+            "FIO": "Марванова Р.З.",
+            "IOF": "Р.З. Марванова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -242,12 +272,14 @@
             "F": "Гильметдинов",
             "I": "Эрик",
             "O": "Рустэмович",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "АО «Транснефть - Урал»",
             "Post": "Начальник ПСП",
+            "LicId": 4,
+            "FIO": "Гильметдинов Э.Р.",
+            "IOF": "Э.Р. Гильметдинов",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -258,10 +290,12 @@
             "O": "Радикович",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Зам. начальника ПСП",
+            "LicId": 4,
+            "FIO": "Гайнанов Р.Р.",
+            "IOF": "Р.Р. Гайнанов",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -272,10 +306,12 @@
             "O": "Аксановна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Ахметзянова Г.А.",
+            "IOF": "Г.А. Ахметзянова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -286,10 +322,12 @@
             "O": "Альбертовна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 5,
+            "FIO": "Саяпова А.А.",
+            "IOF": "А.А. Саяпова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 5
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -300,10 +338,12 @@
             "O": "Илшатовна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Исрафилова И.И.",
+            "IOF": "И.И. Исрафилова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -314,10 +354,12 @@
             "O": "Асафовна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Гизетдинова А.А.",
+            "IOF": "А.А. Гизетдинова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -328,10 +370,12 @@
             "O": "Баязитовна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Каримова Л.Б.",
+            "IOF": "Л.Б. Каримова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -342,10 +386,12 @@
             "O": "Асхатовна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Фатыхова А.А.",
+            "IOF": "А.А. Фатыхова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -356,10 +402,12 @@
             "O": "Анваровна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Каримова А.А.",
+            "IOF": "А.А. Каримова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -370,10 +418,12 @@
             "O": "Сагитович",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Ахмеров И.С.",
+            "IOF": "И.С. Ахмеров",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -384,10 +434,12 @@
             "O": "Айдровна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Ахметгареева А.А.",
+            "IOF": "А.А. Ахметгареева",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -398,10 +450,12 @@
             "O": "Зуфаровна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Валиева Ф.З.",
+            "IOF": "Ф.З. Валиева",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -412,10 +466,12 @@
             "O": "Азатовна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Каримова А.А.",
+            "IOF": "А.А. Каримова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -426,10 +482,12 @@
             "O": "Азатович",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Фагамов А.А.",
+            "IOF": "А.А. Фагамов",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -440,10 +498,12 @@
             "O": "Загировна",
             "Factory": "АО «Транснефть - Урал»",
             "Post": "Оператор товарный",
+            "LicId": 4,
+            "FIO": "Фазуллина Г.З.",
+            "IOF": "Г.З. Фазуллина",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 4
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -454,10 +514,12 @@
             "O": "Альбертовна",
             "Factory": "АО «Транснефть - Прикамье»",
             "Post": "Инженер по учету",
+            "LicId": 1,
+            "FIO": "Шишко Э.А.",
+            "IOF": "Э.А. Шишко",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 1
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -468,10 +530,12 @@
             "O": "Ильгизарович",
             "Factory": "АО «Транснефть - Прикамье»",
             "Post": "Мастер ПСП",
+            "LicId": 2,
+            "FIO": "Хабибуллин И.И.",
+            "IOF": "И.И. Хабибуллин",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 2
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -480,12 +544,14 @@
             "F": "Саяхова",
             "I": "Эльза",
             "O": "Альбертовна",
-            "Factory": "ХАЛ ЛПДС «Нурлино»",
+            "Factory": "ИЛН ЛПДС «Нурлино»",
             "Post": "Лаборант хим. анализа",
+            "LicId": 0,
+            "FIO": "Саяхова Э.А.",
+            "IOF": "Э.А. Саяхова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           },
           {
             "Use": true,
@@ -496,10 +562,12 @@
             "O": "Ильдаровна",
             "Factory": "АО «Транснефть-Урал»",
             "Post": "Инженер по учету",
+            "LicId": 0,
+            "FIO": "Мухарямова Г.И.",
+            "IOF": "Г.И. Мухарямова",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           }
         ],
         "UsersGroup": [
@@ -526,28 +594,28 @@
         ],
         "Licenses": [
           {
+            "Use": true,
             "Id": 1,
-            "Use": true,
-            "LicensesDate": "28.12.2022",
-            "LicensesNumber": "01-01-9/906"
+            "LicensesNumber": "01-01-9/906",
+            "LicensesDate": "28.12.2022"
           },
           {
+            "Use": true,
             "Id": 2,
-            "Use": true,
-            "LicensesDate": "28.12.2022",
-            "LicensesNumber": "01-01-9/905"
+            "LicensesNumber": "01-01-9/905",
+            "LicensesDate": "28.12.2022"
           },
           {
+            "Use": true,
             "Id": 4,
-            "Use": true,
-            "LicensesDate": "5.12.2024",
-            "LicensesNumber": "ТУР-21-80293"
+            "LicensesNumber": "ТУР-21-80293",
+            "LicensesDate": "05.12.2024"
           },
           {
-            "Id": 5,
             "Use": true,
-            "LicensesDate": "24.12.2024",
-            "LicensesNumber": "ТУР-21-86071"
+            "Id": 5,
+            "LicensesNumber": "ТУР-21-86071",
+            "LicensesDate": "24.12.2024"
           }
         ],
         "BIKs": [
