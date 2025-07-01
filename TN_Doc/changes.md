@@ -1,4 +1,15 @@
 # Список изменений:
+## Версия 1.3.6:
+    - Исправление СИКН/СИКНП в CfgKMH_PW.json
+    - Исправления TotalPage для KMH_PR_PU_GOSTR8.1011-2022(U2).frx
+    - Кор. шаблона 16_Poverka3189_Release_version.frx - Qnom = Q_nom_or_max
+    - Доработки шаблонов паспартов по Р 50.2.040 - мелкие правки сносок
+        - Passport_GOSTR50.2.040(G).frx
+        - Passport_GOSTR50.2.040(G)(Export_Rus).frx
+        - Passport_GOSTR50.2.040(I).frx
+        - Passport_GOSTR50.2.040(I)_ShiftTime.frx
+        - Passport_GOSTR50.2.040(I)_ShiftTime_TR.frx
+
 ## Версия 1.3.5:
     - 🐞 Исправлена загрузка списка документов для устройств ИВК-2, ИВК-3
     - Кор. формы протокола KMH_MPR_MPR_GOSTR8.1011-2022(U5).frx - Номер "заключения"
