@@ -22,7 +22,7 @@
       },
       "Header": {
         "FieldSIKN": "СИКН №",
-        "FieldPSP": "ПСП (НСП)"
+        "FieldPSP": "ПСП:"
       },
       "Data": {
         "CalibrationTemperature" : 15
