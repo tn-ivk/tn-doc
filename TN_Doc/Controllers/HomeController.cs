@@ -814,11 +814,5 @@ namespace TN_Doc.Controllers
 
             return Ok();
         }
-
-        public class ClientLogMessage
-        {
-            public string Level { get; set; }
-            public string Message { get; set; }
-        }
     }
 }
