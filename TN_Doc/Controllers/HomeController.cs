@@ -766,36 +766,52 @@ namespace TN_Doc.Controllers
         [HttpPost]
         public IActionResult LogClientMessage([FromBody] ClientLogMessage log)
         {
-            if (log is null)
+            if (log == null)
             {
-                _logger.LogError($"Ошибка лога клиентской части приложения: {nameof(log)} равно null");
-                return Error();
-            }
-            
-            var logLevel = log.Level ?? string.Empty;
-            if (string.IsNullOrEmpty(logLevel))
-            {
-                _logger.LogError("Невозможно определить уровень логирования сообщений клиентской части приложения");
-                return Error();
-            }
-            
-            var msg = log.Message ?? string.Empty;
-            if (string.IsNullOrEmpty(msg))
-            {
-                _logger.LogError("Пустое сообщение от клиентской части приложения");
-                return Error();
+                _logger.LogError("Ошибка лога клиентской части: объект log равен null");
+                return BadRequest("Log object is null");
             }
 
-            switch (logLevel.ToLower())
+            if (string.IsNullOrWhiteSpace(log.Level))
             {
-                case "trace": _logger.LogTrace(msg); break;
-                case "debug": _logger.LogDebug(msg); break;
-                case "info":  _logger.LogInformation(msg); break;
-                case "warn":  _logger.LogWarning(msg); break;
-                case "error": _logger.LogError(msg); break;
-                default:
-                    _logger.LogError($"Сообщение от клиентской части с уровнем логирования {logLevel} невозможно мдентифицировать"); break;
+                _logger.LogError("Ошибка лога клиентской части: не указан уровень логирования");
+                return BadRequest("Log level is required");
             }
+
+            if (string.IsNullOrWhiteSpace(log.Message))
+            {
+                _logger.LogError("Ошибка лога клиентской части: пустое сообщение");
+                return BadRequest("Log message is required");
+            }
+
+            var level = log.Level.Trim().ToLowerInvariant();
+            var msg = log.Message;
+
+            switch (level)
+            {
+                case "trace":
+                    _logger.LogTrace(msg);
+                    break;
+                case "debug":
+                    _logger.LogDebug(msg);
+                    break;
+                case "info":
+                    _logger.LogInformation(msg);
+                    break;
+                case "warn":
+                case "warning":
+                    _logger.LogWarning(msg);
+                    break;
+                case "error":
+                case "fatal":
+                case "critical":
+                    _logger.LogError(msg);
+                    break;
+                default:
+                    _logger.LogError($"Неизвестный уровень логирования от клиента: '{log.Level}'. Сообщение: {msg}");
+                    return BadRequest($"Unknown log level: {log.Level}");
+            }
+
             return Ok();
         }
 
