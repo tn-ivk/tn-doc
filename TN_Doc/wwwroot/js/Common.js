@@ -1660,3 +1660,17 @@ function showError(message) {
     errorMessage.textContent = message;
     errorDialog.showModal();
 }
+
+function logToServer(level, message) {
+    $.ajax({
+        url: '/Home/LogClientMessage',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ level: level, message: message }),
+        error: function() { /* опционально: обработка ошибок отправки лога */ }
+    });
+}
+
+function logInfo(message)  { logToServer('Info', message); }
+function logWarn(message)  { logToServer('Warn', message); }
+function logError(message) { logToServer('Error', message); }

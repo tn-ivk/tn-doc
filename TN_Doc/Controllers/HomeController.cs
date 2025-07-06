@@ -763,5 +763,46 @@ namespace TN_Doc.Controllers
             return strResult;
         }
         
+        [HttpPost]
+        public IActionResult LogClientMessage([FromBody] ClientLogMessage log)
+        {
+            if (log is null)
+            {
+                _logger.LogError($"Ошибка лога клиентской части приложения: {nameof(log)} равно null");
+                return Error();
+            }
+            
+            var logLevel = log.Level ?? string.Empty;
+            if (string.IsNullOrEmpty(logLevel))
+            {
+                _logger.LogError("Невозможно определить уровень логирования сообщений клиентской части приложения");
+                return Error();
+            }
+            
+            var msg = log.Message ?? string.Empty;
+            if (string.IsNullOrEmpty(msg))
+            {
+                _logger.LogError("Пустое сообщение от клиентской части приложения");
+                return Error();
+            }
+
+            switch (logLevel.ToLower())
+            {
+                case "trace": _logger.LogTrace(msg); break;
+                case "debug": _logger.LogDebug(msg); break;
+                case "info":  _logger.LogInformation(msg); break;
+                case "warn":  _logger.LogWarning(msg); break;
+                case "error": _logger.LogError(msg); break;
+                default:
+                    _logger.LogError($"Сообщение от клиентской части с уровнем логирования {logLevel} невозможно мдентифицировать"); break;
+            }
+            return Ok();
+        }
+
+        public class ClientLogMessage
+        {
+            public string Level { get; set; }
+            public string Message { get; set; }
+        }
     }
 }
