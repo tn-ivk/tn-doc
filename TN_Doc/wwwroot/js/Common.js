@@ -1067,7 +1067,7 @@ function GetElisData() {
                 $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
             }
             else {
-                logInfo("Данные ЕЛИС успешно получены");
+                logTrace("Данные ЕЛИС успешно получены");
                 dataELIS = data;
             }
         },
@@ -1081,7 +1081,7 @@ function GetElisData() {
             }
         },
         complete: function (data) {
-            logInfo("Запрос к API ЕЛИС завершён");
+            logTrace("Запрос к API ЕЛИС завершён");
             StateButtonGetElisData(false);
             if(dataELIS)
                 DrawTablePassports(dataELIS);
