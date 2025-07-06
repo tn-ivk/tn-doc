@@ -1027,58 +1027,66 @@ function GetFullNameTag(tagName) {
 
 //Запросить данные из ЕЛИС
 function GetElisData() {
+    logTrace("Запрос данных ЕЛИС инициирован");
     ClearDataElis();
     let dataELIS;
     let clientToken = GetElisToken();
 
     if (clientToken == null) {
+        logError("Не удалось получить токен для TN.ElisConnector. Запрос данных невозможен!");
         $('#info').html('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
         return;
     }
     const periodDocument = GetPeriodDocument();
     StateButtonGetElisData(true);
 
-    $.ajax(
-        {
-            async: true,
-            url: 'http://localhost:5050/api/tspd/getqp',
-            type: 'POST',
-            contentType: 'application/json; charset=UTF-8',
-            dataType: 'json',
-            headers: {
-                "client-token": clientToken.clientToken
-            },
-            data:
-                JSON.stringify({
-                    startPeriod: moment.utc(periodDocument.begin * 1000).format(),
-                    endPeriod: moment.utc(periodDocument.end * 1000).format()
-                }),
-            success: function (data) {
-                if (data.isError) {
-                    if(data.textError) {
-                        $('#info').text(data.textError);
-                        $.post("Elis/ErrorMessage/", {msg:data.textError});    
-                    }
+    logTrace("Отправлен запрос к API ЕЛИС");
+    $.ajax({
+        async: true,
+        url: 'http://localhost:5050/api/tspd/getqp',
+        type: 'POST',
+        contentType: 'application/json; charset=UTF-8',
+        dataType: 'json',
+        headers: {
+            "client-token": clientToken.clientToken
+        },
+        data: JSON.stringify({
+            startPeriod: moment.utc(periodDocument.begin * 1000).format(),
+            endPeriod: moment.utc(periodDocument.end * 1000).format()
+        }),
+        success: function (data) {
+            if (data.isError) {
+                logError("Ошибка от API ЕЛИС: " + (data.textError || ''));
+                if(data.textError) {
+                    $('#info').text(data.textError);
+                    $.post("Elis/ErrorMessage/", {msg:data.textError});    
                 }
-                else if (data.passports.length == 0)
-                    $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
-                else    //отрисовываем таблицу с паспортами
-                    dataELIS = data;
-            },
-            error: function (data) {
-                $('#info').text('Ошибка выполнения запроса.');
-
-                //Неавторизованный пользователь
-                if (data.status == 401) {
-                    RegistrationClient('ИВК-1');
-                }
-            },
-            complete: function (data) {
-                StateButtonGetElisData(false);
-                if(dataELIS)
-                    DrawTablePassports(dataELIS);
             }
-        });
+            else if (data.passports.length == 0) {
+                logWarn("Данные для паспорта в системе ЕЛИС не найдены");
+                $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
+            }
+            else {
+                logInfo("Данные ЕЛИС успешно получены");
+                dataELIS = data;
+            }
+        },
+        error: function (data) {
+            logError("Ошибка выполнения запроса к API ЕЛИС: " + (data && data.status ? data.status : ''));
+            $('#info').text('Ошибка выполнения запроса.');
+
+            if (data.status == 401) {
+                logWarn("Неавторизованный пользователь при запросе к API ЕЛИС");
+                RegistrationClient('ИВК-1');
+            }
+        },
+        complete: function (data) {
+            logInfo("Запрос к API ЕЛИС завершён");
+            StateButtonGetElisData(false);
+            if(dataELIS)
+                DrawTablePassports(dataELIS);
+        }
+    });
 }
 
 //Получение токена для ЕЛИС
@@ -1674,3 +1682,5 @@ function logToServer(level, message) {
 function logInfo(message)  { logToServer('Info', message); }
 function logWarn(message)  { logToServer('Warn', message); }
 function logError(message) { logToServer('Error', message); }
+function logDebug(message) { logToServer('Debug', message); }
+function logTrace(message) { logToServer('Trace', message); }
