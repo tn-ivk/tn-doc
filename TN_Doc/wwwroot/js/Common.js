@@ -1263,6 +1263,7 @@ function formatLabRepresentativeName(laboratory) {
 }
 
 function FillPassportDataElis() {
+    logTrace('Начало заполнения данных паспорта из ЕЛИС');
     try {
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let labInfo = JSON.parse(localStorage.labInfo);
@@ -1281,7 +1282,6 @@ function FillPassportDataElis() {
 
         elisNodes.forEach((item, index, array) => {
             let itemKeys = item.dataset.elisAlias?.split('|');
-            
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
@@ -1331,6 +1331,8 @@ function FillPassportDataElis() {
                 return;
             }
 
+            logTrace('Заполнение поля из ЕЛИС: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey] !== undefined ? JSON.stringify(root[currentKey]) : '[нет значения]'));
+
             if (item.nodeName === 'INPUT') {
                 switch (item.dataset.tag) {
                     case 'AdditionalInfo':
@@ -1349,10 +1351,7 @@ function FillPassportDataElis() {
                     case 'Value':
                         item.value = root[currentKey].value;
                         FixedElisData(item);
-                        
-                        // Заполняем поле "печать" данными ValueString из ЕЛИС
                         if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
-                            // Создаем скрытое поле для передачи ValueString в колонку "Печать"
                             let printValueInput = document.createElement('input');
                             printValueInput.type = 'hidden';
                             printValueInput.setAttribute('data-key', item.dataset.key);
@@ -1364,20 +1363,12 @@ function FillPassportDataElis() {
                         }
                         break;
                 }
-                
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
                 item.setAttribute("data-elis-filled", "true");
-                
-
-                
-                // Применяем зеленую подсветку к элементу и его ячейке
                 applyElisHighlight(item);
-                
                 item.addEventListener("input", ManualCorrect, {once:true});
-                
-                // Добавляем постоянный обработчик для полей Value для обновления колонки "Печать"
                 if (item.dataset.tag === 'Value') {
                     item.addEventListener("input", function(e) {
                         if (e.target.getAttribute('data-elis-filled') === 'false') {
@@ -1400,7 +1391,6 @@ function FillPassportDataElis() {
                 switch(item.dataset.tag)
                 {
                     case 'AdditionalInfo': 
-                        //Проверяем наличие значения в списке, если нет, добавляем.
                         if (!item.contains(obj)) {
                             item.append(new Option(obj, obj));
                         }
@@ -1410,8 +1400,6 @@ function FillPassportDataElis() {
                         const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat();
                         const limitValue = parseFloat(obj.value) + 0.1;
                         let metod = new Metod(0,true, 0, obj.testMethodName, flag, limitValue, obj.valueString);
-
-                        //Проверяем наличие значения в списке, если нет, добавляем.
                         if (!item.contains(obj.testMethodName)) {
                             item.append(new Option(obj.testMethodName, obj.testMethodName));
                         }
@@ -1420,22 +1408,18 @@ function FillPassportDataElis() {
                         break;
                 }
                 item.setAttribute("data-elis-filled", "true");
-                
-                // Применяем зеленую подсветку к элементу и его ячейке
                 applyElisHighlight(item);
-                
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
-        
-        // Обновляем состояние ячеек печати для заполненных методов
         const metodSelects = iframe.contentWindow.document.querySelectorAll('select[data-tag="Metod"][data-elis-filled="true"]');
-        
         metodSelects.forEach(select => {
             iframe.contentWindow.TogglePrintCellEditable(select);
         });
+        logTrace('Заполнение данных паспорта из ЕЛИС завершено успешно');
     } catch (error) {
         showError(`Ошибка заполнения данных ЕЛИС: ${error && error.message ? error.message : error}`);
+        logError('Ошибка заполнения данных ЕЛИС: ' + (error && error.message ? error.message : error));
     }
 }
 
