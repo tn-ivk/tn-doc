@@ -440,30 +440,43 @@
             }
         });
 
+        // Автоматическое определение наличия колонки Документы и применение соответствующего класса
+        // Должно быть выполнено ПЕРВЫМ для корректного отображения таблицы
+        setupTableLayout();
+        
         // Инициализация состояния ячеек печати
         const metodSelects = document.querySelectorAll('select[data-tag="Metod"]');
         metodSelects.forEach(select => {
             TogglePrintCellEditable(select);
         });
-        
-        // Автоматическое определение наличия ЕЛИС и применение соответствующего класса
-        setupTableLayout();
     });
     
     function setupTableLayout() {
         const table = document.getElementById('Edit');
         if (!table) return;
         
-        // Проверяем наличие колонки "Номер документа" в заголовках
+        // Проверяем наличие колонки "Документы" в заголовках
         const hasElisColumn = table.querySelector('th') && 
                             Array.from(table.querySelectorAll('th')).some(th => 
-                                th.textContent.includes('Номер документа'));
+                                th.textContent.includes('Документы'));
         
         // Добавляем соответствующий класс к таблице
         if (!hasElisColumn) {
             table.classList.add('no-elis');
+            
+            // Корректируем colgroup - скрываем колонку Документы
+            const elisCol = table.querySelector('.col-elis');
+            if (elisCol) {
+                elisCol.style.display = 'none';
+            }
         } else {
             table.classList.remove('no-elis');
+            
+            // Показываем колонку Документы если она была скрыта
+            const elisCol = table.querySelector('.col-elis');
+            if (elisCol) {
+                elisCol.style.display = '';
+            }
         }
     }
     

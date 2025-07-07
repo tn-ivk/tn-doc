@@ -1033,11 +1033,13 @@ function GetFullNameTag(tagName) {
 
 //Запросить данные из ЕЛИС
 function GetElisData() {
+    logTrace("Запрос данных ЕЛИС инициирован");
     ClearDataElis();
     let dataELIS;
     let clientToken = GetElisToken();
 
     if (clientToken == null) {
+        logError("Не удалось получить токен для TN.ElisConnector. Запрос данных невозможен!");
         $('#info').html('Не удалось получить токен для TN.ElisConnector.<br>Запрос данных невозможен!');
         $.post("Elis/ErrorMessage/", {msg:"Не удалось получить токен для TN.ElisConnector"});
         return;
@@ -1045,47 +1047,53 @@ function GetElisData() {
     const periodDocument = GetPeriodDocument();
     StateButtonGetElisData(true);
 
-    $.ajax(
-        {
-            async: true,
-            url: 'http://localhost:5050/api/tspd/getqp',
-            type: 'POST',
-            contentType: 'application/json; charset=UTF-8',
-            dataType: 'json',
-            headers: {
-                "client-token": clientToken.clientToken
-            },
-            data:
-                JSON.stringify({
-                    startPeriod: moment.utc(periodDocument.begin * 1000).format(),
-                    endPeriod: moment.utc(periodDocument.end * 1000).format()
-                }),
-            success: function (data) {
-                if (data.isError) {
-                    if(data.textError) {
-                        $('#info').text(data.textError);
-                        $.post("Elis/ErrorMessage/", {msg:data.textError});    
-                    }
+    logTrace("Отправлен запрос к API ЕЛИС");
+    $.ajax({
+        async: true,
+        url: 'http://localhost:5050/api/tspd/getqp',
+        type: 'POST',
+        contentType: 'application/json; charset=UTF-8',
+        dataType: 'json',
+        headers: {
+            "client-token": clientToken.clientToken
+        },
+        data: JSON.stringify({
+            startPeriod: moment.utc(periodDocument.begin * 1000).format(),
+            endPeriod: moment.utc(periodDocument.end * 1000).format()
+        }),
+        success: function (data) {
+            if (data.isError) {
+                logError("Ошибка от API ЕЛИС: " + (data.textError || ''));
+                if(data.textError) {
+                    $('#info').text(data.textError);
+                    $.post("Elis/ErrorMessage/", {msg:data.textError});    
                 }
-                else if (data.passports.length == 0)
-                    $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
-                else    //отрисовываем таблицу с паспортами
-                    dataELIS = data;
-            },
-            error: function (data) {
-                $('#info').text('Ошибка выполнения запроса.');
-
-                //Неавторизованный пользователь
-                if (data.status == 401) {
-                    RegistrationClient('ИВК-1');
-                }
-            },
-            complete: function (data) {
-                StateButtonGetElisData(false);
-                if(dataELIS)
-                    DrawTablePassports(dataELIS);
             }
-        });
+            else if (data.passports.length == 0) {
+                logWarn("Данные для паспорта в системе ЕЛИС не найдены");
+                $('#info').text("Данные для паспорта в системе ЕЛИС не найдены.");
+            }
+            else {
+                logTrace("Данные ЕЛИС успешно получены");
+                dataELIS = data;
+            }
+        },
+        error: function (data) {
+            logError("Ошибка выполнения запроса к API ЕЛИС: " + (data && data.status ? data.status : ''));
+            $('#info').text('Ошибка выполнения запроса.');
+
+            if (data.status == 401) {
+                logWarn("Неавторизованный пользователь при запросе к API ЕЛИС");
+                RegistrationClient('ИВК-1');
+            }
+        },
+        complete: function (data) {
+            logTrace("Запрос к API ЕЛИС завершён");
+            StateButtonGetElisData(false);
+            if(dataELIS)
+                DrawTablePassports(dataELIS);
+        }
+    });
 }
 
 //Получение токена для ЕЛИС
@@ -1194,10 +1202,12 @@ function SetClientToken() {
 }
 
 function DrawTablePassports(dataELIS) {
+    logTrace('Начало отрисовки таблицы паспортов ЕЛИС');
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
     localStorage.setItem('labInfo', JSON.stringify(dataELIS.labInfo));
     dataELIS.passports.forEach(function (item, i, arr) {
+        logTrace('Добавление паспорта в таблицу: ' + (item.protocolNumber || '[нет номера]'));
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
@@ -1218,6 +1228,7 @@ function DrawTablePassports(dataELIS) {
         });
         element.append(li);
     });
+    logTrace('Таблица паспортов ЕЛИС успешно отрисована. Количество: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
 }
 
 function ResetPassportDataElis() {
@@ -1259,6 +1270,7 @@ function formatLabRepresentativeName(laboratory) {
 }
 
 function FillPassportDataElis() {
+    logTrace('Начало заполнения данных паспорта из ЕЛИС');
     try {
         let dataPassport = JSON.parse(localStorage.dataPassport);
         let labInfo = JSON.parse(localStorage.labInfo);
@@ -1277,7 +1289,6 @@ function FillPassportDataElis() {
 
         elisNodes.forEach((item, index, array) => {
             let itemKeys = item.dataset.elisAlias?.split('|');
-            
             let root = null;
             let currentKey = "";
             for (let key in dataPassport.parameters) {
@@ -1327,6 +1338,8 @@ function FillPassportDataElis() {
                 return;
             }
 
+            logTrace('Заполнение поля из ЕЛИС: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey] !== undefined ? JSON.stringify(root[currentKey]) : '[нет значения]'));
+
             if (item.nodeName === 'INPUT') {
                 switch (item.dataset.tag) {
                     case 'AdditionalInfo':
@@ -1345,10 +1358,7 @@ function FillPassportDataElis() {
                     case 'Value':
                         item.value = root[currentKey].value;
                         FixedElisData(item);
-                        
-                        // Заполняем поле "печать" данными ValueString из ЕЛИС
                         if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
-                            // Создаем скрытое поле для передачи ValueString в колонку "Печать"
                             let printValueInput = document.createElement('input');
                             printValueInput.type = 'hidden';
                             printValueInput.setAttribute('data-key', item.dataset.key);
@@ -1360,20 +1370,12 @@ function FillPassportDataElis() {
                         }
                         break;
                 }
-                
                 if(item.hasAttribute("oninput")){
                     item.oninput();
                 }
                 item.setAttribute("data-elis-filled", "true");
-                
-
-                
-                // Применяем зеленую подсветку к элементу и его ячейке
                 applyElisHighlight(item);
-                
                 item.addEventListener("input", ManualCorrect, {once:true});
-                
-                // Добавляем постоянный обработчик для полей Value для обновления колонки "Печать"
                 if (item.dataset.tag === 'Value') {
                     item.addEventListener("input", function(e) {
                         if (e.target.getAttribute('data-elis-filled') === 'false') {
@@ -1396,7 +1398,6 @@ function FillPassportDataElis() {
                 switch(item.dataset.tag)
                 {
                     case 'AdditionalInfo': 
-                        //Проверяем наличие значения в списке, если нет, добавляем.
                         if (!item.contains(obj)) {
                             item.append(new Option(obj, obj));
                         }
@@ -1406,8 +1407,6 @@ function FillPassportDataElis() {
                         const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat();
                         const limitValue = parseFloat(obj.value) + 0.1;
                         let metod = new Metod(0,true, 0, obj.testMethodName, flag, limitValue, obj.valueString);
-
-                        //Проверяем наличие значения в списке, если нет, добавляем.
                         if (!item.contains(obj.testMethodName)) {
                             item.append(new Option(obj.testMethodName, obj.testMethodName));
                         }
@@ -1416,22 +1415,18 @@ function FillPassportDataElis() {
                         break;
                 }
                 item.setAttribute("data-elis-filled", "true");
-                
-                // Применяем зеленую подсветку к элементу и его ячейке
                 applyElisHighlight(item);
-                
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
         });
-        
-        // Обновляем состояние ячеек печати для заполненных методов
         const metodSelects = iframe.contentWindow.document.querySelectorAll('select[data-tag="Metod"][data-elis-filled="true"]');
-        
         metodSelects.forEach(select => {
             iframe.contentWindow.TogglePrintCellEditable(select);
         });
+        logTrace('Заполнение данных паспорта из ЕЛИС завершено успешно');
     } catch (error) {
         showError(`Ошибка заполнения данных ЕЛИС: ${error && error.message ? error.message : error}`);
+        logError('Ошибка заполнения данных ЕЛИС: ' + (error && error.message ? error.message : error));
     }
 }
 
@@ -1667,3 +1662,19 @@ function showError(message) {
     errorMessage.textContent = message;
     errorDialog.showModal();
 }
+
+function logToServer(level, message) {
+    $.ajax({
+        url: '/Home/LogClientMessage',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ level: level, message: message }),
+        error: function() { /* опционально: обработка ошибок отправки лога */ }
+    });
+}
+
+function logInfo(message)  { logToServer('Info', message); }
+function logWarn(message)  { logToServer('Warn', message); }
+function logError(message) { logToServer('Error', message); }
+function logDebug(message) { logToServer('Debug', message); }
+function logTrace(message) { logToServer('Trace', message); }
