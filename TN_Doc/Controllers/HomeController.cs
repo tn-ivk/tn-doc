@@ -488,9 +488,9 @@ namespace TN_Doc.Controllers
             return doc.GetEditDoc(id);
         }
 
-        public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format)
+        public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format, int protocolNumber)
         {         
-            _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}");
+            _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}, номер протокола {protocolNumber}");
             try
             {
                 var doc = LoadDocsModule(IdDevice, IdDoc);
@@ -505,21 +505,19 @@ namespace TN_Doc.Controllers
                     Directory.CreateDirectory(exportDirPath);
 
                 FR.Report.Load(doc.GetPathTemplateFile());
-
-                var jsonDoc = doc.GetViewDoc(id);
+                var jsonDoc = doc.GetViewDoc(id, protocolNumber);
                 if (jsonDoc == null)
                 {
-                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}");
+                    _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}, номер протокола {protocolNumber}");
                     return string.Empty;
                 }
 
                 FR.Report.SetParameterValue("JsonDoc", jsonDoc);
                 FR.Report.Prepare();
-
                 var exportFileName = JObject.Parse(doc.GetViewDoc(id).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
                 if (string.IsNullOrEmpty(exportFileName))
                 {
-                    _logger.LogError($"Невозможно определить имя для экспортируемого файла");
+                    _logger.LogError("Невозможно определить имя для экспортируемого файла");
                     exportFileName = "undefined";
                 }
 
@@ -544,13 +542,12 @@ namespace TN_Doc.Controllers
                 }
 
                 FR.Report.Dispose();
-
                 return exportFilePath;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Ошибка экспорта документа {IdDoc}");
-                return String.Empty;
+                return string.Empty;
             }
         }
 
