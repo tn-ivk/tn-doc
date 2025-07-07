@@ -950,7 +950,8 @@ function ExportDoc() {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
                 id: currentId,
-                format: $('#ComboboxExportFormat').val()
+                format: $('#ComboboxExportFormat').val(),
+                protocolNumber: $('#ComboboxProtocolNumber').val()
             },
             success: function (data) {
 
