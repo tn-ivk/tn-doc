@@ -123,22 +123,22 @@ select:focus {
 
 /* Ширины колонок таблицы редактирования */
 
-/* Базовые ширины (для случая с ЕЛИС) */
-#Edit .col-num { width: 20px; }
+/* Базовые ширины (для случая с колонкой Документы) */
+#Edit .col-num { width: 25px; }
 #Edit .col-name { width: 37%; }
 #Edit .col-method { width: 19%; }
 #Edit .col-ivk { width: 8%; }
-#Edit .col-elis { width: 8%; }
+#Edit .col-elis { width: 8%; }                 /* Колонка "Документы" */
 #Edit .col-hal { width: 8%; }
 #Edit .col-result-value { width: 8%; }
 #Edit .col-result-text { width: 8%; }
 
-/* Ширины для случая БЕЗ ЕЛИС (когда колонка скрыта) */
-#Edit.no-elis .col-num { width: 20px; }
+/* Ширины для случая БЕЗ колонки Документы (когда колонка скрыта) */
+#Edit.no-elis .col-num { width: 25px; }
 #Edit.no-elis .col-name { width: 45%; }
 #Edit.no-elis .col-method { width: 27%; }
 #Edit.no-elis .col-ivk { width: 8%; }
-#Edit.no-elis .col-elis { width: 0%; }        /* Скрываем колонку ЕЛИС */
+#Edit.no-elis .col-elis { display: none; }    /* Полностью скрываем колонку "Документы" */
 #Edit.no-elis .col-hal { width: 8%; }
 #Edit.no-elis .col-result-value { width: 8%; }
 #Edit.no-elis .col-result-text { width: 8%; }
@@ -165,26 +165,37 @@ select:focus {
     min-width: 0;
 }
 
-#Edit td:nth-child(4),
-#Edit td:nth-child(5),
-#Edit td:nth-child(6),
-#Edit td:nth-child(7),
-#Edit td:nth-child(8) { 
+/* Стили для центрирования ячеек данных (ИВК, Документы, ХАЛ, Результат) */
+/* С Документами - колонки 4, 5, 6, 7, 8 (ИВК, Документы, ХАЛ, Результат-Значение, Результат-Текст) */
+#Edit:not(.no-elis) td:nth-child(4),
+#Edit:not(.no-elis) td:nth-child(5),
+#Edit:not(.no-elis) td:nth-child(6),
+#Edit:not(.no-elis) td:nth-child(7),
+#Edit:not(.no-elis) td:nth-child(8) { 
+    text-align: center; 
+}
+
+/* Без Документов - колонки 4, 5, 6, 7 (ИВК, ХАЛ, Результат-Значение, Результат-Текст) */
+#Edit.no-elis td:nth-child(4),
+#Edit.no-elis td:nth-child(5),
+#Edit.no-elis td:nth-child(6),
+#Edit.no-elis td:nth-child(7) { 
     text-align: center; 
 }
 
 /* Специальные стили для колонки "Измерение ХАЛ" */
-#Edit td:nth-child(6) input {
+/* С Документами - "Измерение ХАЛ" находится в 6-й колонке (№, Наименование, Метод, ИВК, Документы, ХАЛ) */
+#Edit:not(.no-elis) td:nth-child(6) input {
     width: 92%;
     font-size: 13px;
     padding: 2px 4px;
 }
 
-/* Для колонки без ЕЛИС - "Измерение ХАЛ" становится 5-й */
-body:not(.elis-enabled) #Edit td:nth-child(5) input {
+/* Без Документов - "Измерение ХАЛ" становится 5-й колонкой (№, Наименование, Метод, ИВК, ХАЛ) */
+#Edit.no-elis td:nth-child(5) input {
     width: 92%;
     font-size: 13px;
     padding: 2px 4px;
 }
 
-/* Случай без ЕЛИС теперь обрабатывается через JavaScript и CSS класс .no-elis */
+
