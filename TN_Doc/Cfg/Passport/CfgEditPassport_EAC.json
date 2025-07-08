@@ -7,7 +7,8 @@
       "Name": "ГОСТ Р 00001-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 2,
@@ -16,7 +17,8 @@
       "Name": "ГОСТ Р 00001-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 3,
@@ -25,7 +27,8 @@
       "Name": "ГОСТ Р 00002-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 4,
@@ -34,7 +37,8 @@
       "Name": "ГОСТ Р 00002-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 5,
@@ -43,7 +47,8 @@
       "Name": "ГОСТ Р 00003-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 6,
@@ -52,7 +57,8 @@
       "Name": "ГОСТ Р 00003-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 7,
@@ -61,7 +67,8 @@
       "Name": "ГОСТ Р 00004-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 8,
@@ -70,7 +77,8 @@
       "Name": "ГОСТ Р 00004-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 9,
@@ -79,7 +87,8 @@
       "Name": "ГОСТ Р 00005-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 10,
@@ -88,7 +97,8 @@
       "Name": "ГОСТ Р 00005-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 11,
@@ -97,7 +107,8 @@
       "Name": "ГОСТ Р 00006-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 12,
@@ -106,7 +117,8 @@
       "Name": "ГОСТ Р 00006-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 13,
@@ -115,7 +127,8 @@
       "Name": "ГОСТ Р 00007-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 14,
@@ -124,7 +137,8 @@
       "Name": "ГОСТ Р 00007-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 15,
@@ -133,7 +147,8 @@
       "Name": "ГОСТ Р 00008-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 16,
@@ -142,7 +157,8 @@
       "Name": "ГОСТ Р 00008-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 17,
@@ -151,7 +167,8 @@
       "Name": "ГОСТ Р 00009-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 18,
@@ -160,7 +177,8 @@
       "Name": "ГОСТ Р 00009-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 19,
@@ -169,7 +187,8 @@
       "Name": "ГОСТ Р 00010-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 20,
@@ -178,7 +197,8 @@
       "Name": "ГОСТ Р 00010-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 21,
@@ -187,7 +207,8 @@
       "Name": "ГОСТ Р 00011-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 22,
@@ -196,7 +217,8 @@
       "Name": "ГОСТ Р 00011-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 23,
@@ -205,7 +227,8 @@
       "Name": "ГОСТ Р 00012-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 24,
@@ -214,7 +237,8 @@
       "Name": "ГОСТ Р 00012-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 25,
@@ -223,7 +247,8 @@
       "Name": "ГОСТ Р 00013-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 26,
@@ -232,7 +257,8 @@
       "Name": "ГОСТ Р 00013-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 27,
@@ -241,7 +267,8 @@
       "Name": "ГОСТ Р 00014-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 28,
@@ -250,7 +277,8 @@
       "Name": "ГОСТ Р 00014-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 29,
@@ -259,7 +287,8 @@
       "Name": "ГОСТ Р 00015-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 30,
@@ -268,7 +297,8 @@
       "Name": "ГОСТ Р 00015-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 31,
@@ -277,7 +307,8 @@
       "Name": "ГОСТ Р 00016-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 32,
@@ -286,7 +317,8 @@
       "Name": "ГОСТ Р 00016-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 33,
@@ -295,7 +327,8 @@
       "Name": "ГОСТ Р 00017-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 34,
@@ -304,7 +337,8 @@
       "Name": "ГОСТ Р 00017-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 35,
@@ -313,7 +347,8 @@
       "Name": "ГОСТ Р 00018-2001 Метод А",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 36,
@@ -322,7 +357,8 @@
       "Name": "ГОСТ Р 00018-2001 Метод Б",
       "LimitValueActivate": false,
       "LimitValue": 0,
-      "LimitValueString": "-"
+      "LimitValueString": "-",
+      "IsDefault": false
     },
     {
       "Id": 37,
