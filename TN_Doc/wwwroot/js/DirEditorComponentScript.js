@@ -459,7 +459,7 @@ function _cancelEditUser(rowItem, itemId) {
     }
 
     let rowMap = {
-        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
+        0: 'bool', 1: 'text', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'combobox-lic', 7: 'bool', 8: 'bool', 9: 'bool', 10: 'ignore'
     };
     
     // Восстанавливаем предыдущее состояние
@@ -501,7 +501,7 @@ function _cancelEditUser(rowItem, itemId) {
 */
 function _editSelectedUser(itemBtn, rowItem, itemId) {
     let rowMap = {
-        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
+        0: 'bool', 1: 'text', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'combobox-lic', 7: 'bool', 8: 'bool', 9: 'bool', 10: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
@@ -625,16 +625,15 @@ function _getCurrentRowState(rowItem) {
     if (rowItem.closest('.users-table')) {
         return {
             use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-            groupName: cells[1].textContent.trim(),
-            surname: cells[2].textContent.trim(),
-            name: cells[3].textContent.trim(),
-            patronymic: cells[4].textContent.trim(),
-            factory: cells[5].textContent.trim(),
-            post: cells[6].textContent.trim(),
-            licId: cells[7].dataset.licId,
-            useFullNameSeparator: cells[8].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-            useFullNameWhiteSpace: cells[9].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-            useShortFullNameForm: cells[10].querySelector('i')?.classList.contains('fa-check-square-o') || false
+            surname: cells[1].textContent.trim(),
+            name: cells[2].textContent.trim(),
+            patronymic: cells[3].textContent.trim(),
+            factory: cells[4].textContent.trim(),
+            post: cells[5].textContent.trim(),
+            licId: cells[6].dataset.licId,
+            useFullNameSeparator: cells[7].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            useFullNameWhiteSpace: cells[8].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            useShortFullNameForm: cells[9].querySelector('i')?.classList.contains('fa-check-square-o') || false
         };
     } else if (rowItem.closest('.licences-table')) {
         return {
@@ -657,30 +656,27 @@ function _restoreRowState(rowItem, previousState) {
         cells[0].innerHTML = '';
         cells[0].appendChild(useIcon);
         
-        // Восстанавливаем имя группы
-        cells[1].textContent = previousState.groupName;
+        // Восстанавливаем ФИО (индексы 1, 2, 3 - без колонки "Группа")
+        cells[1].textContent = previousState.surname;
+        cells[2].textContent = previousState.name;
+        cells[3].textContent = previousState.patronymic;
         
-        // Восстанавливаем ФИО
-        cells[2].textContent = previousState.surname;
-        cells[3].textContent = previousState.name;
-        cells[4].textContent = previousState.patronymic;
+        // Восстанавливаем организацию и должность (индексы 4, 5)
+        cells[4].textContent = previousState.factory;
+        cells[5].textContent = previousState.post;
         
-        // Восстанавливаем организацию и должность
-        cells[5].textContent = previousState.factory;
-        cells[6].textContent = previousState.post;
-        
-        // Восстанавливаем лицензию
-        cells[7].textContent = previousState.licId === "0" ? "Доверенность не выбрана" : 
+        // Восстанавливаем лицензию (индекс 6)
+        cells[6].textContent = previousState.licId === "0" ? "Доверенность не выбрана" : 
             appDictionaries['Licenses'].find(lic => lic.Id === Number(previousState.licId))?.LicensesNumber || "Доверенность не выбрана";
-        cells[7].dataset.licId = previousState.licId;
+        cells[6].dataset.licId = previousState.licId;
         
-        // Восстанавливаем флаги форматирования
+        // Восстанавливаем флаги форматирования (индексы 7, 8, 9)
         ['useFullNameSeparator', 'useFullNameWhiteSpace', 'useShortFullNameForm'].forEach((flag, index) => {
             const icon = document.createElement('i');
             icon.classList.add('fa', previousState[flag] ? 'fa-check-square-o' : 'fa-square-o');
             icon.ariaHidden = true;
-            cells[8 + index].innerHTML = '';
-            cells[8 + index].appendChild(icon);
+            cells[7 + index].innerHTML = '';
+            cells[7 + index].appendChild(icon);
         });
     } else if (rowItem.closest('.licences-table')) {
         // Восстанавливаем флаг использования
@@ -840,59 +836,50 @@ function _applyUserChanges(rowItem, itemId) {
         const useIcon = cells[0].querySelector('i');
         updatedObject['Use'] = useIcon ? useIcon.classList.contains('fa-check-square-o') : false;
     }
-    // Обновляем ID группы
-    const groupInput = cells[1].querySelector('select');
-    if (groupInput) {
-        updatedObject['IdGroup'] = Number(groupInput.value);
-    } else {
-        const groupName = cells[1].textContent.trim();
-        const group = appDictionaries['UsersGroup'].find(item => item['Name'] === groupName);
-        updatedObject['IdGroup'] = group ? group['Id'] : 1;
-    }
     
-    // Обновляем ФИО
-    const surnameInput = cells[2].querySelector('input');
-    updatedObject['F'] = surnameInput ? surnameInput.value : cells[2].textContent.trim();
+    // Обновляем ФИО (индексы 1, 2, 3 - без колонки "Группа")
+    const surnameInput = cells[1].querySelector('input');
+    updatedObject['F'] = surnameInput ? surnameInput.value : cells[1].textContent.trim();
     
-    const nameInput = cells[3].querySelector('input');
-    updatedObject['I'] = nameInput ? nameInput.value : cells[3].textContent.trim();
+    const nameInput = cells[2].querySelector('input');
+    updatedObject['I'] = nameInput ? nameInput.value : cells[2].textContent.trim();
     
-    const patronymicInput = cells[4].querySelector('input');
-    updatedObject['O'] = patronymicInput ? patronymicInput.value : cells[4].textContent.trim();
+    const patronymicInput = cells[3].querySelector('input');
+    updatedObject['O'] = patronymicInput ? patronymicInput.value : cells[3].textContent.trim();
     
-    // Обновляем организацию и должность
-    const factoryInput = cells[5].querySelector('input');
-    updatedObject['Factory'] = factoryInput ? factoryInput.value : cells[5].textContent.trim();
+    // Обновляем организацию и должность (индексы 4, 5)
+    const factoryInput = cells[4].querySelector('input');
+    updatedObject['Factory'] = factoryInput ? factoryInput.value : cells[4].textContent.trim();
     
-    const postInput = cells[6].querySelector('input');
-    updatedObject['Post'] = postInput ? postInput.value : cells[6].textContent.trim();
+    const postInput = cells[5].querySelector('input');
+    updatedObject['Post'] = postInput ? postInput.value : cells[5].textContent.trim();
     
-    // Обновляем ID лицензии
-    const licSelect = cells[7].querySelector('select');
-    updatedObject['LicId'] = licSelect ? Number(licSelect.value) : Number(cells[7].dataset.licId || 0);
+    // Обновляем ID лицензии (индекс 6)
+    const licSelect = cells[6].querySelector('select');
+    updatedObject['LicId'] = licSelect ? Number(licSelect.value) : Number(cells[6].dataset.licId || 0);
     
-    // Обновляем флаги форматирования
-    const sepCheckbox = cells[8].querySelector('input[type="checkbox"]');
+    // Обновляем флаги форматирования (индексы 7, 8, 9)
+    const sepCheckbox = cells[7].querySelector('input[type="checkbox"]');
     if (sepCheckbox) {
         updatedObject['UseFullNameSeparator'] = sepCheckbox.checked;
     } else {
-        const sepIcon = cells[8].querySelector('i');
+        const sepIcon = cells[7].querySelector('i');
         updatedObject['UseFullNameSeparator'] = sepIcon ? sepIcon.classList.contains('fa-check-square-o') : false;
     }
 
-    const whiteSpaceCheckbox = cells[9].querySelector('input[type="checkbox"]');
+    const whiteSpaceCheckbox = cells[8].querySelector('input[type="checkbox"]');
     if (whiteSpaceCheckbox) {
         updatedObject['UseFullNameWhiteSpace'] = whiteSpaceCheckbox.checked;
     } else {
-        const whiteSpaceIcon = cells[9].querySelector('i');
+        const whiteSpaceIcon = cells[8].querySelector('i');
         updatedObject['UseFullNameWhiteSpace'] = whiteSpaceIcon ? whiteSpaceIcon.classList.contains('fa-check-square-o') : false;
     }
 
-    const shortFormCheckbox = cells[10].querySelector('input[type="checkbox"]');
+    const shortFormCheckbox = cells[9].querySelector('input[type="checkbox"]');
     if (shortFormCheckbox) {
         updatedObject['UseShortFullNameForm'] = shortFormCheckbox.checked;
     } else {
-        const shortFormIcon = cells[10].querySelector('i');
+        const shortFormIcon = cells[9].querySelector('i');
         updatedObject['UseShortFullNameForm'] = shortFormIcon ? shortFormIcon.classList.contains('fa-check-square-o') : false;
     }
 }
@@ -1028,9 +1015,9 @@ function _addValidationHandlers(row) {
         let rowMap;
         if (row.closest('.users-table')) {
             rowMap = {
-                0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 
-                5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 
-                9: 'bool', 10: 'bool', 11: 'ignore'
+                0: 'bool', 1: 'text', 2: 'text', 3: 'text', 
+                4: 'text', 5: 'text', 6: 'combobox-lic', 7: 'bool', 
+                8: 'bool', 9: 'bool', 10: 'ignore'
             };
         } else if (row.closest('.licences-table')) {
             rowMap = {
