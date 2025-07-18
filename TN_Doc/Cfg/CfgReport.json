@@ -1,4 +1,4 @@
-﻿{
+{
   "Doc": {
     "Version": "1.0.0",
     "GUID": 0,
@@ -17,7 +17,7 @@
           "LeftMargin": 10,
           "RightMargin": 10
         },
-        "FileNameForExportDoc": "",
+        "FileNameForExportDoc": "Report",
         "ProtocolNumber": 1
       },
       "Header": {

@@ -146,12 +146,54 @@
             "O": "Андреевич",
             "Factory": "ПАО \"ЛУКОЙЛ\"",
             "Post": "Начальник РП ЦППН",
-            "LicId": 2,
+            "LicId": 8,
             "FIO": "Шаргодаров И.А.",
             "IOF": "И.А. Шаргодаров",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
+          },
+          {
+            "Use": true,
+            "Id": 11,
+            "IdGroup": 3,
+            "F": "Котлярова",
+            "I": "А",
+            "O": "А",
+            "Factory": "АО \"Транснефть - Западная Сибирь\"",
+            "Post": "Оператор товарный",
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true,
+            "LicId": 9
+          },
+          {
+            "Use": true,
+            "Id": 12,
+            "IdGroup": 1,
+            "F": "Геринг",
+            "I": "Е",
+            "O": "Г",
+            "Factory": "ПАО \"ЛУКОЙЛ\"",
+            "Post": "Старший лаборант",
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true,
+            "LicId": 7
+          },
+          {
+            "Use": true,
+            "Id": 13,
+            "IdGroup": 3,
+            "F": "Хомочкина",
+            "I": "Т",
+            "O": "А",
+            "Factory": "АО \"Транснефть - Западная Сибирь\"",
+            "Post": "Оператор товарный",
+            "UseFullNameSeparator": true,
+            "UseFullNameWhiteSpace": true,
+            "UseShortFullNameForm": true,
+            "LicId": 0
           }
         ],
         "UsersGroup": [
@@ -224,6 +266,12 @@
             "Id": 8,
             "LicensesNumber": "Д-7049",
             "LicensesDate": "06.12.2024"
+          },
+          {
+            "Id": 9,
+            "Use": true,
+            "LicensesDate": "14.12.2020",
+            "LicensesNumber": "20-338"
           }
         ],
         "BIKs": [
