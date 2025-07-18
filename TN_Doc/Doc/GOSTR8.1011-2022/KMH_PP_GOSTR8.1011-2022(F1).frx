@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/22/2024 10:41:07" ReportInfo.CreatorVersion="2023.3.5.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/02/2025 16:43:58" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -50,9 +50,8 @@ namespace FastReport
       Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
       Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
                   
-      ListOilName = new List&lt;string&gt;() {&quot;нефти&quot;, &quot;нефтепродукте&quot;};
-      //ListKMHType = new List&lt;string&gt;() {&quot;объемной&quot;, &quot;массовой&quot;};
-  
+      ListOilName = new List&lt;string&gt;() {&quot;нефти&quot;, &quot;нефтепродуктов&quot;};
+      
       ProtocolNumber = (int)JSettings[&quot;General&quot;][&quot;ProtocolNumber&quot;];
       KMH_TYPE = (int)JTableKMH_PP[&quot;KMH_TYPE&quot;]; 
       NefType = (int)JSettings[&quot;General&quot;][&quot;NefType&quot;];
@@ -65,7 +64,6 @@ namespace FastReport
     private void FillReportTitle()
     {
       Report.SetParameterValue(&quot;OilName&quot;, ListOilName[NefType-1]);
-      //Report.SetParameterValue(&quot;KMHType&quot;, ListKMHType[KMH_TYPE]);
                 
       string placeSiknName = String.IsNullOrEmpty(JSettings[&quot;Header&quot;][&quot;FieldSIKN&quot;].ToString()) ?
       $&quot;СИКН/СИКНП &lt;u&gt;{JAdditionalInfo[&quot;SIKN_Num&quot;].ToString()}&lt;/u&gt;&quot; :
@@ -210,7 +208,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="109.28" Width="718.2" Height="179.55">
+    <DataBand Name="Data1" Top="107.18" Width="718.2" Height="179.55">
       <TableObject Name="Table1" Top="9.45" Width="718.2" Height="170.1">
         <TableColumn Name="Column181" Width="374.85"/>
         <TableColumn Name="Column182" Width="157.5"/>
@@ -252,7 +250,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="294.17" Width="718.2" Height="151.2">
+    <DataBand Name="Data2" Top="289.95" Width="718.2" Height="151.2">
       <TableObject Name="Table2" Top="9.45" Width="718.2" Height="141.75" ManualBuildEvent="Table2_ManualBuild">
         <TableColumn Name="Column244" Width="78.3"/>
         <TableColumn Name="Column245" Width="78.3"/>
@@ -272,10 +270,10 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row222" Height="28.35">
           <TableCell Name="Cell1212" Border.Lines="All" Border.BottomLine.Style="Double" Text="Номер&#13;&#10;измерений i" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" RowSpan="2"/>
-          <TableCell Name="Cell1213" Border.Lines="All" Text="Показатели нефти/нефтепродуктов в&#13;&#10;БИК" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="3"/>
+          <TableCell Name="Cell1213" Border.Lines="All" Text="Показатели [OilName] в&#13;&#10;БИК" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="3"/>
           <TableCell Name="Cell1214" Border.Lines="All" Border.BottomLine.Style="Double" Font="Arial, 10pt"/>
           <TableCell Name="Cell1215" Border.Lines="All" Border.BottomLine.Style="Double" Font="Arial, 10pt"/>
-          <TableCell Name="Cell1216" Border.Lines="All" Text="Плотность нефти/нефтепродуктов, измеренная&lt;br&gt;при i-м измерении, кг/м&lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" TextRenderType="HtmlTags" ColSpan="2"/>
+          <TableCell Name="Cell1216" Border.Lines="All" Text="Плотность [OilName], измеренная&lt;br&gt;при i-м измерении, кг/м&lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" TextRenderType="HtmlTags" ColSpan="2"/>
           <TableCell Name="Cell1237" Border.Lines="All" Border.BottomLine.Style="Double" Font="Arial, 10pt"/>
           <TableCell Name="Cell1242" Border.Lines="All" Border.BottomLine.Style="Double" Text="|ρ&lt;sub&gt;плi&lt;/sub&gt; – ρ&lt;sub&gt;этi&lt;/sub&gt;|,&lt;br&gt;кг/м&lt;sup&gt;3&lt;/sup&gt;" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" TextRenderType="HtmlTags" RowSpan="2"/>
         </TableRow>
@@ -298,7 +296,7 @@ namespace FastReport
           <TableCell Name="Delta" Border.Lines="All" Text="Delta" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataFooter1" Top="450.7" Width="718.2" Height="56.7">
+      <DataFooterBand Name="DataFooter1" Top="444.38" Width="718.2" Height="56.7">
         <TableObject Name="Table5" Width="718.2" Height="37.8" PrintOnParent="true">
           <TableColumn Name="Column201" Width="259.86"/>
           <TableColumn Name="Column202" Width="458.34"/>
@@ -321,7 +319,7 @@ namespace FastReport
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="512.73" Width="718.2" Height="321.3" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="504.3" Width="718.2" Height="321.3" CanShrink="true">
       <TableObject Name="Table4" Top="9.45" Width="718.2" Height="85.05">
         <TableColumn Name="Column205" Width="718.2"/>
         <TableRow Name="Row142">
