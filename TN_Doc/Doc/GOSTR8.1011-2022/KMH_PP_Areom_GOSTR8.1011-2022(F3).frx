@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="05/20/2025 18:46:51" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/03/2025 12:03:37" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -49,13 +49,9 @@ namespace FastReport
       Page.BottomMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;BottomMargin&quot;];
       Page.LeftMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;LeftMargin&quot;];
       Page.RightMargin = (int)JSettings[&quot;General&quot;][&quot;PageSettings&quot;][&quot;RightMargin&quot;];
-                  
-      ListOilName = new List&lt;string&gt;() {&quot;нефти&quot;, &quot;нефтепродуктов&quot;};
       
+      FillReportParameters();
       ProtocolNumber = (int)JSettings[&quot;General&quot;][&quot;ProtocolNumber&quot;];
-      KMH_TYPE = (int)JTableKMH_PP_Areom[&quot;KMH_TYPE&quot;]; 
-      NefType = (int)JSettings[&quot;General&quot;][&quot;NefType&quot;];
-      
       FillReportTitle(ProtocolNumber);
       FillTable1(ProtocolNumber);
       FillReportSummary(ProtocolNumber);        
@@ -63,7 +59,6 @@ namespace FastReport
         
     private void FillReportTitle(int protocolNumber)
     {
-      Report.SetParameterValue(&quot;OilName&quot;, ListOilName[NefType-1]);
       JToken jsonPP_AddInfo;
       
       if (protocolNumber == 1)
@@ -193,27 +188,30 @@ namespace FastReport
       DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds((long)JTableKMH_PP_Areom[&quot;DateTimeLong&quot;]);
       Report.SetParameterValue(&quot;DateKMH&quot;, date.ToString(&quot;dd.MM.yyyy&quot;));
       
-      bool hasCustomSIKNName = !String.IsNullOrEmpty(JSettings[&quot;Footer&quot;][&quot;FieldSIKN&quot;].ToString());
-      
       ServiceStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Company&quot;].ToString();
       ServiceStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;Post&quot;].ToString();
       ServiceStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;ServiceStaffData&quot;][&quot;FIO&quot;].ToString();
       
-      if(hasCustomSIKNName){
-         ServiceStaffData_Company_Desc.Text=$&quot;организация, проводящая техническое обслуживание {JSettings[&quot;Footer&quot;][&quot;FieldSIKN&quot;]}&quot;;
-      }
-        
       OperatingStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Company&quot;].ToString();
       OperatingStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;Post&quot;].ToString();
       OperatingStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;OperatingStaffData&quot;][&quot;FIO&quot;].ToString();
       
-      if(hasCustomSIKNName){
-       OperatingStaffData_Company_Desc.Text=$&quot;организация, эксплуатирующая {JSettings[&quot;Footer&quot;][&quot;FieldSIKN&quot;]}&quot;;
-      }
-      
       DeliveryOrRecievingStaffData_Company.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Company&quot;].ToString();
       DeliveryOrRecievingStaffData_Post.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;Post&quot;].ToString();
       DeliveryOrRecievingStaffData_FIO.Text = JAdditionalInfo[&quot;GostBinary&quot;][&quot;DeliveryOrRecievingStaffData&quot;][&quot;FIO&quot;].ToString(); 
+    }
+    
+    private void FillReportParameters()
+    {
+      KMH_TYPE = (int)JTableKMH_PP_Areom[&quot;KMH_TYPE&quot;]; 
+      NefType = (int)JSettings[&quot;General&quot;][&quot;NefType&quot;];
+      
+      var fieldSikn = JSettings[&quot;Footer&quot;][&quot;FieldSIKN&quot;].ToString();
+      var siknName = string.IsNullOrEmpty(fieldSikn) ? &quot;СИКН/СИКНП&quot; : fieldSikn;
+      Report.SetParameterValue(&quot;FieldSikn&quot;, siknName);
+      
+      ListOilName = new List&lt;string&gt;() {&quot;нефти&quot;, &quot;нефтепродуктов&quot;};
+      Report.SetParameterValue(&quot;OilName&quot;, ListOilName[NefType-1]);
     }
     
     private void PrintTable(TableObject table)
@@ -240,6 +238,7 @@ namespace FastReport
     <Parameter Name="DateKMH" DataType="System.String" AsString=""/>
     <Parameter Name="OilName" DataType="System.String" AsString=""/>
     <Parameter Name="KMHType" DataType="System.String" AsString=""/>
+    <Parameter Name="FieldSikn" DataType="System.String" AsString=""/>
   </Dictionary>
   <ReportPage Name="Page" RawPaperSize="9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
     <ReportTitleBand Name="ReportTitle" Width="718.2" Height="71.82" CanGrow="true" CanShrink="true" CanBreak="true">
@@ -260,7 +259,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="Data1" Top="75.02" Width="718.2" Height="254.48">
+    <DataBand Name="Data1" Top="75.05" Width="718.2" Height="254.48">
       <TableObject Name="Table1" Top="5" Width="718.2" Height="249.48">
         <TableColumn Name="Column181" Width="374.85"/>
         <TableColumn Name="Column182" Width="157.5"/>
@@ -296,18 +295,18 @@ namespace FastReport
           <TableCell Name="AbsError_Areom" Border.Lines="All" Text="AbsError_Areom" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt"/>
         </TableRow>
         <TableRow Name="Row215" Height="56.7">
-          <TableCell Name="Cell1141" Border.Lines="All" Text="Систематическая погрешность метода определения плотности&#13;&#10;[OilName] лабораторным или переносным СИ плотности в&#13;&#10;соответствии со свидетельством об аттестации методики измерений&#13;&#10;плотности на СИКН/СИКНП, кг/м&lt;sup&gt;3&lt;/sup&gt; (со знаком)" VertAlign="Center" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1141" Border.Lines="All" Text="Систематическая погрешность метода определения плотности&#13;&#10;[OilName] лабораторным или переносным СИ плотности в&#13;&#10;соответствии со свидетельством об аттестации методики измерений&#13;&#10;плотности на [FieldSikn], кг/м&lt;sup&gt;3&lt;/sup&gt; (со знаком)" VertAlign="Center" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Delta_Syst" Border.Lines="All" Text="Delta_Syst" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="2"/>
           <TableCell Name="Cell1143" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row216" Height="56.7">
-          <TableCell Name="Cell1144" Border.Lines="All" Text="Погрешность метода определения плотности [OilName]&lt;br&gt;лабораторным или переносным СИ плотности в соответствии&lt;br&gt;со свидетельством об аттестации методики измерений плотности на&lt;br&gt;СИКН/СИКНП, кг/м&lt;sup&gt;3&lt;/sup&gt; (без знака)" VertAlign="Center" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1144" Border.Lines="All" Text="Погрешность метода определения плотности [OilName]&lt;br&gt;лабораторным или переносным СИ плотности в соответствии&lt;br&gt;со свидетельством об аттестации методики измерений плотности на&lt;br&gt;[FieldSikn], кг/м&lt;sup&gt;3&lt;/sup&gt; (без знака)" VertAlign="Center" Font="Arial, 8pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Delta_Meth" Border.Lines="All" Text="Delta_Meth" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" ColSpan="2"/>
           <TableCell Name="Cell1146" Border.Lines="All" HorzAlign="Center" VertAlign="Center" Font="Arial, 10pt"/>
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="332.7" Width="718.2" Height="231.8">
+    <DataBand Name="Data2" Top="332.75" Width="718.2" Height="231.8">
       <TableObject Name="Table2" Top="5" Width="718.18" Height="226.8" ManualBuildEvent="Table2_ManualBuild">
         <TableColumn Name="Column233" Width="60.65"/>
         <TableColumn Name="Column234" Width="56.87"/>
@@ -387,7 +386,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data3" Top="567.7" Width="718.2" Height="34.02">
+    <DataBand Name="Data3" Top="567.78" Width="718.2" Height="34.02">
       <TableObject Name="Table5" Width="718.2" Height="34.02" PrintOnParent="true">
         <TableColumn Name="Column201" Width="259.86"/>
         <TableColumn Name="Column202" Width="458.34"/>
@@ -401,7 +400,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data4" Top="604.92" Width="718.2" Height="18.9">
+    <DataBand Name="Data4" Top="605.02" Width="718.2" Height="18.9">
       <TableObject Name="Table6" Width="718.2" Height="18.9" PrintOnParent="true">
         <TableColumn Name="Column203" Width="113.45"/>
         <TableColumn Name="Column204" Width="604.75"/>
@@ -411,7 +410,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="627.02" Width="718.2" Height="291.95" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="627.15" Width="718.2" Height="291.95" CanShrink="true">
       <TableObject Name="Table4" Width="718.2" Height="68.04" PrintOnParent="true">
         <TableColumn Name="Column205" Width="718.2"/>
         <TableRow Name="Row142">
@@ -432,7 +431,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row145">
           <TableCell Name="Cell1130" Font="Arial, 10pt"/>
-          <TableCell Name="ServiceStaffData_Company_Desc" Text="организация, проводящая техническое обслуживание СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
+          <TableCell Name="ServiceStaffData_Company_Desc" Text="организация, проводящая техническое обслуживание [FieldSikn]" HorzAlign="Center" Font="Arial, 8pt"/>
           <TableCell Name="Cell1131" Font="Arial, 10pt"/>
         </TableRow>
       </TableObject>
@@ -462,7 +461,7 @@ namespace FastReport
               </TableRow>
               <TableRow Name="Row147">
                 <TableCell Name="Cell1134" Font="Arial, 10pt"/>
-                <TableCell Name="OperatingStaffData_Company_Desc" Text="организация, эксплуатирующая СИКН/СИКНП" HorzAlign="Center" Font="Arial, 8pt"/>
+                <TableCell Name="OperatingStaffData_Company_Desc" Text="организация, эксплуатирующая [FieldSikn]" HorzAlign="Center" Font="Arial, 8pt"/>
                 <TableCell Name="Cell1136" Font="Arial, 10pt"/>
               </TableRow>
             </TableObject>
@@ -532,7 +531,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="922.17" Width="718.2" Height="18.9" Visible="false" VisibleExpression="IIf([TotalPages]&gt;1,true,false)">
+    <PageFooterBand Name="PageFooter" Top="922.32" Width="718.2" Height="18.9" Visible="false" VisibleExpression="IIf([TotalPages]&gt;1,true,false)">
       <TextObject Name="PageNumeration" Width="718.2" Height="18.9" Dock="Top" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
