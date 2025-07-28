@@ -582,7 +582,7 @@ namespace FastReport
           <TableCell Name="Cell85" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row198" Height="28.35">
-          <TableCell Name="LabMIDensity" Text="*) заполняют при отказе поточного преобразователя плотности (определяют по МИ 2153)" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="8"/>
+          <TableCell Name="LabMIDensity" Text="*) заполняют при отказе поточного преобразователя плотности (определяют по ФР.1.29.2013.14800)" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="8"/>
           <TableCell Name="Cell1575" Font="Arial, 10pt"/>
           <TableCell Name="Cell1576" Font="Arial, 10pt"/>
           <TableCell Name="Cell1577" Font="Arial, 10pt"/>
