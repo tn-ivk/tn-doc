@@ -1230,7 +1230,17 @@ function DrawTablePassports(dataELIS) {
         element.append(li);
     });
     logTrace('Таблица паспортов ЕЛИС успешно отрисована. Количество: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
-    UpdateElisApplyButtonState();
+    
+    // Автоматически выбираем первый протокол, если протоколы загружены
+    if (dataELIS.passports && dataELIS.passports.length > 0) {
+        const firstProtocol = document.querySelector('#listPassports .list-group-item:first-child');
+        if (firstProtocol) {
+            logTrace('Автоматический выбор первого протокола ЕЛИС');
+            firstProtocol.click();
+        }
+    } else {
+        UpdateElisApplyButtonState();
+    }
 }
 
 function ResetPassportDataElis() {
