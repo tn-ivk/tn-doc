@@ -162,7 +162,7 @@ namespace FastReport
       
       var methodValue = method[&quot;Value&quot;]?.Value&lt;string&gt;();
       if (!string.IsNullOrEmpty(methodValue))
-        return methodValue;
+        return methodValue.Replace('.', ',');
     
       if (!float.TryParse(result, out float value))
         return result;
