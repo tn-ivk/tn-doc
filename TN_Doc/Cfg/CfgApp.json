@@ -145,7 +145,7 @@
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 9,
               "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж) (Экспорт)",
               "Description": "Форма паспорта качества на экспорт. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
@@ -221,7 +221,7 @@
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
-              "Use": false,
+              "Use": true,
               "Id": 7,
               "Name": "Акт для валовых объемов нефти (Экспорт)",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)(Экспорт)",
@@ -1297,6 +1297,22 @@
               "Description": "Форма паспорта нефти по ТР ЕАЭС 045.2017",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_EAC.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_EAC.json"
+            },
+            {
+              "Use": false,
+              "Id": 8,
+              "Name": "石油品质报告 (МИ 3532-2015 Приложение 15)",
+              "Description": "石油品质报告 Форма паспорта качества для поставки нефти на экспорт. МИ 3532-2015 (Приложение 15)",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15)_China.frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
+            },
+            {
+              "Use": true,
+              "Id": 9,
+              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж) (Экспорт)",
+              "Description": "Форма паспорта качества на экспорт. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
+              "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G)(Export_Rus).frx",
+              "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json"
             }
           ]
         },
@@ -1356,6 +1372,22 @@
               "Name": "Акт для валовых объемов нефти",
               "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
+            },
+            {
+              "Use": false,
+              "Id": 6,
+              "Name": "Акт для валовых объемов нефти (Китай)",
+              "Description": "(Китай) Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
+              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx",
+              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
+            },
+            {
+              "Use": true,
+              "Id": 7,
+              "Name": "Акт для валовых объемов нефти (Экспорт)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)(Экспорт)",
+              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             }
           ]
