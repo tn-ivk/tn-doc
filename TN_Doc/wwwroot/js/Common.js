@@ -1225,10 +1225,12 @@ function DrawTablePassports(dataELIS) {
                     item.classList.remove('active');
             })
             elisPassport.classList.add('active');
+            UpdateElisApplyButtonState();
         });
         element.append(li);
     });
     logTrace('Таблица паспортов ЕЛИС успешно отрисована. Количество: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
+    UpdateElisApplyButtonState();
 }
 
 function ResetPassportDataElis() {
@@ -1556,6 +1558,7 @@ function StateButtonGetElisData(state) {
 function OpenElisDialog() {
     $('#listPassports').empty();
     localStorage.removeItem('dataPassport');
+    UpdateElisApplyButtonState();
 }
 
 function ApplicationSecurity(tagName, tagValue) {
@@ -1588,6 +1591,15 @@ function ClearDataElis() {
     $('#info').text('');
     $('#listPassports').empty();
     localStorage.removeItem('dataPassport');
+    UpdateElisApplyButtonState();
+}
+
+//Управление состоянием кнопки "Применить" в диалоге ЕЛИС
+function UpdateElisApplyButtonState() {
+    const applyButton = $('#elisApplyButton');
+    const hasSelectedPassport = $('#listPassports .list-group-item.active').length > 0;
+    
+    applyButton.prop('disabled', !hasSelectedPassport);
 }
 
 String.prototype.toFloat = function (value) {
