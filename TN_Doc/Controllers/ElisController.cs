@@ -47,6 +47,7 @@ namespace TN_Doc.Controllers
                 }
             }    
             _logger.LogError(msg);   
+            //EventLog.WriteEntry($".NET Runtime", msg, EventLogEntryType.Error, 1000, 1);
         }
         
         public void WarnMessage(string msg) => _logger.LogWarning(msg);

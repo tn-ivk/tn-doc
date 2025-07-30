@@ -1,0 +1,11 @@
+/* Общие layout-стили для справочников */
+
+:root {
+    --dictionary-font-size: 12px;
+    --dictionary-active-bg: #1b6ec2;
+    --dictionary-active-color: #fff;
+}
+
+.qp-dir-item, .dir-item {
+    height: 80vh !important;
+} 
