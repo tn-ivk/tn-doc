@@ -46,6 +46,7 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
                 let param = {};
                 param["Key"] = $(this).attr('data-key');
                 param["Tag"] = $(this).attr('data-tag');
+                param["ElisFilled"] = $(this).attr('data-elis-filled') === 'true';
                 if ($(this)[0].nodeName == "SELECT") {
                     if ($(this)[0].selectedIndex == -1)
                         param["Value"] = "";
@@ -96,6 +97,7 @@ function SaveDoc(NameDevice, GuidDevice, DocGUID, IdDoc, PrefixTag) {
             });
 
         if (DocGUID == 1) {
+            const wt = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag));
             const lastResult = ReadTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassportResult', PrefixTag), 2, 0);
             WriteTag(NameDevice, GetFullNameTag('ARM.ARM_FillActAndPassport', PrefixTag), true, 2, 0);
 
