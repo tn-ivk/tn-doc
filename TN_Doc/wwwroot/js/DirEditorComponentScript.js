@@ -1478,6 +1478,9 @@ async function _checkIntentSaving() {
         return true;
 
     } else {
+        await confirm('Изменения отсутствуют. Сохранение не требуется.', {
+            'title': 'Информация', 'yesBtnName': 'ОК', 'noBtnName': null, 'iconClass': "fa fa-info-circle text-info"
+        });
         return false;
     }
 }
