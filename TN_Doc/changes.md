@@ -1,5 +1,19 @@
 # Список изменений:
 ## Версия 1.4.0:
+    - Проверка даты окончания периода отбора в паспорте
+        - Passport_GOSTR50.2.040(I).frx
+        - Passport_GOSTR50.2.040(I)_ShiftTime.frx
+        - Passport_GOSTR50.2.040(I)_ShiftTime_TR.frx
+        - Passport_GOSTR50.2.040(G).frx
+        - Passport_GOSTR50.2.040(G)(Export_Rus).frx
+        - Passport_MI3532(13).frx
+        - Passport_MI3532(14).frx
+        - Passport_MI3532(15).frx
+        - Passport_MI3532(15)_China.frx
+        - Passport_EAC.frx
+    - Кор. логики Справочников 
+        - выделение групп пользователей в отдельный комбобокс
+        - выделение групп методов тспытаний в отдельный комбобокс
     - Редактирование текстовых значений показателей качества паспорта
 
 ## Версия 1.3.7:
