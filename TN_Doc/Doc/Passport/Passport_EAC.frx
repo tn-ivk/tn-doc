@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 13:07:15" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/31/2025 11:45:17" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -71,8 +71,11 @@ namespace FastReport
       NameDocumentForOilSample.Text = $&quot;{JDataARM[&quot;Passport_EAC&quot;][&quot;NameDocumentForOilSample&quot;]}&quot;;
       SIKN_Number.Text = $&quot;СИКН № {JAdditionalData[&quot;SIKN_Number&quot;]}&quot;;
       
-      string dateTimeEnd = SamplingPeriodEnd.ToString(&quot;HH:mm&quot;) == &quot;00:00&quot; ? SamplingPeriodEnd.AddDays(-1).ToString(&quot;dd.MM.yyyy HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;): SamplingPeriodEnd.ToString(&quot;dd.MM.yyyy HH:mm&quot;);
-      DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy HH:mm&quot;)} - {dateTimeEnd}&quot;;      
+      var correctedSamplingEnd = string.Empty; 
+      if(SamplingPeriodEnd &gt; SamplingPeriodBegin &amp;&amp; SamplingPeriodEnd.ToString(&quot;HH:mm&quot;) == &quot;00:00&quot;)
+        correctedSamplingEnd = SamplingPeriodEnd.AddDays(-1).ToString(&quot;dd.MM.yyyy HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;);
+      var samplingEnd = string.IsNullOrEmpty(correctedSamplingEnd) ? SamplingPeriodEnd.ToString(&quot;dd.MM.yyyy HH:mm&quot;) : correctedSamplingEnd; 
+      DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy HH:mm&quot;)} - {samplingEnd}&quot;;      
     }
              
     private void DrawTablePassport()
@@ -373,7 +376,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="318.83" Width="718.2" Height="406.35" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="318.86" Width="718.2" Height="406.35" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="396.9">
         <TableColumn Name="Column37" Width="26.46"/>
         <TableColumn Name="Column38" Width="102.06"/>
@@ -551,7 +554,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="728.38" Width="718.2" Height="247.59" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="728.43" Width="718.2" Height="247.59" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table3" Width="718.2" Height="98.28">
         <TableColumn Name="Column43" Width="203.24"/>
         <TableColumn Name="Column44" Width="514.96"/>
