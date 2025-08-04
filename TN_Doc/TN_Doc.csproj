@@ -57,7 +57,7 @@
   <!-- NuGet-пакеты -->
   <ItemGroup>
     <PackageReference Include="EncryptionLibrary" Version="1.0.1" />
-    <PackageReference Include="FastReport.Web.Skia" Version="2025.2.2" />
+    <PackageReference Include="FastReport.Web.Skia" Version="2025.2.8" />
     <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.20" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.1" />
