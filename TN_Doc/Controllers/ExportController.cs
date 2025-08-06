@@ -12,7 +12,7 @@ public class ExportController : Controller
 
     public List<string> GetListFormats()
     {
-        return new List<string>() { "pdf", "excel", "ods", "xml" };
+        return ["pdf", "excel", "ods", "xml"];
     }
 
     public void ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format)
