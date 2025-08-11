@@ -1160,7 +1160,7 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars" : ["'"]
     },
     {
       "Use": true,
@@ -2322,7 +2322,7 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars" : ["'"]
     },
     {
       "Use": false,
@@ -3484,7 +3484,7 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars" : ["'"]
     }
   ],
   "PrintSettings": {
