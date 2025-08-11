@@ -342,6 +342,7 @@
       "LimitValue": 0,
       "LimitValueString": "-"
     }
+
   ],
   "Parameters": [
     {
@@ -349,35 +350,35 @@
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": false,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 2,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": false,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 3,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": false,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 4,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": false,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 5,
       "Key": "Dens15Correction",
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": false,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 6,

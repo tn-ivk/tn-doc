@@ -1,346 +1,22 @@
 {
   "Methods": [
     {
-      "Id": 1,
-      "Use": true,
-      "IdParameter": 1,
-      "Name": "ГОСТ Р 00001-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
       "Id": 2,
       "Use": true,
-      "IdParameter": 1,
-      "Name": "ГОСТ Р 00001-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
+      "IdParameter": 19,
+      "Name": "ASTM D4929 (процедура С)",
+      "LimitValueActivate": true,
+      "LimitValue": 5,
+      "LimitValueString": "менее 5"
     },
     {
       "Id": 3,
       "Use": true,
-      "IdParameter": 2,
-      "Name": "ГОСТ Р 00002-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 4,
-      "Use": true,
-      "IdParameter": 2,
-      "Name": "ГОСТ Р 00002-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 5,
-      "Use": true,
-      "IdParameter": 3,
-      "Name": "ГОСТ Р 00003-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 6,
-      "Use": true,
-      "IdParameter": 3,
-      "Name": "ГОСТ Р 00003-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 7,
-      "Use": true,
-      "IdParameter": 4,
-      "Name": "ГОСТ Р 00004-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 8,
-      "Use": true,
-      "IdParameter": 4,
-      "Name": "ГОСТ Р 00004-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 9,
-      "Use": true,
-      "IdParameter": 5,
-      "Name": "ГОСТ Р 00005-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 10,
-      "Use": true,
-      "IdParameter": 5,
-      "Name": "ГОСТ Р 00005-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 11,
-      "Use": true,
-      "IdParameter": 6,
-      "Name": "ГОСТ Р 00006-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 12,
-      "Use": true,
-      "IdParameter": 6,
-      "Name": "ГОСТ Р 00006-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 13,
-      "Use": true,
-      "IdParameter": 7,
-      "Name": "ГОСТ Р 00007-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 14,
-      "Use": true,
-      "IdParameter": 7,
-      "Name": "ГОСТ Р 00007-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 15,
-      "Use": true,
-      "IdParameter": 8,
-      "Name": "ГОСТ Р 00008-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 16,
-      "Use": true,
-      "IdParameter": 8,
-      "Name": "ГОСТ Р 00008-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 17,
-      "Use": true,
-      "IdParameter": 9,
-      "Name": "ГОСТ Р 00009-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 18,
-      "Use": true,
-      "IdParameter": 9,
-      "Name": "ГОСТ Р 00009-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 19,
-      "Use": true,
-      "IdParameter": 10,
-      "Name": "ГОСТ Р 00010-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 20,
-      "Use": true,
-      "IdParameter": 10,
-      "Name": "ГОСТ Р 00010-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 21,
-      "Use": true,
-      "IdParameter": 11,
-      "Name": "ГОСТ Р 00011-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 22,
-      "Use": true,
-      "IdParameter": 11,
-      "Name": "ГОСТ Р 00011-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 23,
-      "Use": true,
-      "IdParameter": 12,
-      "Name": "ГОСТ Р 00012-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 24,
-      "Use": true,
-      "IdParameter": 12,
-      "Name": "ГОСТ Р 00012-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 25,
-      "Use": true,
-      "IdParameter": 13,
-      "Name": "ГОСТ Р 00013-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 26,
-      "Use": true,
-      "IdParameter": 13,
-      "Name": "ГОСТ Р 00013-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 27,
-      "Use": true,
-      "IdParameter": 14,
-      "Name": "ГОСТ Р 00014-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 28,
-      "Use": true,
-      "IdParameter": 14,
-      "Name": "ГОСТ Р 00014-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 29,
-      "Use": true,
-      "IdParameter": 15,
-      "Name": "ГОСТ Р 00015-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 30,
-      "Use": true,
-      "IdParameter": 15,
-      "Name": "ГОСТ Р 00015-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 31,
-      "Use": true,
-      "IdParameter": 16,
-      "Name": "ГОСТ Р 00016-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 32,
-      "Use": true,
-      "IdParameter": 16,
-      "Name": "ГОСТ Р 00016-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 33,
-      "Use": true,
-      "IdParameter": 17,
-      "Name": "ГОСТ Р 00017-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 34,
-      "Use": true,
-      "IdParameter": 17,
-      "Name": "ГОСТ Р 00017-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 35,
-      "Use": true,
       "IdParameter": 18,
-      "Name": "ГОСТ Р 00018-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 36,
-      "Use": true,
-      "IdParameter": 18,
-      "Name": "ГОСТ Р 00018-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 37,
-      "Use": true,
-      "IdParameter": 19,
-      "Name": "ГОСТ Р 00019-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 38,
-      "Use": true,
-      "IdParameter": 19,
-      "Name": "ГОСТ Р 00019-2001 Метод Б",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
+      "Name": "ГОСТ Р 50802-2021",
+      "LimitValueActivate": true,
+      "LimitValue": 4,
+      "LimitValueString": "менее 4"
     }
   ],
   "Parameters": [
@@ -349,35 +25,35 @@
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 2,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 3,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 4,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 5,
       "Key": "Dens15Correction",
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": true
     },
     {
       "Id": 6,

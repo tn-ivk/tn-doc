@@ -5,7 +5,7 @@
     "Settings": {
       "General": {
         "ObjType": 1,
-        "NefType": 1,
+        "NefType": 2,
         "NumberDensitometers": 1,
         "NumberViscometers": 1,
         "NumberWatermetrs": 1,
@@ -27,115 +27,201 @@
         "Users": [
           {
             "Use": true,
+            "Id": 1,
+            "IdGroup": 3,
+            "F": "Бердников",
+            "I": "Александр",
+            "O": "Игоревич",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Начальник ПСП",
+            "LicId": 1
+          },
+          {
+            "Use": true,
             "Id": 2,
-            "IdGroup": 1,
-            "F": "Горбачев",
-            "I": "Сергей",
-            "O": "Владиславович",
-            "Factory": "",
-            "Post": "Старший лаборант",
-            "LicId": 0,
-            "UseFullNameSeparator": true,
-            "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true
+            "IdGroup": 2,
+            "F": "Бердников",
+            "I": "Александр",
+            "O": "Игоревич",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Начальник ПСП",
+            "LicId": 2
+          },
+          {
+            "Use": true,
+            "Id": 3,
+            "IdGroup": 3,
+            "F": "Лазарев",
+            "I": "Илья",
+            "O": "Иванович",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Зам. начальника ПСП",
+            "LicId": 3
           },
           {
             "Use": true,
             "Id": 4,
             "IdGroup": 2,
-            "F": "Попов",
+            "F": "Лазарев",
             "I": "Илья",
-            "O": "Фёдорович",
-            "Factory": "ООО \"Сдающая сторона\"",
-            "Post": "Оператор товарный",
-            "LicId": 1,
-            "UseFullNameSeparator": true,
-            "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true
+            "O": "Иванович",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Зам. начальника ПСП",
+            "LicId": 4
           },
           {
             "Use": true,
             "Id": 5,
-            "IdGroup": 2,
-            "F": "Власов",
-            "I": "Григорий",
-            "O": "Егорович",
-            "Factory": "ООО \"Сдающая сторона\"",
-            "Post": "Начальник ПСП",
-            "LicId": 2,
-            "UseFullNameSeparator": true,
-            "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true
+            "IdGroup": 3,
+            "F": "Зарубин",
+            "I": "Александр",
+            "O": "Андреевич",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Инженер 2 кат. ПСП",
+            "LicId": 5
           },
           {
             "Use": true,
             "Id": 6,
             "IdGroup": 2,
-            "F": "Колесников",
-            "I": "Фёдор",
-            "O": "Алексеевич",
-            "Factory": "ООО \"Сдающая сторона\"",
-            "Post": "Оператор",
-            "LicId": 1,
-            "UseFullNameSeparator": true,
-            "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true
+            "F": "Зарубин",
+            "I": "Александр",
+            "O": "Андреевич",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Инженер 2 кат. ПСП",
+            "LicId": 6
           },
           {
             "Use": true,
             "Id": 7,
             "IdGroup": 3,
-            "F": "Никитин",
-            "I": "Кирилл",
-            "O": "Андреевич",
-            "Factory": "ООО \"Принимающая сторона\"",
-            "Post": "Оператор товарный",
-            "LicId": 4,
-            "UseFullNameSeparator": true,
-            "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true
+            "F": "Александрова",
+            "I": "Марина",
+            "O": "Владимировна",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Инженер по учету",
+            "LicId": 7
           },
           {
             "Use": true,
             "Id": 8,
-            "IdGroup": 3,
-            "F": "Игнатьев",
-            "I": "Александр",
-            "O": "Данилович",
-            "Factory": "ООО \"Принимающая сторона\"",
-            "Post": "Начальник ПСП",
-            "LicId": 5,
-            "UseFullNameSeparator": true,
-            "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true
+            "IdGroup": 2,
+            "F": "Александрова",
+            "I": "Марина",
+            "O": "Владимировна",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Инженер по учету",
+            "LicId": 8
           },
           {
             "Use": true,
             "Id": 9,
-            "IdGroup": 3,
-            "F": "Леонов",
-            "I": "Михаил",
-            "O": "Ильич",
-            "Factory": "ООО \"Принимающая сторона\"",
-            "Post": "Оператор",
-            "LicId": 6,
-            "UseFullNameSeparator": true,
-            "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true
+            "IdGroup": 2,
+            "F": "Белицкий",
+            "I": "Александр",
+            "O": "Андреевич",
+            "Factory": "ГРНУ АО \"Транснефть - Верхняя Волга\"",
+            "Post": "Мастер ПСП",
+            "LicId": 9
           },
           {
             "Use": true,
             "Id": 10,
+            "IdGroup": 2,
+            "F": "Воробьев",
+            "I": "Владимир",
+            "O": "Федерович",
+            "Factory": "ГРНУ АО \"Транснефть - Верхняя Волга\"",
+            "Post": "Инженер ПСП",
+            "LicId": 10
+          },
+          {
+            "Use": true,
+            "Id": 11,
+            "IdGroup": 1,
+            "F": "Казачков",
+            "I": "Алексей",
+            "O": "Валерьевич",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Начальник ИЛ",
+            "LicId": 0
+          },
+          {
+            "Use": true,
+            "Id": 12,
+            "IdGroup": 1,
+            "F": "Орехова",
+            "I": "Анастатия ",
+            "O": "Александровна",
+            "Factory": "ЯРНУ ООО \"Транснефть - Балтика\"",
+            "Post": "Зам. начальника ИЛ",
+            "LicId": 0
+          },
+          {
+            "Use": true,
+            "Id": 13,
             "IdGroup": 3,
-            "F": "王",
-            "I": "华丽",
-            "O": "",
-            "Factory": "ООО Китай",
-            "Post": "Инженер",
-            "UseFullNameSeparator": false,
-            "UseFullNameWhiteSpace": false,
-            "UseShortFullNameForm": false,
-            "LicId": 6
+            "F": "Павлова",
+            "I": "Наталья",
+            "O": "Вадимовна",
+            "Factory": "ПАО \"Славнефть - ЯНОС\"",
+            "Post": "Начальник УЗН ц. №13",
+            "LicId": 11
+          },
+          {
+            "Use": true,
+            "Id": 14,
+            "IdGroup": 3,
+            "F": "Черепенникова",
+            "I": "Ольга",
+            "O": "Владимировна",
+            "Factory": "ПАО \"Славнефть - ЯНОС\"",
+            "Post": "Оператор УЗН ц. №13",
+            "LicId": 12
+          },
+          {
+            "Use": true,
+            "Id": 15,
+            "IdGroup": 3,
+            "F": "Самсоненко",
+            "I": "Елена",
+            "O": "Викторовна",
+            "Factory": "ПАО \"Славнефть - ЯНОС\"",
+            "Post": "Оператор УЗН ц. №13",
+            "LicId": 13
+          },
+          {
+            "Use": true,
+            "Id": 16,
+            "IdGroup": 3,
+            "F": "Курочкин",
+            "I": "Алексей",
+            "O": "Борисович",
+            "Factory": "ПАО \"Славнефть - ЯНОС\"",
+            "Post": "Оператор УЗН ц. №13",
+            "LicId": 14
+          },
+          {
+            "Use": true,
+            "Id": 17,
+            "IdGroup": 3,
+            "F": "Мартьянова",
+            "I": "Татьяна",
+            "O": "Михайловна",
+            "Factory": "ПАО \"Славнефть - ЯНОС\"",
+            "Post": "Оператор УЗН ц. №13",
+            "LicId": 15
+          },
+          {
+            "Use": true,
+            "Id": 18,
+            "IdGroup": 3,
+            "F": "Урахова",
+            "I": "Татьяна",
+            "O": "Робертовна",
+            "Factory": "ПАО \"Славнефть - ЯНОС\"",
+            "Post": "Оператор УЗН ц. №13",
+            "LicId": 16
           }
         ],
         "UsersGroup": [
@@ -164,56 +250,130 @@
           {
             "Id": 1,
             "Use": true,
-            "LicensesDate": "01.01.2024",
-            "LicensesNumber": "ДОВ/10/123/71"
+            "IdUser": 1,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/452-24"
           },
           {
             "Id": 2,
             "Use": true,
-            "LicensesDate": "01.01.2024",
-            "LicensesNumber": "ДОВ/10/123/72"
+            "IdUser": 2,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/446-24"
           },
           {
             "Id": 3,
             "Use": true,
-            "LicensesDate": "01.01.2024",
-            "LicensesNumber": "ДОВ/10/123/73"
+            "IdUser": 3,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/453-24"
           },
           {
             "Id": 4,
             "Use": true,
-            "LicensesDate": "10.01.2024",
-            "LicensesNumber": "ДОВ/88/542/21"
+            "IdUser": 4,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/447-24"
           },
           {
             "Id": 5,
             "Use": true,
-            "LicensesDate": "10.01.2024",
-            "LicensesNumber": "ДОВ/88/542/22"
+            "IdUser": 5,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/454-24"
           },
           {
             "Id": 6,
             "Use": true,
-            "LicensesDate": "10.01.2024",
-            "LicensesNumber": "ДОВ/88/542/23"
+            "IdUser": 6,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/448-24"
           },
           {
             "Id": 7,
             "Use": true,
-            "LicensesDate": "01.11.2024",
-            "LicensesNumber": "ДОВ/88/542/24"
+            "IdUser": 7,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/455-24"
+          },
+          {
+            "Id": 8,
+            "Use": true,
+            "IdUser": 8,
+            "LicensesDate": "20.12.2024",
+            "LicensesNumber": "20-09/449-24"
+          },
+          {
+            "Id": 9,
+            "Use": true,
+            "LicensesDate": "13.12.2024",
+            "LicensesNumber": "21-19/513"
+          },
+          {
+            "Id": 10,
+            "Use": true,
+            "LicensesDate": "13.12.2024",
+            "LicensesNumber": "21-19/513"
+          },
+          {
+            "Id": 11,
+            "Use": true,
+            "LicensesDate": "23.12.2024",
+            "LicensesNumber": "011/436"
+          },
+          {
+            "Id": 12,
+            "Use": true,
+            "LicensesDate": "23.12.2024",
+            "LicensesNumber": "011/441"
+          },
+          {
+            "Id": 13,
+            "Use": true,
+            "LicensesDate": "23.12.2024",
+            "LicensesNumber": "011/439"
+          },
+          {
+            "Id": 14,
+            "Use": true,
+            "LicensesDate": "23.12.2024",
+            "LicensesNumber": "011/440"
+          },
+          {
+            "Id": 15,
+            "Use": true,
+            "LicensesDate": "23.12.2024",
+            "LicensesNumber": "011/438"
+          },
+          {
+            "Id": 16,
+            "Use": true,
+            "LicensesDate": "23.12.2024",
+            "LicensesNumber": "011/437"
           }
         ],
         "BIKs": [
           {
             "Id": 1,
-            "Name": "БИК-1"
+            "Name": "БИК СИКН №3 МН С-П"
+          },
+		  {
+            "Id": 2,
+            "Name": "БИК СИКН №3 МН В-Я"
           }
         ],
         "Directions": [
           {
             "Id": 0,
             "Name": "СИКН"
+          },
+          {
+            "Id": 1,
+            "Name": "ЯНОС"
+          },
+          {
+            "Id": 2,
+            "Name": "РП"
           }
         ]
       }

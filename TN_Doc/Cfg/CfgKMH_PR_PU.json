@@ -21,14 +21,14 @@
         "ProtocolNumber": 1
       },
       "Header": {
-        "FieldSIKN": "СИКН",
+        "FieldSIKN": "����",
         "FieldPSP": ""
       },
       "Data": {
         "TypeTPU": 2
       },
       "Footer": {
-        "FieldSIKN": "СИКН"
+        "FieldSIKN": ""
       },
       "Dictionarys": {
 
