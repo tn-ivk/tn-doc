@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/11/2025 16:47:42" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/11/2025 18:23:29" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -331,14 +331,14 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="440.33" Width="718.2" Height="308.07" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="440.33" Width="718.2" Height="309.96" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="298.62">
         <TableColumn Name="Column29" Width="283.5"/>
         <TableColumn Name="Column31" Width="202.23"/>
         <TableColumn Name="Column32" Width="7.56"/>
         <TableColumn Name="Column33" Width="224.91"/>
         <TableRow Name="Row189" Height="60.48" AutoSize="true">
-          <TableCell Name="Cell1534" Text="Пункт 3 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену).&#13;&#10;Пункты 4 и 5 заполняют по показаниям поточного плотномера (средневзвешенное значение&#13;&#10;плотности нефти за смену), приведенным к стандартным условиям.&#13;&#10;При отказе поточного плотномера плотность нефти определяют в испытательной лаборатории." Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" ColSpan="4"/>
+          <TableCell Name="Cell1534" Text="Пункт 3 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену).&#13;&#10;Пункты 4 и 5 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену), приведенным к стандартным условиям.&#13;&#10;При отказе поточного плотномера плотность нефти определяют в испытательной лаборатории." Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" ColSpan="4"/>
           <TableCell Name="Cell1536" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1537" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1538" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
