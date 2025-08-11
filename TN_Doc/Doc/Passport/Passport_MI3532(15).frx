@@ -340,7 +340,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="RowMass_fraction_of_methyl_and_ethyl_mercaptan" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1591" Border.Lines="All" Text="14." HorzAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1592" Border.Lines="All" Text="&lt;b&gt;Массовая доля метил-и этилмеркаптанов в сумме, млнˉ¹ (ppm)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Total methyl-ethyl mercaptans, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1592" Border.Lines="All" Text="&lt;b&gt;Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Total methyl-ethyl mercaptans, mg/kg (ррт)&lt;/i&gt;" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1593" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1594" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>

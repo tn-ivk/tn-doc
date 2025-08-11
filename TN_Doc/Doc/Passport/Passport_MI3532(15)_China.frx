@@ -368,7 +368,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="RowMass_fraction_of_methyl_and_ethyl_mercaptan" Height="30.24" AutoSize="true">
           <TableCell Name="Cell1591" Border.Lines="All" Text="14." HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
-          <TableCell Name="Cell1592" Border.Lines="All" Text="Массовая доля метил-и этилмеркаптанов в сумме, млнˉ¹ (ppm)&#13;&#10;甲基硫醇和乙基硫醇总量，质量分数, 10⁻⁶ (ppm)" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt"/>
+          <TableCell Name="Cell1592" Border.Lines="All" Text="Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)&#13;&#10;甲基硫醇和乙基硫醇总量，质量分数, 10⁻⁶ (ppm)" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1593" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
           <TableCell Name="Cell1594" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt"/>
         </TableRow>
