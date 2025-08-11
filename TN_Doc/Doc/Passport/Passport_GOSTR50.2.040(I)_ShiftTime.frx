@@ -324,7 +324,7 @@ namespace FastReport
         <TableColumn Name="Column32" Width="7.56"/>
         <TableColumn Name="Column33" Width="224.91"/>
         <TableRow Name="Row189" Height="60.48" AutoSize="true">
-          <TableCell Name="Cell1534" Text="Пункт 3 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену).&#13;&#10;Пункты 4 и 5 заполняют по показаниям поточного плотномера (средневзвешенное значение&#13;&#10;плотности нефти за смену), приведенным к стандартным условиям.&#13;&#10;При отказе поточного плотномера плотность нефти определяют в испытательной лаборатории." Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" ColSpan="4"/>
+          <TableCell Name="Cell1534" Text="Пункт 3 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену).&#13;&#10;Пункты 4 и 5 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену), приведенным к стандартным условиям.&#13;&#10;При отказе поточного плотномера плотность нефти определяют в испытательной лаборатории." Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 9pt" ColSpan="4"/>
           <TableCell Name="Cell1536" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1537" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1538" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
