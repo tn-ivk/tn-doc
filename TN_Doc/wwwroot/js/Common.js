@@ -1285,10 +1285,24 @@ function FillPassportDataElis() {
     logTrace('Начало заполнения данных паспорта из ЕЛИС');
     try {
         let dataPassport = JSON.parse(localStorage.dataPassport);
+        if (!dataPassport) {
+            logError('dataPassport не найден в localStorage или имеет невалидное значение');
+            showError('Ошибка: данные протокола ЕЛИС не найдены');
+            return;
+        }
+        else{
+            logTrace('ПИ ЕЛИС: ' + JSON.stringify(dataPassport));
+        }
+
         let labInfo = JSON.parse(localStorage.labInfo);
+        if (!labInfo) {
+            logError('labInfo не найден в localStorage или имеет невалидное значение');
+        }
+        else{
+            logTrace('Информация о лаборатории: ' + JSON.stringify(labInfo));
+        }
         
         let iframe = document.querySelector('.FR');
-        
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data');
         
         // Добавляем данные о представителе лаборатории из Signers
