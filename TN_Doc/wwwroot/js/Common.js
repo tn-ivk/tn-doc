@@ -1207,7 +1207,7 @@ function DrawTablePassports(dataELIS) {
     $('#listPassports').empty();
     localStorage.setItem('labInfo', JSON.stringify(dataELIS.labInfo));
     dataELIS.passports.forEach(function (item, i, arr) {
-        logTrace('Добавление протокола в таблицу: ' + (item.protocolNumber || '[нет номера]'));
+        logTrace('Добавление протокола испытаний ЕЛИС в таблицу: ' + (item.protocolNumber || '[нет номера]'));
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
@@ -1229,7 +1229,7 @@ function DrawTablePassports(dataELIS) {
         });
         element.append(li);
     });
-    logTrace('Таблица протоколов испытаний ЕЛИС успешно отрисована. Количество: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
+    logTrace('Таблица протоколов испытаний ЕЛИС успешно отрисована. Количество протоколов: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
     
     // Автоматически выбираем первый протокол, если протоколы загружены
     if (dataELIS.passports && dataELIS.passports.length > 0) {
