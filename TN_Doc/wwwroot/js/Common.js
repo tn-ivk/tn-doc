@@ -1291,7 +1291,7 @@ function FillPassportDataElis() {
             return;
         }
         else{
-            logTrace('ПИ ЕЛИС: ' + JSON.stringify(dataPassport));
+            logTrace('ПИ ЕЛИС:\n' + JSON.stringify(dataPassport, null, 2));
         }
 
         let labInfo = JSON.parse(localStorage.labInfo);
@@ -1299,11 +1299,31 @@ function FillPassportDataElis() {
             logError('labInfo не найден в localStorage или имеет невалидное значение');
         }
         else{
-            logTrace('Информация о лаборатории: ' + JSON.stringify(labInfo));
+            logTrace('Информация о лаборатории:\n' + JSON.stringify(labInfo, null, 2));
         }
         
         let iframe = document.querySelector('.FR');
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data');
+        
+        if (!elisNodes || elisNodes.length === 0) {
+            logError('Форма паспорта не настроена для заполнения данными с ЕЛИС');
+            showError('Форма паспорта не настроена для заполнения данными с ЕЛИС');
+            return;
+        }
+        
+        logTrace('Найдено элементов для заполнения данными ЕЛИС: ' + elisNodes.length);
+
+        const elisElementsInfo = Array.from(elisNodes).map((item, index) => ({
+            index: index,
+            nodeName: item.nodeName,
+            tag: item.dataset.tag || 'не указан',
+            elisAlias: item.dataset.elisAlias || 'не указан',
+            key: item.dataset.key || 'не указан',
+            type: item.type || 'не указан',
+            id: item.id || 'не указан',
+            className: item.className || 'не указан'
+        }));
+        logTrace('Элементы интерфейса для заполнения ЕЛИС:\n' + JSON.stringify(elisElementsInfo, null, 2));
         
         // Добавляем данные о представителе лаборатории из Signers
         if (dataPassport.signers?.laboratory) {
