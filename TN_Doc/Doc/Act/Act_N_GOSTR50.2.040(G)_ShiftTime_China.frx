@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/16/2025 10:21:27" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/13/2025 01:05:35" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -111,8 +111,14 @@ namespace FastReport
       bool ShowResultColumn = SettingsData.ShowResultColumn;
       int ColumnsCount = 0; 
       List&lt;TN.Doc.Act&gt; listShiftsData;
-      listShiftsData = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act.Where(i =&gt; ! i.Vol_LastShift.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Vol_LastShift) == false).ToList();
-         
+      string usedShiftStrInit = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
+      int usedShiftInit;
+      var listActs = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act;
+      if (int.TryParse(usedShiftStrInit, out usedShiftInit) &amp;&amp; usedShiftInit &gt;= 1)
+        listShiftsData = listActs.Take(usedShiftInit).ToList();
+      else
+        listShiftsData = listActs.Where(i =&gt; ! i.Vol_LastShift.Contains(&quot;-&quot;) &amp;&amp; !String.IsNullOrEmpty(i.Vol_LastShift)).ToList();
+      
       if (Engine.FinalPass == true)
       {
         if (ShowResultColumn)
@@ -303,7 +309,7 @@ namespace FastReport
     <PageHeaderBand Name="PageHeader1" Width="718.2" Height="15.12">
       <TextObject Name="PageHeaderText" Width="708.75" Height="15.12" Text="PageHeaderText" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 7pt" FontWidthRatio="0.9"/>
     </PageHeaderBand>
-    <ReportTitleBand Name="ReportTitle" Top="19.12" Width="718.2" Height="268.38" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportTitleBand Name="ReportTitle" Top="19.83" Width="718.2" Height="268.38" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableHeader" Width="708.04" Height="268.38">
         <TableColumn Name="Column1" Width="302.54"/>
         <TableColumn Name="Column2" Width="317.51"/>
@@ -370,7 +376,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="291.5" Width="718.2" Height="549.88" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="292.91" Width="718.2" Height="549.88" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="9.45" Width="546.55" Height="541.38" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="253.17"/>
         <TableColumn Name="Column282" Width="104.38"/>
@@ -568,7 +574,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="845.38" Width="718.2" Height="37.8" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="847.5" Width="718.2" Height="37.8" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Width="657.72" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="657.72"/>
         <TableRow Name="Row195">
@@ -579,7 +585,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="887.18" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="890" Width="718.2" Height="115.29" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="658.5" Height="88.83" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="74.98"/>
         <TableColumn Name="Column5" Width="94.27"/>
@@ -631,7 +637,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1006.47" Width="718.2" Height="18.9" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1010" Width="718.2" Height="18.9" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Top="-1.89" Width="217.35" Height="18.9" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
