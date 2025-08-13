@@ -1313,17 +1313,17 @@ function FillPassportDataElis() {
         
         logTrace('Найдено элементов для заполнения данными ЕЛИС: ' + elisNodes.length);
 
-        const elisElementsInfo = Array.from(elisNodes).map((item, index) => ({
-            index: index,
-            nodeName: item.nodeName,
-            tag: item.dataset.tag || 'не указан',
-            elisAlias: item.dataset.elisAlias || 'не указан',
-            key: item.dataset.key || 'не указан',
-            type: item.type || 'не указан',
-            id: item.id || 'не указан',
-            className: item.className || 'не указан'
-        }));
-        logTrace('Элементы интерфейса для заполнения ЕЛИС:\n' + JSON.stringify(elisElementsInfo, null, 2));
+        const elisElementsInfo = Array.from(elisNodes).map((item, index) => {
+            const nodeName = item.nodeName;
+            const tag = item.dataset.tag || 'не указан';
+            const elisAlias = item.dataset.elisAlias || 'не указан';
+            const key = item.dataset.key || 'не указан';
+            const type = item.type || 'не указан';
+            const id = item.id || 'не указан';
+            const className = item.className || 'не указан';
+            return `index=${index + 1}; nodeName=${nodeName}; tag=${tag}; elisAlias=${elisAlias}; key=${key}; type=${type}; id=${id}; className=${className}`;
+        });
+        logTrace('Элементы интерфейса для заполнения ЕЛИС:\n' + elisElementsInfo.join('\n'));
         
         // Добавляем данные о представителе лаборатории из Signers
         if (dataPassport.signers?.laboratory) {
