@@ -1312,7 +1312,6 @@ function FillPassportDataElis() {
         }
         
         logTrace('Найдено элементов для заполнения данными ЕЛИС: ' + elisNodes.length);
-
         const elisElementsInfo = Array.from(elisNodes).map((item, index) => {
             const nodeName = item.nodeName;
             const tag = item.dataset.tag || 'не указан';
@@ -1331,6 +1330,12 @@ function FillPassportDataElis() {
             dataPassport.chiefLabShortSign = formatLabRepresentativeName(dataPassport.signers.laboratory);
             dataPassport.chiefLabPosition = dataPassport.signers.laboratory.post;
             dataPassport.chiefLabOrganization = dataPassport.signers.laboratory.company;
+            const info = {
+                chiefLabShortSign: dataPassport.chiefLabShortSign || '',
+                chiefLabPosition: dataPassport.chiefLabPosition || '',
+                chiefLabOrganization: dataPassport.chiefLabOrganization || ''
+            };
+            logTrace('Информация о представителе лаборатории: ' + JSON.stringify(info, null, 2));
         }
 
         elisNodes.forEach((item, index, array) => {
