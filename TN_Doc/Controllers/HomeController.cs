@@ -357,13 +357,13 @@ public class HomeController : Controller
         }
     }
 
-    private (long UnixTimeBegin, long UnixTimeEnd) ParseDateRange(string? dtBegin, string? dtEnd)
+    private (long UnixTimeBegin, long UnixTimeEnd) ParseDateRange(string dtBegin, string dtEnd)
     {
-        DateTime beginDate = dtBegin != null ? DateTime.Parse(dtBegin) : DateTime.MinValue;
-        DateTime endDate = dtEnd != null ? DateTime.Parse(dtEnd) : DateTime.MaxValue;
+        var beginDate = dtBegin != null ? DateTime.Parse(dtBegin) : DateTime.MinValue;
+        var endDate = dtEnd != null ? DateTime.Parse(dtEnd) : DateTime.MaxValue;
 
-        long unixTimeBegin = new DateTimeOffset(beginDate, TimeSpan.Zero).ToUnixTimeSeconds();
-        long unixTimeEnd = new DateTimeOffset(endDate, TimeSpan.Zero).ToUnixTimeSeconds() + 1;
+        var unixTimeBegin = new DateTimeOffset(beginDate, TimeSpan.Zero).ToUnixTimeSeconds();
+        var unixTimeEnd = new DateTimeOffset(endDate, TimeSpan.Zero).ToUnixTimeSeconds() + 1;
 
         return (unixTimeBegin, unixTimeEnd);
     }
