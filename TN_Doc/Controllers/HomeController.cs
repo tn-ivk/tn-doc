@@ -334,7 +334,7 @@ public class HomeController : Controller
         if (data is null)
         {
             _logger.LogError($"Невозможно получить список документов. Переменная {nameof(data)} is null");
-            return new List<RequestListDocs>();
+            return [];
         }
         _logger.LogTrace($"Получение списка документов типа {data.IdDoc} для устройства {_appConfig.GetDeviceName(data.IdDevice)}");
         try
@@ -359,13 +359,38 @@ public class HomeController : Controller
 
     private (long UnixTimeBegin, long UnixTimeEnd) ParseDateRange(string dtBegin, string dtEnd)
     {
-        var beginDate = dtBegin != null ? DateTime.Parse(dtBegin) : DateTime.MinValue;
-        var endDate = dtEnd != null ? DateTime.Parse(dtEnd) : DateTime.MaxValue;
+        var beginDate = ParseDateSafely(dtBegin);
+        var endDate = ParseDateSafely(dtEnd);
+        
+        if (endDate < beginDate)
+        {
+            _logger.LogError($"Конец периода ({dtEnd}) раньше начала ({dtBegin}). Используются значения по умолчанию");
+            return (default, default);
+        }
 
-        var unixTimeBegin = new DateTimeOffset(beginDate, TimeSpan.Zero).ToUnixTimeSeconds();
-        var unixTimeEnd = new DateTimeOffset(endDate, TimeSpan.Zero).ToUnixTimeSeconds() + 1;
+        try
+        {
+            var unixTimeBegin = new DateTimeOffset(beginDate, TimeSpan.Zero).ToUnixTimeSeconds();
+            var unixTimeEnd = new DateTimeOffset(endDate, TimeSpan.Zero).ToUnixTimeSeconds() + 1;
+            return (unixTimeBegin, unixTimeEnd);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            _logger.LogError(ex, $"Ошибка преобразования дат в Unix время: начало={dtBegin}, конец={dtEnd}");
+            return (default, default);
+        }
+    }
 
-        return (unixTimeBegin, unixTimeEnd);
+    private DateTime ParseDateSafely(string dateString)
+    {
+        if (string.IsNullOrWhiteSpace(dateString))
+            return DateTime.UnixEpoch;
+
+        if (DateTime.TryParse(dateString, out var parsedDate))
+            return parsedDate;
+
+        _logger.LogError($"Невозможно разобрать дату '{dateString}'. Используется значение по умолчанию: {DateTime.UnixEpoch}");
+        return DateTime.UnixEpoch;
     }
     
     public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
