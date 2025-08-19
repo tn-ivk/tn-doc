@@ -161,6 +161,22 @@
       "Key": "ARM_Poverka_Result_Type",
       "Type": "list",
       "Name": "Применение в качестве"
+    },
+    {
+      "Id": 21,
+      "Use": true,
+      "Edit": true,
+      "Key": "ViscForFirstMeas",
+      "Type": "text",
+      "Name": "Вязкость нефти для первого измерения"
+    },
+    {
+      "Id": 22,
+      "Use": true,
+      "Edit": true,
+        "Key": "ViscForEndMeas",
+      "Type": "text",
+      "Name": "Вязкость нефти для последнего измерения"
     }
   ]
 }

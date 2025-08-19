@@ -36,9 +36,8 @@ namespace TN_Doc.Models.Printer
             catch (Exception ex)
             {
                 _logger.LogError($"Ошибка получения списка доступных принтеров в системе: {ex.Message}");
-                return Enumerable.Empty<string>();
+                return [];
             }
-            
         }
         
         /// <summary>

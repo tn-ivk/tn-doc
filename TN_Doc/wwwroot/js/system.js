@@ -25,7 +25,13 @@ function RedefinitionConfirmWindow() {
         $('#PromiseConfirm .modal-footer .confirm-ok-btn').html(yesBtnName);
         $('#PromiseConfirm .modal-footer .confirm-cancel-btn').html(noBtnName);
         $('#PromiseConfirm .modal-body').html(message);
-        $('#PromiseConfirm .modal-body ')
+        
+        // Скрытие кнопки "Нет" если передан null
+        if (opt && opt['noBtnName'] === null) {
+            $('#PromiseConfirm .modal-footer .confirm-cancel-btn').hide();
+        } else {
+            $('#PromiseConfirm .modal-footer .confirm-cancel-btn').show();
+        }
 
         let PromiseConfirm = $('#PromiseConfirm').modal({
             keyboard: false,
