@@ -1721,7 +1721,7 @@ function showError(message) {
 
 function logToServer(level, message) {
     $.ajax({
-        url: '/Home/LogClientMessage',
+        url: '/api/ClientLog/logging',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ level: level, message: message }),
