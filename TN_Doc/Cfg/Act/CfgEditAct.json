@@ -110,12 +110,12 @@
       "Use": true,
       "Edit": false,
       "Key": "Receive_Lic_Number",
-      "Type": "false",
+      "Type": "text",
       "Name": "Номер доверенности"
     },
     {
       "Id": 15,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Oil_Name",
       "Type": "text",
@@ -123,7 +123,7 @@
     },
     {
       "Id": 16,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Contract",
       "Type": "text",
@@ -131,7 +131,7 @@
     },
     {
       "Id": 17,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Route_Telegram",
       "Type": "text",
@@ -139,7 +139,7 @@
     },
     {
       "Id": 18,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Refinery_Plant",
       "Type": "text",
@@ -147,7 +147,7 @@
     },
     {
       "Id": 19,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Consignor",
       "Type": "text",
@@ -155,7 +155,7 @@
     },
     {
       "Id": 20,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Consignee",
       "Type": "text",
@@ -163,7 +163,7 @@
     },
     {
       "Id": 21,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Destination",
       "Type": "text",
@@ -171,7 +171,7 @@
     },
     {
       "Id": 22,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Exporter_Importer",
       "Type": "text",
@@ -179,7 +179,7 @@
     },
     {
       "Id": 23,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Declaration",
       "Type": "text",
@@ -187,7 +187,7 @@
     },
     {
       "Id": 24,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "TankerName",
       "Type": "text",
@@ -195,7 +195,7 @@
     },
     {
       "Id": 25,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "TimeSchedule_Position",
       "Type": "text",

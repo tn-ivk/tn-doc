@@ -1197,12 +1197,12 @@ function SetClientToken() {
 }
 
 function DrawTablePassports(dataELIS) {
-    logTrace('Начало отрисовки таблицы паспортов ЕЛИС');
+    logTrace('Начало отрисовки таблицы протоколов испытаний ЕЛИС');
     let element = document.querySelector('#listPassports');
     $('#listPassports').empty();
     localStorage.setItem('labInfo', JSON.stringify(dataELIS.labInfo));
     dataELIS.passports.forEach(function (item, i, arr) {
-        logTrace('Добавление паспорта в таблицу: ' + (item.protocolNumber || '[нет номера]'));
+        logTrace('Добавление протокола испытаний ЕЛИС в таблицу: ' + (item.protocolNumber || '[нет номера]'));
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
@@ -1224,7 +1224,7 @@ function DrawTablePassports(dataELIS) {
         });
         element.append(li);
     });
-    logTrace('Таблица паспортов ЕЛИС успешно отрисована. Количество: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
+    logTrace('Таблица протоколов испытаний ЕЛИС успешно отрисована. Количество протоколов: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
     
     // Автоматически выбираем первый протокол, если протоколы загружены
     if (dataELIS.passports && dataELIS.passports.length > 0) {
@@ -1280,11 +1280,44 @@ function FillPassportDataElis() {
     logTrace('Начало заполнения данных паспорта из ЕЛИС');
     try {
         let dataPassport = JSON.parse(localStorage.dataPassport);
+        if (!dataPassport) {
+            logError('dataPassport не найден в localStorage или имеет невалидное значение');
+            showError('Ошибка: данные протокола ЕЛИС не найдены');
+            return;
+        }
+        else{
+            logTrace('ПИ ЕЛИС:\n' + JSON.stringify(dataPassport, null, 2));
+        }
+
         let labInfo = JSON.parse(localStorage.labInfo);
+        if (!labInfo) {
+            logError('labInfo не найден в localStorage или имеет невалидное значение');
+        }
+        else{
+            logTrace('Информация о лаборатории:\n' + JSON.stringify(labInfo, null, 2));
+        }
         
         let iframe = document.querySelector('.FR');
-        
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data');
+        
+        if (!elisNodes || elisNodes.length === 0) {
+            logError('Форма паспорта не настроена для заполнения данными с ЕЛИС');
+            showError('Форма паспорта не настроена для заполнения данными с ЕЛИС');
+            return;
+        }
+        
+        logTrace('Найдено элементов для заполнения данными ЕЛИС: ' + elisNodes.length);
+        const elisElementsInfo = Array.from(elisNodes).map((item, index) => {
+            const nodeName = item.nodeName;
+            const tag = item.dataset.tag || 'не указан';
+            const elisAlias = item.dataset.elisAlias || 'не указан';
+            const key = item.dataset.key || 'не указан';
+            const type = item.type || 'не указан';
+            const id = item.id || 'не указан';
+            const className = item.className || 'не указан';
+            return `index=${index + 1}; nodeName=${nodeName}; tag=${tag}; elisAlias=${elisAlias}; key=${key}; type=${type}; id=${id}; className=${className}`;
+        });
+        logTrace('Элементы интерфейса для заполнения ЕЛИС:\n' + elisElementsInfo.join('\n'));
         
         // Добавляем данные о представителе лаборатории из Signers
         if (dataPassport.signers?.laboratory) {
@@ -1292,6 +1325,12 @@ function FillPassportDataElis() {
             dataPassport.chiefLabShortSign = formatLabRepresentativeName(dataPassport.signers.laboratory);
             dataPassport.chiefLabPosition = dataPassport.signers.laboratory.post;
             dataPassport.chiefLabOrganization = dataPassport.signers.laboratory.company;
+            const info = {
+                chiefLabShortSign: dataPassport.chiefLabShortSign || '',
+                chiefLabPosition: dataPassport.chiefLabPosition || '',
+                chiefLabOrganization: dataPassport.chiefLabOrganization || ''
+            };
+            logTrace('Информация о представителе лаборатории: ' + JSON.stringify(info, null, 2));
         }
 
         elisNodes.forEach((item, index, array) => {
