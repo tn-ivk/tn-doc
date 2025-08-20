@@ -1389,9 +1389,7 @@ function FillPassportDataElis() {
             if (root === null) {
                 return;
             }
-
-            logTrace('Заполнение поля из ЕЛИС: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey] !== undefined ? JSON.stringify(root[currentKey]) : '[нет значения]'));
-
+            
             if (item.nodeName === 'INPUT') {
                 switch (item.dataset.tag) {
                     case 'AdditionalInfo':
@@ -1470,6 +1468,7 @@ function FillPassportDataElis() {
                 applyElisHighlight(item);
                 item.addEventListener("input", ManualCorrect, {once:true});
             }
+            logTrace('Заполнение поля из ЕЛИС (' + item.dataset.tag + '): ' + (currentKey || '[нет ключа]') + ', значение: ' + (item.value || '[нет значения]'));
         });
         const metodSelects = iframe.contentWindow.document.querySelectorAll('select[data-tag="Metod"][data-elis-filled="true"]');
         metodSelects.forEach(select => {
@@ -1727,7 +1726,7 @@ function showError(message) {
 
 function logToServer(level, message) {
     $.ajax({
-        url: '/Home/LogClientMessage',
+        url: '/api/ClientLog/logging',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ level: level, message: message }),
