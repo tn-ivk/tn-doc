@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_04.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/14/2025 23:29:08" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka1974_04.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/22/2025 00:57:15" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -921,8 +921,8 @@ namespace FastReport
           <TableCell Name="Cell1762" Border.Lines="All" Text="Погрешность" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row207" Height="34.02">
-          <TableCell Name="Cell1733" Border.Lines="All" Text="&lt;i&gt;(f / ν )&lt;sub&gt; j&lt;/sub&gt;,&lt;/i&gt;&lt;br&gt;Гц / сСт" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1734" Border.Lines="All" Text="&lt;i&gt;(f / ν )&lt;sub&gt; j&lt;/sub&gt;,&lt;/i&gt;&lt;br&gt;Гц / сСт" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1733" Border.Lines="All" Text="&lt;i&gt;(f / &lt;span style=&quot;font-family:Symbol;&quot;&gt;n&lt;/span&gt; )&lt;sub&gt; j&lt;/sub&gt;,&lt;/i&gt;&lt;br&gt;Гц / сСт" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlParagraph"/>
+          <TableCell Name="Cell1734" Border.Lines="All" Text="&lt;i&gt;(f / &lt;span style=&quot;font-family:Symbol;&quot;&gt;n&lt;/span&gt; )&lt;sub&gt; j&lt;/sub&gt;,&lt;/i&gt;&lt;br&gt;Гц / сСт" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlParagraph"/>
           <TableCell Name="Cell1735" Border.Lines="All" Text="&lt;i&gt;A" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1736" Border.Lines="All" Text="&lt;i&gt;B" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1737" Border.Lines="All" Text="&lt;i&gt;C" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="14" TextRenderType="HtmlTags"/>
