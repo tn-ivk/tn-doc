@@ -651,7 +651,7 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row179" Height="22.68">
           <TableCell Name="Cell1476" Border.Lines="All" Text="№ точ/&lt;br&gt;№ изм&lt;br&gt;j/i" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
-          <TableCell Name="Cell1477" Border.Lines="All" Text="Q&lt;sub&gt; ji&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;/ч" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
+          <TableCell Name="Cell1477" Border.Lines="All" Text="Q&lt;sub&gt; ij&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt;3&lt;/sup&gt;/ч" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" RowSpan="2"/>
           <TableCell Name="Cell1478" Border.Lines="All" Text="по ПУ" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags" ColSpan="5"/>
           <TableCell Name="Cell1479" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1480" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
@@ -667,15 +667,15 @@ namespace FastReport
           <TableCell Name="Cell898" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell899" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell900" Border.Lines="All" Text="Детек-&lt;br&gt;торы" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell901" Border.Lines="All" Text="T &lt;sub&gt;ji&lt;/sub&gt;,&lt;br&gt;c" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell902" Border.Lines="All" Text="t&lt;sub&gt; ji&lt;/sub&gt;&lt;sup&gt;ПУ&lt;/sup&gt;,&lt;br&gt;°С" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell903" Border.Lines="All" Text="P&lt;sub&gt; ji&lt;/sub&gt;&lt;sup&gt;ПУ&lt;/sup&gt;,&lt;br&gt;МПа" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell905" Border.Lines="All" Text="V &lt;sub&gt; ji&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt; 3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell906" Border.Lines="All" Text="f&lt;sub&gt; ji&lt;/sub&gt;,&lt;br&gt;Гц" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1426" Border.Lines="All" Text="t&lt;sub&gt; ji&lt;/sub&gt;,&lt;br&gt;°C" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1427" Border.Lines="All" Text="P&lt;sub&gt; ji&lt;/sub&gt;,&lt;br&gt;МПа" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1428" Border.Lines="All" Text="N &lt;sub&gt;ji&lt;/sub&gt;,&lt;br&gt;имп" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1429" Border.Lines="All" Text="K &lt;sub&gt;ji&lt;/sub&gt;,&lt;br&gt;имп/м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell901" Border.Lines="All" Text="T &lt;sub&gt;ij&lt;/sub&gt;,&lt;br&gt;c" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell902" Border.Lines="All" Text="t&lt;sub&gt; ij&lt;/sub&gt;&lt;sup&gt;ПУ&lt;/sup&gt;,&lt;br&gt;°С" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell903" Border.Lines="All" Text="P&lt;sub&gt; ij&lt;/sub&gt;&lt;sup&gt;ПУ&lt;/sup&gt;,&lt;br&gt;МПа" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell905" Border.Lines="All" Text="V &lt;sub&gt; ij&lt;/sub&gt;,&lt;br&gt;м&lt;sup&gt; 3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell906" Border.Lines="All" Text="f&lt;sub&gt; ij&lt;/sub&gt;,&lt;br&gt;Гц" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1426" Border.Lines="All" Text="t&lt;sub&gt; ij&lt;/sub&gt;,&lt;br&gt;°C" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1427" Border.Lines="All" Text="P&lt;sub&gt; ij&lt;/sub&gt;,&lt;br&gt;МПа" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1428" Border.Lines="All" Text="N &lt;sub&gt;ij&lt;/sub&gt;,&lt;br&gt;имп" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1429" Border.Lines="All" Text="K &lt;sub&gt;ij&lt;/sub&gt;,&lt;br&gt;имп/м&lt;sup&gt;3&lt;/sup&gt;" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="Row131" Height="15.12">
           <TableCell Name="Cell915" Border.Lines="All" Text="1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
@@ -727,8 +727,8 @@ namespace FastReport
         </TableRow>
         <TableRow Name="Row182" Height="34.02">
           <TableCell Name="Cell1521" Border.Lines="All" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" LineHeight="14" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1533" Border.Lines="All" Text="ρ&lt;sub&gt; ji&lt;/sub&gt;,&lt;br&gt;кг/м&lt;sup&gt;3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Cell1534" Border.Lines="All" Text="t&lt;sub&gt; ji&lt;/sub&gt;&lt;sup&gt;ПП&lt;/sup&gt;,&lt;br&gt;°C" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1533" Border.Lines="All" Text="ρ&lt;sub&gt; ij&lt;/sub&gt;,&lt;br&gt;кг/м&lt;sup&gt;3" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Cell1534" Border.Lines="All" Text="t&lt;sub&gt; ij&lt;/sub&gt;&lt;sup&gt;ПП&lt;/sup&gt;,&lt;br&gt;°C" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1535" Border.Lines="All" Text="n&lt;span style=&quot;font-family:Arial;&quot;&gt;&lt;sub&gt; ij&lt;/sub&gt;,&lt;br&gt;сСт" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Symbol, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlParagraph"/>
         </TableRow>
         <TableRow Name="Row183" Height="15.12">
