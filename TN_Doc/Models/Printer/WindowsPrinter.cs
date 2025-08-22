@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PrinterSettings = SystemDrawing::System.Drawing.Printing.PrinterSettings;
+using TN_Doc.Models.Services;
 
 namespace TN_Doc.Models.Printer
 {
@@ -16,10 +17,12 @@ namespace TN_Doc.Models.Printer
     public sealed class WindowsPrinter : AbsPrinter
     {
         private readonly ILogger<WindowsPrinter> _logger;
+        private readonly IReportBuffer _buffer;
         
-        public WindowsPrinter(ILogger<WindowsPrinter> logger)
+        public WindowsPrinter(ILogger<WindowsPrinter> logger, IReportBuffer buffer)
         {
             _logger = logger;
+            _buffer = buffer;
         }
         
         /// <summary>
@@ -49,19 +52,34 @@ namespace TN_Doc.Models.Printer
         {
             return Task.Run(async() =>
             {
-                    var curDir = Directory.GetCurrentDirectory();
                     var printersName = GetAvailablePrinters();
                     if (!printersName.Contains(printerName))
-                        return;
-                    using var process = new Process();
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    process.StartInfo.Arguments = $"-p \"{printerName}\" -f \"{Path.Combine(curDir, "wwwroot", "PDF", "PDF.pdf")}\"";
-                    process.StartInfo.FileName = Path.Combine(curDir, "prutils", "winprutil.exe");
-                    process.StartInfo.CreateNoWindow = true;
-                    process.Start();
-                    await Task.Delay(2000);
-                    await process.WaitForExitAsync();
+                        throw new InvalidOperationException($"Принтер '{printerName}' не доступен");
+
+                    var pdfBytes = _buffer.GetPdfBytes();
+                    if (pdfBytes == null || pdfBytes.Length == 0)
+                        throw new InvalidOperationException("Отсутствуют подготовленные данные для печати");
+
+                    var tempPath = Path.Combine(Path.GetTempPath(), $"TN_Doc_{Guid.NewGuid()}.pdf");
+                    await File.WriteAllBytesAsync(tempPath, pdfBytes);
+
+                    try
+                    {
+                        var curDir = Directory.GetCurrentDirectory();
+                        using var process = new Process();
+                        process.StartInfo.UseShellExecute = false;
+                        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                        process.StartInfo.Arguments = $"-p \"{printerName}\" -f \"{tempPath}\"";
+                        process.StartInfo.FileName = Path.Combine(curDir, "prutils", "winprutil.exe");
+                        process.StartInfo.CreateNoWindow = true;
+                        process.Start();
+                        await Task.Delay(2000);
+                        await process.WaitForExitAsync();
+                    }
+                    finally
+                    {
+                        try { File.Delete(tempPath); } catch { }
+                    }
             });
         }
     }
