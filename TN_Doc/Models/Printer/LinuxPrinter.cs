@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using TN_Doc.Models.Services;
 using System.Threading.Tasks;
 
 namespace TN_Doc.Models.Printer
@@ -12,6 +13,12 @@ namespace TN_Doc.Models.Printer
     /// </summary>
     public sealed class LinuxPrinter : AbsPrinter
     {
+        private readonly IReportBuffer _buffer;
+
+        public LinuxPrinter(IReportBuffer buffer)
+        {
+            _buffer = buffer;
+        }
         /// <summary>
         /// Получение списка доступных принтеров в системе
         /// </summary>
@@ -43,14 +50,22 @@ namespace TN_Doc.Models.Printer
                 var printersName = GetAvailablePrinters();
                 if (!printersName.Contains(printerName))
                     return;
-                var consoleStr = $"-H localhost -P  {printerName} -ol {Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf")}";
+                var pdfBytes = _buffer.GetPdfBytes();
+                if (pdfBytes is null || pdfBytes.Length == 0)
+                    return;
                 using var process = new Process();
                 process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                process.StartInfo.Arguments = consoleStr;
-                process.StartInfo.FileName = "lpr";
+                process.StartInfo.Arguments = $"-d {printerName} -t \"TN_Doc\"";
+                process.StartInfo.FileName = "lp";
                 process.StartInfo.CreateNoWindow = true;
                 process.Start();
+                using (var stdin = process.StandardInput.BaseStream)
+                {
+                    stdin.Write(pdfBytes, 0, pdfBytes.Length);
+                    stdin.Flush();
+                }
                 process.WaitForExit();
             });
         }

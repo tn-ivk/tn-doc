@@ -19,7 +19,7 @@ public class Startup
 		Configuration = configuration;
 	}
 
-	public IConfiguration Configuration { get; }
+	private IConfiguration Configuration { get; }
 
 	// This method gets called by the runtime. Use this method to add services to the container.
 	public void ConfigureServices(IServiceCollection services)
@@ -43,12 +43,13 @@ public class Startup
 					.SetIsOriginAllowed((host) => true)
 					.AllowCredentials();
 			}));
-#if RELEASE
+		#if RELEASE
 		services.ConfigAppDirectory();
-#endif
+		#endif
 		services.AddAppInfoProvider();
 		services.AddPrinters();
 		services.AddPrinterService();
+		services.AddSingleton<IReportBuffer, ReportBuffer>();
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
 	}
@@ -67,11 +68,29 @@ public class Startup
 			app.UseHsts();
 		}
 
+		// Интерцептор для /PDF/PDF.pdf до статических файлов, чтобы отдавать PDF из памяти
+		app.Use(async (context, next) =>
+		{
+			if (context.Request.Path.Value?.Equals("/PDF/PDF.pdf", System.StringComparison.OrdinalIgnoreCase) == true)
+			{
+				var buffer = context.RequestServices.GetService(typeof(IReportBuffer)) as IReportBuffer;
+				var bytes = buffer?.GetPdfBytes();
+				if (bytes != null && bytes.Length > 0)
+				{
+					context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate";
+					context.Response.Headers["Pragma"] = "no-cache";
+					context.Response.Headers["Expires"] = "0";
+					context.Response.ContentType = "application/pdf";
+					await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+					return;
+				}
+			}
+			await next();
+		});
+
 		app.UseStaticFiles();
 		app.UseRouting();
-
 		app.UseCors("CorsPolicy");
-
 		app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}"); });
 	}
 }

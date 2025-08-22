@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
+using TN_Doc.Models.Services;
 using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Services;
 using TN.Doc;
@@ -36,16 +37,16 @@ public class HomeController : Controller
     private WebReport FR;
     CancellationToken stoppingToken;
     IAppConfigService _appConfig;
+    private readonly IReportBuffer _reportBuffer;
 
-    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration)
+    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration, IReportBuffer reportBuffer)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         options = context;
         _appConfig = AppConfigService.GetInstance(configuration);
-
         FR = new WebReport();
-
         _cfgApp = _appConfig.GetAppCfg();
+        _reportBuffer = reportBuffer;
     }
 
     private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
@@ -443,38 +444,21 @@ public class HomeController : Controller
             FR.Report.SetParameterValue("JsonDoc", jsonDoc);
             FR.Report.Prepare();
 
-            var pdfExport = new FastReport.Export.Pdf.PDFExport()
+            using (var ms = new MemoryStream())
             {
-                ShowProgress = false,
-                Subject = "Subject",
-                Title = " ",
-                Compressed = true,
-                AllowPrint = true,
-                EmbeddingFonts = true,
-                //HideMenubar = true,
-                //HideToolbar = true,
-                //HideWindowUI= true
-            };
-
-            var pdfFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf");
-            var pdfFile = new FileInfo(pdfFilePath);
-            if (pdfFile.Directory is null)
-                throw new Exception("Ошибка определения пути файла PDF.pdf");
-            
-            if (!pdfFile.Directory.Exists)
-            {
-                _logger.LogWarning($"Не существует директория: {pdfFile.Directory.FullName}");
-                pdfFile.Directory.Create();
+                using var pdfExport = new FastReport.Export.Pdf.PDFExport();
+                pdfExport.ShowProgress = false;
+                pdfExport.Subject = "Subject";
+                pdfExport.Title = " ";
+                pdfExport.Compressed = true;
+                pdfExport.AllowPrint = true;
+                pdfExport.EmbeddingFonts = true;
+                FR.Report.Export(pdfExport, ms);
+                var bytes = ms.ToArray();
+                _reportBuffer.SetPdfBytes(bytes);
             }
 
-            if(!pdfFile.Exists)
-                _logger.LogWarning($"Файл не существует: {pdfFile.FullName}");
-            
-            FR.Report.Export(pdfExport, pdfFile.FullName);
-
-            pdfExport.Dispose();
             FR.Report.Dispose();
-
             return true;
         }
         catch (Exception ex)
