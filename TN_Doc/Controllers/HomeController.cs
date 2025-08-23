@@ -678,66 +678,7 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
-
-    private void GetPropertyValue(object obj, string key, ref object result)
-    {
-        if (obj is null) return;
-
-        if (obj is IEnumerable)
-        {
-            IEnumerable enumerable = (IEnumerable)obj;
-            foreach (object item in enumerable)
-                GetPropertyValue(item, key, ref result);
-        }
-        else
-        {
-            Type objType = obj.GetType();
-            PropertyInfo[] properties = objType.GetProperties();
-
-            foreach (var property in properties)
-            {
-                object propValue = property.GetValue(obj, null);
-
-                if (property.PropertyType.IsPrimitive)
-                {
-                    Debug.WriteLine(property.Name);
-                    if (property.Name == key)
-                    {
-                        result = property.GetValue(obj);
-                    }
-                }
-                else if (property.PropertyType.IsClass)
-                {
-                    Debug.WriteLine(property.Name);
-                    if (propValue is string)
-                    {
-                        if (property.Name == key)
-                        {
-                            result = property.GetValue(obj);
-                        }
-                    }
-                    else if (property.PropertyType.IsArray || property.PropertyType.IsSerializable)
-                    {
-                        IEnumerable enumerable = (IEnumerable)propValue;
-                        foreach (object item in enumerable)
-                            GetPropertyValue(item, key, ref result);
-                    }
-                    else
-                    {
-                        if (property.Name == key)
-                        {
-                            result = property.GetValue(obj);
-                        }
-                        else
-                        {
-                            GetPropertyValue(propValue, key, ref result);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+    
     public string arrByteToString(object arrByte)
     {
         if (string.IsNullOrEmpty(arrByte.ToString()))
