@@ -4,18 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using TN_Doc.Models;
 using FastReport.Web;
 using System.IO;
 using System.Threading;
 using System.Text;
-using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
 using TN_Doc.Models.Services;
 using TN_DocGeneral.Interfaces;
@@ -25,6 +22,7 @@ using TN.DocData;
 using TN.Utils;
 using Data = TN_Doc.Models.Home.Data;
 using FileInfo = System.IO.FileInfo;
+using IdDoc = TN.DocData.IdDoc;
 
 namespace TN_Doc.Controllers;
 
@@ -32,61 +30,26 @@ public class HomeController : Controller
 {
     CfgApp _cfgApp;
     readonly ILogger<HomeController> _logger;
-    DbContextOptions<DocGeneral> options;
+    private readonly DbContextOptions<DocGeneral> _options;
     DocGeneral dbDoc;
     private WebReport FR;
     CancellationToken stoppingToken;
     IAppConfigService _appConfig;
     private readonly IReportBuffer _reportBuffer;
+    private readonly IDocModuleLoader _docModuleLoader;
 
-    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration, IReportBuffer reportBuffer)
+    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration, IReportBuffer reportBuffer, IDocModuleLoader docModuleLoader)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        options = context;
+        _options = context;
         _appConfig = AppConfigService.GetInstance(configuration);
         FR = new WebReport();
         _cfgApp = _appConfig.GetAppCfg();
         _reportBuffer = reportBuffer;
+        _docModuleLoader = docModuleLoader;
     }
 
-    private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
-    {
-        _logger.LogDebug($"Загрузка DLL документа {idDoc} устройства {_appConfig.GetDeviceName(idDevice)}");
-        try
-        {
-            var pathToDll = Directory.GetCurrentDirectory() + _appConfig.GetPathToDocDll(idDevice, idDoc);
-            if (string.IsNullOrEmpty(pathToDll))
-            {
-                _logger.LogError($"Невозможно определить путь до файла DLL документа {idDoc}");
-                return null;
-            }
-            _logger.LogTrace($"Файл DLL: {pathToDll}");
-            var dllFileInfo = new FileInfo(pathToDll);
-            if (!dllFileInfo.Exists)
-            {
-                _logger.LogError($"Файл {dllFileInfo.FullName} не существует");
-                return null;
-            }
-            
-            var assembly = Assembly.LoadFrom(dllFileInfo.FullName);
-            var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
-
-            _logger.LogDebug($"Загрузка DLL {doc.FullName}");
-            return (DocGeneral)assembly.CreateInstance(
-                doc.FullName,
-                false,
-                BindingFlags.Default,
-                null,
-                new object[] { options, _appConfig, idDevice, idDoc, Directory.GetCurrentDirectory() },
-                null,
-                null);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка загрузки DLL документа {idDoc}");
-            return null;
-        }
-    }
+    private DocGeneral LoadDocsModule2(int idDevice, IdDoc idDoc) => _docModuleLoader.LoadDocsModule(_options, idDevice, idDoc, Directory.GetCurrentDirectory());
 
     public List<ListItem> GetListDevices()
     {
@@ -341,7 +304,7 @@ public class HomeController : Controller
         try
         {
             var (unixTimeBegin, unixTimeEnd) = ParseDateRange(data.DTBegin, data.DTEnd);
-            var doc = LoadDocsModule(data.IdDevice, data.IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, data.IdDevice, data.IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {data.IdDoc}");
@@ -405,7 +368,7 @@ public class HomeController : Controller
 
         try
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -477,7 +440,7 @@ public class HomeController : Controller
             return string.Empty;
         }
         
-        var doc = LoadDocsModule(IdDevice, IdDoc);
+        var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
         if (doc is null)
         {
             _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -492,7 +455,7 @@ public class HomeController : Controller
         _logger.LogDebug($"Сохранение документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -524,7 +487,7 @@ public class HomeController : Controller
                 return;                
             }
             
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -544,7 +507,7 @@ public class HomeController : Controller
         _logger.LogDebug($"Получение периода документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");

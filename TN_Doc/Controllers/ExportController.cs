@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 using TN.DocData;
 using Newtonsoft.Json.Linq;
 using TN_DocGeneral.Services;
@@ -13,12 +14,16 @@ namespace TN_Doc.Controllers;
 public class ExportController : Controller
 {
     private readonly ILogger<ExportController> _logger;
+    private readonly DbContextOptions<DocGeneral> _options;
     private readonly IAppConfigService _appConfig;
+    private readonly IDocModuleLoader _docModuleLoader;
 
-    public ExportController(ILogger<ExportController> logger, IAppConfigService appConfig)
+    public ExportController(ILogger<ExportController> logger, DbContextOptions<DocGeneral> context, IAppConfigService appConfig, IDocModuleLoader docModuleLoader)
     {
         _logger = logger;
+        _options = context;
         _appConfig = appConfig;
+        _docModuleLoader = docModuleLoader;
     }
 
     public List<string> GetListFormats()
@@ -26,18 +31,12 @@ public class ExportController : Controller
         return ["pdf", "excel", "ods", "xml"];
     }
 
-    private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
-    {
-        _logger.LogDebug($"Загрузка DLL документа {idDoc} устройства {_appConfig.GetDeviceName(idDevice)}");
-        return new DocGeneral();
-    }
-
     public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format, int protocolNumber)
     {         
         _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}, номер протокола {protocolNumber} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");

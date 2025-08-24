@@ -9,6 +9,7 @@ using NLog.Extensions.Logging;
 using TN_Doc.Extensions;
 using TN_Doc.Models.Services;
 using TN.Doc;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc;
 
@@ -50,8 +51,11 @@ public class Startup
 		services.AddPrinters();
 		services.AddPrinterService();
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
+		// Регистрация AppConfigService как IAppConfigService (singleton с фабрикой конфигурации)
+		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
+		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
 	}
 
 	// This method gets called by the runtime. Use this method to configure
