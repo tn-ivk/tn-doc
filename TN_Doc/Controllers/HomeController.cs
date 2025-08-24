@@ -486,68 +486,6 @@ public class HomeController : Controller
         return doc.GetEditDoc(id);
     }
 
-    public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format, int protocolNumber)
-    {         
-        _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}, номер протокола {protocolNumber} для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        try
-        {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return string.Empty;
-            }
-
-            var exportDirPath = Path.Combine(_appConfig.GetAppCfg().ExportDoc.Path, _appConfig.GetDocCfg(IdDevice, IdDoc).Name);
-            if (!Directory.Exists(exportDirPath))
-                Directory.CreateDirectory(exportDirPath);
-
-            FR.Report.Load(doc.GetPathTemplateFile());
-            var jsonDoc = doc.GetViewDoc(id, protocolNumber);
-            if (jsonDoc == null)
-            {
-                _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}, номер протокола {protocolNumber}");
-                return string.Empty;
-            }
-
-            FR.Report.SetParameterValue("JsonDoc", jsonDoc);
-            FR.Report.Prepare();
-            var exportFileName = JObject.Parse(doc.GetViewDoc(id).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
-            if (string.IsNullOrEmpty(exportFileName))
-            {
-                _logger.LogError("Невозможно определить имя для экспортируемого файла");
-                exportFileName = "undefined";
-            }
-
-            var exportFilePath = Path.Combine(exportDirPath, exportFileName);
-
-            switch (format)
-            {
-                case "pdf":
-                    FR.Report.Export(new FastReport.Export.Pdf.PDFExport() { ShowProgress = false }, exportFilePath += ".pdf");
-                    break;
-                case "excel":
-                    FR.Report.Export(new FastReport.Export.OoXML.Excel2007Export() { ShowProgress = false }, exportFilePath += ".xlsx");
-                    break;
-                case "ods":
-                    FR.Report.Export(new FastReport.Export.Odf.ODSExport() { ShowProgress = false }, exportFilePath += ".ods");
-                    break;
-                case "xml":
-                    FR.Report.Export(new FastReport.Export.Xml.XMLExport() { ShowProgress = false }, exportFilePath += ".xml");
-                    break;
-                default:
-                    throw new NotSupportedException($"Формат {format} не поддерживается");
-            }
-
-            FR.Report.Dispose();
-            return exportFilePath;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка экспорта документа {IdDoc}");
-            return string.Empty;
-        }
-    }
 
     public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
     {
