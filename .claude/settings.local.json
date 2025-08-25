@@ -27,7 +27,8 @@
       "Bash(then echo \"НУЖНО ОБНОВИТЬ: $file\")",
       "Bash(do if grep -q \"SaveDoc.*string.*jsonData\" \"$file\")",
       "Bash(then if ! grep -q \"Сохранение документа\" \"$file\")",
-      "Bash(do echo \"=== $file ===\")"
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(dotnet test:*)"
     ],
     "deny": []
   }

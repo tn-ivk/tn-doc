@@ -36,33 +36,26 @@ public static class ServiceCollectionExtensions
 	/// Добавления сервиса взаимодействия с принтерами печати
 	/// </summary>
 	/// <param name="services">Коллекция сервисов</param>
-	public static void AddPrinterService(this IServiceCollection services) => services.AddTransient<PrinterService>();
+	public static void AddPrinterService(this IServiceCollection services) => services.AddTransient<IPrinterService, PrinterService>();
 
 	/// <summary>
 	/// Сбор информации о приложение
 	/// </summary>
-	/// <param name="services"></param>
-	/// <returns></returns>
+	/// <param name="services">Коллекция сервисов</param>
 	public static void AddAppInfoProvider(this IServiceCollection services)
 	{
-		Assembly assembly = Assembly.GetExecutingAssembly();
-		FileVersionInfo vi = FileVersionInfo.GetVersionInfo(assembly.Location);
-		string version = $"{(vi.FileVersion ?? "???")}";
+		var assembly = Assembly.GetExecutingAssembly();
+		var fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+		var version = $"{(fileVersionInfo.FileVersion ?? "???")}";
 #if DEBUG
         version += $".test-{Guid.NewGuid().ToString().Substring(0,5)}";
 #endif
-		AppInfoProvider pr = new(version);
-		services.AddSingleton(pr);
+		var appInfoProvider = new AppInfoProvider(version);
+		services.AddSingleton(appInfoProvider);
 		var logger = LogManager.GetCurrentClassLogger();
-		logger.Info($"Запуск приложения: {assembly.GetName().Name} версии: {pr.Version}");
+		logger.Info($"Запуск приложения: {assembly.GetName().Name} версии: {appInfoProvider.Version}");
 	}
 
-	/// <summary>
-	/// Флаг использования операционной системы Windows
-	/// </summary>
-	/// <returns>
-	/// Возвращает true - если система развертывания Windows
-	/// </returns>
 	private static bool IsWindows => Environment.OSVersion.Platform != PlatformID.Unix &&
 	                                 Environment.OSVersion.Platform != PlatformID.MacOSX;
 }
