@@ -22,6 +22,9 @@ namespace Tests.Controllers
             _controller = new ClientLogController(_mockLogger.Object);
         }
 
+        /// <summary>
+        /// Должен вернуть 400 и залогировать ошибку, когда входной объект лога равен null.
+        /// </summary>
         [Test]
         public void LogClientMessage_NullLog_Returns400AndLogsError()
         {
@@ -43,6 +46,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 400 и залогировать ошибку, если уровень логирования пустой/пробельный.
+        /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
@@ -70,6 +76,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 400 и залогировать ошибку, если сообщение пустое/пробельное.
+        /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
@@ -97,6 +106,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 200 и залогировать Trace при уровне trace (любые регистры/пробелы).
+        /// </summary>
         [Test]
         [TestCase("trace", LogLevel.Trace)]
         [TestCase("TRACE", LogLevel.Trace)]
@@ -122,6 +134,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 200 и залогировать Debug при уровне debug (любые регистры/пробелы).
+        /// </summary>
         [Test]
         [TestCase("debug", LogLevel.Debug)]
         [TestCase("DEBUG", LogLevel.Debug)]
@@ -147,6 +162,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 200 и залогировать Information при уровне info (любые регистры/пробелы).
+        /// </summary>
         [Test]
         [TestCase("info", LogLevel.Information)]
         [TestCase("INFO", LogLevel.Information)]
@@ -172,6 +190,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 200 и залогировать Warning при уровне warn/warning (любые регистры/пробелы).
+        /// </summary>
         [Test]
         [TestCase("warn", LogLevel.Warning)]
         [TestCase("warning", LogLevel.Warning)]
@@ -200,6 +221,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 200 и залогировать Error при уровне error/fatal/critical (любые регистры/пробелы).
+        /// </summary>
         [Test]
         [TestCase("error", LogLevel.Error)]
         [TestCase("fatal", LogLevel.Error)]
@@ -231,6 +255,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Должен вернуть 400 и залогировать Error при неизвестном уровне логирования.
+        /// </summary>
         [Test]
         [TestCase("unknown")]
         [TestCase("invalid")]

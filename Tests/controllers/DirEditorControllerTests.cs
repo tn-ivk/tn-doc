@@ -150,6 +150,9 @@ namespace Tests.Controllers
                 JsonConvert.SerializeObject(lastUsedTemplateList, Formatting.Indented));
         }
 
+        /// <summary>
+        /// Возвращает 200 и валидный JSON со словарями при успешном чтении.
+        /// </summary>
         [Test]
         public async Task GetDirAsync_ReturnsOkWithDirectories()
         {
@@ -176,6 +179,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Возвращает 200 и сохраняет новые словари; последующий GetDirAsync отражает изменения.
+        /// </summary>
         [Test]
         public async Task SetDirAsync_ReturnsOkAndUpdatesDirectories()
         {
@@ -215,6 +221,9 @@ namespace Tests.Controllers
             Assert.That(getDirEditDto.DirJsonRaw, Contains.Substring("Updated Direction"));
         }
 
+        /// <summary>
+        /// Возвращает 200 и JSON с конфигурацией паспортов качества.
+        /// </summary>
         [Test]
         public async Task GetQpConfigsAsync_ReturnsOkWithQpConfigs()
         {
@@ -241,6 +250,9 @@ namespace Tests.Controllers
                 Times.Once);
         }
 
+        /// <summary>
+        /// Возвращает 200 и применяет обновлённый JSON конфигурации паспортов качества.
+        /// </summary>
         [Test]
         public async Task SetQpConfigsAsync_ReturnsOkAndUpdatesQpConfigs()
         {
@@ -289,6 +301,9 @@ namespace Tests.Controllers
             Assert.That(getQpEditDto.QpCfgJsonRaw, Contains.Substring("Updated Test"));
         }
 
+        /// <summary>
+        /// Не должен падать при некорректном JSON словарей (поведение сервиса — логирует ошибку).
+        /// </summary>
         [Test]
         public async Task SetDirAsync_WithInvalidJson_HandlesGracefully()
         {
@@ -302,6 +317,9 @@ namespace Tests.Controllers
             Assert.DoesNotThrowAsync(async () => await _controller.SetDirAsync(dirEditDto));
         }
 
+        /// <summary>
+        /// Должен выбросить JsonReaderException при некорректном JSON конфигурации паспортов качества.
+        /// </summary>
         [Test]
         public async Task SetQpConfigsAsync_WithInvalidJson_ThrowsJsonReaderException()
         {
