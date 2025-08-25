@@ -1,130 +1,22 @@
 {
   "Methods": [
     {
-      "Id": 4,
+      "Id": 2,
       "Use": true,
-      "IdParameter": 10,
-      "Name": "ГОСТ Р 51947-2002",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
+      "IdParameter": 19,
+      "Name": "ASTM D4929 (процедура С)",
+      "LimitValueActivate": true,
+      "LimitValue": 5,
+      "LimitValueString": "менее 5"
     },
     {
-      "Id": 5,
-      "Use": true,
-      "IdParameter": 6,
-      "Name": "ГОСТ 2477-2014",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 6,
-      "Use": true,
-      "IdParameter": 11,
-      "Name": "ГОСТ Р 52340-2005",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 7,
-      "Use": true,
-      "IdParameter": 12,
-      "Name": "ГОСТ Р 52340-2005",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 8,
-      "Use": true,
-      "IdParameter": 11,
-      "Name": "ASTM D323-20a, метод В",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 9,
-      "Use": true,
-      "IdParameter": 12,
-      "Name": "ASTM D323-20a, метод В",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 10,
-      "Use": true,
-      "IdParameter": 9,
-      "Name": "ГОСТ 6370-2018",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 11,
+      "Id": 3,
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ Р 50802-2021",
       "LimitValueActivate": true,
       "LimitValue": 4,
       "LimitValueString": "менее 4"
-    },
-    {
-      "Id": 12,
-      "Use": true,
-      "IdParameter": 17,
-      "Name": "ГОСТ Р 50802-2021",
-      "LimitValueActivate": true,
-      "LimitValue": 2,
-      "LimitValueString": "менее 2"
-    },
-    {
-      "Id": 13,
-      "Use": true,
-      "IdParameter": 7,
-      "Name": "ГОСТ 21534-2021, метод А, часть 1",
-      "LimitValueActivate": true,
-      "LimitValue": 5,
-      "LimitValueString": "менее 5"
-    },
-    {
-      "Id": 14,
-      "Use": true,
-      "IdParameter": 11,
-      "Name": "ГОСТ 1756-2000",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 15,
-      "Use": true,
-      "IdParameter": 12,
-      "Name": "ГОСТ 1756-2000",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 16,
-      "Use": true,
-      "IdParameter": 19,
-      "Name": "ГОСТ Р 52247-2021, метод В",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-"
-    },
-    {
-      "Id": 17,
-      "Use": true,
-      "IdParameter": 19,
-      "Name": "ГОСТ Р 52247-2021, метод Г",
-      "LimitValueActivate": true,
-      "LimitValue": 1,
-      "LimitValueString": "менее 1"
     }
   ],
   "Parameters": [
@@ -381,15 +273,6 @@
       "Key": "TankerName",
       "Type": "text",
       "Name": "Название танкера"
-    },
-    {
-      "Id": 17,
-      "Use": true,
-      "Key": "TestProtocolNumberELIS",
-      "KeyELIS": "protocolNumber",
-      "Type": "text",
-      "Name": "Номер протокола испытаний ЕЛИС",
-      "Edit": false
     }
   ]
 }

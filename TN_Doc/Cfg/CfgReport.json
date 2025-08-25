@@ -49,18 +49,6 @@
             },
             {
               "Visible": true,
-              "Name": "ТЕМПЕР. ПЛОТНОМЕРА",
-              "SI": "°C",
-              "Key": "DensTemp"
-            },
-            {
-              "Visible": true,
-              "Name": "ДАВЛЕНИЕ ПЛОТНОМЕРА",
-              "SI": "МПа",
-              "Key": "DensPress"
-            },
-            {
-              "Visible": true,
               "Name": "ДИНАМ. ВЯЗКОСТЬ",
               "SI": "мПа·с (сП)",
               "Key": "DynamicVisc"
@@ -72,10 +60,10 @@
               "Key": "KinemVisc"
             },
             {
-              "Visible": false,
-              "Name": "ТЕМПЕР. ВИСКОЗИМЕТРА",
-              "SI": "°C",
-              "Key": "ViscTemp"
+              "Visible": true,
+              "Name": "РАСХОД",
+              "SI": "м³/ч",
+              "Key": "Flow"
             },
             {
               "Visible": true,
@@ -97,9 +85,21 @@
             },
             {
               "Visible": true,
-              "Name": "РАСХОД",
-              "SI": "м³/ч",
-              "Key": "Flow"
+              "Name": "ТЕМПЕР. ПЛОТНОМЕРА",
+              "SI": "°C",
+              "Key": "DensTemp"
+            },
+            {
+              "Visible": true,
+              "Name": "ДАВЛЕНИЕ ПЛОТНОМЕРА",
+              "SI": "МПа",
+              "Key": "DensPress"
+            },
+            {
+              "Visible": false,
+              "Name": "ТЕМПЕР. ВИСКОЗИМЕТРА",
+              "SI": "°C",
+              "Key": "ViscTemp"
             }
           ]
         },
@@ -114,43 +114,19 @@
               "SI": "Ед. изм.",
               "Key": "Name"
             },
-            {
-              "Visible": true,
-              "Name": "Массовый расход",
-              "SI": "т/ч",
-              "Key": "MassFlow"
-            },
-            {
-              "Visible": true,
-              "Name": "Объемный расход",
-              "SI": "м³/ч",
-              "Key": "VolFlow"
-            },
-            {
+			{
               "Visible": true,
               "Name": "Объем",
               "SI": "м³",
               "Key": "Vol"
             },
-            {
-              "Visible": true,
-              "Name": "Объем при 20 °C",
-              "SI": "м³",
-              "Key": "Vol20"
-            },
-            {
-              "Visible": true,
-              "Name": "Объем при 15 °C",
-              "SI": "м³",
-              "Key": "Vol15"
-            },
-            {
+			{
               "Visible": true,
               "Name": "Масса",
               "SI": "т",
               "Key": "Mass"
             },
-            {
+			{
               "Visible": true,
               "Name": "Средневзвешенное значение температуры",
               "SI": "°C",
@@ -167,6 +143,30 @@
               "Name": "Средневзвешенное значение плотности",
               "SI": "кг/м³",
               "Key": "Dens"
+            },
+			{
+              "Visible": true,
+              "Name": "Объемный расход",
+              "SI": "м³/ч",
+              "Key": "VolFlow"
+            },
+            {
+              "Visible": true,
+              "Name": "Массовый расход",
+              "SI": "т/ч",
+              "Key": "MassFlow"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 20 °C",
+              "SI": "м³",
+              "Key": "Vol20"
+            },
+            {
+              "Visible": true,
+              "Name": "Объем при 15 °C",
+              "SI": "м³",
+              "Key": "Vol15"
             },
             {
               "Visible": true,
