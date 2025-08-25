@@ -184,6 +184,9 @@ namespace Tests.Services
         [Test]
         public void GetLastUsedTemplateList_ShouldReturnLastUsedTemplateListCfg()
         {
+            // warm-up to ensure LastTemplateList is initialized for device 1
+            _appConfigService.GetLastUsedTemplateId(1, IdDoc.Passport);
+
             // Act
             var result = _appConfigService.GetLastUsedTemplateList();
 
