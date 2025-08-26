@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,5 +51,11 @@ public class ElisController : Controller
         //EventLog.WriteEntry($".NET Runtime", msg, EventLogEntryType.Error, 1000, 1);
     }
     
-    public void WarnMessage(string msg) => _logger.LogWarning(msg);
+    public void WarnMessage(string msg)
+    {
+        if (string.IsNullOrEmpty(msg))
+            return;
+        
+        _logger.LogWarning(msg);
+    }
 }

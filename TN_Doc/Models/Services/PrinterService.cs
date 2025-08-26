@@ -7,7 +7,7 @@ namespace TN_Doc.Models.Services;
 /// <summary>
 /// Сервис для взаимодействия с принтерами
 /// </summary>
-public sealed class PrinterService
+public sealed class PrinterService : IPrinterService
 {
     private readonly AbsPrinter _printer;
 
