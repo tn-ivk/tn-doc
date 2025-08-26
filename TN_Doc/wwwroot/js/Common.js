@@ -1403,15 +1403,44 @@ function FillPassportDataElis() {
                         item.value = root[currentKey].value;
                         FixedElisData(item);
                         if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
-                            let printValueInput = document.createElement('input');
-                            printValueInput.type = 'hidden';
-                            printValueInput.setAttribute('data-key', item.dataset.key);
-                            printValueInput.setAttribute('data-tag', 'PrintValue');
-                            printValueInput.setAttribute('data-edit', '1');
-                            printValueInput.setAttribute('data-elis-filled', 'true');
-                            printValueInput.value = root[currentKey].valueString;
-                            item.parentNode.appendChild(printValueInput);
-                            logTrace('Заполнение поля Результат-Текст: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey].valueString || '-'));
+                            // Ищем уже существующий скрытый PrintValue для этого параметра
+                            let existingPrintValue = item.parentNode.querySelector('[data-tag="PrintValue"][data-key="' + item.dataset.key + '"]');
+                            if (existingPrintValue) {
+                                existingPrintValue.value = root[currentKey].valueString;
+                                existingPrintValue.setAttribute('data-elis-filled', 'true');
+                                logTrace('Обновление колонки Результат-Текст (скрытое поле): ' + (currentKey || '[нет ключа]') + ', новое значение: ' + (root[currentKey].valueString || '-'));
+                            } else {
+                                let printValueInput = document.createElement('input');
+                                printValueInput.type = 'hidden';
+                                printValueInput.setAttribute('data-key', item.dataset.key);
+                                printValueInput.setAttribute('data-tag', 'PrintValue');
+                                printValueInput.setAttribute('data-edit', '1');
+                                printValueInput.setAttribute('data-elis-filled', 'true');
+                                printValueInput.value = root[currentKey].valueString;
+                                item.parentNode.appendChild(printValueInput);
+                                logTrace('Заполнение поля Результат-Текст: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey].valueString || '-'));
+                            }
+
+                            // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe
+                            try {
+                                let parameterKey = item.dataset.key;
+                                let printCell = iframe.contentWindow.document.querySelector('[data-parameter-key="' + parameterKey + '"]');
+                                if (printCell) {
+                                    let printInput = printCell.querySelector('.print-cell-input');
+                                    if (printInput) {
+                                        printInput.value = root[currentKey].valueString || '-';
+                                        printInput.setAttribute('data-elis-filled', 'true');
+                                        applyElisHighlight(printInput);
+                                        logTrace('Обновлена колонка Результат-Текст (input, авто): key=' + (parameterKey || '[нет ключа]') + ', значение=' + (printInput.value || '-'));
+                                    } else {
+                                        printCell.textContent = root[currentKey].valueString || '-';
+                                        printCell.setAttribute('data-elis-filled', 'true');
+                                        logTrace('Обновлена колонка Результат-Текст (text, авто): key=' + (parameterKey || '[нет ключа]') + ', значение=' + (printCell.textContent || '-'));
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('Ошибка автообновления колонки Результат-Текст:', e);
+                            }
                         }
                         break;
                 }
