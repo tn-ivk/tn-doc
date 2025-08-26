@@ -1246,7 +1246,9 @@ function ResetPassportDataElis() {
 // Функция для форматирования ФИО в формат "И. О. Фамилия"
 // Пример: {givenName: "Иван", middleName: "Петрович", familyName: "Сидоров"} -> "И. П. Сидоров"
 function formatLabRepresentativeName(laboratory) {
+    try { logTrace('formatLabRepresentativeName: входные данные=' + JSON.stringify(laboratory)); } catch (e) {}
     if (!laboratory) {
+        logWarn('formatLabRepresentativeName: laboratory отсутствует');
         return '';
     }
     
@@ -1268,12 +1270,15 @@ function formatLabRepresentativeName(laboratory) {
         if (laboratory.familyName) {
             formatted += laboratory.familyName;
         }
-        
-        return formatted.trim();
+        const result = formatted.trim();
+        logTrace('formatLabRepresentativeName: сформировано из given/middle/family -> ' + result);
+        return result;
     }
     
     // Fallback к старому полю iof, если новые поля отсутствуют
-    return laboratory.iof || '';
+    const fallback = laboratory.iof || '';
+    logTrace('formatLabRepresentativeName: fallback по iof -> ' + (fallback || ''));
+    return fallback;
 }
 
 function FillPassportDataElis() {
