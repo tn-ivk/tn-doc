@@ -1,4 +1,7 @@
-﻿const hubConnection = new signalR.HubConnectionBuilder()
+﻿// Подключение модуля логирования
+// Функции логирования: logInfo, logWarn, logError, logDebug, logTrace
+
+const hubConnection = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:5010/SignalRApp")
     //.WithAutomaticReconnect()
     .build();
@@ -1246,7 +1249,9 @@ function ResetPassportDataElis() {
 // Функция для форматирования ФИО в формат "И. О. Фамилия"
 // Пример: {givenName: "Иван", middleName: "Петрович", familyName: "Сидоров"} -> "И. П. Сидоров"
 function formatLabRepresentativeName(laboratory) {
+    try { logTrace('formatLabRepresentativeName: входные данные=' + JSON.stringify(laboratory)); } catch (e) {}
     if (!laboratory) {
+        logWarn('formatLabRepresentativeName: laboratory отсутствует');
         return '';
     }
     
@@ -1268,12 +1273,15 @@ function formatLabRepresentativeName(laboratory) {
         if (laboratory.familyName) {
             formatted += laboratory.familyName;
         }
-        
-        return formatted.trim();
+        const result = formatted.trim();
+        logTrace('formatLabRepresentativeName: сформировано из given/middle/family -> ' + result);
+        return result;
     }
     
     // Fallback к старому полю iof, если новые поля отсутствуют
-    return laboratory.iof || '';
+    const fallback = laboratory.iof || '';
+    logTrace('formatLabRepresentativeName: fallback по iof -> ' + (fallback || ''));
+    return fallback;
 }
 
 function FillPassportDataElis() {
@@ -1403,14 +1411,44 @@ function FillPassportDataElis() {
                         item.value = root[currentKey].value;
                         FixedElisData(item);
                         if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
-                            let printValueInput = document.createElement('input');
-                            printValueInput.type = 'hidden';
-                            printValueInput.setAttribute('data-key', item.dataset.key);
-                            printValueInput.setAttribute('data-tag', 'PrintValue');
-                            printValueInput.setAttribute('data-edit', '1');
-                            printValueInput.setAttribute('data-elis-filled', 'true');
-                            printValueInput.value = root[currentKey].valueString;
-                            item.parentNode.appendChild(printValueInput);
+                            // Ищем уже существующий скрытый PrintValue для этого параметра
+                            let existingPrintValue = item.parentNode.querySelector('[data-tag="PrintValue"][data-key="' + item.dataset.key + '"]');
+                            if (existingPrintValue) {
+                                existingPrintValue.value = root[currentKey].valueString;
+                                existingPrintValue.setAttribute('data-elis-filled', 'true');
+                                logTrace('Обновление колонки Результат-Текст (скрытое поле): ' + (currentKey || '[нет ключа]') + ', новое значение: ' + (root[currentKey].valueString || '-'));
+                            } else {
+                                let printValueInput = document.createElement('input');
+                                printValueInput.type = 'hidden';
+                                printValueInput.setAttribute('data-key', item.dataset.key);
+                                printValueInput.setAttribute('data-tag', 'PrintValue');
+                                printValueInput.setAttribute('data-edit', '1');
+                                printValueInput.setAttribute('data-elis-filled', 'true');
+                                printValueInput.value = root[currentKey].valueString;
+                                item.parentNode.appendChild(printValueInput);
+                                logTrace('Заполнение поля Результат-Текст: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey].valueString || '-'));
+                            }
+
+                            // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe
+                            try {
+                                let parameterKey = item.dataset.key;
+                                let printCell = iframe.contentWindow.document.querySelector('[data-parameter-key="' + parameterKey + '"]');
+                                if (printCell) {
+                                    let printInput = printCell.querySelector('.print-cell-input');
+                                    if (printInput) {
+                                        printInput.value = root[currentKey].valueString || '-';
+                                        printInput.setAttribute('data-elis-filled', 'true');
+                                        applyElisHighlight(printInput);
+                                        logTrace('Обновлена колонка Результат-Текст (input, авто): key=' + (parameterKey || '[нет ключа]') + ', значение=' + (printInput.value || '-'));
+                                    } else {
+                                        printCell.textContent = root[currentKey].valueString || '-';
+                                        printCell.setAttribute('data-elis-filled', 'true');
+                                        logTrace('Обновлена колонка Результат-Текст (text, авто): key=' + (parameterKey || '[нет ключа]') + ', значение=' + (printCell.textContent || '-'));
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('Ошибка автообновления колонки Результат-Текст:', e);
+                            }
                         }
                         break;
                 }
@@ -1530,24 +1568,34 @@ function ManualCorrect(event) {
         return;
     }
     
-    if(event.target.hasAttribute("data-elis-filled")) {
-        event.target.setAttribute("data-elis-filled", "false");
+    try {
+        logTrace(`ManualCorrect: ручная корректировка поля ${event.target.name || event.target.id || 'неизвестное'}, значение: ${event.target.value}, тег: ${event.target.dataset.tag || 'не указан'}`);
         
-        // Убираем зеленую подсветку
-        removeElisHighlight(event.target);
-        
-        // Если это поле значения, обновляем колонку "Печать"
-        if (event.target.dataset.tag === 'Value') {
-            updatePrintColumnFromInput(event.target);
-        }
-        
-        // Если это поле "Результат-Текст", обновляем только его статус
-        if (event.target.dataset.tag === 'PrintValue') {
-            let parentCell = event.target.closest('td');
-            if (parentCell) {
-                parentCell.setAttribute('data-elis-filled', 'false');
+        if(event.target.hasAttribute("data-elis-filled")) {
+            event.target.setAttribute("data-elis-filled", "false");
+            
+            // Убираем зеленую подсветку
+            removeElisHighlight(event.target);
+            
+            // Если это поле значения, обновляем колонку "Печать"
+            if (event.target.dataset.tag === 'Value') {
+                updatePrintColumnFromInput(event.target);
             }
+            
+            // Если это поле "Результат-Текст", обновляем только его статус
+            if (event.target.dataset.tag === 'PrintValue') {
+                let parentCell = event.target.closest('td');
+                if (parentCell) {
+                    parentCell.setAttribute('data-elis-filled', 'false');
+                }
+                logTrace('Ручная корректировка поля Результат-Текст: key=' + (event.target.dataset.key || '[нет ключа]') + ', новое значение=' + (event.target.value || '-'));
+            }
+            
+            logTrace(`ManualCorrect: сброшена подсветка ЕЛИС для поля ${event.target.name || event.target.id || 'неизвестное'}`);
         }
+    } catch (error) {
+        logError(`ManualCorrect: ошибка при обработке ручной корректировки поля ${event.target.name || event.target.id || 'неизвестное'}: ${error.message}`);
+        console.error('ManualCorrect error:', error);
     }
 }
 
@@ -1555,13 +1603,15 @@ function ManualCorrect(event) {
 function updatePrintColumnFromInput(valueInput) {
     try {
         let iframe = document.querySelector('.FR');
+        let parameterKey = valueInput && valueInput.dataset ? valueInput.dataset.key : undefined;
+        logTrace('Обновление колонки Результат-Текст (from Value): key=' + (parameterKey || '[нет ключа]') + ', значение=' + (valueInput && valueInput.value ? valueInput.value : '-'));
         
         // Вызываем функцию обновления в iframe
         if (iframe.contentWindow.updatePrintValueOnHalChange) {
+            logTrace('Вызов iframe.updatePrintValueOnHalChange: key=' + (parameterKey || '[нет ключа]') + ', значение=' + (valueInput && valueInput.value ? valueInput.value : '-'));
             iframe.contentWindow.updatePrintValueOnHalChange(valueInput);
         } else {
             // Fallback к старой логике, если функция не найдена
-            let parameterKey = valueInput.dataset.key;
             let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
             if (printCell) {
                 printCell.setAttribute('data-print-value', valueInput.value || '-');
@@ -1573,14 +1623,18 @@ function updatePrintColumnFromInput(valueInput) {
                     printInput.style.backgroundColor = '';
                     printInput.setAttribute("data-elis-filled", "false");
                     removeElisHighlight(printInput);
+                    logTrace('Обновлена колонка Результат-Текст (input): key=' + (parameterKey || '[нет ключа]') + ', новое значение=' + (printInput.value || '-'));
                 } else {
                     printCell.textContent = valueInput.value || '-';
                     printCell.style.backgroundColor = '';
+                    logTrace('Обновлена колонка Результат-Текст (text): key=' + (parameterKey || '[нет ключа]') + ', новое значение=' + (printCell.textContent || '-'));
                 }
+            } else {
+                logWarn('Не найдена ячейка колонки Результат-Текст для key=' + (parameterKey || '[нет ключа]'));
             }
         }
     } catch (error) {
-        console.error('Ошибка обновления колонки "Печать" при ручном изменении:', error);
+        console.error('Ошибка обновления колонки Результат-Текст при ручном изменении:', error);
     }
 }
 
@@ -1718,18 +1772,4 @@ function showError(message) {
     errorDialog.showModal();
 }
 
-function logToServer(level, message) {
-    $.ajax({
-        url: '/api/ClientLog/logging',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ level: level, message: message }),
-        error: function() { /* опционально: обработка ошибок отправки лога */ }
-    });
-}
-
-function logInfo(message)  { logToServer('Info', message); }
-function logWarn(message)  { logToServer('Warn', message); }
-function logError(message) { logToServer('Error', message); }
-function logDebug(message) { logToServer('Debug', message); }
-function logTrace(message) { logToServer('Trace', message); }
+// Функции логирования вынесены в отдельный модуль Logger.js
