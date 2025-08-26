@@ -1411,6 +1411,7 @@ function FillPassportDataElis() {
                             printValueInput.setAttribute('data-elis-filled', 'true');
                             printValueInput.value = root[currentKey].valueString;
                             item.parentNode.appendChild(printValueInput);
+                            logTrace('Заполнение поля Результат-Текст: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey].valueString || '-'));
                         }
                         break;
                 }
@@ -1547,6 +1548,7 @@ function ManualCorrect(event) {
             if (parentCell) {
                 parentCell.setAttribute('data-elis-filled', 'false');
             }
+            logTrace('Ручная корректировка поля Результат-Текст: key=' + (event.target.dataset.key || '[нет ключа]') + ', новое значение=' + (event.target.value || '-'));
         }
     }
 }
@@ -1555,13 +1557,15 @@ function ManualCorrect(event) {
 function updatePrintColumnFromInput(valueInput) {
     try {
         let iframe = document.querySelector('.FR');
+        let parameterKey = valueInput && valueInput.dataset ? valueInput.dataset.key : undefined;
+        logTrace('Обновление колонки Результат-Текст (from Value): key=' + (parameterKey || '[нет ключа]') + ', значение=' + (valueInput && valueInput.value ? valueInput.value : '-'));
         
         // Вызываем функцию обновления в iframe
         if (iframe.contentWindow.updatePrintValueOnHalChange) {
+            logTrace('Вызов iframe.updatePrintValueOnHalChange: key=' + (parameterKey || '[нет ключа]') + ', значение=' + (valueInput && valueInput.value ? valueInput.value : '-'));
             iframe.contentWindow.updatePrintValueOnHalChange(valueInput);
         } else {
             // Fallback к старой логике, если функция не найдена
-            let parameterKey = valueInput.dataset.key;
             let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
             if (printCell) {
                 printCell.setAttribute('data-print-value', valueInput.value || '-');
@@ -1573,14 +1577,18 @@ function updatePrintColumnFromInput(valueInput) {
                     printInput.style.backgroundColor = '';
                     printInput.setAttribute("data-elis-filled", "false");
                     removeElisHighlight(printInput);
+                    logTrace('Обновлена колонка Результат-Текст (input): key=' + (parameterKey || '[нет ключа]') + ', новое значение=' + (printInput.value || '-'));
                 } else {
                     printCell.textContent = valueInput.value || '-';
                     printCell.style.backgroundColor = '';
+                    logTrace('Обновлена колонка Результат-Текст (text): key=' + (parameterKey || '[нет ключа]') + ', новое значение=' + (printCell.textContent || '-'));
                 }
+            } else {
+                logWarn('Не найдена ячейка колонки Результат-Текст для key=' + (parameterKey || '[нет ключа]'));
             }
         }
     } catch (error) {
-        console.error('Ошибка обновления колонки "Печать" при ручном изменении:', error);
+        console.error('Ошибка обновления колонки Результат-Текст при ручном изменении:', error);
     }
 }
 
