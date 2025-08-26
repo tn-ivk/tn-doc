@@ -1,13 +1,12 @@
-﻿namespace TN_Doc.Models.DTOs
+﻿namespace TN_Doc.Models.DTOs;
+
+/// <summary>
+/// Модель общения с хранением json  словарей внутри
+/// </summary>
+public class DirEditDTO
 {
     /// <summary>
-    /// Модель общения с хранением json  словарей внутри
+    /// Сырой JSON словарей
     /// </summary>
-    public class DirEditDTO
-    {
-        /// <summary>
-        /// Сырой JSON словарей
-        /// </summary>
-        public string DirJsonRaw { get; set; }
-    }
+    public string DirJsonRaw { get; set; }
 }

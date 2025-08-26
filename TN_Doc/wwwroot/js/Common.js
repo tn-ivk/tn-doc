@@ -950,7 +950,7 @@ function PrintDoc() {
 function ExportDoc() {
     $.ajax(
         {
-            url: 'Home/ExportDoc',
+            url: 'Export/ExportDoc',
             type: 'GET',
             data: {
                 IdDevice: $('#ComboboxDevice').val(),

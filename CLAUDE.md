@@ -1,0 +1,365 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents and reports from measurement system data (ИВК - Измерительно-вычислительный комплекс). The system generates quality certificates, verification protocols, acceptance acts, and various measurement reports using FastReport templates.
+
+**Version**: 1.4.1  
+**Target Framework**: .NET 8.0  
+**Runtime Requirement**: .NET Runtime 8.0.13 or higher
+**Current Branch**: develop (active development branch)
+
+## Build and Development Commands
+
+### Prerequisites
+```bash
+# Add required NuGet sources
+dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
+dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "<USERNAME>" --password "<PASSWORD>" --store-password-in-clear-text
+```
+
+### Building the Solution
+```bash
+# Build entire solution
+dotnet build
+
+# Build specific project
+dotnet build TN_Doc/TN_Doc.csproj
+
+# Publish for production (Linux)
+dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+
+# Clean build
+dotnet clean && dotnet build
+```
+
+### Running the Application
+```bash
+# Run in development mode
+cd TN_Doc
+dotnet run
+
+# Run with specific environment
+ASPNETCORE_ENVIRONMENT=Development dotnet run
+
+# Run with specific URLs
+dotnet run --urls="http://localhost:38509;https://localhost:44357"
+```
+
+### Testing
+```bash
+# Run all tests
+dotnet test
+
+# Run tests in specific project
+dotnet test Tests/Tests.csproj
+
+# Run tests with detailed output
+dotnet test --logger:"console;verbosity=detailed"
+
+# Run a specific test method
+dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
+
+# Run tests for specific class
+dotnet test --filter "ClassName=AppConfigServiceTests"
+
+# Run tests with code coverage
+dotnet test /p:CollectCoverage=true
+```
+
+### Related Projects Setup
+The following projects must be deployed at the same level (all share TN_Doc configuration):
+- TN_KMH: `git clone http://192.168.100.100/orpovy/ivk/tn_kmh.git`
+- TN_MessagingService: `git clone http://192.168.100.100/orpovy/ivk/tn_messagingservice.git` 
+  - Use "samara_build" branch for OPC DA support (older IVK systems)
+  - Master branch for standard OPC UA communication
+- TN.ElisConnector (for ELIS integration): `git clone http://192.168.100.100/orpovy/ivk/tn.elisconnector.git`
+  - Includes TSPD.Mock.Hub for testing ELIS integration
+
+## Architecture Overview
+
+### Solution Structure
+- **TN_Doc**: Main ASP.NET Core web application
+- **TN.DocGeneral**: Core business logic and shared utilities
+- **tn.docgeneral/** (Document modules organized by type):
+  - Individual document implementations (Passport, Poverka*, KMH*, Act, Report, Jornal)
+  - Sikn425 modules in separate subfolder
+  - Common modules for shared document logic
+- **Tests**: Unit tests using NUnit framework with Moq for mocking
+- **tn_toolsfastreport/TN_Tools**: FastReport utilities
+- **winprutil**: Go-based Windows printing utility
+- **Dll/**: Pre-compiled document module assemblies
+- **prutils/**: Contains winprutil.exe for Windows PDF printing
+
+### Document Module Pattern
+Each document type module implements a consistent pattern:
+- **Class Library**: Contains document-specific business logic
+- **Configuration Files**: 
+  - Document config: `TN_Doc/Cfg/Cfg{DocumentType}.json`
+  - Edit form config: `TN_Doc/Cfg/CfgEdit{DocumentType}.json`
+- **FastReport Template**: `TN_Doc/Doc/{Number}_{DocumentType}.frx`
+- **Standard Interface Methods**:
+  - `GetViewDoc(id)`: Returns JSON data for report generation
+  - `GetPathTemplateFile()`: Returns path to .frx template
+  - `GetEditDoc(id)`: Returns HTML for editing forms
+  - `SetDocFromJson(json)`: Updates document data from JSON
+
+### FastReport Integration
+- Templates are .frx files with embedded C# scripting
+- Data passed via JSON parameter "JsonDoc"
+- Templates can reference project DLLs for complex processing
+- Export formats: PDF, Excel, ODS, XML, HTML
+- Script security disabled for template flexibility
+- Platform-specific rendering libraries (SkiaSharp, HarfBuzz)
+
+### Configuration System
+- **CfgApp.json**: Main application settings
+  - Device definitions with database connections
+  - ELIS integration settings
+  - OPC communication parameters
+  - Security features toggle
+  - PVL and PVS usage enabled by default
+- **Document Configs** (`Cfg*.json`):
+  - Template paths and report settings
+  - Edit form configurations
+  - Field mappings and validation rules
+- **Environment-Specific**:
+  - Development configs: `*.Development.json`
+  - Only copied to output in Debug builds
+  - Removed before deployment to avoid conflicts
+
+## Key Dependencies and External Systems
+
+### ELIS Integration
+ELIS (Единая Лабораторная Информационная Система) for quality passport data:
+- Requires TN.ElisConnector module from separate repository
+- Communicates with LabHub for laboratory data
+- Configuration in CfgApp.json under "Elis" section
+- Supports global or per-device ELIS configuration
+- SSL certificate support for secure communication
+- **SSL Certificate Setup**:
+  - Place certificate files in `Cert/` folder
+  - Install certificates on server
+  - Configure certificate path in ELIS settings
+
+### OPC Communication
+Real-time data acquisition from measurement systems:
+- **OPC DA**: Legacy protocol (requires "samara_build" branch of TN_MessagingService)
+  - Tags must be pre-defined in `opc.da.tags.json`
+  - All tags must be registered before first use
+- **OPC UA**: Modern protocol with better security
+  - Configuration in `opc.ua.tags.json`
+- Settings in CfgApp.json under "OpcConnectionSettings"
+
+### Database Connectivity
+- **MySQL/MariaDB** via Pomelo.EntityFrameworkCore.MySql (v7.0.0)
+- Per-device connection strings in CfgApp.json
+- Password encryption supported via EncryptionLibrary
+- Entity Framework Core for data access
+
+### Key Package Dependencies
+- **FastReport.Web.Skia** (2025.2.8): Report generation engine
+- **NLog** (5.4.0): Structured logging
+- **Newtonsoft.Json** (13.0.3): JSON processing
+- **Platform Libraries**:
+  - SkiaSharp.NativeAssets.Linux
+  - HarfBuzzSharp.NativeAssets.Linux
+  - System.Drawing.Common
+  - libgdiplus (Linux system dependency)
+- **Hosting Extensions**:
+  - Microsoft.Extensions.Hosting.Systemd (Linux)
+  - Microsoft.Extensions.Hosting.WindowsServices (Windows)
+
+## Important File Locations
+
+### Configuration
+- `/TN_Doc/Cfg/CfgApp.json` - Main application configuration
+- `/TN_Doc/Cfg/Cfg{DocumentType}.json` - Document template configurations
+- `/TN_Doc/Cfg/CfgEdit{DocumentType}.json` - Edit form configurations
+- `/TN_Doc/appsettings.json` - ASP.NET Core settings
+- `/TN_Doc/nlog.config` - Logging configuration
+- `/TN_Doc/opc.da.tags.json` - OPC DA tag definitions
+- `/TN_Doc/opc.ua.tags.json` - OPC UA tag definitions
+
+### Templates and Documents
+- `/TN_Doc/Doc/**/*.frx` - FastReport templates
+- `/TN_Doc/Doc/GOSTR8.1011-2022/` - GOST standard templates
+- `/TN_Doc/Doc/Act/` - Acceptance act templates
+- `/TN_Doc/Doc/Passport/` - Quality passport templates
+- `/TN_Doc/wwwroot/HTML/` - HTML editing forms
+
+### Output Directories
+- `/TN_Doc/wwwroot/PDF/` - Generated PDF documents
+- **Log Directories** (Platform-specific as of v1.3.4):
+  - Windows: `{basedir}/TN_Doc/logs/`
+  - Linux: `/opt/TN_Doc/logs/` (temporary, subject to change)
+- `/TN_Doc/UserPreference/` - User preferences (last used templates)
+
+## Development Notes
+
+### Service Architecture
+The application uses dependency injection with the following key services:
+- **IAppConfigService**: Singleton configuration management
+- **PrinterService**: Platform-specific printing (Windows/Linux)
+- **DirectoryService**: File system operations
+- **DbContext**: Entity Framework database context
+- **AppInfoProvider**: Application version information
+
+Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
+
+### Document Generation Architecture  
+The system uses a factory pattern with dynamic module loading:
+- **IAppConfigService**: Singleton that manages configuration and provides `GetDocumentClass(idDevice, idDoc)` factory method
+- **Document Classes**: Each document type implements standard interface with methods:
+  - `GetViewDoc(id)`: Returns JSON data for report generation
+  - `GetPathTemplateFile()`: Returns path to .frx template file
+  - `GetEditDoc(id)`: Returns HTML for editing forms
+  - `SetDocFromJson(json)`: Updates document data from JSON
+- **Dynamic Loading**: Document modules are loaded at runtime from `Dll/` directory or compiled assemblies
+- **Template Resolution**: FastReport templates (.frx files) paths resolved through document configuration files
+
+### Memory Management and PDF Generation
+Current development focus on solving file locking issues:
+- **Problem**: PDF generation saves to static `wwwroot/PDF/PDF.pdf` causing "file in use" errors
+- **Solution**: Move to in-memory generation using MemoryStream and `File()` returns
+- **FastReport Integration**: Use `report.Export(exporter, memoryStream)` instead of file paths
+- **Printer Support**: Temporary files still needed for physical printing (winprutil.exe/CUPS)
+
+### Multi-platform Support
+- **Windows**:
+  - Deploy as Windows Service using `sc create`
+  - Run as `NT AUTHORITY\NETWORK SERVICE` (must have appropriate permissions)
+  - Uses `prutils/winprutil.exe` for PDF printing
+- **Linux**:
+  - Deploy with systemd service
+  - Run as user `alphadaemon` (created during package installation)
+  - Native CUPS printing support
+  - Requires `libgdiplus` package
+- Platform detection in `Program.cs` configures appropriate hosting
+
+### Document Generation Workflow
+1. User selects document type and record ID from web interface
+2. Controller instantiates appropriate document module
+3. Module retrieves data from database using ID
+4. Configuration loaded from `Cfg{DocumentType}.json`
+5. FastReport template (`.frx`) loaded with path from config
+6. JSON data injected into template via "JsonDoc" parameter
+7. Report rendered to requested format (PDF/Excel/etc.)
+8. Result streamed to browser or saved to `/wwwroot/PDF/`
+
+### Security Considerations
+- **UseSecurityFeatures** flag in CfgApp.json enables:
+  - Database password encryption
+  - Enhanced input validation
+  - Restricted file access
+- FastReport script security disabled for flexibility
+- Sensitive configs excluded from release builds
+- CORS configured with permissive policy (review for production)
+
+### Deployment Process
+
+#### Linux Deployment (via GitLab CI/CD)
+1. Tag push triggers pipeline (e.g., `v1.3.5`)
+2. Docker builds with .NET SDK 8.0
+3. Creates `.deb` package with:
+   - Application files in `/opt/TN_Doc/`
+   - Systemd service as `tn-doc.service` (runs with `ASPNETCORE_ENVIRONMENT=Production`)
+   - Log directory at `/var/log/TN_Doc/`
+4. Package validates .NET Runtime 8.0.13+
+5. Pre/post-install scripts create `alphadaemon` user and set permissions
+
+#### Windows Deployment
+1. Publish as self-contained or framework-dependent
+2. Create service: `sc create TN_Doc binPath="path\to\TN_Doc.exe"`
+3. Configure service identity as `NT AUTHORITY\NETWORK SERVICE`
+4. Ensure `prutils/winprutil.exe` is accessible
+5. Grant necessary permissions to service account
+
+### Development Workflow Tips
+- Use `ASPNETCORE_ENVIRONMENT=Development` for local debugging
+- Development configs auto-loaded in Debug builds
+- Check logs for detailed error information (platform-specific paths)
+- Test document generation with various IDs before deployment
+- Validate FastReport templates with test data
+- Remove `appsettings.Development.json` before production deployment
+- When working with OPC DA, ensure all tags are pre-registered
+- **Windows Service Deployment**: Use `NT AUTHORITY\NETWORK SERVICE` account (no password)
+- **Deployment from develop branch**: All three projects should be deployed from develop folder
+
+### Common Issues and Solutions
+- **Build errors**: Ensure NuGet sources are configured (ortpr and FastReport)
+- **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
+- **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
+- **Document generation failures**: Check logs and validate JSON data structure
+- **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
+- **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
+- **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
+
+### Working with Document Modules
+When working on specific document types:
+- Document-specific templates are in `/TN_Doc/Doc/{DocumentType}/`
+- Configuration files follow pattern `Cfg{DocumentType}.json` and `CfgEdit{DocumentType}.json`
+- Each document module implements standard interface methods in corresponding class library
+- Test document generation thoroughly before modifying templates
+- FastReport templates (.frx files) are binary - use FastReport Designer for editing
+- Pre-compiled modules available in `Dll/` directory
+
+### Version Management
+- Version is centrally managed in `TN_Doc.csproj`
+- Changes are documented in `/TN_Doc/changes.md`
+- Current version: 1.4.1 (.NET 8.0)
+
+### Git Workflow Notes
+- **Main branches**: `master` (production), `develop` (active development)
+- Large number of configuration files are tracked - be careful with bulk changes
+- Many binary .frx templates are in the repository - use FastReport Designer for editing
+- Current working directory is on `develop` branch with many modified files
+
+### Key Development Patterns
+
+#### Dependency Injection Setup
+- **Singleton Services**: AppConfigService (thread-safe singleton pattern)
+- **Platform-Specific Services**: Printers registered based on OS detection in `IServiceCollectionExtensions.cs`
+- **Release-Only Services**: Directory configuration only applied in Release builds (`#if RELEASE`)
+
+#### Configuration Loading Pattern
+Configuration follows a layered approach:
+1. **appsettings.json**: ASP.NET Core application settings
+2. **CfgApp.json**: Main application configuration (devices, ELIS, OPC)
+3. **Cfg{DocumentType}.json**: Document-specific template and report settings
+4. **CfgEdit{DocumentType}.json**: Edit form configurations
+5. **Development overlays**: `*.Development.json` files auto-loaded in Debug builds
+
+#### Error Handling and Logging
+- **NLog**: Structured logging with platform-specific log directories
+  - Configuration: `/TN_Doc/nlog.config`
+  - Client-side logging via `ClientLogController` (v1.4.1+)
+  - Document operation logging with library events
+- **Exception Boundaries**: Controllers catch exceptions and return appropriate HTTP status codes
+- **Resource Cleanup**: Explicit disposal of FastReport objects and streams in finally blocks
+
+### Recent Changes (v1.4.1)
+- 🐞 Fixed incorrect population of Act shifts when filling "reverse" passports
+- Sorting of Acts by date and documents in KMH and verifications by date
+- Display of values in locked cells for quality passport editing forms
+- Corrected log messages to properly display device names
+- Updated docgeneral to version 1.2.1
+- Manual viscosity correction for Poverka 1974 variants (2004, 1995, 1989)
+- Client-side logging moved to separate controller (`ClientLogController`)
+- Enhanced document operation logging (library events)
+- Corrected ELIS form population logging
+
+### Previous Major Changes
+- **v1.4.0**: Modal dictionary window closing after saving, validation improvements
+- **v1.3.7**: Manual viscosity correction for Poverka 3380, export fixes
+- **v1.3.6**: Template corrections and passport improvements
+- **v1.3.5**: Fixed document loading for IVK-2/IVK-3 devices
+- **v1.3.4**: Platform-specific log paths, PVL/PVS enabled by default
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

@@ -4,19 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using TN_Doc.Models;
 using FastReport.Web;
 using System.IO;
 using System.Threading;
 using System.Text;
-using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using TN_Doc.Models.Home;
+using TN_Doc.Models.Services;
 using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Services;
 using TN.Doc;
@@ -24,6 +22,7 @@ using TN.DocData;
 using TN.Utils;
 using Data = TN_Doc.Models.Home.Data;
 using FileInfo = System.IO.FileInfo;
+using IdDoc = TN.DocData.IdDoc;
 
 namespace TN_Doc.Controllers;
 
@@ -31,61 +30,26 @@ public class HomeController : Controller
 {
     CfgApp _cfgApp;
     readonly ILogger<HomeController> _logger;
-    DbContextOptions<DocGeneral> options;
+    private readonly DbContextOptions<DocGeneral> _options;
     DocGeneral dbDoc;
     private WebReport FR;
     CancellationToken stoppingToken;
     IAppConfigService _appConfig;
+    private readonly IReportBuffer _reportBuffer;
+    private readonly IDocModuleLoader _docModuleLoader;
 
-    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration)
+    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration, IReportBuffer reportBuffer, IDocModuleLoader docModuleLoader)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        options = context;
+        _options = context;
         _appConfig = AppConfigService.GetInstance(configuration);
-
         FR = new WebReport();
-
         _cfgApp = _appConfig.GetAppCfg();
+        _reportBuffer = reportBuffer;
+        _docModuleLoader = docModuleLoader;
     }
 
-    private DocGeneral LoadDocsModule(int idDevice, IdDoc idDoc)
-    {
-        _logger.LogDebug($"Загрузка DLL документа {idDoc} устройства {_appConfig.GetDeviceName(idDevice)}");
-        try
-        {
-            var pathToDll = Directory.GetCurrentDirectory() + _appConfig.GetPathToDocDll(idDevice, idDoc);
-            if (string.IsNullOrEmpty(pathToDll))
-            {
-                _logger.LogError($"Невозможно определить путь до файла DLL документа {idDoc}");
-                return null;
-            }
-            _logger.LogTrace($"Файл DLL: {pathToDll}");
-            var dllFileInfo = new FileInfo(pathToDll);
-            if (!dllFileInfo.Exists)
-            {
-                _logger.LogError($"Файл {dllFileInfo.FullName} не существует");
-                return null;
-            }
-            
-            var assembly = Assembly.LoadFrom(dllFileInfo.FullName);
-            var doc = assembly.GetTypes().Single(x => x.BaseType?.Name == "DocGeneral");
-
-            _logger.LogDebug($"Загрузка DLL {doc.FullName}");
-            return (DocGeneral)assembly.CreateInstance(
-                doc.FullName,
-                false,
-                BindingFlags.Default,
-                null,
-                new object[] { options, _appConfig, idDevice, idDoc, Directory.GetCurrentDirectory() },
-                null,
-                null);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка загрузки DLL документа {idDoc}");
-            return null;
-        }
-    }
+    private DocGeneral LoadDocsModule2(int idDevice, IdDoc idDoc) => _docModuleLoader.LoadDocsModule(_options, idDevice, idDoc, Directory.GetCurrentDirectory());
 
     public List<ListItem> GetListDevices()
     {
@@ -340,7 +304,7 @@ public class HomeController : Controller
         try
         {
             var (unixTimeBegin, unixTimeEnd) = ParseDateRange(data.DTBegin, data.DTEnd);
-            var doc = LoadDocsModule(data.IdDevice, data.IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, data.IdDevice, data.IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {data.IdDoc}");
@@ -404,7 +368,7 @@ public class HomeController : Controller
 
         try
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -443,38 +407,21 @@ public class HomeController : Controller
             FR.Report.SetParameterValue("JsonDoc", jsonDoc);
             FR.Report.Prepare();
 
-            var pdfExport = new FastReport.Export.Pdf.PDFExport()
+            using (var ms = new MemoryStream())
             {
-                ShowProgress = false,
-                Subject = "Subject",
-                Title = " ",
-                Compressed = true,
-                AllowPrint = true,
-                EmbeddingFonts = true,
-                //HideMenubar = true,
-                //HideToolbar = true,
-                //HideWindowUI= true
-            };
-
-            var pdfFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf");
-            var pdfFile = new FileInfo(pdfFilePath);
-            if (pdfFile.Directory is null)
-                throw new Exception("Ошибка определения пути файла PDF.pdf");
-            
-            if (!pdfFile.Directory.Exists)
-            {
-                _logger.LogWarning($"Не существует директория: {pdfFile.Directory.FullName}");
-                pdfFile.Directory.Create();
+                using var pdfExport = new FastReport.Export.Pdf.PDFExport();
+                pdfExport.ShowProgress = false;
+                pdfExport.Subject = "Subject";
+                pdfExport.Title = " ";
+                pdfExport.Compressed = true;
+                pdfExport.AllowPrint = true;
+                pdfExport.EmbeddingFonts = true;
+                FR.Report.Export(pdfExport, ms);
+                var bytes = ms.ToArray();
+                _reportBuffer.SetPdfBytes(bytes);
             }
 
-            if(!pdfFile.Exists)
-                _logger.LogWarning($"Файл не существует: {pdfFile.FullName}");
-            
-            FR.Report.Export(pdfExport, pdfFile.FullName);
-
-            pdfExport.Dispose();
             FR.Report.Dispose();
-
             return true;
         }
         catch (Exception ex)
@@ -493,7 +440,7 @@ public class HomeController : Controller
             return string.Empty;
         }
         
-        var doc = LoadDocsModule(IdDevice, IdDoc);
+        var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
         if (doc is null)
         {
             _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -502,75 +449,13 @@ public class HomeController : Controller
         return doc.GetEditDoc(id);
     }
 
-    public string ExportDoc(int IdDevice, IdDoc IdDoc, int id, string format, int protocolNumber)
-    {         
-        _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}, номер протокола {protocolNumber} для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        try
-        {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return string.Empty;
-            }
-
-            var exportDirPath = Path.Combine(_appConfig.GetAppCfg().ExportDoc.Path, _appConfig.GetDocCfg(IdDevice, IdDoc).Name);
-            if (!Directory.Exists(exportDirPath))
-                Directory.CreateDirectory(exportDirPath);
-
-            FR.Report.Load(doc.GetPathTemplateFile());
-            var jsonDoc = doc.GetViewDoc(id, protocolNumber);
-            if (jsonDoc == null)
-            {
-                _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}, номер протокола {protocolNumber}");
-                return string.Empty;
-            }
-
-            FR.Report.SetParameterValue("JsonDoc", jsonDoc);
-            FR.Report.Prepare();
-            var exportFileName = JObject.Parse(doc.GetViewDoc(id).ToString() ?? string.Empty)["Doc"]?["Settings"]?["General"]?["FileNameForExportDoc"]?.ToString();
-            if (string.IsNullOrEmpty(exportFileName))
-            {
-                _logger.LogError("Невозможно определить имя для экспортируемого файла");
-                exportFileName = "undefined";
-            }
-
-            var exportFilePath = Path.Combine(exportDirPath, exportFileName);
-
-            switch (format)
-            {
-                case "pdf":
-                    FR.Report.Export(new FastReport.Export.Pdf.PDFExport() { ShowProgress = false }, exportFilePath += ".pdf");
-                    break;
-                case "excel":
-                    FR.Report.Export(new FastReport.Export.OoXML.Excel2007Export() { ShowProgress = false }, exportFilePath += ".xlsx");
-                    break;
-                case "ods":
-                    FR.Report.Export(new FastReport.Export.Odf.ODSExport() { ShowProgress = false }, exportFilePath += ".ods");
-                    break;
-                case "xml":
-                    FR.Report.Export(new FastReport.Export.Xml.XMLExport() { ShowProgress = false }, exportFilePath += ".xml");
-                    break;
-                default:
-                    throw new NotSupportedException($"Формат {format} не поддерживается");
-            }
-
-            FR.Report.Dispose();
-            return exportFilePath;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка экспорта документа {IdDoc}");
-            return string.Empty;
-        }
-    }
 
     public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
     {
         _logger.LogDebug($"Сохранение документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -602,7 +487,7 @@ public class HomeController : Controller
                 return;                
             }
             
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -622,7 +507,7 @@ public class HomeController : Controller
         _logger.LogDebug($"Получение периода документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = LoadDocsModule(IdDevice, IdDoc);
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -694,66 +579,7 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
-
-    private void GetPropertyValue(object obj, string key, ref object result)
-    {
-        if (obj is null) return;
-
-        if (obj is IEnumerable)
-        {
-            IEnumerable enumerable = (IEnumerable)obj;
-            foreach (object item in enumerable)
-                GetPropertyValue(item, key, ref result);
-        }
-        else
-        {
-            Type objType = obj.GetType();
-            PropertyInfo[] properties = objType.GetProperties();
-
-            foreach (var property in properties)
-            {
-                object propValue = property.GetValue(obj, null);
-
-                if (property.PropertyType.IsPrimitive)
-                {
-                    Debug.WriteLine(property.Name);
-                    if (property.Name == key)
-                    {
-                        result = property.GetValue(obj);
-                    }
-                }
-                else if (property.PropertyType.IsClass)
-                {
-                    Debug.WriteLine(property.Name);
-                    if (propValue is string)
-                    {
-                        if (property.Name == key)
-                        {
-                            result = property.GetValue(obj);
-                        }
-                    }
-                    else if (property.PropertyType.IsArray || property.PropertyType.IsSerializable)
-                    {
-                        IEnumerable enumerable = (IEnumerable)propValue;
-                        foreach (object item in enumerable)
-                            GetPropertyValue(item, key, ref result);
-                    }
-                    else
-                    {
-                        if (property.Name == key)
-                        {
-                            result = property.GetValue(obj);
-                        }
-                        else
-                        {
-                            GetPropertyValue(propValue, key, ref result);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+    
     public string arrByteToString(object arrByte)
     {
         if (string.IsNullOrEmpty(arrByte.ToString()))

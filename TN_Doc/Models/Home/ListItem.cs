@@ -1,8 +1,7 @@
-﻿namespace TN_Doc.Models.Home
+﻿namespace TN_Doc.Models.Home;
+
+public class ListItem
 {
-    public class ListItem
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
 }
