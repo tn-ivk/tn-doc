@@ -1,4 +1,7 @@
-﻿const hubConnection = new signalR.HubConnectionBuilder()
+﻿// Подключение модуля логирования
+// Функции логирования: logInfo, logWarn, logError, logDebug, logTrace
+
+const hubConnection = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:5010/SignalRApp")
     //.WithAutomaticReconnect()
     .build();
@@ -1565,25 +1568,34 @@ function ManualCorrect(event) {
         return;
     }
     
-    if(event.target.hasAttribute("data-elis-filled")) {
-        event.target.setAttribute("data-elis-filled", "false");
+    try {
+        logTrace(`ManualCorrect: ручная корректировка поля ${event.target.name || event.target.id || 'неизвестное'}, значение: ${event.target.value}, тег: ${event.target.dataset.tag || 'не указан'}`);
         
-        // Убираем зеленую подсветку
-        removeElisHighlight(event.target);
-        
-        // Если это поле значения, обновляем колонку "Печать"
-        if (event.target.dataset.tag === 'Value') {
-            updatePrintColumnFromInput(event.target);
-        }
-        
-        // Если это поле "Результат-Текст", обновляем только его статус
-        if (event.target.dataset.tag === 'PrintValue') {
-            let parentCell = event.target.closest('td');
-            if (parentCell) {
-                parentCell.setAttribute('data-elis-filled', 'false');
+        if(event.target.hasAttribute("data-elis-filled")) {
+            event.target.setAttribute("data-elis-filled", "false");
+            
+            // Убираем зеленую подсветку
+            removeElisHighlight(event.target);
+            
+            // Если это поле значения, обновляем колонку "Печать"
+            if (event.target.dataset.tag === 'Value') {
+                updatePrintColumnFromInput(event.target);
             }
-            logTrace('Ручная корректировка поля Результат-Текст: key=' + (event.target.dataset.key || '[нет ключа]') + ', новое значение=' + (event.target.value || '-'));
+            
+            // Если это поле "Результат-Текст", обновляем только его статус
+            if (event.target.dataset.tag === 'PrintValue') {
+                let parentCell = event.target.closest('td');
+                if (parentCell) {
+                    parentCell.setAttribute('data-elis-filled', 'false');
+                }
+                logTrace('Ручная корректировка поля Результат-Текст: key=' + (event.target.dataset.key || '[нет ключа]') + ', новое значение=' + (event.target.value || '-'));
+            }
+            
+            logTrace(`ManualCorrect: сброшена подсветка ЕЛИС для поля ${event.target.name || event.target.id || 'неизвестное'}`);
         }
+    } catch (error) {
+        logError(`ManualCorrect: ошибка при обработке ручной корректировки поля ${event.target.name || event.target.id || 'неизвестное'}: ${error.message}`);
+        console.error('ManualCorrect error:', error);
     }
 }
 
@@ -1760,18 +1772,4 @@ function showError(message) {
     errorDialog.showModal();
 }
 
-function logToServer(level, message) {
-    $.ajax({
-        url: '/api/ClientLog/logging',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ level: level, message: message }),
-        error: function() { /* опционально: обработка ошибок отправки лога */ }
-    });
-}
-
-function logInfo(message)  { logToServer('Info', message); }
-function logWarn(message)  { logToServer('Warn', message); }
-function logError(message) { logToServer('Error', message); }
-function logDebug(message) { logToServer('Debug', message); }
-function logTrace(message) { logToServer('Trace', message); }
+// Функции логирования вынесены в отдельный модуль Logger.js
