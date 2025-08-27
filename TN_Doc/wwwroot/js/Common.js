@@ -1477,13 +1477,26 @@ function FillPassportDataElis() {
                     return false;
                 }
                 let obj = root[currentKey];
+                
                 switch(item.dataset.tag)
                 {
                     case 'AdditionalInfo': 
                         if (!item.contains(obj)) {
                             item.append(new Option(obj, obj));
                         }
-                        item.value = obj;           
+                        
+                        // Для SELECT элементов нужно найти опцию по тексту и установить её value
+                        let foundOption = null;
+                        for (let i = 0; i < item.options.length; i++) {
+                            if (item.options[i].text === obj) {
+                                foundOption = item.options[i];
+                                break;
+                            }
+                        }
+                        
+                        if (foundOption) {
+                            item.value = foundOption.value;
+                        }
                         break;
                     case 'Metod': 
                         const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat();
