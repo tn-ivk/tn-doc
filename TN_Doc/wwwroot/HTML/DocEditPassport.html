@@ -48,6 +48,7 @@
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.css">
+    <script src="/js/Logger.js"></script>
     <script src="/js/EditDoc.js"></script>
     <script src="/js/loading-spinner.js"></script>
     <script id="ElementChangeEventHandling" type="text/javascript">
@@ -66,21 +67,62 @@
         }
 
         function UserChangeEvent(selectObject) {
-            if (selectObject.name == "Laboratory_IOF") {
-                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
-                document.getElementById("Laboratory_Post").value = user[0].Post;
-                document.getElementById("Laboratory_Factory").value = user[0].Factory;
-
-            }
-            else if (selectObject.name == "Delive_IOF") {
-                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
-                document.getElementById("Delive_Post").value = user[0].Post;
-                document.getElementById("Delive_Factory").value = user[0].Factory;
-            }
-            else if (selectObject.name == "Receive_IOF") {
-                var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
-                document.getElementById("Receive_Post").value = user[0].Post;
-                document.getElementById("Receive_Factory").value = user[0].Factory;
+            try {
+                logTrace(`UserChangeEvent: начало обработки изменения для ${selectObject.name}, значение: ${selectObject.value}`);
+                
+                if (selectObject.name == "Laboratory_IOF") {
+                    var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                    
+                    if (user && user.length > 0 && user[0]) {
+                        logTrace(`UserChangeEvent: найден пользователь лаборатории - ${user[0].IOF || 'неизвестно'}, должность: ${user[0].Post || 'не указана'}, предприятие: ${user[0].Factory || 'не указано'}`);
+                        
+                        document.getElementById("Laboratory_Post").value = user[0].Post || '';
+                        document.getElementById("Laboratory_Factory").value = user[0].Factory || '';
+                        
+                        logTrace(`UserChangeEvent: обновлены поля должности и предприятия для лаборатории`);
+                    } else {
+                        logWarn(`UserChangeEvent: пользователь с ID ${selectObject.value} не найден в словаре лаборатории`);
+                        document.getElementById("Laboratory_Post").value = '';
+                        document.getElementById("Laboratory_Factory").value = '';
+                    }
+                }
+                else if (selectObject.name == "Delive_IOF") {
+                    var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                    
+                    if (user && user.length > 0 && user[0]) {
+                        logTrace(`UserChangeEvent: найден пользователь сдающей стороны - ${user[0].IOF || 'неизвестно'}, должность: ${user[0].Post || 'не указана'}, предприятие: ${user[0].Factory || 'не указано'}`);
+                        
+                        document.getElementById("Delive_Post").value = user[0].Post || '';
+                        document.getElementById("Delive_Factory").value = user[0].Factory || '';
+                        
+                        logTrace(`UserChangeEvent: обновлены поля должности и предприятия для сдающей стороны`);
+                    } else {
+                        logWarn(`UserChangeEvent: пользователь с ID ${selectObject.value} не найден в словаре сдающей стороны`);
+                        document.getElementById("Delive_Post").value = '';
+                        document.getElementById("Delive_Factory").value = '';
+                    }
+                }
+                else if (selectObject.name == "Receive_IOF") {
+                    var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                    
+                    if (user && user.length > 0 && user[0]) {
+                        logTrace(`UserChangeEvent: найден пользователь принимающей стороны - ${user[0].IOF || 'неизвестно'}, должность: ${user[0].Post || 'не указана'}, предприятие: ${user[0].Factory || 'не указано'}`);
+                        
+                        document.getElementById("Receive_Post").value = user[0].Post || '';
+                        document.getElementById("Receive_Factory").value = user[0].Factory || '';
+                        
+                        logTrace(`UserChangeEvent: обновлены поля должности и предприятия для принимающей стороны`);
+                    } else {
+                        logWarn(`UserChangeEvent: пользователь с ID ${selectObject.value} не найден в словаре принимающей стороны`);
+                        document.getElementById("Receive_Post").value = '';
+                        document.getElementById("Receive_Factory").value = '';
+                    }
+                }
+                
+                logTrace(`UserChangeEvent: обработка изменения для ${selectObject.name} завершена успешно`);
+            } catch (error) {
+                logError(`UserChangeEvent: ошибка при обработке изменения ${selectObject.name}: ${error.message}`);
+                console.error('UserChangeEvent error:', error);
             }
         }
 
