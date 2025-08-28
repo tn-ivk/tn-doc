@@ -7,7 +7,6 @@ using System.Linq;
 using TN_Doc.Models;
 using FastReport.Web;
 using System.IO;
-using System.Threading;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +27,11 @@ namespace TN_Doc.Controllers;
 
 public class HomeController : Controller
 {
-    CfgApp _cfgApp;
-    readonly ILogger<HomeController> _logger;
+    private readonly CfgApp _cfgApp;
+    private readonly ILogger<HomeController> _logger;
     private readonly DbContextOptions<DocGeneral> _options;
-    DocGeneral dbDoc;
-    private WebReport FR;
-    CancellationToken stoppingToken;
-    IAppConfigService _appConfig;
+    private readonly WebReport _fr;
+    private readonly IAppConfigService _appConfig;
     private readonly IReportBuffer _reportBuffer;
     private readonly IDocModuleLoader _docModuleLoader;
 
@@ -43,13 +40,11 @@ public class HomeController : Controller
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = context;
         _appConfig = AppConfigService.GetInstance(configuration);
-        FR = new WebReport();
+        _fr = new WebReport();
         _cfgApp = _appConfig.GetAppCfg();
         _reportBuffer = reportBuffer;
         _docModuleLoader = docModuleLoader;
     }
-
-    private DocGeneral LoadDocsModule2(int idDevice, IdDoc idDoc) => _docModuleLoader.LoadDocsModule(_options, idDevice, idDoc, Directory.GetCurrentDirectory());
 
     public List<ListItem> GetListDevices()
     {
@@ -271,19 +266,19 @@ public class HomeController : Controller
         try
         {
             FastReport.Utils.Config.EnableScriptSecurity = false;
-            FR.EnableMargins = true;
-            FR.Mode = WebReportMode.Preview;
-            FR.SinglePage = true;
-            FR.Toolbar = new ToolbarSettings() 
+            _fr.EnableMargins = true;
+            _fr.Mode = WebReportMode.Preview;
+            _fr.SinglePage = true;
+            _fr.Toolbar = new ToolbarSettings() 
             { 
                 Show = false, 
                 ShowRefreshButton = false, 
                 ShowFirstButton = false 
             };
-            FR.Width = "100%";
-            FR.Height = "auto";
-            FR.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), "Doc", "01_Report_2022-05-05_Release_version.frx"));
-            FR.Render();             
+            _fr.Width = "100%";
+            _fr.Height = "auto";
+            _fr.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), "Doc", "01_Report_2022-05-05_Release_version.frx"));
+            _fr.Render();             
         }
         catch (Exception ex)
         {
@@ -389,7 +384,7 @@ public class HomeController : Controller
                 return false;
             }
             _logger.LogTrace($"Загрузка шаблона документа: {templateFile.FullName}");
-            FR.Report.Load(templateFile.FullName);
+            _fr.Report.Load(templateFile.FullName);
             var jsonDoc = IdDoc switch
             {
                 IdDoc.KMH_PP_Areom => doc.GetViewDoc(id, protocolNumber),
@@ -404,8 +399,8 @@ public class HomeController : Controller
                 _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}");
                 return false;
             }
-            FR.Report.SetParameterValue("JsonDoc", jsonDoc);
-            FR.Report.Prepare();
+            _fr.Report.SetParameterValue("JsonDoc", jsonDoc);
+            _fr.Report.Prepare();
 
             using (var ms = new MemoryStream())
             {
@@ -416,12 +411,12 @@ public class HomeController : Controller
                 pdfExport.Compressed = true;
                 pdfExport.AllowPrint = true;
                 pdfExport.EmbeddingFonts = true;
-                FR.Report.Export(pdfExport, ms);
+                _fr.Report.Export(pdfExport, ms);
                 var bytes = ms.ToArray();
                 _reportBuffer.SetPdfBytes(bytes);
             }
 
-            FR.Report.Dispose();
+            _fr.Report.Dispose();
             return true;
         }
         catch (Exception ex)
