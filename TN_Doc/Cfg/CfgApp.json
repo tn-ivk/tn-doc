@@ -1,10 +1,12 @@
 ﻿{
-	"Devices": [{
+	"Devices": [
+      {
             "Use": true,
             "IdDevice": 0,
             "Name": "ИВК-1",
             "Description": "",
-            "Docs": [{
+            "Docs": [
+              {
                     "Use": true,
                     "IdDoc": 0,
                     "Name": "Отчеты",
@@ -102,51 +104,51 @@
                     "Name": "Акты",
                     "Description": "",
                     "PathToDocDll": "/Dll/Act.dll",
-                    "PathToDocConfigFile": "/Cfg/CfgAct.json",
-                    "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
+                    "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+                    "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
                     "LastUsedTemplateId": 5,
                     "TemplateDocs": [{
                             "Use": false,
                             "Id": 0,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_MI3532(18).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_MI3532(18).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }, {
                             "Use": false,
                             "Id": 1,
                             "Name": "Акт для партий нефти",
                             "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
-                            "PathToDocTemplateFile": "/Doc/ActParty.frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+                            "PathToDocTemplateFile": "/Doc/Act/ActParty.frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
                         }, {
                             "Use": false,
                             "Id": 2,
                             "Name": "Акт для нефтепродукта",
                             "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
-                            "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_NP_MI3275-2016(B).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActNP.json"
                         }, {
                             "Use": false,
                             "Id": 3,
                             "Name": "Акт приема - сдачи нефти ",
                             "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
-                            "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+                            "PathToDocTemplateFile": "/Doc/Act/ActParty_MI3532(19).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
                         }, {
                             "Use": false,
                             "Id": 4,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }, {
                             "Use": true,
                             "Id": 5,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }
                     ]
                 }, {
@@ -846,31 +848,60 @@
                     ]
                 }
             ],
-            "DBConnectionStrings": [{
-                    "Use": true,
-                    "GuidDevice": 0,
-                    "Server": "192.168.233.101",
-                    "Userid": "user",
-                    "Password": "mJKuyb&9!2@m",
-                    "Database": "IVK_TN_01",
-                    "ConnectionTimeout": 1
-                }, {
-                    "Use": true,
-                    "GuidDevice": 0,
-                    "Server": "192.168.233.201",
-                    "Userid": "user",
-                    "Password": "mJKuyb&9!2@m",
-                    "Database": "IVK_TN_01",
-                    "ConnectionTimeout": 1
-                }
+            "DBConnectionStrings": [
+              {
+                "Use": true,
+                "GuidDevice": 0,
+                "Server": "192.168.233.101",
+                "Userid": "user",
+                "Password": "$1$83F+qTyYmHOfVHKPsApmT1xgFnO64A/lEkxNn9k8VKs=",
+                "Database": "IVK_TN_01",
+                "ConnectionTimeout": 1
+              },
+              {
+                "Use": true,
+                "GuidDevice": 0,
+                "Server": "192.168.233.201",
+                "Userid": "user",
+                "Password": "$1$cA34ZrL19FeEuzhyvEmZvAzFAfLBIivo3/LKZfbfoVg=",
+                "Database": "IVK_TN_01",
+                "ConnectionTimeout": 1
+              }
             ],
-            "Elis": null
-        }, {
+            "Elis": null,
+            "UsedSI": {
+              "UsedPR": true,
+              "UsedPP": true,
+              "UsedPVL": true,
+              "UsedPVS": true,
+              "UsedSecondSI_PP": true,
+              "UsedSecondSI_PVL": true,
+              "UsedSecondSI_PVS": true
+            },
+            "UsedProcedureTypePR": null,
+            "OpcConnectionSettings": {
+              "Type": 1,
+              "DaSettings": {
+                "StartPrefix": "Root.PLC1.IVK_TN_01",
+                "Host": "localhost",
+                "ProgId": "psregulopcda_01",
+                "UpdateRate": 500
+              },
+              "UaSettings": {
+                "ConfigFilename": "Config.xml",
+                "UpdateRate": 500,
+                "StartPrefix": "IVK_TN_01"
+              }
+            },
+            "InvalidChars" : ["'"]
+            }, 
+      {
             "Use": true,
             "IdDevice": 1,
             "Name": "ИВК-2",
             "Description": "",
-            "Docs": [{
+            "Docs": [
+              {
                     "Use": true,
                     "IdDoc": 0,
                     "Name": "Отчеты",
@@ -968,51 +999,51 @@
                     "Name": "Акты",
                     "Description": "",
                     "PathToDocDll": "/Dll/Act.dll",
-                    "PathToDocConfigFile": "/Cfg/CfgAct.json",
-                    "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
+                    "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+                    "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
                     "LastUsedTemplateId": 5,
                     "TemplateDocs": [{
                             "Use": false,
                             "Id": 0,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_MI3532(18).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_MI3532(18).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }, {
                             "Use": false,
                             "Id": 1,
                             "Name": "Акт для партий нефти",
                             "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
-                            "PathToDocTemplateFile": "/Doc/ActParty.frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+                            "PathToDocTemplateFile": "/Doc/Act/ActParty.frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
                         }, {
                             "Use": false,
                             "Id": 2,
                             "Name": "Акт для нефтепродукта",
                             "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
-                            "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_NP_MI3275-2016(B).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActNP.json"
                         }, {
                             "Use": false,
                             "Id": 3,
                             "Name": "Акт приема - сдачи нефти ",
                             "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
-                            "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+                            "PathToDocTemplateFile": "/Doc/Act/ActParty_MI3532(19).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
                         }, {
                             "Use": false,
                             "Id": 4,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }, {
                             "Use": true,
                             "Id": 5,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }
                     ]
                 }, {
@@ -1712,31 +1743,60 @@
                     ]
                 }
             ],
-            "DBConnectionStrings": [{
-                    "Use": true,
-                    "GuidDevice": 1,
-                    "Server": "192.168.233.102",
-                    "Userid": "user",
-                    "Password": "mJKuyb&9!2@m",
-                    "Database": "IVK_TN_01",
-                    "ConnectionTimeout": 1
-                }, {
-                    "Use": true,
-                    "GuidDevice": 1,
-                    "Server": "192.168.233.202",
-                    "Userid": "user",
-                    "Password": "mJKuyb&9!2@m",
-                    "Database": "IVK_TN_01",
-                    "ConnectionTimeout": 1
-                }
+            "DBConnectionStrings": [
+              {
+                "Use": true,
+                "GuidDevice": 1,
+                "Server": "192.168.233.102",
+                "Userid": "user",
+                "Password": "$1$lWYmN8fbjJBXRxMriPw5JLsfa6PbyzBcZthtH5hRJQ8=",
+                "Database": "IVK_TN_01",
+                "ConnectionTimeout": 1
+              },
+              {
+                "Use": true,
+                "GuidDevice": 1,
+                "Server": "192.168.233.202",
+                "Userid": "user",
+                "Password": "$1$Da1vbiUU2jMTiRqMJKHD4Yh0s0CDqJg2IBl47HuEx8c=",
+                "Database": "IVK_TN_01",
+                "ConnectionTimeout": 1
+              }
             ],
-            "Elis": null
-        }, {
+            "Elis": null,
+            "UsedSI": {
+              "UsedPR": true,
+              "UsedPP": true,
+              "UsedPVL": true,
+              "UsedPVS": true,
+              "UsedSecondSI_PP": true,
+              "UsedSecondSI_PVL": true,
+              "UsedSecondSI_PVS": true
+            },
+            "UsedProcedureTypePR": null,
+            "OpcConnectionSettings": {
+              "Type": 1,
+              "DaSettings": {
+                "StartPrefix": "Root.PLC2.IVK_TN_01",
+                "Host": "localhost",
+                "ProgId": "psregulopcda_01",
+                "UpdateRate": 500
+              },
+              "UaSettings": {
+                "ConfigFilename": "Config.xml",
+                "UpdateRate": 500,
+                "StartPrefix": "IVK_TN_01"
+              }
+            },
+            "InvalidChars" : ["'"]
+        }, 
+      {
             "Use": false,
             "IdDevice": 2,
             "Name": "ИВК-РСУ",
             "Description": "",
-            "Docs": [{
+            "Docs": [
+              {
                     "Use": true,
                     "IdDoc": 0,
                     "Name": "Отчеты",
@@ -1834,51 +1894,51 @@
                     "Name": "Акты",
                     "Description": "",
                     "PathToDocDll": "/Dll/Act.dll",
-                    "PathToDocConfigFile": "/Cfg/CfgAct.json",
-                    "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json",
+                    "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
+                    "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
                     "LastUsedTemplateId": 5,
                     "TemplateDocs": [{
                             "Use": false,
                             "Id": 0,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_MI3532(18).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_MI3532(18).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }, {
                             "Use": false,
                             "Id": 1,
                             "Name": "Акт для партий нефти",
                             "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
-                            "PathToDocTemplateFile": "/Doc/ActParty.frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+                            "PathToDocTemplateFile": "/Doc/Act/ActParty.frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
                         }, {
                             "Use": false,
                             "Id": 2,
                             "Name": "Акт для нефтепродукта",
                             "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
-                            "PathToDocTemplateFile": "/Doc/Act_NP_MI3275-2016(B).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActNP.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_NP_MI3275-2016(B).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActNP.json"
                         }, {
                             "Use": false,
                             "Id": 3,
                             "Name": "Акт приема - сдачи нефти ",
                             "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
-                            "PathToDocTemplateFile": "/Doc/ActParty_MI3532(19).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditActParty.json"
+                            "PathToDocTemplateFile": "/Doc/Act/ActParty_MI3532(19).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
                         }, {
                             "Use": false,
                             "Id": 4,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G).frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G).frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }, {
                             "Use": true,
                             "Id": 5,
                             "Name": "Акт для валовых объемов нефти",
                             "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-                            "PathToDocTemplateFile": "/Doc/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
-                            "PathToDocEditConfigFile": "/Cfg/CfgEditAct.json"
+                            "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
+                            "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
                         }
                     ]
                 }, {
@@ -2571,25 +2631,52 @@
                     ]
                 }
             ],
-            "DBConnectionStrings": [{
-                    "Use": true,
-                    "GuidDevice": 2,
-                    "Server": "192.168.233.103",
-                    "Userid": "user",
-                    "Password": "mJKuyb&9!2@m",
-                    "Database": "IVK_TN_01",
-                    "ConnectionTimeout": 1
-                }, {
-                    "Use": true,
-                    "GuidDevice": 2,
-                    "Server": "192.168.233.203",
-                    "Userid": "user",
-                    "Password": "mJKuyb&9!2@m",
-                    "Database": "IVK_TN_01",
-                    "ConnectionTimeout": 1
-                }
+            "DBConnectionStrings": [
+              {
+                "Use": true,
+                "GuidDevice": 2,
+                "Server": "192.168.233.103",
+                "Userid": "user",
+                "Password": "$1$tMxr/hnj4vSosbFKfg4zl3FS3gSxe/whDp4SZFPTL+I=",
+                "Database": "IVK_TN_01",
+                "ConnectionTimeout": 1
+              },
+              {
+                "Use": true,
+                "GuidDevice": 2,
+                "Server": "192.168.233.203",
+                "Userid": "user",
+                "Password": "$1$KqBhyXeSlR25iUyUR3ohFnwoNEgBmaK494RV6WyP4NI=",
+                "Database": "IVK_TN_01",
+                "ConnectionTimeout": 1
+              }
             ],
-            "Elis": null
+            "Elis": null,
+            "UsedSI": {
+              "UsedPR": true,
+              "UsedPP": true,
+              "UsedPVL": true,
+              "UsedPVS": true,
+              "UsedSecondSI_PP": true,
+              "UsedSecondSI_PVL": true,
+              "UsedSecondSI_PVS": true
+            },
+            "UsedProcedureTypePR": null,
+            "OpcConnectionSettings": {
+              "Type": 1,
+              "DaSettings": {
+                "StartPrefix": "Root.PLC3.IVK_TN_01",
+                "Host": "localhost",
+                "ProgId": "psregulopcda_01",
+                "UpdateRate": 500
+              },
+              "UaSettings": {
+                "ConfigFilename": "Config.xml",
+                "UpdateRate": 500,
+                "StartPrefix": "IVK_TN_01"
+              }
+            },
+            "InvalidChars" : ["'"]
         }
     ],
     "PrintSettings": {
@@ -2605,5 +2692,19 @@
         "ClientName": "clientName",
         "ClientToken": ""
     },
-    "UseSecurityFeatures": false
+  "UseSecurityFeatures": false,
+  "ArmOpcConnectionSettings": {
+    "Type": 1,
+    "DaSettings": {
+      "StartPrefix": "Root.ARM.Reports",
+      "Host": "localhost",
+      "ProgId": "psregulopcda_01",
+      "UpdateRate": 500
+    },
+    "UaSettings": {
+      "ConfigFilename": "Config.xml",
+      "UpdateRate": 500,
+      "StartPrefix": "root.ARM.Reports"
+    }
+  }
 }
