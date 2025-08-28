@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PrinterSettings = SystemDrawing::System.Drawing.Printing.PrinterSettings;
@@ -29,8 +30,15 @@ public sealed class WindowsPrinter : AbsPrinter
     /// Получение списка доступных принтеров в системе
     /// </summary>
     /// <returns>Список доступных принтеров в системе</returns>
+    [SupportedOSPlatform("windows")]
     public override IEnumerable<string> GetAvailablePrinters()
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            _logger.LogWarning("Получение списка принтеров поддерживается только в Windows");
+            return [];
+        }
+
         try
         {
             var printers = PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
@@ -48,8 +56,15 @@ public sealed class WindowsPrinter : AbsPrinter
     /// </summary>
     /// <param name="printerName">Наименование принтера</param>
     /// <returns>Задача на печать документа pdf</returns>
+    [SupportedOSPlatform("windows")]
     public override Task PrintDocAsync(string printerName)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            _logger.LogWarning("Печать поддерживается только в Windows");
+            return Task.FromException(new PlatformNotSupportedException("Печать поддерживается только в Windows"));
+        }
+
         return Task.Run(async() =>
         {
                 var printersName = GetAvailablePrinters();
