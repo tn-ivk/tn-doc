@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Microsoft.Extensions.Logging;
 
 namespace TN_Doc.Models.Services;
 
@@ -12,8 +11,6 @@ public class LoggingPathService
     //private const string LinuxLogDirectory = "/var/log/TN_Doc";
     private const string LinuxLogDirectory = "/opt/TN_Doc/logs";
     private const string WindowsLogDirectory = "logs";
-    
-    private readonly ILogger<LoggingPathService> _logger;
 
     /// <summary>
     /// Получить директорию для логов в зависимости от операционной системы
