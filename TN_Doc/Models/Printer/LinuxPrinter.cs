@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
-using TN_Doc.Models.Services;
 using System.Threading.Tasks;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc.Models.Printer;
 

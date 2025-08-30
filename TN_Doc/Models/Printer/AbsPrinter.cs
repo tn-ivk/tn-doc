@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using TN_Doc.Models.Services;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc.Models.Printer;
 
