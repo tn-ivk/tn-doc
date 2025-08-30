@@ -15,17 +15,8 @@ namespace TN_Doc.Models.Printer;
 /// <summary>
 /// Вспомогательный класс для работы с принтером в ОС Windows
 /// </summary>
-public sealed class WindowsPrinter : AbsPrinter
+public sealed class WindowsPrinter(ILogger<WindowsPrinter> logger, IReportBuffer buffer) : AbsPrinter(logger, buffer)
 {
-    private readonly ILogger<WindowsPrinter> _logger;
-    private readonly IReportBuffer _buffer;
-    
-    public WindowsPrinter(ILogger<WindowsPrinter> logger, IReportBuffer buffer)
-    {
-        _logger = logger;
-        _buffer = buffer;
-    }
-    
     /// <summary>
     /// Получение списка доступных принтеров в системе
     /// </summary>

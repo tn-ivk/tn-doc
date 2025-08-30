@@ -4,20 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using TN_Doc.Models.Services;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace TN_Doc.Models.Printer;
 
 /// <summary>
 /// Класс принтера для взаимодействия с печатью под Linux
 /// </summary>
-public sealed class LinuxPrinter : AbsPrinter
+public sealed class LinuxPrinter(ILogger<LinuxPrinter> logger, IReportBuffer buffer) : AbsPrinter(logger, buffer)
 {
-    private readonly IReportBuffer _buffer;
-
-    public LinuxPrinter(IReportBuffer buffer)
-    {
-        _buffer = buffer;
-    }
     /// <summary>
     /// Получение списка доступных принтеров в системе
     /// </summary>
