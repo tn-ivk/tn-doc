@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using TN_Doc.Models.Services;
 
 namespace TN_Doc.Models.Printer;
@@ -8,9 +7,8 @@ namespace TN_Doc.Models.Printer;
 /// <summary>
 /// Абстрактная модель принтера печати документов
 /// </summary>
-public abstract class AbsPrinter(ILogger logger, IReportBuffer buffer)
+public abstract class AbsPrinter(IReportBuffer buffer)
 {
-    protected ILogger _logger = logger;
     protected IReportBuffer _buffer = buffer;
 
     /// <summary>

@@ -15,7 +15,7 @@ namespace TN_Doc.Models.Printer;
 /// <summary>
 /// Вспомогательный класс для работы с принтером в ОС Windows
 /// </summary>
-public sealed class WindowsPrinter(ILogger<WindowsPrinter> logger, IReportBuffer buffer) : AbsPrinter(logger, buffer)
+public sealed class WindowsPrinter(IReportBuffer buffer) : AbsPrinter(buffer)
 {
     /// <summary>
     /// Получение списка доступных принтеров в системе
@@ -26,20 +26,11 @@ public sealed class WindowsPrinter(ILogger<WindowsPrinter> logger, IReportBuffer
     {
         if (!OperatingSystem.IsWindows())
         {
-            _logger.LogWarning("Получение списка принтеров поддерживается только в Windows");
-            return [];
+            throw new PlatformNotSupportedException("Получение списка принтеров поддерживается только в Windows");
         }
 
-        try
-        {
-            var printers = PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
-            return printers;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Ошибка получения списка доступных принтеров в системе: {ex.Message}");
-            return [];
-        }
+        var printers = PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
+        return printers;
     }
     
     /// <summary>
@@ -52,8 +43,7 @@ public sealed class WindowsPrinter(ILogger<WindowsPrinter> logger, IReportBuffer
     {
         if (!OperatingSystem.IsWindows())
         {
-            _logger.LogWarning("Печать поддерживается только в Windows");
-            return Task.FromException(new PlatformNotSupportedException("Печать поддерживается только в Windows"));
+            throw new PlatformNotSupportedException("Печать поддерживается только в Windows");
         }
 
         return Task.Run(async() =>
