@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Versioning;
 using TN_Doc.Models.Services;
 using System.Threading.Tasks;
 
@@ -16,8 +17,14 @@ public sealed class LinuxPrinter(IReportBuffer buffer) : AbsPrinter(buffer)
     /// Получение списка доступных принтеров в системе
     /// </summary>
     /// <returns>Список доступных принтеров</returns>
+    [SupportedOSPlatform("linux")]
     public override IEnumerable<string> GetAvailablePrinters()
     {
+        if (!OperatingSystem.IsLinux())
+        {
+            throw new PlatformNotSupportedException("Получение списка принтеров поддерживается только в Linux");
+        }
+
         using var process = new Process();
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
@@ -48,8 +55,14 @@ public sealed class LinuxPrinter(IReportBuffer buffer) : AbsPrinter(buffer)
     /// Печать сформированного отчёта на заданном принтере
     /// </summary>
     /// <param name="printerName">Название принтера</param>
+    [SupportedOSPlatform("linux")]
     public override Task PrintDocAsync(string printerName)
     {
+        if (!OperatingSystem.IsLinux())
+        {
+            throw new PlatformNotSupportedException("Печать поддерживается только в Linux");
+        }
+
         return Task.Run(() =>
         {
             var printersName = GetAvailablePrinters();

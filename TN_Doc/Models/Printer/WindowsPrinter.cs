@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PrinterSettings = SystemDrawing::System.Drawing.Printing.PrinterSettings;
 using TN_Doc.Models.Services;
 
