@@ -1744,9 +1744,7 @@ function createMetodFromElisData(obj) {
             // "До 4,0", "до 4.5"
             { regex: /^до\s+([\d,\.]+)$/, operator: 'less' },
             // "От 4,0", "от 4.5"
-            { regex: /^от\s+([\d,\.]+)$/, operator: 'more_equal' },
-            // Просто число
-            { regex: /^([\d,\.]+)$/, operator: 'equal' }
+            { regex: /^от\s+([\d,\.]+)$/, operator: 'more_equal' }
         ];
         
         for (const pattern of patterns) {
@@ -1771,7 +1769,7 @@ function createMetodFromElisData(obj) {
     // Если парсинг не удался, используем существующую логику с очень маленькой дельтой
     if (limitValue === null) {
         const baseValue = parseFloat(obj.value) || 0;
-        limitValue = baseValue + 0.0001; // Очень маленькая дельта вместо 0.1
+        limitValue = baseValue + 0.0001;
         limitValueActivate = obj.value?.toFloat() !== limitValueString?.toFloat();
         logTrace(`Парсинг valueString не удался, использована базовая логика: ${baseValue} + 0.0001 = ${limitValue}`);
     }
