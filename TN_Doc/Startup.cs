@@ -51,7 +51,6 @@ public class Startup
 		services.AddPrinters();
 		services.AddPrinterService();
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
-		// Регистрация AppConfigService как IAppConfigService (singleton с фабрикой конфигурации)
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();

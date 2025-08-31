@@ -34,11 +34,12 @@ public class HomeController : Controller
     private readonly IReportBuffer _reportBuffer;
     private readonly IDocModuleLoader _docModuleLoader;
 
-    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration, IReportBuffer reportBuffer, IDocModuleLoader docModuleLoader)
+    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IReportBuffer reportBuffer, 
+        IDocModuleLoader docModuleLoader, IAppConfigService appConfig)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = context;
-        _appConfig = AppConfigService.GetInstance(configuration);
+        _appConfig = appConfig;
         _fr = new WebReport();
         _cfgApp = _appConfig.GetAppCfg();
         _reportBuffer = reportBuffer;
