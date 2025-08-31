@@ -1478,6 +1478,9 @@ async function _checkIntentSaving() {
         return true;
 
     } else {
+        await confirm('Изменения отсутствуют. Сохранение не требуется.', {
+            'title': 'Информация', 'yesBtnName': 'ОК', 'noBtnName': null, 'iconClass': "fa fa-info-circle text-info"
+        });
         return false;
     }
 }
@@ -1545,6 +1548,8 @@ function _addSaveButtonHandler() {
             AddClassToElement('.modal-header>.close-menu >.btn > i > .fa-flooppy', 'd-none')
             try {
                 _saveQpAndDict();
+                // Закрытие модального окна после успешного сохранения
+                $('#modal-window').modal('hide');
             } finally {
                 RemoveClassToElement('.modal-header>.close-menu> .btn > i > .fa-flooppy', 'd-none')
                 AddClassToElement('.modal-header>.close-menu> .btn >  i > .fa-spin', 'd-none')

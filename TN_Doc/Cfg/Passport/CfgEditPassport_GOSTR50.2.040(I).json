@@ -335,7 +335,7 @@
       ],
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": false
     },
     {
       "Id": 13,

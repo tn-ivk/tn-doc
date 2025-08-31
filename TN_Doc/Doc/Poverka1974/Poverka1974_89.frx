@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;CommonPoverka1974.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/24/2025 12:21:49" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;CommonPoverka1974.dll&#13;&#10;Poverka1974_89.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/02/2025 10:26:22" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -147,7 +147,7 @@ namespace FastReport
     
     private void ShowSourceDataWithManyRow()
     {
-      var colWidth = new [] { 1.0, 1.0, 1.0, 1.2, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 }; 
+      var colWidth = new [] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.2, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 }; 
       var totalColWidth = 0.0;
       for(int i=0; i &lt; colWidth.Length; i++)
         totalColWidth +=colWidth[i];        
@@ -186,25 +186,7 @@ namespace FastReport
         Teta_t.Text = tools.GetNormalizedValue(Protocol.Table1.Teta_t);
         Teta_V0.Text = (n &lt; listTeta_V0.Count) ? tools.GetNormalizedValue(listTeta_V0[n]) : &quot;-&quot;;
         T095.Text = tools.GetNormalizedValue(Protocol.Table1.t095);
-          
-        // RowSpans для общих параметров
-        for (int i = 0; i &lt; Table1SourceData.ColumnCount; i++)                                                              
-        {                                                                                                                                                            
-          switch(i)                                                                                                                                                  
-          {                                                                                                                                                                
-            case 3:  // m_D
-            case 4:  // m_S                                                                                                           
-            case 5:  // m_E                                                                                                                  
-            case 6:  // Alpha_t
-            case 7:  // Dens
-            case 8:  // Beta
-            case 9:  // Gamma 
-            case 11: // Teta_t
-            case 13: // T095
-              Table1SourceData[i,3].RowSpan = listTable1Detectors.Count;
-              break;  
-          }
-        }
+        
         Table1SourceData.PrintRow(3);     
         Table1SourceData.PrintColumns();  
       }
@@ -406,12 +388,12 @@ namespace FastReport
         <TableColumn Name="Column368" Width="68.04"/>
         <TableRow Name="Row144">
           <TableCell Name="Cell1082" Text="Тип преобразователя" Padding="0, 0, 0, 0" AllowExpressions="false" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
-          <TableCell Name="PR_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PR_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" WordWrap="false" Font="Arial, 9pt"/>
+          <TableCell Name="PR_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PR_Type" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" WordWrap="false" Font="Arial, 9pt"/>
           <TableCell Name="Cell1447" Text="Зав. номер" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
-          <TableCell Name="PR_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PR_FactoryNumber" Padding="0, 0, 0, 0" VertAlign="Bottom" WordWrap="false" Font="Arial, 9pt"/>
+          <TableCell Name="PR_FactoryNumber" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PR_FactoryNumber" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" WordWrap="false" Font="Arial, 9pt"/>
           <TableCell Name="Cell1767" Text="Вязкость, мм²/с (сСт)" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1768" Text="в начале поверки" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
-          <TableCell Name="ViscBegin" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="ViscBegin" VertAlign="Bottom" Font="Arial, 9pt"/>
+          <TableCell Name="ViscBegin" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="ViscBegin" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
         </TableRow>
         <TableRow Name="Row212">
           <TableCell Name="Cell1770" Font="Arial, 10pt"/>
@@ -420,7 +402,7 @@ namespace FastReport
           <TableCell Name="Cell1773" Font="Arial, 10pt"/>
           <TableCell Name="Cell1774" Font="Arial, 10pt"/>
           <TableCell Name="Cell1775" Text="в конце поверки" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
-          <TableCell Name="ViscEnd" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="ViscEnd" AllowExpressions="false" VertAlign="Bottom" Font="Arial, 9pt"/>
+          <TableCell Name="ViscEnd" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="ViscEnd" AllowExpressions="false" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
         </TableRow>
       </TableObject>
       <TableObject Name="TableHeader03" Top="79.38" Width="430.92" Height="18.9">
@@ -440,7 +422,7 @@ namespace FastReport
           <TableCell Name="Cell1575" Text="Тип ТПУ" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="PU_Type" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="PU_Type" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt"/>
           <TableCell Name="Cell1576" Text="Средняя температура нефти, °С" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
-          <TableCell Name="TempAvg" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="TempAvg" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt"/>
+          <TableCell Name="TempAvg" Border.Lines="Bottom" Border.BottomLine.Width="0.75" Text="TempAvg" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 9pt"/>
         </TableRow>
       </TableObject>
     </ReportTitleBand>
@@ -509,8 +491,8 @@ namespace FastReport
           <TableCell Name="Cell1412" Border.Lines="All" Text="14" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
         </TableRow>
         <TableRow Name="baseRowTableSourceData" Height="20.79">
-          <TableCell Name="V12" Border.Lines="All" Text="-" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags" CellDuplicates="Merge"/>
-          <TableCell Name="V21" Border.Lines="All" Text="-" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags" CellDuplicates="Merge"/>
+          <TableCell Name="V12" Border.Lines="All" Text="-" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
+          <TableCell Name="V21" Border.Lines="All" Text="-" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="5" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="V0" Border.Lines="All" Text="V0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="m_D" Border.Lines="All" Text="m_D" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>
           <TableCell Name="m_S" Border.Lines="All" Text="m_S" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 9pt" TextRenderType="HtmlTags"/>

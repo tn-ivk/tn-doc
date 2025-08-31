@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="06/03/2025 13:09:49" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/11/2025 18:16:53" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -66,8 +66,11 @@ namespace FastReport
       SIKN_Number.Text = $&quot;{JAdditionalData[&quot;SIKN_Number&quot;]}&quot;;
       Reservoir.Text = &quot;&quot;;
       
-      string dateTimeEnd = SamplingPeriodEnd.ToString(&quot;HH:mm&quot;) == &quot;00:00&quot; ? SamplingPeriodEnd.AddDays(-1).ToString(&quot;dd.MM.yyyy HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;): SamplingPeriodEnd.ToString(&quot;dd.MM.yyyy HH:mm&quot;);
-      DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy HH:mm&quot;)} - {dateTimeEnd}&quot;;      
+      var correctedSamplingEnd = string.Empty; 
+      if(SamplingPeriodEnd &gt; SamplingPeriodBegin &amp;&amp; SamplingPeriodEnd.ToString(&quot;HH:mm&quot;) == &quot;00:00&quot;)
+        correctedSamplingEnd = SamplingPeriodEnd.AddDays(-1).ToString(&quot;dd.MM.yyyy HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;);
+      var samplingEnd = string.IsNullOrEmpty(correctedSamplingEnd) ? SamplingPeriodEnd.ToString(&quot;dd.MM.yyyy HH:mm&quot;) : correctedSamplingEnd; 
+      DateTimeSampling.Text = $&quot;{SamplingPeriodBegin.ToString(&quot;dd.MM.yyyy HH:mm&quot;)} - {samplingEnd}&quot;;      
     }
              
     private void DrawTablePassport()
@@ -228,7 +231,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="146.84" Width="718.2" Height="291.06" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="148.35" Width="718.2" Height="291.06" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="281.61" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="434.7"/>
@@ -320,14 +323,14 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="441.1" Width="718.2" Height="355.32" CanGrow="true" CanShrink="true" CanBreak="true">
-      <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="353.43">
+    <ReportSummaryBand Name="ReportSummary" Top="444.11" Width="718.2" Height="332.64" CanGrow="true" CanShrink="true" CanBreak="true">
+      <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="325.08">
         <TableColumn Name="Column29" Width="283.5"/>
         <TableColumn Name="Column31" Width="202.23"/>
         <TableColumn Name="Column32" Width="7.56"/>
         <TableColumn Name="Column33" Width="224.91"/>
-        <TableRow Name="Row189" Height="103.95" AutoSize="true">
-          <TableCell Name="Cell1534" Text="    * предприятия трубопроводного транспорта не заполняют&#13;&#10;    Пункт 3 заполняют по показаниям поточного плотномера (средневзвешенное значение &#13;&#10;плотности нефти за смену).&#13;&#10;    Пункты 4 и 5 заполняют по показаниям поточного плотномера (средневзвешенное &#13;&#10;значение плотности нефти за смену), приведенным к стандартным условиям.&#13;&#10;    При отказе поточного плотномера плотность нефти определяют в испытательной &#13;&#10;лаборатории." Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" ColSpan="4"/>
+        <TableRow Name="Row189" Height="75.6" AutoSize="true">
+          <TableCell Name="Cell1534" Text="    * предприятия трубопроводного транспорта не заполняют&#13;&#10;    Пункт 3 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену).&#13;&#10;    Пункты 4 и 5 заполняют по показаниям поточного плотномера (средневзвешенное значение плотности нефти за смену), приведенным к стандартным условиям.&#13;&#10;    При отказе поточного плотномера плотность нефти определяют в испытательной лаборатории." Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 9pt" ColSpan="4"/>
           <TableCell Name="Cell1536" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1537" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
           <TableCell Name="Cell1538" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" TextRenderType="HtmlTags"/>
