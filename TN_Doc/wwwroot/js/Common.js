@@ -1505,9 +1505,7 @@ function FillPassportDataElis() {
                         }
                         break;
                     case 'Metod': 
-                        const flag = obj.value?.toFloat() !== obj['valueString']?.toFloat();
-                        const limitValue = parseFloat(obj.value) + 0.1;
-                        let metod = new Metod(0,true, 0, obj.testMethodName, flag, limitValue, obj.valueString);
+                        let metod = createMetodFromElisData(obj);
                         if (!item.contains(obj.testMethodName)) {
                             item.append(new Option(obj.testMethodName, obj.testMethodName));
                         }
@@ -1720,6 +1718,65 @@ function UpdateElisApplyButtonState() {
 
 String.prototype.toFloat = function (value) {
     return parseFloat(this.replace(',', '.').trim())
+}
+
+// Функция для умного парсинга valueString и генерации объекта Metod
+function createMetodFromElisData(obj) {
+    let limitValue = null;
+    let limitValueString = obj.valueString || '';
+    let limitValueActivate = false;
+    
+    // Пытаемся распарсить текстовое представление
+    if (limitValueString && typeof limitValueString === 'string') {
+        // Убираем лишние пробелы и приводим к нижнему регистру
+        const cleanString = limitValueString.trim().toLowerCase();
+        
+        // Паттерны для парсинга
+        const patterns = [
+            // "Менее 4,0", "менее 4.5", "менее 4"
+            { regex: /^менее\s+([\d,\.]+)$/, operator: 'less' },
+            // "Более 4,0", "более 4.5", "более 4"
+            { regex: /^более\s+([\d,\.]+)$/, operator: 'more' },
+            // "Не более 4,0", "не более 4.5"
+            { regex: /^не\s+более\s+([\d,\.]+)$/, operator: 'less_equal' },
+            // "Не менее 4,0", "не менее 4.5"
+            { regex: /^не\s+менее\s+([\d,\.]+)$/, operator: 'more_equal' },
+            // "До 4,0", "до 4.5"
+            { regex: /^до\s+([\d,\.]+)$/, operator: 'less' },
+            // "От 4,0", "от 4.5"
+            { regex: /^от\s+([\d,\.]+)$/, operator: 'more_equal' },
+            // Просто число
+            { regex: /^([\d,\.]+)$/, operator: 'equal' }
+        ];
+        
+        for (const pattern of patterns) {
+            const match = cleanString.match(pattern.regex);
+            if (match) {
+                // Заменяем запятую на точку для корректного парсинга
+                const numberStr = match[1].replace(',', '.');
+                const parsedValue = parseFloat(numberStr);
+                
+                if (!isNaN(parsedValue)) {
+                    limitValue = parsedValue;
+                    limitValueActivate = true;
+                    
+                    // Логируем успешный парсинг
+                    logTrace(`Успешно распарсен valueString: "${limitValueString}" -> ${parsedValue} (оператор: ${pattern.operator})`);
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Если парсинг не удался, используем существующую логику с очень маленькой дельтой
+    if (limitValue === null) {
+        const baseValue = parseFloat(obj.value) || 0;
+        limitValue = baseValue + 0.0001; // Очень маленькая дельта вместо 0.1
+        limitValueActivate = obj.value?.toFloat() !== limitValueString?.toFloat();
+        logTrace(`Парсинг valueString не удался, использована базовая логика: ${baseValue} + 0.0001 = ${limitValue}`);
+    }
+    
+    return new Metod(0, true, 0, obj.testMethodName, limitValueActivate, limitValue, limitValueString);
 }
 
 
