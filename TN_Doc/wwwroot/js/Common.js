@@ -1,6 +1,8 @@
 ﻿// Подключение модуля логирования
 // Функции логирования: logInfo, logWarn, logError, logDebug, logTrace
 
+const ELIS_FALLBACK_DELTA = 0.0001; // Минимальная дельта для fallback значений
+
 const hubConnection = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:5010/SignalRApp")
     //.WithAutomaticReconnect()
@@ -1769,9 +1771,9 @@ function createMetodFromElisData(obj) {
     // Если парсинг не удался, используем существующую логику с очень маленькой дельтой
     if (limitValue === null) {
         const baseValue = parseFloat(obj.value) || 0;
-        limitValue = baseValue + 0.0001;
+        limitValue = baseValue + ELIS_FALLBACK_DELTA;
         limitValueActivate = obj.value?.toFloat() !== limitValueString?.toFloat();
-        logTrace(`Парсинг valueString не удался, использована базовая логика: ${baseValue} + 0.0001 = ${limitValue}`);
+        logTrace(`Парсинг valueString не удался, использована базовая логика: ${baseValue} + ${ELIS_FALLBACK_DELTA} = ${limitValue}`);
     }
     
     return new Metod(0, true, 0, obj.testMethodName, limitValueActivate, limitValue, limitValueString);
