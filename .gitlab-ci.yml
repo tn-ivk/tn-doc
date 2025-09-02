@@ -26,7 +26,7 @@ build-job:
   script:
     - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
-    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
+    - 'dotnet nuget add source "nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - echo "Rebuilding solution ..."
     - dotnet build
     - echo "Moving to $PROJECT_NAME..."
