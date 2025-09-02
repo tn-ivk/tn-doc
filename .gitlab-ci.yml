@@ -63,67 +63,91 @@ extract-version-job:
       echo "Looking for previous pipeline with version $VERSION..."
       BUILD_NUMBER=1
       
-      # Получаем список последних успешных pipeline'ов
-      echo "Fetching recent successful pipelines..."
-      PIPELINES=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
-        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/pipelines?status=success&per_page=20")
-      
-      if [ $? -eq 0 ] && echo "$PIPELINES" | jq -e '.[0]' > /dev/null 2>&1; then
-        echo "Found $(echo "$PIPELINES" | jq length) successful pipelines"
+      # Проверяем доступность API токена
+      if [ -z "$PROJECT_API_TOKEN" ]; then
+        echo "WARNING: PROJECT_API_TOKEN not set, using build number 1"
+      else
+        echo "API Token is available, fetching pipeline data..."
         
-        # Проходим по pipeline'ам и ищем артефакты с той же версией
-        for pipeline_id in $(echo "$PIPELINES" | jq -r '.[].id'); do
-          echo "Checking pipeline $pipeline_id for version $VERSION..."
+        # Получаем список последних успешных pipeline'ов с подробной диагностикой
+        echo "Fetching recent successful pipelines..."
+        API_URL="$CI_API_V4_URL/projects/$CI_PROJECT_ID/pipelines?status=success&per_page=20"
+        echo "API URL: $API_URL"
+        
+        PIPELINES_RESPONSE=$(curl -s -w "HTTPCODE:%{http_code}" \
+          --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" "$API_URL")
+        
+        HTTP_CODE=$(echo "$PIPELINES_RESPONSE" | tail -1 | cut -d: -f2)
+        PIPELINES=$(echo "$PIPELINES_RESPONSE" | sed '$d')
+        
+        echo "API HTTP Code: $HTTP_CODE"
+        
+        if [ "$HTTP_CODE" = "200" ]; then
+          PIPELINE_COUNT=$(echo "$PIPELINES" | jq length 2>/dev/null || echo "0")
+          echo "Found $PIPELINE_COUNT successful pipelines"
           
-          # Получаем jobs этого pipeline
-          JOBS=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
-            "$CI_API_V4_URL/projects/$CI_PROJECT_ID/pipelines/$pipeline_id/jobs")
-          
-          # Ищем extract-version-job
-          JOB_ID=$(echo "$JOBS" | jq -r '.[] | select(.name=="extract-version-job") | .id' | head -1)
-          
-          if [ -n "$JOB_ID" ] && [ "$JOB_ID" != "null" ]; then
-            echo "Found extract-version-job with ID: $JOB_ID"
-            
-            # Скачиваем артефакт version.env
-            if curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
-              "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/$JOB_ID/artifacts/version.env" \
-              -o previous_version.env 2>/dev/null; then
+          if [ "$PIPELINE_COUNT" != "0" ] && [ "$PIPELINE_COUNT" != "null" ]; then
+            # Проходим по pipeline'ам и ищем артефакты с той же версией
+            for pipeline_id in $(echo "$PIPELINES" | jq -r '.[].id' 2>/dev/null); do
+              echo "Checking pipeline $pipeline_id for version $VERSION..."
               
-              if [ -f previous_version.env ] && [ -s previous_version.env ]; then
-                echo "Downloaded previous version.env"
-                cat previous_version.env
+              # Получаем jobs этого pipeline
+              JOBS_URL="$CI_API_V4_URL/projects/$CI_PROJECT_ID/pipelines/$pipeline_id/jobs"
+              JOBS=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" "$JOBS_URL")
+              
+              # Ищем успешный extract-version-job
+              JOB_ID=$(echo "$JOBS" | jq -r '.[] | select(.name=="extract-version-job" and .status=="success") | .id' 2>/dev/null | head -1)
+              
+              if [ -n "$JOB_ID" ] && [ "$JOB_ID" != "null" ]; then
+                echo "Found successful extract-version-job with ID: $JOB_ID"
                 
-                PREV_VERSION=$(grep "VERSION=" previous_version.env | cut -d'=' -f2)
-                PREV_BUILD_NUMBER=$(grep "BUILD_NUMBER=" previous_version.env | cut -d'=' -f2)
+                # Скачиваем артефакт version.env
+                ARTIFACT_URL="$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/$JOB_ID/artifacts/version.env"
+                echo "Downloading artifact from: $ARTIFACT_URL"
                 
-                echo "Previous version: $PREV_VERSION, Previous build: $PREV_BUILD_NUMBER"
-                
-                if [ "$PREV_VERSION" = "$VERSION" ] && [ -n "$PREV_BUILD_NUMBER" ] && [ "$PREV_BUILD_NUMBER" != "" ]; then
-                  BUILD_NUMBER=$((PREV_BUILD_NUMBER + 1))
-                  echo "Found matching version! Incrementing from $PREV_BUILD_NUMBER to $BUILD_NUMBER"
-                  rm -f previous_version.env
-                  break
+                if curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+                  "$ARTIFACT_URL" -o previous_version.env 2>/dev/null; then
+                  
+                  if [ -f previous_version.env ] && [ -s previous_version.env ]; then
+                    echo "Downloaded previous version.env successfully:"
+                    cat previous_version.env
+                    
+                    PREV_VERSION=$(grep "^VERSION=" previous_version.env | cut -d'=' -f2)
+                    PREV_BUILD_NUMBER=$(grep "^BUILD_NUMBER=" previous_version.env | cut -d'=' -f2)
+                    
+                    echo "Previous version: '$PREV_VERSION', Previous build: '$PREV_BUILD_NUMBER'"
+                    
+                    if [ "$PREV_VERSION" = "$VERSION" ] && [ -n "$PREV_BUILD_NUMBER" ] && [ "$PREV_BUILD_NUMBER" != "" ]; then
+                      BUILD_NUMBER=$((PREV_BUILD_NUMBER + 1))
+                      echo "SUCCESS: Found matching version! Incrementing from $PREV_BUILD_NUMBER to $BUILD_NUMBER"
+                      rm -f previous_version.env
+                      break
+                    else
+                      echo "Version mismatch or invalid build number, continuing search..."
+                    fi
+                    rm -f previous_version.env
+                  else
+                    echo "Failed to download or empty version.env for job $JOB_ID"
+                  fi
                 else
-                  echo "Version mismatch or invalid build number, continuing search..."
+                  echo "Failed to download artifacts for job $JOB_ID (may not exist yet)"
                 fi
-                rm -f previous_version.env
               else
-                echo "Failed to download or empty version.env"
+                echo "No successful extract-version-job found in pipeline $pipeline_id"
               fi
-            else
-              echo "Failed to download artifacts for job $JOB_ID"
+            done
+            
+            if [ "$BUILD_NUMBER" = "1" ]; then
+              echo "No previous pipeline found with version $VERSION, starting with build number 1"
             fi
           else
-            echo "No extract-version-job found in pipeline $pipeline_id"
+            echo "No successful pipelines found in API response, starting with build number 1"
           fi
-        done
-        
-        if [ "$BUILD_NUMBER" = "1" ]; then
-          echo "No previous pipeline found with version $VERSION, starting with build number 1"
+        else
+          echo "API request failed with HTTP code $HTTP_CODE"
+          echo "Response: $PIPELINES"
+          echo "Starting with build number 1"
         fi
-      else
-        echo "No previous successful pipelines found or API error, starting with build number 1"
       fi
       
       echo "Final build number: $BUILD_NUMBER"
