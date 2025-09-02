@@ -73,7 +73,7 @@ extract-version-job:
     # Формирование ревизии из CI_COMMIT_SHORT_SHA
     - REVISION="${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
-    - FULL_VERSION="${VERSION}-$b{BUILD_NUMBER}-${REVISION}"
+    - FULL_VERSION="${VERSION}-b${BUILD_NUMBER}-${REVISION}"
     - echo "Full version:$FULL_VERSION"
     # Сохранение переменных для последующих этапов
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
