@@ -46,6 +46,10 @@ extract-version-job:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   tags:
     - orpovy
+  cache:
+    key: "${VERSION}-build-number"
+    paths:
+      - build_number.txt
   script:
     # Определение пути к .csproj файлу
     - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
@@ -56,16 +60,27 @@ extract-version-job:
     - echo "Extracted version:$VERSION"
     # Проверка версии
     - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
+    # Формирование build number
+    - |
+      if [ -f build_number.txt ]; then
+        BUILD_NUMBER=$(cat build_number.txt)
+        BUILD_NUMBER=$((BUILD_NUMBER+1))
+      else
+        BUILD_NUMBER=1
+      fi
+      echo $BUILD_NUMBER > build_number.txt
+    - echo "BUILD_NUMBER=$BUILD_NUMBER" >> version.env
     # Формирование ревизии из CI_COMMIT_SHORT_SHA
-    - REVISION="r${CI_COMMIT_SHORT_SHA}"
+    - REVISION="${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
-    - FULL_VERSION="${VERSION}-${REVISION}"
+    - FULL_VERSION="${VERSION}-$b{BUILD_NUMBER}-${REVISION}"
     - echo "Full version:$FULL_VERSION"
     # Сохранение переменных для последующих этапов
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
     - echo "VERSION=$VERSION" >> version.env
     - echo "REVISION=$REVISION" >> version.env
     - echo "PACKAGE_NAME=$PROJECT_NAME" >> version.env
+    
   artifacts:
     reports:
       dotenv: version.env
