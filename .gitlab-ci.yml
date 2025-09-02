@@ -47,8 +47,8 @@ extract-version-job:
   tags:
     - orpovy
   script:
-    # Установка curl и jq для работы с GitLab API
-    - apt-get update && apt-get install -y curl jq
+    # Установка curl для работы с GitLab API
+    - apt-get update && apt-get install -y curl
     # Определение пути к .csproj файлу
     - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
     # Проверка существования файла
@@ -58,100 +58,32 @@ extract-version-job:
     - echo "Extracted version:$VERSION"
     # Проверка версии
     - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
-    # Поиск последнего успешного pipeline с той же версией
+    # Формирование имени переменной для build number
+    - BUILD_VAR_NAME="BUILD_NUMBER_$(echo $VERSION | tr '.' '_')"
+    - echo "Build variable name:$BUILD_VAR_NAME"
+    # Получение текущего build number из переменных проекта
     - |
-      echo "Looking for previous pipeline with version $VERSION..."
-      BUILD_NUMBER=1
-      
-      # Проверяем доступность API токена
-      if [ -z "$PROJECT_API_TOKEN" ]; then
-        echo "WARNING: PROJECT_API_TOKEN not set, using build number 1"
-      else
-        echo "API Token is available, fetching pipeline data..."
-        
-        # Получаем список последних успешных pipeline'ов с подробной диагностикой
-        echo "Fetching recent successful pipelines..."
-        API_URL="$CI_API_V4_URL/projects/$CI_PROJECT_ID/pipelines?status=success&per_page=20"
-        echo "API URL: $API_URL"
-        
-        PIPELINES_RESPONSE=$(curl -s -w "HTTPCODE:%{http_code}" \
-          --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" "$API_URL")
-        
-        HTTP_CODE=$(echo "$PIPELINES_RESPONSE" | tail -1 | cut -d: -f2)
-        PIPELINES=$(echo "$PIPELINES_RESPONSE" | sed '$d')
-        
-        echo "API HTTP Code: $HTTP_CODE"
-        
-        if [ "$HTTP_CODE" = "200" ]; then
-          PIPELINE_COUNT=$(echo "$PIPELINES" | jq length 2>/dev/null || echo "0")
-          echo "Found $PIPELINE_COUNT successful pipelines"
-          
-          if [ "$PIPELINE_COUNT" != "0" ] && [ "$PIPELINE_COUNT" != "null" ]; then
-            # Проходим по pipeline'ам и ищем артефакты с той же версией
-            for pipeline_id in $(echo "$PIPELINES" | jq -r '.[].id' 2>/dev/null); do
-              echo "Checking pipeline $pipeline_id for version $VERSION..."
-              
-              # Получаем jobs этого pipeline
-              JOBS_URL="$CI_API_V4_URL/projects/$CI_PROJECT_ID/pipelines/$pipeline_id/jobs"
-              JOBS=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" "$JOBS_URL")
-              
-              # Ищем успешный extract-version-job
-              JOB_ID=$(echo "$JOBS" | jq -r '.[] | select(.name=="extract-version-job" and .status=="success") | .id' 2>/dev/null | head -1)
-              
-              if [ -n "$JOB_ID" ] && [ "$JOB_ID" != "null" ]; then
-                echo "Found successful extract-version-job with ID: $JOB_ID"
-                
-                # Скачиваем артефакт version.env
-                ARTIFACT_URL="$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/$JOB_ID/artifacts/version.env"
-                echo "Downloading artifact from: $ARTIFACT_URL"
-                
-                if curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
-                  "$ARTIFACT_URL" -o previous_version.env 2>/dev/null; then
-                  
-                  if [ -f previous_version.env ] && [ -s previous_version.env ]; then
-                    echo "Downloaded previous version.env successfully:"
-                    cat previous_version.env
-                    
-                    PREV_VERSION=$(grep "^VERSION=" previous_version.env | cut -d'=' -f2)
-                    PREV_BUILD_NUMBER=$(grep "^BUILD_NUMBER=" previous_version.env | cut -d'=' -f2)
-                    
-                    echo "Previous version: '$PREV_VERSION', Previous build: '$PREV_BUILD_NUMBER'"
-                    
-                    if [ "$PREV_VERSION" = "$VERSION" ] && [ -n "$PREV_BUILD_NUMBER" ] && [ "$PREV_BUILD_NUMBER" != "" ]; then
-                      BUILD_NUMBER=$((PREV_BUILD_NUMBER + 1))
-                      echo "SUCCESS: Found matching version! Incrementing from $PREV_BUILD_NUMBER to $BUILD_NUMBER"
-                      rm -f previous_version.env
-                      break
-                    else
-                      echo "Version mismatch or invalid build number, continuing search..."
-                    fi
-                    rm -f previous_version.env
-                  else
-                    echo "Failed to download or empty version.env for job $JOB_ID"
-                  fi
-                else
-                  echo "Failed to download artifacts for job $JOB_ID (may not exist yet)"
-                fi
-              else
-                echo "No successful extract-version-job found in pipeline $pipeline_id"
-              fi
-            done
-            
-            if [ "$BUILD_NUMBER" = "1" ]; then
-              echo "No previous pipeline found with version $VERSION, starting with build number 1"
-            fi
-          else
-            echo "No successful pipelines found in API response, starting with build number 1"
-          fi
-        else
-          echo "API request failed with HTTP code $HTTP_CODE"
-          echo "Response: $PIPELINES"
-          echo "Starting with build number 1"
-        fi
+      CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME" | \
+        grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
+    - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
+    - BUILD_NUMBER=$((CURRENT_BUILD + 1))
+    - echo "Current build number:$CURRENT_BUILD, New build number:$BUILD_NUMBER"
+    # Обновление build number в переменных проекта
+    - |
+      RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+        --header "Content-Type: application/json" \
+        --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME")
+      if echo "$RESPONSE" | grep -q "404\|message"; then
+        echo "Variable does not exist, creating new one..."
+        curl -s --request POST --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+          --header "Content-Type: application/json" \
+          --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
+          "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables"
       fi
-      
-      echo "Final build number: $BUILD_NUMBER"
-    # Формирование ревизии из CI_COMMIT_SHORT_SHA  
+      echo "Build number updated successfully"
+    # Формирование ревизии из CI_COMMIT_SHORT_SHA
     - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
     - FULL_VERSION="${VERSION}-${REVISION}"
@@ -162,14 +94,9 @@ extract-version-job:
     - echo "REVISION=$REVISION" >> version.env
     - echo "BUILD_NUMBER=$BUILD_NUMBER" >> version.env
     - echo "PACKAGE_NAME=$PROJECT_NAME" >> version.env
-    - echo "Created version.env:"
-    - cat version.env
   artifacts:
     reports:
       dotenv: version.env
-    paths:
-      - version.env
-    expire_in: 1 year
 
 package-job:      # This job runs in the deploy stage.
   stage: package
