@@ -63,7 +63,7 @@ extract-version-job:
     - echo "Build variable name:$BUILD_VAR_NAME"
     # Получение текущего build number из переменных проекта
     - |
-      CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $CI_JOB_TOKEN" \
+      CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
         "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME" | \
         grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
     - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
@@ -71,14 +71,18 @@ extract-version-job:
     - echo "Current build number:$CURRENT_BUILD, New build number:$BUILD_NUMBER"
     # Обновление build number в переменных проекта
     - |
-      curl -s --request PUT --header "PRIVATE-TOKEN: $CI_JOB_TOKEN" \
+      RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
         --header "Content-Type: application/json" \
         --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
-        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME" || \
-      curl -s --request POST --header "PRIVATE-TOKEN: $CI_JOB_TOKEN" \
-        --header "Content-Type: application/json" \
-        --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
-        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables"
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME")
+      if echo "$RESPONSE" | grep -q "404\|message"; then
+        echo "Variable does not exist, creating new one..."
+        curl -s --request POST --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+          --header "Content-Type: application/json" \
+          --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
+          "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables"
+      fi
+      echo "Build number updated successfully"
     # Формирование ревизии из CI_COMMIT_SHORT_SHA
     - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
