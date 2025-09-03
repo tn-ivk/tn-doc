@@ -1,0 +1,14 @@
+[Unit]
+Description=Service TN_KMH
+
+[Service]
+WorkingDirectory=/opt/TN_KMH/
+ExecStart=/usr/bin/dotnet/dotnet /opt/TN_KMH/TN_KMH.dll
+Restart=always
+RestartSec=10
+SyslogIdentifier=dotnet-TN_KMH
+User=alphadaemon
+Environment=ASPNETCORE_ENVIRONMENT=Production
+
+[Install]
+WantedBy=multi-user.target

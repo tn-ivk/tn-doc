@@ -1,0 +1,244 @@
+---
+- name: 'REPORTS install'
+
+  vars_files: 
+    - ../inventories/settings.yml
+    - ../inventories/global_vars.yml
+  hosts: "{{play_host}}"
+  #become: true
+  tasks:
+
+#### Подключение репозитория
+    - import_tasks: ../tasks/t_repo_add.yml
+    
+##### Добавлление шрифтов
+    - name: Copy fonts files
+      become: true
+      copy:
+         src: '{{home_dir}}/distrib/fonts/'
+         dest: /usr/share/fonts/
+      notify: 
+         - Update fonts cache
+    
+#### Стоп TN_xxx сервис если запущен     
+    - name: Stop TN_xxx service (if started)
+      become: true
+      ignore_errors: true
+      systemd:
+         name: '{{ item }}'
+         state: stopped 
+      loop:
+        - 'TN_Doc'
+        - 'TN_KMH'
+        - 'TN_MessagingService'
+
+#### Установка DOTNET
+    - import_tasks: ../tasks/t_install_dotnet.yml
+
+
+
+#### Установка WebViewer вручную 
+#   # Создание дирректорий
+#   - name: Make dir for WebViewer
+#     become: true
+#     file:
+#        path: /opt/webviewer/
+#        state: directory
+#   # Копирование файлов
+#   - name: Copy files WebViewer
+#     copy:
+#        dest: /tempdir
+#        src: {{home_dir}}/distrib/reports/{{webviewer}}
+#        force: false
+#   # Извлечение архива
+#   - name: Unziped WebViewer
+#     become: true
+#     unarchive:
+#        dest: /opt/webviewer/
+#        src: /tempdir/{{webviewer}}
+#        #Закоментировать при обновлении или удалить всю папку сначала
+#        creates: /opt/webviewer/webviewer
+#        remote_src: true
+#   # Удаление установщика
+#   - name: Delete WebViewer archives
+#     file:
+#        path: /tempdir/{{webviewer}}
+#        state: absent
+#   # Делаем файл исполняемым (если он таким не является)
+#   - name: Make file WebViewer execute
+#     #become: true
+#     file:
+#        path: /opt/webviewer/webviewer
+#        mode: +x
+#   - name: Delete error whith sandbox 
+#     become: true
+#     file:
+#        path: /opt/webviewer/chrome-sandbox
+#        mode: '4755'
+#### Окончание установки WebViewer вручную    
+
+
+#### Установка пакетов необходимых для WebViewer
+#
+#   - name: Install nodejs from repository
+#     become: true
+#     apt: 
+#        name: nodejs
+#        install_recommends: true
+#        force: true
+#
+#### Окончание установки пакетов необходимых для WebViewer  
+  
+#### Установка TN_Doc
+
+  
+  
+  
+    # Удаление дирректорий на случай исправления старых отчетов
+    - name: Del All dir TN_xxx
+      become: true
+      file:
+         path: '{{item}}'
+         state: absent
+      loop:
+         - /usr/share/CIA
+         - /opt/TN_Doc
+         - /opt/TN_KMH
+         - /opt/TN_MessagingService
+    # Создание дирректории для TN_MessagingService и изменение прав доступа
+    - name: Make dir CIA for TN_MessagingService
+      become: true
+      file:
+         path: '/usr/share/CIA/'
+         state: directory
+         group: alphadaemon
+         owner: alphadaemon
+         mode: u=rwx,g=rx,o=rx
+    # Копирование файлов
+    - name: Copy files for TN_Doc to tempdir
+      copy:
+         dest: /tempdir
+         src: '{{home_dir}}/distrib/reports/{{item}}'
+         force: true
+      loop:
+        - '{{libgdiplus}}'
+        - '{{TN_Doc}}'
+        - '{{TN_KMH}}'
+        - '{{TN_MessagingService}}'
+        - '{{webviewer}}'
+      notify:
+        - 'Delete TN_Doc files'
+        
+    # Создание дирректорий
+    - name: Make dir for TN_xxx
+      become: true
+      file:
+         path: '/opt/{{ item }}/'
+         state: directory
+         group: alphadaemon
+         owner: alphadaemon
+      loop:
+        - 'TN_Doc'
+        - 'TN_KMH'
+        - 'TN_MessagingService'
+        
+    # Извлечение архива TN_Doc
+    - name: Unziped TN_Doc
+      become: true
+      unarchive:
+         dest: /opt/TN_Doc
+         src: /tempdir/{{TN_Doc}}
+         group: alphadaemon
+         owner: alphadaemon
+         #Закоментировать при обновлении или удалить всю папку сначала
+         #creates: /opt/TN_Doc/TN_Doc.dll
+         remote_src: true
+      notify:
+        - 'Delete TN_Doc files'
+    - name: Unziped TN_KMH
+      become: true
+      unarchive:
+         dest: /opt/TN_KMH
+         src: /tempdir/{{TN_KMH}}
+         group: alphadaemon
+         owner: alphadaemon
+         #Закоментировать при обновлении или удалить всю папку сначала
+         #creates: /opt/TN_Doc/TN_KMH.dll
+         remote_src: true
+      notify:
+        - 'Delete TN_Doc files'
+    - name: Unziped TN_MessagingService
+      become: true
+      unarchive:
+         dest: /opt/TN_MessagingService
+         src: /tempdir/{{TN_MessagingService}}
+         #Закоментировать при обновлении или удалить всю папку сначала
+         #creates: /opt/TN_Doc/TN_MessagingService.dll
+         group: alphadaemon
+         owner: alphadaemon
+         remote_src: true
+      notify:
+        - 'Delete TN_Doc files'
+    # Установка необходимых пакетов для TN_Doc
+    - name: Install deb packages
+      become: true
+      apt:
+         deb: /tempdir/{{item}}
+         #install_recommends: true
+         force: true
+         state: present
+      loop:
+        - '{{libgdiplus}}'
+        - '{{webviewer}}'
+      notify:
+        - 'Delete TN_Doc files'
+#### Окончание установки TN_xxx
+
+#### Настройка TN_xxx в качестве службы
+    # Копирование файлов
+    - name: Copy files TN_xxx.service
+      become: true
+      copy:
+         dest: /etc/systemd/system/
+         src: '{{home_dir}}/distrib/reports/{{ item }}.service'
+         #group: administrator
+         #owner: administrator
+      loop:
+        - 'TN_Doc'
+        - 'TN_KMH'
+        - 'TN_MessagingService'
+    - name: Update services list
+      become: true
+      systemd:
+         daemon_reload: true
+    - name: Start TN_xxx as Service
+      become: true
+      systemd:
+         name: '{{ item }}'
+         enabled: true 
+         state: started 
+      loop:
+        - 'TN_Doc'
+        - 'TN_KMH'
+        - 'TN_MessagingService'
+#### Окончание настройки TN_Doc в качестве службы
+         
+  handlers:
+#### Отключение репозитория
+    - import_tasks: ../tasks/t_repo_del.yml
+
+    - name: 'Update fonts cache'
+      become: true
+      command: fc-cache -fv
+    
+    # Удаление установочных файлов
+    - name: Delete TN_Doc files
+      file:
+         path: '{{item}}'
+         state: absent
+      loop:
+        - /tempdir/{{libgdiplus}}
+        - /tempdir/{{TN_Doc}}
+        - /tempdir/{{TN_KMH}}
+        - /tempdir/{{TN_MessagingService}}
+        - /tempdir/{{webviewer}}

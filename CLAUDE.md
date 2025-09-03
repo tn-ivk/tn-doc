@@ -293,18 +293,27 @@ Current development focus on solving file locking issues:
 - **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
 - **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
 - **Document generation failures**: Check logs and validate JSON data structure
+- **PDF file locking**: As of v1.4.1, moved to in-memory generation. If issues persist, check memory usage and disposal patterns
 - **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
 - **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
 - **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
+- **Service deployment**: For Windows, use `NT AUTHORITY\NETWORK SERVICE` account with appropriate permissions
 
 ### Working with Document Modules
 When working on specific document types:
-- Document-specific templates are in `/TN_Doc/Doc/{DocumentType}/`
-- Configuration files follow pattern `Cfg{DocumentType}.json` and `CfgEdit{DocumentType}.json`
-- Each document module implements standard interface methods in corresponding class library
-- Test document generation thoroughly before modifying templates
-- FastReport templates (.frx files) are binary - use FastReport Designer for editing
-- Pre-compiled modules available in `Dll/` directory
+- **Document modules**: Located in `tn.docgeneral/` directory organized by type
+  - Individual implementations: Passport, Poverka*, KMH*, Act, Report, Jornal
+  - Sikn425 modules in separate subfolder  
+- **Templates**: Document-specific templates in `/TN_Doc/Doc/{DocumentType}/`
+- **Configuration**: Files follow pattern `Cfg{DocumentType}.json` and `CfgEdit{DocumentType}.json`
+- **Interface**: Each document module implements standard methods:
+  - `GetViewDoc(id)`: Returns JSON data for report generation
+  - `GetPathTemplateFile()`: Returns path to .frx template
+  - `GetEditDoc(id)`: Returns HTML for editing forms
+  - `SetDocFromJson(json)`: Updates document data from JSON
+- **Template editing**: FastReport templates (.frx files) are binary - use FastReport Designer
+- **Pre-compiled modules**: Available in `Dll/` directory
+- **Testing**: Test document generation thoroughly before modifying templates
 
 ### Version Management
 - Version is centrally managed in `TN_Doc.csproj`
@@ -350,6 +359,7 @@ Configuration follows a layered approach:
 - Client-side logging moved to separate controller (`ClientLogController`)
 - Enhanced document operation logging (library events)
 - Corrected ELIS form population logging
+- ⚠️ **In-memory document generation**: Critical architectural change moving from file-based to memory-based PDF generation to resolve file locking issues
 
 ### Previous Major Changes
 - **v1.4.0**: Modal dictionary window closing after saving, validation improvements
