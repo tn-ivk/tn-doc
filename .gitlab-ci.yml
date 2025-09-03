@@ -26,7 +26,7 @@ build-job:
   script:
     - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
-    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
+    - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - echo "Rebuilding solution ..."
     - dotnet build
     - echo "Moving to $PROJECT_NAME..."
@@ -47,6 +47,8 @@ extract-version-job:
   tags:
     - orpovy
   script:
+    # Установка curl для работы с GitLab API
+    - apt-get update && apt-get install -y curl
     # Определение пути к .csproj файлу
     - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
     # Проверка существования файла
@@ -56,8 +58,33 @@ extract-version-job:
     - echo "Extracted version:$VERSION"
     # Проверка версии
     - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
+    # Формирование имени переменной для build number
+    - BUILD_VAR_NAME="BUILD_NUMBER_$(echo $VERSION | tr '.' '_')"
+    - echo "Build variable name:$BUILD_VAR_NAME"
+    # Получение текущего build number из переменных проекта
+    - |
+      CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME" | \
+        grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
+    - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
+    - BUILD_NUMBER=$((CURRENT_BUILD + 1))
+    - echo "Current build number:$CURRENT_BUILD, New build number:$BUILD_NUMBER"
+    # Обновление build number в переменных проекта
+    - |
+      RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+        --header "Content-Type: application/json" \
+        --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME")
+      if echo "$RESPONSE" | grep -q "404\|message"; then
+        echo "Variable does not exist, creating new one..."
+        curl -s --request POST --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+          --header "Content-Type: application/json" \
+          --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
+          "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables"
+      fi
+      echo "Build number updated successfully"
     # Формирование ревизии из CI_COMMIT_SHORT_SHA
-    - REVISION="r${CI_COMMIT_SHORT_SHA}"
+    - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
     - FULL_VERSION="${VERSION}-${REVISION}"
     - echo "Full version:$FULL_VERSION"
@@ -65,6 +92,7 @@ extract-version-job:
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
     - echo "VERSION=$VERSION" >> version.env
     - echo "REVISION=$REVISION" >> version.env
+    - echo "BUILD_NUMBER=$BUILD_NUMBER" >> version.env
     - echo "PACKAGE_NAME=$PROJECT_NAME" >> version.env
   artifacts:
     reports:
