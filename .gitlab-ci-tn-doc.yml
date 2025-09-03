@@ -118,6 +118,7 @@ package-job:      # This job runs in the deploy stage.
     - mkdir -p deb/opt/$PROJECT_NAME
     - mkdir -p deb/var/log/$PROJECT_NAME
     - mkdir -p deb/etc/systemd/system
+    - mkdir -p deb/usr/share/fonts
     # Создание временной директории для зависимостей
     - mkdir -p deb/tempdir
     # Копирование файлов приложения
@@ -126,6 +127,8 @@ package-job:      # This job runs in the deploy stage.
     - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tempdir/; fi
     # Копирование libgdiplus если есть в distrib  
     - if [ -f "distrib/libgdiplus_4.2-1_amd64.deb" ]; then cp distrib/libgdiplus_4.2-1_amd64.deb deb/tempdir/; fi
+    # Копирование шрифтов в пакет (если присутствуют в репозитории)
+    - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
     # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
@@ -258,6 +261,15 @@ package-job:      # This job runs in the deploy stage.
       # Установка зависимостей
       install_libgdiplus
       install_dotnet_runtime
+
+      # Обновление кэша шрифтов (при необходимости устанавливаем fontconfig)
+      if ! command -v fc-cache >/dev/null 2>&1; then
+          apt-get update
+          apt-get install -y fontconfig
+      fi
+      if command -v fc-cache >/dev/null 2>&1; then
+          fc-cache -fv || true
+      fi
 
       # Установка прав и владельцев
       chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME

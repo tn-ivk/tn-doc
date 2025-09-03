@@ -116,6 +116,7 @@ package-job:
     - mkdir -p deb/opt/$PROJECT_NAME
     - mkdir -p deb/var/log/$PROJECT_NAME
     - mkdir -p deb/etc/systemd/system
+    - mkdir -p deb/usr/share/CIA
     # Создание временной директории для зависимостей
     - mkdir -p deb/tempdir
     # Копирование файлов приложения
@@ -232,6 +233,11 @@ package-job:
 
       # Установка зависимостей (только .NET Runtime для MessagingService)
       install_dotnet_runtime
+
+      # Создание каталога для очередей/данных CIA, установка прав
+      mkdir -p /usr/share/CIA
+      chown -R alphadaemon:alphadaemon /usr/share/CIA
+      chmod u=rwx,g=rx,o=rx /usr/share/CIA
 
       # Установка прав и владельцев
       chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
