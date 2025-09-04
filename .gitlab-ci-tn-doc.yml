@@ -218,23 +218,34 @@ package-job:      # This job runs in the deploy stage.
 
       # Функция установки libgdiplus
       install_libgdiplus() {
-          if ! dpkg -l | grep -q "libgdiplus"; then
-              echo "Installing libgdiplus..."
-              
-              # Проверяем наличие локального .deb файла
-              if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
-                  echo "Installing libgdiplus from local package..."
-                  dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
-                  rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
-              else
-                  # Устанавливаем из репозитория
-                  apt-get update
-                  apt-get install -y libgdiplus
-              fi
-              echo "libgdiplus installed successfully"
-          else
-              echo "libgdiplus already installed"
+          REQUIRED_GDIPLUS_VERSION="4.2-1"
+          CURRENT_GDIPLUS_VERSION=""
+          if dpkg -s libgdiplus >/dev/null 2>&1; then
+              CURRENT_GDIPLUS_VERSION=$(dpkg -s libgdiplus | awk -F": " '/^Version:/ {print $2}')
           fi
+
+          if [ -z "$CURRENT_GDIPLUS_VERSION" ]; then
+              echo "libgdiplus is not installed. Installing..."
+          else
+              if dpkg --compare-versions "$CURRENT_GDIPLUS_VERSION" ge "$REQUIRED_GDIPLUS_VERSION"; then
+                  echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is already installed and compatible (>= $REQUIRED_GDIPLUS_VERSION)"
+                  return 0
+              else
+                  echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is installed, but >= $REQUIRED_GDIPLUS_VERSION is required. Upgrading..."
+              fi
+          fi
+
+          # Проверяем наличие локального .deb файла
+          if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
+              echo "Installing libgdiplus from local package..."
+              dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
+              rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
+          else
+              # Устанавливаем из репозитория
+              apt-get update
+              apt-get install -y libgdiplus
+          fi
+          echo "libgdiplus installed/updated successfully"
       }
 
       # Функция установки .NET Runtime
