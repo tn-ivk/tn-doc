@@ -232,7 +232,9 @@ package-job:      # This job runs in the deploy stage.
           # Проверяем наличие локального .deb файла
           if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
               echo "Installing libgdiplus from local package..."
-              dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
+              # Используем apt-get вместо dpkg для избежания блокировки
+              apt-get update -qq
+              apt-get install -y /tempdir/libgdiplus_4.2-1_amd64.deb
               rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
               echo "libgdiplus installed/updated successfully"
           else
