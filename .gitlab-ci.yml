@@ -1,4 +1,3 @@
-
 variables:
     VERSION: $CI_COMMIT_TAG
     GIT_SUBMODULE_STRATEGY: recursive
@@ -119,17 +118,26 @@ package-job:      # This job runs in the deploy stage.
     - mkdir -p deb/opt/$PROJECT_NAME
     - mkdir -p deb/var/log/$PROJECT_NAME
     - mkdir -p deb/etc/systemd/system
+    - mkdir -p deb/usr/share/fonts
+    # Создание временной директории для зависимостей
+    - mkdir -p deb/tempdir
     # Копирование файлов приложения
     - cp -r ./publish/* deb/opt/$PROJECT_NAME/
+    # Копирование .NET Runtime если есть в distrib
+    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tempdir/; fi
+    # Копирование libgdiplus если есть в distrib  
+    - if [ -f "distrib/libgdiplus_4.2-1_amd64.deb" ]; then cp distrib/libgdiplus_4.2-1_amd64.deb deb/tempdir/; fi
+    # Копирование шрифтов в пакет (если присутствуют в репозитории)
+    - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
     # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
-      Package: ${PROJECT_NAME}
+      Package: $(echo "${PROJECT_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')
       Version: ${VERSION}
       Section: utils
       Priority: optional
       Architecture: amd64
-      Depends: libgdiplus
+      Depends: systemd
       Maintainer: DadonovAD <dadonovad@transneft.ru>
       Description: ${PROJECT_NAME} это приложение для работы с документами СОИ СИКН/ОСИКН.
       Homepage:
@@ -137,65 +145,138 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация preinst
     - |
-      cat << EOF > deb/DEBIAN/preinst
+      cat << 'EOF' > deb/DEBIAN/preinst
       #!/bin/bash
       set -e
 
-      # Проверка наличия .NET Runtime
-      if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
-          echo "Error: .NET Runtime 8 is not installed. Please install dotnet-runtime-8.0."
-          exit 1
-      fi
+      # Проверка .NET Runtime перед установкой
+      check_dotnet_runtime() {
+          # Проверка наличия .NET Runtime
+          if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              echo "Warning: .NET Runtime 8 is not installed. Will install from local archive."
+              return 1
+          fi
 
-      # Проверка версии .NET Runtime
-      REQUIRED_VERSION="$DOTNET_RT_VERSION"
-      INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+          # Проверка версии .NET Runtime
+          REQUIRED_VERSION="$DOTNET_RT_VERSION"
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
 
-      if [ -z "\$INSTALLED_VERSION" ]; then
-          echo "Error: No compatible .NET Runtime 8 version found."
-          exit 1
-      fi
+          if [ -z "$INSTALLED_VERSION" ]; then
+              echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
+              return 1
+          fi
 
-      if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
-          echo "Error: .NET Runtime version \$INSTALLED_VERSION is installed, but version >= \$REQUIRED_VERSION is required."
-          exit 1
-      fi
+          if [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
+              echo "Warning: .NET Runtime version $INSTALLED_VERSION is installed, but version >= $REQUIRED_VERSION is required. Will install from local archive."
+              return 1
+          fi
+
+          echo ".NET Runtime version $INSTALLED_VERSION is compatible (>= $REQUIRED_VERSION)"
+          return 0
+      }
+
+      # Проверка .NET Runtime (установка будет в postinst если нужно)
+      check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
 
       # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
-          echo "Stopping ${PROJECT_NAME}.service..."
-          systemctl stop ${PROJECT_NAME}.service
+      if systemctl is-active --quiet $PROJECT_NAME.service; then
+          echo "Stopping $PROJECT_NAME.service..."
+          systemctl stop $PROJECT_NAME.service
       fi
 
       # Удаление старых директорий
-      echo "Removing old ${PROJECT_NAME} directories..."
+      echo "Removing old $PROJECT_NAME directories..."
       for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
-          if [ -d "\$dir" ]; then
-              rm -rf "\$dir"
-              echo "Removed \$dir"
+          if [ -d "$dir" ]; then
+              rm -rf "$dir"
+              echo "Removed $dir"
           fi
       done
 
       exit 0
       EOF
     - |
-      cat << EOF > deb/DEBIAN/prerm
+      cat << 'EOF' > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
 
-      # Остановка службы ${PROJECT_NAME}, если она запущена
-      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
-          echo "Stopping ${PROJECT_NAME}.service..."
-          systemctl stop ${PROJECT_NAME}.service
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet $PROJECT_NAME.service; then
+          echo "Stopping $PROJECT_NAME.service..."
+          systemctl stop $PROJECT_NAME.service
       fi
 
       exit 0
       EOF
-    # Генерация postinst
+    # Генерация postinst с автоустановкой зависимостей
     - |
-      cat << EOF > deb/DEBIAN/postinst
+      cat << 'EOF' > deb/DEBIAN/postinst
       #!/bin/bash
       set -e
+
+      echo "Installing dependencies for $PROJECT_NAME..."
+
+      # Функция установки libgdiplus
+      install_libgdiplus() {
+          REQUIRED_GDIPLUS_VERSION="4.2-1"
+          CURRENT_GDIPLUS_VERSION=""
+          if dpkg -s libgdiplus >/dev/null 2>&1; then
+              CURRENT_GDIPLUS_VERSION=$(dpkg -s libgdiplus | awk -F": " '/^Version:/ {print $2}')
+          fi
+
+          if [ -n "$CURRENT_GDIPLUS_VERSION" ] && dpkg --compare-versions "$CURRENT_GDIPLUS_VERSION" ge "$REQUIRED_GDIPLUS_VERSION"; then
+              echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is already installed and compatible (>= $REQUIRED_GDIPLUS_VERSION)"
+              return 0
+          fi
+
+          # Проверяем наличие локального .deb файла
+          if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
+              echo "Installing libgdiplus from local package..."
+              dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
+              rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
+              echo "libgdiplus installed/updated successfully"
+          else
+              echo "Error: /tempdir/libgdiplus_4.2-1_amd64.deb not found. Please include this file in the package."
+              exit 1
+          fi
+      }
+
+      # Функция установки .NET Runtime
+      install_dotnet_runtime() {
+          # Проверяем, нужна ли установка
+          if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              REQUIRED_VERSION="$DOTNET_RT_VERSION"
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+              
+              if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
+                  echo ".NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+                  return 0
+              fi
+          fi
+          
+          echo "Installing .NET Runtime..."
+          
+          # Проверяем наличие локального архива
+          if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              echo "Installing .NET Runtime from local archive..."
+              mkdir -p /usr/share/dotnet
+              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/share/dotnet
+              ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
+              rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+              echo ".NET Runtime installed successfully"
+          else
+              echo "Error: .NET Runtime not found and no local archive available."
+              echo "Please install .NET Runtime 8.0.13+ manually before installing this package."
+              exit 1
+          fi
+      }
+
+      # Установка зависимостей
+      install_libgdiplus
+      install_dotnet_runtime
+
+      # Обновление кэша шрифтов (как в Ansible, без установки fontconfig)
+      fc-cache -fv || true
 
       # Установка прав и владельцев
       chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
@@ -209,38 +290,44 @@ package-job:      # This job runs in the deploy stage.
       systemctl daemon-reload
 
       # Включение и запуск сервиса
-      systemctl enable ${PROJECT_NAME}.service
-      systemctl start ${PROJECT_NAME}.service
+      systemctl enable $PROJECT_NAME.service
+      systemctl start $PROJECT_NAME.service
 
+      echo "$PROJECT_NAME installation completed successfully"
       exit 0
       EOF
     - |
-      cat << EOF > deb/DEBIAN/postrm
+      cat << 'EOF' > deb/DEBIAN/postrm
       #!/bin/bash
       set -e
 
       # Удаление директорий при полной очистке (purge)
-      if [ "\$1" = "purge" ]; then
-          echo "Purging ${PROJECT_NAME} directories..."
+      if [ "$1" = "purge" ]; then
+          echo "Purging $PROJECT_NAME directories..."
           for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
-              if [ -d "\$dir" ]; then
-                  rm -rf "\$dir"
-                  echo "Removed \$dir"
+              if [ -d "$dir" ]; then
+                  rm -rf "$dir"
+                  echo "Removed $dir"
               fi
           done
+          
+          # Удаление systemd service
+          systemctl disable $PROJECT_NAME.service 2>/dev/null || true
+          rm -f /etc/systemd/system/$PROJECT_NAME.service
+          systemctl daemon-reload
       fi
 
       exit 0
       EOF
-    # Генерация TN_Doc.service
+    # Генерация systemd unit для $PROJECT_NAME
     - |
       cat << EOF > deb/etc/systemd/system/${PROJECT_NAME}.service
       [Unit]
       Description=Service ${PROJECT_NAME}
 
       [Service]
-      WorkingDirectory=/opt/$PROJECT_NAME/
-      ExecStart=/usr/bin/dotnet/dotnet /opt/$PROJECT_NAME/$PROJECT_NAME.dll
+      WorkingDirectory=/opt/${PROJECT_NAME}/
+      ExecStart=/usr/bin/dotnet /opt/${PROJECT_NAME}/${PROJECT_NAME}.dll
       Restart=always
       RestartSec=10
       SyslogIdentifier=dotnet-${PROJECT_NAME}
@@ -251,10 +338,10 @@ package-job:      # This job runs in the deploy stage.
       WantedBy=multi-user.target
       EOF
     # Установка прав
-    - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst
+    - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst deb/DEBIAN/prerm deb/DEBIAN/postrm
     - chmod 644 deb/DEBIAN/control
     - chmod 755 deb/opt/$PROJECT_NAME/$PROJECT_NAME
-    - chmod 644 deb/opt/$PROJECT_NAME/*.dll
+    - chmod 644 deb/opt/$PROJECT_NAME/*.dll 2>/dev/null || true
     - echo "Creating control.tar.xz..."
     - tar -cJf control.tar.xz -C deb/DEBIAN .
     - echo "Creating data.tar.xz..."

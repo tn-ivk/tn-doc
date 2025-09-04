@@ -108,7 +108,7 @@ package-job:      # This job runs in the deploy stage.
   tags:
     - orpovy
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev curl
+    - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
     - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
@@ -179,14 +179,14 @@ package-job:      # This job runs in the deploy stage.
       check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
 
       # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet TN_Doc.service; then
-          echo "Stopping TN_Doc.service..."
-          systemctl stop TN_Doc.service
+      if systemctl is-active --quiet $PROJECT_NAME.service; then
+          echo "Stopping $PROJECT_NAME.service..."
+          systemctl stop $PROJECT_NAME.service
       fi
 
       # Удаление старых директорий
-      echo "Removing old TN_Doc directories..."
-      for dir in /opt/TN_Doc /var/log/TN_Doc; do
+      echo "Removing old $PROJECT_NAME directories..."
+      for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
           if [ -d "$dir" ]; then
               rm -rf "$dir"
               echo "Removed $dir"
@@ -201,9 +201,9 @@ package-job:      # This job runs in the deploy stage.
       set -e
 
       # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet TN_Doc.service; then
-          echo "Stopping TN_Doc.service..."
-          systemctl stop TN_Doc.service
+      if systemctl is-active --quiet $PROJECT_NAME.service; then
+          echo "Stopping $PROJECT_NAME.service..."
+          systemctl stop $PROJECT_NAME.service
       fi
 
       exit 0
@@ -319,18 +319,18 @@ package-job:      # This job runs in the deploy stage.
 
       exit 0
       EOF
-    # Генерация TN_Doc.service
+    # Генерация systemd unit для $PROJECT_NAME
     - |
-      cat << 'EOF' > deb/etc/systemd/system/TN_Doc.service
+      cat << EOF > deb/etc/systemd/system/${PROJECT_NAME}.service
       [Unit]
-      Description=Service TN_Doc
+      Description=Service ${PROJECT_NAME}
 
       [Service]
-      WorkingDirectory=/opt/TN_Doc/
-      ExecStart=/usr/bin/dotnet /opt/TN_Doc/TN_Doc.dll
+      WorkingDirectory=/opt/${PROJECT_NAME}/
+      ExecStart=/usr/bin/dotnet /opt/${PROJECT_NAME}/${PROJECT_NAME}.dll
       Restart=always
       RestartSec=10
-      SyslogIdentifier=dotnet-TN_Doc
+      SyslogIdentifier=dotnet-${PROJECT_NAME}
       User=alphadaemon
       Environment=ASPNETCORE_ENVIRONMENT=Production
 
