@@ -224,15 +224,9 @@ package-job:      # This job runs in the deploy stage.
               CURRENT_GDIPLUS_VERSION=$(dpkg -s libgdiplus | awk -F": " '/^Version:/ {print $2}')
           fi
 
-          if [ -z "$CURRENT_GDIPLUS_VERSION" ]; then
-              echo "libgdiplus is not installed. Installing..."
-          else
-              if dpkg --compare-versions "$CURRENT_GDIPLUS_VERSION" ge "$REQUIRED_GDIPLUS_VERSION"; then
-                  echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is already installed and compatible (>= $REQUIRED_GDIPLUS_VERSION)"
-                  return 0
-              else
-                  echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is installed, but >= $REQUIRED_GDIPLUS_VERSION is required. Upgrading..."
-              fi
+          if [ -n "$CURRENT_GDIPLUS_VERSION" ] && dpkg --compare-versions "$CURRENT_GDIPLUS_VERSION" ge "$REQUIRED_GDIPLUS_VERSION"; then
+              echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is already installed and compatible (>= $REQUIRED_GDIPLUS_VERSION)"
+              return 0
           fi
 
           # Проверяем наличие локального .deb файла
@@ -240,12 +234,11 @@ package-job:      # This job runs in the deploy stage.
               echo "Installing libgdiplus from local package..."
               dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
               rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
+              echo "libgdiplus installed/updated successfully"
           else
-              # Устанавливаем из репозитория
-              apt-get update
-              apt-get install -y libgdiplus
+              echo "Error: /tempdir/libgdiplus_4.2-1_amd64.deb not found. Please include this file in the package."
+              exit 1
           fi
-          echo "libgdiplus installed/updated successfully"
       }
 
       # Функция установки .NET Runtime
