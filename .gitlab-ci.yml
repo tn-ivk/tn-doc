@@ -145,7 +145,7 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация preinst
     - |
-      cat << 'EOF' > deb/DEBIAN/preinst
+      cat << EOF > deb/DEBIAN/preinst
       #!/bin/bash
       set -e
 
@@ -196,7 +196,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     - |
-      cat << 'EOF' > deb/DEBIAN/prerm
+      cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
 
@@ -210,7 +210,7 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация postinst с автоустановкой зависимостей
     - |
-      cat << 'EOF' > deb/DEBIAN/postinst
+      cat << EOF > deb/DEBIAN/postinst
       #!/bin/bash
       set -e
 
@@ -297,7 +297,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     - |
-      cat << 'EOF' > deb/DEBIAN/postrm
+      cat << EOF > deb/DEBIAN/postrm
       #!/bin/bash
       set -e
 
