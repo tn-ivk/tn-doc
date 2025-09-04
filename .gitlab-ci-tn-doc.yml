@@ -301,8 +301,6 @@ package-job:      # This job runs in the deploy stage.
       #!/bin/bash
       set -e
 
-      PROJECT_NAME="TN_Doc"
-
       # Удаление директорий при полной очистке (purge)
       if [ "$1" = "purge" ]; then
           echo "Purging $PROJECT_NAME directories..."
