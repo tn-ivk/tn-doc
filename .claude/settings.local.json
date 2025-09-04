@@ -28,7 +28,8 @@
       "Bash(do if grep -q \"SaveDoc.*string.*jsonData\" \"$file\")",
       "Bash(then if ! grep -q \"Сохранение документа\" \"$file\")",
       "Bash(do echo \"=== $file ===\")",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Read(//mnt/c/dev/dotnet/ivk/**)"
     ],
     "deny": []
   }

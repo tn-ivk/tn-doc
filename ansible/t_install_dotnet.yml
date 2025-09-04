@@ -1,0 +1,90 @@
+---
+#- name: 'inslall aspnetcore_runtime'
+#
+#  vars_files: 
+#    - ../inventories/global_vars.yml
+#  hosts: "{{play_host}}"
+#  become: true
+#  tasks:
+
+    
+#### Установка DOTNET
+    # Создание директорий
+    - name: Make dir for DOTNET
+      become: true
+      file:
+         path: '/usr/bin/dotnet/'
+         state: directory
+    # Копирование файлов
+    - name: Copy files DOTNET
+      copy:
+         dest: /tempdir
+         src: '{{home_dir}}/distrib/{{aspnetcore_runtime}}'
+         force: false
+    # Извлечение архива
+    - name: Unziped DOTNET
+      become: true
+      unarchive:
+         dest: /usr/bin/dotnet/
+         src: /tempdir/{{aspnetcore_runtime}}
+         #Закоментировать при обновлении или удалить всю папку сначала
+         creates: /usr/bin/dotnet/dotnet
+         remote_src: true
+    # Создание переменных окружения (DOTNET_ROOT) для пользователя administrator 
+    - name: Set environment DOTNET_ROOT for administrator
+      become: true
+      lineinfile: 
+         path: /home/administrator/.profile
+         state: present
+         insertafter: EOF
+         line: 'DOTNET_ROOT=:/usr/bin/dotnet'
+    # Создание переменных окружения (DOTNET_ROOT) для пользователя operators
+    - name: Set environment DOTNET_ROOT for operators
+      become: true
+      lineinfile: 
+         path: /home/operators/.profile
+         state: present
+         insertafter: EOF
+         line: 'DOTNET_ROOT=:/usr/bin/dotnet'
+      when: "{{add_user_operators}}"
+    # Создание переменных окружения (DOTNET_ROOT) для пользователя engineer
+    - name: Set environment DOTNET_ROOT for engineer
+      become: true
+      lineinfile: 
+         path: /home/engineer/.profile
+         state: present
+         insertafter: EOF
+         line: 'DOTNET_ROOT=:/usr/bin/dotnet'
+      when: "{{add_user_engineer}}"
+    # Создание переменных окружения (PATH) для пользователя administrator 
+    - name: Set environment PATH for administrator
+      become: true
+      lineinfile: 
+         path: /home/administrator/.profile
+         state: present
+         insertafter: EOF
+         line: 'PATH=$PATH:/usr/bin/dotnet'
+    # Создание переменных окружения (PATH) для пользователя operators
+    - name: Set environment PATH for operators
+      become: true
+      lineinfile: 
+         path: /home/operators/.profile
+         state: present
+         insertafter: EOF
+         line: 'PATH=$PATH:/usr/bin/dotnet'
+      when: "{{add_user_operators}}"
+    # Создание переменных окружения (PATH) для пользователя engineer 
+    - name: Set environment PATH for engineer
+      become: true
+      lineinfile: 
+         path: /home/engineer/.profile
+         state: present
+         insertafter: EOF
+         line: 'PATH=$PATH:/usr/bin/dotnet'
+      when: "{{add_user_engineer}}"
+    # Удаление установщика
+    - name: Delete DOTNET archives
+      file:
+        path: /tempdir/{{aspnetcore_runtime}}
+        state: absent
+#### Окончание установки DOTNET

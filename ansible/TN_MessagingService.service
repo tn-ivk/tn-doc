@@ -1,0 +1,14 @@
+[Unit]
+Description=Service TN_MessagingService
+
+[Service]
+WorkingDirectory=/opt/TN_MessagingService/
+ExecStart=/usr/bin/dotnet/dotnet /opt/TN_MessagingService/TN_MessagingService.dll
+Restart=always
+RestartSec=10
+SyslogIdentifier=dotnet-TN_MessagingService
+User=alphadaemon
+Environment=ASPNETCORE_ENVIRONMENT=Production
+
+[Install]
+WantedBy=multi-user.target
