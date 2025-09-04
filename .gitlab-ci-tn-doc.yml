@@ -214,9 +214,6 @@ package-job:      # This job runs in the deploy stage.
       #!/bin/bash
       set -e
 
-      PROJECT_NAME="TN_Doc"
-      DOTNET_RT_VERSION="8.0.13"
-
       echo "Installing dependencies for $PROJECT_NAME..."
 
       # Функция установки libgdiplus

@@ -208,9 +208,6 @@ package-job:
       #!/bin/bash
       set -e
 
-      PROJECT_NAME="TN_MessagingService"
-      DOTNET_RT_VERSION="8.0.13"
-
       echo "Installing dependencies for $PROJECT_NAME..."
 
       # Функция установки .NET Runtime
