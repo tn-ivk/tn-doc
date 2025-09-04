@@ -143,6 +143,35 @@ package-job:
       #!/bin/bash
       set -e
 
+      # Проверка .NET Runtime перед установкой
+      check_dotnet_runtime() {
+          # Проверка наличия .NET Runtime
+          if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              echo "Warning: .NET Runtime 8 is not installed. Will install from local archive."
+              return 1
+          fi
+
+          # Проверка версии .NET Runtime
+          REQUIRED_VERSION="$DOTNET_RT_VERSION"
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+
+          if [ -z "$INSTALLED_VERSION" ]; then
+              echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
+              return 1
+          fi
+
+          if [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
+              echo "Warning: .NET Runtime version $INSTALLED_VERSION is installed, but version >= $REQUIRED_VERSION is required. Will install from local archive."
+              return 1
+          fi
+
+          echo ".NET Runtime version $INSTALLED_VERSION is compatible (>= $REQUIRED_VERSION)"
+          return 0
+      }
+
+      # Проверка .NET Runtime (установка будет в postinst если нужно)
+      check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
+
       # Остановка службы TN_MessagingService, если она запущена
       if systemctl is-active --quiet TN_MessagingService.service; then
           echo "Stopping TN_MessagingService.service..."
@@ -184,49 +213,22 @@ package-job:
 
       echo "Installing dependencies for $PROJECT_NAME..."
 
-      # Функция установки .NET Runtime (libgdiplus не требуется для MessagingService)
+      # Функция установки .NET Runtime
       install_dotnet_runtime() {
-          if [ ! -d "/usr/share/dotnet" ] && [ ! -d "/usr/bin/dotnet" ]; then
-              echo "Installing .NET Runtime..."
-              
-              # Проверяем наличие локального архива
-              if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
-                  echo "Installing .NET Runtime from local archive..."
-                  mkdir -p /usr/share/dotnet
-                  tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/share/dotnet
-                  ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
-                  rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
-              else
-                  # Устанавливаем через Microsoft репозиторий
-                  apt-get update
-                  apt-get install -y wget
-                  
-                  # Добавляем Microsoft package signing key
-                  wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-                  dpkg -i packages-microsoft-prod.deb
-                  rm packages-microsoft-prod.deb
-                  
-                  apt-get update
-                  apt-get install -y aspnetcore-runtime-8.0
-              fi
+          echo "Installing .NET Runtime..."
+          
+          # Проверяем наличие локального архива
+          if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              echo "Installing .NET Runtime from local archive..."
+              mkdir -p /usr/share/dotnet
+              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/share/dotnet
+              ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
+              rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
               echo ".NET Runtime installed successfully"
           else
-              # Проверка версии .NET Runtime
-              INSTALLED_VERSION=""
-              if [ -d "/usr/share/dotnet/shared/Microsoft.NETCore.App" ]; then
-                  INSTALLED_VERSION=$(ls /usr/share/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
-              elif [ -d "/usr/share/dotnet/shared/Microsoft.AspNetCore.App" ]; then
-                  INSTALLED_VERSION=$(ls /usr/share/dotnet/shared/Microsoft.AspNetCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
-              fi
-
-              if [ -n "$INSTALLED_VERSION" ]; then
-                  if [ "$(printf '%s\n' "$INSTALLED_VERSION" "$DOTNET_RT_VERSION" | sort -V | head -n1)" = "$DOTNET_RT_VERSION" ]; then
-                      echo ".NET Runtime version $INSTALLED_VERSION is compatible (>= $DOTNET_RT_VERSION)"
-                  else
-                      echo "Warning: .NET Runtime version $INSTALLED_VERSION is installed, but version >= $DOTNET_RT_VERSION is recommended."
-                  fi
-              else
-                  echo ".NET Runtime is installed but version check failed"
+              echo "Error: .NET Runtime not found and no local archive available."
+              echo "Please install .NET Runtime 8.0.13+ manually before installing this package."
+              exit 1
               fi
           fi
       }
