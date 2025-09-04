@@ -212,6 +212,17 @@ package-job:
 
       # Функция установки .NET Runtime
       install_dotnet_runtime() {
+          # Проверяем, нужна ли установка
+          if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              REQUIRED_VERSION="$DOTNET_RT_VERSION"
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+              
+              if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
+                  echo ".NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+                  return 0
+              fi
+          fi
+          
           echo "Installing .NET Runtime..."
           
           # Проверяем наличие локального архива
@@ -226,7 +237,6 @@ package-job:
               echo "Error: .NET Runtime not found and no local archive available."
               echo "Please install .NET Runtime 8.0.13+ manually before installing this package."
               exit 1
-              fi
           fi
       }
 
