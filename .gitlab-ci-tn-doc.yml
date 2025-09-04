@@ -275,14 +275,8 @@ package-job:      # This job runs in the deploy stage.
       install_libgdiplus
       install_dotnet_runtime
 
-      # Обновление кэша шрифтов (при необходимости устанавливаем fontconfig)
-      if ! command -v fc-cache >/dev/null 2>&1; then
-          apt-get update
-          apt-get install -y fontconfig
-      fi
-      if command -v fc-cache >/dev/null 2>&1; then
-          fc-cache -fv || true
-      fi
+      # Обновление кэша шрифтов (как в Ansible, без установки fontconfig)
+      fc-cache -fv || true
 
       # Установка прав и владельцев
       chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
