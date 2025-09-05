@@ -216,34 +216,8 @@ package-job:      # This job runs in the deploy stage.
 
       echo "Installing dependencies for $PROJECT_NAME..."
 
-      # Функция установки libgdiplus
-      install_libgdiplus() {
-          REQUIRED_GDIPLUS_VERSION="4.2-1"
-          CURRENT_GDIPLUS_VERSION=""
-          if dpkg -s libgdiplus >/dev/null 2>&1; then
-              CURRENT_GDIPLUS_VERSION=$(dpkg -s libgdiplus | awk -F": " '/^Version:/ {print $2}')
-          fi
 
-          if [ -n "$CURRENT_GDIPLUS_VERSION" ] && dpkg --compare-versions "$CURRENT_GDIPLUS_VERSION" ge "$REQUIRED_GDIPLUS_VERSION"; then
-              echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is already installed and compatible (>= $REQUIRED_GDIPLUS_VERSION)"
-              return 0
-          fi
-
-          # Проверяем наличие локального .deb файла
-          if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
-              echo "Installing libgdiplus from local package..."
-              # Используем apt-get вместо dpkg для избежания блокировки
-              apt-get update -qq
-              apt-get install -y /tempdir/libgdiplus_4.2-1_amd64.deb
-              rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
-              echo "libgdiplus installed/updated successfully"
-          else
-              echo "Error: /tempdir/libgdiplus_4.2-1_amd64.deb not found. Please include this file in the package."
-              exit 1
-          fi
-      }
-
-      # Функция установки .NET Runtime
+      # Установка .NET Runtime (libgdiplus устанавливается через triggers)
       install_dotnet_runtime() {
           # Проверяем, нужна ли установка
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
@@ -273,12 +247,39 @@ package-job:      # This job runs in the deploy stage.
           fi
       }
 
-      # Установка зависимостей
-      install_libgdiplus
+      # Установка .NET Runtime
       install_dotnet_runtime
 
       # Обновление кэша шрифтов (как в Ansible, без установки fontconfig)
       fc-cache -fv || true
+
+      # Проверка необходимости установки libgdiplus
+      check_libgdiplus_need() {
+          REQUIRED_GDIPLUS_VERSION="4.2-1"
+          CURRENT_GDIPLUS_VERSION=""
+          
+          # Проверяем, установлен ли libgdiplus
+          if dpkg -s libgdiplus >/dev/null 2>&1; then
+              CURRENT_GDIPLUS_VERSION=$(dpkg -s libgdiplus | awk -F": " '/^Version:/ {print $2}')
+          fi
+
+          # Проверяем, нужна ли установка
+          if [ -n "$CURRENT_GDIPLUS_VERSION" ] && dpkg --compare-versions "$CURRENT_GDIPLUS_VERSION" ge "$REQUIRED_GDIPLUS_VERSION"; then
+              echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is already installed and compatible (>= $REQUIRED_GDIPLUS_VERSION)"
+              return 1  # Не нужно устанавливать
+          else
+              echo "libgdiplus needs to be installed/updated (required: >= $REQUIRED_GDIPLUS_VERSION, current: $CURRENT_GDIPLUS_VERSION)"
+              return 0  # Нужно устанавливать
+          fi
+      }
+
+      # Создание файла-триггера для установки libgdiplus только при необходимости
+      if check_libgdiplus_need; then
+          echo "Creating trigger for libgdiplus installation..."
+          touch /tmp/install_tn_doc_libgdiplus
+      else
+          echo "libgdiplus is already compatible, skipping trigger creation"
+      fi
 
       # Установка прав и владельцев
       chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
@@ -295,9 +296,48 @@ package-job:      # This job runs in the deploy stage.
       systemctl enable $PROJECT_NAME.service
       systemctl start $PROJECT_NAME.service
 
+      # Запуск установки libgdiplus через trigger (если нужно)
+      if [ -f /tmp/install_tn_doc_libgdiplus ]; then
+          echo "Triggering libgdiplus installation..."
+          /usr/local/bin/install-tn-doc-libgdiplus.sh
+      fi
+
       echo "$PROJECT_NAME installation completed successfully"
       exit 0
       EOF
+    - |
+      # Создание файла triggers для libgdiplus
+      cat << 'EOF' > deb/DEBIAN/triggers
+      interest-noawait /opt/TN_Doc
+      EOF
+
+      # Создание скрипта для обработки триггера libgdiplus
+      cat << 'EOF' > deb/usr/local/bin/install-tn-doc-libgdiplus.sh
+      #!/bin/bash
+      set -e
+      
+      # Проверяем, нужно ли устанавливать libgdiplus
+      if [ -f /tmp/install_tn_doc_libgdiplus ]; then
+          echo "Trigger: Installing libgdiplus for TN_Doc..."
+          
+          # Проверяем наличие локального .deb файла
+          if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
+              echo "Installing libgdiplus from local package..."
+              dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
+              rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
+              echo "libgdiplus installed/updated successfully"
+          else
+              echo "Warning: /tempdir/libgdiplus_4.2-1_amd64.deb not found. libgdiplus may not be installed."
+              echo "Please ensure libgdiplus >= 4.2-1 is installed manually."
+          fi
+          
+          rm -f /tmp/install_tn_doc_libgdiplus
+          echo "Trigger: libgdiplus installation completed"
+      fi
+      EOF
+
+      # Установка прав на скрипт триггера
+      chmod +x deb/usr/local/bin/install-tn-doc-libgdiplus.sh
     - |
       cat << EOF > deb/DEBIAN/postrm
       #!/bin/bash
