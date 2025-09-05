@@ -119,6 +119,7 @@ package-job:      # This job runs in the deploy stage.
     - mkdir -p deb/var/log/$PROJECT_NAME
     - mkdir -p deb/etc/systemd/system
     - mkdir -p deb/usr/share/fonts
+    - mkdir -p deb/usr/local/bin
     # Создание временной директории для зависимостей
     - mkdir -p deb/tempdir
     # Копирование файлов приложения
