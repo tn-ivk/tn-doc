@@ -212,21 +212,24 @@ namespace Tests.Controllers
         }
 
         /// <summary>
-        /// PrintDoc: проверяет обработку исключений из сервиса печати
+        /// PrintDoc: при исключении в сервисе возвращает StatusCode(500)
         /// </summary>
         [Test]
-        public void PrintDoc_ServiceThrowsException_ExceptionPropagates()
+        public async Task PrintDoc_ServiceThrowsException_ReturnsStatusCode500()
         {
             // Arrange
             const string printerName = "TestPrinter";
             var expectedException = new InvalidOperationException("Print service error");
             _mockPrinterService.Setup(x => x.PrintDocAsync(printerName)).ThrowsAsync(expectedException);
 
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await _controller.PrintDoc(printerName));
-            
-            Assert.That(exception.Message, Is.EqualTo("Print service error"));
+            // Act
+            var result = await _controller.PrintDoc(printerName);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<ObjectResult>());
+            var objectResult = result as ObjectResult;
+            Assert.That(objectResult.StatusCode, Is.EqualTo(500));
+            Assert.That(objectResult.Value, Is.EqualTo("Произошла ошибка при печати документа"));
             _mockPrinterService.Verify(x => x.PrintDocAsync(printerName), Times.Once);
         }
 
