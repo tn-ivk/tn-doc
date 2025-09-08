@@ -997,6 +997,40 @@ namespace Tests.Controllers
             // Результат может быть пустой строкой в случае ошибки или JSON в случае успеха
         }
 
+        /// <summary>
+        /// GetListUsers: при null от сервиса возвращает "[]"
+        /// </summary>
+        [Test]
+        public async Task GetListUsers_ServiceReturnsNull_ReturnsEmptyJsonArray()
+        {
+            // Arrange
+            _mockAppConfig.Setup(x => x.GetDictionariesJsonAsync())
+                .ReturnsAsync((string)null);
+
+            // Act
+            var result = await _controller.GetListUsers();
+
+            // Assert
+            Assert.That(result, Is.EqualTo("[]"));
+        }
+
+        /// <summary>
+        /// GetListUsers: при исключении в сервисе возвращает "[]"
+        /// </summary>
+        [Test]
+        public async Task GetListUsers_ServiceThrowsException_ReturnsEmptyJsonArray()
+        {
+            // Arrange
+            _mockAppConfig.Setup(x => x.GetDictionariesJsonAsync())
+                .ThrowsAsync(new Exception("Test exception"));
+
+            // Act
+            var result = await _controller.GetListUsers();
+
+            // Assert
+            Assert.That(result, Is.EqualTo("[]"));
+        }
+
         #endregion
 
         #region GetInvalideChars Tests

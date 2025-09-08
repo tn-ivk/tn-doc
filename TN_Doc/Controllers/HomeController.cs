@@ -524,12 +524,12 @@ public class HomeController : Controller
         try
         {
             var result = await _appConfig.GetDictionariesJsonAsync();
-            return result;
+            return result ?? "[]";
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Ошибка получения списка пользователей");
-            return String.Empty;
+            return "[]";
         }
     }
 
