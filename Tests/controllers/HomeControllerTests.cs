@@ -644,11 +644,8 @@ namespace Tests.Controllers
             // Assert - проверяем что метод возвращает boolean значение
             Assert.That(result, Is.InstanceOf<bool>());
             
-            // Получаем ожидаемое значение из реальной конфигурации для сравнения
-            var appConfigService = AppConfigService.GetInstance(_configuration);
-            var expectedValue = appConfigService.GetAppCfg().UseSecurityFeatures;
-            
-            // Проверяем что результат соответствует реальной конфигурации
+            // Сравниваем с замоканным значением конфигурации, используемой контроллером
+            var expectedValue = _cfgApp.UseSecurityFeatures;
             Assert.That(result, Is.EqualTo(expectedValue));
         }
 
