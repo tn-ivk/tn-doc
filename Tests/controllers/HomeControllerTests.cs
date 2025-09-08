@@ -215,7 +215,7 @@ namespace Tests.Controllers
             CfgFileRW.SaveCfg(cfgAppPath, _cfgApp);
             
             // Mock AppConfigService.GetInstance для статического вызова
-            _controller = new HomeController(_mockLogger.Object, _dbOptions, _configuration, _mockReportBuffer.Object, _mockDocModuleLoader.Object);
+            _controller = new HomeController(_mockLogger.Object, _dbOptions, _mockReportBuffer.Object, _mockDocModuleLoader.Object, _mockAppConfig.Object);
         }
 
         #region GetListDevices Tests
