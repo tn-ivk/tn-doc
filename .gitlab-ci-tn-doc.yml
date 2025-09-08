@@ -315,8 +315,7 @@ package-job:      # This job runs in the deploy stage.
       # Создание скрипта для обработки триггера libgdiplus
       cat << 'EOF' > deb/usr/local/bin/install-tn-doc-libgdiplus.sh
       #!/bin/bash
-      set -e
-      
+
       # Проверяем, нужно ли устанавливать libgdiplus
       if [ -f /tmp/install_tn_doc_libgdiplus ]; then
           echo "Trigger: Installing libgdiplus for TN_Doc..."
@@ -324,7 +323,13 @@ package-job:      # This job runs in the deploy stage.
           # Проверяем наличие локального .deb файла
           if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
               echo "Installing libgdiplus from local package..."
-              dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
+              # Сначала попробуем apt-get (работает параллельно с dpkg)
+              if apt-get install -y /tempdir/libgdiplus_4.2-1_amd64.deb; then
+                  echo "libgdiplus installed successfully with apt-get"
+              else
+                  echo "apt-get failed, trying dpkg..."
+                  dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
+              fi
               rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
               echo "libgdiplus installed/updated successfully"
           else
