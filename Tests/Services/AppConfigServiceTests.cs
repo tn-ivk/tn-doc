@@ -119,6 +119,9 @@ namespace Tests.Services
             _appConfigService = AppConfigService.GetInstance(_configuration);
         }
 
+        /// <summary>
+        /// Проверяет, что GetInstance(null) выбрасывает ArgumentNullException.
+        /// </summary>
         [Test]
         public void GetInstance_WithNullConfiguration_ShouldThrowArgumentNullException()
         {
@@ -126,6 +129,9 @@ namespace Tests.Services
             Assert.Throws<ArgumentNullException>(() => AppConfigService.GetInstance(null));
         }
 
+        /// <summary>
+        /// Проверяет, что при валидной конфигурации возвращается один и тот же синглтон экземпляр.
+        /// </summary>
         [Test]
         public void GetInstance_WithValidConfiguration_ShouldReturnSameInstance()
         {
@@ -137,6 +143,9 @@ namespace Tests.Services
             Assert.That(instance1, Is.SameAs(instance2));
         }
 
+        /// <summary>
+        /// Проверяет, что метод GetCfg возвращает объект Root.
+        /// </summary>
         [Test]
         public void GetCfg_ShouldReturnRoot()
         {
@@ -148,6 +157,9 @@ namespace Tests.Services
             Assert.That(result, Is.InstanceOf<Root>());
         }
 
+        /// <summary>
+        /// Проверяет, что метод GetAppCfg возвращает объект CfgApp и содержит хотя бы одно устройство.
+        /// </summary>
         [Test]
         public void GetAppCfg_ShouldReturnCfgApp()
         {
@@ -161,6 +173,9 @@ namespace Tests.Services
             Assert.That(result.Devices[0].IdDevice, Is.EqualTo(1));
         }
 
+        /// <summary>
+        /// Проверяет, что при невалидном deviceId метод GetDeviceCfg возвращает null.
+        /// </summary>
         [Test]
         public void GetDeviceCfg_WithInvalidId_ShouldReturnNull()
         {
@@ -171,6 +186,9 @@ namespace Tests.Services
             Assert.That(result, Is.Null);
         }
 
+        /// <summary>
+        /// Проверяет, что при невалидных идентификаторах метод GetDocCfg возвращает null.
+        /// </summary>
         [Test]
         public void GetDocCfg_WithInvalidIds_ShouldReturnNull()
         {
@@ -181,9 +199,16 @@ namespace Tests.Services
             Assert.That(result, Is.Null);
         }
 
+        /// <summary>
+        /// Проверяет, что метод GetLastUsedTemplateList возвращает корректный объект и непустые данные.
+        /// Перед проверкой выполняется прогрев списка.
+        /// </summary>
         [Test]
         public void GetLastUsedTemplateList_ShouldReturnLastUsedTemplateListCfg()
         {
+            // warm-up to ensure LastTemplateList is initialized for device 1
+            _appConfigService.GetLastUsedTemplateId(1, IdDoc.Passport);
+
             // Act
             var result = _appConfigService.GetLastUsedTemplateList();
 
@@ -194,6 +219,9 @@ namespace Tests.Services
             Assert.That(result.Devices[0].LastTemplateList, Has.Count.GreaterThanOrEqualTo(1));
         }
 
+        /// <summary>
+        /// Проверяет, что при невалидных идентификаторах метод GetLastUsedTemplateId возвращает null.
+        /// </summary>
         [Test]
         public void GetLastUsedTemplateId_WithInvalidIds_ShouldReturnNull()
         {
@@ -204,6 +232,9 @@ namespace Tests.Services
             Assert.That(result, Is.Null);
         }
 
+        /// <summary>
+        /// Проверяет, что SetLastUsedTemplateId возвращает false для невалидных идентификаторов.
+        /// </summary>
         [Test]
         public void SetLastUsedTemplateId_WithInvalidIds_ShouldReturnFalse()
         {
@@ -214,6 +245,9 @@ namespace Tests.Services
             Assert.That(result, Is.False);
         }
 
+        /// <summary>
+        /// Проверяет, что при невалидных идентификаторах метод GetPathToDocDll возвращает null.
+        /// </summary>
         [Test]
         public void GetPathToDocDll_WithInvalidIds_ShouldReturnNull()
         {
@@ -224,6 +258,9 @@ namespace Tests.Services
             Assert.That(result, Is.Null);
         }
 
+        /// <summary>
+        /// Проверяет, что при невалидных идентификаторах GetPathConfigFile возвращает пустую строку.
+        /// </summary>
         [Test]
         public void GetPathConfigFile_WithInvalidIds_ShouldReturnEmptyString()
         {
@@ -234,6 +271,9 @@ namespace Tests.Services
             Assert.That(result, Is.Empty);
         }
 
+        /// <summary>
+        /// Проверяет, что при невалидных идентификаторах GetPathEditConfigFile возвращает пустую строку.
+        /// </summary>
         [Test]
         public void GetPathEditConfigFile_WithInvalidIds_ShouldReturnEmptyString()
         {
@@ -244,6 +284,9 @@ namespace Tests.Services
             Assert.That(result, Is.Empty);
         }
 
+        /// <summary>
+        /// Проверяет, что при невалидных идентификаторах GetPathTemplateFile возвращает пустую строку.
+        /// </summary>
         [Test]
         public void GetPathTemplateFile_WithInvalidIds_ShouldReturnEmptyString()
         {
@@ -254,6 +297,9 @@ namespace Tests.Services
             Assert.That(result, Is.Empty);
         }
 
+        /// <summary>
+        /// Проверяет, что SetElisClientToken возвращает false для невалидного deviceId.
+        /// </summary>
         [Test]
         public void SetElisClientToken_WithInvalidDeviceId_ShouldReturnFalse()
         {
