@@ -163,7 +163,9 @@ package-job:      # This job runs in the deploy stage.
           # Проверка версии .NET Runtime
           REQUIRED_VERSION="__DOTNET_RT_VERSION__"
           echo "Pre-install check - Debug info:"
-          echo "  Required version from CI variable: '$REQUIRED_VERSION'"
+          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
+          echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
+          echo "  Testing variable assignment..."
           echo "  Directory /usr/bin/dotnet/shared/Microsoft.NETCore.App contents:"
           ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
           echo "  Raw ls output:"
@@ -171,7 +173,7 @@ package-job:      # This job runs in the deploy stage.
           echo "  Filtered output:"
           ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
 
-          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1 | tr -d '\n\r')
           echo "Pre-install check - Detected .NET Runtime version: '$INSTALLED_VERSION' (required: $REQUIRED_VERSION)"
 
           if [ -z "$INSTALLED_VERSION" ]; then
@@ -214,8 +216,8 @@ package-job:      # This job runs in the deploy stage.
 
       exit 0
       EOF
-    # Заменяем плейсхолдеры на реальные значения переменных
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    # Обрабатываем preinst скрипт
+    - sed "s/__DOTNET_RT_VERSION__/$(echo ${DOTNET_RT_VERSION} | sed 's/\./\\./g')/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
     - chmod +x deb/DEBIAN/preinst
     - rm deb/DEBIAN/preinst.tmp
     - |
@@ -255,6 +257,9 @@ package-job:      # This job runs in the deploy stage.
 
           # Проверяем, нужна ли установка
           REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          echo "Post-install check - Debug info:"
+          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
+          echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
           echo "Checking for existing .NET Runtime installation..."
 
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
@@ -267,7 +272,7 @@ package-job:      # This job runs in the deploy stage.
               echo "  Filtered output:"
               ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
 
-              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1 | tr -d '\n\r')
               echo "Detected installed version: '$INSTALLED_VERSION'"
               
               if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
@@ -457,8 +462,8 @@ package-job:      # This job runs in the deploy stage.
       echo "============================================"
       exit 0
       EOF
-    # Заменяем плейсхолдеры на реальные значения переменных
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    # Обрабатываем postinst скрипт
+    - sed "s/__DOTNET_RT_VERSION__/$(echo ${DOTNET_RT_VERSION} | sed 's/\./\\./g')/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
     - chmod +x deb/DEBIAN/postinst
     - rm deb/DEBIAN/postinst.tmp
     - |
