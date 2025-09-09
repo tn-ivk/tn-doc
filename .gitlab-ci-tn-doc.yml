@@ -158,7 +158,8 @@ package-job:      # This job runs in the deploy stage.
 
           # Проверка версии .NET Runtime
           REQUIRED_VERSION="$DOTNET_RT_VERSION"
-          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+          echo "Pre-install check - Detected .NET Runtime version: '$INSTALLED_VERSION' (required: $REQUIRED_VERSION)"
 
           if [ -z "$INSTALLED_VERSION" ]; then
               echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
@@ -187,10 +188,14 @@ package-job:      # This job runs in the deploy stage.
       echo "Removing old $PROJECT_NAME directories..."
       for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
           if [ -d "$dir" ]; then
+              echo "Removing directory: $dir"
               rm -rf "$dir"
-              echo "Removed $dir"
+              echo "✓ Successfully removed $dir"
+          else
+              echo "! Directory $dir does not exist, skipping"
           fi
       done
+      echo "=== Old directories cleanup completed ==="
 
       exit 0
       EOF
@@ -217,6 +222,7 @@ package-job:      # This job runs in the deploy stage.
       echo "Starting post-installation script for $PROJECT_NAME"
       echo "============================================"
       echo "Installing dependencies for $PROJECT_NAME..."
+      echo "Note: 'Распаковывается tn.doc (1.4.1) на замену (1.4.1)' означает замену существующего пакета"
 
 
       # Установка .NET Runtime
@@ -230,8 +236,8 @@ package-job:      # This job runs in the deploy stage.
 
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
               echo "Found .NET Runtime directory: /usr/bin/dotnet/shared/Microsoft.NETCore.App"
-              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
-              echo "Detected installed version: $INSTALLED_VERSION"
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+              echo "Detected installed version: '$INSTALLED_VERSION'"
 
               if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
                   echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
@@ -358,6 +364,7 @@ package-job:      # This job runs in the deploy stage.
       echo "✓ Environment variables setup completed"
 
       # Обновление кэша шрифтов (как в Ansible, без установки fontconfig)
+      # Это вызовет триггеры fontconfig после установки пакета
       echo "Step 3: Updating font cache..."
       fc-cache -fv || true
       echo "✓ Font cache updated"
