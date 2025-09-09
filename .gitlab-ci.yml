@@ -144,7 +144,7 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация preinst
     - |
-      cat << EOF > deb/DEBIAN/preinst
+      cat << EOF > deb/DEBIAN/preinst.tmp
       #!/bin/bash
       set -e
 
@@ -161,9 +161,9 @@ package-job:      # This job runs in the deploy stage.
           fi
 
           # Проверка версии .NET Runtime
-          REQUIRED_VERSION="$DOTNET_RT_VERSION"
+          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
           echo "Pre-install check - Debug info:"
-          echo "  DOTNET_RT_VERSION variable: '$DOTNET_RT_VERSION'"
+          echo "  Required version from CI variable: '$REQUIRED_VERSION'"
           echo "  Directory /usr/bin/dotnet/shared/Microsoft.NETCore.App contents:"
           ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
           echo "  Raw ls output:"
@@ -199,6 +199,7 @@ package-job:      # This job runs in the deploy stage.
 
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
+      echo "Note: These directories may not exist yet during preinst phase - this is normal"
       echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
       for dir in /opt/TN_Doc /var/log/TN_Doc; do
           if [ -d "$dir" ]; then
@@ -213,6 +214,10 @@ package-job:      # This job runs in the deploy stage.
 
       exit 0
       EOF
+    # Заменяем плейсхолдеры на реальные значения переменных
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    - chmod +x deb/DEBIAN/preinst
+    - rm deb/DEBIAN/preinst.tmp
     - |
       cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
@@ -232,7 +237,7 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация postinst с автоустановкой зависимостей
     - |
-      cat << EOF > deb/DEBIAN/postinst
+      cat << EOF > deb/DEBIAN/postinst.tmp
       #!/bin/bash
       set -e
 
@@ -246,10 +251,10 @@ package-job:      # This job runs in the deploy stage.
       # Установка .NET Runtime
       install_dotnet_runtime() {
           echo "=== Starting .NET Runtime installation check ==="
-          echo "Required version: $DOTNET_RT_VERSION"
+          echo "Required version from CI variable: __DOTNET_RT_VERSION__"
 
           # Проверяем, нужна ли установка
-          REQUIRED_VERSION="$DOTNET_RT_VERSION"
+          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
           echo "Checking for existing .NET Runtime installation..."
 
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
@@ -294,7 +299,7 @@ package-job:      # This job runs in the deploy stage.
               echo "Removing temporary archive file..."
               rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
 
-              echo "✓ .NET Runtime $REQUIRED_VERSION installed successfully"
+              echo "✓ .NET Runtime __DOTNET_RT_VERSION__ installed successfully"
           else
               echo "✗ ERROR: .NET Runtime archive not found at /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
               echo "Please ensure the archive is available before installing this package."
@@ -452,6 +457,10 @@ package-job:      # This job runs in the deploy stage.
       echo "============================================"
       exit 0
       EOF
+    # Заменяем плейсхолдеры на реальные значения переменных
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    - chmod +x deb/DEBIAN/postinst
+    - rm deb/DEBIAN/postinst.tmp
     - |
       cat << EOF > deb/DEBIAN/postrm
       #!/bin/bash
@@ -474,7 +483,7 @@ package-job:      # This job runs in the deploy stage.
                   echo "! Directory $dir does not exist, skipping"
               fi
           done
-
+          
           # Удаление systemd service
           echo "Removing systemd service..."
           systemctl disable TN_Doc.service 2>/dev/null || echo "! Failed to disable service"
