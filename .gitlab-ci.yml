@@ -385,11 +385,35 @@ package-job:      # This job runs in the deploy stage.
 
       # Включение и запуск сервиса
       echo "Step 6: Enabling and starting application service..."
+      echo "Checking if dotnet binary exists..."
+      if [ -f "/usr/bin/dotnet/dotnet" ]; then
+          echo "✓ dotnet binary found at /usr/bin/dotnet/dotnet"
+      else
+          echo "! WARNING: dotnet binary not found at /usr/bin/dotnet/dotnet"
+          ls -la /usr/bin/dotnet/ || echo "Directory /usr/bin/dotnet/ not found"
+      fi
+
+      echo "Checking application binary..."
+      if [ -f "/opt/$PROJECT_NAME/$PROJECT_NAME" ]; then
+          echo "✓ Application binary found at /opt/$PROJECT_NAME/$PROJECT_NAME"
+      else
+          echo "! WARNING: Application binary not found at /opt/$PROJECT_NAME/$PROJECT_NAME"
+          ls -la /opt/$PROJECT_NAME/ || echo "Directory /opt/$PROJECT_NAME/ not found"
+      fi
+
       echo "Enabling $PROJECT_NAME.service..."
-      systemctl enable $PROJECT_NAME.service
+      systemctl enable $PROJECT_NAME.service || echo "! Failed to enable service"
       echo "Starting $PROJECT_NAME.service..."
-      systemctl start $PROJECT_NAME.service
-      echo "✓ Application service started"
+      systemctl start $PROJECT_NAME.service || echo "! Failed to start service"
+
+      echo "Checking service status..."
+      systemctl is-active $PROJECT_NAME.service >/dev/null 2>&1
+      if [ $? -eq 0 ]; then
+          echo "✓ Application service started successfully"
+      else
+          echo "! WARNING: Service failed to start. Checking logs..."
+          journalctl -u $PROJECT_NAME.service -n 20 --no-pager || echo "Cannot read journal logs"
+      fi
 
       echo "=== $PROJECT_NAME installation completed successfully ==="
       echo "============================================"
@@ -426,7 +450,7 @@ package-job:      # This job runs in the deploy stage.
 
       [Service]
       WorkingDirectory=/opt/${PROJECT_NAME}/
-      ExecStart=/usr/bin/dotnet /opt/${PROJECT_NAME}/${PROJECT_NAME}.dll
+      ExecStart=/usr/bin/dotnet/dotnet /opt/${PROJECT_NAME}/${PROJECT_NAME}.dll
       Restart=always
       RestartSec=10
       SyslogIdentifier=dotnet-${PROJECT_NAME}
