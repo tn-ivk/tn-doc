@@ -213,61 +213,186 @@ package-job:      # This job runs in the deploy stage.
       #!/bin/bash
       set -e
 
+      echo "============================================"
+      echo "Starting post-installation script for $PROJECT_NAME"
+      echo "============================================"
       echo "Installing dependencies for $PROJECT_NAME..."
 
 
       # Установка .NET Runtime
       install_dotnet_runtime() {
+          echo "=== Starting .NET Runtime installation check ==="
+          echo "Required version: $DOTNET_RT_VERSION"
+
           # Проверяем, нужна ли установка
+          REQUIRED_VERSION="$DOTNET_RT_VERSION"
+          echo "Checking for existing .NET Runtime installation..."
+
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
-              REQUIRED_VERSION="$DOTNET_RT_VERSION"
+              echo "Found .NET Runtime directory: /usr/bin/dotnet/shared/Microsoft.NETCore.App"
               INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
-              
+              echo "Detected installed version: $INSTALLED_VERSION"
+
               if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
-                  echo ".NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+                  echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+                  echo "=== Skipping .NET Runtime installation ==="
                   return 0
+              else
+                  echo "! Installed version $INSTALLED_VERSION is not compatible with required $REQUIRED_VERSION"
               fi
+          else
+              echo "! .NET Runtime directory not found, installation required"
           fi
-          
-          echo "Installing .NET Runtime..."
-          
+
+          echo "=== Starting .NET Runtime installation ==="
+
           # Проверяем наличие локального архива
           if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
-              echo "Installing .NET Runtime from local archive..."
-              mkdir -p /usr/share/dotnet
-              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/share/dotnet
-              ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
+              echo "✓ Found .NET Runtime archive: /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+
+              # Создаем директорию для .NET (как в Ansible)
+              echo "Creating .NET directory: /usr/bin/dotnet"
+              mkdir -p /usr/bin/dotnet
+
+              # Распаковываем архив напрямую в /usr/bin/dotnet (как в Ansible)
+              echo "Extracting .NET Runtime archive to /usr/bin/dotnet..."
+              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+
+              # Удаляем архив (как в Ansible)
+              echo "Removing temporary archive file..."
               rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
-              echo ".NET Runtime installed successfully"
+
+              echo "✓ .NET Runtime $REQUIRED_VERSION installed successfully"
           else
-              echo "Error: .NET Runtime not found and no local archive available."
-              echo "Please install .NET Runtime 8.0.13+ manually before installing this package."
+              echo "✗ ERROR: .NET Runtime archive not found at /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+              echo "Please ensure the archive is available before installing this package."
               exit 1
           fi
+
+          echo "=== .NET Runtime installation completed ==="
       }
 
+      # Установка переменных окружения для пользователей (как в Ansible)
+      setup_dotnet_environment() {
+          echo "=== Setting up .NET environment variables ==="
+
+          # Создание переменных окружения (DOTNET_ROOT) для пользователя administrator
+          echo "Setting up environment for user: administrator"
+          if [ -f "/home/administrator/.profile" ]; then
+              echo "✓ Found .profile file for administrator"
+
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo "Adding DOTNET_ROOT=/usr/bin/dotnet to administrator's .profile"
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/administrator/.profile
+              else
+                  echo "! DOTNET_ROOT already exists in administrator's .profile"
+              fi
+
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo "Adding /usr/bin/dotnet to PATH in administrator's .profile"
+                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
+              else
+                  echo "! /usr/bin/dotnet already in PATH in administrator's .profile"
+              fi
+          else
+              echo "! .profile file not found for administrator, skipping"
+          fi
+
+          # Создание переменных окружения для пользователя operators
+          echo "Setting up environment for user: operators"
+          if [ -f "/home/operators/.profile" ]; then
+              echo "✓ Found .profile file for operators"
+
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/operators/.profile; then
+                  echo "Adding DOTNET_ROOT=/usr/bin/dotnet to operators's .profile"
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/operators/.profile
+              else
+                  echo "! DOTNET_ROOT already exists in operators's .profile"
+              fi
+
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/operators/.profile; then
+                  echo "Adding /usr/bin/dotnet to PATH in operators's .profile"
+                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/operators/.profile
+              else
+                  echo "! /usr/bin/dotnet already in PATH in operators's .profile"
+              fi
+          else
+              echo "! .profile file not found for operators, skipping"
+          fi
+
+          # Создание переменных окружения для пользователя engineer
+          echo "Setting up environment for user: engineer"
+          if [ -f "/home/engineer/.profile" ]; then
+              echo "✓ Found .profile file for engineer"
+
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo "Adding DOTNET_ROOT=/usr/bin/dotnet to engineer's .profile"
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/engineer/.profile
+              else
+                  echo "! DOTNET_ROOT already exists in engineer's .profile"
+              fi
+
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo "Adding /usr/bin/dotnet to PATH in engineer's .profile"
+                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
+              else
+                  echo "! /usr/bin/dotnet already in PATH in engineer's .profile"
+              fi
+          else
+              echo "! .profile file not found for engineer, skipping"
+          fi
+
+          echo "=== Environment setup completed ==="
+      }
+
+      echo "=== Starting application dependencies installation ==="
+
       # Установка .NET Runtime
+      echo "Step 1: Installing .NET Runtime..."
       install_dotnet_runtime
+      echo "✓ .NET Runtime setup completed"
+
+      # Установка переменных окружения для пользователей
+      echo "Step 2: Setting up environment variables..."
+      setup_dotnet_environment
+      echo "✓ Environment variables setup completed"
 
       # Обновление кэша шрифтов (как в Ansible, без установки fontconfig)
+      echo "Step 3: Updating font cache..."
       fc-cache -fv || true
+      echo "✓ Font cache updated"
 
       # Установка прав и владельцев
+      echo "Step 4: Setting up application permissions..."
+      echo "Setting executable permissions for application binary..."
       chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
+      echo "Setting permissions for application DLLs..."
       chmod 644 /opt/$PROJECT_NAME/*.dll
+      echo "Setting ownership for application directory..."
       chown -R alphadaemon:alphadaemon /opt/$PROJECT_NAME
+      echo "Setting directory permissions..."
       chmod u=rwx,g=rx,o=rx /opt/$PROJECT_NAME
+      echo "Setting ownership for log directory..."
       chown alphadaemon:alphadaemon /var/log/$PROJECT_NAME
+      echo "Setting log directory permissions..."
       chmod u=rwx,g=rx,o=rx /var/log/$PROJECT_NAME
+      echo "✓ Application permissions setup completed"
 
       # Перезагрузка systemd
+      echo "Step 5: Reloading systemd daemon..."
       systemctl daemon-reload
+      echo "✓ Systemd daemon reloaded"
 
       # Включение и запуск сервиса
+      echo "Step 6: Enabling and starting application service..."
+      echo "Enabling $PROJECT_NAME.service..."
       systemctl enable $PROJECT_NAME.service
+      echo "Starting $PROJECT_NAME.service..."
       systemctl start $PROJECT_NAME.service
+      echo "✓ Application service started"
 
-      echo "$PROJECT_NAME installation completed successfully"
+      echo "=== $PROJECT_NAME installation completed successfully ==="
+      echo "============================================"
       exit 0
       EOF
     - |
