@@ -148,6 +148,10 @@ package-job:      # This job runs in the deploy stage.
       #!/bin/bash
       set -e
 
+      echo "============================================"
+      echo "Starting pre-installation script for $PROJECT_NAME"
+      echo "============================================"
+
       # Проверка .NET Runtime перед установкой
       check_dotnet_runtime() {
           # Проверка наличия .NET Runtime
@@ -158,7 +162,16 @@ package-job:      # This job runs in the deploy stage.
 
           # Проверка версии .NET Runtime
           REQUIRED_VERSION="$DOTNET_RT_VERSION"
-          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+          echo "Pre-install check - Debug info:"
+          echo "  DOTNET_RT_VERSION variable: '$DOTNET_RT_VERSION'"
+          echo "  Directory /usr/bin/dotnet/shared/Microsoft.NETCore.App contents:"
+          ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
+          echo "  Raw ls output:"
+          ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null || echo "  No files found"
+          echo "  Filtered output:"
+          ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
+
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
           echo "Pre-install check - Detected .NET Runtime version: '$INSTALLED_VERSION' (required: $REQUIRED_VERSION)"
 
           if [ -z "$INSTALLED_VERSION" ]; then
@@ -185,8 +198,9 @@ package-job:      # This job runs in the deploy stage.
       fi
 
       # Удаление старых директорий
-      echo "Removing old $PROJECT_NAME directories..."
-      for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+      echo "Removing old TN_Doc directories..."
+      echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
+      for dir in /opt/TN_Doc /var/log/TN_Doc; do
           if [ -d "$dir" ]; then
               echo "Removing directory: $dir"
               rm -rf "$dir"
@@ -203,6 +217,10 @@ package-job:      # This job runs in the deploy stage.
       cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for $PROJECT_NAME"
+      echo "============================================"
 
       # Остановка службы TN_Doc, если она запущена
       if systemctl is-active --quiet $PROJECT_NAME.service; then
@@ -236,9 +254,17 @@ package-job:      # This job runs in the deploy stage.
 
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
               echo "Found .NET Runtime directory: /usr/bin/dotnet/shared/Microsoft.NETCore.App"
-              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
-              echo "Detected installed version: '$INSTALLED_VERSION'"
+              echo "Post-install check - Debug info:"
+              echo "  Directory contents:"
+              ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
+              echo "  Raw ls output:"
+              ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null || echo "  No files found"
+              echo "  Filtered output:"
+              ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
 
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+              echo "Detected installed version: '$INSTALLED_VERSION'"
+              
               if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
                   echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
                   echo "=== Skipping .NET Runtime installation ==="
@@ -249,9 +275,9 @@ package-job:      # This job runs in the deploy stage.
           else
               echo "! .NET Runtime directory not found, installation required"
           fi
-
+          
           echo "=== Starting .NET Runtime installation ==="
-
+          
           # Проверяем наличие локального архива
           if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
               echo "✓ Found .NET Runtime archive: /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
@@ -431,20 +457,30 @@ package-job:      # This job runs in the deploy stage.
       #!/bin/bash
       set -e
 
+      echo "============================================"
+      echo "Starting post-removal script for $PROJECT_NAME"
+      echo "============================================"
+
       # Удаление директорий при полной очистке (purge)
       if [ "$1" = "purge" ]; then
-          echo "Purging $PROJECT_NAME directories..."
-          for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+          echo "Purging TN_Doc directories..."
+          echo "PROJECT_NAME variable in postrm: '$PROJECT_NAME'"
+          for dir in /opt/TN_Doc /var/log/TN_Doc; do
               if [ -d "$dir" ]; then
+                  echo "Removing directory: $dir"
                   rm -rf "$dir"
-                  echo "Removed $dir"
+                  echo "✓ Successfully removed $dir"
+              else
+                  echo "! Directory $dir does not exist, skipping"
               fi
           done
-          
+
           # Удаление systemd service
-          systemctl disable $PROJECT_NAME.service 2>/dev/null || true
-          rm -f /etc/systemd/system/$PROJECT_NAME.service
+          echo "Removing systemd service..."
+          systemctl disable TN_Doc.service 2>/dev/null || echo "! Failed to disable service"
+          rm -f /etc/systemd/system/TN_Doc.service
           systemctl daemon-reload
+          echo "✓ Systemd service removed"
       fi
 
       exit 0
