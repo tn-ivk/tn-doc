@@ -173,7 +173,7 @@ package-job:      # This job runs in the deploy stage.
           echo "  Filtered output:"
           ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
 
-          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1 | tr -d '\n\r')
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
           echo "Pre-install check - Detected .NET Runtime version: '$INSTALLED_VERSION' (required: $REQUIRED_VERSION)"
 
           if [ -z "$INSTALLED_VERSION" ]; then
@@ -200,10 +200,10 @@ package-job:      # This job runs in the deploy stage.
       fi
 
       # Удаление старых директорий
-      echo "Removing old TN_Doc directories..."
+      echo "Removing old $PROJECT_NAME directories..."
       echo "Note: These directories may not exist yet during preinst phase - this is normal"
       echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
-      for dir in /opt/TN_Doc /var/log/TN_Doc; do
+      for dir in "/opt/$PROJECT_NAME" "/var/log/$PROJECT_NAME"; do
           if [ -d "$dir" ]; then
               echo "Removing directory: $dir"
               rm -rf "$dir"
@@ -217,7 +217,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем preinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/$(echo ${DOTNET_RT_VERSION} | sed 's/\./\\./g')/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
     - chmod +x deb/DEBIAN/preinst
     - rm deb/DEBIAN/preinst.tmp
     - |
@@ -272,7 +272,7 @@ package-job:      # This job runs in the deploy stage.
               echo "  Filtered output:"
               ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
 
-              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1 | tr -d '\n\r')
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
               echo "Detected installed version: '$INSTALLED_VERSION'"
               
               if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
@@ -463,7 +463,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем postinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/$(echo ${DOTNET_RT_VERSION} | sed 's/\./\\./g')/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
     - chmod +x deb/DEBIAN/postinst
     - rm deb/DEBIAN/postinst.tmp
     - |
@@ -477,9 +477,9 @@ package-job:      # This job runs in the deploy stage.
 
       # Удаление директорий при полной очистке (purge)
       if [ "$1" = "purge" ]; then
-          echo "Purging TN_Doc directories..."
+          echo "Purging $PROJECT_NAME directories..."
           echo "PROJECT_NAME variable in postrm: '$PROJECT_NAME'"
-          for dir in /opt/TN_Doc /var/log/TN_Doc; do
+          for dir in "/opt/$PROJECT_NAME" "/var/log/$PROJECT_NAME"; do
               if [ -d "$dir" ]; then
                   echo "Removing directory: $dir"
                   rm -rf "$dir"
@@ -491,8 +491,8 @@ package-job:      # This job runs in the deploy stage.
           
           # Удаление systemd service
           echo "Removing systemd service..."
-          systemctl disable TN_Doc.service 2>/dev/null || echo "! Failed to disable service"
-          rm -f /etc/systemd/system/TN_Doc.service
+          systemctl disable $PROJECT_NAME.service 2>/dev/null || echo "! Failed to disable service"
+          rm -f /etc/systemd/system/$PROJECT_NAME.service
           systemctl daemon-reload
           echo "✓ Systemd service removed"
       fi
