@@ -126,8 +126,6 @@ package-job:      # This job runs in the deploy stage.
     - cp -r ./publish/* deb/opt/$PROJECT_NAME/
     # Копирование .NET Runtime если есть в distrib
     - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tempdir/; fi
-    # Копирование libgdiplus если есть в distrib  
-    - if [ -f "distrib/libgdiplus_4.2-1_amd64.deb" ]; then cp distrib/libgdiplus_4.2-1_amd64.deb deb/tempdir/; fi
     # Копирование шрифтов в пакет (если присутствуют в репозитории)
     - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
     # Генерация control
@@ -146,9 +144,13 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация preinst
     - |
-      cat << EOF > deb/DEBIAN/preinst
+      cat << EOF > deb/DEBIAN/preinst.tmp
       #!/bin/bash
       set -e
+
+      echo "============================================"
+      echo "Starting pre-installation script for $PROJECT_NAME"
+      echo "============================================"
 
       # Проверка .NET Runtime перед установкой
       check_dotnet_runtime() {
@@ -159,8 +161,20 @@ package-job:      # This job runs in the deploy stage.
           fi
 
           # Проверка версии .NET Runtime
-          REQUIRED_VERSION="$DOTNET_RT_VERSION"
-          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          echo "Pre-install check - Debug info:"
+          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
+          echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
+          echo "  Testing variable assignment..."
+          echo "  Directory /usr/bin/dotnet/shared/Microsoft.NETCore.App contents:"
+          ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
+          echo "  Raw ls output:"
+          ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null || echo "  No files found"
+          echo "  Filtered output:"
+          ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
+
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+          echo "Pre-install check - Detected .NET Runtime version: '$INSTALLED_VERSION' (required: $REQUIRED_VERSION)"
 
           if [ -z "$INSTALLED_VERSION" ]; then
               echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
@@ -187,19 +201,33 @@ package-job:      # This job runs in the deploy stage.
 
       # Удаление старых директорий
       echo "Removing old $PROJECT_NAME directories..."
-      for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+      echo "Note: These directories may not exist yet during preinst phase - this is normal"
+      echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
+      for dir in "/opt/$PROJECT_NAME" "/var/log/$PROJECT_NAME"; do
           if [ -d "$dir" ]; then
+              echo "Removing directory: $dir"
               rm -rf "$dir"
-              echo "Removed $dir"
+              echo "✓ Successfully removed $dir"
+          else
+              echo "! Directory $dir does not exist, skipping"
           fi
       done
+      echo "=== Old directories cleanup completed ==="
 
       exit 0
       EOF
+    # Обрабатываем preinst скрипт
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    - chmod +x deb/DEBIAN/preinst
+    - rm deb/DEBIAN/preinst.tmp
     - |
       cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for $PROJECT_NAME"
+      echo "============================================"
 
       # Остановка службы TN_Doc, если она запущена
       if systemctl is-active --quiet $PROJECT_NAME.service; then
@@ -211,153 +239,262 @@ package-job:      # This job runs in the deploy stage.
       EOF
     # Генерация postinst с автоустановкой зависимостей
     - |
-      cat << EOF > deb/DEBIAN/postinst
+      cat << EOF > deb/DEBIAN/postinst.tmp
       #!/bin/bash
       set -e
 
+      echo "============================================"
+      echo "Starting post-installation script for $PROJECT_NAME"
+      echo "============================================"
       echo "Installing dependencies for $PROJECT_NAME..."
+      echo "Note: 'Распаковывается tn.doc (1.4.1) на замену (1.4.1)' означает замену существующего пакета"
 
 
-      # Установка .NET Runtime (libgdiplus устанавливается через triggers)
+      # Установка .NET Runtime
       install_dotnet_runtime() {
+          echo "=== Starting .NET Runtime installation check ==="
+          echo "Required version from CI variable: __DOTNET_RT_VERSION__"
+
           # Проверяем, нужна ли установка
+          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          echo "Post-install check - Debug info:"
+          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
+          echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
+          echo "Checking for existing .NET Runtime installation..."
+
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
-              REQUIRED_VERSION="$DOTNET_RT_VERSION"
-              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+              echo "Found .NET Runtime directory: /usr/bin/dotnet/shared/Microsoft.NETCore.App"
+              echo "Post-install check - Debug info:"
+              echo "  Directory contents:"
+              ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
+              echo "  Raw ls output:"
+              ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null || echo "  No files found"
+              echo "  Filtered output:"
+              ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
+
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+              echo "Detected installed version: '$INSTALLED_VERSION'"
               
               if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
-                  echo ".NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+                  echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+                  echo "=== Skipping .NET Runtime installation ==="
                   return 0
+              else
+                  echo "! Installed version $INSTALLED_VERSION is not compatible with required $REQUIRED_VERSION"
               fi
+          else
+              echo "! .NET Runtime directory not found, installation required"
           fi
           
-          echo "Installing .NET Runtime..."
+          echo "=== Starting .NET Runtime installation ==="
           
           # Проверяем наличие локального архива
           if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
-              echo "Installing .NET Runtime from local archive..."
-              mkdir -p /usr/share/dotnet
-              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/share/dotnet
-              ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
+              echo "✓ Found .NET Runtime archive: /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+
+              # Создаем директорию для .NET (как в Ansible)
+              echo "Creating .NET directory: /usr/bin/dotnet"
+              mkdir -p /usr/bin/dotnet
+
+              # Распаковываем архив напрямую в /usr/bin/dotnet (как в Ansible)
+              echo "Extracting .NET Runtime archive to /usr/bin/dotnet..."
+              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+
+              # Удаляем архив (как в Ansible)
+              echo "Removing temporary archive file..."
               rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
-              echo ".NET Runtime installed successfully"
+
+              echo "✓ .NET Runtime __DOTNET_RT_VERSION__ installed successfully"
           else
-              echo "Error: .NET Runtime not found and no local archive available."
-              echo "Please install .NET Runtime 8.0.13+ manually before installing this package."
+              echo "✗ ERROR: .NET Runtime archive not found at /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+              echo "Please ensure the archive is available before installing this package."
               exit 1
           fi
+
+          echo "=== .NET Runtime installation completed ==="
       }
+
+      # Установка переменных окружения для пользователей (как в Ansible)
+      setup_dotnet_environment() {
+          echo "=== Setting up .NET environment variables ==="
+
+          # Создание переменных окружения (DOTNET_ROOT) для пользователя administrator
+          echo "Setting up environment for user: administrator"
+          if [ -f "/home/administrator/.profile" ]; then
+              echo "✓ Found .profile file for administrator"
+
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo "Adding DOTNET_ROOT=/usr/bin/dotnet to administrator's .profile"
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/administrator/.profile
+              else
+                  echo "! DOTNET_ROOT already exists in administrator's .profile"
+              fi
+
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo "Adding /usr/bin/dotnet to PATH in administrator's .profile"
+                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
+              else
+                  echo "! /usr/bin/dotnet already in PATH in administrator's .profile"
+              fi
+          else
+              echo "! .profile file not found for administrator, skipping"
+          fi
+
+          # Создание переменных окружения для пользователя operators
+          echo "Setting up environment for user: operators"
+          if [ -f "/home/operators/.profile" ]; then
+              echo "✓ Found .profile file for operators"
+
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/operators/.profile; then
+                  echo "Adding DOTNET_ROOT=/usr/bin/dotnet to operators's .profile"
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/operators/.profile
+              else
+                  echo "! DOTNET_ROOT already exists in operators's .profile"
+              fi
+
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/operators/.profile; then
+                  echo "Adding /usr/bin/dotnet to PATH in operators's .profile"
+                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/operators/.profile
+              else
+                  echo "! /usr/bin/dotnet already in PATH in operators's .profile"
+              fi
+          else
+              echo "! .profile file not found for operators, skipping"
+          fi
+
+          # Создание переменных окружения для пользователя engineer
+          echo "Setting up environment for user: engineer"
+          if [ -f "/home/engineer/.profile" ]; then
+              echo "✓ Found .profile file for engineer"
+
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo "Adding DOTNET_ROOT=/usr/bin/dotnet to engineer's .profile"
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/engineer/.profile
+              else
+                  echo "! DOTNET_ROOT already exists in engineer's .profile"
+              fi
+
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo "Adding /usr/bin/dotnet to PATH in engineer's .profile"
+                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
+              else
+                  echo "! /usr/bin/dotnet already in PATH in engineer's .profile"
+              fi
+          else
+              echo "! .profile file not found for engineer, skipping"
+          fi
+
+          echo "=== Environment setup completed ==="
+      }
+
+      echo "=== Starting application dependencies installation ==="
 
       # Установка .NET Runtime
+      echo "Step 1: Installing .NET Runtime..."
       install_dotnet_runtime
+      echo "✓ .NET Runtime setup completed"
+
+      # Установка переменных окружения для пользователей
+      echo "Step 2: Setting up environment variables..."
+      setup_dotnet_environment
+      echo "✓ Environment variables setup completed"
 
       # Обновление кэша шрифтов (как в Ansible, без установки fontconfig)
+      # Это вызовет триггеры fontconfig после установки пакета
+      echo "Step 3: Updating font cache..."
       fc-cache -fv || true
-
-      # Проверка необходимости установки libgdiplus
-      check_libgdiplus_need() {
-          REQUIRED_GDIPLUS_VERSION="4.2-1"
-          CURRENT_GDIPLUS_VERSION=""
-          
-          # Проверяем, установлен ли libgdiplus
-          if dpkg -s libgdiplus >/dev/null 2>&1; then
-              CURRENT_GDIPLUS_VERSION=$(dpkg -s libgdiplus | awk -F": " '/^Version:/ {print $2}')
-          fi
-
-          # Проверяем, нужна ли установка
-          if [ -n "$CURRENT_GDIPLUS_VERSION" ] && dpkg --compare-versions "$CURRENT_GDIPLUS_VERSION" ge "$REQUIRED_GDIPLUS_VERSION"; then
-              echo "libgdiplus version $CURRENT_GDIPLUS_VERSION is already installed and compatible (>= $REQUIRED_GDIPLUS_VERSION)"
-              return 1  # Не нужно устанавливать
-          else
-              echo "libgdiplus needs to be installed/updated (required: >= $REQUIRED_GDIPLUS_VERSION, current: $CURRENT_GDIPLUS_VERSION)"
-              return 0  # Нужно устанавливать
-          fi
-      }
-
-      # Создание файла-триггера для установки libgdiplus только при необходимости
-      if check_libgdiplus_need; then
-          echo "Creating trigger for libgdiplus installation..."
-          touch /tmp/install_tn_doc_libgdiplus
-      else
-          echo "libgdiplus is already compatible, skipping trigger creation"
-      fi
+      echo "✓ Font cache updated"
 
       # Установка прав и владельцев
+      echo "Step 4: Setting up application permissions..."
+      echo "Setting executable permissions for application binary..."
       chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
+      echo "Setting permissions for application DLLs..."
       chmod 644 /opt/$PROJECT_NAME/*.dll
+      echo "Setting ownership for application directory..."
       chown -R alphadaemon:alphadaemon /opt/$PROJECT_NAME
+      echo "Setting directory permissions..."
       chmod u=rwx,g=rx,o=rx /opt/$PROJECT_NAME
+      echo "Setting ownership for log directory..."
       chown alphadaemon:alphadaemon /var/log/$PROJECT_NAME
+      echo "Setting log directory permissions..."
       chmod u=rwx,g=rx,o=rx /var/log/$PROJECT_NAME
+      echo "✓ Application permissions setup completed"
 
       # Перезагрузка systemd
+      echo "Step 5: Reloading systemd daemon..."
       systemctl daemon-reload
+      echo "✓ Systemd daemon reloaded"
 
       # Включение и запуск сервиса
-      systemctl enable $PROJECT_NAME.service
-      systemctl start $PROJECT_NAME.service
-
-      # Запуск установки libgdiplus через trigger (если нужно)
-      if [ -f /tmp/install_tn_doc_libgdiplus ]; then
-          echo "Triggering libgdiplus installation..."
-          /usr/local/bin/install-tn-doc-libgdiplus.sh
+      echo "Step 6: Enabling and starting application service..."
+      echo "Checking if dotnet binary exists..."
+      if [ -f "/usr/bin/dotnet/dotnet" ]; then
+          echo "✓ dotnet binary found at /usr/bin/dotnet/dotnet"
+      else
+          echo "! WARNING: dotnet binary not found at /usr/bin/dotnet/dotnet"
+          ls -la /usr/bin/dotnet/ || echo "Directory /usr/bin/dotnet/ not found"
       fi
 
-      echo "$PROJECT_NAME installation completed successfully"
+      echo "Checking application binary..."
+      if [ -f "/opt/$PROJECT_NAME/$PROJECT_NAME" ]; then
+          echo "✓ Application binary found at /opt/$PROJECT_NAME/$PROJECT_NAME"
+      else
+          echo "! WARNING: Application binary not found at /opt/$PROJECT_NAME/$PROJECT_NAME"
+          ls -la /opt/$PROJECT_NAME/ || echo "Directory /opt/$PROJECT_NAME/ not found"
+      fi
+
+      echo "Enabling $PROJECT_NAME.service..."
+      systemctl enable $PROJECT_NAME.service || echo "! Failed to enable service"
+      echo "Starting $PROJECT_NAME.service..."
+      systemctl start $PROJECT_NAME.service || echo "! Failed to start service"
+
+      echo "Checking service status..."
+      systemctl is-active $PROJECT_NAME.service >/dev/null 2>&1
+      if [ $? -eq 0 ]; then
+          echo "✓ Application service started successfully"
+      else
+          echo "! WARNING: Service failed to start. Checking logs..."
+          journalctl -u $PROJECT_NAME.service -n 20 --no-pager || echo "Cannot read journal logs"
+      fi
+
+      echo "=== $PROJECT_NAME installation completed successfully ==="
+      echo "============================================"
       exit 0
       EOF
-    - |
-      # Создание файла triggers для libgdiplus
-      cat << 'EOF' > deb/DEBIAN/triggers
-      interest-noawait /opt/TN_Doc
-      EOF
-
-      # Создание скрипта для обработки триггера libgdiplus
-      cat << 'EOF' > deb/usr/local/bin/install-tn-doc-libgdiplus.sh
-      #!/bin/bash
-      set -e
-      
-      # Проверяем, нужно ли устанавливать libgdiplus
-      if [ -f /tmp/install_tn_doc_libgdiplus ]; then
-          echo "Trigger: Installing libgdiplus for TN_Doc..."
-          
-          # Проверяем наличие локального .deb файла
-          if [ -f "/tempdir/libgdiplus_4.2-1_amd64.deb" ]; then
-              echo "Installing libgdiplus from local package..."
-              dpkg -i /tempdir/libgdiplus_4.2-1_amd64.deb || apt-get install -f -y
-              rm -f /tempdir/libgdiplus_4.2-1_amd64.deb
-              echo "libgdiplus installed/updated successfully"
-          else
-              echo "Warning: /tempdir/libgdiplus_4.2-1_amd64.deb not found. libgdiplus may not be installed."
-              echo "Please ensure libgdiplus >= 4.2-1 is installed manually."
-          fi
-          
-          rm -f /tmp/install_tn_doc_libgdiplus
-          echo "Trigger: libgdiplus installation completed"
-      fi
-      EOF
-
-      # Установка прав на скрипт триггера
-      chmod +x deb/usr/local/bin/install-tn-doc-libgdiplus.sh
+    # Обрабатываем postinst скрипт
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    - chmod +x deb/DEBIAN/postinst
+    - rm deb/DEBIAN/postinst.tmp
     - |
       cat << EOF > deb/DEBIAN/postrm
       #!/bin/bash
       set -e
 
+      echo "============================================"
+      echo "Starting post-removal script for $PROJECT_NAME"
+      echo "============================================"
+
       # Удаление директорий при полной очистке (purge)
       if [ "$1" = "purge" ]; then
           echo "Purging $PROJECT_NAME directories..."
-          for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+          echo "PROJECT_NAME variable in postrm: '$PROJECT_NAME'"
+          for dir in "/opt/$PROJECT_NAME" "/var/log/$PROJECT_NAME"; do
               if [ -d "$dir" ]; then
+                  echo "Removing directory: $dir"
                   rm -rf "$dir"
-                  echo "Removed $dir"
+                  echo "✓ Successfully removed $dir"
+              else
+                  echo "! Directory $dir does not exist, skipping"
               fi
           done
           
           # Удаление systemd service
-          systemctl disable $PROJECT_NAME.service 2>/dev/null || true
+          echo "Removing systemd service..."
+          systemctl disable $PROJECT_NAME.service 2>/dev/null || echo "! Failed to disable service"
           rm -f /etc/systemd/system/$PROJECT_NAME.service
           systemctl daemon-reload
+          echo "✓ Systemd service removed"
       fi
 
       exit 0
@@ -370,7 +507,7 @@ package-job:      # This job runs in the deploy stage.
 
       [Service]
       WorkingDirectory=/opt/${PROJECT_NAME}/
-      ExecStart=/usr/bin/dotnet /opt/${PROJECT_NAME}/${PROJECT_NAME}.dll
+      ExecStart=/usr/bin/dotnet/dotnet /opt/${PROJECT_NAME}/${PROJECT_NAME}.dll
       Restart=always
       RestartSec=10
       SyslogIdentifier=dotnet-${PROJECT_NAME}
