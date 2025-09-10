@@ -227,8 +227,8 @@ package-job:      # This job runs in the deploy stage.
       echo "[DEBUG] Calling check_dotnet_runtime function"
       CHECK_RESULT=0
       check_dotnet_runtime || CHECK_RESULT=$?
-      echo "[DEBUG] check_dotnet_runtime returned: $CHECK_RESULT"
-      if [ $CHECK_RESULT -ne 0 ]; then
+      echo "[DEBUG] check_dotnet_runtime returned: ${CHECK_RESULT:-empty}"
+      if [ "${CHECK_RESULT:-0}" -ne 0 ]; then
           echo "Will install .NET Runtime in postinst"
       fi
 
@@ -280,7 +280,10 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем preinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    - echo "DEBUG - Processing preinst script with variables:"
+    - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
+    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
     - chmod +x deb/DEBIAN/preinst
     - rm deb/DEBIAN/preinst.tmp
     - |
@@ -321,7 +324,9 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем prerm скрипт
-    - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
+    - echo "DEBUG - Processing prerm script with variables:"
+    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
+    - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
     - chmod +x deb/DEBIAN/prerm
     # Генерация postinst с автоустановкой зависимостей
     - |
@@ -555,14 +560,14 @@ package-job:      # This job runs in the deploy stage.
       echo "Step 1: Installing .NET Runtime..."
       INSTALL_RESULT=0
       install_dotnet_runtime || INSTALL_RESULT=$?
-      echo "[DEBUG] install_dotnet_runtime returned: $INSTALL_RESULT"
+      echo "[DEBUG] install_dotnet_runtime returned: ${INSTALL_RESULT:-empty}"
       
-      if [ $INSTALL_RESULT -eq 0 ]; then
+      if [ "${INSTALL_RESULT:-0}" -eq 0 ]; then
           echo "✓ .NET Runtime setup completed"
           echo "[DEBUG] .NET Runtime installation successful"
       else
           echo "✗ .NET Runtime setup failed"
-          echo "[DEBUG] .NET Runtime installation failed with code: $INSTALL_RESULT"
+          echo "[DEBUG] .NET Runtime installation failed with code: ${INSTALL_RESULT:-empty}"
           exit 1
       fi
 
@@ -571,14 +576,14 @@ package-job:      # This job runs in the deploy stage.
       echo "Step 2: Setting up environment variables..."
       ENV_RESULT=0
       setup_dotnet_environment || ENV_RESULT=$?
-      echo "[DEBUG] setup_dotnet_environment returned: $ENV_RESULT"
+      echo "[DEBUG] setup_dotnet_environment returned: ${ENV_RESULT:-empty}"
       
-      if [ $ENV_RESULT -eq 0 ]; then
+      if [ "${ENV_RESULT:-0}" -eq 0 ]; then
           echo "✓ Environment variables setup completed"
           echo "[DEBUG] Environment setup successful"
       else
           echo "✗ Environment variables setup failed"
-          echo "[DEBUG] Environment setup failed with code: $ENV_RESULT"
+          echo "[DEBUG] Environment setup failed with code: ${ENV_RESULT:-empty}"
           # Не критичная ошибка, продолжаем
       fi
 
@@ -646,7 +651,10 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем postinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    - echo "DEBUG - Processing postinst script with variables:"
+    - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
+    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
     - chmod +x deb/DEBIAN/postinst
     - rm deb/DEBIAN/postinst.tmp
     - |
@@ -732,7 +740,9 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем postrm скрипт
-    - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
+    - echo "DEBUG - Processing postrm script with variables:"
+    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
+    - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
     - chmod +x deb/DEBIAN/postrm
     # Генерация systemd unit для $PROJECT_NAME
     - |
