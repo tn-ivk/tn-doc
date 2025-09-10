@@ -453,22 +453,17 @@ debug-package-job:
     
     # Генерация упрощенного postrm
     - |
-      cat << 'POSTRM_EOF' > deb/DEBIAN/postrm
+      cat > deb/DEBIAN/postrm << 'EOF'
       #!/bin/bash
       set -e
-
       echo "============================================"
       echo "DEBUG: Starting post-removal script for __PROJECT_NAME__"
       echo "============================================"
-
-      echo "[DEBUG] Script argument: '$1'"
-
+      echo "[DEBUG] Script argument: $1"
       if [ "$1" = "purge" ]; then
           echo "[DEBUG] Purge operation - removing directories"
-          
           PROJECT_DIR="/opt/__PROJECT_NAME__"
           LOG_DIR="/var/log/__PROJECT_NAME__"
-          
           for dir in "$PROJECT_DIR" "$LOG_DIR"; do
               echo "[DEBUG] Checking directory: $dir"
               if [ -d "$dir" ]; then
@@ -479,23 +474,18 @@ debug-package-job:
                   echo "[DEBUG] Directory does not exist: $dir"
               fi
           done
-          
-          # Удаление systemd service
           SERVICE_FILE="/etc/systemd/system/__PROJECT_NAME__.service"
           echo "[DEBUG] Removing service file: $SERVICE_FILE"
-          
           systemctl disable "__PROJECT_NAME__.service" 2>/dev/null || echo "[DEBUG] Failed to disable service"
           rm -f "$SERVICE_FILE"
           systemctl daemon-reload
-          
           echo "SUCCESS: Service removed"
       else
           echo "[DEBUG] Not a purge operation, skipping cleanup"
       fi
-
       echo "DEBUG: Post-removal completed"
       exit 0
-      POSTRM_EOF
+      EOF
     
     - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp
     - mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
