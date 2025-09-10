@@ -111,6 +111,11 @@ package-job:      # This job runs in the deploy stage.
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
+    - echo "DEBUG - Available variables in package-job:"
+    - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
+    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
+    - echo "  PACKAGE_NAME='${PACKAGE_NAME}'"
+    - echo "  FULL_VERSION='${FULL_VERSION}'"
     - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
@@ -291,6 +296,8 @@ package-job:      # This job runs in the deploy stage.
     - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst || echo "  No unreplaced patterns found (good)"
     - echo "  Searching for REQUIRED_VERSION assignments:"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/preinst || echo "  No REQUIRED_VERSION found"
+    - echo "  Sample of replaced content:"
+    - grep -A2 -B2 "REQUIRED_VERSION=" deb/DEBIAN/preinst || echo "  No context found"
     - chmod +x deb/DEBIAN/preinst
     - rm deb/DEBIAN/preinst.tmp
     - |
@@ -669,6 +676,8 @@ package-job:      # This job runs in the deploy stage.
     - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst || echo "  No unreplaced patterns found (good)"
     - echo "  Searching for REQUIRED_VERSION assignments:"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/postinst || echo "  No REQUIRED_VERSION found"
+    - echo "  Sample of replaced content:"
+    - grep -A2 -B2 "REQUIRED_VERSION=" deb/DEBIAN/postinst || echo "  No context found"
     - chmod +x deb/DEBIAN/postinst
     - rm deb/DEBIAN/postinst.tmp
     - |
