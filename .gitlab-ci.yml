@@ -452,40 +452,21 @@ debug-package-job:
     - chmod +x deb/DEBIAN/prerm
     
     # Генерация упрощенного postrm
-    - |
-      cat > deb/DEBIAN/postrm << 'EOF'
-      #!/bin/bash
-      set -e
-      echo "============================================"
-      echo "DEBUG: Starting post-removal script for __PROJECT_NAME__"
-      echo "============================================"
-      echo "[DEBUG] Script argument: $1"
-      if [ "$1" = "purge" ]; then
-          echo "[DEBUG] Purge operation - removing directories"
-          PROJECT_DIR="/opt/__PROJECT_NAME__"
-          LOG_DIR="/var/log/__PROJECT_NAME__"
-          for dir in "$PROJECT_DIR" "$LOG_DIR"; do
-              echo "[DEBUG] Checking directory: $dir"
-              if [ -d "$dir" ]; then
-                  echo "[DEBUG] Removing directory: $dir"
-                  rm -rf "$dir"
-                  echo "SUCCESS: Removed $dir"
-              else
-                  echo "[DEBUG] Directory does not exist: $dir"
-              fi
-          done
-          SERVICE_FILE="/etc/systemd/system/__PROJECT_NAME__.service"
-          echo "[DEBUG] Removing service file: $SERVICE_FILE"
-          systemctl disable "__PROJECT_NAME__.service" 2>/dev/null || echo "[DEBUG] Failed to disable service"
-          rm -f "$SERVICE_FILE"
-          systemctl daemon-reload
-          echo "SUCCESS: Service removed"
-      else
-          echo "[DEBUG] Not a purge operation, skipping cleanup"
-      fi
-      echo "DEBUG: Post-removal completed"
-      exit 0
-      EOF
+    - echo "#!/bin/bash" > deb/DEBIAN/postrm
+    - echo "set -e" >> deb/DEBIAN/postrm
+    - echo "echo 'DEBUG: Starting post-removal script for ${PROJECT_NAME}'" >> deb/DEBIAN/postrm
+    - echo "if [ \"\$1\" = \"purge\" ]; then" >> deb/DEBIAN/postrm
+    - echo "  echo '[DEBUG] Purge operation - removing directories'" >> deb/DEBIAN/postrm
+    - echo "  rm -rf /opt/${PROJECT_NAME} /var/log/${PROJECT_NAME} 2>/dev/null || true" >> deb/DEBIAN/postrm
+    - echo "  systemctl disable ${PROJECT_NAME}.service 2>/dev/null || true" >> deb/DEBIAN/postrm
+    - echo "  rm -f /etc/systemd/system/${PROJECT_NAME}.service" >> deb/DEBIAN/postrm
+    - echo "  systemctl daemon-reload" >> deb/DEBIAN/postrm
+    - echo "  echo 'SUCCESS: Service and directories removed'" >> deb/DEBIAN/postrm
+    - echo "else" >> deb/DEBIAN/postrm
+    - echo "  echo '[DEBUG] Not a purge operation, skipping cleanup'" >> deb/DEBIAN/postrm
+    - echo "fi" >> deb/DEBIAN/postrm
+    - echo "echo 'DEBUG: Post-removal completed'" >> deb/DEBIAN/postrm
+    - echo "exit 0" >> deb/DEBIAN/postrm
     
     - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp
     - mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
