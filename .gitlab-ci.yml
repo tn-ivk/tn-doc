@@ -17,7 +17,7 @@ minimal-build-job:
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   # tags:
-    # - orpovy
+  #   - orpovy
   script:
     - echo "Creating minimal application structure for testing..."
     - mkdir -p ./publish
