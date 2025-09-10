@@ -16,8 +16,8 @@ build-job:
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
-  tags:
-    - orpovy
+  #tags:
+  #  - orpovy
   before_script:
     # Создание директории для публикации
     - mkdir -p ./publish
@@ -43,8 +43,8 @@ extract-version-job:
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
-  tags:
-    - orpovy
+  #tags:
+  #  - orpovy
   script:
     # Установка curl для работы с GitLab API
     - apt-get update && apt-get install -y curl
@@ -105,8 +105,8 @@ package-job:      # This job runs in the deploy stage.
   needs:
     - build-job
     - extract-version-job
-  tags:
-    - orpovy
+  #tags:
+  #  - orpovy
   before_script:
     - apt-get update && apt-get install -y dpkg-dev
   script:
@@ -203,7 +203,9 @@ package-job:      # This job runs in the deploy stage.
       echo "Removing old $PROJECT_NAME directories..."
       echo "Note: These directories may not exist yet during preinst phase - this is normal"
       echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
-      for dir in "/opt/$PROJECT_NAME" "/var/log/$PROJECT_NAME"; do
+      OPT_DIR="/opt/$PROJECT_NAME"
+      LOG_DIR="/var/log/$PROJECT_NAME"
+      for dir in "$OPT_DIR" "$LOG_DIR"; do
           if [ -d "$dir" ]; then
               echo "Removing directory: $dir"
               rm -rf "$dir"
@@ -217,7 +219,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем preinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
     - chmod +x deb/DEBIAN/preinst
     - rm deb/DEBIAN/preinst.tmp
     - |
@@ -237,6 +239,9 @@ package-job:      # This job runs in the deploy stage.
 
       exit 0
       EOF
+    # Обрабатываем prerm скрипт
+    - sed "s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
+    - chmod +x deb/DEBIAN/prerm
     # Генерация postinst с автоустановкой зависимостей
     - |
       cat << EOF > deb/DEBIAN/postinst.tmp
@@ -463,7 +468,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем postinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
     - chmod +x deb/DEBIAN/postinst
     - rm deb/DEBIAN/postinst.tmp
     - |
@@ -479,7 +484,9 @@ package-job:      # This job runs in the deploy stage.
       if [ "$1" = "purge" ]; then
           echo "Purging $PROJECT_NAME directories..."
           echo "PROJECT_NAME variable in postrm: '$PROJECT_NAME'"
-          for dir in "/opt/$PROJECT_NAME" "/var/log/$PROJECT_NAME"; do
+          OPT_DIR="/opt/$PROJECT_NAME"
+          LOG_DIR="/var/log/$PROJECT_NAME"
+          for dir in "$OPT_DIR" "$LOG_DIR"; do
               if [ -d "$dir" ]; then
                   echo "Removing directory: $dir"
                   rm -rf "$dir"
@@ -499,6 +506,9 @@ package-job:      # This job runs in the deploy stage.
 
       exit 0
       EOF
+    # Обрабатываем postrm скрипт
+    - sed "s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
+    - chmod +x deb/DEBIAN/postrm
     # Генерация systemd unit для $PROJECT_NAME
     - |
       cat << EOF > deb/etc/systemd/system/${PROJECT_NAME}.service
