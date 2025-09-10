@@ -55,7 +55,7 @@ extract-version-job:
         grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
     - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
     - BUILD_NUMBER=$((CURRENT_BUILD + 1))
-    - echo "Current build number: $CURRENT_BUILD, New build number: $BUILD_NUMBER"
+    - 'echo "Current build number: $CURRENT_BUILD, New build number: $BUILD_NUMBER"'
     # Обновление build number в переменных проекта
     - |
       RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
