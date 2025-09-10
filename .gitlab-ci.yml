@@ -283,7 +283,7 @@ package-job:      # This job runs in the deploy stage.
     - echo "DEBUG - Processing preinst script with variables:"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - # Экранируем точки в версии .NET для корректной работы sed
+    # Экранируем точки в версии .NET для корректной работы sed
     - ESCAPED_DOTNET_VERSION=$(echo "${DOTNET_RT_VERSION}" | sed 's/\./\\./g')
     - echo "  ESCAPED_DOTNET_VERSION='${ESCAPED_DOTNET_VERSION}'"
     - sed "s/__DOTNET_RT_VERSION__/${ESCAPED_DOTNET_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
@@ -659,7 +659,7 @@ package-job:      # This job runs in the deploy stage.
     - echo "DEBUG - Processing postinst script with variables:"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - # Экранируем точки в версии .NET для корректной работы sed
+    # Экранируем точки в версии .NET для корректной работы sed
     - ESCAPED_DOTNET_VERSION=$(echo "${DOTNET_RT_VERSION}" | sed 's/\./\\./g')
     - echo "  ESCAPED_DOTNET_VERSION='${ESCAPED_DOTNET_VERSION}'"
     - sed "s/__DOTNET_RT_VERSION__/${ESCAPED_DOTNET_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g; s/\\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
