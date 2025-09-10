@@ -21,7 +21,7 @@ minimal-build-job:
   script:
     - echo "Creating minimal application structure for testing..."
     - mkdir -p ./publish
-    # Создаем фиктивные файлы для тестирования пакета
+    - # Создаем фиктивные файлы для тестирования пакета
     - echo '#!/bin/bash' > ./publish/${PROJECT_NAME}
     - echo 'echo "Test application ${PROJECT_NAME}"' >> ./publish/${PROJECT_NAME}
     - chmod +x ./publish/${PROJECT_NAME}
@@ -42,13 +42,13 @@ extract-version-job:
     - orpovy
   script:
     - apt-get update && apt-get install -y curl
-    # Используем фиксированную версию для тестирования
+    - # Используем фиксированную версию для тестирования
     - VERSION="1.4.1"
     - echo "Using test version: $VERSION"
-    # Формирование имени переменной для build number
+    - # Формирование имени переменной для build number
     - BUILD_VAR_NAME="BUILD_NUMBER_$(echo $VERSION | tr '.' '_')"
     - echo "Build variable name: $BUILD_VAR_NAME"
-    # Получение текущего build number из переменных проекта
+    - # Получение текущего build number из переменных проекта
     - |
       CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
         "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME" | \
@@ -56,7 +56,7 @@ extract-version-job:
     - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
     - BUILD_NUMBER=$((CURRENT_BUILD + 1))
     - 'echo "Current build number: $CURRENT_BUILD, New build number: $BUILD_NUMBER"'
-    # Обновление build number в переменных проекта
+    - # Обновление build number в переменных проекта
     - |
       RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
         --header "Content-Type: application/json" \
@@ -70,12 +70,12 @@ extract-version-job:
           "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables"
       fi
       echo "Build number updated successfully"
-    # Формирование ревизии из CI_COMMIT_SHORT_SHA
+    - # Формирование ревизии из CI_COMMIT_SHORT_SHA
     - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
-    # Формирование полной версии
+    - # Формирование полной версии
     - FULL_VERSION="${VERSION}-${REVISION}"
     - echo "Full version: $FULL_VERSION"
-    # Сохранение переменных для последующих этапов
+    - # Сохранение переменных для последующих этапов
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
     - echo "VERSION=$VERSION" >> version.env
     - echo "REVISION=$REVISION" >> version.env
@@ -102,21 +102,21 @@ debug-package-job:
     - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-debug-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     
-    # Создание структуры пакета
+    - # Создание структуры пакета
     - mkdir -p deb/DEBIAN
     - mkdir -p deb/opt/$PROJECT_NAME
     - mkdir -p deb/var/log/$PROJECT_NAME
     - mkdir -p deb/etc/systemd/system
     - mkdir -p deb/usr/local/bin
     
-    # Копирование тестовых файлов приложения
+    - # Копирование тестовых файлов приложения
     - cp -r ./publish/* deb/opt/$PROJECT_NAME/
     
-    # Создание тестового .NET Runtime архива (если нужно тестировать установку)
+    - # Создание тестового .NET Runtime архива (если нужно тестировать установку)
     - mkdir -p deb/tempdir
     - echo "Fake .NET Runtime archive for testing" > deb/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
     
-    # Генерация control
+    - # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
       Package: $(echo "${PROJECT_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-debug
@@ -131,7 +131,7 @@ debug-package-job:
 
       EOF
     
-    # Генерация упрощенного preinst для отладки
+    - # Генерация упрощенного preinst для отладки
     - |
       cat << 'PREINST_EOF' > deb/DEBIAN/preinst
       #!/bin/bash
@@ -260,12 +260,12 @@ debug-package-job:
       exit 0
       PREINST_EOF
     
-    # Обработка переменных в preinst
+    - # Обработка переменных в preinst
     - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/preinst > deb/DEBIAN/preinst.tmp
     - mv deb/DEBIAN/preinst.tmp deb/DEBIAN/preinst
     - chmod +x deb/DEBIAN/preinst
     
-    # Генерация упрощенного postinst для отладки
+    - # Генерация упрощенного postinst для отладки
     - |
       cat << 'POSTINST_EOF' > deb/DEBIAN/postinst
       #!/bin/bash
@@ -417,12 +417,12 @@ debug-package-job:
       exit 0
       POSTINST_EOF
     
-    # Обработка переменных в postinst
+    - # Обработка переменных в postinst
     - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/postinst > deb/DEBIAN/postinst.tmp
     - mv deb/DEBIAN/postinst.tmp deb/DEBIAN/postinst
     - chmod +x deb/DEBIAN/postinst
     
-    # Генерация упрощенного prerm
+    - # Генерация упрощенного prerm
     - |
       cat << 'PRERM_EOF' > deb/DEBIAN/prerm
       #!/bin/bash
@@ -451,7 +451,7 @@ debug-package-job:
     - mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
     - chmod +x deb/DEBIAN/prerm
     
-    # Генерация упрощенного postrm
+    - # Генерация упрощенного postrm
     - echo "#!/bin/bash" > deb/DEBIAN/postrm
     - echo "set -e" >> deb/DEBIAN/postrm
     - echo "echo 'DEBUG: Starting post-removal script for ${PROJECT_NAME}'" >> deb/DEBIAN/postrm
@@ -472,11 +472,11 @@ debug-package-job:
     - mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
     - chmod +x deb/DEBIAN/postrm
     
-    # Установка прав
+    - # Установка прав
     - chmod 755 deb/DEBIAN/*
     - chmod 644 deb/DEBIAN/control
     
-    # Сборка пакета
+    - # Сборка пакета
     - echo "Creating control.tar.xz..."
     - tar -cJf control.tar.xz -C deb/DEBIAN .
     - echo "Creating data.tar.xz..."
@@ -488,7 +488,7 @@ debug-package-job:
     - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
     - rm -f debian-binary control.tar.xz data.tar.xz
     
-    # Информация о созданном пакете
+    - # Информация о созданном пакете
     - echo "=== DEBUG PACKAGE CREATED ==="
     - ls -l ./packages/${DEB_NAME}_amd64.deb
     - echo "Package name: ${DEB_NAME}_amd64.deb"
