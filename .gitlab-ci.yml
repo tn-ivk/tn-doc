@@ -30,7 +30,7 @@ build-job:
     - dotnet build
     - echo "Moving to $PROJECT_NAME..."
     - cd $PROJECT_NAME
-    - echo "Current directory after cd $(pwd)"
+    - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
     - dotnet publish ${PROJECT_NAME}.csproj -c Release -r linux-x64 --self-contained false -o ../publish
   artifacts:
@@ -51,15 +51,15 @@ extract-version-job:
     # Определение пути к .csproj файлу
     - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
     # Проверка существования файла
-    - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error $CSPROJ_FILE not found"; exit 1; fi
+    - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
     # Извлечение версии из .csproj
     - VERSION=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" $CSPROJ_FILE 2>/dev/null || grep -oP '<Version>\K[^<]+' $CSPROJ_FILE)
-    - echo "Extracted version $VERSION"
+    - echo "Extracted version:$VERSION"
     # Проверка версии
-    - if [ -z "$VERSION" ]; then echo "Error Version not found in $CSPROJ_FILE"; exit 1; fi
+    - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
     # Формирование имени переменной для build number
     - BUILD_VAR_NAME="BUILD_NUMBER_$(echo $VERSION | tr '.' '_')"
-    - echo "Build variable name $BUILD_VAR_NAME"
+    - echo "Build variable name:$BUILD_VAR_NAME"
     # Получение текущего build number из переменных проекта
     - |
       CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
@@ -67,7 +67,7 @@ extract-version-job:
         grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
     - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
     - BUILD_NUMBER=$((CURRENT_BUILD + 1))
-    - echo "Current build number $CURRENT_BUILD, New build number $BUILD_NUMBER"
+    - echo "Current build number:$CURRENT_BUILD, New build number:$BUILD_NUMBER"
     # Обновление build number в переменных проекта
     - |
       RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
@@ -86,7 +86,7 @@ extract-version-job:
     - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
     - FULL_VERSION="${VERSION}-${REVISION}"
-    - echo "Full version $FULL_VERSION"
+    - echo "Full version:$FULL_VERSION"
     # Сохранение переменных для последующих этапов
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
     - echo "VERSION=$VERSION" >> version.env
@@ -108,14 +108,9 @@ package-job:      # This job runs in the deploy stage.
   tags:
     - orpovy
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev gettext-base
+    - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
-    - echo "DEBUG - Available variables in package-job"
-    - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
-    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - echo "  PACKAGE_NAME='${PACKAGE_NAME}'"
-    - echo "  FULL_VERSION='${FULL_VERSION}'"
     - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
@@ -159,161 +154,72 @@ package-job:      # This job runs in the deploy stage.
 
       # Проверка .NET Runtime перед установкой
       check_dotnet_runtime() {
-          echo "[DEBUG] Entering check_dotnet_runtime function"
-          
           # Проверка наличия .NET Runtime
-          echo "[DEBUG] Checking if .NET Runtime directory exists /usr/bin/dotnet/shared/Microsoft.NETCore.App"
           if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
-              echo "[DEBUG] .NET Runtime directory does not exist"
               echo "Warning: .NET Runtime 8 is not installed. Will install from local archive."
-              echo "[DEBUG] Exiting check_dotnet_runtime with return code 1"
               return 1
           fi
-          echo "[DEBUG] .NET Runtime directory exists"
 
           # Проверка версии .NET Runtime
-          REQUIRED_VERSION="$DOTNET_RT_VERSION"
-          echo "[DEBUG] Variable assignment completed"
-          echo "[DEBUG]   REQUIRED_VERSION='$REQUIRED_VERSION'"
-          echo "[DEBUG]   Length of REQUIRED_VERSION: ${#REQUIRED_VERSION}"
-          
-          echo "Pre-install check - Debug info"
-          echo "  DOTNET_RT_VERSION env var: '$DOTNET_RT_VERSION'"
+          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          echo "Pre-install check - Debug info:"
+          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
           echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
           echo "  Testing variable assignment..."
-          
-          echo "[DEBUG] Listing directory contents with detailed info:"
           echo "  Directory /usr/bin/dotnet/shared/Microsoft.NETCore.App contents:"
           ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
-          
-          echo "[DEBUG] Getting raw directory listing:"
           echo "  Raw ls output:"
           ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null || echo "  No files found"
-          
-          echo "[DEBUG] Applying version filter (8.0.x pattern):"
           echo "  Filtered output:"
           ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
 
-          echo "[DEBUG] Extracting installed version:"
           INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
-          echo "[DEBUG]   Raw command result: '$INSTALLED_VERSION'"
-          echo "[DEBUG]   Length of INSTALLED_VERSION: ${#INSTALLED_VERSION}"
           echo "Pre-install check - Detected .NET Runtime version: '$INSTALLED_VERSION' (required: $REQUIRED_VERSION)"
 
-          echo "[DEBUG] Checking if installed version is empty:"
           if [ -z "$INSTALLED_VERSION" ]; then
-              echo "[DEBUG] INSTALLED_VERSION is empty - no compatible version found"
               echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
-              echo "[DEBUG] Exiting check_dotnet_runtime with return code 1"
               return 1
           fi
-          echo "[DEBUG] INSTALLED_VERSION is not empty: '$INSTALLED_VERSION'"
 
-          echo "[DEBUG] Comparing versions using printf and sort:"
-          VERSION_COMPARISON=$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)
-          echo "[DEBUG]   Version comparison result: '$VERSION_COMPARISON'"
-          echo "[DEBUG]   Required version: '$REQUIRED_VERSION'"
-          echo "[DEBUG]   Comparison test: '$VERSION_COMPARISON' != '$REQUIRED_VERSION'"
-          
-          if [ "$VERSION_COMPARISON" != "$REQUIRED_VERSION" ]; then
-              echo "[DEBUG] Version comparison failed - installed version is older"
+          if [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
               echo "Warning: .NET Runtime version $INSTALLED_VERSION is installed, but version >= $REQUIRED_VERSION is required. Will install from local archive."
-              echo "[DEBUG] Exiting check_dotnet_runtime with return code 1"
               return 1
           fi
 
-          echo "[DEBUG] Version comparison passed - installed version is compatible"
           echo ".NET Runtime version $INSTALLED_VERSION is compatible (>= $REQUIRED_VERSION)"
-          echo "[DEBUG] Exiting check_dotnet_runtime with return code 0"
           return 0
       }
 
       # Проверка .NET Runtime (установка будет в postinst если нужно)
-      echo "[DEBUG] Calling check_dotnet_runtime function"
-      CHECK_RESULT=0
-      check_dotnet_runtime || CHECK_RESULT=$?
-      echo "[DEBUG] check_dotnet_runtime returned: ${CHECK_RESULT:-empty}"
-      if [ "${CHECK_RESULT:-0}" -ne 0 ]; then
-          echo "Will install .NET Runtime in postinst"
-      fi
+      check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
 
       # Остановка службы TN_Doc, если она запущена
-      echo "[DEBUG] Checking if service $PROJECT_NAME.service is active"
       if systemctl is-active --quiet $PROJECT_NAME.service; then
-          echo "[DEBUG] Service is active, stopping it"
           echo "Stopping $PROJECT_NAME.service..."
           systemctl stop $PROJECT_NAME.service
-          echo "[DEBUG] Service stop command completed"
-      else
-          echo "[DEBUG] Service $PROJECT_NAME.service is not active"
       fi
 
       # Удаление старых директорий
-      echo "[DEBUG] Starting directory cleanup process"
       echo "Removing old $PROJECT_NAME directories..."
       echo "Note: These directories may not exist yet during preinst phase - this is normal"
       echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
-      
-      echo "[DEBUG] Setting up directory variables:"
       OPT_DIR="/opt/$PROJECT_NAME"
       LOG_DIR="/var/log/$PROJECT_NAME"
-      echo "[DEBUG]   OPT_DIR='$OPT_DIR'"
-      echo "[DEBUG]   LOG_DIR='$LOG_DIR'"
-      
-      echo "[DEBUG] Processing directories for removal:"
       for dir in "$OPT_DIR" "$LOG_DIR"; do
-          echo "[DEBUG] Checking directory: $dir"
           if [ -d "$dir" ]; then
-              echo "[DEBUG] Directory exists, removing: $dir"
               echo "Removing directory: $dir"
               rm -rf "$dir"
-              if [ $? -eq 0 ]; then
-                  echo "✓ Successfully removed $dir"
-                  echo "[DEBUG] Directory removal successful"
-              else
-                  echo "✗ Failed to remove $dir"
-                  echo "[DEBUG] Directory removal failed"
-              fi
+              echo "✓ Successfully removed $dir"
           else
-              echo "[DEBUG] Directory does not exist: $dir"
               echo "! Directory $dir does not exist, skipping"
           fi
       done
-      echo "[DEBUG] Directory cleanup process completed"
       echo "=== Old directories cleanup completed ==="
 
       exit 0
       EOF
-    # Проверяем созданный preinst.tmp файл
-    - echo "DEBUG - Checking created preinst.tmp file"
-    - ls -la deb/DEBIAN/preinst.tmp || echo "  preinst.tmp file not found"
-    - echo "  First 10 lines with \$DOTNET_RT_VERSION patterns"
-    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/preinst.tmp | head -10 || echo "  No \$DOTNET_RT_VERSION patterns found"
     # Обрабатываем preinst скрипт
-    - echo "DEBUG - Processing preinst script with variables"
-    - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
-    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - echo "  Length of DOTNET_RT_VERSION ${#DOTNET_RT_VERSION}"
-    - echo "  Length of PROJECT_NAME ${#PROJECT_NAME}"
-    # Проверяем, что переменные не пусты
-    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR DOTNET_RT_VERSION is empty!"; exit 1; fi
-    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR PROJECT_NAME is empty!"; exit 1; fi
-    # Используем envsubst для замены переменных (более надежно чем sed)
-    - echo "  Using envsubst for variable substitution"
-    - echo "  Testing envsubst first"
-    - echo '$DOTNET_RT_VERSION' | DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" envsubst
-    - echo "  Before envsubst - checking source file content"
-    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/preinst.tmp || echo "  No \$DOTNET_RT_VERSION patterns in source file"
-    - DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
-    - echo "  After envsubst - checking result file content"
-    - grep -n "REQUIRED_VERSION=" deb/DEBIAN/preinst | head -3 || echo "  No REQUIRED_VERSION assignments found"
-    - echo "DEBUG - Checking variable replacement in preinst"
-    - echo "  Searching for \$DOTNET_RT_VERSION patterns (should be 0)"
-    - grep -c '\$DOTNET_RT_VERSION' deb/DEBIAN/preinst || echo "  No unreplaced patterns found (good)"
-    - echo "  Searching for REQUIRED_VERSION assignments"
-    - grep -n "REQUIRED_VERSION=" deb/DEBIAN/preinst || echo "  No REQUIRED_VERSION found"
-    - echo "  Sample of replaced content"
-    - grep -A2 -B2 "REQUIRED_VERSION=" deb/DEBIAN/preinst || echo "  No context found"
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
     - chmod +x deb/DEBIAN/preinst
     - rm deb/DEBIAN/preinst.tmp
     - |
@@ -325,38 +231,16 @@ package-job:      # This job runs in the deploy stage.
       echo "Starting pre-removal script for $PROJECT_NAME"
       echo "============================================"
 
-      echo "[DEBUG] Starting prerm script execution"
-      echo "[DEBUG] PROJECT_NAME variable: '$PROJECT_NAME'"
-
       # Остановка службы TN_Doc, если она запущена
-      echo "[DEBUG] Checking if service $PROJECT_NAME.service is active"
-      SERVICE_NAME="$PROJECT_NAME.service"
-      echo "[DEBUG] Service name: $SERVICE_NAME"
-      
-      if systemctl is-active --quiet "$SERVICE_NAME"; then
-          echo "[DEBUG] Service is active, stopping it"
-          echo "Stopping $SERVICE_NAME..."
-          systemctl stop "$SERVICE_NAME"
-          STOP_RESULT=$?
-          echo "[DEBUG] Service stop result: $STOP_RESULT"
-          
-          if [ $STOP_RESULT -eq 0 ]; then
-              echo "[DEBUG] Service stopped successfully"
-          else
-              echo "[DEBUG] Service stop failed with code: $STOP_RESULT"
-          fi
-      else
-          echo "[DEBUG] Service $SERVICE_NAME is not active or does not exist"
+      if systemctl is-active --quiet $PROJECT_NAME.service; then
+          echo "Stopping $PROJECT_NAME.service..."
+          systemctl stop $PROJECT_NAME.service
       fi
-
-      echo "[DEBUG] prerm script execution completed"
 
       exit 0
       EOF
     # Обрабатываем prerm скрипт
-    - echo "DEBUG - Processing prerm script with variables"
-    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
+    - sed "s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
     - chmod +x deb/DEBIAN/prerm
     # Генерация postinst с автоустановкой зависимостей
     - |
@@ -373,27 +257,19 @@ package-job:      # This job runs in the deploy stage.
 
       # Установка .NET Runtime
       install_dotnet_runtime() {
-          echo "[DEBUG] Entering install_dotnet_runtime function"
           echo "=== Starting .NET Runtime installation check ==="
-          echo "Required version from CI variable: $DOTNET_RT_VERSION"
+          echo "Required version from CI variable: __DOTNET_RT_VERSION__"
 
           # Проверяем, нужна ли установка
-          echo "[DEBUG] Setting REQUIRED_VERSION variable"
-          REQUIRED_VERSION="$DOTNET_RT_VERSION"
-          echo "[DEBUG] Variable assignment completed"
-          echo "[DEBUG]   REQUIRED_VERSION='$REQUIRED_VERSION'"
-          echo "[DEBUG]   Length of REQUIRED_VERSION: ${#REQUIRED_VERSION}"
-          
-          echo "Post-install check - Debug info"
-          echo "  DOTNET_RT_VERSION env var: '$DOTNET_RT_VERSION'"
+          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          echo "Post-install check - Debug info:"
+          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
           echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
           echo "Checking for existing .NET Runtime installation..."
 
-          echo "[DEBUG] Checking if .NET Runtime directory exists"
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
-              echo "[DEBUG] .NET Runtime directory exists"
               echo "Found .NET Runtime directory: /usr/bin/dotnet/shared/Microsoft.NETCore.App"
-              echo "Post-install check - Debug info"
+              echo "Post-install check - Debug info:"
               echo "  Directory contents:"
               ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
               echo "  Raw ls output:"
@@ -401,112 +277,46 @@ package-job:      # This job runs in the deploy stage.
               echo "  Filtered output:"
               ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
 
-              echo "[DEBUG] Extracting installed version"
               INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
-              echo "[DEBUG]   Raw command result: '$INSTALLED_VERSION'"
-              echo "[DEBUG]   Length of INSTALLED_VERSION: ${#INSTALLED_VERSION}"
               echo "Detected installed version: '$INSTALLED_VERSION'"
               
-              echo "[DEBUG] Checking version compatibility"
-              if [ -n "$INSTALLED_VERSION" ]; then
-                  echo "[DEBUG] INSTALLED_VERSION is not empty, performing version comparison"
-                  VERSION_COMPARISON=$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)
-                  echo "[DEBUG]   Version comparison result: '$VERSION_COMPARISON'"
-                  echo "[DEBUG]   Required version: '$REQUIRED_VERSION'"
-                  echo "[DEBUG]   Comparison test: '$VERSION_COMPARISON' = '$REQUIRED_VERSION'"
-                  
-                  if [ "$VERSION_COMPARISON" = "$REQUIRED_VERSION" ]; then
-                      echo "[DEBUG] Version compatibility check passed"
-                      echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
-                      echo "=== Skipping .NET Runtime installation ==="
-                      echo "[DEBUG] Exiting install_dotnet_runtime with return code 0"
-                      return 0
-                  else
-                      echo "[DEBUG] Version compatibility check failed"
-                      echo "! Installed version $INSTALLED_VERSION is not compatible with required $REQUIRED_VERSION"
-                  fi
+              if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
+                  echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+                  echo "=== Skipping .NET Runtime installation ==="
+                  return 0
               else
-                  echo "[DEBUG] INSTALLED_VERSION is empty"
-                  echo "! No compatible .NET Runtime version found"
+                  echo "! Installed version $INSTALLED_VERSION is not compatible with required $REQUIRED_VERSION"
               fi
           else
-              echo "[DEBUG] .NET Runtime directory does not exist"
               echo "! .NET Runtime directory not found, installation required"
           fi
           
-          echo "[DEBUG] Starting .NET Runtime installation process"
           echo "=== Starting .NET Runtime installation ==="
           
           # Проверяем наличие локального архива
-          echo "[DEBUG] Checking for .NET Runtime archive"
-          ARCHIVE_PATH="/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
-          echo "[DEBUG] Archive path: $ARCHIVE_PATH"
-          
-          if [ -f "$ARCHIVE_PATH" ]; then
-              echo "[DEBUG] Archive file exists"
-              echo "✓ Found .NET Runtime archive: $ARCHIVE_PATH"
-              
-              # Получаем размер архива для диагностики
-              ARCHIVE_SIZE=$(ls -lh "$ARCHIVE_PATH" | awk '{print $5}')
-              echo "[DEBUG] Archive size: $ARCHIVE_SIZE"
+          if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              echo "✓ Found .NET Runtime archive: /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
 
               # Создаем директорию для .NET (как в Ansible)
-              echo "[DEBUG] Creating .NET directory"
               echo "Creating .NET directory: /usr/bin/dotnet"
               mkdir -p /usr/bin/dotnet
-              if [ $? -eq 0 ]; then
-                  echo "[DEBUG] Directory creation successful"
-              else
-                  echo "[DEBUG] Directory creation failed"
-                  exit 1
-              fi
 
               # Распаковываем архив напрямую в /usr/bin/dotnet (как в Ansible)
-              echo "[DEBUG] Extracting archive"
               echo "Extracting .NET Runtime archive to /usr/bin/dotnet..."
-              tar -xzf "$ARCHIVE_PATH" -C /usr/bin/dotnet
-              TAR_RESULT=$?
-              echo "[DEBUG] tar command result: $TAR_RESULT"
-              
-              if [ $TAR_RESULT -ne 0 ]; then
-                  echo "[DEBUG] Archive extraction failed"
-                  echo "✗ ERROR: Failed to extract .NET Runtime archive"
-                  exit 1
-              fi
-              echo "[DEBUG] Archive extraction successful"
-
-              # Проверяем что файлы извлечены
-              echo "[DEBUG] Verifying extracted files"
-              if [ -f "/usr/bin/dotnet/dotnet" ]; then
-                  echo "[DEBUG] dotnet binary found"
-                  DOTNET_VERSION=$(/usr/bin/dotnet/dotnet --version 2>/dev/null || echo "unknown")
-                  echo "[DEBUG] dotnet version: $DOTNET_VERSION"
-              else
-                  echo "[DEBUG] WARNING: dotnet binary not found after extraction"
-              fi
+              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
 
               # Удаляем архив (как в Ansible)
-              echo "[DEBUG] Removing temporary archive"
               echo "Removing temporary archive file..."
-              rm -f "$ARCHIVE_PATH"
-              if [ $? -eq 0 ]; then
-                  echo "[DEBUG] Archive removal successful"
-              else
-                  echo "[DEBUG] Archive removal failed (non-critical)"
-              fi
+              rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
 
-              echo "✓ .NET Runtime $DOTNET_RT_VERSION installed successfully"
-              echo "[DEBUG] .NET Runtime installation completed successfully"
+              echo "✓ .NET Runtime __DOTNET_RT_VERSION__ installed successfully"
           else
-              echo "[DEBUG] Archive file not found"
-              echo "✗ ERROR: .NET Runtime archive not found at $ARCHIVE_PATH"
+              echo "✗ ERROR: .NET Runtime archive not found at /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
               echo "Please ensure the archive is available before installing this package."
-              echo "[DEBUG] Exiting with error code 1"
               exit 1
           fi
 
           echo "=== .NET Runtime installation completed ==="
-          echo "[DEBUG] Exiting install_dotnet_runtime with return code 0"
       }
 
       # Установка переменных окружения для пользователей (как в Ansible)
@@ -582,40 +392,17 @@ package-job:      # This job runs in the deploy stage.
           echo "=== Environment setup completed ==="
       }
 
-      echo "[DEBUG] Starting postinst main execution"
       echo "=== Starting application dependencies installation ==="
 
       # Установка .NET Runtime
-      echo "[DEBUG] Step 1: Calling install_dotnet_runtime"
       echo "Step 1: Installing .NET Runtime..."
-      INSTALL_RESULT=0
-      install_dotnet_runtime || INSTALL_RESULT=$?
-      echo "[DEBUG] install_dotnet_runtime returned: ${INSTALL_RESULT:-empty}"
-      
-      if [ "${INSTALL_RESULT:-0}" -eq 0 ]; then
-          echo "✓ .NET Runtime setup completed"
-          echo "[DEBUG] .NET Runtime installation successful"
-      else
-          echo "✗ .NET Runtime setup failed"
-          echo "[DEBUG] .NET Runtime installation failed with code: ${INSTALL_RESULT:-empty}"
-          exit 1
-      fi
+      install_dotnet_runtime
+      echo "✓ .NET Runtime setup completed"
 
       # Установка переменных окружения для пользователей
-      echo "[DEBUG] Step 2: Calling setup_dotnet_environment"
       echo "Step 2: Setting up environment variables..."
-      ENV_RESULT=0
-      setup_dotnet_environment || ENV_RESULT=$?
-      echo "[DEBUG] setup_dotnet_environment returned: ${ENV_RESULT:-empty}"
-      
-      if [ "${ENV_RESULT:-0}" -eq 0 ]; then
-          echo "✓ Environment variables setup completed"
-          echo "[DEBUG] Environment setup successful"
-      else
-          echo "✗ Environment variables setup failed"
-          echo "[DEBUG] Environment setup failed with code: ${ENV_RESULT:-empty}"
-          # Не критичная ошибка, продолжаем
-      fi
+      setup_dotnet_environment
+      echo "✓ Environment variables setup completed"
 
       # Обновление кэша шрифтов (как в Ansible, без установки fontconfig)
       # Это вызовет триггеры fontconfig после установки пакета
@@ -680,36 +467,8 @@ package-job:      # This job runs in the deploy stage.
       echo "============================================"
       exit 0
       EOF
-    # Проверяем созданный postinst.tmp файл
-    - echo "DEBUG - Checking created postinst.tmp file"
-    - ls -la deb/DEBIAN/postinst.tmp || echo "  postinst.tmp file not found"
-    - echo "  First 10 lines with \$DOTNET_RT_VERSION patterns"
-    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/postinst.tmp | head -10 || echo "  No \$DOTNET_RT_VERSION patterns found"
     # Обрабатываем postinst скрипт
-    - echo "DEBUG - Processing postinst script with variables"
-    - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
-    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - echo "  Length of DOTNET_RT_VERSION ${#DOTNET_RT_VERSION}"
-    - echo "  Length of PROJECT_NAME ${#PROJECT_NAME}"
-    # Проверяем, что переменные не пусты
-    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR DOTNET_RT_VERSION is empty!"; exit 1; fi
-    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR PROJECT_NAME is empty!"; exit 1; fi
-    # Используем envsubst для замены переменных (более надежно чем sed)
-    - echo "  Using envsubst for variable substitution"
-    - echo "  Testing envsubst first"
-    - echo '$DOTNET_RT_VERSION' | DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" envsubst
-    - echo "  Before envsubst - checking source file content"
-    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/postinst.tmp || echo "  No \$DOTNET_RT_VERSION patterns in source file"
-    - DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
-    - echo "  After envsubst - checking result file content"
-    - grep -n "REQUIRED_VERSION=" deb/DEBIAN/postinst | head -3 || echo "  No REQUIRED_VERSION assignments found"
-    - echo "DEBUG - Checking variable replacement in postinst"
-    - echo "  Searching for \$DOTNET_RT_VERSION patterns (should be 0)"
-    - grep -c '\$DOTNET_RT_VERSION' deb/DEBIAN/postinst || echo "  No unreplaced patterns found (good)"
-    - echo "  Searching for REQUIRED_VERSION assignments"
-    - grep -n "REQUIRED_VERSION=" deb/DEBIAN/postinst || echo "  No REQUIRED_VERSION found"
-    - echo "  Sample of replaced content"
-    - grep -A2 -B2 "REQUIRED_VERSION=" deb/DEBIAN/postinst || echo "  No context found"
+    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
     - chmod +x deb/DEBIAN/postinst
     - rm deb/DEBIAN/postinst.tmp
     - |
@@ -721,83 +480,34 @@ package-job:      # This job runs in the deploy stage.
       echo "Starting post-removal script for $PROJECT_NAME"
       echo "============================================"
 
-      echo "[DEBUG] Starting postrm script execution"
-      echo "[DEBUG] Script argument \$1: '$1'"
-      echo "[DEBUG] PROJECT_NAME variable: '$PROJECT_NAME'"
-
       # Удаление директорий при полной очистке (purge)
-      echo "[DEBUG] Checking if this is a purge operation"
       if [ "$1" = "purge" ]; then
-          echo "[DEBUG] This is a purge operation, proceeding with cleanup"
           echo "Purging $PROJECT_NAME directories..."
           echo "PROJECT_NAME variable in postrm: '$PROJECT_NAME'"
-          
-          echo "[DEBUG] Setting up directory variables:"
           OPT_DIR="/opt/$PROJECT_NAME"
           LOG_DIR="/var/log/$PROJECT_NAME"
-          echo "[DEBUG]   OPT_DIR='$OPT_DIR'"
-          echo "[DEBUG]   LOG_DIR='$LOG_DIR'"
-          
-          echo "[DEBUG] Processing directories for removal:"
           for dir in "$OPT_DIR" "$LOG_DIR"; do
-              echo "[DEBUG] Checking directory: $dir"
               if [ -d "$dir" ]; then
-                  echo "[DEBUG] Directory exists, removing: $dir"
                   echo "Removing directory: $dir"
                   rm -rf "$dir"
-                  REMOVE_RESULT=$?
-                  echo "[DEBUG] Directory removal result: $REMOVE_RESULT"
-                  
-                  if [ $REMOVE_RESULT -eq 0 ]; then
-                      echo "✓ Successfully removed $dir"
-                      echo "[DEBUG] Directory removal successful"
-                  else
-                      echo "✗ Failed to remove $dir"
-                      echo "[DEBUG] Directory removal failed"
-                  fi
+                  echo "✓ Successfully removed $dir"
               else
-                  echo "[DEBUG] Directory does not exist: $dir"
                   echo "! Directory $dir does not exist, skipping"
               fi
           done
           
           # Удаление systemd service
-          echo "[DEBUG] Starting systemd service cleanup"
           echo "Removing systemd service..."
-          SERVICE_NAME="$PROJECT_NAME.service"
-          echo "[DEBUG] Service name: $SERVICE_NAME"
-          
-          echo "[DEBUG] Disabling service"
-          systemctl disable "$SERVICE_NAME" 2>/dev/null || echo "! Failed to disable service"
-          DISABLE_RESULT=$?
-          echo "[DEBUG] Service disable result: $DISABLE_RESULT"
-          
-          echo "[DEBUG] Removing service file"
-          SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME"
-          echo "[DEBUG] Service file path: $SERVICE_FILE"
-          rm -f "$SERVICE_FILE"
-          REMOVE_FILE_RESULT=$?
-          echo "[DEBUG] Service file removal result: $REMOVE_FILE_RESULT"
-          
-          echo "[DEBUG] Reloading systemd daemon"
+          systemctl disable $PROJECT_NAME.service 2>/dev/null || echo "! Failed to disable service"
+          rm -f /etc/systemd/system/$PROJECT_NAME.service
           systemctl daemon-reload
-          RELOAD_RESULT=$?
-          echo "[DEBUG] Systemd daemon reload result: $RELOAD_RESULT"
-          
           echo "✓ Systemd service removed"
-          echo "[DEBUG] Systemd service cleanup completed"
-      else
-          echo "[DEBUG] Not a purge operation (argument: '$1'), skipping cleanup"
       fi
-
-      echo "[DEBUG] postrm script execution completed"
 
       exit 0
       EOF
     # Обрабатываем postrm скрипт
-    - echo "DEBUG - Processing postrm script with variables"
-    - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
+    - sed "s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
     - chmod +x deb/DEBIAN/postrm
     # Генерация systemd unit для $PROJECT_NAME
     - |
@@ -833,7 +543,7 @@ package-job:      # This job runs in the deploy stage.
     - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
     - rm -f debian-binary control.tar.xz data.tar.xz
     - ls -l ./packages/${DEB_NAME}_amd64.deb
-    - echo "Current directory $(pwd)"
+    - echo "Current directory:$(pwd)"
   artifacts:
     name: "package-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
     paths:
