@@ -108,7 +108,7 @@ package-job:      # This job runs in the deploy stage.
   tags:
     - orpovy
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update && apt-get install -y dpkg-dev gettext-base
   script:
     - echo "Packaging the application into a .deb file..."
     - echo "DEBUG - Available variables in package-job"
@@ -172,13 +172,13 @@ package-job:      # This job runs in the deploy stage.
           echo "[DEBUG] .NET Runtime directory exists"
 
           # Проверка версии .NET Runtime
-          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          REQUIRED_VERSION="$DOTNET_RT_VERSION"
           echo "[DEBUG] Variable assignment completed"
           echo "[DEBUG]   REQUIRED_VERSION='$REQUIRED_VERSION'"
           echo "[DEBUG]   Length of REQUIRED_VERSION: ${#REQUIRED_VERSION}"
           
           echo "Pre-install check - Debug info"
-          echo "  DOTNET_RT_VERSION env var: '__DOTNET_RT_VERSION__'"
+          echo "  DOTNET_RT_VERSION env var: '$DOTNET_RT_VERSION'"
           echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
           echo "  Testing variable assignment..."
           
@@ -255,8 +255,8 @@ package-job:      # This job runs in the deploy stage.
       echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
       
       echo "[DEBUG] Setting up directory variables:"
-      OPT_DIR="/opt/__PROJECT_NAME__"
-      LOG_DIR="/var/log/__PROJECT_NAME__"
+      OPT_DIR="/opt/$PROJECT_NAME"
+      LOG_DIR="/var/log/$PROJECT_NAME"
       echo "[DEBUG]   OPT_DIR='$OPT_DIR'"
       echo "[DEBUG]   LOG_DIR='$LOG_DIR'"
       
@@ -287,8 +287,8 @@ package-job:      # This job runs in the deploy stage.
     # Проверяем созданный preinst.tmp файл
     - echo "DEBUG - Checking created preinst.tmp file"
     - ls -la deb/DEBIAN/preinst.tmp || echo "  preinst.tmp file not found"
-    - echo "  First 10 lines with __DOTNET_RT_VERSION__ patterns"
-    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst.tmp | head -10 || echo "  No __DOTNET_RT_VERSION__ patterns found"
+    - echo "  First 10 lines with \$DOTNET_RT_VERSION patterns"
+    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/preinst.tmp | head -10 || echo "  No \$DOTNET_RT_VERSION patterns found"
     # Обрабатываем preinst скрипт
     - echo "DEBUG - Processing preinst script with variables"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
@@ -298,18 +298,18 @@ package-job:      # This job runs in the deploy stage.
     # Проверяем, что переменные не пусты
     - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR DOTNET_RT_VERSION is empty!"; exit 1; fi
     - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR PROJECT_NAME is empty!"; exit 1; fi
-    # Используем разделитель | в sed для избежания конфликтов с точками
-    - echo "  Using sed with | delimiter to avoid conflicts"
-    - echo "  Testing sed command first"
-    - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
-    - echo "  Before sed - checking source file content"
-    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst.tmp || echo "  No __DOTNET_RT_VERSION__ patterns in source file"
-    - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
-    - echo "  After sed - checking result file content"
+    # Используем envsubst для замены переменных (более надежно чем sed)
+    - echo "  Using envsubst for variable substitution"
+    - echo "  Testing envsubst first"
+    - echo '$DOTNET_RT_VERSION' | DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" envsubst
+    - echo "  Before envsubst - checking source file content"
+    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/preinst.tmp || echo "  No \$DOTNET_RT_VERSION patterns in source file"
+    - DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    - echo "  After envsubst - checking result file content"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/preinst | head -3 || echo "  No REQUIRED_VERSION assignments found"
     - echo "DEBUG - Checking variable replacement in preinst"
-    - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0)"
-    - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst || echo "  No unreplaced patterns found (good)"
+    - echo "  Searching for \$DOTNET_RT_VERSION patterns (should be 0)"
+    - grep -c '\$DOTNET_RT_VERSION' deb/DEBIAN/preinst || echo "  No unreplaced patterns found (good)"
     - echo "  Searching for REQUIRED_VERSION assignments"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/preinst || echo "  No REQUIRED_VERSION found"
     - echo "  Sample of replaced content"
@@ -356,7 +356,7 @@ package-job:      # This job runs in the deploy stage.
     # Обрабатываем prerm скрипт
     - echo "DEBUG - Processing prerm script with variables"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - sed "s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
+    - PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
     - chmod +x deb/DEBIAN/prerm
     # Генерация postinst с автоустановкой зависимостей
     - |
@@ -375,17 +375,17 @@ package-job:      # This job runs in the deploy stage.
       install_dotnet_runtime() {
           echo "[DEBUG] Entering install_dotnet_runtime function"
           echo "=== Starting .NET Runtime installation check ==="
-          echo "Required version from CI variable: __DOTNET_RT_VERSION__"
+          echo "Required version from CI variable: $DOTNET_RT_VERSION"
 
           # Проверяем, нужна ли установка
           echo "[DEBUG] Setting REQUIRED_VERSION variable"
-          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          REQUIRED_VERSION="$DOTNET_RT_VERSION"
           echo "[DEBUG] Variable assignment completed"
           echo "[DEBUG]   REQUIRED_VERSION='$REQUIRED_VERSION'"
           echo "[DEBUG]   Length of REQUIRED_VERSION: ${#REQUIRED_VERSION}"
           
           echo "Post-install check - Debug info"
-          echo "  DOTNET_RT_VERSION env var: '__DOTNET_RT_VERSION__'"
+          echo "  DOTNET_RT_VERSION env var: '$DOTNET_RT_VERSION'"
           echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
           echo "Checking for existing .NET Runtime installation..."
 
@@ -495,7 +495,7 @@ package-job:      # This job runs in the deploy stage.
                   echo "[DEBUG] Archive removal failed (non-critical)"
               fi
 
-              echo "✓ .NET Runtime __DOTNET_RT_VERSION__ installed successfully"
+              echo "✓ .NET Runtime $DOTNET_RT_VERSION installed successfully"
               echo "[DEBUG] .NET Runtime installation completed successfully"
           else
               echo "[DEBUG] Archive file not found"
@@ -683,8 +683,8 @@ package-job:      # This job runs in the deploy stage.
     # Проверяем созданный postinst.tmp файл
     - echo "DEBUG - Checking created postinst.tmp file"
     - ls -la deb/DEBIAN/postinst.tmp || echo "  postinst.tmp file not found"
-    - echo "  First 10 lines with __DOTNET_RT_VERSION__ patterns"
-    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst.tmp | head -10 || echo "  No __DOTNET_RT_VERSION__ patterns found"
+    - echo "  First 10 lines with \$DOTNET_RT_VERSION patterns"
+    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/postinst.tmp | head -10 || echo "  No \$DOTNET_RT_VERSION patterns found"
     # Обрабатываем postinst скрипт
     - echo "DEBUG - Processing postinst script with variables"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
@@ -694,18 +694,18 @@ package-job:      # This job runs in the deploy stage.
     # Проверяем, что переменные не пусты
     - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR DOTNET_RT_VERSION is empty!"; exit 1; fi
     - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR PROJECT_NAME is empty!"; exit 1; fi
-    # Используем разделитель | в sed для избежания конфликтов с точками
-    - echo "  Using sed with | delimiter to avoid conflicts"
-    - echo "  Testing sed command first"
-    - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
-    - echo "  Before sed - checking source file content"
-    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst.tmp || echo "  No __DOTNET_RT_VERSION__ patterns in source file"
-    - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
-    - echo "  After sed - checking result file content"
+    # Используем envsubst для замены переменных (более надежно чем sed)
+    - echo "  Using envsubst for variable substitution"
+    - echo "  Testing envsubst first"
+    - echo '$DOTNET_RT_VERSION' | DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" envsubst
+    - echo "  Before envsubst - checking source file content"
+    - grep -n '\$DOTNET_RT_VERSION' deb/DEBIAN/postinst.tmp || echo "  No \$DOTNET_RT_VERSION patterns in source file"
+    - DOTNET_RT_VERSION="${DOTNET_RT_VERSION}" PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    - echo "  After envsubst - checking result file content"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/postinst | head -3 || echo "  No REQUIRED_VERSION assignments found"
     - echo "DEBUG - Checking variable replacement in postinst"
-    - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0)"
-    - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst || echo "  No unreplaced patterns found (good)"
+    - echo "  Searching for \$DOTNET_RT_VERSION patterns (should be 0)"
+    - grep -c '\$DOTNET_RT_VERSION' deb/DEBIAN/postinst || echo "  No unreplaced patterns found (good)"
     - echo "  Searching for REQUIRED_VERSION assignments"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/postinst || echo "  No REQUIRED_VERSION found"
     - echo "  Sample of replaced content"
@@ -733,8 +733,8 @@ package-job:      # This job runs in the deploy stage.
           echo "PROJECT_NAME variable in postrm: '$PROJECT_NAME'"
           
           echo "[DEBUG] Setting up directory variables:"
-          OPT_DIR="/opt/__PROJECT_NAME__"
-          LOG_DIR="/var/log/__PROJECT_NAME__"
+          OPT_DIR="/opt/$PROJECT_NAME"
+          LOG_DIR="/var/log/$PROJECT_NAME"
           echo "[DEBUG]   OPT_DIR='$OPT_DIR'"
           echo "[DEBUG]   LOG_DIR='$LOG_DIR'"
           
@@ -797,7 +797,7 @@ package-job:      # This job runs in the deploy stage.
     # Обрабатываем postrm скрипт
     - echo "DEBUG - Processing postrm script with variables"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - sed "s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
+    - PROJECT_NAME="${PROJECT_NAME}" envsubst < deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
     - chmod +x deb/DEBIAN/postrm
     # Генерация systemd unit для $PROJECT_NAME
     - |
