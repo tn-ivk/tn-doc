@@ -118,22 +118,22 @@ package-job:      # This job runs in the deploy stage.
     - echo "  FULL_VERSION='${FULL_VERSION}'"
     - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
-    - # Создание структуры пакета
+    # Создание структуры пакета
     - mkdir -p deb/DEBIAN
     - mkdir -p deb/opt/$PROJECT_NAME
     - mkdir -p deb/var/log/$PROJECT_NAME
     - mkdir -p deb/etc/systemd/system
     - mkdir -p deb/usr/share/fonts
     - mkdir -p deb/usr/local/bin
-    - # Создание временной директории для зависимостей
+    # Создание временной директории для зависимостей
     - mkdir -p deb/tempdir
-    - # Копирование файлов приложения
+    # Копирование файлов приложения
     - cp -r ./publish/* deb/opt/$PROJECT_NAME/
-    - # Копирование .NET Runtime если есть в distrib
+    # Копирование .NET Runtime если есть в distrib
     - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tempdir/; fi
-    - # Копирование шрифтов в пакет (если присутствуют в репозитории)
+    # Копирование шрифтов в пакет (если присутствуют в репозитории)
     - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
-    - # Генерация control
+    # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
       Package: $(echo "${PROJECT_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')
@@ -147,7 +147,7 @@ package-job:      # This job runs in the deploy stage.
       Homepage:
 
       EOF
-    - # Генерация preinst
+    # Генерация preinst
     - |
       cat << EOF > deb/DEBIAN/preinst.tmp
       #!/bin/bash
@@ -290,10 +290,10 @@ package-job:      # This job runs in the deploy stage.
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
     - echo "  Length of DOTNET_RT_VERSION: ${#DOTNET_RT_VERSION}"
     - echo "  Length of PROJECT_NAME: ${#PROJECT_NAME}"
-    - # Проверяем, что переменные не пусты
+    # Проверяем, что переменные не пусты
     - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR: DOTNET_RT_VERSION is empty!"; exit 1; fi
     - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR: PROJECT_NAME is empty!"; exit 1; fi
-    - # Используем разделитель | в sed для избежания конфликтов с точками
+    # Используем разделитель | в sed для избежания конфликтов с точками
     - echo "  Using sed with | delimiter to avoid conflicts"
     - echo "  Testing sed command first:"
     - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
@@ -677,10 +677,10 @@ package-job:      # This job runs in the deploy stage.
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
     - echo "  Length of DOTNET_RT_VERSION: ${#DOTNET_RT_VERSION}"
     - echo "  Length of PROJECT_NAME: ${#PROJECT_NAME}"
-    - # Проверяем, что переменные не пусты
+    # Проверяем, что переменные не пусты
     - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR: DOTNET_RT_VERSION is empty!"; exit 1; fi
     - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR: PROJECT_NAME is empty!"; exit 1; fi
-    - # Используем разделитель | в sed для избежания конфликтов с точками
+    # Используем разделитель | в sed для избежания конфликтов с точками
     - echo "  Using sed with | delimiter to avoid conflicts"
     - echo "  Testing sed command first:"
     - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
