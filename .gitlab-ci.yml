@@ -30,7 +30,7 @@ build-job:
     - dotnet build
     - echo "Moving to $PROJECT_NAME..."
     - cd $PROJECT_NAME
-    - echo "Current directory after cd:$(pwd)"
+    - echo "Current directory after cd $(pwd)"
     - echo "Building the application..."
     - dotnet publish ${PROJECT_NAME}.csproj -c Release -r linux-x64 --self-contained false -o ../publish
   artifacts:
@@ -51,15 +51,15 @@ extract-version-job:
     # Определение пути к .csproj файлу
     - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
     # Проверка существования файла
-    - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
+    - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error $CSPROJ_FILE not found"; exit 1; fi
     # Извлечение версии из .csproj
     - VERSION=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" $CSPROJ_FILE 2>/dev/null || grep -oP '<Version>\K[^<]+' $CSPROJ_FILE)
-    - echo "Extracted version:$VERSION"
+    - echo "Extracted version $VERSION"
     # Проверка версии
-    - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
+    - if [ -z "$VERSION" ]; then echo "Error Version not found in $CSPROJ_FILE"; exit 1; fi
     # Формирование имени переменной для build number
     - BUILD_VAR_NAME="BUILD_NUMBER_$(echo $VERSION | tr '.' '_')"
-    - echo "Build variable name:$BUILD_VAR_NAME"
+    - echo "Build variable name $BUILD_VAR_NAME"
     # Получение текущего build number из переменных проекта
     - |
       CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
@@ -67,7 +67,7 @@ extract-version-job:
         grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
     - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
     - BUILD_NUMBER=$((CURRENT_BUILD + 1))
-    - echo "Current build number:$CURRENT_BUILD, New build number:$BUILD_NUMBER"
+    - echo "Current build number $CURRENT_BUILD, New build number $BUILD_NUMBER"
     # Обновление build number в переменных проекта
     - |
       RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
@@ -86,7 +86,7 @@ extract-version-job:
     - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
     - FULL_VERSION="${VERSION}-${REVISION}"
-    - echo "Full version:$FULL_VERSION"
+    - echo "Full version $FULL_VERSION"
     # Сохранение переменных для последующих этапов
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
     - echo "VERSION=$VERSION" >> version.env
@@ -111,7 +111,7 @@ package-job:      # This job runs in the deploy stage.
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
-    - echo "DEBUG - Available variables in package-job:"
+    - echo "DEBUG - Available variables in package-job"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
     - echo "  PACKAGE_NAME='${PACKAGE_NAME}'"
@@ -162,7 +162,7 @@ package-job:      # This job runs in the deploy stage.
           echo "[DEBUG] Entering check_dotnet_runtime function"
           
           # Проверка наличия .NET Runtime
-          echo "[DEBUG] Checking if .NET Runtime directory exists: /usr/bin/dotnet/shared/Microsoft.NETCore.App"
+          echo "[DEBUG] Checking if .NET Runtime directory exists /usr/bin/dotnet/shared/Microsoft.NETCore.App"
           if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
               echo "[DEBUG] .NET Runtime directory does not exist"
               echo "Warning: .NET Runtime 8 is not installed. Will install from local archive."
@@ -173,11 +173,11 @@ package-job:      # This job runs in the deploy stage.
 
           # Проверка версии .NET Runtime
           REQUIRED_VERSION="__DOTNET_RT_VERSION__"
-          echo "[DEBUG] Variable assignment completed:"
+          echo "[DEBUG] Variable assignment completed"
           echo "[DEBUG]   REQUIRED_VERSION='$REQUIRED_VERSION'"
           echo "[DEBUG]   Length of REQUIRED_VERSION: ${#REQUIRED_VERSION}"
           
-          echo "Pre-install check - Debug info:"
+          echo "Pre-install check - Debug info"
           echo "  DOTNET_RT_VERSION env var: '__DOTNET_RT_VERSION__'"
           echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
           echo "  Testing variable assignment..."
@@ -285,25 +285,25 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем preinst скрипт
-    - echo "DEBUG - Processing preinst script with variables:"
+    - echo "DEBUG - Processing preinst script with variables"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - echo "  Length of DOTNET_RT_VERSION: ${#DOTNET_RT_VERSION}"
-    - echo "  Length of PROJECT_NAME: ${#PROJECT_NAME}"
+    - echo "  Length of DOTNET_RT_VERSION ${#DOTNET_RT_VERSION}"
+    - echo "  Length of PROJECT_NAME ${#PROJECT_NAME}"
     # Проверяем, что переменные не пусты
-    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR: DOTNET_RT_VERSION is empty!"; exit 1; fi
-    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR: PROJECT_NAME is empty!"; exit 1; fi
+    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR DOTNET_RT_VERSION is empty!"; exit 1; fi
+    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR PROJECT_NAME is empty!"; exit 1; fi
     # Используем разделитель | в sed для избежания конфликтов с точками
     - echo "  Using sed with | delimiter to avoid conflicts"
-    - echo "  Testing sed command first:"
+    - echo "  Testing sed command first"
     - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
     - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
-    - echo "DEBUG - Checking variable replacement in preinst:"
-    - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0):"
+    - echo "DEBUG - Checking variable replacement in preinst"
+    - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0)"
     - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst || echo "  No unreplaced patterns found (good)"
-    - echo "  Searching for REQUIRED_VERSION assignments:"
+    - echo "  Searching for REQUIRED_VERSION assignments"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/preinst || echo "  No REQUIRED_VERSION found"
-    - echo "  Sample of replaced content:"
+    - echo "  Sample of replaced content"
     - grep -A2 -B2 "REQUIRED_VERSION=" deb/DEBIAN/preinst || echo "  No context found"
     - chmod +x deb/DEBIAN/preinst
     - rm deb/DEBIAN/preinst.tmp
@@ -345,7 +345,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем prerm скрипт
-    - echo "DEBUG - Processing prerm script with variables:"
+    - echo "DEBUG - Processing prerm script with variables"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
     - sed "s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
     - chmod +x deb/DEBIAN/prerm
@@ -371,11 +371,11 @@ package-job:      # This job runs in the deploy stage.
           # Проверяем, нужна ли установка
           echo "[DEBUG] Setting REQUIRED_VERSION variable"
           REQUIRED_VERSION="__DOTNET_RT_VERSION__"
-          echo "[DEBUG] Variable assignment completed:"
+          echo "[DEBUG] Variable assignment completed"
           echo "[DEBUG]   REQUIRED_VERSION='$REQUIRED_VERSION'"
           echo "[DEBUG]   Length of REQUIRED_VERSION: ${#REQUIRED_VERSION}"
           
-          echo "Post-install check - Debug info:"
+          echo "Post-install check - Debug info"
           echo "  DOTNET_RT_VERSION env var: '__DOTNET_RT_VERSION__'"
           echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
           echo "Checking for existing .NET Runtime installation..."
@@ -384,7 +384,7 @@ package-job:      # This job runs in the deploy stage.
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
               echo "[DEBUG] .NET Runtime directory exists"
               echo "Found .NET Runtime directory: /usr/bin/dotnet/shared/Microsoft.NETCore.App"
-              echo "Post-install check - Debug info:"
+              echo "Post-install check - Debug info"
               echo "  Directory contents:"
               ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
               echo "  Raw ls output:"
@@ -672,25 +672,25 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем postinst скрипт
-    - echo "DEBUG - Processing postinst script with variables:"
+    - echo "DEBUG - Processing postinst script with variables"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
-    - echo "  Length of DOTNET_RT_VERSION: ${#DOTNET_RT_VERSION}"
-    - echo "  Length of PROJECT_NAME: ${#PROJECT_NAME}"
+    - echo "  Length of DOTNET_RT_VERSION ${#DOTNET_RT_VERSION}"
+    - echo "  Length of PROJECT_NAME ${#PROJECT_NAME}"
     # Проверяем, что переменные не пусты
-    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR: DOTNET_RT_VERSION is empty!"; exit 1; fi
-    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR: PROJECT_NAME is empty!"; exit 1; fi
+    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR DOTNET_RT_VERSION is empty!"; exit 1; fi
+    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR PROJECT_NAME is empty!"; exit 1; fi
     # Используем разделитель | в sed для избежания конфликтов с точками
     - echo "  Using sed with | delimiter to avoid conflicts"
-    - echo "  Testing sed command first:"
+    - echo "  Testing sed command first"
     - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
     - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
-    - echo "DEBUG - Checking variable replacement in postinst:"
-    - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0):"
+    - echo "DEBUG - Checking variable replacement in postinst"
+    - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0)"
     - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst || echo "  No unreplaced patterns found (good)"
-    - echo "  Searching for REQUIRED_VERSION assignments:"
+    - echo "  Searching for REQUIRED_VERSION assignments"
     - grep -n "REQUIRED_VERSION=" deb/DEBIAN/postinst || echo "  No REQUIRED_VERSION found"
-    - echo "  Sample of replaced content:"
+    - echo "  Sample of replaced content"
     - grep -A2 -B2 "REQUIRED_VERSION=" deb/DEBIAN/postinst || echo "  No context found"
     - chmod +x deb/DEBIAN/postinst
     - rm deb/DEBIAN/postinst.tmp
@@ -777,7 +777,7 @@ package-job:      # This job runs in the deploy stage.
       exit 0
       EOF
     # Обрабатываем postrm скрипт
-    - echo "DEBUG - Processing postrm script with variables:"
+    - echo "DEBUG - Processing postrm script with variables"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
     - sed "s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
     - chmod +x deb/DEBIAN/postrm
@@ -815,7 +815,7 @@ package-job:      # This job runs in the deploy stage.
     - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
     - rm -f debian-binary control.tar.xz data.tar.xz
     - ls -l ./packages/${DEB_NAME}_amd64.deb
-    - echo "Current directory:$(pwd)"
+    - echo "Current directory $(pwd)"
   artifacts:
     name: "package-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
     paths:
