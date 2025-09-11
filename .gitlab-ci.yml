@@ -3,6 +3,7 @@ variables:
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SUBMODULE_FORCE_HTTPS: "true"
     GIT_STRATEGY: clone
+    DOTNET_SDK_VERSION: "8.0"
     DOTNET_RT_VERSION: "8.0.13"   
     PROJECT_NAME: "TN_Doc"  
 
@@ -10,53 +11,64 @@ stages:
   - build
   - package 
 
-# Минимальная сборка для создания базовой структуры
-minimal-build-job:
+build-job:
   stage: build
-  image: ubuntu:latest
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
-  # tags:
-  #   - orpovy
-  script:
-    - echo "Creating minimal application structure for testing..."
+  tags:
+    - orpovy
+  before_script:
+    # Создание директории для публикации
     - mkdir -p ./publish
-    - # Создаем фиктивные файлы для тестирования пакета
-    - echo '#!/bin/bash' > ./publish/${PROJECT_NAME}
-    - echo 'echo "Test application ${PROJECT_NAME}"' >> ./publish/${PROJECT_NAME}
-    - chmod +x ./publish/${PROJECT_NAME}
-    - echo "Fake DLL content" > ./publish/${PROJECT_NAME}.dll
-    - echo "Test files created:"
-    - ls -la ./publish/
+    - mkdir -p TN_Doc/Dll
+  script:
+    - echo "Adding NuGet sources..."    
+    - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
+    - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
+    - echo "Rebuilding solution ..."
+    - dotnet build
+    - echo "Moving to TN_Doc..."
+    - cd TN_Doc
+    - echo "Current directory after cd:$(pwd)"
+    - echo "Building the application..."
+    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
   artifacts:
-    name: "minimal-build-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./publish/
 
 extract-version-job:       
   stage: build
-  image: ubuntu:latest
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   tags:
     - orpovy
   script:
+    # Установка curl для работы с GitLab API
     - apt-get update && apt-get install -y curl
-    - # Используем фиксированную версию для тестирования
-    - VERSION="1.4.1"
-    - echo "Using test version: $VERSION"
-    - # Формирование имени переменной для build number
+    # Определение пути к .csproj файлу
+    - CSPROJ_FILE="TN_Doc/TN_Doc.csproj"
+    # Проверка существования файла
+    - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
+    # Извлечение версии из .csproj
+    - VERSION=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" $CSPROJ_FILE 2>/dev/null || grep -oP '<Version>\K[^<]+' $CSPROJ_FILE)
+    - echo "Extracted version:$VERSION"
+    # Проверка версии
+    - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
+    # Формирование имени переменной для build number
     - BUILD_VAR_NAME="BUILD_NUMBER_$(echo $VERSION | tr '.' '_')"
-    - echo "Build variable name: $BUILD_VAR_NAME"
-    - # Получение текущего build number из переменных проекта
+    - echo "Build variable name:$BUILD_VAR_NAME"
+    # Получение текущего build number из переменных проекта
     - |
       CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
         "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME" | \
         grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
     - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
     - BUILD_NUMBER=$((CURRENT_BUILD + 1))
-    - 'echo "Current build number: $CURRENT_BUILD, New build number: $BUILD_NUMBER"'
-    - # Обновление build number в переменных проекта
+    - echo "Current build number:$CURRENT_BUILD, New build number:$BUILD_NUMBER"
+    # Обновление build number в переменных проекта
     - |
       RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
         --header "Content-Type: application/json" \
@@ -70,432 +82,409 @@ extract-version-job:
           "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables"
       fi
       echo "Build number updated successfully"
-    - # Формирование ревизии из CI_COMMIT_SHORT_SHA
+    # Формирование ревизии из CI_COMMIT_SHORT_SHA
     - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
-    - # Формирование полной версии
+    # Формирование полной версии
     - FULL_VERSION="${VERSION}-${REVISION}"
-    - echo "Full version: $FULL_VERSION"
-    - # Сохранение переменных для последующих этапов
+    - echo "Full version:$FULL_VERSION"
+    # Сохранение переменных для последующих этапов
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
     - echo "VERSION=$VERSION" >> version.env
     - echo "REVISION=$REVISION" >> version.env
     - echo "BUILD_NUMBER=$BUILD_NUMBER" >> version.env
-    - echo "PACKAGE_NAME=$PROJECT_NAME" >> version.env
+    - echo "PACKAGE_NAME=TN_Doc" >> version.env
   artifacts:
     reports:
       dotenv: version.env
 
-debug-package-job:
+package-job:      # This job runs in the deploy stage.
   stage: package
   image: ubuntu:latest
   rules:
     - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   needs:
-    - minimal-build-job
+    - build-job
     - extract-version-job
   tags:
     - orpovy
   before_script:
     - apt-get update && apt-get install -y dpkg-dev
   script:
-    - echo "Creating debug package for .NET version checking and directory management..."
-    - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-debug-${FULL_VERSION}"
+    - echo "Packaging the application into a .deb file..."
+    - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
-    
-    - # Создание структуры пакета
+    # Создание структуры пакета
     - mkdir -p deb/DEBIAN
-    - mkdir -p deb/opt/$PROJECT_NAME
-    - mkdir -p deb/var/log/$PROJECT_NAME
+    - mkdir -p deb/opt/TN_Doc
+    - mkdir -p deb/var/log/TN_Doc
     - mkdir -p deb/etc/systemd/system
+    - mkdir -p deb/usr/share/fonts
     - mkdir -p deb/usr/local/bin
-    
-    - # Копирование тестовых файлов приложения
-    - cp -r ./publish/* deb/opt/$PROJECT_NAME/
-    
-    - # Создание тестового .NET Runtime архива (если нужно тестировать установку)
+    # Создание временной директории для зависимостей
     - mkdir -p deb/tempdir
-    - echo "Fake .NET Runtime archive for testing" > deb/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
-    
-    - # Генерация control
+    # Копирование файлов приложения
+    - cp -r ./publish/* deb/opt/TN_Doc/
+    # Копирование .NET Runtime если есть в distrib
+    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tempdir/; fi
+    # Копирование шрифтов в пакет (если присутствуют в репозитории)
+    - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
+    # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
-      Package: $(echo "${PROJECT_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-debug
+      Package: tn.doc
       Version: ${VERSION}
       Section: utils
       Priority: optional
       Architecture: amd64
       Depends: systemd
       Maintainer: DadonovAD <dadonovad@transneft.ru>
-      Description: Debug package for ${PROJECT_NAME} - .NET version checking and directory management
+      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
       Homepage:
 
       EOF
-    
-    - # Генерация упрощенного preinst для отладки
+    # Генерация preinst с хардкод значениями (оптимизированный вывод)
     - |
-      cat << 'PREINST_EOF' > deb/DEBIAN/preinst
+      cat << EOF > deb/DEBIAN/preinst
       #!/bin/bash
       set -e
 
       echo "============================================"
-      echo "DEBUG: Starting pre-installation script for __PROJECT_NAME__"
+      echo "Starting pre-installation script for TN_Doc"
       echo "============================================"
 
-      # Функция проверки .NET Runtime
+      # Проверка .NET Runtime перед установкой
       check_dotnet_runtime() {
-          echo "[DEBUG] === check_dotnet_runtime function start ==="
-          echo "[DEBUG] Function entry point reached"
-          
           # Проверка наличия .NET Runtime
-          DOTNET_DIR="/usr/bin/dotnet/shared/Microsoft.NETCore.App"
-          echo "[DEBUG] Checking if .NET Runtime directory exists: $DOTNET_DIR"
-          
-          if [ ! -d "$DOTNET_DIR" ]; then
-              echo "[DEBUG] .NET Runtime directory does not exist"
-              echo "WARNING: .NET Runtime 8 is not installed."
-              echo "[DEBUG] Function exit with return code 1"
+          if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              echo "Warning: .NET Runtime 8 is not installed. Will install from local archive."
               return 1
           fi
-          
-          echo "[DEBUG] .NET Runtime directory exists"
-          echo "[DEBUG] Directory listing:"
-          ls -la "$DOTNET_DIR" 2>/dev/null || echo "[DEBUG] Failed to list directory"
 
           # Проверка версии .NET Runtime
-          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
-          echo "[DEBUG] Required version: '$REQUIRED_VERSION'"
-          echo "[DEBUG] Required version length: ${#REQUIRED_VERSION}"
+          REQUIRED_VERSION="8.0.13"
+          INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
           
-          echo "[DEBUG] Searching for installed versions matching pattern '^8\.0\.[0-9]+$'"
-          echo "[DEBUG] Raw directory listing:"
-          ls "$DOTNET_DIR" 2>/dev/null || echo "[DEBUG] No files in directory"
-          
-          echo "[DEBUG] Filtered versions:"
-          ls "$DOTNET_DIR" 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "[DEBUG] No matching versions found"
-          
-          INSTALLED_VERSION=$(ls "$DOTNET_DIR" 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
-          echo "[DEBUG] Extracted installed version: '$INSTALLED_VERSION'"
-          echo "[DEBUG] Installed version length: ${#INSTALLED_VERSION}"
-
-          if [ -z "$INSTALLED_VERSION" ]; then
-              echo "[DEBUG] No compatible .NET Runtime 8 version found"
-              echo "WARNING: No compatible .NET Runtime 8 version found."
-              echo "[DEBUG] Function exit with return code 1"
+          if [ -z "\$INSTALLED_VERSION" ]; then
+              echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
               return 1
           fi
 
-          echo "[DEBUG] Version comparison process:"
-          echo "[DEBUG] Comparing '$INSTALLED_VERSION' >= '$REQUIRED_VERSION'"
-          
-          # Используем printf и sort для сравнения версий
-          VERSION_COMPARISON=$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)
-          echo "[DEBUG] Version comparison result: '$VERSION_COMPARISON'"
-          echo "[DEBUG] Expected (should equal required): '$REQUIRED_VERSION'"
-          
-          if [ "$VERSION_COMPARISON" != "$REQUIRED_VERSION" ]; then
-              echo "[DEBUG] Version check failed - installed version is older"
-              echo "WARNING: .NET Runtime version $INSTALLED_VERSION < $REQUIRED_VERSION"
-              echo "[DEBUG] Function exit with return code 1"
+          if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
+              echo "Warning: .NET Runtime version \$INSTALLED_VERSION < \$REQUIRED_VERSION. Will install from local archive."
               return 1
           fi
 
-          echo "[DEBUG] Version check passed"
-          echo "SUCCESS: .NET Runtime version $INSTALLED_VERSION >= $REQUIRED_VERSION"
-          echo "[DEBUG] === check_dotnet_runtime function end ==="
+          echo "✓ .NET Runtime version \$INSTALLED_VERSION is compatible (>= \$REQUIRED_VERSION)"
           return 0
       }
 
-      # Основная проверка
-      echo "[DEBUG] Starting .NET Runtime check"
-      CHECK_RESULT=0
-      check_dotnet_runtime || CHECK_RESULT=$?
-      echo "[DEBUG] check_dotnet_runtime returned: $CHECK_RESULT"
-      
-      if [ "$CHECK_RESULT" -ne 0 ]; then
-          echo "RESULT: .NET Runtime installation will be required"
-      else
-          echo "RESULT: .NET Runtime is already compatible"
+      # Проверка .NET Runtime (установка будет в postinst если нужно)
+      check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
       fi
 
-      # Проверка и остановка службы
-      echo "[DEBUG] === Service management section ==="
-      SERVICE_NAME="__PROJECT_NAME__.service"
-      echo "[DEBUG] Checking service: $SERVICE_NAME"
-      
-      if systemctl is-active --quiet "$SERVICE_NAME"; then
-          echo "[DEBUG] Service is active, stopping it"
-          echo "Stopping $SERVICE_NAME..."
-          systemctl stop "$SERVICE_NAME"
-          echo "[DEBUG] Service stop command completed"
-      else
-          echo "[DEBUG] Service $SERVICE_NAME is not active or does not exist"
-      fi
-
-      # Проверка и удаление старых директорий
-      echo "[DEBUG] === Directory cleanup section ==="
-      PROJECT_DIR="/opt/__PROJECT_NAME__"
-      LOG_DIR="/var/log/__PROJECT_NAME__"
-      
-      echo "[DEBUG] Checking directories for cleanup:"
-      echo "[DEBUG] Project directory: $PROJECT_DIR"
-      echo "[DEBUG] Log directory: $LOG_DIR"
-      
-      for dir in "$PROJECT_DIR" "$LOG_DIR"; do
-          echo "[DEBUG] Processing directory: $dir"
-          if [ -d "$dir" ]; then
-              echo "[DEBUG] Directory exists, removing: $dir"
-              echo "Removing directory: $dir"
-              rm -rf "$dir"
-              if [ $? -eq 0 ]; then
-                  echo "[DEBUG] Successfully removed $dir"
+      # Удаление старых директорий
+      echo "Removing old TN_Doc directories..."
+      OPT_DIR="/opt/TN_Doc"
+      LOG_DIR="/var/log/TN_Doc"
+      for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+          if [ -d "\$dir" ]; then
+              echo "Removing directory: \$dir"
+              rm -rf "\$dir"
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Successfully removed \$dir"
               else
-                  echo "[DEBUG] Failed to remove $dir"
+                  echo "! WARNING: Failed to remove \$dir"
               fi
-          else
-              echo "[DEBUG] Directory does not exist: $dir"
           fi
       done
+      echo "=== Old directories cleanup completed ==="
 
-      echo "[DEBUG] preinst script completed successfully"
       exit 0
-      PREINST_EOF
-    
-    - # Обработка переменных в preinst
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/preinst > deb/DEBIAN/preinst.tmp
-    - mv deb/DEBIAN/preinst.tmp deb/DEBIAN/preinst
+      EOF
     - chmod +x deb/DEBIAN/preinst
-    
-    - # Генерация упрощенного postinst для отладки
+    # Генерация prerm с хардкод значениями (убрана отладочная информация)
     - |
-      cat << 'POSTINST_EOF' > deb/DEBIAN/postinst
+      cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
 
       echo "============================================"
-      echo "DEBUG: Starting post-installation script for __PROJECT_NAME__"
+      echo "Starting pre-removal script for TN_Doc"
       echo "============================================"
 
-      # Функция установки .NET Runtime
-      install_dotnet_runtime() {
-          echo "[DEBUG] === install_dotnet_runtime function start ==="
-          
-          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
-          echo "[DEBUG] Required version: '$REQUIRED_VERSION'"
-          
-          DOTNET_DIR="/usr/bin/dotnet/shared/Microsoft.NETCore.App"
-          echo "[DEBUG] Checking existing installation in: $DOTNET_DIR"
-          
-          # Проверяем существующую установку
-          if [ -d "$DOTNET_DIR" ]; then
-              echo "[DEBUG] .NET directory exists, checking version"
-              INSTALLED_VERSION=$(ls "$DOTNET_DIR" 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
-              echo "[DEBUG] Found installed version: '$INSTALLED_VERSION'"
-              
-              if [ -n "$INSTALLED_VERSION" ]; then
-                  VERSION_COMPARISON=$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)
-                  if [ "$VERSION_COMPARISON" = "$REQUIRED_VERSION" ]; then
-                      echo "[DEBUG] Compatible version already installed"
-                      echo "SUCCESS: .NET Runtime $INSTALLED_VERSION is compatible"
-                      return 0
-                  fi
-              fi
-          fi
-          
-          echo "[DEBUG] .NET Runtime installation required"
-          
-          # Проверка архива
-          ARCHIVE_PATH="/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
-          echo "[DEBUG] Looking for archive: $ARCHIVE_PATH"
-          
-          if [ -f "$ARCHIVE_PATH" ]; then
-              echo "[DEBUG] Found archive file"
-              
-              # Создание директории .NET
-              echo "[DEBUG] Creating .NET directory: /usr/bin/dotnet"
-              mkdir -p /usr/bin/dotnet
-              
-              # Имитация распаковки архива (для тестирования)
-              echo "[DEBUG] Simulating archive extraction..."
-              mkdir -p /usr/bin/dotnet/shared/Microsoft.NETCore.App/__DOTNET_RT_VERSION__
-              echo "#!/bin/bash" > /usr/bin/dotnet/dotnet
-              echo "echo 'Fake dotnet version __DOTNET_RT_VERSION__'" >> /usr/bin/dotnet/dotnet
-              chmod +x /usr/bin/dotnet/dotnet
-              
-              # Удаление архива
-              echo "[DEBUG] Removing temporary archive"
-              rm -f "$ARCHIVE_PATH"
-              
-              echo "SUCCESS: .NET Runtime __DOTNET_RT_VERSION__ installed"
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+          if [ \$? -eq 0 ]; then
+              echo "✓ Service stopped successfully"
           else
-              echo "[DEBUG] Archive not found: $ARCHIVE_PATH"
-              echo "ERROR: .NET Runtime archive not found"
-              return 1
+              echo "! WARNING: Failed to stop service"
           fi
-          
-          echo "[DEBUG] === install_dotnet_runtime function end ==="
-      }
-
-      # Установка .NET Runtime
-      echo "[DEBUG] Step 1: Installing .NET Runtime"
-      install_dotnet_runtime || {
-          echo "ERROR: .NET Runtime installation failed"
-          exit 1
-      }
-
-      # Создание директорий
-      echo "[DEBUG] Step 2: Creating application directories"
-      
-      PROJECT_DIR="/opt/__PROJECT_NAME__"
-      LOG_DIR="/var/log/__PROJECT_NAME__"
-      
-      echo "[DEBUG] Creating project directory: $PROJECT_DIR"
-      mkdir -p "$PROJECT_DIR"
-      echo "[DEBUG] Creating log directory: $LOG_DIR"
-      mkdir -p "$LOG_DIR"
-
-      # Установка прав доступа
-      echo "[DEBUG] Step 3: Setting up permissions"
-      echo "[DEBUG] Setting executable permissions for application binary"
-      chmod 755 "$PROJECT_DIR/__PROJECT_NAME__" 2>/dev/null || echo "[DEBUG] Binary not found, skipping"
-      
-      echo "[DEBUG] Setting permissions for DLLs"
-      chmod 644 "$PROJECT_DIR"/*.dll 2>/dev/null || echo "[DEBUG] No DLL files found"
-      
-      # Проверка пользователя alphadaemon
-      if id "alphadaemon" &>/dev/null; then
-          echo "[DEBUG] User alphadaemon exists, setting ownership"
-          chown -R alphadaemon:alphadaemon "$PROJECT_DIR" 2>/dev/null || echo "[DEBUG] Failed to set ownership"
-          chown alphadaemon:alphadaemon "$LOG_DIR" 2>/dev/null || echo "[DEBUG] Failed to set log ownership"
-      else
-          echo "[DEBUG] User alphadaemon does not exist, skipping ownership"
       fi
 
-      # Создание systemd service
-      echo "[DEBUG] Step 4: Creating systemd service"
+      exit 0
+      EOF
+    - chmod +x deb/DEBIAN/prerm
+    # Генерация postinst с хардкод значениями (оптимизированный вывод)
+    - |
+      cat << EOF > deb/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-installation script for TN_Doc"
+      echo "============================================"
+      echo "Installing dependencies for TN_Doc..."
+
+      # Установка .NET Runtime
+      install_dotnet_runtime() {
+          echo "=== Starting .NET Runtime installation check ==="
+          
+          # Проверяем, нужна ли установка
+          REQUIRED_VERSION="8.0.13"
+
+          if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+              
+              if [ -n "\$INSTALLED_VERSION" ] && [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" = "\$REQUIRED_VERSION" ]; then
+                  echo "✓ .NET Runtime version \$INSTALLED_VERSION is already installed and compatible"
+                  echo "=== Skipping .NET Runtime installation ==="
+                  return 0
+              else
+                  echo "! Installed version \$INSTALLED_VERSION is not compatible with required \$REQUIRED_VERSION"
+              fi
+          else
+              echo "! .NET Runtime directory not found, installation required"
+          fi
+          
+          echo "=== Starting .NET Runtime installation ==="
+          
+          # Проверяем наличие локального архива
+          if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              echo "✓ Found .NET Runtime archive"
+
+              # Создаем директорию для .NET
+              echo "Creating .NET directory: /usr/bin/dotnet"
+              mkdir -p /usr/bin/dotnet
+
+              # Распаковываем архив напрямую в /usr/bin/dotnet
+              echo "Extracting .NET Runtime archive..."
+              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Archive extracted successfully"
+              else
+                  echo "✗ ERROR: Failed to extract archive"
+                  exit 1
+              fi
+
+              # Удаляем архив
+              rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+              echo "✓ .NET Runtime 8.0.13 installed successfully"
+          else
+              echo "✗ ERROR: .NET Runtime archive not found at /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+              echo "Please ensure the archive is available before installing this package."
+              exit 1
+          fi
+
+          echo "=== .NET Runtime installation completed ==="
+      }
+
+      # Установка переменных окружения для пользователей
+      setup_dotnet_environment() {
+          echo "=== Setting up .NET environment variables ==="
+
+          # Создание переменных окружения для пользователя administrator
+          if [ -f "/home/administrator/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added DOTNET_ROOT to administrator's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in administrator's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя operators
+          if [ -f "/home/operators/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added DOTNET_ROOT to operators's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in operators's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя engineer
+          if [ -f "/home/engineer/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added DOTNET_ROOT to engineer's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in engineer's .profile"
+              fi
+          fi
+
+          echo "=== Environment setup completed ==="
+      }
+
+      echo "=== Starting application dependencies installation ==="
+
+      # Установка .NET Runtime
+      echo "Step 1: Installing .NET Runtime..."
+      install_dotnet_runtime
+      echo "✓ .NET Runtime setup completed"
+
+      # Установка переменных окружения для пользователей
+      echo "Step 2: Setting up environment variables..."
+      setup_dotnet_environment
+      echo "✓ Environment variables setup completed"
+
+      # Обновление кэша шрифтов (без verbose вывода)
+      echo "Step 3: Updating font cache..."
+      fc-cache -f || true
+      echo "✓ Font cache updated"
+
+      # Установка прав и владельцев
+      echo "Step 4: Setting up application permissions..."
+      chmod 755 /opt/TN_Doc/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Executable permissions set"
+      else
+          echo "! WARNING: Failed to set executable permissions"
+      fi
       
-      cat << EOF > /etc/systemd/system/__PROJECT_NAME__.service
+      chmod 644 /opt/TN_Doc/*.dll
+      chown -R alphadaemon:alphadaemon /opt/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Ownership set successfully"
+      else
+          echo "! WARNING: Failed to set ownership"
+      fi
+      
+      chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+      chown alphadaemon:alphadaemon /var/log/TN_Doc
+      chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+      echo "✓ Application permissions setup completed"
+
+      # Перезагрузка systemd
+      echo "Step 5: Reloading systemd daemon..."
+      systemctl daemon-reload
+      echo "✓ Systemd daemon reloaded"
+
+      # Включение и запуск сервиса
+      echo "Step 6: Enabling and starting application service..."
+      
+      # Проверка наличия необходимых файлов
+      if [ -f "/usr/bin/dotnet/dotnet" ] && [ -f "/opt/TN_Doc/TN_Doc" ]; then
+          echo "✓ All required binaries found"
+      else
+          echo "! WARNING: Some binaries missing"
+          [ ! -f "/usr/bin/dotnet/dotnet" ] && echo "  - dotnet binary not found"
+          [ ! -f "/opt/TN_Doc/TN_Doc" ] && echo "  - application binary not found"
+      fi
+
+      systemctl enable TN_Doc.service
+      systemctl start TN_Doc.service
+
+      # Проверка статуса сервиса
+      sleep 2
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "✓ Application service started successfully"
+      else
+          echo "! WARNING: Service failed to start. Checking logs..."
+          journalctl -u TN_Doc.service -n 10 --no-pager || echo "Cannot read journal logs"
+      fi
+
+      echo "=== TN_Doc installation completed successfully ==="
+      echo "============================================"
+      exit 0
+      EOF
+    - chmod +x deb/DEBIAN/postinst
+    # Генерация postrm с хардкод значениями
+    - |
+      cat << EOF > deb/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-removal script for TN_Doc"
+      echo "============================================"
+
+      # Удаление директорий при полной очистке (purge)
+      if [ "\$1" = "purge" ]; then
+          echo "Purging TN_Doc directories..."
+          OPT_DIR="/opt/TN_Doc"
+          LOG_DIR="/var/log/TN_Doc"
+          for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+              if [ -d "\$dir" ]; then
+                  echo "Removing directory: \$dir"
+                  rm -rf "\$dir"
+                  if [ \$? -eq 0 ]; then
+                      echo "✓ Successfully removed \$dir"
+                  else
+                      echo "! WARNING: Failed to remove \$dir"
+                  fi
+              fi
+          done
+          
+          # Удаление systemd service
+          echo "Removing systemd service..."
+          systemctl disable TN_Doc.service 2>/dev/null || true
+          rm -f /etc/systemd/system/TN_Doc.service
+          systemctl daemon-reload
+          echo "✓ Systemd service removed"
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb/DEBIAN/postrm
+    # Генерация systemd unit с хардкод значениями
+    - |
+      cat << EOF > deb/etc/systemd/system/TN_Doc.service
       [Unit]
-      Description=Debug Service __PROJECT_NAME__
+      Description=Service TN_Doc
 
       [Service]
-      WorkingDirectory=$PROJECT_DIR
-      ExecStart=/usr/bin/dotnet/dotnet $PROJECT_DIR/__PROJECT_NAME__.dll
+      WorkingDirectory=/opt/TN_Doc/
+      ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
       Restart=always
       RestartSec=10
-      SyslogIdentifier=dotnet-__PROJECT_NAME__
+      SyslogIdentifier=dotnet-TN_Doc
       User=alphadaemon
       Environment=ASPNETCORE_ENVIRONMENT=Production
 
       [Install]
       WantedBy=multi-user.target
       EOF
-
-      # Перезагрузка systemd
-      echo "[DEBUG] Step 5: Reloading systemd"
-      systemctl daemon-reload
-
-      # Проверка результата установки
-      echo "[DEBUG] === Installation verification ==="
-      
-      echo "[DEBUG] Checking .NET installation:"
-      if [ -f "/usr/bin/dotnet/dotnet" ]; then
-          echo "SUCCESS: dotnet binary exists"
-          /usr/bin/dotnet/dotnet --version 2>/dev/null || echo "Version check failed"
-      else
-          echo "WARNING: dotnet binary not found"
-      fi
-      
-      echo "[DEBUG] Checking directories:"
-      echo "Project directory: $(ls -ld $PROJECT_DIR 2>/dev/null || echo 'NOT FOUND')"
-      echo "Log directory: $(ls -ld $LOG_DIR 2>/dev/null || echo 'NOT FOUND')"
-      
-      echo "[DEBUG] Checking service file:"
-      echo "Service file: $(ls -l /etc/systemd/system/__PROJECT_NAME__.service 2>/dev/null || echo 'NOT FOUND')"
-
-      echo "DEBUG: Installation completed successfully"
-      echo "============================================"
-      exit 0
-      POSTINST_EOF
-    
-    - # Обработка переменных в postinst
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/postinst > deb/DEBIAN/postinst.tmp
-    - mv deb/DEBIAN/postinst.tmp deb/DEBIAN/postinst
-    - chmod +x deb/DEBIAN/postinst
-    
-    - # Генерация упрощенного prerm
-    - |
-      cat << 'PRERM_EOF' > deb/DEBIAN/prerm
-      #!/bin/bash
-      set -e
-
-      echo "============================================"
-      echo "DEBUG: Starting pre-removal script for __PROJECT_NAME__"
-      echo "============================================"
-
-      SERVICE_NAME="__PROJECT_NAME__.service"
-      echo "[DEBUG] Checking service: $SERVICE_NAME"
-      
-      if systemctl is-active --quiet "$SERVICE_NAME"; then
-          echo "[DEBUG] Service is active, stopping it"
-          systemctl stop "$SERVICE_NAME"
-          echo "SUCCESS: Service stopped"
-      else
-          echo "[DEBUG] Service is not active"
-      fi
-
-      echo "DEBUG: Pre-removal completed"
-      exit 0
-      PRERM_EOF
-    
-    - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp
-    - mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
-    - chmod +x deb/DEBIAN/prerm
-    
-    - # Генерация упрощенного postrm
-    - echo "#!/bin/bash" > deb/DEBIAN/postrm
-    - echo "set -e" >> deb/DEBIAN/postrm
-    - echo "echo 'DEBUG: Starting post-removal script for ${PROJECT_NAME}'" >> deb/DEBIAN/postrm
-    - echo "if [ \"\$1\" = \"purge\" ]; then" >> deb/DEBIAN/postrm
-    - echo "  echo '[DEBUG] Purge operation - removing directories'" >> deb/DEBIAN/postrm
-    - echo "  rm -rf /opt/${PROJECT_NAME} /var/log/${PROJECT_NAME} 2>/dev/null || true" >> deb/DEBIAN/postrm
-    - echo "  systemctl disable ${PROJECT_NAME}.service 2>/dev/null || true" >> deb/DEBIAN/postrm
-    - echo "  rm -f /etc/systemd/system/${PROJECT_NAME}.service" >> deb/DEBIAN/postrm
-    - echo "  systemctl daemon-reload" >> deb/DEBIAN/postrm
-    - echo "  echo 'SUCCESS: Service and directories removed'" >> deb/DEBIAN/postrm
-    - echo "else" >> deb/DEBIAN/postrm
-    - echo "  echo '[DEBUG] Not a purge operation, skipping cleanup'" >> deb/DEBIAN/postrm
-    - echo "fi" >> deb/DEBIAN/postrm
-    - echo "echo 'DEBUG: Post-removal completed'" >> deb/DEBIAN/postrm
-    - echo "exit 0" >> deb/DEBIAN/postrm
-    
-    - sed "s/__PROJECT_NAME__/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp
-    - mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
-    - chmod +x deb/DEBIAN/postrm
-    
-    - # Установка прав
-    - chmod 755 deb/DEBIAN/*
+    # Установка прав
+    - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst deb/DEBIAN/prerm deb/DEBIAN/postrm
     - chmod 644 deb/DEBIAN/control
-    
-    - # Сборка пакета
+    - chmod 755 deb/opt/TN_Doc/TN_Doc
+    - chmod 644 deb/opt/TN_Doc/*.dll 2>/dev/null || true
     - echo "Creating control.tar.xz..."
     - tar -cJf control.tar.xz -C deb/DEBIAN .
     - echo "Creating data.tar.xz..."
     - tar -cJf data.tar.xz -C deb --exclude=DEBIAN .
     - echo "Creating debian-binary..."
     - echo "2.0" > debian-binary
-    - echo "Building debug .deb package..."
+    - echo "Building .deb package..."
     - mkdir -p packages
     - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
     - rm -f debian-binary control.tar.xz data.tar.xz
-    
-    - # Информация о созданном пакете
-    - echo "=== DEBUG PACKAGE CREATED ==="
     - ls -l ./packages/${DEB_NAME}_amd64.deb
-    - echo "Package name: ${DEB_NAME}_amd64.deb"
-    - echo "Package contents can be inspected with: dpkg -c package.deb"
-    - echo "Package info can be viewed with: dpkg -I package.deb"
-    
+    - echo "Current directory:$(pwd)"
   artifacts:
-    name: "debug-package-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    name: "package-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./packages/
