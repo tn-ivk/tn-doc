@@ -21,20 +21,20 @@ build-job:
   before_script:
     # Создание директории для публикации
     - mkdir -p ./publish
-    - mkdir -p $PROJECT_NAME/Dll
+    - mkdir -p TN_Doc/Dll
   script:
     - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
     - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - echo "Rebuilding solution ..."
     - dotnet build
-    - echo "Moving to $PROJECT_NAME..."
-    - cd $PROJECT_NAME
+    - echo "Moving to TN_Doc..."
+    - cd TN_Doc
     - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
-    - dotnet publish ${PROJECT_NAME}.csproj -c Release -r linux-x64 --self-contained false -o ../publish
+    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
   artifacts:
-    name: "build-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./publish/
 
@@ -49,7 +49,7 @@ extract-version-job:
     # Установка curl для работы с GitLab API
     - apt-get update && apt-get install -y curl
     # Определение пути к .csproj файлу
-    - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
+    - CSPROJ_FILE="TN_Doc/TN_Doc.csproj"
     # Проверка существования файла
     - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
     # Извлечение версии из .csproj
@@ -92,7 +92,7 @@ extract-version-job:
     - echo "VERSION=$VERSION" >> version.env
     - echo "REVISION=$REVISION" >> version.env
     - echo "BUILD_NUMBER=$BUILD_NUMBER" >> version.env
-    - echo "PACKAGE_NAME=$PROJECT_NAME" >> version.env
+    - echo "PACKAGE_NAME=TN_Doc" >> version.env
   artifacts:
     reports:
       dotenv: version.env
@@ -111,19 +111,19 @@ package-job:      # This job runs in the deploy stage.
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
-    - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
+    - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
     - mkdir -p deb/DEBIAN
-    - mkdir -p deb/opt/$PROJECT_NAME
-    - mkdir -p deb/var/log/$PROJECT_NAME
+    - mkdir -p deb/opt/TN_Doc
+    - mkdir -p deb/var/log/TN_Doc
     - mkdir -p deb/etc/systemd/system
     - mkdir -p deb/usr/share/fonts
     - mkdir -p deb/usr/local/bin
     # Создание временной директории для зависимостей
     - mkdir -p deb/tempdir
     # Копирование файлов приложения
-    - cp -r ./publish/* deb/opt/$PROJECT_NAME/
+    - cp -r ./publish/* deb/opt/TN_Doc/
     # Копирование .NET Runtime если есть в distrib
     - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tempdir/; fi
     # Копирование шрифтов в пакет (если присутствуют в репозитории)
@@ -131,25 +131,25 @@ package-job:      # This job runs in the deploy stage.
     # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
-      Package: $(echo "${PROJECT_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')
+      Package: tn.doc
       Version: ${VERSION}
       Section: utils
       Priority: optional
       Architecture: amd64
       Depends: systemd
       Maintainer: DadonovAD <dadonovad@transneft.ru>
-      Description: ${PROJECT_NAME} это приложение для работы с документами СОИ СИКН/ОСИКН.
+      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
       Homepage:
 
       EOF
-    # Генерация preinst
+    # Генерация preinst с хардкод значениями
     - |
-      cat << EOF > deb/DEBIAN/preinst.tmp
+      cat << EOF > deb/DEBIAN/preinst
       #!/bin/bash
       set -e
 
       echo "============================================"
-      echo "Starting pre-installation script for $PROJECT_NAME"
+      echo "Starting pre-installation script for TN_Doc"
       echo "============================================"
 
       # Проверка .NET Runtime перед установкой
@@ -161,32 +161,32 @@ package-job:      # This job runs in the deploy stage.
           fi
 
           # Проверка версии .NET Runtime
-          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          REQUIRED_VERSION="8.0.13"
           echo "Pre-install check - Debug info:"
-          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
-          echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
+          echo "  DOTNET_RT_VERSION env var: '8.0.13'"
+          echo "  REQUIRED_VERSION after assignment: '\$REQUIRED_VERSION'"
           echo "  Testing variable assignment..."
           echo "  Directory /usr/bin/dotnet/shared/Microsoft.NETCore.App contents:"
           ls -la /usr/bin/dotnet/shared/Microsoft.NETCore.App || echo "  Directory not found or empty"
           echo "  Raw ls output:"
           ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null || echo "  No files found"
           echo "  Filtered output:"
-          ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
+          ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' || echo "  No version directories found"
 
-          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
-          echo "Pre-install check - Detected .NET Runtime version: '$INSTALLED_VERSION' (required: $REQUIRED_VERSION)"
+          INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+          echo "Pre-install check - Detected .NET Runtime version: '\$INSTALLED_VERSION' (required: \$REQUIRED_VERSION)"
 
-          if [ -z "$INSTALLED_VERSION" ]; then
+          if [ -z "\$INSTALLED_VERSION" ]; then
               echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
               return 1
           fi
 
-          if [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
-              echo "Warning: .NET Runtime version $INSTALLED_VERSION is installed, but version >= $REQUIRED_VERSION is required. Will install from local archive."
+          if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
+              echo "Warning: .NET Runtime version \$INSTALLED_VERSION is installed, but version >= \$REQUIRED_VERSION is required. Will install from local archive."
               return 1
           fi
 
-          echo ".NET Runtime version $INSTALLED_VERSION is compatible (>= $REQUIRED_VERSION)"
+          echo ".NET Runtime version \$INSTALLED_VERSION is compatible (>= \$REQUIRED_VERSION)"
           return 0
       }
 
@@ -194,77 +194,73 @@ package-job:      # This job runs in the deploy stage.
       check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
 
       # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet $PROJECT_NAME.service; then
-          echo "Stopping $PROJECT_NAME.service..."
-          systemctl stop $PROJECT_NAME.service
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
       fi
 
       # Удаление старых директорий
-      echo "Removing old $PROJECT_NAME directories..."
+      echo "Removing old TN_Doc directories..."
       echo "Note: These directories may not exist yet during preinst phase - this is normal"
-      echo "PROJECT_NAME variable in preinst: '$PROJECT_NAME'"
-      OPT_DIR="/opt/$PROJECT_NAME"
-      LOG_DIR="/var/log/$PROJECT_NAME"
-      for dir in "$OPT_DIR" "$LOG_DIR"; do
-          if [ -d "$dir" ]; then
-              echo "Removing directory: $dir"
-              rm -rf "$dir"
-              echo "✓ Successfully removed $dir"
+      echo "PROJECT_NAME variable in preinst: 'TN_Doc'"
+      OPT_DIR="/opt/TN_Doc"
+      LOG_DIR="/var/log/TN_Doc"
+      for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+          if [ -d "\$dir" ]; then
+              echo "Removing directory: \$dir"
+              rm -rf "\$dir"
+              echo "✓ Successfully removed \$dir"
           else
-              echo "! Directory $dir does not exist, skipping"
+              echo "! Directory \$dir does not exist, skipping"
           fi
       done
       echo "=== Old directories cleanup completed ==="
 
       exit 0
       EOF
-    # Обрабатываем preinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
     - chmod +x deb/DEBIAN/preinst
-    - rm deb/DEBIAN/preinst.tmp
+    # Генерация prerm с хардкод значениями
     - |
       cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
 
       echo "============================================"
-      echo "Starting pre-removal script for $PROJECT_NAME"
+      echo "Starting pre-removal script for TN_Doc"
       echo "============================================"
 
       # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet $PROJECT_NAME.service; then
-          echo "Stopping $PROJECT_NAME.service..."
-          systemctl stop $PROJECT_NAME.service
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
       fi
 
       exit 0
       EOF
-    # Обрабатываем prerm скрипт
-    - sed "s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/prerm > deb/DEBIAN/prerm.tmp && mv deb/DEBIAN/prerm.tmp deb/DEBIAN/prerm
     - chmod +x deb/DEBIAN/prerm
-    # Генерация postinst с автоустановкой зависимостей
+    # Генерация postinst с хардкод значениями
     - |
-      cat << EOF > deb/DEBIAN/postinst.tmp
+      cat << EOF > deb/DEBIAN/postinst
       #!/bin/bash
       set -e
 
       echo "============================================"
-      echo "Starting post-installation script for $PROJECT_NAME"
+      echo "Starting post-installation script for TN_Doc"
       echo "============================================"
-      echo "Installing dependencies for $PROJECT_NAME..."
+      echo "Installing dependencies for TN_Doc..."
       echo "Note: 'Распаковывается tn.doc (1.4.1) на замену (1.4.1)' означает замену существующего пакета"
 
 
       # Установка .NET Runtime
       install_dotnet_runtime() {
           echo "=== Starting .NET Runtime installation check ==="
-          echo "Required version from CI variable: __DOTNET_RT_VERSION__"
+          echo "Required version from CI variable: 8.0.13"
 
           # Проверяем, нужна ли установка
-          REQUIRED_VERSION="__DOTNET_RT_VERSION__"
+          REQUIRED_VERSION="8.0.13"
           echo "Post-install check - Debug info:"
-          echo "  DOTNET_RT_VERSION env var: '${DOTNET_RT_VERSION}'"
-          echo "  REQUIRED_VERSION after assignment: '$REQUIRED_VERSION'"
+          echo "  DOTNET_RT_VERSION env var: '8.0.13'"
+          echo "  REQUIRED_VERSION after assignment: '\$REQUIRED_VERSION'"
           echo "Checking for existing .NET Runtime installation..."
 
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
@@ -275,17 +271,17 @@ package-job:      # This job runs in the deploy stage.
               echo "  Raw ls output:"
               ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null || echo "  No files found"
               echo "  Filtered output:"
-              ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' || echo "  No version directories found"
+              ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' || echo "  No version directories found"
 
-              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
-              echo "Detected installed version: '$INSTALLED_VERSION'"
+              INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+              echo "Detected installed version: '\$INSTALLED_VERSION'"
               
-              if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
-                  echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible (>= $REQUIRED_VERSION)"
+              if [ -n "\$INSTALLED_VERSION" ] && [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" = "\$REQUIRED_VERSION" ]; then
+                  echo "✓ .NET Runtime version \$INSTALLED_VERSION is already installed and compatible (>= \$REQUIRED_VERSION)"
                   echo "=== Skipping .NET Runtime installation ==="
                   return 0
               else
-                  echo "! Installed version $INSTALLED_VERSION is not compatible with required $REQUIRED_VERSION"
+                  echo "! Installed version \$INSTALLED_VERSION is not compatible with required \$REQUIRED_VERSION"
               fi
           else
               echo "! .NET Runtime directory not found, installation required"
@@ -309,7 +305,7 @@ package-job:      # This job runs in the deploy stage.
               echo "Removing temporary archive file..."
               rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
 
-              echo "✓ .NET Runtime __DOTNET_RT_VERSION__ installed successfully"
+              echo "✓ .NET Runtime 8.0.13 installed successfully"
           else
               echo "✗ ERROR: .NET Runtime archive not found at /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
               echo "Please ensure the archive is available before installing this package."
@@ -337,7 +333,7 @@ package-job:      # This job runs in the deploy stage.
 
               if ! grep -q "PATH.*:/usr/bin/dotnet" /home/administrator/.profile; then
                   echo "Adding /usr/bin/dotnet to PATH in administrator's .profile"
-                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
               else
                   echo "! /usr/bin/dotnet already in PATH in administrator's .profile"
               fi
@@ -359,7 +355,7 @@ package-job:      # This job runs in the deploy stage.
 
               if ! grep -q "PATH.*:/usr/bin/dotnet" /home/operators/.profile; then
                   echo "Adding /usr/bin/dotnet to PATH in operators's .profile"
-                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/operators/.profile
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/operators/.profile
               else
                   echo "! /usr/bin/dotnet already in PATH in operators's .profile"
               fi
@@ -381,7 +377,7 @@ package-job:      # This job runs in the deploy stage.
 
               if ! grep -q "PATH.*:/usr/bin/dotnet" /home/engineer/.profile; then
                   echo "Adding /usr/bin/dotnet to PATH in engineer's .profile"
-                  echo 'PATH=$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
               else
                   echo "! /usr/bin/dotnet already in PATH in engineer's .profile"
               fi
@@ -413,17 +409,17 @@ package-job:      # This job runs in the deploy stage.
       # Установка прав и владельцев
       echo "Step 4: Setting up application permissions..."
       echo "Setting executable permissions for application binary..."
-      chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
+      chmod 755 /opt/TN_Doc/TN_Doc
       echo "Setting permissions for application DLLs..."
-      chmod 644 /opt/$PROJECT_NAME/*.dll
+      chmod 644 /opt/TN_Doc/*.dll
       echo "Setting ownership for application directory..."
-      chown -R alphadaemon:alphadaemon /opt/$PROJECT_NAME
+      chown -R alphadaemon:alphadaemon /opt/TN_Doc
       echo "Setting directory permissions..."
-      chmod u=rwx,g=rx,o=rx /opt/$PROJECT_NAME
+      chmod u=rwx,g=rx,o=rx /opt/TN_Doc
       echo "Setting ownership for log directory..."
-      chown alphadaemon:alphadaemon /var/log/$PROJECT_NAME
+      chown alphadaemon:alphadaemon /var/log/TN_Doc
       echo "Setting log directory permissions..."
-      chmod u=rwx,g=rx,o=rx /var/log/$PROJECT_NAME
+      chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
       echo "✓ Application permissions setup completed"
 
       # Перезагрузка systemd
@@ -442,85 +438,81 @@ package-job:      # This job runs in the deploy stage.
       fi
 
       echo "Checking application binary..."
-      if [ -f "/opt/$PROJECT_NAME/$PROJECT_NAME" ]; then
-          echo "✓ Application binary found at /opt/$PROJECT_NAME/$PROJECT_NAME"
+      if [ -f "/opt/TN_Doc/TN_Doc" ]; then
+          echo "✓ Application binary found at /opt/TN_Doc/TN_Doc"
       else
-          echo "! WARNING: Application binary not found at /opt/$PROJECT_NAME/$PROJECT_NAME"
-          ls -la /opt/$PROJECT_NAME/ || echo "Directory /opt/$PROJECT_NAME/ not found"
+          echo "! WARNING: Application binary not found at /opt/TN_Doc/TN_Doc"
+          ls -la /opt/TN_Doc/ || echo "Directory /opt/TN_Doc/ not found"
       fi
 
-      echo "Enabling $PROJECT_NAME.service..."
-      systemctl enable $PROJECT_NAME.service || echo "! Failed to enable service"
-      echo "Starting $PROJECT_NAME.service..."
-      systemctl start $PROJECT_NAME.service || echo "! Failed to start service"
+      echo "Enabling TN_Doc.service..."
+      systemctl enable TN_Doc.service || echo "! Failed to enable service"
+      echo "Starting TN_Doc.service..."
+      systemctl start TN_Doc.service || echo "! Failed to start service"
 
       echo "Checking service status..."
-      systemctl is-active $PROJECT_NAME.service >/dev/null 2>&1
-      if [ $? -eq 0 ]; then
+      systemctl is-active TN_Doc.service >/dev/null 2>&1
+      if [ \$? -eq 0 ]; then
           echo "✓ Application service started successfully"
       else
           echo "! WARNING: Service failed to start. Checking logs..."
-          journalctl -u $PROJECT_NAME.service -n 20 --no-pager || echo "Cannot read journal logs"
+          journalctl -u TN_Doc.service -n 20 --no-pager || echo "Cannot read journal logs"
       fi
 
-      echo "=== $PROJECT_NAME installation completed successfully ==="
+      echo "=== TN_Doc installation completed successfully ==="
       echo "============================================"
       exit 0
       EOF
-    # Обрабатываем postinst скрипт
-    - sed "s/__DOTNET_RT_VERSION__/${DOTNET_RT_VERSION}/g; s/\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
     - chmod +x deb/DEBIAN/postinst
-    - rm deb/DEBIAN/postinst.tmp
+    # Генерация postrm с хардкод значениями
     - |
       cat << EOF > deb/DEBIAN/postrm
       #!/bin/bash
       set -e
 
       echo "============================================"
-      echo "Starting post-removal script for $PROJECT_NAME"
+      echo "Starting post-removal script for TN_Doc"
       echo "============================================"
 
       # Удаление директорий при полной очистке (purge)
-      if [ "$1" = "purge" ]; then
-          echo "Purging $PROJECT_NAME directories..."
-          echo "PROJECT_NAME variable in postrm: '$PROJECT_NAME'"
-          OPT_DIR="/opt/$PROJECT_NAME"
-          LOG_DIR="/var/log/$PROJECT_NAME"
-          for dir in "$OPT_DIR" "$LOG_DIR"; do
-              if [ -d "$dir" ]; then
-                  echo "Removing directory: $dir"
-                  rm -rf "$dir"
-                  echo "✓ Successfully removed $dir"
+      if [ "\$1" = "purge" ]; then
+          echo "Purging TN_Doc directories..."
+          echo "PROJECT_NAME variable in postrm: 'TN_Doc'"
+          OPT_DIR="/opt/TN_Doc"
+          LOG_DIR="/var/log/TN_Doc"
+          for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+              if [ -d "\$dir" ]; then
+                  echo "Removing directory: \$dir"
+                  rm -rf "\$dir"
+                  echo "✓ Successfully removed \$dir"
               else
-                  echo "! Directory $dir does not exist, skipping"
+                  echo "! Directory \$dir does not exist, skipping"
               fi
           done
           
           # Удаление systemd service
           echo "Removing systemd service..."
-          systemctl disable $PROJECT_NAME.service 2>/dev/null || echo "! Failed to disable service"
-          rm -f /etc/systemd/system/$PROJECT_NAME.service
+          systemctl disable TN_Doc.service 2>/dev/null || echo "! Failed to disable service"
+          rm -f /etc/systemd/system/TN_Doc.service
           systemctl daemon-reload
           echo "✓ Systemd service removed"
       fi
 
       exit 0
       EOF
-    # Обрабатываем postrm скрипт
-    - sed "s/\\$PROJECT_NAME/${PROJECT_NAME}/g" deb/DEBIAN/postrm > deb/DEBIAN/postrm.tmp && mv deb/DEBIAN/postrm.tmp deb/DEBIAN/postrm
     - chmod +x deb/DEBIAN/postrm
-    # Генерация systemd unit для $PROJECT_NAME
+    # Генерация systemd unit с хардкод значениями
     - |
-      cat << EOF > deb/etc/systemd/system/${PROJECT_NAME}.service
+      cat << EOF > deb/etc/systemd/system/TN_Doc.service
       [Unit]
-      Description=Service ${PROJECT_NAME}
+      Description=Service TN_Doc
 
       [Service]
-      WorkingDirectory=/opt/${PROJECT_NAME}/
-      ExecStart=/usr/bin/dotnet/dotnet /opt/${PROJECT_NAME}/${PROJECT_NAME}.dll
+      WorkingDirectory=/opt/TN_Doc/
+      ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
       Restart=always
       RestartSec=10
-      SyslogIdentifier=dotnet-${PROJECT_NAME}
+      SyslogIdentifier=dotnet-TN_Doc
       User=alphadaemon
       Environment=ASPNETCORE_ENVIRONMENT=Production
 
@@ -530,8 +522,8 @@ package-job:      # This job runs in the deploy stage.
     # Установка прав
     - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst deb/DEBIAN/prerm deb/DEBIAN/postrm
     - chmod 644 deb/DEBIAN/control
-    - chmod 755 deb/opt/$PROJECT_NAME/$PROJECT_NAME
-    - chmod 644 deb/opt/$PROJECT_NAME/*.dll 2>/dev/null || true
+    - chmod 755 deb/opt/TN_Doc/TN_Doc
+    - chmod 644 deb/opt/TN_Doc/*.dll 2>/dev/null || true
     - echo "Creating control.tar.xz..."
     - tar -cJf control.tar.xz -C deb/DEBIAN .
     - echo "Creating data.tar.xz..."
@@ -545,6 +537,6 @@ package-job:      # This job runs in the deploy stage.
     - ls -l ./packages/${DEB_NAME}_amd64.deb
     - echo "Current directory:$(pwd)"
   artifacts:
-    name: "package-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    name: "package-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./packages/
