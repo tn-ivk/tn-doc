@@ -284,6 +284,11 @@ package-job:      # This job runs in the deploy stage.
 
       exit 0
       EOF
+    # Проверяем созданный preinst.tmp файл
+    - echo "DEBUG - Checking created preinst.tmp file"
+    - ls -la deb/DEBIAN/preinst.tmp || echo "  preinst.tmp file not found"
+    - echo "  First 10 lines with __DOTNET_RT_VERSION__ patterns"
+    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst.tmp | head -10 || echo "  No __DOTNET_RT_VERSION__ patterns found"
     # Обрабатываем preinst скрипт
     - echo "DEBUG - Processing preinst script with variables"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
@@ -297,7 +302,11 @@ package-job:      # This job runs in the deploy stage.
     - echo "  Using sed with | delimiter to avoid conflicts"
     - echo "  Testing sed command first"
     - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
+    - echo "  Before sed - checking source file content"
+    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst.tmp || echo "  No __DOTNET_RT_VERSION__ patterns in source file"
     - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
+    - echo "  After sed - checking result file content"
+    - grep -n "REQUIRED_VERSION=" deb/DEBIAN/preinst | head -3 || echo "  No REQUIRED_VERSION assignments found"
     - echo "DEBUG - Checking variable replacement in preinst"
     - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0)"
     - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/preinst || echo "  No unreplaced patterns found (good)"
@@ -671,6 +680,11 @@ package-job:      # This job runs in the deploy stage.
       echo "============================================"
       exit 0
       EOF
+    # Проверяем созданный postinst.tmp файл
+    - echo "DEBUG - Checking created postinst.tmp file"
+    - ls -la deb/DEBIAN/postinst.tmp || echo "  postinst.tmp file not found"
+    - echo "  First 10 lines with __DOTNET_RT_VERSION__ patterns"
+    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst.tmp | head -10 || echo "  No __DOTNET_RT_VERSION__ patterns found"
     # Обрабатываем postinst скрипт
     - echo "DEBUG - Processing postinst script with variables"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
@@ -684,7 +698,11 @@ package-job:      # This job runs in the deploy stage.
     - echo "  Using sed with | delimiter to avoid conflicts"
     - echo "  Testing sed command first"
     - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
+    - echo "  Before sed - checking source file content"
+    - grep -n "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst.tmp || echo "  No __DOTNET_RT_VERSION__ patterns in source file"
     - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
+    - echo "  After sed - checking result file content"
+    - grep -n "REQUIRED_VERSION=" deb/DEBIAN/postinst | head -3 || echo "  No REQUIRED_VERSION assignments found"
     - echo "DEBUG - Checking variable replacement in postinst"
     - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0)"
     - grep -c "__DOTNET_RT_VERSION__" deb/DEBIAN/postinst || echo "  No unreplaced patterns found (good)"
