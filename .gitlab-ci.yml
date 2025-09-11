@@ -120,12 +120,12 @@ package-job:      # This job runs in the deploy stage.
     - mkdir -p deb/etc/systemd/system
     - mkdir -p deb/usr/share/fonts
     - mkdir -p deb/usr/local/bin
-    # Создание временной директории для зависимостей
-    - mkdir -p deb/tempdir
+    # Создание уникальной временной директории для зависимостей
+    - mkdir -p deb/tmp/TN_Doc
     # Копирование файлов приложения
     - cp -r ./publish/* deb/opt/TN_Doc/
     # Копирование .NET Runtime если есть в distrib
-    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tempdir/; fi
+    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tmp/TN_Doc/; fi
     # Копирование шрифтов в пакет (если присутствуют в репозитории)
     - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
     # Генерация control
@@ -180,6 +180,11 @@ package-job:      # This job runs in the deploy stage.
 
       # Проверка .NET Runtime (установка будет в postinst если нужно)
       check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
+
+      # Очистка временной директории TN_Doc
+      echo "Cleaning /tmp/TN_Doc directory..."
+      rm -rf /tmp/TN_Doc
+      echo "✓ Temporary directory cleaned"
 
       # Остановка службы TN_Doc, если она запущена
       if systemctl is-active --quiet TN_Doc.service; then
@@ -266,7 +271,7 @@ package-job:      # This job runs in the deploy stage.
           echo "=== Starting .NET Runtime installation ==="
           
           # Проверяем наличие локального архива
-          if [ -f "/tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+          if [ -f "/tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
               echo "✓ Found .NET Runtime archive"
 
               # Создаем директорию для .NET
@@ -275,7 +280,7 @@ package-job:      # This job runs in the deploy stage.
 
               # Распаковываем архив напрямую в /usr/bin/dotnet
               echo "Extracting .NET Runtime archive..."
-              tar -xzf /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+              tar -xzf /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
               if [ \$? -eq 0 ]; then
                   echo "✓ Archive extracted successfully"
               else
@@ -284,10 +289,10 @@ package-job:      # This job runs in the deploy stage.
               fi
 
               # Удаляем архив
-              rm -f /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+              rm -f /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
               echo "✓ .NET Runtime 8.0.13 installed successfully"
           else
-              echo "✗ ERROR: .NET Runtime archive not found at /tempdir/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+              echo "✗ ERROR: .NET Runtime archive not found at /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
               echo "Please ensure the archive is available before installing this package."
               exit 1
           fi
@@ -405,6 +410,11 @@ package-job:      # This job runs in the deploy stage.
           echo "! WARNING: Service failed to start. Checking logs..."
           journalctl -u TN_Doc.service -n 10 --no-pager || echo "Cannot read journal logs"
       fi
+
+      # Финальная очистка временной директории
+      echo "Final cleanup: Removing /tmp/TN_Doc directory..."
+      rm -rf /tmp/TN_Doc
+      echo "✓ Temporary directory cleaned"
 
       echo "=== TN_Doc installation completed successfully ==="
       echo "============================================"
