@@ -288,8 +288,15 @@ package-job:      # This job runs in the deploy stage.
     - echo "DEBUG - Processing preinst script with variables:"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
+    - echo "  Length of DOTNET_RT_VERSION: ${#DOTNET_RT_VERSION}"
+    - echo "  Length of PROJECT_NAME: ${#PROJECT_NAME}"
+    # Проверяем, что переменные не пусты
+    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR: DOTNET_RT_VERSION is empty!"; exit 1; fi
+    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR: PROJECT_NAME is empty!"; exit 1; fi
     # Используем разделитель | в sed для избежания конфликтов с точками
     - echo "  Using sed with | delimiter to avoid conflicts"
+    - echo "  Testing sed command first:"
+    - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
     - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/preinst.tmp > deb/DEBIAN/preinst
     - echo "DEBUG - Checking variable replacement in preinst:"
     - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0):"
@@ -668,8 +675,15 @@ package-job:      # This job runs in the deploy stage.
     - echo "DEBUG - Processing postinst script with variables:"
     - echo "  DOTNET_RT_VERSION='${DOTNET_RT_VERSION}'"
     - echo "  PROJECT_NAME='${PROJECT_NAME}'"
+    - echo "  Length of DOTNET_RT_VERSION: ${#DOTNET_RT_VERSION}"
+    - echo "  Length of PROJECT_NAME: ${#PROJECT_NAME}"
+    # Проверяем, что переменные не пусты
+    - if [ -z "${DOTNET_RT_VERSION}" ]; then echo "ERROR: DOTNET_RT_VERSION is empty!"; exit 1; fi
+    - if [ -z "${PROJECT_NAME}" ]; then echo "ERROR: PROJECT_NAME is empty!"; exit 1; fi
     # Используем разделитель | в sed для избежания конфликтов с точками
     - echo "  Using sed with | delimiter to avoid conflicts"
+    - echo "  Testing sed command first:"
+    - echo "__DOTNET_RT_VERSION__" | sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g"
     - sed "s|__DOTNET_RT_VERSION__|${DOTNET_RT_VERSION}|g; s|__PROJECT_NAME__|${PROJECT_NAME}|g; s|\\\$PROJECT_NAME|${PROJECT_NAME}|g" deb/DEBIAN/postinst.tmp > deb/DEBIAN/postinst
     - echo "DEBUG - Checking variable replacement in postinst:"
     - echo "  Searching for __DOTNET_RT_VERSION__ patterns (should be 0):"
