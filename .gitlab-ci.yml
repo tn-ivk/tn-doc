@@ -784,7 +784,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Creating .NET Runtime standalone package..."
-    - DEB_NAME="dotnet-runtime-tn-8.0.13-${FULL_VERSION}"
+    - DEB_NAME="tn.dotnet-runtime-8.0.13"
     - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
     - mkdir -p deb-runtime/DEBIAN
@@ -795,7 +795,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
     # Генерация control
     - |
       cat << EOF > deb-runtime/DEBIAN/control
-      Package: dotnet-runtime-tn
+      Package: tn.dotnet-runtime
       Version: 8.0.13-${VERSION}
       Section: libs
       Priority: optional
@@ -1017,7 +1017,7 @@ package-fonts-job:      # System fonts standalone package
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Creating system fonts standalone package..."
-    - DEB_NAME="fonts-tn-${FULL_VERSION}"
+    - DEB_NAME="tn.fonts-${VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Проверка наличия шрифтов
     - if [ ! -d "fonts" ]; then echo "ERROR fonts directory not found"; exit 1; fi
@@ -1029,7 +1029,7 @@ package-fonts-job:      # System fonts standalone package
     # Генерация control
     - |
       cat << EOF > deb-fonts/DEBIAN/control
-      Package: fonts-tn
+      Package: tn.fonts
       Version: ${VERSION}
       Section: fonts
       Priority: optional
@@ -1181,9 +1181,9 @@ package-fonts-job:      # System fonts standalone package
     - echo "2.0" > debian-binary-fonts
     - echo "Building fonts .deb package..."
     - mkdir -p packages
-    - ar r ./packages/${DEB_NAME}_all.deb debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
+    - ar r ./packages/${DEB_NAME}.deb debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
     - rm -f debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
-    - ls -l ./packages/${DEB_NAME}_all.deb
+    - ls -l ./packages/${DEB_NAME}.deb
     - echo "Current directory:$(pwd)"
   artifacts:
     name: "package-fonts-TN_Doc-${CI_COMMIT_SHORT_SHA}"
