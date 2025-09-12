@@ -504,17 +504,16 @@ package-job:      # This job runs in the deploy stage.
           local package_name="$1"
           local package_size="$2"
           local job_name="$3"
-          local message="✅ Собран deb-пакет: \`$package_name\`
+          local message="✅ Собран deb-пакет: $package_name
       📦 Размер: $package_size
       🏷️ Версия: ${VERSION}
       🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
-      🔧 Job: $job_name
+      🛠️ Job: $job_name
       📋 Pipeline: ${CI_PIPELINE_URL}"
           
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
               -d chat_id="${TELEGRAM_CHAT_ID}" \
               -d text="${message}" \
-              -d parse_mode="Markdown"
       }
       send_telegram_notification "$PACKAGE_NAME" "$PACKAGE_SIZE" "${CI_JOB_NAME}"
   artifacts:
@@ -797,17 +796,16 @@ package-minimal-job:      # Minimal package without dependencies
           local package_name="$1"
           local package_size="$2"
           local job_name="$3"
-          local message="✅ Собран deb-пакет: \`$package_name\`
+          local message="✅ Собран deb-пакет: $package_name
       📦 Размер: $package_size
       🏷️ Версия: ${VERSION}
       🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
-      🔧 Job: $job_name
+      🛠️ Job: $job_name
       📋 Pipeline: ${CI_PIPELINE_URL}"
           
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
               -d chat_id="${TELEGRAM_CHAT_ID}" \
               -d text="${message}" \
-              -d parse_mode="Markdown"
       }
       send_telegram_notification "$PACKAGE_NAME" "$PACKAGE_SIZE" "${CI_JOB_NAME}"
   artifacts:
@@ -1052,17 +1050,16 @@ package-net-runtime-job:      # .NET Runtime standalone package
           local package_name="$1"
           local package_size="$2"
           local job_name="$3"
-          local message="✅ Собран deb-пакет: \`$package_name\`
+          local message="✅ Собран deb-пакет: $package_name
       📦 Размер: $package_size
       🏷️ Версия: ${VERSION}
       🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
-      🔧 Job: $job_name
+      🛠️ Job: $job_name
       📋 Pipeline: ${CI_PIPELINE_URL}"
           
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
               -d chat_id="${TELEGRAM_CHAT_ID}" \
               -d text="${message}" \
-              -d parse_mode="Markdown"
       }
       send_telegram_notification "$PACKAGE_NAME" "$PACKAGE_SIZE" "${CI_JOB_NAME}"
   artifacts:
@@ -1260,17 +1257,16 @@ package-fonts-job:      # System fonts standalone package
           local package_name="$1"
           local package_size="$2"
           local job_name="$3"
-          local message="✅ Собран deb-пакет: \`$package_name\`
+          local message="✅ Собран deb-пакет: $package_name
       📦 Размер: $package_size
       🏷️ Версия: ${VERSION}
       🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
-      🔧 Job: $job_name
+      🛠️ Job: $job_name
       📋 Pipeline: ${CI_PIPELINE_URL}"
           
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
               -d chat_id="${TELEGRAM_CHAT_ID}" \
               -d text="${message}" \
-              -d parse_mode="Markdown"
       }
       send_telegram_notification "$PACKAGE_NAME" "$PACKAGE_SIZE" "${CI_JOB_NAME}"
   artifacts:
