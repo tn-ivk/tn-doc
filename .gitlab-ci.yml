@@ -1020,7 +1020,7 @@ package-fonts-job:      # System fonts standalone package
     - DEB_NAME="fonts-tn-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Проверка наличия шрифтов
-    - if [ ! -d "fonts" ]; then echo "ERROR: fonts directory not found"; exit 1; fi
+    - if [ ! -d "fonts" ]; then echo "ERROR fonts directory not found"; exit 1; fi
     # Создание структуры пакета
     - mkdir -p deb-fonts/DEBIAN
     - mkdir -p deb-fonts/usr/share/fonts
