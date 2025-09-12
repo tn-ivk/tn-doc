@@ -111,7 +111,7 @@ package-job:      # This job runs in the deploy stage.
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
-    - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
+    - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-full-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
     - mkdir -p deb/DEBIAN
@@ -131,14 +131,15 @@ package-job:      # This job runs in the deploy stage.
     # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
-      Package: tn.doc
+      Package: tn.doc-full
       Version: ${VERSION}
       Section: utils
       Priority: optional
       Architecture: amd64
       Depends: systemd
       Maintainer: DadonovAD <dadonovad@transneft.ru>
-      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
+      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН (полная версия).
+       Включает .NET Runtime 8.0.13 и системные шрифты для автономной работы.
       Homepage:
 
       EOF
@@ -149,7 +150,7 @@ package-job:      # This job runs in the deploy stage.
       set -e
 
       echo "============================================"
-      echo "Starting pre-installation script for TN_Doc"
+      echo "Starting pre-installation script for TN_Doc (full version)"
       echo "============================================"
 
       # Проверка .NET Runtime перед установкой
@@ -219,7 +220,7 @@ package-job:      # This job runs in the deploy stage.
       set -e
 
       echo "============================================"
-      echo "Starting pre-removal script for TN_Doc"
+      echo "Starting pre-removal script for TN_Doc (full version)"
       echo "============================================"
 
       # Остановка службы TN_Doc, если она запущена
@@ -243,7 +244,7 @@ package-job:      # This job runs in the deploy stage.
       set -e
 
       echo "============================================"
-      echo "Starting post-installation script for TN_Doc"
+      echo "Starting post-installation script for TN_Doc (full version)"
       echo "============================================"
       echo "Installing dependencies for TN_Doc..."
 
@@ -428,7 +429,7 @@ package-job:      # This job runs in the deploy stage.
       set -e
 
       echo "============================================"
-      echo "Starting post-removal script for TN_Doc"
+      echo "Starting post-removal script for TN_Doc (full version)"
       echo "============================================"
 
       # Удаление директорий при полной очистке (purge)
@@ -463,7 +464,7 @@ package-job:      # This job runs in the deploy stage.
     - |
       cat << EOF > deb/etc/systemd/system/TN_Doc.service
       [Unit]
-      Description=Service TN_Doc
+      Description=Service TN_Doc (full version)
 
       [Service]
       WorkingDirectory=/opt/TN_Doc/
@@ -495,6 +496,293 @@ package-job:      # This job runs in the deploy stage.
     - ls -l ./packages/${DEB_NAME}_amd64.deb
     - echo "Current directory:$(pwd)"
   artifacts:
-    name: "package-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    name: "package-full-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
+
+package-minimal-job:      # Minimal package without dependencies
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - build-job
+    - extract-version-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev
+  script:
+    - echo "Packaging the application into a minimal .deb file..."
+    - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
+    - echo "DEB_NAME=$DEB_NAME"
+    # Создание структуры минимального пакета
+    - mkdir -p deb-minimal/DEBIAN
+    - mkdir -p deb-minimal/opt/TN_Doc
+    - mkdir -p deb-minimal/var/log/TN_Doc
+    - mkdir -p deb-minimal/etc/systemd/system
+    # Копирование только файлов приложения
+    - cp -r ./publish/* deb-minimal/opt/TN_Doc/
+    # Генерация minimal control
+    - |
+      cat << EOF > deb-minimal/DEBIAN/control
+      Package: tn.doc
+      Version: ${VERSION}
+      Section: utils
+      Priority: optional
+      Architecture: amd64
+      Depends: systemd, dotnet-runtime-8.0 (>= 8.0.13)
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
+       Требует предустановленный .NET Runtime 8.0.13+ и системные шрифты.
+      Homepage:
+
+      EOF
+    # Генерация minimal preinst
+    - |
+      cat << EOF > deb-minimal/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-installation script for TN_Doc"
+      echo "============================================"
+
+      # Проверка наличия .NET Runtime
+      check_dotnet_runtime() {
+          if ! command -v dotnet >/dev/null 2>&1; then
+              echo "ERROR: dotnet command not found in PATH"
+              echo "Please install .NET Runtime 8.0.13 or later before installing this package"
+              exit 1
+          fi
+
+          # Проверка наличия .NET Runtime (системный путь)
+          RUNTIME_PATHS="/usr/share/dotnet/shared/Microsoft.NETCore.App /usr/lib/dotnet/shared/Microsoft.NETCore.App"
+          RUNTIME_FOUND=false
+          
+          for RUNTIME_PATH in \$RUNTIME_PATHS; do
+              if [ -d "\$RUNTIME_PATH" ]; then
+                  RUNTIME_FOUND=true
+                  break
+              fi
+          done
+          
+          if [ "\$RUNTIME_FOUND" = false ]; then
+              echo "ERROR: .NET Runtime directory not found in standard locations"
+              echo "Please install .NET Runtime 8.0.13 or later before installing this package"
+              exit 1
+          fi
+
+          # Проверка версии .NET Runtime
+          REQUIRED_VERSION="8.0.13"
+          INSTALLED_VERSION=\$(ls \$RUNTIME_PATH 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+          
+          if [ -z "\$INSTALLED_VERSION" ]; then
+              echo "ERROR: No compatible .NET Runtime 8 version found in \$RUNTIME_PATH"
+              echo "Please install .NET Runtime 8.0.13 or later"
+              exit 1
+          fi
+
+          if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
+              echo "ERROR: .NET Runtime version \$INSTALLED_VERSION < \$REQUIRED_VERSION"
+              echo "Please install .NET Runtime 8.0.13 or later"
+              exit 1
+          fi
+
+          echo "✓ .NET Runtime version \$INSTALLED_VERSION is compatible (>= \$REQUIRED_VERSION)"
+      }
+
+      # Проверка .NET Runtime
+      echo "Checking .NET Runtime availability..."
+      check_dotnet_runtime
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+      fi
+
+      # Удаление старых директорий
+      echo "Removing old TN_Doc directories..."
+      OPT_DIR="/opt/TN_Doc"
+      LOG_DIR="/var/log/TN_Doc"
+      for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+          if [ -d "\$dir" ]; then
+              echo "Removing directory: \$dir"
+              rm -rf "\$dir"
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Successfully removed \$dir"
+              else
+                  echo "! WARNING: Failed to remove \$dir"
+              fi
+          fi
+      done
+
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/preinst
+    # Генерация minimal prerm
+    - |
+      cat << EOF > deb-minimal/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for TN_Doc"
+      echo "============================================"
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+          if [ \$? -eq 0 ]; then
+              echo "✓ Service stopped successfully"
+          else
+              echo "! WARNING: Failed to stop service"
+          fi
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/prerm
+    # Генерация minimal postinst
+    - |
+      cat << EOF > deb-minimal/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-installation script for TN_Doc"
+      echo "============================================"
+
+      # Установка прав и владельцев
+      echo "Setting up application permissions..."
+      chmod 755 /opt/TN_Doc/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Executable permissions set"
+      else
+          echo "! WARNING: Failed to set executable permissions"
+      fi
+      
+      chmod 644 /opt/TN_Doc/*.dll
+      chown -R alphadaemon:alphadaemon /opt/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Ownership set successfully"
+      else
+          echo "! WARNING: Failed to set ownership"
+      fi
+      
+      chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+      chown alphadaemon:alphadaemon /var/log/TN_Doc
+      chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+      echo "✓ Application permissions setup completed"
+
+      # Перезагрузка systemd
+      echo "Reloading systemd daemon..."
+      systemctl daemon-reload
+      echo "✓ Systemd daemon reloaded"
+
+      # Включение и запуск сервиса
+      echo "Enabling and starting application service..."
+      
+      # Проверка наличия необходимых файлов
+      if [ -f "/opt/TN_Doc/TN_Doc" ]; then
+          echo "✓ Application binary found"
+      else
+          echo "! WARNING: Application binary not found"
+      fi
+
+      systemctl enable TN_Doc.service
+      systemctl start TN_Doc.service
+
+      # Проверка статуса сервиса
+      sleep 2
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "✓ Application service started successfully"
+      else
+          echo "! WARNING: Service failed to start. Checking logs..."
+          journalctl -u TN_Doc.service -n 10 --no-pager || echo "Cannot read journal logs"
+      fi
+
+      echo "=== TN_Doc installation completed successfully ==="
+      echo "============================================"
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/postinst
+    # Генерация minimal postrm
+    - |
+      cat << EOF > deb-minimal/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-removal script for TN_Doc"
+      echo "============================================"
+
+      # Удаление директорий при полной очистке (purge)
+      if [ "\$1" = "purge" ]; then
+          echo "Purging TN_Doc directories..."
+          OPT_DIR="/opt/TN_Doc"
+          LOG_DIR="/var/log/TN_Doc"
+          for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+              if [ -d "\$dir" ]; then
+                  echo "Removing directory: \$dir"
+                  rm -rf "\$dir"
+                  if [ \$? -eq 0 ]; then
+                      echo "✓ Successfully removed \$dir"
+                  else
+                      echo "! WARNING: Failed to remove \$dir"
+                  fi
+              fi
+          done
+          
+          # Удаление systemd service
+          echo "Removing systemd service..."
+          systemctl disable TN_Doc.service 2>/dev/null || true
+          rm -f /etc/systemd/system/TN_Doc.service
+          systemctl daemon-reload
+          echo "✓ Systemd service removed"
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/postrm
+    # Генерация systemd unit (использует системный dotnet)
+    - |
+      cat << EOF > deb-minimal/etc/systemd/system/TN_Doc.service
+      [Unit]
+      Description=Service TN_Doc
+
+      [Service]
+      WorkingDirectory=/opt/TN_Doc/
+      ExecStart=dotnet /opt/TN_Doc/TN_Doc.dll
+      Restart=always
+      RestartSec=10
+      SyslogIdentifier=dotnet-TN_Doc
+      User=alphadaemon
+      Environment=ASPNETCORE_ENVIRONMENT=Production
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+    # Установка прав
+    - chmod 755 deb-minimal/DEBIAN/preinst deb-minimal/DEBIAN/postinst deb-minimal/DEBIAN/prerm deb-minimal/DEBIAN/postrm
+    - chmod 644 deb-minimal/DEBIAN/control
+    - chmod 755 deb-minimal/opt/TN_Doc/TN_Doc
+    - chmod 644 deb-minimal/opt/TN_Doc/*.dll 2>/dev/null || true
+    - echo "Creating minimal control.tar.xz..."
+    - tar -cJf control-minimal.tar.xz -C deb-minimal/DEBIAN .
+    - echo "Creating minimal data.tar.xz..."
+    - tar -cJf data-minimal.tar.xz -C deb-minimal --exclude=DEBIAN .
+    - echo "Creating minimal debian-binary..."
+    - echo "2.0" > debian-binary-minimal
+    - echo "Building minimal .deb package..."
+    - mkdir -p packages
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary-minimal control-minimal.tar.xz data-minimal.tar.xz
+    - rm -f debian-binary-minimal control-minimal.tar.xz data-minimal.tar.xz
+    - ls -l ./packages/${DEB_NAME}_amd64.deb
+    - echo "Current directory:$(pwd)"
+  artifacts:
+    name: "package-minimal-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./packages/
