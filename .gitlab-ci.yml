@@ -791,7 +791,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
     - mkdir -p deb-runtime/usr/bin/dotnet
     - mkdir -p deb-runtime/tmp/dotnet-runtime
     # Копирование .NET Runtime архива
-    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb-runtime/tmp/dotnet-runtime/; else echo "ERROR: .NET Runtime archive not found"; exit 1; fi
+    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb-runtime/tmp/dotnet-runtime/; else echo "ERROR .NET Runtime archive not found"; exit 1; fi
     # Генерация control
     - |
       cat << EOF > deb-runtime/DEBIAN/control
