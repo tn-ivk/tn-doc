@@ -770,3 +770,236 @@ package-minimal-job:      # Minimal package without dependencies
     name: "package-minimal-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./packages/
+
+package-net-runtime-job:      # .NET Runtime standalone package
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - extract-version-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev
+  script:
+    - echo "Creating .NET Runtime standalone package..."
+    - DEB_NAME="dotnet-runtime-tn-8.0.13-${FULL_VERSION}"
+    - echo "DEB_NAME=$DEB_NAME"
+    # Создание структуры пакета
+    - mkdir -p deb-runtime/DEBIAN
+    - mkdir -p deb-runtime/usr/bin/dotnet
+    - mkdir -p deb-runtime/tmp/dotnet-runtime
+    # Копирование .NET Runtime архива
+    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb-runtime/tmp/dotnet-runtime/; else echo "ERROR: .NET Runtime archive not found"; exit 1; fi
+    # Генерация control
+    - |
+      cat << EOF > deb-runtime/DEBIAN/control
+      Package: dotnet-runtime-tn
+      Version: 8.0.13-${VERSION}
+      Section: libs
+      Priority: optional
+      Architecture: amd64
+      Depends: libc6, libgcc-s1, libstdc++6
+      Provides: dotnet-runtime-8.0
+      Conflicts: dotnet-runtime-8.0
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: Microsoft .NET Runtime 8.0.13 для TN приложений.
+       Автономная установка .NET Runtime 8.0.13 в /usr/bin/dotnet.
+       Предоставляет среду выполнения для TN_Doc и других .NET приложений.
+      Homepage:
+
+      EOF
+    # Генерация preinst
+    - |
+      cat << EOF > deb-runtime/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-installation script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      # Проверка конфликтующих установок
+      check_existing_dotnet() {
+          if [ -d "/usr/bin/dotnet" ]; then
+              echo "Warning: Existing .NET installation found in /usr/bin/dotnet"
+              echo "Backing up existing installation..."
+              mv /usr/bin/dotnet "/usr/bin/dotnet.backup.\$(date +%Y%m%d_%H%M%S)"
+          fi
+      }
+
+      check_existing_dotnet
+
+      # Очистка временной директории
+      rm -rf /tmp/dotnet-runtime
+      echo "✓ Pre-installation checks completed"
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/preinst
+    # Генерация postinst (с логикой из package-job)
+    - |
+      cat << EOF > deb-runtime/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-installation script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      # Установка .NET Runtime
+      install_dotnet_runtime() {
+          echo "=== Starting .NET Runtime installation ==="
+          
+          # Проверяем наличие локального архива
+          if [ -f "/tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              echo "✓ Found .NET Runtime archive"
+
+              # Создаем директорию для .NET
+              echo "Creating .NET directory: /usr/bin/dotnet"
+              mkdir -p /usr/bin/dotnet
+
+              # Распаковываем архив напрямую в /usr/bin/dotnet
+              echo "Extracting .NET Runtime archive..."
+              tar -xzf /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Archive extracted successfully"
+              else
+                  echo "✗ ERROR: Failed to extract archive"
+                  exit 1
+              fi
+
+              # Удаляем архив
+              rm -f /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+              echo "✓ .NET Runtime 8.0.13 installed successfully"
+          else
+              echo "✗ ERROR: .NET Runtime archive not found at /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+              exit 1
+          fi
+
+          echo "=== .NET Runtime installation completed ==="
+      }
+
+      # Установка переменных окружения для пользователей
+      setup_dotnet_environment() {
+          echo "=== Setting up .NET environment variables ==="
+
+          # Создание переменных окружения для пользователя administrator
+          if [ -f "/home/administrator/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added DOTNET_ROOT to administrator's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in administrator's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя operators
+          if [ -f "/home/operators/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added DOTNET_ROOT to operators's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in operators's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя engineer
+          if [ -f "/home/engineer/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added DOTNET_ROOT to engineer's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in engineer's .profile"
+              fi
+          fi
+
+          echo "=== Environment setup completed ==="
+      }
+
+      # Выполнение установки
+      install_dotnet_runtime
+      setup_dotnet_environment
+
+      # Финальная очистка
+      rm -rf /tmp/dotnet-runtime
+      echo "✓ .NET Runtime 8.0.13 installation completed successfully"
+      echo "============================================"
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/postinst
+    # Генерация prerm
+    - |
+      cat << EOF > deb-runtime/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      # Проверка использования другими пакетами
+      if dpkg -l | grep -q "tn\.doc"; then
+          echo "WARNING: TN_Doc packages are installed and may depend on this runtime"
+          echo "Consider removing dependent packages first"
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/prerm
+    # Генерация postrm
+    - |
+      cat << EOF > deb-runtime/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-removal script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      if [ "\$1" = "purge" ]; then
+          echo "Purging .NET Runtime installation..."
+          
+          # Удаление .NET Runtime
+          if [ -d "/usr/bin/dotnet" ]; then
+              rm -rf /usr/bin/dotnet
+              echo "✓ .NET Runtime directory removed"
+          fi
+          
+          # Очистка переменных окружения
+          for user_home in /home/administrator /home/operators /home/engineer; do
+              if [ -f "\${user_home}/.profile" ]; then
+                  sed -i '/DOTNET_ROOT=\/usr\/bin\/dotnet/d' "\${user_home}/.profile"
+                  sed -i '/PATH=.*:\/usr\/bin\/dotnet/d' "\${user_home}/.profile"
+                  echo "✓ Cleaned environment variables from \${user_home}/.profile"
+              fi
+          done
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/postrm
+    # Установка прав
+    - chmod 644 deb-runtime/DEBIAN/control
+    - echo "Creating runtime control.tar.xz..."
+    - tar -cJf control-runtime.tar.xz -C deb-runtime/DEBIAN .
+    - echo "Creating runtime data.tar.xz..."
+    - tar -cJf data-runtime.tar.xz -C deb-runtime --exclude=DEBIAN .
+    - echo "Creating runtime debian-binary..."
+    - echo "2.0" > debian-binary-runtime
+    - echo "Building .NET Runtime .deb package..."
+    - mkdir -p packages
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary-runtime control-runtime.tar.xz data-runtime.tar.xz
+    - rm -f debian-binary-runtime control-runtime.tar.xz data-runtime.tar.xz
+    - ls -l ./packages/${DEB_NAME}_amd64.deb
+    - echo "Current directory:$(pwd)"
+  artifacts:
+    name: "package-net-runtime-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
