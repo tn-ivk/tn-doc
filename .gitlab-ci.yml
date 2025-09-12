@@ -550,35 +550,19 @@ package-minimal-job:      # Minimal package without dependencies
 
       # Проверка наличия .NET Runtime
       check_dotnet_runtime() {
-          if ! command -v dotnet >/dev/null 2>&1; then
-              echo "ERROR: dotnet command not found in PATH"
-              echo "Please install .NET Runtime 8.0.13 or later before installing this package"
-              exit 1
-          fi
-
-          # Проверка наличия .NET Runtime (системный путь)
-          RUNTIME_PATHS="/usr/share/dotnet/shared/Microsoft.NETCore.App /usr/lib/dotnet/shared/Microsoft.NETCore.App"
-          RUNTIME_FOUND=false
-          
-          for RUNTIME_PATH in \$RUNTIME_PATHS; do
-              if [ -d "\$RUNTIME_PATH" ]; then
-                  RUNTIME_FOUND=true
-                  break
-              fi
-          done
-          
-          if [ "\$RUNTIME_FOUND" = false ]; then
-              echo "ERROR: .NET Runtime directory not found in standard locations"
+          # Проверка наличия .NET Runtime
+          if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              echo "ERROR: .NET Runtime 8 is not installed."
               echo "Please install .NET Runtime 8.0.13 or later before installing this package"
               exit 1
           fi
 
           # Проверка версии .NET Runtime
           REQUIRED_VERSION="8.0.13"
-          INSTALLED_VERSION=\$(ls \$RUNTIME_PATH 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+          INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
           
           if [ -z "\$INSTALLED_VERSION" ]; then
-              echo "ERROR: No compatible .NET Runtime 8 version found in \$RUNTIME_PATH"
+              echo "ERROR: No compatible .NET Runtime 8 version found in /usr/bin/dotnet/shared/Microsoft.NETCore.App"
               echo "Please install .NET Runtime 8.0.13 or later"
               exit 1
           fi
