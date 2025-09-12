@@ -1003,3 +1003,189 @@ package-net-runtime-job:      # .NET Runtime standalone package
     name: "package-net-runtime-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./packages/
+
+package-fonts-job:      # System fonts standalone package
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - extract-version-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev
+  script:
+    - echo "Creating system fonts standalone package..."
+    - DEB_NAME="fonts-tn-${FULL_VERSION}"
+    - echo "DEB_NAME=$DEB_NAME"
+    # Проверка наличия шрифтов
+    - if [ ! -d "fonts" ]; then echo "ERROR: fonts directory not found"; exit 1; fi
+    # Создание структуры пакета
+    - mkdir -p deb-fonts/DEBIAN
+    - mkdir -p deb-fonts/usr/share/fonts
+    # Копирование шрифтов
+    - cp -r fonts/* deb-fonts/usr/share/fonts/
+    # Генерация control
+    - |
+      cat << EOF > deb-fonts/DEBIAN/control
+      Package: fonts-tn
+      Version: ${VERSION}
+      Section: fonts
+      Priority: optional
+      Architecture: all
+      Depends: fontconfig
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: Системные шрифты для TN приложений.
+       Набор шрифтов Arial, Segoe UI, Tahoma для корректного отображения
+       документов в TN_Doc и других TN приложениях.
+      Homepage:
+
+      EOF
+    # Генерация preinst
+    - |
+      cat << EOF > deb-fonts/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-installation script for TN Fonts"
+      echo "============================================"
+
+      # Проверка доступности fontconfig
+      if ! command -v fc-cache >/dev/null 2>&1; then
+          echo "WARNING: fontconfig (fc-cache) not found. Font cache may not be updated."
+      fi
+
+      # Очистка старых шрифтов TN (если есть)
+      if [ -d "/usr/share/fonts/tn-fonts" ]; then
+          echo "Removing old TN fonts directory..."
+          rm -rf /usr/share/fonts/tn-fonts
+      fi
+
+      echo "✓ Pre-installation checks completed"
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/preinst
+    # Генерация postinst
+    - |
+      cat << EOF > deb-fonts/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-installation script for TN Fonts"
+      echo "============================================"
+
+      # Установка прав на шрифты
+      echo "Setting fonts permissions..."
+      find /usr/share/fonts -name "*.ttf" -exec chmod 644 {} \;
+      find /usr/share/fonts -name "*.TTF" -exec chmod 644 {} \;
+      echo "✓ Font permissions set"
+
+      # Обновление кэша шрифтов
+      echo "Updating font cache..."
+      if command -v fc-cache >/dev/null 2>&1; then
+          fc-cache -f -v
+          if [ \$? -eq 0 ]; then
+              echo "✓ Font cache updated successfully"
+          else
+              echo "! WARNING: Font cache update failed"
+          fi
+      else
+          echo "! WARNING: fc-cache not available, font cache not updated"
+      fi
+
+      # Проверка установленных шрифтов
+      echo "Verifying installed fonts..."
+      FONT_COUNT=\$(find /usr/share/fonts -name "*.ttf" -o -name "*.TTF" | wc -l)
+      echo "Found \$FONT_COUNT font files installed"
+
+      if command -v fc-list >/dev/null 2>&1; then
+          ARIAL_COUNT=\$(fc-list | grep -i arial | wc -l)
+          SEGOE_COUNT=\$(fc-list | grep -i "segoe ui" | wc -l)
+          TAHOMA_COUNT=\$(fc-list | grep -i tahoma | wc -l)
+          echo "Available fonts: Arial (\$ARIAL_COUNT), Segoe UI (\$SEGOE_COUNT), Tahoma (\$TAHOMA_COUNT)"
+      fi
+
+      echo "=== TN Fonts installation completed successfully ==="
+      echo "============================================"
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/postinst
+    # Генерация prerm
+    - |
+      cat << EOF > deb-fonts/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for TN Fonts"
+      echo "============================================"
+
+      # Проверка использования другими пакетами
+      if dpkg -l | grep -q "tn\.doc"; then
+          echo "WARNING: TN_Doc packages are installed and may use these fonts"
+          echo "Documents may not render correctly after font removal"
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/prerm
+    # Генерация postrm
+    - |
+      cat << EOF > deb-fonts/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-removal script for TN Fonts"
+      echo "============================================"
+
+      if [ "\$1" = "purge" ]; then
+          echo "Purging TN fonts installation..."
+          
+          # Удаление остатков шрифтов (если остались)
+          for font_dir in "/usr/share/fonts/arial" "/usr/share/fonts/segoe ui" "/usr/share/fonts/tahoma"; do
+              if [ -d "\$font_dir" ]; then
+                  echo "Removing font directory: \$font_dir"
+                  rm -rf "\$font_dir"
+                  if [ \$? -eq 0 ]; then
+                      echo "✓ Successfully removed \$font_dir"
+                  else
+                      echo "! WARNING: Failed to remove \$font_dir"
+                  fi
+              fi
+          done
+          
+          # Обновление кэша шрифтов после удаления
+          echo "Updating font cache after removal..."
+          if command -v fc-cache >/dev/null 2>&1; then
+              fc-cache -f
+              echo "✓ Font cache updated"
+          fi
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/postrm
+    # Установка прав
+    - chmod 644 deb-fonts/DEBIAN/control
+    - find deb-fonts/usr/share/fonts -name "*.ttf" -exec chmod 644 {} \;
+    - find deb-fonts/usr/share/fonts -name "*.TTF" -exec chmod 644 {} \;
+    - echo "Creating fonts control.tar.xz..."
+    - tar -cJf control-fonts.tar.xz -C deb-fonts/DEBIAN .
+    - echo "Creating fonts data.tar.xz..."
+    - tar -cJf data-fonts.tar.xz -C deb-fonts --exclude=DEBIAN .
+    - echo "Creating fonts debian-binary..."
+    - echo "2.0" > debian-binary-fonts
+    - echo "Building fonts .deb package..."
+    - mkdir -p packages
+    - ar r ./packages/${DEB_NAME}_all.deb debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
+    - rm -f debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
+    - ls -l ./packages/${DEB_NAME}_all.deb
+    - echo "Current directory:$(pwd)"
+  artifacts:
+    name: "package-fonts-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
