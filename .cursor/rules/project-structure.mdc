@@ -1,0 +1,33 @@
+---
+alwaysApply: true
+---
+# Гид по структуре проекта
+
+Этот репозиторий содержит несколько решений на .NET и вспомогательные утилиты.
+
+- Основное веб-приложение ASP.NET Core: [TN_Doc/TN_Doc.csproj](mdc:TN_Doc/TN_Doc.csproj)
+  - Точка входа: [TN_Doc/Program.cs](mdc:TN_Doc/Program.cs) и [TN_Doc/Startup.cs](mdc:TN_Doc/Startup.cs)
+  - Контроллеры: [TN_Doc/Controllers/](mdc:TN_Doc/Controllers)
+  - Модели/сервисы: [TN_Doc/Models/](mdc:TN_Doc/Models)
+  - Представления: [TN_Doc/Views/](mdc:TN_Doc/Views)
+  - Статика: [TN_Doc/wwwroot/](mdc:TN_Doc/wwwroot)
+  - Конфигурация: [TN_Doc/appsettings.json](mdc:TN_Doc/appsettings.json), [TN_Doc/appsettings.Development.json](mdc:TN_Doc/appsettings.Development.json), [TN_Doc/nlog.config](mdc:TN_Doc/nlog.config)
+
+- Библиотека БД: [Ivk.DataBase](mdc:Ivk.DataBase)
+
+- Тесты: [Tests/Tests.csproj](mdc:Tests/Tests.csproj)
+  - Тесты контроллеров: [Tests/controllers](mdc:Tests/controllers)
+  - Тесты сервисов: [Tests/Services](mdc:Tests/Services)
+
+- Пакеты шаблонов/отчётов: [TN_Doc/Doc](mdc:TN_Doc/Doc), [TN_Doc/Cfg](mdc:TN_Doc/Cfg), [TN_Doc/DLL](mdc:TN_Doc/DLL)
+
+- Общие доменные библиотеки: [tn.docgeneral](mdc:tn.docgeneral)
+
+Рекомендации по навигации и изменению кода
+
+1. Перед изменениями ищите соответствующий контроллер в [TN_Doc/Controllers](mdc:TN_Doc/Controllers) и связанный сервис в [TN_Doc/Models/Services](mdc:TN_Doc/Models/Services).
+2. Конфигурацию новых зависимостей добавляйте в [TN_Doc/Startup.cs](mdc:TN_Doc/Startup.cs) и `appsettings.*.json`.
+3. Логирование настраивается через [TN_Doc/nlog.config](mdc:TN_Doc/nlog.config).
+4. При работе с отчётами проверяйте шаблоны в [TN_Doc/Doc](mdc:TN_Doc/Doc) и конфиги в [TN_Doc/Cfg](mdc:TN_Doc/Cfg).
+5. Для сборки и запуска используйте проект [TN_Doc.csproj](mdc:TN_Doc/TN_Doc.csproj).
+

@@ -1,0 +1,39 @@
+---
+globs: TN_Doc/**
+description: Правила для ASP.NET Core приложения TN_Doc
+---
+# TN_Doc (ASP.NET Core) — практические правила
+
+Роли файлов
+
+- Точка входа и DI: [TN_Doc/Program.cs](mdc:TN_Doc/Program.cs), [TN_Doc/Startup.cs](mdc:TN_Doc/Startup.cs)
+- Регистрация сервисов: [TN_Doc/Extensions/IServiceCollectionExtensions.cs](mdc:TN_Doc/Extensions/IServiceCollectionExtensions.cs)
+- Контроллеры: [TN_Doc/Controllers](mdc:TN_Doc/Controllers)
+- Конфиги: [TN_Doc/appsettings.json](mdc:TN_Doc/appsettings.json), [TN_Doc/appsettings.Development.json](mdc:TN_Doc/appsettings.Development.json), [TN_Doc/Config.xml](mdc:TN_Doc/Config.xml)
+- Логи: [TN_Doc/nlog.config](mdc:TN_Doc/nlog.config)
+
+Добавление нового эндпоинта
+
+1. Создайте экшен в соответствующем контроллере под бизнес-кейс.
+2. Внедрите сервис через конструктор (DI). Логику помещайте в `Models/Services`.
+3. Валидируйте входные данные. Возвращайте `IActionResult`/`ActionResult<T>`.
+4. Логи ошибок через NLog (`ILogger<T>`). Не глотайте исключения.
+
+Конфигурация
+
+- Все параметры — в `appsettings.*.json`. Секции связывайте через `IOptions<T>`.
+- Не храните секреты в репозитории. Используйте переменные среды/секреты.
+
+Работа с отчётами и печатью
+
+- Шаблоны: [TN_Doc/Doc](mdc:TN_Doc/Doc). Конфиги/макеты: [TN_Doc/Cfg](mdc:TN_Doc/Cfg).
+- Перед правками шаблонов делайте копию. Сохраняйте совместимость.
+
+Версионирование статических файлов
+
+- Помещайте ресурсы в [TN_Doc/wwwroot](mdc:TN_Doc/wwwroot). Учитывайте кэширование браузера.
+
+Трассировка и диагностика
+
+- Включайте подробные логи в Development, минимальные — в Production.
+

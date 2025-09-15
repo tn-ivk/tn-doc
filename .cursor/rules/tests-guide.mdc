@@ -1,0 +1,22 @@
+---
+globs: Tests/**
+description: Руководство по тестам в проекте
+---
+# Руководство по тестам
+
+Структура
+
+- Проект тестов: [Tests/Tests.csproj](mdc:Tests/Tests.csproj)
+- Категории: контроллеры — [Tests/controllers](mdc:Tests/controllers), сервисы — [Tests/Services](mdc:Tests/Services)
+
+Правила
+
+- Пишите независимые тесты (без скрытых зависимостей от окружения).
+- Используйте моки/фейки для внешних сервисов и БД.
+- Именование: `MethodName_WhenCondition_ThenExpectedResult`.
+- Покрывайте негативные сценарии и ошибки валидации.
+
+Запуск
+
+- Запускайте тесты стандартными инструментами .NET (`dotnet test`).
+
