@@ -6,11 +6,6 @@
     <div class="cont">
         <table class="mainTable">
             <tr>
-                <td class="topPanel" colspan="2">
-                    <!-- Top panel now empty, button moved to action panel -->
-                </td>
-            </tr>
-            <tr>
                 <td class="leftPanel">
                     <table class="filterTable">
                         <tr>
@@ -86,13 +81,13 @@
                                         <select id="ComboboxProtocolNumber">Номер протокола</select>
                                     </td>
                                     <td align="right" style="border: 1px none rgb(248, 2, 2)">
-                                        <input class="bExport" id="ButtonDictionaries" type="button" value="Справочники" data-toggle="modal" data-target="#modal-window"
-                                               data-backdrop="static" data-keyboard="false">
                                         <select id="ComboboxExportFormat">Экспорт</select>
                                         <input class="bExport" id="ButtonExport" type="button" value="Экспорт"
                                                onclick="ExportDoc()">
                                         <select id="ComboboxPrinterName">Принтер</select>
                                         <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
+                                        <input class="bExport" id="ButtonDictionaries" type="button" value="Справочники" data-toggle="modal" data-target="#modal-window"
+                                               data-backdrop="static" data-keyboard="false">
                                     </td>
                                 </table>
                             </td>
