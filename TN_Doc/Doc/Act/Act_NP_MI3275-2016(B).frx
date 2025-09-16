@@ -45,13 +45,7 @@ namespace FastReport
     #endregion
       
     private void Page_StartPage(object sender, EventArgs e)
-    {
-      //using (var sr = new StreamReader(&quot;C:/SVN/FastReport/Входящие данные от Алексея (классы и json)/11_Act/DocAct.json&quot;))
-      //{                                                                                          
-      // Read the stream as a string
-      //   Report.SetParameterValue(&quot;Act&quot;, sr.ReadToEnd());
-      //}
-      //// Десериализация данных (формат json) из входного параметра - Json                         
+    {                         
       string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
       Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
       settings.TypeNameHandling = TypeNameHandling.All;         
