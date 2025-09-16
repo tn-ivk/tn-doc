@@ -137,15 +137,26 @@ namespace FastReport
         TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
             
         // Fill TableAct with data
-        string shiftCountStr = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
-        if (!int.TryParse(shiftCountStr, out int shiftCount) || shiftCount &lt; 1)
-        shiftCount = 1;
-        double hoursPerShift = 24.0 / shiftCount;
-        
-        for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
+        string begin = string.Empty;
+        string end = string.Empty;
+        int samplingBeginTs = 0;
+        int samplingEndTs = 0;
+
+        for (int i = 0; i &lt; (listShiftsData.Count); i++)
         {
-          string begin = FormatTime(i * hoursPerShift);
-          string end = FormatTime((i + 1) * hoursPerShift);
+          begin = string.Empty;
+          end = string.Empty;
+          if(i &lt; DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT.Count)
+          {
+            samplingBeginTs = DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].Begin;
+            samplingEndTs = DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].End;
+          }
+
+          if(samplingBeginTs &gt; 0 &amp;&amp; samplingEndTs &gt; 0)
+          {
+            begin = tools.UnixTimestampToDatetime(samplingBeginTs).ToString(&quot;HH:mm&quot;);
+            end = tools.UnixTimestampToDatetime(samplingEndTs).ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;);
+          }
           TableAct[(2+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
           TableAct[(2+i),2].Text = $&quot;{begin}-{end}&quot;;            
           TableAct[(2+i),3].Text = $&quot;Смена {i+1}&quot;;            
@@ -184,17 +195,7 @@ namespace FastReport
       }
     }      
       
-    private string FormatTime(double totalHours)
-    {
-      int hours = (int)totalHours;
-      int minutes = (int)((totalHours - hours) * 60);
-
-      if (hours == 24)
-        return &quot;24:00&quot;;
-
-      return $&quot;{hours:00}:{minutes:00}&quot;;
-    }
-    
+        
     private void TableAdditionlInfo_ManualBuild(object sender, EventArgs e)
     {
       // Setup Last Column width
