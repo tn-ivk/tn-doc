@@ -69,6 +69,18 @@ dotnet test --filter "ClassName=AppConfigServiceTests"
 dotnet test /p:CollectCoverage=true
 ```
 
+#### Test Structure and Conventions
+- **Test Project**: `Tests/Tests.csproj` using NUnit framework with Moq for mocking
+- **Test Categories**:
+  - Controllers: `Tests/controllers/`
+  - Services: `Tests/Services/`
+- **Naming Convention**: `MethodName_WhenCondition_ThenExpectedResult`
+- **Test Rules**:
+  - Write independent tests without hidden environment dependencies
+  - Use mocks/fakes for external services and databases
+  - Cover negative scenarios and validation errors
+  - Follow AAA pattern: Arrange-Act-Assert
+
 ### Related Projects Setup
 The following projects must be deployed at the same level (all share TN_Doc configuration):
 - TN_KMH: `git clone http://192.168.100.100/orpovy/ivk/tn_kmh.git`
@@ -82,16 +94,26 @@ The following projects must be deployed at the same level (all share TN_Doc conf
 
 ### Solution Structure
 - **TN_Doc**: Main ASP.NET Core web application
+  - Entry point: `TN_Doc/Program.cs` and `TN_Doc/Startup.cs`
+  - Controllers: `TN_Doc/Controllers/`
+  - Models/Services: `TN_Doc/Models/`
+  - Views: `TN_Doc/Views/`
+  - Static files: `TN_Doc/wwwroot/`
+  - Configuration: `TN_Doc/appsettings.json`, `TN_Doc/nlog.config`
 - **TN.DocGeneral**: Core business logic and shared utilities
+- **Ivk.DataBase**: Database library
 - **tn.docgeneral/** (Document modules organized by type):
   - Individual document implementations (Passport, Poverka*, KMH*, Act, Report, Jornal)
   - Sikn425 modules in separate subfolder
   - Common modules for shared document logic
 - **Tests**: Unit tests using NUnit framework with Moq for mocking
+  - Controller tests: `Tests/controllers/`
+  - Service tests: `Tests/Services/`
 - **tn_toolsfastreport/TN_Tools**: FastReport utilities
 - **winprutil**: Go-based Windows printing utility
 - **Dll/**: Pre-compiled document module assemblies
 - **prutils/**: Contains winprutil.exe for Windows PDF printing
+- **Template/Config packages**: `TN_Doc/Doc/`, `TN_Doc/Cfg/`, `TN_Doc/DLL/`
 
 ### Document Module Pattern
 Each document type module implements a consistent pattern:
@@ -318,6 +340,21 @@ When working on specific document types:
 - Current working directory is on `develop` branch with many modified files
 
 ### Key Development Patterns
+
+#### Coding Conventions (C#)
+- **Naming**: `PascalCase` for types/methods, `camelCase` for private fields, `_camelCase` for private readonly fields
+- **API Design**: Explicitly annotate public APIs, avoid `dynamic`/`object` without justification
+- **Control Flow**: Prefer early returns, avoid deep nesting
+- **Error Handling**: Never suppress exceptions, log and return meaningful errors
+- **Dependencies**: Register in `Startup.cs`/`IServiceCollectionExtensions.cs`, bind settings via `IOptions<T>`
+- **Project Files**: Fix target frameworks and exact package versions in `*.csproj`
+
+#### ASP.NET Core Patterns
+- **New Endpoints**: Create actions in appropriate controllers, inject services via DI, place logic in `Models/Services`
+- **Validation**: Validate input data, return `IActionResult`/`ActionResult<T>`
+- **Logging**: Use NLog (`ILogger<T>`), detailed logs in Development, minimal in Production
+- **Configuration**: All parameters in `appsettings.*.json`, bind sections through `IOptions<T>`
+- **Static Files**: Place resources in `wwwroot/`, consider browser caching
 
 #### Dependency Injection Setup
 - **Singleton Services**: AppConfigService (thread-safe singleton pattern)
