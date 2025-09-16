@@ -56,15 +56,33 @@ function _renderAppDictionaries() {
      Дополнительно словари записываются в локальное хранилище
 */
 function _loadAppDictionaries() {
-    $.ajax({
-        async: false, url: dictFetchOptions.getUrlDir, type: dictFetchOptions.getMethod, success: function (data) {
-            appDictionaries = JSON.parse(data['dirJsonRaw'])
-            hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries)
-        }, error: function (xhr, ajaxOptions, thrownError) {
-            appDictionaries = {};
-            hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries)
-        }
-    })
+    logTrace('Начало загрузки словарей приложения');
+    try {
+        $.ajax({
+            async: false, url: dictFetchOptions.getUrlDir, type: dictFetchOptions.getMethod, success: function (data) {
+                try {
+                    appDictionaries = JSON.parse(data['dirJsonRaw']);
+                    hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+                    logInfo('Словари приложения успешно загружены');
+                    logDebug(`Загружено словарей: ${Object.keys(appDictionaries).length}, HashCode: ${hashCodeLoadedCodeDict}`);
+                } catch (parseError) {
+                    logError('Ошибка парсинга JSON данных словарей: ' + parseError.message);
+                    appDictionaries = {};
+                    hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+                    throw parseError;
+                }
+            }, error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка загрузки словарей приложения: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                appDictionaries = {};
+                hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+            }
+        });
+    } catch (error) {
+        logError('Критическая ошибка при загрузке словарей: ' + error.message);
+        appDictionaries = {};
+        hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+    }
 }
 
 /*
@@ -1565,15 +1583,33 @@ function _addSaveButtonHandler() {
    методов и параметров
 */
 function _loadQPConfigsDictionaries() {
-    $.ajax({
-        async: false, url: dictFetchOptions.getQpCfg, type: dictFetchOptions.getMethod, success: function (data) {
-            qpCfgsDictionaries = JSON.parse(data['qpCfgJsonRaw']);
-            hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
-        }, error: function (xhr, ajaxOptions, thrownError) {
-            appDictionaries = {};
-            hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
-        }
-    })
+    logTrace('Начало загрузки конфигураций паспортов качества');
+    try {
+        $.ajax({
+            async: false, url: dictFetchOptions.getQpCfg, type: dictFetchOptions.getMethod, success: function (data) {
+                try {
+                    qpCfgsDictionaries = JSON.parse(data['qpCfgJsonRaw']);
+                    hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+                    logInfo('Конфигурации паспортов качества успешно загружены');
+                    logDebug(`Загружено конфигураций QP: ${qpCfgsDictionaries?.QpsInfo?.length || 0}, HashCode: ${hashCodeLoadedQpConfigs}`);
+                } catch (parseError) {
+                    logError('Ошибка парсинга JSON данных конфигураций QP: ' + parseError.message);
+                    qpCfgsDictionaries = {};
+                    hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+                    throw parseError;
+                }
+            }, error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка загрузки конфигураций QP: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                qpCfgsDictionaries = {};
+                hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+            }
+        });
+    } catch (error) {
+        logError('Критическая ошибка при загрузке конфигураций QP: ' + error.message);
+        qpCfgsDictionaries = {};
+        hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+    }
 }
 
 
@@ -1644,38 +1680,73 @@ function _renderQpConfigs() {
  * @private
  */
 function _saveQpAndDict() {
-    $.ajax({
-        async: false,
-        url: dictFetchOptions.setUrlDir,
-        type: dictFetchOptions.setMethod,
-        contentType: 'application/json; charset=UTF-8',
-        data: JSON.stringify({
-            dirJsonRaw: JSON.stringify(appDictionaries)
-        }),
-        success: function () {
-            _reRenderUserAndLicTable();
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            appDictionaries = {};
-        },
-    });
+    logTrace('Начало сохранения словарей и конфигураций QP');
+    let dictSaveSuccess = false;
+    let qpSaveSuccess = false;
 
-    $.ajax({
-        async: false,
-        url: dictFetchOptions.setQpCfg,
-        type: dictFetchOptions.setMethod,
-        contentType: 'application/json; charset=UTF-8',
-        data: JSON.stringify({
-            qpCfgJsonRaw: JSON.stringify(qpCfgsDictionaries)
-        }),
-        error: function (xhr, ajaxOptions, thrownError) {
-            qpCfgsDictionaries = {};
+    try {
+        // Сохранение словарей приложения
+        logDebug('Сохранение словарей приложения на сервере');
+        $.ajax({
+            async: false,
+            url: dictFetchOptions.setUrlDir,
+            type: dictFetchOptions.setMethod,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify({
+                dirJsonRaw: JSON.stringify(appDictionaries)
+            }),
+            success: function () {
+                logInfo('Словари приложения успешно сохранены на сервере');
+                dictSaveSuccess = true;
+                _reRenderUserAndLicTable();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка сохранения словарей: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                appDictionaries = {};
+            },
+        });
 
-        },
+        // Сохранение конфигураций QP
+        logDebug('Сохранение конфигураций паспортов качества на сервере');
+        $.ajax({
+            async: false,
+            url: dictFetchOptions.setQpCfg,
+            type: dictFetchOptions.setMethod,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify({
+                qpCfgJsonRaw: JSON.stringify(qpCfgsDictionaries)
+            }),
+            success: function () {
+                logInfo('Конфигурации паспортов качества успешно сохранены на сервере');
+                qpSaveSuccess = true;
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка сохранения конфигураций QP: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                qpCfgsDictionaries = {};
+            },
+        });
 
-    });
-    hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
-    hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+        if (dictSaveSuccess && qpSaveSuccess) {
+            logInfo('Все данные справочников успешно сохранены');
+        } else if (dictSaveSuccess) {
+            logWarn('Словари сохранены, но конфигурации QP сохранить не удалось');
+        } else if (qpSaveSuccess) {
+            logWarn('Конфигурации QP сохранены, но словари сохранить не удалось');
+        } else {
+            logError('Не удалось сохранить ни словари, ни конфигурации QP');
+        }
+
+        // Обновление хэш-кодов после сохранения
+        hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+        hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+        logDebug(`Обновлены хэш-коды: Dict=${hashCodeLoadedCodeDict}, QP=${hashCodeLoadedQpConfigs}`);
+
+    } catch (error) {
+        logError('Критическая ошибка при сохранении справочников: ' + error.message);
+        throw error;
+    }
 }
 
 /*
@@ -1715,75 +1786,98 @@ function _addBtnToAddQp(qpId) {
     btnDiv.appendChild(btn);
 
     btn.addEventListener('click', function (event) {
-        let item = event.target;
-        if (event.target.tagName === "I" || event.target.tagName === "LABEL") {
-            item = event.target.closest('button');
-        }
-        let qpId = item.dataset.qpId;
-        
-        // Получаем текущий выбранный параметр
-        let currentParameterId = item.dataset.currentParameterId;
-        if (!currentParameterId) {
-            // Если параметр не установлен, берем первый доступный
-            let container = document.querySelector(`.methods-tables-container[data-qp-id="${qpId}"]`);
-            let selector = container ? container.parentElement.querySelector('.parameter-select') : null;
-            if (selector && selector.options.length > 0) {
-                currentParameterId = parseInt(selector.value);
+        try {
+            let item = event.target;
+            if (event.target.tagName === "I" || event.target.tagName === "LABEL") {
+                item = event.target.closest('button');
+            }
+            let qpId = item.dataset.qpId;
+            logTrace(`Добавление нового метода для QP ID: ${qpId}`);
+
+            // Получаем текущий выбранный параметр
+            let currentParameterId = item.dataset.currentParameterId;
+            if (!currentParameterId) {
+                // Если параметр не установлен, берем первый доступный
+                let container = document.querySelector(`.methods-tables-container[data-qp-id="${qpId}"]`);
+                let selector = container ? container.parentElement.querySelector('.parameter-select') : null;
+                if (selector && selector.options.length > 0) {
+                    currentParameterId = parseInt(selector.value);
+                    logDebug(`Выбран параметр по умолчанию: ${currentParameterId}`);
+                } else {
+                    logWarn('Нет доступных параметров для добавления метода');
+                    alert('Нет доступных параметров для добавления метода');
+                    return;
+                }
             } else {
-                alert('Нет доступных параметров для добавления метода');
+                logDebug(`Используется предустановленный параметр: ${currentParameterId}`);
+            }
+
+            let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0 ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
+                return accumId > curId ? accumId : curId;
+            }) ['Id'] : 1;
+
+            const newMethodId = maxId + 1;
+            logDebug(`Создание нового метода с ID: ${newMethodId}, для параметра: ${currentParameterId}`);
+
+            // Создаем новый метод с привязкой к текущему параметру
+            qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
+                Id: newMethodId,
+                Use: true, // По умолчанию активен
+                IdParameter: parseInt(currentParameterId),
+                Name: '',
+                LimitValueActivate: false,
+                LimitValue: 0,
+                LimitValueString: '',
+                IsDefault: false // Новое поле
+            });
+
+            logInfo(`Новый метод успешно добавлен: ID=${newMethodId}, Parameter=${currentParameterId}, Active=true`);
+
+            _clearQpsConfig();
+            _renderQpConfigs();
+
+            for (let liItem of document.querySelectorAll('#qp-list>li')) {
+                if (liItem.classList.contains('active')) {
+                    liItem.classList.remove('active');
+                }
+            }
+
+            for (let qpDirItem of document.querySelectorAll('.qp-dir-item')) {
+                if (!qpDirItem.classList.contains('d-none')) {
+                    qpDirItem.classList.add('d-none');
+                }
+            }
+
+            let li = document.querySelector('li[data-target="' + '#qpId' + item.dataset.qpId + '"]');
+            li.classList.add('active');
+            document.querySelector(li.dataset.target).classList.remove('d-none');
+
+            // Переключаемся на таблицу нужного параметра
+            _switchParameterTable(qpId, parseInt(currentParameterId));
+
+            // Находим текущую видимую таблицу и последнюю строку в ней
+            let visibleTable = document.querySelector(`[data-qp-id="${qpId}"] .parameter-table-wrapper:not(.d-none) table`);
+            if (!visibleTable) {
+                logWarn('Не удалось найти видимую таблицу для редактирования нового метода');
                 return;
             }
-        }
-        
-        let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0 ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
-            return accumId > curId ? accumId : curId;
-        }) ['Id'] : 1;
-        
-        // Создаем новый метод с привязкой к текущему параметру
-        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
-            Id: maxId + 1,
-            Use: true,
-            IdParameter: parseInt(currentParameterId),
-            Name: '',
-            LimitValueActivate: false,
-            LimitValue: 0,
-            LimitValueString: '',
-            IsDefault: false // Новое поле
-        });
 
-        _clearQpsConfig();
-        _renderQpConfigs();
-
-        for (let liItem of document.querySelectorAll('#qp-list>li')) {
-            if (liItem.classList.contains('active')) {
-                liItem.classList.remove('active');
+            let lastRow = visibleTable.lastChild;
+            let itemBtn = lastRow.querySelector('.edit-methods-btn');
+            if (!itemBtn || !lastRow) {
+                logWarn('Не удалось найти кнопку редактирования или строку для нового метода');
+                return;
             }
-        }
 
-        for (let qpDirItem of document.querySelectorAll('.qp-dir-item')) {
-            if (!qpDirItem.classList.contains('d-none')) {
-                qpDirItem.classList.add('d-none');
-            }
-        }
+            // Устанавливаем режим инициализации для новой строки
+            itemBtn.dataset.mode = 'init';
+            _editQpMethod(lastRow, itemBtn);
+            logDebug('Новый метод переведен в режим редактирования');
 
-        let li = document.querySelector('li[data-target="' + '#qpId' + item.dataset.qpId + '"]');
-        li.classList.add('active');
-        document.querySelector(li.dataset.target).classList.remove('d-none');
-        
-        // Переключаемся на таблицу нужного параметра
-        _switchParameterTable(qpId, parseInt(currentParameterId));
-        
-        // Находим текущую видимую таблицу и последнюю строку в ней
-        let visibleTable = document.querySelector(`[data-qp-id="${qpId}"] .parameter-table-wrapper:not(.d-none) table`);
-        if (!visibleTable) return;
-        
-        let lastRow = visibleTable.lastChild;
-        let itemBtn = lastRow.querySelector('.edit-methods-btn');
-        if (!itemBtn || !lastRow) return;
-        
-        // Устанавливаем режим инициализации для новой строки
-        itemBtn.dataset.mode = 'init';
-        _editQpMethod(lastRow, itemBtn);
+        } catch (error) {
+            logError('Ошибка при добавлении нового метода: ' + error.message);
+            throw error;
+        }
     });
 
     let img = document.createElement('i');
@@ -2107,15 +2201,38 @@ function _createEditQpMethodsBtn(faClass, buttonClass) {
     @param event - возникшее событие.
 */
 function _deleteQpMethodsBtnHandler(event) {
-    let row = event.target.closest('tr');
-    if (!row) return;
-    let table = row.closest('table');
-    if (!table) return;
-    let qpId = Number(table.dataset.qpId);
-    qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries["QpsInfo"][qpId]['Methods'].filter(function (item) {
-        return item["Id"] !== Number(row.dataset.id);
-    });
-    row.remove();
+    try {
+        let row = event.target.closest('tr');
+        if (!row) {
+            logWarn('Не удалось найти строку для удаления метода');
+            return;
+        }
+
+        let table = row.closest('table');
+        if (!table) {
+            logWarn('Не удалось найти таблицу для удаления метода');
+            return;
+        }
+
+        let qpId = Number(table.dataset.qpId);
+        let methodId = Number(row.dataset.id);
+
+        logTrace(`Удаление метода ID: ${methodId} для QP ID: ${qpId}`);
+
+        // Находим метод для логирования его названия перед удалением
+        let methodToDelete = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].find(m => m.Id === methodId);
+        let methodName = methodToDelete ? methodToDelete.Name || 'Без названия' : 'Неизвестно';
+
+        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries["QpsInfo"][qpId]['Methods'].filter(function (item) {
+            return item["Id"] !== methodId;
+        });
+
+        row.remove();
+        logInfo(`Метод успешно удален: ID=${methodId}, Name="${methodName}"`);
+
+    } catch (error) {
+        logError('Ошибка при удалении метода: ' + error.message);
+    }
 }
 
 /*
@@ -2123,18 +2240,31 @@ function _deleteQpMethodsBtnHandler(event) {
     @param event - возникшее событие.
 */
 function _editQpMethodBtnHandler(event) {
-    let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
-    let row = item.closest('tr');
-    if (!row) return;
-    
-    // Если это кнопка отмены, вызываем соответствующую функцию
-    if (item.classList.contains('cancel-edit-btn')) {
-        _cancelEditQpMethod(row, Number(row.dataset.id));
-        return;
+    try {
+        let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
+        let row = item.closest('tr');
+        if (!row) {
+            logWarn('Не удалось найти строку для редактирования метода');
+            return;
+        }
+
+        let methodId = Number(row.dataset.id);
+        logTrace(`Обработка действия редактирования для метода ID: ${methodId}`);
+
+        // Если это кнопка отмены, вызываем соответствующую функцию
+        if (item.classList.contains('cancel-edit-btn')) {
+            logDebug(`Отмена редактирования метода ID: ${methodId}`);
+            _cancelEditQpMethod(row, methodId);
+            return;
+        }
+
+        // В противном случае обрабатываем как обычное редактирование
+        logDebug(`Начало редактирования метода ID: ${methodId}`);
+        _editQpMethod(row, item);
+
+    } catch (error) {
+        logError('Ошибка в обработчике редактирования метода: ' + error.message);
     }
-    
-    // В противном случае обрабатываем как обычное редактирование
-    _editQpMethod(row, item);
 }
 
 /*
