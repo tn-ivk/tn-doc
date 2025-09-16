@@ -1,35 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(rg:*)",
-      "Bash(grep:*)",
-      "Bash(dotnet build:*)",
-      "Bash(xmllint:*)",
+      "Bash(wget:*)",
+      "Bash(sudo dpkg:*)",
+      "Bash(sudo apt-get:*)",
+      "Bash(sudo apt-get install:*)",
+      "Bash(dotnet run:*)",
+      "Bash(./TN_Doc:*)",
+      "Bash(chmod:*)",
+      "Bash(dotnet:*)",
       "Bash(python3:*)",
-      "Bash(find:*)",
-      "Bash(for:*)",
-      "Bash(do)",
-      "Bash(if [[ -f \"$file\" ]])",
-      "Bash(! grep -q \"orderby.*DateTimeLong\" \"$file\")",
-      "Bash(then)",
-      "Bash(echo \"Need to update: $file\")",
-      "Bash(fi)",
-      "Bash(done)",
-      "Bash(do if [[ -f \"$file\" ]])",
-      "Bash(then ! grep -q \"Запрос списка документов\" \"$file\")",
-      "Bash(do echo \"Processing: $file\")",
-      "Bash(echo \"=== ПРОВЕРКА: Сколько файлов уже имеют логирование ===\" find /mnt/c/dev/dotnet/ivk/tn_doc/tn.docgeneral -name \"*.cs\" -exec grep -l \"Запрос списка документов\" {})",
-      "Bash(echo \"=== ПРОВЕРКА: Сколько файлов ВСЕГО имеют GetList с параметрами UTBegin, UTEnd ===\" find /mnt/c/dev/dotnet/ivk/tn_doc/tn.docgeneral -name \"*.cs\" -exec grep -l \"GetList.*UTBegin.*UTEnd\" {})",
-      "Bash(echo \"=== ПОИСК МЕТОДОВ GetViewDoc ===\" find /mnt/c/dev/dotnet/ivk/tn_doc/tn.docgeneral -name \"*.cs\" -exec grep -l \"GetViewDoc.*int.*id\" {})",
-      "Bash(sed:*)",
-      "Bash(do if grep -q \"GetEditDoc.*int.*id\" \"$file\")",
-      "Bash(then if ! grep -q \"Получение данных для редактирования документа\" \"$file\")",
-      "Bash(then echo \"НУЖНО ОБНОВИТЬ: $file\")",
-      "Bash(do if grep -q \"SaveDoc.*string.*jsonData\" \"$file\")",
-      "Bash(then if ! grep -q \"Сохранение документа\" \"$file\")",
-      "Bash(do echo \"=== $file ===\")",
-      "Bash(dotnet test:*)"
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_install"
     ],
-    "deny": []
+    "deny": [],
+    "ask": []
   }
 }
