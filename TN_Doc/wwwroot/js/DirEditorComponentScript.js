@@ -1741,12 +1741,12 @@ function _addBtnToAddQp(qpId) {
         
         // Создаем новый метод с привязкой к текущему параметру
         qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
-            Id: maxId + 1, 
-            Use: false, 
-            IdParameter: parseInt(currentParameterId), 
-            Name: '', 
-            LimitValueActivate: false, 
-            LimitValue: 0, 
+            Id: maxId + 1,
+            Use: true,
+            IdParameter: parseInt(currentParameterId),
+            Name: '',
+            LimitValueActivate: false,
+            LimitValue: 0,
             LimitValueString: '',
             IsDefault: false // Новое поле
         });
