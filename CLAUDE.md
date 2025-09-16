@@ -328,6 +328,42 @@ When working on specific document types:
 - FastReport templates (.frx files) are binary - use FastReport Designer for editing
 - Pre-compiled modules available in `Dll/` directory
 
+#### Complete Document Libraries List (43 libraries)
+The system contains the following document libraries that require test coverage:
+
+**Core Documents (4)**:
+- Act - Acceptance acts
+- Passport - Quality passports
+- Jornal - Journals
+- Report - Reports
+
+**Verification Documents - Poverka (21)**:
+- Poverka1974, Poverka1974_04, Poverka1974_89, Poverka1974_95 - GOST R 8.1011-2022 standard
+- Poverka2816 - MI 2816 verification
+- Poverka3151 - GOST 3151 verification
+- Poverka3189 - GOST 3189 verification
+- Poverka3265_PR_PU, Poverka3265_UPR_PR, Poverka3265_UPR_PU - GOST 3265 verification
+- Poverka3266, Poverka3267, Poverka3272 - GOST 3266/3267/3272 verification
+- Poverka3287, Poverka3288 - GOST 3287/3288 verification
+- Poverka3312_PR_PU, Poverka3312_UPR_PR - GOST 3312 verification
+- Poverka3380 - GOST 3380 verification
+- PoverkaSikn425_PR_PR, PoverkaSikn425_PR_PU - SIKN-425 verification
+
+**Quality Control - KMH (14)**:
+- KMH3265_PR_PU, KMH3265_UPR_PR - GOST 3265 quality control
+- KMH3288_MPR_TPR - GOST 3288 mass/temperature quality control
+- KMH3312_PR_PU, KMH3312_UPR_PR - GOST 3312 quality control
+- KMH_MI2816 - MI 2816 quality control
+- KMH_MPR_MPR, KMH_MPR_PU, KMH_MPR_TPR - Mass/pressure/temperature control
+- KMH_PP, KMH_PP_Areom - Density control
+- KMH_PR_PR, KMH_PR_PU - Pressure control
+- KMH_PV - Volume control, KMH_PW - Mass control
+- KMX_Sikn425_PR_PR, KMX_Sikn425_PR_PU - SIKN-425 quality control
+
+**Common Libraries (3)**:
+- CommonPoverka1974 - Shared functionality for GOST R 8.1011-2022 documents
+- CommonSikn425 - Common SIKN-425 functionality
+
 ### Version Management
 - Version is centrally managed in `TN_Doc.csproj`
 - Changes are documented in `/TN_Doc/changes.md`
