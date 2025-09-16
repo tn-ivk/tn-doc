@@ -16,7 +16,9 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet run --urls=\"http://localhost:38509\")",
-      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet run --urls=\"http://localhost:38509\" --verbosity detailed)"
+      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet run --urls=\"http://localhost:38509\" --verbosity detailed)",
+      "Bash(find:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []
