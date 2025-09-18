@@ -1,25 +1,24 @@
-# План (каркас): редактирование документов типов Report и Jornal без добавления новых контроллеров
+# План (каркас): редактирование документов типов RKMH_PP без добавления новых контроллеров
 
 ## Цель
-Включить базовую возможность редактирования для документов типа `Report` и `Jornal`, переиспользуя имеющиеся подходы (как в `Act`/`Passport`) и существующие точки входа. Нужно дать возможность заполнять ФИО подписантов для этих документов.
+Включить базовую возможность редактирования для документов типа `Report` и `Jornal`, переиспользуя имеющиеся подходы (как в `KMH_PP`) и существующие точки входа. Нужно дать возможность заполнять ФИО подписантов для этих документов.
 
 ## Ограничения
-- Без новых контроллеров и маршрутов.
-- Встраиваемся в текущие экшены/страницы (расширяем их логику и представления).
-- Референс на существующий функционал редактирования в `Act`/`Passport`.
+- Новые контроллеры/маршруты не добавляются.
+- Расширяем текущие экшены и UI.
+- Используем подход, как в KMH_PP (GetEditDoc, SaveDoc).
 
-## Пример-эталон (KMH_PP)
-- Файл: `tn.docgeneral/KMH_PP/KMH_PP.cs`
-- Методы:
-  - `GetEditDoc(int id)`: формирует HTML на базе `wwwroot/HTML/DocEdit.html` (HtmlAgilityPack).
-  - `SaveDoc(string json)`: парсит JSON и сохраняет данные в соответствующие поля таблицы (через EF/SQL).
+## Эталон
+- tn.docgeneral/KMH_PP/KMH_PP.cs
+    - GetEditDoc(int id) → генерирует HTML из DocEdit.html.
+    - SaveDoc(string json) → сохраняет JSON в БД (DataARM).
 
-## Требования по доработкам
+## Доработки
 
 ### 1) Report (`tn.docgeneral/Report/DocReport.cs`)
 - Доработать `GetEditDoc(int id)`:
   - Вызвать `GetViewDoc(id)`.
-  - Загрузить `CfgEdit` для Report (`tn.docgeneral/Report/CfgEditReport.cs`, список `AdditionalInfo`).
+  - Список `AdditionalInfo` нужно формировать из существующего файла CfgReport. Логика формирования будет обсуждена отдельно.
   - Загрузить шаблон `PathToRootDirectory + "/wwwroot/HTML/DocEdit.html"`.
   - Сгенерировать строки полей (по `AdditionalInfo.Use == true`) и вставить в `#AdditionalInfo > tbody`.
   - Сохранить итог в `PathToRootDirectory + "/wwwroot/HTML/html.html"`.
@@ -30,12 +29,11 @@
     - Так как `TableReportData.DataARM` помечено `[NotMapped]`, использовать SQL:
       - `Database.ExecuteSqlRaw("UPDATE TableReport SET DataARM = {0} WHERE id = {1}", json, docId);`
   - Вернуть `true/false` по результату.
-- Метод `DocUpdate(json)` НЕ реализовывать.
 
 ### 2) Jornal (`tn.docgeneral/Jornal/DocJornal.cs`)
 - Доработать `GetEditDoc(int id)`:
   - Вызвать `GetViewDoc(id)`.
-  - Загрузить `CfgEdit` для Jornal (добавить `tn.docgeneral/Jornal/CfgEditJornal.cs` по аналогии с Report: `List<DataARM> AdditionalInfo`).
+  - ЗСписок `AdditionalInfo` нужно формировать из существующего файла CfgReport. Логика формирования будет обсуждена отдельно.
   - Загрузить шаблон `PathToRootDirectory + "/wwwroot/HTML/DocEdit.html"`.
   - Сгенерировать поля и вставить в `#AdditionalInfo > tbody`.
   - Сохранить в `PathToRootDirectory + "/wwwroot/HTML/html.html"`.
@@ -47,7 +45,6 @@
     - `Entry(row).Property(x => x.DataARM).IsModified = true;`
     - `SaveChanges();`
   - Вернуть `true`.
-- Метод `DocUpdate(json)` НЕ реализовывать.
 
 ## Проверка существования колонки DataARM (однократно, с кэшированием)
 
@@ -77,7 +74,6 @@
       - Передать `canEdit` в представление для показа/скрытия переключателя “Просмотр/Редактирование”
 - **Связь с модулями**:
   - Модули `Report`/`Jornal` не делают проверку каждый раз.
-  - Редактор и `SaveDoc` вызываются только если `canEdit == true`.
 
 ### Обработка ошибок и деградация
 
@@ -94,26 +90,11 @@
   - `bool HasDataArm(...) { if (!_cache.TryGetValue(key, out var v)) { v = CheckWithDBtService(...); _cache[key] = v; } return v; }`
 
 
-## Проверка наличия DataARM и UI
-- Редактирование возможно только если в БД есть колонка `DataARM`.
-  - Для Jornal: колонка есть (`TableMeasurementJornalData.DataARM`).
-  - Для Report: колонка может быть в БД, но свойство в модели `[NotMapped]`; запись — через SQL.
-- Проверку наличия `DataARM` выполнять единожды на устройство (кэшировать результат), чтобы показывать/скрывать переключатель “Просмотр/Редактирование”.
-- Без новых контроллеров: использовать существующие `HomeController.GetDocEdit` и `HomeController.SaveDoc`.
-
 ## Пошаговая реализация
-1) Report:
-   - Заполнить `GetEditDoc(id)` согласно описанию.
-   - Реализовать `SaveDoc(json)` — запись JSON в `TableReport.DataARM` через `ExecuteSqlRaw`.
-2) Jornal:
-   - Добавить `Jornal/CfgEditJornal.cs` с `List<DataARM> AdditionalInfo`.
-   - Заполнить `GetEditDoc(id)` как для Report.
-   - Реализовать `SaveDoc(json)` — EF-обновление `DataARM`.
-3) UI:
-   - Переиспользовать `wwwroot/HTML/DocEdit.html` и текущий переключатель “Просмотр/Редактирование”.
-   - Форма сохранения дергает уже существующий `SaveDoc(...)`.
-4) Проверка схемы:
-   - Одноразовая проверка наличия `DataARM` и кэширование результата для показа/скрытия режима редактирования.
+1) Report: реализовать GetEditDoc и SaveDoc.
+2) Jornal: реализовать GetEditDoc и SaveDoc.
+3) UI: использовать DocEdit.html и текущий переключатель “Просмотр/Редактирование”.
+4) Проверка схемы: внедрить IDbSchemaCache, кэшировать наличие DataARM.
 
 ## Критерии приемки
 - Для `Report` и `Jornal`:
