@@ -810,7 +810,6 @@ function GetData() {
             },
             complete: function (data) {
                 if ($('#ComboboxDocGUID').val() == 0 ||
-                    $('#ComboboxDocGUID').val() == 3 ||
                     $('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
                     isEditingDoc = false;
