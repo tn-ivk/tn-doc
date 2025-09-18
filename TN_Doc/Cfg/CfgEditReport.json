@@ -1,0 +1,36 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryFIO1",
+      "Type": "text",
+      "Name": "Сдающая сторона - ФИО 1"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryFIO2",
+      "Type": "text",
+      "Name": "Сдающая сторона - ФИО 2"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": true,
+      "Key": "ReceiveFIO1",
+      "Type": "text",
+      "Name": "Принимающая сторона - ФИО 1"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": true,
+      "Key": "ReceiveFIO2",
+      "Type": "text",
+      "Name": "Принимающая сторона - ФИО 2"
+    }
+  ]
+}
