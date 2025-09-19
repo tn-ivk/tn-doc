@@ -809,8 +809,7 @@ function GetData() {
                 ret = [];
             },
             complete: function (data) {
-                if ($('#ComboboxDocGUID').val() == 0 ||
-                    $('#ComboboxDocGUID').val() == 32) {
+                if ($('#ComboboxDocGUID').val() == 32) {
                     $('#ButtonSave').prop('disabled', true);
                     isEditingDoc = false;
                     $('#viewModeButton').prop('hidden', true);
