@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Report.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="06/18/2021 09:21:52" ReportInfo.Modified="09/19/2025 17:47:26" ReportInfo.CreatorVersion="2025.2.8.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Report.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="06/18/2021 09:21:52" ReportInfo.Modified="09/22/2025 01:31:46" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -518,6 +518,8 @@ namespace FastReport
         RowDelivePost2.Visible=delivery.ShowSigner[reportID].Visible;
         if(dataArm != null)
           DeliveryIOF.Text = dataArm.AdditionalData.DeliveryIOF;
+        else
+          DeliveryIOF.Text = string.Empty;
       }
       var receive = signers.FirstOrDefault(x =&gt; x.Key == &quot;ReceiveIOF&quot;);
       if(receive != null)
@@ -527,6 +529,8 @@ namespace FastReport
         RowReceivePost2.Visible=receive.ShowSigner[reportID].Visible;
         if(dataArm != null)
           ReceiveIOF.Text = dataArm.AdditionalData.ReceiveIOF;
+        else
+          ReceiveIOF.Text = string.Empty;
       }
       var oper = signers.FirstOrDefault(x =&gt; x.Key == &quot;OperatorIOF&quot;);
       if(oper != null)
@@ -536,6 +540,8 @@ namespace FastReport
         RowOperator2.Visible=oper.ShowSigner[reportID].Visible;
         if(dataArm != null)
           OperatorIOF.Text = dataArm.AdditionalData.OperatorIOF;
+        else
+          OperatorIOF.Text = string.Empty;
       }
   
       TableSigners.Rows[1].Visible = isIllegalTimeResult;  
