@@ -39,6 +39,12 @@ public static class ServiceCollectionExtensions
 	public static void AddPrinterService(this IServiceCollection services) => services.AddTransient<IPrinterService, PrinterService>();
 
 	/// <summary>
+	/// Добавление сервиса кэширования схемы базы данных
+	/// </summary>
+	/// <param name="services">Коллекция сервисов</param>
+	public static void AddDbSchemaCache(this IServiceCollection services) => services.AddScoped<IDbSchemaCache, DbSchemaCache>();
+
+	/// <summary>
 	/// Сбор информации о приложение
 	/// </summary>
 	/// <param name="services">Коллекция сервисов</param>
