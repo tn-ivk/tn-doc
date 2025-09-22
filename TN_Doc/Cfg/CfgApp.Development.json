@@ -1119,7 +1119,7 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.90.39",
+          "Server": "192.168.233.101",
           "Userid": "user",
           "Password": "$1$83F+qTyYmHOfVHKPsApmT1xgFnO64A/lEkxNn9k8VKs=",
           "Database": "IVK_TN_01",
@@ -1147,7 +1147,7 @@
       },
       "UsedProcedureTypePR": null,
       "OpcConnectionSettings": {
-        "Type": 1,
+        "Type": 0,
         "DaSettings": {
           "StartPrefix": "Root.PLC1.IVK_TN_01",
           "Host": "localhost",

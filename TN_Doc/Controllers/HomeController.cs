@@ -572,17 +572,16 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public IActionResult CanEditDocument(int idDevice, int idDoc)
+    public IActionResult CanEditDocument(int idDevice, IdDoc idDoc)
     {
         _logger.LogDebug($"Проверка возможности редактирования документа {idDoc} для устройства {_appConfig.GetDeviceName(idDevice)}");
         try
         {
-            var idDocEnum = (IdDoc)idDoc;
-
-            var canEdit = idDocEnum switch
+            var canEdit = idDoc switch
             {
-                IdDoc.Report => _dbSchemaCache.HasDataArm(idDevice, idDocEnum),
+                IdDoc.Report => _dbSchemaCache.HasDataArm(idDevice, idDoc),
                 IdDoc.ReportIncomplete => false,
+                IdDoc.Jornal => _dbSchemaCache.HasDataArm(idDevice, idDoc),
                 _ => true
             }; 
             
