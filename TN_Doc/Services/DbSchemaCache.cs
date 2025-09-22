@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using TN_DocGeneral.Services;
@@ -75,25 +74,6 @@ public class DbSchemaCache : IDbSchemaCache
             _logger.LogError(ex, $"Ошибка при проверке схемы БД для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}");
             return false;
         }
-    }
-
-    public void ClearCache()
-    {
-        var count = _cache.Count;
-        _cache.Clear();
-        _logger.LogDebug($"Кэш схемы БД очищен. Удалено {count} записей");
-    }
-
-    public Dictionary<string, object> GetCacheStats()
-    {
-        return new Dictionary<string, object>
-        {
-            ["CacheSize"] = _cache.Count,
-            ["CachedEntries"] = _cache.ToDictionary(
-                kvp => $"Device{kvp.Key.deviceId}_{kvp.Key.tableName}",
-                kvp => kvp.Value
-            )
-        };
     }
 
     private string GetTableName(IdDoc idDoc)
