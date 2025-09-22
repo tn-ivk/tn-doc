@@ -201,6 +201,33 @@ public class DbSchemaCacheTests
     }
 
     /// <summary>
+    /// HasDataArm: второй вызов логирует получение из кэша
+    /// </summary>
+    [Test]
+    public void HasDataArm_SecondCall_LogsFromCache()
+    {
+        // Arrange
+        _mockAppConfigService.Setup(x => x.GetDeviceCfg(1))
+            .Returns(_cfgApp.Devices.First(d => d.IdDevice == 1));
+        
+        // Act - первый вызов (заполняет кэш)
+        _dbSchemaCache.HasDataArm(1, IdDoc.Report);
+        
+        // Act - второй вызов (должен брать из кэша)
+        _dbSchemaCache.HasDataArm(1, IdDoc.Report);
+
+        // Assert - проверяем, что второй вызов логирует получение из кэша
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Trace,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Результат из кэша")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
+    }
+
+    /// <summary>
     /// HasDataArm: разные устройства кэшируются отдельно
     /// </summary>
     [Test]
@@ -362,6 +389,15 @@ public class DbSchemaCacheTests
                 LogLevel.Debug,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Проверка наличия колонки DataARM для устройства")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
+            
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Debug,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Значение не найдено в кэше, выполняется проверка БД")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.Once);
@@ -587,7 +623,7 @@ public class DbSchemaCacheTests
         
         _mockLogger.Verify(
             x => x.Log(
-                LogLevel.Information,
+                LogLevel.Debug,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Кэш схемы БД очищен")),
                 It.IsAny<Exception>(),

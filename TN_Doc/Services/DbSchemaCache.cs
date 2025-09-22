@@ -34,8 +34,17 @@ public class DbSchemaCache : IDbSchemaCache
 
         var key = (deviceId, tableName);
         
+        // Проверяем, есть ли значение в кэше
+        if (_cache.TryGetValue(key, out var cachedResult))
+        {
+            _logger.LogTrace($"Результат из кэша: устройство {_appConfigService.GetDeviceName(deviceId)}, таблица {tableName}, DataARM: {cachedResult}");
+            return cachedResult;
+        }
+        
         // Ленивая инициализация: проверяем только нужную таблицу для нужного устройства
-        var result = _cache.GetOrAdd(key, _ => CheckDataArmExists(deviceId, tableName));
+        _logger.LogDebug($"Значение не найдено в кэше, выполняется проверка БД для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}");
+        var result = CheckDataArmExists(deviceId, tableName);
+        _cache.TryAdd(key, result);
         
         _logger.LogTrace($"Результат проверки DataARM для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}: {result}");
         return result;
