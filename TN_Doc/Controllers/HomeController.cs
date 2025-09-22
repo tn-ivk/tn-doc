@@ -585,12 +585,12 @@ public class HomeController : Controller
                 _ => true
             }; 
             
-            _logger.LogTrace($"Результат проверки наличия DataARM для документа {idDoc}: {canEdit}");
+            _logger.LogTrace($"Результат возможности редактирования документа {idDoc}: {canEdit}");
             return Json(new { canEdit = canEdit });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ошибка проверки возможности редактирования документа {idDoc} для устройства {idDevice}");
+            _logger.LogError(ex, $"Ошибка проверки возможности редактирования документа {idDoc} для устройства {_appConfig.GetDeviceName(idDevice)}");
             return Json(new { canEdit = true });
         }
     }
