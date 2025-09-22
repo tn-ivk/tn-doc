@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TN_Doc.Models.Services;
+namespace TN_Doc.Services;
 
 /// <summary>
 /// Интерфейс сервиса для взаимодействия с принтерами

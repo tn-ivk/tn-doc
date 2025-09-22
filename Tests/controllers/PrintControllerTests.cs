@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using TN_Doc.Controllers;
-using TN_Doc.Models.Services;
+using TN_Doc.Services;
 
 namespace Tests.Controllers;
 

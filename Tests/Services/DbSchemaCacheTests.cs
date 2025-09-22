@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using TN.DocData;
-using TN_Doc.Models.Services;
-using TN_DocGeneral.Models;
+using TN_Doc.Services;
 using TN_DocGeneral.Services;
 
 namespace Tests.Services;

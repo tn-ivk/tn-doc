@@ -4,7 +4,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using TN_Doc.Models.Printer;
-using TN_Doc.Models.Services;
+using TN_Doc.Services;
 using TN.Utils;
 
 namespace TN_Doc.Extensions;

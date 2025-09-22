@@ -1,6 +1,6 @@
 using TN.DocData;
 
-namespace TN_Doc.Models.Services;
+namespace TN_Doc.Services;
 
 public interface IDbSchemaCache
 {
