@@ -10,7 +10,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Models;
