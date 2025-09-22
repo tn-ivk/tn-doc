@@ -40,7 +40,6 @@ var table = null;
 var currentId = null;
 var docTemplates = {};
 let isViewing = false;
-let isEditingDoc = false;
 let isShowEditAndSave = true;
 let isAllowEditAndSave = true;
 
@@ -760,10 +759,7 @@ function InitElement() {
         InitTemplatesDoc();
         InitProtocolNumber();
         
-        // Проверяем возможность редактирования для нового типа документа
-        const canEdit = await checkCanEditDocument();
-        $('#viewModeButton').prop('hidden', !canEdit);
-        
+        $('#viewModeButton').prop('hidden', true);
         updateSaveBtnText();
     });
     $('#ComboboxTemplateDoc').change(function () {
@@ -812,19 +808,6 @@ function GetData() {
                 ret = [];
             },
             complete: async function (data) {
-                if ($('#ComboboxDocGUID').val() == 32) {
-                    $('#ButtonSave').prop('disabled', true);
-                    isEditingDoc = false;
-                    $('#viewModeButton').prop('hidden', true);
-                } else {
-                    $('#ButtonSave').prop('disabled', false);
-                    isEditingDoc = true;
-                    
-                    // Проверяем возможность редактирования для текущего типа документа
-                    const canEdit = await checkCanEditDocument();
-                    $('#viewModeButton').prop('hidden', !canEdit);
-                }
-
                 if ($('#ComboboxDocGUID').val() == 1) {
                     $('#ButtonElis').prop('hidden', !IsUsedElis);
                 } else
@@ -860,14 +843,12 @@ async function GetDoc() {
                 $('#editPanel').prop('hidden', true);
                 isViewing = true;
                 
-                if(isEditingDoc) {
-                    // Проверяем возможность редактирования
-                    const canEdit = await checkCanEditDocument();
-                    $('#viewModeButton')
-                        .prop('value', 'Редактирование')
-                        .prop('hidden', !canEdit)
-                        .prop('disabled', !isAllowEditAndSave);
-                }
+                const canEdit = await checkCanEditDocument();
+                $('#viewModeButton')
+                    .prop('value', 'Редактирование')
+                    .prop('hidden', !canEdit)
+                    .prop('disabled', !isAllowEditAndSave);
+                $('#ButtonSave').prop('disabled', !canEdit);
             },
         });
 }
@@ -898,8 +879,7 @@ function GetEditDoc() {
         });
     
     isViewing = false;
-    $('#viewModeButton').prop('hidden', false)
-        .prop('value', '     Просмотр     ');
+    $('#viewModeButton').prop('value', '     Просмотр     ');
 }
 
 async function SaveDoc() {
