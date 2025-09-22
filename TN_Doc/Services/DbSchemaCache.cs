@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using TN_DocGeneral.Services;
@@ -27,12 +28,15 @@ public class DbSchemaCache : IDbSchemaCache
         var tableName = GetTableName(idDoc);
         if (string.IsNullOrEmpty(tableName))
         {
-            _logger.LogTrace("Документ {IdDoc} не поддерживает проверку DataARM", idDoc);
+            _logger.LogTrace($"Документ {idDoc} не поддерживает проверку DataARM");
             return false;
         }
 
         var key = (deviceId, tableName);
+        
+        // Ленивая инициализация: проверяем только нужную таблицу для нужного устройства
         var result = _cache.GetOrAdd(key, _ => CheckDataArmExists(deviceId, tableName));
+        
         _logger.LogTrace($"Результат проверки DataARM для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}: {result}");
         return result;
     }
@@ -62,6 +66,25 @@ public class DbSchemaCache : IDbSchemaCache
             _logger.LogError(ex, $"Ошибка при проверке схемы БД для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}");
             return false;
         }
+    }
+
+    public void ClearCache()
+    {
+        var count = _cache.Count;
+        _cache.Clear();
+        _logger.LogDebug($"Кэш схемы БД очищен. Удалено {count} записей");
+    }
+
+    public Dictionary<string, object> GetCacheStats()
+    {
+        return new Dictionary<string, object>
+        {
+            ["CacheSize"] = _cache.Count,
+            ["CachedEntries"] = _cache.ToDictionary(
+                kvp => $"Device{kvp.Key.deviceId}_{kvp.Key.tableName}",
+                kvp => kvp.Value
+            )
+        };
     }
 
     private string GetTableName(IdDoc idDoc)

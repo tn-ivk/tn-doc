@@ -563,4 +563,78 @@ public class DbSchemaCacheTests
     }
 
     #endregion
+
+    #region ClearCache Tests
+
+    /// <summary>
+    /// ClearCache: очищает кэш и логирует количество удаленных записей
+    /// </summary>
+    [Test]
+    public void ClearCache_EmptiesCacheAndLogsCount()
+    {
+        // Arrange - добавляем данные в кэш
+        _mockAppConfigService.Setup(x => x.GetDeviceCfg(1))
+            .Returns(_cfgApp.Devices.First(d => d.IdDevice == 1));
+        
+        _dbSchemaCache.HasDataArm(1, IdDoc.Report); // Это добавит запись в кэш
+        
+        // Act
+        _dbSchemaCache.ClearCache();
+
+        // Assert
+        var stats = _dbSchemaCache.GetCacheStats();
+        Assert.That((int)stats["CacheSize"], Is.EqualTo(0));
+        
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Кэш схемы БД очищен")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
+    }
+
+    #endregion
+
+    #region GetCacheStats Tests
+
+    /// <summary>
+    /// GetCacheStats: возвращает корректную статистику кэша
+    /// </summary>
+    [Test]
+    public void GetCacheStats_ReturnsCorrectStatistics()
+    {
+        // Act
+        var stats = _dbSchemaCache.GetCacheStats();
+
+        // Assert
+        Assert.That(stats, Is.Not.Null);
+        Assert.That(stats.ContainsKey("CacheSize"), Is.True);
+        Assert.That(stats.ContainsKey("CachedEntries"), Is.True);
+        Assert.That((int)stats["CacheSize"], Is.EqualTo(0));
+    }
+
+    /// <summary>
+    /// GetCacheStats: после добавления данных в кэш возвращает актуальную статистику
+    /// </summary>
+    [Test]
+    public void GetCacheStats_AfterCacheOperations_ReturnsUpdatedStatistics()
+    {
+        // Arrange
+        _mockAppConfigService.Setup(x => x.GetDeviceCfg(1))
+            .Returns(_cfgApp.Devices.First(d => d.IdDevice == 1));
+        
+        // Act - добавляем данные в кэш
+        _dbSchemaCache.HasDataArm(1, IdDoc.Report);
+        var stats = _dbSchemaCache.GetCacheStats();
+
+        // Assert
+        Assert.That((int)stats["CacheSize"], Is.GreaterThanOrEqualTo(0));
+        
+        var cachedEntries = stats["CachedEntries"] as Dictionary<string, object>;
+        Assert.That(cachedEntries, Is.Not.Null);
+    }
+
+    #endregion
 }

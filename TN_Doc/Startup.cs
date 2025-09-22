@@ -52,7 +52,7 @@ public class Startup
 		services.AddPrinterService();
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
-		services.AddScoped<IDbSchemaCache, DbSchemaCache>();
+		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
