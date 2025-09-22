@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
 using TN_Doc.Extensions;
-using TN_Doc.Models.Services;
+using TN_Doc.Services;
 using TN.Doc;
 using TN_DocGeneral.Services;
 
@@ -52,6 +52,7 @@ public class Startup
 		services.AddPrinterService();
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
+		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
