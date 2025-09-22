@@ -22,7 +22,7 @@ public class DbSchemaCache : IDbSchemaCache
 
     public bool HasDataArm(int deviceId, IdDoc idDoc)
     {
-        _logger.LogDebug($"Проверка наличия колонки DataARM для устройства {deviceId}, документа {idDoc}");
+        _logger.LogDebug($"Проверка наличия колонки DataARM для устройства {_appConfigService.GetDeviceName(deviceId)}, документа {idDoc}");
         
         var tableName = GetTableName(idDoc);
         if (string.IsNullOrEmpty(tableName))
@@ -33,7 +33,7 @@ public class DbSchemaCache : IDbSchemaCache
 
         var key = (deviceId, tableName);
         var result = _cache.GetOrAdd(key, _ => CheckDataArmExists(deviceId, tableName));
-        _logger.LogTrace($"Результат проверки DataARM для устройства {deviceId}, таблицы {tableName}: {result}");
+        _logger.LogTrace($"Результат проверки DataARM для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}: {result}");
         return result;
     }
 
@@ -41,12 +41,12 @@ public class DbSchemaCache : IDbSchemaCache
     {
         try
         {
-            _logger.LogDebug($"Выполнение проверки схемы БД для устройства {deviceId}, таблицы {tableName}");
+            _logger.LogDebug($"Выполнение проверки схемы БД для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}");
             
             var cfgDevice = _appConfigService.GetDeviceCfg(deviceId);
             if (cfgDevice?.DBConnectionStrings == null || !cfgDevice.DBConnectionStrings.Any(x => x.Use))
             {
-                _logger.LogWarning($"Устройство {deviceId} не имеет активных подключений к БД");
+                _logger.LogWarning($"Устройство {_appConfigService.GetDeviceName(deviceId)} не имеет активных подключений к БД");
                 return false;
             }
 
@@ -54,12 +54,12 @@ public class DbSchemaCache : IDbSchemaCache
             var fields = dbService.GetTableInfo(tableName);
 
             var hasDataArm = fields.Any(f => string.Equals(f.Field, "DataARM", StringComparison.OrdinalIgnoreCase));
-            _logger.LogTrace($"Проверка схемы БД завершена: устройство {deviceId}, таблица {tableName}, наличие DataARM: {hasDataArm}");
+            _logger.LogTrace($"Проверка схемы БД завершена: устройство {_appConfigService.GetDeviceName(deviceId)}, таблица {tableName}, наличие DataARM: {hasDataArm}");
             return hasDataArm;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ошибка при проверке схемы БД для устройства {deviceId}, таблицы {tableName}");
+            _logger.LogError(ex, $"Ошибка при проверке схемы БД для устройства {_appConfigService.GetDeviceName(deviceId)}, таблицы {tableName}");
             return false;
         }
     }
