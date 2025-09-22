@@ -11,6 +11,7 @@ using NUnit.Framework;
 using TN.Doc;
 using TN.DocData;
 using TN_Doc.Controllers;
+using TN_Doc.Models.Services;
 using TN_DocGeneral.Models;
 using TN_DocGeneral.Services;
 using TN.Utils;
@@ -29,6 +30,7 @@ public class HomeControllerTests
     private Mock<IDocModuleLoader> _mockDocModuleLoader;
     private Mock<DocGeneral> _mockDocGeneral;
     private Mock<IAppConfigService> _mockAppConfig;
+    private Mock<IDbSchemaCache> _mockDbSchemaCache;
     private DbContextOptions<DocGeneral> _dbOptions;
     private HomeController _controller;
     private CfgApp _cfgApp;
@@ -177,6 +179,7 @@ public class HomeControllerTests
         _mockDocModuleLoader = new Mock<IDocModuleLoader>();
         _mockDocGeneral = new Mock<DocGeneral>();
         _mockAppConfig = new Mock<IAppConfigService>();
+        _mockDbSchemaCache = new Mock<IDbSchemaCache>();
         
         _dbOptions = new DbContextOptionsBuilder<DocGeneral>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
@@ -213,7 +216,7 @@ public class HomeControllerTests
         CfgFileRW.SaveCfg(cfgAppPath, _cfgApp);
         
         // Mock AppConfigService.GetInstance для статического вызова
-        _controller = new HomeController(_mockLogger.Object, _dbOptions, _mockReportBuffer.Object, _mockDocModuleLoader.Object, _mockAppConfig.Object);
+        _controller = new HomeController(_mockLogger.Object, _dbOptions, _mockReportBuffer.Object, _mockDocModuleLoader.Object, _mockAppConfig.Object, _mockDbSchemaCache.Object);
     }
 
     #region GetListDevices Tests
@@ -1163,6 +1166,195 @@ public class HomeControllerTests
         // Assert
         Assert.That(result, Does.StartWith("0x"));
         Assert.That(result, Is.EqualTo("0x4869")); // "Hi" в UTF-8: H=0x48, i=0x69
+    }
+
+    #endregion
+
+    #region CanEditDocument Tests
+
+    /// <summary>
+    /// CanEditDocument: для Report с DataARM - возвращает true
+    /// </summary>
+    [Test]
+    public void CanEditDocument_ReportWithDataArm_ReturnsTrue()
+    {
+        // Arrange
+        _mockDbSchemaCache.Setup(x => x.HasDataArm(1, IdDoc.Report)).Returns(true);
+        
+        // Act
+        var result = _controller.CanEditDocument(1, IdDoc.Report);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.JsonResult>());
+        var jsonResult = result as Microsoft.AspNetCore.Mvc.JsonResult;
+        var resultData = jsonResult.Value;
+        
+        // Проверяем структуру JSON ответа
+        var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(resultData);
+        var parsed = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(jsonString);
+        Assert.That((bool)parsed.canEdit, Is.True);
+        
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Debug,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Проверка возможности редактирования документа")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
+    }
+
+    /// <summary>
+    /// CanEditDocument: для Report без DataARM - возвращает false
+    /// </summary>
+    [Test]
+    public void CanEditDocument_ReportWithoutDataArm_ReturnsFalse()
+    {
+        // Arrange
+        _mockDbSchemaCache.Setup(x => x.HasDataArm(1, IdDoc.Report)).Returns(false);
+        
+        // Act
+        var result = _controller.CanEditDocument(1, IdDoc.Report);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.JsonResult>());
+        var jsonResult = result as Microsoft.AspNetCore.Mvc.JsonResult;
+        var resultData = jsonResult.Value;
+        
+        var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(resultData);
+        var parsed = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(jsonString);
+        Assert.That((bool)parsed.canEdit, Is.False);
+    }
+
+    /// <summary>
+    /// CanEditDocument: для Jornal с DataARM - возвращает true
+    /// </summary>
+    [Test]
+    public void CanEditDocument_JornalWithDataArm_ReturnsTrue()
+    {
+        // Arrange
+        _mockDbSchemaCache.Setup(x => x.HasDataArm(1, IdDoc.Jornal)).Returns(true);
+        
+        // Act
+        var result = _controller.CanEditDocument(1, IdDoc.Jornal);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.JsonResult>());
+        var jsonResult = result as Microsoft.AspNetCore.Mvc.JsonResult;
+        var resultData = jsonResult.Value;
+        
+        var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(resultData);
+        var parsed = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(jsonString);
+        Assert.That((bool)parsed.canEdit, Is.True);
+    }
+
+    /// <summary>
+    /// CanEditDocument: для ReportIncomplete - всегда возвращает false
+    /// </summary>
+    [Test]
+    public void CanEditDocument_ReportIncomplete_ReturnsFalse()
+    {
+        // Arrange - не настраиваем мок, так как метод не должен вызываться
+        
+        // Act
+        var result = _controller.CanEditDocument(1, IdDoc.ReportIncomplete);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.JsonResult>());
+        var jsonResult = result as Microsoft.AspNetCore.Mvc.JsonResult;
+        var resultData = jsonResult.Value;
+        
+        var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(resultData);
+        var parsed = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(jsonString);
+        Assert.That((bool)parsed.canEdit, Is.False);
+        
+        // Проверяем, что HasDataArm не вызывался для ReportIncomplete
+        _mockDbSchemaCache.Verify(x => x.HasDataArm(It.IsAny<int>(), IdDoc.ReportIncomplete), Times.Never);
+    }
+
+    /// <summary>
+    /// CanEditDocument: для других типов документов - всегда возвращает true
+    /// </summary>
+    [TestCase(IdDoc.Passport)]
+    [TestCase(IdDoc.Act)]
+    [TestCase(IdDoc.KMH_PP_Areom)]
+    [TestCase(IdDoc.KMH_PV)]
+    [TestCase(IdDoc.KMH_PW)]
+    [TestCase(IdDoc.Poverka2816)]
+    [TestCase(IdDoc.KMH_MI2816)]
+    public void CanEditDocument_OtherDocumentTypes_ReturnsTrue(IdDoc idDoc)
+    {
+        // Arrange - не настраиваем мок, так как метод не должен вызываться
+        
+        // Act
+        var result = _controller.CanEditDocument(1, idDoc);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.JsonResult>());
+        var jsonResult = result as Microsoft.AspNetCore.Mvc.JsonResult;
+        var resultData = jsonResult.Value;
+        
+        var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(resultData);
+        var parsed = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(jsonString);
+        Assert.That((bool)parsed.canEdit, Is.True);
+        
+        // Проверяем, что HasDataArm не вызывался для других типов документов
+        _mockDbSchemaCache.Verify(x => x.HasDataArm(It.IsAny<int>(), idDoc), Times.Never);
+    }
+
+    /// <summary>
+    /// CanEditDocument: при исключении в DbSchemaCache - возвращает true (fail-safe)
+    /// </summary>
+    [Test]
+    public void CanEditDocument_DbSchemaCacheThrows_ReturnsTrue()
+    {
+        // Arrange
+        _mockDbSchemaCache.Setup(x => x.HasDataArm(1, IdDoc.Report))
+            .Throws(new Exception("Database connection error"));
+        
+        // Act
+        var result = _controller.CanEditDocument(1, IdDoc.Report);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<Microsoft.AspNetCore.Mvc.JsonResult>());
+        var jsonResult = result as Microsoft.AspNetCore.Mvc.JsonResult;
+        var resultData = jsonResult.Value;
+        
+        var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(resultData);
+        var parsed = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(jsonString);
+        Assert.That((bool)parsed.canEdit, Is.True);
+        
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Ошибка проверки возможности редактирования документа")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
+    }
+
+    /// <summary>
+    /// CanEditDocument: проверяет логирование результата проверки
+    /// </summary>
+    [Test]
+    public void CanEditDocument_LogsTraceResult()
+    {
+        // Arrange
+        _mockDbSchemaCache.Setup(x => x.HasDataArm(1, IdDoc.Report)).Returns(true);
+        
+        // Act
+        _controller.CanEditDocument(1, IdDoc.Report);
+
+        // Assert
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Trace,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Результат проверки наличия DataARM для документа Report: True")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
     }
 
     #endregion
