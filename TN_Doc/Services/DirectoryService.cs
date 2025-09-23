@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace TN_Doc.Models.Services;
+namespace TN_Doc.Services;
 
 /// <summary>
 /// Сервис взаимодействия со справочниками

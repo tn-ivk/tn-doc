@@ -10,7 +10,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Models;
@@ -18,6 +17,7 @@ using TN_DocGeneral.Services;
 using TN.Doc;
 using TN.DocData;
 using TN.Utils;
+using TN_Doc.Services;
 using Data = TN_Doc.Models.Home.Data;
 using FileInfo = System.IO.FileInfo;
 using IdDoc = TN.DocData.IdDoc;
@@ -33,9 +33,10 @@ public class HomeController : Controller
     private readonly IAppConfigService _appConfig;
     private readonly IReportBuffer _reportBuffer;
     private readonly IDocModuleLoader _docModuleLoader;
+    private readonly IDbSchemaCache _dbSchemaCache;
 
     public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IReportBuffer reportBuffer, 
-        IDocModuleLoader docModuleLoader, IAppConfigService appConfig)
+        IDocModuleLoader docModuleLoader, IAppConfigService appConfig, IDbSchemaCache dbSchemaCache)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = context;
@@ -44,6 +45,7 @@ public class HomeController : Controller
         _cfgApp = _appConfig.GetAppCfg();
         _reportBuffer = reportBuffer;
         _docModuleLoader = docModuleLoader;
+        _dbSchemaCache = dbSchemaCache;
     }
 
     public List<ListItem> GetListDevices()
@@ -565,6 +567,30 @@ public class HomeController : Controller
         {
             _logger.LogError(ex, $"Ошибка получения текста кнопки сохранения для документа {IdDoc} для устройства {IdDevice}");
             return "Сохранить";
+        }
+    }
+
+    [HttpGet]
+    public IActionResult CanEditDocument(int idDevice, IdDoc idDoc)
+    {
+        _logger.LogDebug($"Проверка возможности редактирования документа {idDoc} для устройства {_appConfig.GetDeviceName(idDevice)}");
+        try
+        {
+            var canEdit = idDoc switch
+            {
+                IdDoc.Report => _dbSchemaCache.HasDataArm(idDevice, idDoc),
+                IdDoc.ReportIncomplete => false,
+                IdDoc.Jornal => _dbSchemaCache.HasDataArm(idDevice, idDoc),
+                _ => true
+            }; 
+            
+            _logger.LogTrace($"Результат возможности редактирования документа {idDoc}: {canEdit}");
+            return Json(new { canEdit = canEdit });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка проверки возможности редактирования документа {idDoc} для устройства {_appConfig.GetDeviceName(idDevice)}");
+            return Json(new { canEdit = true });
         }
     }
     

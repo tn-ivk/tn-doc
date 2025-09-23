@@ -4,7 +4,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using TN_Doc.Models.Printer;
-using TN_Doc.Models.Services;
+using TN_Doc.Services;
 using TN.Utils;
 
 namespace TN_Doc.Extensions;
@@ -37,6 +37,12 @@ public static class ServiceCollectionExtensions
 	/// </summary>
 	/// <param name="services">Коллекция сервисов</param>
 	public static void AddPrinterService(this IServiceCollection services) => services.AddTransient<IPrinterService, PrinterService>();
+
+	/// <summary>
+	/// Добавление сервиса кэширования схемы базы данных
+	/// </summary>
+	/// <param name="services">Коллекция сервисов</param>
+	public static void AddDbSchemaCache(this IServiceCollection services) => services.AddScoped<IDbSchemaCache, DbSchemaCache>();
 
 	/// <summary>
 	/// Сбор информации о приложение

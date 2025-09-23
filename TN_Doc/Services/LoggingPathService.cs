@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace TN_Doc.Models.Services;
+namespace TN_Doc.Services;
 
 /// <summary>
 /// Сервис для определения путей логирования в зависимости от операционной системы

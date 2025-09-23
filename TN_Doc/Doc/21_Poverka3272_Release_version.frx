@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3272.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/29/2023 08:23:19" ReportInfo.CreatorVersion="2023.2.0.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3272.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/23/2025 00:28:51" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -77,16 +77,16 @@ namespace FastReport
       Page.RightMargin = General.PageSettings.RightMargin;
                                                                 
       // Load Data from classes
-      listTable2 = DataIVK.TablePoverka3272.Protokol.Table2.Where(i =&gt; i.Activated==1).ToList();
-      listTable2_part1 = DataIVK.TablePoverka3272.Protokol.Table2_part1.Where(i =&gt; i.Activated==1).ToList();
-      listTable2_part1_Points = DataIVK.TablePoverka3272.Protokol.Table2_part1_Points.Where(i =&gt; ! i.K1_TPR_j.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.K1_TPR_j) == false).ToList();            
-      listTable2_part2 = DataIVK.TablePoverka3272.Protokol.Table2_part2.Where(i =&gt; i.Activated==1).ToList();
-      listTable2_part2_Points = DataIVK.TablePoverka3272.Protokol.Table2_part2_Points.Where(i =&gt; ! i.K_TPR_j.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.K_TPR_j) == false).ToList();            
+      listTable2 = DataIVK.TablePoverka3272.Protokol.Table2.Where(i =&gt; i.Activated == 1).ToList();
+      listTable2_part1 = DataIVK.TablePoverka3272.Protokol.Table2_part1.Where(i =&gt; i.Activated == 1).ToList();
+      listTable2_part1_Points = DataIVK.TablePoverka3272.Protokol.Table2_part1_Points.Where(i =&gt; i.K1_TPR_j != &quot;-&quot; &amp; String.IsNullOrEmpty(i.K1_TPR_j) == false).ToList();            
+      listTable2_part2 = DataIVK.TablePoverka3272.Protokol.Table2_part2.Where(i =&gt; i.Activated == 1).ToList();
+      listTable2_part2_Points = DataIVK.TablePoverka3272.Protokol.Table2_part2_Points.Where(i =&gt; i.K_TPR_j != &quot;-&quot; &amp; String.IsNullOrEmpty(i.K_TPR_j) == false).ToList();            
        
-      listPointsTable4_1 = DataIVK.TablePoverka3272.Protokol.Table4_1.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
-      listPointsTable4_2 = DataIVK.TablePoverka3272.Protokol.Table4_2.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
-      listPointsTable4_3 = DataIVK.TablePoverka3272.Protokol.Table4_3.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
-      listSubrangesTable4_3 = DataIVK.TablePoverka3272.Protokol.Table4_3_Subr.Where(i =&gt; ! i.Point.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      listPointsTable4_1 = DataIVK.TablePoverka3272.Protokol.Table4_1.Where(i =&gt; i.Point != &quot;-&quot;  &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      listPointsTable4_2 = DataIVK.TablePoverka3272.Protokol.Table4_2.Where(i =&gt; i.Point != &quot;-&quot; &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      listPointsTable4_3 = DataIVK.TablePoverka3272.Protokol.Table4_3.Where(i =&gt; i.Point != &quot;-&quot; &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
+      listSubrangesTable4_3 = DataIVK.TablePoverka3272.Protokol.Table4_3_Subr.Where(i =&gt; i.Point != &quot;-&quot; &amp; String.IsNullOrEmpty(i.Point) == false).ToList();
 
       // Запуск отрисовки таблиц на странице отчета
       DrawTableHeader();    
@@ -191,7 +191,7 @@ namespace FastReport
           SerRow.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_part1[n].Ser, listTable2_part1[n].Row);
           Q_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].Q_ji);                   
           N_TPR_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].N_TPR_ji);                   
-          t_KP_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].t_KP_ji);                   
+          t_TPR_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].t_TPR_ji);                   
           P_TPR_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].P_TPR_ji);                   
           t_KP_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].t_KP_ji);                   
           P_KP_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].P_KP_ji);                   
@@ -200,10 +200,18 @@ namespace FastReport
           Wx.Text =&quot;-&quot;;                   
           V_KP_PR_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].V_KP_PR_ji);                   
           K_TPR_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].K_TPR_ji);       
-          Repeatability_K_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].Repeatability_K_j);                   
-          K1_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].K1_TPR_j);                   
-          K2_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].K2_TPR_j);                   
-          Delta_k_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].Delta_k_j);         
+          if(n &lt; listTable2_part1_Points.Count) {
+            Repeatability_K_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[n].Repeatability_K_j);                   
+            K1_TPR_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[n].K1_TPR_j);                   
+            K2_TPR_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[n].K2_TPR_j);                   
+            Delta_k_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[n].Delta_k_j);          
+          }
+          else {
+            Repeatability_K_j.Text = &quot;-&quot;;                   
+            K1_TPR_j.Text = &quot;-&quot;;                   
+            K2_TPR_j.Text = &quot;-&quot;;                   
+            Delta_k_j.Text = &quot;-&quot;;           
+          }
             
           Table2_part1.PrintRow(4);     
           Table2_part1.PrintColumns();  
@@ -237,9 +245,15 @@ namespace FastReport
         for (int n = 0; n &lt; (listTable2_part2.Count); n++)
         {
           SerRow2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_part2[n].Ser, listTable2_part2[n].Row);
-          Q_ji2.Text = tools.GetNormalizedValue(listTable2_part2[n].Q_ji);      
-          K_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part2_Points[n].K_TPR_j);                   
-          N_TPR_zad_j.Text =  tools.GetNormalizedValue(listTable2_part2_Points[n].N_TPR_zad_j);                   
+          Q_ji2.Text = tools.GetNormalizedValue(listTable2_part2[n].Q_ji);
+          if(n &lt; listTable2_part2_Points.Count) {
+            K_TPR_j.Text = tools.GetNormalizedValue(listTable2_part2_Points[n].K_TPR_j);                   
+            N_TPR_zad_j.Text = tools.GetNormalizedValue(listTable2_part2_Points[n].N_TPR_zad_j);                     
+          }
+          else {
+            K_TPR_j.Text = &quot;-&quot;;                   
+            N_TPR_zad_j.Text = &quot;-&quot;;                     
+          }
           V_TPR_ji.Text = tools.GetNormalizedValue(listTable2_part2[n].V_TPR_ji);      
           t_TPR_ji2.Text = tools.GetNormalizedValue(listTable2_part2[n].t_TPR_ji);                   
           P_TPR_ji2.Text = tools.GetNormalizedValue(listTable2_part2[n].P_TPR_ji);   
@@ -810,7 +824,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1" Top="201.12" Width="1047.06" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable1" Top="201.68" Width="1047.06" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1" Top="7.56" Width="607.75" Height="102.06" FixedRows="4" ManualBuildEvent="Table1_ManualBuild">
         <TableColumn Name="Column5" Width="55.25"/>
         <TableColumn Name="Column6" Width="55.25"/>
@@ -890,7 +904,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2_part1" Top="313.4" Width="1047.06" Height="132.3" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable2_part1" Top="314.52" Width="1047.06" Height="132.3" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table2_part1" Top="7.56" Width="1047.04" Height="124.74" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2_part1_ManualBuild">
         <TableColumn Name="Column158" Width="65.44"/>
         <TableColumn Name="Column159" Width="65.44"/>
@@ -1000,7 +1014,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2_part2" Top="448.37" Width="1047.06" Height="113.4">
+    <DataBand Name="DataBandTable2_part2" Top="450.05" Width="1047.06" Height="113.4">
       <TableObject Name="Table2_part2" Top="7.56" Width="1047.02" Height="105.84" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2_part2_ManualBuild">
         <TableColumn Name="Column339" Width="69.8"/>
         <TableColumn Name="Column340" Width="69.8"/>
@@ -1104,7 +1118,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2" Top="564.44" Width="1047.06" Height="113.4">
+    <DataBand Name="DataBandTable2" Top="566.67" Width="1047.06" Height="113.4">
       <TableObject Name="Table2" Top="7.56" Width="598.5" Height="105.84" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2_ManualBuild">
         <TableColumn Name="Column368" Width="59.85"/>
         <TableColumn Name="Column369" Width="59.85"/>
@@ -1178,7 +1192,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2Continuation" Top="680.5" Width="1047.06" Height="94.5">
+    <DataBand Name="DataBandTable2Continuation" Top="683.3" Width="1047.06" Height="94.5">
       <TableObject Name="Table2Continuation" Top="7.56" Width="359.1" Height="86.94" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table2Continuation_ManualBuild">
         <TableColumn Name="Column379" Width="59.85"/>
         <TableColumn Name="Column381" Width="59.85"/>
@@ -1220,7 +1234,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3CoeffValue" Top="777.67" Width="1047.06" Height="94.5">
+    <DataBand Name="DataBandTable3CoeffValue" Top="781.02" Width="1047.06" Height="94.5">
       <TableObject Name="Table3CoeffValue" Top="7.56" Width="926.55" Height="86.94" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table3CoeffValue_ManualBuild">
         <TableColumn Name="Column389" Width="185.31"/>
         <TableColumn Name="Column390" Width="185.31"/>
@@ -1257,7 +1271,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_1Results" Top="874.84" Width="1047.06" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_1Results" Top="878.75" Width="1047.06" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_1Results" Top="7.56" Width="695.5" Height="90.72" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_1Results_ManualBuild">
         <TableColumn Name="Column33" Width="69.55"/>
         <TableColumn Name="Column34" Width="69.55"/>
@@ -1329,7 +1343,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_2Results" Top="979.56" Width="1047.06" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_2Results" Top="984.04" Width="1047.06" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_2Results" Top="7.56" Width="642.6" Height="90.72" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_2Results_ManualBuild">
         <TableColumn Name="Column293" Width="64.26"/>
         <TableColumn Name="Column294" Width="64.26"/>
@@ -1401,7 +1415,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable4_3Results" Top="1084.29" Width="1047.06" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable4_3Results" Top="1089.32" Width="1047.06" Height="102.06" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table4_3Results" Top="7.56" Width="680.45" Height="90.72" GrowToBottom="true" FixedRows="3" ManualBuildEvent="Table4_3Results_ManualBuild">
         <TableColumn Name="Column304" Width="56.18"/>
         <TableColumn Name="Column305" Width="56.18"/>
@@ -1485,7 +1499,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="1189.02" Width="1047.06" Height="139.86" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="1194.61" Width="1047.06" Height="139.86" CanShrink="true">
       <TableObject Name="TableConclusion1" Top="7.56" Width="690.01" Height="30.24" GrowToBottom="true">
         <TableColumn Name="Column178" Width="245.05"/>
         <TableColumn Name="Column236" Width="113.4" AutoSize="true"/>
@@ -1549,7 +1563,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="1331.54" Width="1047.06" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="1337.69" Width="1047.06" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page] из [[TotalPages]-1]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

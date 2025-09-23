@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TN_Doc.Models.Printer;
 
-namespace TN_Doc.Models.Services;
+namespace TN_Doc.Services;
 
 /// <summary>
 /// Сервис для взаимодействия с принтерами
