@@ -1351,7 +1351,7 @@ public class HomeControllerTests
             x => x.Log(
                 LogLevel.Trace,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Результат проверки наличия DataARM для документа Report: True")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Результат возможности редактирования документа Report: True")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.Once);

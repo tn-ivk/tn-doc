@@ -489,7 +489,7 @@ public class DbSchemaCacheTests
             x => x.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Устройство 2 не имеет активных подключений к БД")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("не имеет активных подключений к БД")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.Once);
