@@ -24,7 +24,7 @@
         "FieldSIKN": "СИКН"
       },
       "Data": {
-        "ShowResultColumn": true
+        "ShowResultColumn": false
       },
       "Footer": {
         "LabMIDensity": ""
