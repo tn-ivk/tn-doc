@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using TN_Doc.Models.Services;
+using TN_Doc.Services;
 
 namespace TN_Doc.Controllers;
 
@@ -62,8 +62,16 @@ public class PrintController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> PrintDoc(string printerName)
     {
-        _logger.LogTrace($"Печать документа на принтере: {printerName}");
-        await _service.PrintDocAsync(printerName);
-        return Ok();
+        try
+        {
+            _logger.LogTrace($"Печать документа на принтере: {printerName}");
+            await _service.PrintDocAsync(printerName);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Ошибка печати документа: {ex.Message}");
+            return StatusCode(500, "Произошла ошибка при печати документа");
+        }
     }
 }

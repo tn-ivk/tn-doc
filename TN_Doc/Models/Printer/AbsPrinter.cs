@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc.Models.Printer;
 
 /// <summary>
 /// Абстрактная модель принтера печати документов
 /// </summary>
-public abstract class AbsPrinter
+public abstract class AbsPrinter(IReportBuffer buffer)
 {
+    protected IReportBuffer _buffer = buffer;
+
     /// <summary>
     /// Получение списка доступных принтеров
     /// </summary>

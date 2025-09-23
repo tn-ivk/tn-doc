@@ -7,19 +7,17 @@ using System.Linq;
 using TN_Doc.Models;
 using FastReport.Web;
 using System.IO;
-using System.Threading;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using TN_Doc.Models.Home;
-using TN_Doc.Models.Services;
 using TN_DocGeneral.Interfaces;
+using TN_DocGeneral.Models;
 using TN_DocGeneral.Services;
 using TN.Doc;
 using TN.DocData;
 using TN.Utils;
+using TN_Doc.Services;
 using Data = TN_Doc.Models.Home.Data;
 using FileInfo = System.IO.FileInfo;
 using IdDoc = TN.DocData.IdDoc;
@@ -28,28 +26,27 @@ namespace TN_Doc.Controllers;
 
 public class HomeController : Controller
 {
-    CfgApp _cfgApp;
-    readonly ILogger<HomeController> _logger;
+    private readonly CfgApp _cfgApp;
+    private readonly ILogger<HomeController> _logger;
     private readonly DbContextOptions<DocGeneral> _options;
-    DocGeneral dbDoc;
-    private WebReport FR;
-    CancellationToken stoppingToken;
-    IAppConfigService _appConfig;
+    private readonly WebReport _fr;
+    private readonly IAppConfigService _appConfig;
     private readonly IReportBuffer _reportBuffer;
     private readonly IDocModuleLoader _docModuleLoader;
+    private readonly IDbSchemaCache _dbSchemaCache;
 
-    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IConfiguration configuration, IReportBuffer reportBuffer, IDocModuleLoader docModuleLoader)
+    public HomeController(ILogger<HomeController> logger, DbContextOptions<DocGeneral> context, IReportBuffer reportBuffer, 
+        IDocModuleLoader docModuleLoader, IAppConfigService appConfig, IDbSchemaCache dbSchemaCache)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = context;
-        _appConfig = AppConfigService.GetInstance(configuration);
-        FR = new WebReport();
+        _appConfig = appConfig;
+        _fr = new WebReport();
         _cfgApp = _appConfig.GetAppCfg();
         _reportBuffer = reportBuffer;
         _docModuleLoader = docModuleLoader;
+        _dbSchemaCache = dbSchemaCache;
     }
-
-    private DocGeneral LoadDocsModule2(int idDevice, IdDoc idDoc) => _docModuleLoader.LoadDocsModule(_options, idDevice, idDoc, Directory.GetCurrentDirectory());
 
     public List<ListItem> GetListDevices()
     {
@@ -271,19 +268,19 @@ public class HomeController : Controller
         try
         {
             FastReport.Utils.Config.EnableScriptSecurity = false;
-            FR.EnableMargins = true;
-            FR.Mode = WebReportMode.Preview;
-            FR.SinglePage = true;
-            FR.Toolbar = new ToolbarSettings() 
+            _fr.EnableMargins = true;
+            _fr.Mode = WebReportMode.Preview;
+            _fr.SinglePage = true;
+            _fr.Toolbar = new ToolbarSettings() 
             { 
                 Show = false, 
                 ShowRefreshButton = false, 
                 ShowFirstButton = false 
             };
-            FR.Width = "100%";
-            FR.Height = "auto";
-            FR.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), "Doc", "01_Report_2022-05-05_Release_version.frx"));
-            FR.Render();             
+            _fr.Width = "100%";
+            _fr.Height = "auto";
+            _fr.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), "Doc", "01_Report_2022-05-05_Release_version.frx"));
+            _fr.Render();             
         }
         catch (Exception ex)
         {
@@ -389,7 +386,7 @@ public class HomeController : Controller
                 return false;
             }
             _logger.LogTrace($"Загрузка шаблона документа: {templateFile.FullName}");
-            FR.Report.Load(templateFile.FullName);
+            _fr.Report.Load(templateFile.FullName);
             var jsonDoc = IdDoc switch
             {
                 IdDoc.KMH_PP_Areom => doc.GetViewDoc(id, protocolNumber),
@@ -404,8 +401,8 @@ public class HomeController : Controller
                 _logger.LogError($"Метод GetViewDoc вернул null для документа {IdDoc} с id: {id}");
                 return false;
             }
-            FR.Report.SetParameterValue("JsonDoc", jsonDoc);
-            FR.Report.Prepare();
+            _fr.Report.SetParameterValue("JsonDoc", jsonDoc);
+            _fr.Report.Prepare();
 
             using (var ms = new MemoryStream())
             {
@@ -416,12 +413,12 @@ public class HomeController : Controller
                 pdfExport.Compressed = true;
                 pdfExport.AllowPrint = true;
                 pdfExport.EmbeddingFonts = true;
-                FR.Report.Export(pdfExport, ms);
+                _fr.Report.Export(pdfExport, ms);
                 var bytes = ms.ToArray();
                 _reportBuffer.SetPdfBytes(bytes);
             }
 
-            FR.Report.Dispose();
+            _fr.Report.Dispose();
             return true;
         }
         catch (Exception ex)
@@ -529,12 +526,12 @@ public class HomeController : Controller
         try
         {
             var result = await _appConfig.GetDictionariesJsonAsync();
-            return result;
+            return result ?? "[]";
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Ошибка получения списка пользователей");
-            return String.Empty;
+            return "[]";
         }
     }
 
@@ -570,6 +567,30 @@ public class HomeController : Controller
         {
             _logger.LogError(ex, $"Ошибка получения текста кнопки сохранения для документа {IdDoc} для устройства {IdDevice}");
             return "Сохранить";
+        }
+    }
+
+    [HttpGet]
+    public IActionResult CanEditDocument(int idDevice, IdDoc idDoc)
+    {
+        _logger.LogDebug($"Проверка возможности редактирования документа {idDoc} для устройства {_appConfig.GetDeviceName(idDevice)}");
+        try
+        {
+            var canEdit = idDoc switch
+            {
+                IdDoc.Report => _dbSchemaCache.HasDataArm(idDevice, idDoc),
+                IdDoc.ReportIncomplete => false,
+                IdDoc.Jornal => _dbSchemaCache.HasDataArm(idDevice, idDoc),
+                _ => true
+            }; 
+            
+            _logger.LogTrace($"Результат возможности редактирования документа {idDoc}: {canEdit}");
+            return Json(new { canEdit = canEdit });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка проверки возможности редактирования документа {idDoc} для устройства {_appConfig.GetDeviceName(idDevice)}");
+            return Json(new { canEdit = true });
         }
     }
     

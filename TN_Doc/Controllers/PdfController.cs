@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using TN_Doc.Models.Services;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc.Controllers;
 

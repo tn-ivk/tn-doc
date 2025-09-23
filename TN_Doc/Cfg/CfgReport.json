@@ -285,6 +285,7 @@
           {
             "Id": 1,
             "Name": "Оператор товарный сдающей стороны:",
+            "Key": "DeliveryIOF",
             "ShowSigner": [
               {
                 "Id": 1,
@@ -316,6 +317,7 @@
           {
             "Id": 2,
             "Name": "Оператор товарный принимающей стороны:",
+            "Key": "ReceiveIOF",
             "ShowSigner": [
               {
                 "Id": 1,
@@ -347,6 +349,7 @@
           {
             "Id": 3,
             "Name": "Оператор товарный:",
+            "Key": "OperatorIOF",
             "ShowSigner": [
               {
                 "Id": 1,

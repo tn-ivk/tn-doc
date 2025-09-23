@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="11/22/2024 09:16:16" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Jornal.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/18/2025 18:08:32" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -145,24 +145,24 @@ namespace FastReport
          
       if (DataIVK.TableMeasurementJornal.DataARM == null)
       {   
-        dictSignersFIO.Add(&quot;DeliveryFIO1&quot;, &quot;&quot;);
-        dictSignersFIO.Add(&quot;ReceiveFIO1&quot;, &quot;&quot;);
-        dictSignersFIO.Add(&quot;DeliveryFIO2&quot;, &quot;&quot;);
-        dictSignersFIO.Add(&quot;ReceiveFIO2&quot;, &quot;&quot;);
+        dictSignersFIO.Add(&quot;DeliveryIOF1&quot;, &quot;&quot;);
+        dictSignersFIO.Add(&quot;ReceiveIOF1&quot;, &quot;&quot;);
+        dictSignersFIO.Add(&quot;DeliveryIOF2&quot;, &quot;&quot;);
+        dictSignersFIO.Add(&quot;ReceiveIOF2&quot;, &quot;&quot;);
       }
       else
       {
-        PropertyInfo[] props =  DataIVK.TableMeasurementJornal.DataARM.GetType().GetProperties();
+        PropertyInfo[] props =  DataIVK.TableMeasurementJornal.DataARM.AdditionalData.GetType().GetProperties();
         foreach (var prop in props)
         {
-          dictSignersFIO.Add(prop.Name, prop.GetValue(DataIVK.TableMeasurementJornal.DataARM, null).ToString());
+          dictSignersFIO.Add(prop.Name, prop.GetValue(DataIVK.TableMeasurementJornal.DataARM.AdditionalData, null).ToString());
         }
       }
-      DeliveryFIO1.Text = dictSignersFIO[&quot;DeliveryFIO1&quot;];
-      ReceiveFIO1.Text = dictSignersFIO[&quot;ReceiveFIO1&quot;];
-      DeliveryFIO2.Text = dictSignersFIO[&quot;DeliveryFIO2&quot;];
-      ReceiveFIO2.Text = dictSignersFIO[&quot;ReceiveFIO2&quot;];       
-    } 
+      DeliveryIOF1.Text =dictSignersFIO[&quot;DeliveryIOF1&quot;];
+      ReceiveIOF1.Text =dictSignersFIO[&quot;ReceiveIOF1&quot;];
+      DeliveryIOF2.Text =dictSignersFIO[&quot;DeliveryIOF2&quot;];
+      ReceiveIOF2.Text =dictSignersFIO[&quot;ReceiveIOF2&quot;];       
+    }  
       
     private void PageFooter_BeforeLayout(object sender, EventArgs e)
     {
@@ -261,7 +261,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableJournal" Top="58.99" Width="1047.06" Height="169.17">
+    <DataBand Name="DataBandTableJournal" Top="59.93" Width="1047.06" Height="169.17">
       <TableObject Name="TableJournal" Width="1043.28" Height="169.17" FixedRows="5" ManualBuildEvent="TableJournal_ManualBuild">
         <TableColumn Name="Column122" Width="30.24"/>
         <TableColumn Name="Column123" Width="64.26"/>
@@ -409,7 +409,7 @@ namespace FastReport
           <TableCell Name="B_Dens15" Border.Lines="All" Text="B_Dens15" HorzAlign="Center" VertAlign="Center" Font="Arial, 7pt" FontWidthRatio="0.85"/>
         </TableRow>
       </TableObject>
-      <DataFooterBand Name="DataFooter1" Top="230.44" Width="1047.06" Height="75.6" Border.Lines="All">
+      <DataFooterBand Name="DataFooter1" Top="232.32" Width="1047.06" Height="75.6" Border.Lines="All">
         <TableObject Name="Table1" Width="1043.28" Height="75.6">
           <TableColumn Name="Column277" Width="1043.28"/>
           <TableRow Name="Row185" Height="75.6">
@@ -418,7 +418,7 @@ namespace FastReport
         </TableObject>
       </DataFooterBand>
     </DataBand>
-    <DataBand Name="DataBandTableTotal" Top="308.33" Width="1047.06" Height="16.21" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableTotal" Top="311.15" Width="1047.06" Height="16.21" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableTotal" Top="0.14" Width="1020.6" Height="16.07" ManualBuildEvent="TableTotal_ManualBuild">
         <TableColumn Name="Column138" Width="1020.6"/>
         <TableRow Name="Row106" Height="16.07">
@@ -426,10 +426,10 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="Data2" Top="326.82" Width="1047.06" Height="15.12">
+    <DataBand Name="Data2" Top="330.58" Width="1047.06" Height="15.12">
       <TextObject Name="Text1" Width="1020.6" Height="15.12" Text="     *- заполняется при наливе в танкер." VertAlign="Center" Font="Arial, 8pt"/>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="344.23" Width="1047.06" Height="94.5" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="348.93" Width="1047.06" Height="94.5" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Width="1041.39" Height="94.5">
         <TableColumn Name="Column52" Width="94.5"/>
         <TableColumn Name="Column51" Width="5.67"/>
@@ -460,13 +460,13 @@ namespace FastReport
           <TableCell Name="Cell623" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell621" Border.Lines="Bottom" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell613" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
-          <TableCell Name="DeliveryFIO1" Border.Lines="Bottom" Text="DeliveryFIO1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="DeliveryIOF1" Border.Lines="Bottom" Text="DeliveryIOF1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell615" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell616" Text="Смену сдал" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell617" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell618" Border.Lines="Bottom" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell619" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
-          <TableCell Name="ReceiveFIO1" Border.Lines="Bottom" Text="ReceiveFIO1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="ReceiveIOF1" Border.Lines="Bottom" Text="ReceiveIOF1" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row48" Height="15.12">
           <TableCell Name="Cell626" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
@@ -486,13 +486,13 @@ namespace FastReport
           <TableCell Name="Cell1138" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1139" Border.Lines="Bottom" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1140" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
-          <TableCell Name="DeliveryFIO2" Border.Lines="Bottom" Text="DeliveryFIO2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="DeliveryIOF2" Border.Lines="Bottom" Text="DeliveryIOF2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1142" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1143" Text="Смену сдал" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1144" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1145" Border.Lines="Bottom" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
           <TableCell Name="Cell1146" Padding="0, 0, 0, 0" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
-          <TableCell Name="ReceiveFIO2" Border.Lines="Bottom" Text="ReceiveFIO2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
+          <TableCell Name="ReceiveIOF2" Border.Lines="Bottom" Text="ReceiveIOF2" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row100" Height="15.12">
           <TableCell Name="Cell1148" Padding="0, 0, 0, 0" VertAlign="Center" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85"/>
@@ -509,7 +509,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="441.01" Width="1047.06" Height="13.19" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="446.65" Width="1047.06" Height="13.19" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Top="-0.04" Width="198.45" Height="13.23" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
