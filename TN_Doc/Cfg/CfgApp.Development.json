@@ -960,7 +960,7 @@
           "Name": "КМХ МИ 3272-2010",
           "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
           "PathToDocDll": "/Dll/KMH_MPR_TPR.dll",
-          "PathToDocConfigFile": "",
+          "PathToDocConfigFile": "/Cfg/CfgKMH3272_MPR_TPR.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -969,8 +969,8 @@
               "Id": 0,
               "Name": "КМХ МИ 3272-2010",
               "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
-              "PathToDocTemplateFile": "",
-              "PathToDocEditConfigFile": null
+              "PathToDocTemplateFile": "/Doc/33_TableKMH3272_MPR_TPR_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH3272_MPR_TPR.json"
             }
           ]
         },

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MPR_TPR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="01/20/2023 11:52:03" ReportInfo.CreatorVersion="2021.4.4.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;KMH_MPR_TPR.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/24/2025 11:59:40" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -113,13 +113,15 @@ namespace FastReport
       private void Table1SourceData_ManualBuild(object sender, EventArgs e)
       {
          // Setup Columns width
-         int sumDynamicCols=Table1SourceData.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
- 
+         var colWidth = new [] { 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+         var totalColWidth = 0.0;
+         for(int i=0; i &lt; colWidth.Length; i++)
+           totalColWidth += colWidth[i];
+         var widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/totalColWidth;                  
          for (int w = 0; w &lt; (Table1SourceData.ColumnCount); w++)                 
          {
-            Table1SourceData.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
+           Table1SourceData.Columns[w].Width = (float)(widthDynamicCol * colWidth[w] * Units.Millimeters);
+         }
                             
          //Draw Fixed rows
          for (int n = 0; n &lt; Table1SourceData.FixedRows; n++)
@@ -198,18 +200,21 @@ namespace FastReport
       {                
          
          List &lt;TN.Doc.Table2_part1_Points&gt; listTable2_part1_Points;
-         listTable2_part1_Points = DataIVK.TableKMH_MPR_TPR.Protokol.Table2_part1_Points.Where(i =&gt; ! i.K1_TPR_j.Contains(&quot;-&quot;) &amp; String.IsNullOrEmpty(i.K1_TPR_j) == false).ToList();
+         listTable2_part1_Points = DataIVK.TableKMH_MPR_TPR.Protokol.Table2_part1_Points.Where(i =&gt; i.K1_TPR_j != &quot;-&quot; &amp; String.IsNullOrEmpty(i.K1_TPR_j) == false).ToList();
 
          List &lt;TN.Doc.Table2_part1&gt; listTable2_part1;
          listTable2_part1 = DataIVK.TableKMH_MPR_TPR.Protokol.Table2_part1.Where(i =&gt; i.Activated != 0 &amp; i.Activated != null).ToList();
          
          //Setup Columns width
-         int sumDynamicCols=Table2_part1.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
-         for (int w = 0; w &lt; (Table2_part1.ColumnCount); w++)                 
-         {
-            Table2_part1.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
+          var colWidth = new [] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0 };
+          var totalColWidth = 0.0;
+          for(int i=0; i &lt; colWidth.Length; i++)
+            totalColWidth += colWidth[i];
+          var widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/totalColWidth;                  
+          for (int w = 0; w &lt; (Table2_part1.ColumnCount); w++)                 
+          {
+            Table2_part1.Columns[w].Width = (float)(widthDynamicCol * colWidth[w] * Units.Millimeters);
+          }    
          
          //Draw Fixed rows
          for (int n = 0; n &lt; Table2_part1.FixedRows; n++)
@@ -217,7 +222,7 @@ namespace FastReport
             Table2_part1.PrintRow(n);
             Table2_part1.PrintColumns();                                             
          }
-          
+         int curSeria;
          //Fill table with data
          for (int n = 0; n &lt; (listTable2_part1.Count); n++)
          {
@@ -233,11 +238,23 @@ namespace FastReport
             Wx.Text =&quot;-&quot;;                   
             V_KP_PR_ji.Text = tools.GetNormalizedValue(listTable2_part1[n].V_KP_PR_ji);
             K_TPR_ji.Text =  tools.GetNormalizedValue(listTable2_part1[n].K_TPR_ji);
-                  
-            Repeatability_K_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].Repeatability_K_j);                   
-            K1_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].K1_TPR_j);                   
-            K2_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].K2_TPR_j);                   
-            Delta_k_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].Delta_k_j);         
+                
+            if(int.TryParse(listTable2_part1[n].Ser, out curSeria) &amp;&amp; (curSeria - 1) &lt; listTable2_part1_Points.Count) {
+              Repeatability_K_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[curSeria - 1].Repeatability_K_j);                   
+              K1_TPR_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[curSeria - 1].K1_TPR_j);                   
+              K2_TPR_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[curSeria - 1].K2_TPR_j);                   
+              Delta_k_j.Text = tools.GetNormalizedValue(listTable2_part1_Points[curSeria - 1].Delta_k_j);          
+            }
+            else {
+              Repeatability_K_j.Text = &quot;-&quot;;                   
+              K1_TPR_j.Text = &quot;-&quot;;                   
+              K2_TPR_j.Text = &quot;-&quot;;                   
+              Delta_k_j.Text = &quot;-&quot;;           
+            }
+            //Repeatability_K_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].Repeatability_K_j);                   
+            //K1_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].K1_TPR_j);                   
+            //K2_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].K2_TPR_j);                   
+            //Delta_k_j.Text =  tools.GetNormalizedValue(listTable2_part1_Points[n].Delta_k_j);         
             
             Table2_part1.PrintRow(4);     
             Table2_part1.PrintColumns();  
@@ -255,13 +272,16 @@ namespace FastReport
          
 
          //Setup Columns width
-         int sumDynamicCols=Table2_part2.ColumnCount;
-         float widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/sumDynamicCols;                  
+         var colWidth = new [] { 1.0, 1.0, 1.5, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+         var totalColWidth = 0.0;
+         for(int i=0; i &lt; colWidth.Length; i++)
+           totalColWidth += colWidth[i];
+         var widthDynamicCol=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)/totalColWidth;                  
          for (int w = 0; w &lt; (Table2_part2.ColumnCount); w++)                 
          {
-            Table2_part2.Columns[w].Width = widthDynamicCol * Units.Millimeters;
-         }      
-         
+           Table2_part2.Columns[w].Width = (float)(widthDynamicCol * colWidth[w] * Units.Millimeters);
+         }
+        
          //Draw Fixed rows
          for (int n = 0; n &lt; Table2_part2.FixedRows; n++)
          {
@@ -269,15 +289,21 @@ namespace FastReport
             Table2_part2.PrintColumns();                                             
          }
          
-
+         int curSeria;
          //Fill table with data
          for (int n = 0; n &lt; (listTable2_part2.Count); n++)
          {
             SerRow2.Text =  String.Format(&quot;{0}/{1}&quot;, listTable2_part2[n].Ser, listTable2_part2[n].Row);
             Q_ji2.Text = tools.GetNormalizedValue(listTable2_part2[n].Q_ji);
-            
-            K_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part2_Points[n].K_TPR_j);                   
-            N_TPR_zad_j.Text =  tools.GetNormalizedValue(listTable2_part2_Points[n].N_TPR_zad_j);                   
+            if(int.TryParse(listTable2_part2[n].Ser, out curSeria) &amp;&amp; (curSeria - 1) &lt; listTable2_part2_Points.Count) {
+              K_TPR_j.Text = tools.GetNormalizedValue(listTable2_part2_Points[curSeria - 1].K_TPR_j);  
+              //N_TPR_zad_j.Text =  tools.GetNormalizedValue(listTable2_part2_Points[curSeria - 1].N_TPR_zad_j);
+            }
+            else {
+              K_TPR_j.Text = &quot;-&quot;;                                        
+            }
+            //K_TPR_j.Text =  tools.GetNormalizedValue(listTable2_part2_Points[n].K_TPR_j);                   
+            //N_TPR_zad_j.Text =  tools.GetNormalizedValue(listTable2_part2[n].N_TPR_zad_j);                   
              
             V_TPR_ji.Text = tools.GetNormalizedValue(listTable2_part2[n].V_TPR_ji);
             
@@ -351,7 +377,7 @@ namespace FastReport
   </Styles>
   <Dictionary>
     <Relation Name="dbo_tCheckups1_dbo_tPoints" ParentDataSource="null" ChildDataSource="null" ParentColumns="id" ChildColumns="id_tCheckups" Enabled="true"/>
-    <Parameter Name="JsonDoc" DataType="System.String"/>
+    <Parameter Name="JsonDoc" DataType="System.String" AsString=""/>
   </Dictionary>
   <ReportPage Name="Page" PaperWidth="297" Guides="-18.9" Watermark.Font="Arial, 60pt" StartPageEvent="Page_StartPage">
     <ReportTitleBand Name="ReportTitle" Width="1047.06" Height="98.28" CanGrow="true" CanShrink="true" CanBreak="true" AfterLayoutEvent="ReportTitle_AfterLayout">
@@ -413,7 +439,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTable1SourceData" Top="101.04" Width="1047.06" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable1SourceData" Top="101.06" Width="1047.06" Height="109.62" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table1SourceData" Top="7.56" Width="872.35" Height="102.06" FixedRows="4" ManualBuildEvent="Table1SourceData_ManualBuild">
         <TableColumn Name="Column351"/>
         <TableColumn Name="Column5" Width="55.25"/>
@@ -517,7 +543,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable2Results" Top="213.42" Width="1047.06" Height="132.3" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
+    <DataBand Name="DataBandTable2Results" Top="213.46" Width="1047.06" Height="132.3" CanGrow="true" CanShrink="true" CanBreak="true" FirstRowStartsNewPage="true">
       <TableObject Name="Table2_part1" Top="7.56" Width="1047.04" Height="124.74" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2_part1_ManualBuild">
         <TableColumn Name="Column400" Width="65.44"/>
         <TableColumn Name="Column401" Width="65.44"/>
@@ -627,7 +653,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandTable3Results" Top="348.48" Width="1047.06" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTable3Results" Top="348.53" Width="1047.06" Height="113.4" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="Table2_part2" Top="7.56" Width="1054.54" Height="105.84" GrowToBottom="true" FixedRows="4" ManualBuildEvent="Table2_part2_ManualBuild">
         <TableColumn Name="Column409" Width="61.66"/>
         <TableColumn Name="Column410" Width="61.66"/>
@@ -743,7 +769,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="464.63" Width="1047.06" Height="200.34" CanShrink="true">
+    <ReportSummaryBand Name="ReportSummary" Top="464.71" Width="1047.06" Height="200.34" CanShrink="true">
       <TableObject Name="TableConclusion" Top="7.56" Width="718.2" Height="187.11" FixedColumns="1">
         <TableColumn Name="Column13" Width="194.67"/>
         <TableColumn Name="Column14" Width="523.53" AutoSize="true"/>
@@ -785,7 +811,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="667.73" Width="1047.06" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="667.83" Width="1047.06" Height="22.68" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="529.2" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" VertAlign="Bottom" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
