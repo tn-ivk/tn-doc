@@ -77,6 +77,7 @@
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.css">
+    <script src="/js/Logger.js"></script>
     <script src="/js/EditDoc.js"></script>
     <script src="/js/loading-spinner.js"></script>
     <script id="ElementChangeEventHandling" type="text/javascript">
@@ -85,28 +86,89 @@
     let invalidChars;
     
     function UserChangeEvent(selectObject) {
-        if (selectObject.name === "Delive_IOF") {
-            let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
-            let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
-            if (user) {
-            document.getElementById("Delive_Factory").value = user.Factory;
-            document.getElementById("Delive_FIO").value = user.FIO;
+        try {
+            logTrace(`UserChangeEvent: начало обработки изменения для ${selectObject.name}, значение: ${selectObject.value}`);
+            
+            if (selectObject.name === "Delive_IOF") {
+                let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
+                
+                if (user) {
+                    logTrace(`UserChangeEvent: найден пользователь сдающей стороны - ${user.FIO || 'неизвестно'}, предприятие: ${user.Factory || 'не указано'}`);
+                    
+                    document.getElementById("Delive_Factory").value = user.Factory || '';
+                    document.getElementById("Delive_FIO").value = user.FIO || '';
+
+                    // Применяем валидацию к автоматически заполненным полям
+                    InputStringCheck(document.getElementById("Delive_Factory"));
+                    InputStringCheck(document.getElementById("Delive_FIO"));
+
+                    let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
+                    if (license) {
+                        logTrace(`UserChangeEvent: найдена доверенность для сдающей стороны - номер: ${license.LicensesNumber || 'не указан'}, дата: ${license.LicensesDate || 'не указана'}`);
+
+                        document.getElementById("Delive_Lic_Date").value = license.LicensesDate || '';
+                        document.getElementById("Delive_Lic_Number").value = license.LicensesNumber || '';
+
+                        // Применяем валидацию к полям доверенности
+                        InputStringCheck(document.getElementById("Delive_Lic_Date"));
+                        InputStringCheck(document.getElementById("Delive_Lic_Number"));
+                    } else {
+                        logWarn(`UserChangeEvent: доверенность для пользователя сдающей стороны не найдена, LicId: ${user['LicId'] || 'не указан'}`);
+                        document.getElementById("Delive_Lic_Date").value = '';
+                        document.getElementById("Delive_Lic_Number").value = '';
+                    }
+                    
+                    logTrace(`UserChangeEvent: обновлены поля для сдающей стороны`);
+                } else {
+                    logWarn(`UserChangeEvent: пользователь сдающей стороны с ID ${selectObject.value} не найден`);
+                    document.getElementById("Delive_Factory").value = '';
+                    document.getElementById("Delive_FIO").value = '';
+                    document.getElementById("Delive_Lic_Date").value = '';
+                    document.getElementById("Delive_Lic_Number").value = '';
+                }
+            } else if (selectObject.name === "Receive_IOF") {
+                let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
+                
+                if (user) {
+                    logTrace(`UserChangeEvent: найден пользователь принимающей стороны - ${user.FIO || 'неизвестно'}, предприятие: ${user.Factory || 'не указано'}`);
+                    
+                    document.getElementById("Receive_Factory").value = user.Factory || '';
+                    document.getElementById("Receive_FIO").value = user.FIO || '';
+
+                    // Применяем валидацию к автоматически заполненным полям
+                    InputStringCheck(document.getElementById("Receive_Factory"));
+                    InputStringCheck(document.getElementById("Receive_FIO"));
+
+                    let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
+                    if (license) {
+                        logTrace(`UserChangeEvent: найдена доверенность для принимающей стороны - номер: ${license.LicensesNumber || 'не указан'}, дата: ${license.LicensesDate || 'не указана'}`);
+
+                        document.getElementById("Receive_Lic_Date").value = license.LicensesDate || '';
+                        document.getElementById("Receive_Lic_Number").value = license.LicensesNumber || '';
+
+                        // Применяем валидацию к полям доверенности
+                        InputStringCheck(document.getElementById("Receive_Lic_Date"));
+                        InputStringCheck(document.getElementById("Receive_Lic_Number"));
+                    } else {
+                        logWarn(`UserChangeEvent: доверенность для пользователя принимающей стороны не найдена, LicId: ${user['LicId'] || 'не указан'}`);
+                        document.getElementById("Receive_Lic_Date").value = '';
+                        document.getElementById("Receive_Lic_Number").value = '';
+                    }
+                    
+                    logTrace(`UserChangeEvent: обновлены поля для принимающей стороны`);
+                } else {
+                    logWarn(`UserChangeEvent: пользователь принимающей стороны с ID ${selectObject.value} не найден`);
+                    document.getElementById("Receive_Factory").value = '';
+                    document.getElementById("Receive_FIO").value = '';
+                    document.getElementById("Receive_Lic_Date").value = '';
+                    document.getElementById("Receive_Lic_Number").value = '';
+                }
             }
-            if (license) {
-            document.getElementById("Delive_Lic_Date").value = license.LicensesDate;
-            document.getElementById("Delive_Lic_Number").value = license.LicensesNumber;
-            }
-        } else if (selectObject.name === "Receive_IOF") {
-            let user = dictionaries.Users.filter(users => users["Id"] === Number($(selectObject).val()))[0];
-            let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
-            if (user) {
-            document.getElementById("Receive_Factory").value = user.Factory;
-            document.getElementById("Receive_FIO").value = user.FIO;
-            }
-            if (license) {
-            document.getElementById("Receive_Lic_Date").value = license.LicensesDate;
-            document.getElementById("Receive_Lic_Number").value = license.LicensesNumber;
-            }
+            
+            logTrace(`UserChangeEvent: обработка изменения для ${selectObject.name} завершена успешно`);
+        } catch (error) {
+            logError(`UserChangeEvent: ошибка при обработке изменения ${selectObject.name}: ${error.message}`);
+            console.error('UserChangeEvent error:', error);
         }
     }
 
@@ -173,16 +235,28 @@
     }
 
     function updateTooltip(element) {
+        // Проверяем наличие id у элемента перед использованием jQuery селектора
+        if (!element.id) {
+            return;
+        }
+
+        const $element = $('#' + element.id);
+
+        // Проверяем, инициализирован ли tooltip для элемента
+        if (!$element.hasClass('ui-tooltip-trigger') && !$element.data('ui-tooltip')) {
+            // Инициализируем tooltip для элемента
+            $element.tooltip();
+        }
+
         if(element.classList.contains("incorrect-value"))
         {
-            $('#' + element.id)
-                .tooltip("enable")
+            $element.tooltip("enable")
                 .tooltip("option", "content", element.getAttribute("title"));
         }
 
         if(element.classList.contains("correct-value"))
         {
-            $('#' + element.id).tooltip("disable");
+            $element.tooltip("disable");
         }
     }
 </script>

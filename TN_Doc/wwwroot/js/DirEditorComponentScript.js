@@ -38,7 +38,10 @@ function _renderAppDictionaries() {
     _addDitctionariesHandler();
     _renderUserGroupsRowTable();
     _renderAndAddHandlerLicencesTable();
-    _renderAndAddHandlerUserTable();
+    _renderUserGroupSelector();
+    let selector = document.querySelector('#users-group-selector');
+    let selectedGroupId = selector ? Number(selector.value) : (appDictionaries['UsersGroup'][0]?.Id || 1);
+    _renderAndAddHandlerUserTable(selectedGroupId);
     _addLicHandler();
     _addUserHandler();
 }
@@ -53,15 +56,33 @@ function _renderAppDictionaries() {
      Дополнительно словари записываются в локальное хранилище
 */
 function _loadAppDictionaries() {
-    $.ajax({
-        async: false, url: dictFetchOptions.getUrlDir, type: dictFetchOptions.getMethod, success: function (data) {
-            appDictionaries = JSON.parse(data['dirJsonRaw'])
-            hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries)
-        }, error: function (xhr, ajaxOptions, thrownError) {
-            appDictionaries = {};
-            hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries)
-        }
-    })
+    logTrace('Начало загрузки словарей приложения');
+    try {
+        $.ajax({
+            async: false, url: dictFetchOptions.getUrlDir, type: dictFetchOptions.getMethod, success: function (data) {
+                try {
+                    appDictionaries = JSON.parse(data['dirJsonRaw']);
+                    hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+                    logInfo('Словари приложения успешно загружены');
+                    logDebug(`Загружено словарей: ${Object.keys(appDictionaries).length}, HashCode: ${hashCodeLoadedCodeDict}`);
+                } catch (parseError) {
+                    logError('Ошибка парсинга JSON данных словарей: ' + parseError.message);
+                    appDictionaries = {};
+                    hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+                    throw parseError;
+                }
+            }, error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка загрузки словарей приложения: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                appDictionaries = {};
+                hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+            }
+        });
+    } catch (error) {
+        logError('Критическая ошибка при загрузке словарей: ' + error.message);
+        appDictionaries = {};
+        hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+    }
 }
 
 /*
@@ -135,27 +156,38 @@ function _renderAndAddHandlerLicencesTable() {
         row.appendChild(dateCell);
 
         let actionCell = document.createElement('td');
+        actionCell.classList.add('action-buttons-cell');
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1'));
+        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary');
+        editBtn.classList.add('action-btn');
+        editDivElement.appendChild(editBtn);
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+        let deleteBtn = _createDeleteLicenseBtn('fa-trash', 'btn-outline-danger');
+        deleteBtn.classList.add('action-btn');
+        deleteDivElement.appendChild(deleteBtn);
         actionCell.appendChild(editDivElement);
         actionCell.appendChild(deleteDivElement);
         row.appendChild(actionCell);
         table.append(row)
     }
-
 }
 
 /*
     Отрисовка таблицы пользователей.
 */
-function _renderAndAddHandlerUserTable() {
+function _renderAndAddHandlerUserTable(selectedGroupId) {
     let table = document.querySelector('.users-table');
-    let usersGroups = appDictionaries['UsersGroup'];
     let licences = appDictionaries['Licenses'];
-    for (let user of appDictionaries['Users']) {
-
+    // Если не передан selectedGroupId, берём первый из списка
+    if (typeof selectedGroupId === 'undefined' || selectedGroupId === null) {
+        let selector = document.querySelector('#users-group-selector');
+        if (selector) selectedGroupId = Number(selector.value);
+        else if (appDictionaries['UsersGroup'].length > 0) selectedGroupId = appDictionaries['UsersGroup'][0].Id;
+        else selectedGroupId = 1;
+    }
+    // Оставляем только пользователей выбранной группы
+    let users = appDictionaries['Users'].filter(u => u['IdGroup'] === selectedGroupId);
+    for (let user of users) {
         let row = document.createElement('tr')
         row.classList.add('data-row')
         row.dataset.id = user['Id'];
@@ -169,10 +201,7 @@ function _renderAndAddHandlerUserTable() {
         _addCellStyle(usedCell);
         row.appendChild(usedCell);
 
-        let groupNameCell = document.createElement('td');
-        groupNameCell.innerText = usersGroups.filter(group => group['Id'] === user['IdGroup'])[0]['Name'];
-        _addCellStyle(groupNameCell);
-        row.appendChild(groupNameCell);
+        // Удаляем колонку "Группа" (теперь она в селекторе)
 
         let surnameCell = document.createElement('td');
         surnameCell.innerText = user.F;
@@ -201,7 +230,6 @@ function _renderAndAddHandlerUserTable() {
 
         let licCell = document.createElement('td');
         _addCellStyle(licCell);
-
         let licItem = licences.filter(lic => lic['Id'] === user['LicId'])[0];
         if (licItem) {
             licCell.innerText = `${licItem['LicensesNumber']}`;
@@ -240,15 +268,15 @@ function _renderAndAddHandlerUserTable() {
         row.appendChild(shortFormCell);
 
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
-
+        editDivElement.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary'));
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
-
+        deleteDivElement.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
         let actionCell = document.createElement('td');
+        actionCell.classList.add('action-buttons-cell');
+        editDivElement.firstChild.classList.add('action-btn');
+        deleteDivElement.firstChild.classList.add('action-btn');
         actionCell.appendChild(editDivElement);
         actionCell.appendChild(deleteDivElement);
-
         row.appendChild(actionCell);
         table.append(row)
     }
@@ -271,6 +299,7 @@ function _addCellStyle(cell) {
 function _createDeleteUserBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.classList.add('delete-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
         _deleteSelectedRowHandler(e, 'Users');
     });
@@ -286,6 +315,7 @@ function _createDeleteUserBtn(faClass, buttonClass, margin) {
 function _createDeleteLicenseBtn(faClass, buttonClass, margin) {
     let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
     btn.classList.add('delete-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
         _cleatUserLicId(e)
         _deleteSelectedRowHandler(e, 'Licenses');
@@ -338,10 +368,11 @@ function _deleteSelectedRowHandler(e, arrayName) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createEditLicensesButton(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createEditLicensesButton(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-licences-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
         let itemBtn;
         if (e.target.tagName === 'I') {
@@ -363,11 +394,14 @@ function _createEditLicensesButton(faClass, buttonClass, margin) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createEditUsersButton(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createEditUsersButton(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, buttonClass);
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-user-btn');
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         let itemBtn;
         if (e.target.tagName === 'I') {
             itemBtn = e.target.closest('button')
@@ -388,10 +422,13 @@ function _createEditUsersButton(faClass, buttonClass, margin) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createCancelEditButton(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createCancelEditButton(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, 'btn-outline-danger');
     btn.classList.add('cancel-edit-btn');
+    btn.classList.add('action-btn'); // обязательно для кастомных стилей!
     btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         let itemBtn;
         if (e.target.tagName === 'I') {
             itemBtn = e.target.closest('button')
@@ -401,7 +438,6 @@ function _createCancelEditButton(faClass, buttonClass, margin) {
         let rowItem = itemBtn.closest('tr')
         let itemId = Number(rowItem.dataset.id);
         if (!itemId) return;
-        
         // Определяем тип таблицы и вызываем соответствующую функцию отмены
         if (rowItem.closest('.users-table')) {
             _cancelEditUser(rowItem, itemId);
@@ -411,7 +447,7 @@ function _createCancelEditButton(faClass, buttonClass, margin) {
             _cancelEditQpMethod(rowItem, itemId);
         }
     });
-    return btn
+    return btn;
 }
 
 /*
@@ -441,7 +477,7 @@ function _cancelEditUser(rowItem, itemId) {
     }
 
     let rowMap = {
-        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
+        0: 'bool', 1: 'text', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'combobox-lic', 7: 'bool', 8: 'bool', 9: 'bool', 10: 'ignore'
     };
     
     // Восстанавливаем предыдущее состояние
@@ -471,8 +507,8 @@ function _cancelEditUser(rowItem, itemId) {
     deleteDiv.innerHTML = '';
     
     // Добавляем кнопки просмотра
-    editDiv.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1'));
-    deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
+    editDiv.appendChild(_createEditUsersButton('fa-lock', 'btn-outline-primary'));
+    deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
 }
 
 /*
@@ -483,7 +519,7 @@ function _cancelEditUser(rowItem, itemId) {
 */
 function _editSelectedUser(itemBtn, rowItem, itemId) {
     let rowMap = {
-        0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 9: 'bool', 10: 'bool', 11: 'ignore'
+        0: 'bool', 1: 'text', 2: 'text', 3: 'text', 4: 'text', 5: 'text', 6: 'combobox-lic', 7: 'bool', 8: 'bool', 9: 'bool', 10: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
@@ -510,18 +546,38 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         
         // Меняем кнопки
         let actionCell = rowItem.querySelector('td:last-child');
+        
+        // Удаляем лишние элементы (например, checkbox) из action-ячейки
+        let extraElements = actionCell.querySelectorAll('input, span, i:not(button i)');
+        extraElements.forEach(element => element.remove());
+        
+        // Проверяем количество div и создаем недостающие
+        let divs = actionCell.querySelectorAll('div');
+        if (divs.length < 2) {
+            // Очищаем action-ячейку и создаем структуру заново
+            actionCell.innerHTML = '';
+            
+            // Создаем editDiv
+            let editDiv = document.createElement('div');
+            actionCell.appendChild(editDiv);
+            
+            // Создаем deleteDiv
+            let deleteDiv = document.createElement('div');
+            actionCell.appendChild(deleteDiv);
+        }
+        
         let editDiv = actionCell.querySelector('div:first-child');
         let deleteDiv = actionCell.querySelector('div:last-child');
         
         // Удаляем текущие кнопки
-        editDiv.innerHTML = '';
-        deleteDiv.innerHTML = '';
+        if (editDiv) editDiv.innerHTML = '';
+        if (deleteDiv) deleteDiv.innerHTML = '';
         
         // Добавляем кнопки редактирования
-        let editBtn = _createEditUsersButton('fa-unlock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditUsersButton('fa-unlock', 'btn-outline-primary');
         editBtn.dataset.mode = 'edit';
-        editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger', ''));
+        if (editDiv) editDiv.appendChild(editBtn);
+        if (deleteDiv) deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger'));
         
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
@@ -547,18 +603,38 @@ function _editSelectedUser(itemBtn, rowItem, itemId) {
         
         // Меняем кнопки обратно
         let actionCell = rowItem.querySelector('td:last-child');
+        
+        // Удаляем лишние элементы из action-ячейки
+        let extraElements = actionCell.querySelectorAll('input, span, i:not(button i)');
+        extraElements.forEach(element => element.remove());
+        
+        // Проверяем количество div и создаем недостающие
+        let divs = actionCell.querySelectorAll('div');
+        if (divs.length < 2) {
+            // Очищаем action-ячейку и создаем структуру заново
+            actionCell.innerHTML = '';
+            
+            // Создаем editDiv
+            let editDiv = document.createElement('div');
+            actionCell.appendChild(editDiv);
+            
+            // Создаем deleteDiv
+            let deleteDiv = document.createElement('div');
+            actionCell.appendChild(deleteDiv);
+        }
+        
         let editDiv = actionCell.querySelector('div:first-child');
         let deleteDiv = actionCell.querySelector('div:last-child');
         
         // Удаляем текущие кнопки
-        editDiv.innerHTML = '';
-        deleteDiv.innerHTML = '';
+        if (editDiv) editDiv.innerHTML = '';
+        if (deleteDiv) deleteDiv.innerHTML = '';
         
         // Добавляем кнопки просмотра
-        let editBtn = _createEditUsersButton('fa-lock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditUsersButton('fa-lock', 'btn-outline-primary');
         editBtn.dataset.mode = 'stable';
-        editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger', ''));
+        if (editDiv) editDiv.appendChild(editBtn);
+        if (deleteDiv) deleteDiv.appendChild(_createDeleteUserBtn('fa-trash', 'btn-outline-danger'));
     }
 }
 
@@ -567,16 +643,15 @@ function _getCurrentRowState(rowItem) {
     if (rowItem.closest('.users-table')) {
         return {
             use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-            groupName: cells[1].textContent.trim(),
-            surname: cells[2].textContent.trim(),
-            name: cells[3].textContent.trim(),
-            patronymic: cells[4].textContent.trim(),
-            factory: cells[5].textContent.trim(),
-            post: cells[6].textContent.trim(),
-            licId: cells[7].dataset.licId,
-            useFullNameSeparator: cells[8].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-            useFullNameWhiteSpace: cells[9].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-            useShortFullNameForm: cells[10].querySelector('i')?.classList.contains('fa-check-square-o') || false
+            surname: cells[1].textContent.trim(),
+            name: cells[2].textContent.trim(),
+            patronymic: cells[3].textContent.trim(),
+            factory: cells[4].textContent.trim(),
+            post: cells[5].textContent.trim(),
+            licId: cells[6].dataset.licId,
+            useFullNameSeparator: cells[7].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            useFullNameWhiteSpace: cells[8].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+            useShortFullNameForm: cells[9].querySelector('i')?.classList.contains('fa-check-square-o') || false
         };
     } else if (rowItem.closest('.licences-table')) {
         return {
@@ -599,30 +674,27 @@ function _restoreRowState(rowItem, previousState) {
         cells[0].innerHTML = '';
         cells[0].appendChild(useIcon);
         
-        // Восстанавливаем имя группы
-        cells[1].textContent = previousState.groupName;
+        // Восстанавливаем ФИО (индексы 1, 2, 3 - без колонки "Группа")
+        cells[1].textContent = previousState.surname;
+        cells[2].textContent = previousState.name;
+        cells[3].textContent = previousState.patronymic;
         
-        // Восстанавливаем ФИО
-        cells[2].textContent = previousState.surname;
-        cells[3].textContent = previousState.name;
-        cells[4].textContent = previousState.patronymic;
+        // Восстанавливаем организацию и должность (индексы 4, 5)
+        cells[4].textContent = previousState.factory;
+        cells[5].textContent = previousState.post;
         
-        // Восстанавливаем организацию и должность
-        cells[5].textContent = previousState.factory;
-        cells[6].textContent = previousState.post;
-        
-        // Восстанавливаем лицензию
-        cells[7].textContent = previousState.licId === "0" ? "Доверенность не выбрана" : 
+        // Восстанавливаем лицензию (индекс 6)
+        cells[6].textContent = previousState.licId === "0" ? "Доверенность не выбрана" : 
             appDictionaries['Licenses'].find(lic => lic.Id === Number(previousState.licId))?.LicensesNumber || "Доверенность не выбрана";
-        cells[7].dataset.licId = previousState.licId;
+        cells[6].dataset.licId = previousState.licId;
         
-        // Восстанавливаем флаги форматирования
+        // Восстанавливаем флаги форматирования (индексы 7, 8, 9)
         ['useFullNameSeparator', 'useFullNameWhiteSpace', 'useShortFullNameForm'].forEach((flag, index) => {
             const icon = document.createElement('i');
             icon.classList.add('fa', previousState[flag] ? 'fa-check-square-o' : 'fa-square-o');
             icon.ariaHidden = true;
-            cells[8 + index].innerHTML = '';
-            cells[8 + index].appendChild(icon);
+            cells[7 + index].innerHTML = '';
+            cells[7 + index].appendChild(icon);
         });
     } else if (rowItem.closest('.licences-table')) {
         // Восстанавливаем флаг использования
@@ -683,10 +755,10 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
         deleteDiv.innerHTML = '';
         
         // Добавляем кнопки редактирования
-        let editBtn = _createEditLicensesButton('fa-unlock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditLicensesButton('fa-unlock', 'btn-outline-primary');
         editBtn.dataset.mode = 'edit';
         editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger', ''));
+        deleteDiv.appendChild(_createCancelEditButton('fa-times', 'btn-outline-danger'));
         
         itemBtn.dataset.mode = 'edit';
     } else if (itemBtn.dataset.mode === 'edit') {
@@ -720,10 +792,10 @@ function _editSelectedLicences(itemBtn, rowItem, itemId) {
         deleteDiv.innerHTML = '';
         
         // Добавляем кнопки просмотра
-        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1');
+        let editBtn = _createEditLicensesButton('fa-lock', 'btn-outline-primary');
         editBtn.dataset.mode = 'stable';
         editDiv.appendChild(editBtn);
-        deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+        deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger'));
         
         // Обновляем таблицу пользователей
         _clearRowTable('.users-table');
@@ -782,59 +854,50 @@ function _applyUserChanges(rowItem, itemId) {
         const useIcon = cells[0].querySelector('i');
         updatedObject['Use'] = useIcon ? useIcon.classList.contains('fa-check-square-o') : false;
     }
-    // Обновляем ID группы
-    const groupInput = cells[1].querySelector('select');
-    if (groupInput) {
-        updatedObject['IdGroup'] = Number(groupInput.value);
-    } else {
-        const groupName = cells[1].textContent.trim();
-        const group = appDictionaries['UsersGroup'].find(item => item['Name'] === groupName);
-        updatedObject['IdGroup'] = group ? group['Id'] : 1;
-    }
     
-    // Обновляем ФИО
-    const surnameInput = cells[2].querySelector('input');
-    updatedObject['F'] = surnameInput ? surnameInput.value : cells[2].textContent.trim();
+    // Обновляем ФИО (индексы 1, 2, 3 - без колонки "Группа")
+    const surnameInput = cells[1].querySelector('input');
+    updatedObject['F'] = surnameInput ? surnameInput.value : cells[1].textContent.trim();
     
-    const nameInput = cells[3].querySelector('input');
-    updatedObject['I'] = nameInput ? nameInput.value : cells[3].textContent.trim();
+    const nameInput = cells[2].querySelector('input');
+    updatedObject['I'] = nameInput ? nameInput.value : cells[2].textContent.trim();
     
-    const patronymicInput = cells[4].querySelector('input');
-    updatedObject['O'] = patronymicInput ? patronymicInput.value : cells[4].textContent.trim();
+    const patronymicInput = cells[3].querySelector('input');
+    updatedObject['O'] = patronymicInput ? patronymicInput.value : cells[3].textContent.trim();
     
-    // Обновляем организацию и должность
-    const factoryInput = cells[5].querySelector('input');
-    updatedObject['Factory'] = factoryInput ? factoryInput.value : cells[5].textContent.trim();
+    // Обновляем организацию и должность (индексы 4, 5)
+    const factoryInput = cells[4].querySelector('input');
+    updatedObject['Factory'] = factoryInput ? factoryInput.value : cells[4].textContent.trim();
     
-    const postInput = cells[6].querySelector('input');
-    updatedObject['Post'] = postInput ? postInput.value : cells[6].textContent.trim();
+    const postInput = cells[5].querySelector('input');
+    updatedObject['Post'] = postInput ? postInput.value : cells[5].textContent.trim();
     
-    // Обновляем ID лицензии
-    const licSelect = cells[7].querySelector('select');
-    updatedObject['LicId'] = licSelect ? Number(licSelect.value) : Number(cells[7].dataset.licId || 0);
+    // Обновляем ID лицензии (индекс 6)
+    const licSelect = cells[6].querySelector('select');
+    updatedObject['LicId'] = licSelect ? Number(licSelect.value) : Number(cells[6].dataset.licId || 0);
     
-    // Обновляем флаги форматирования
-    const sepCheckbox = cells[8].querySelector('input[type="checkbox"]');
+    // Обновляем флаги форматирования (индексы 7, 8, 9)
+    const sepCheckbox = cells[7].querySelector('input[type="checkbox"]');
     if (sepCheckbox) {
         updatedObject['UseFullNameSeparator'] = sepCheckbox.checked;
     } else {
-        const sepIcon = cells[8].querySelector('i');
+        const sepIcon = cells[7].querySelector('i');
         updatedObject['UseFullNameSeparator'] = sepIcon ? sepIcon.classList.contains('fa-check-square-o') : false;
     }
 
-    const whiteSpaceCheckbox = cells[9].querySelector('input[type="checkbox"]');
+    const whiteSpaceCheckbox = cells[8].querySelector('input[type="checkbox"]');
     if (whiteSpaceCheckbox) {
         updatedObject['UseFullNameWhiteSpace'] = whiteSpaceCheckbox.checked;
     } else {
-        const whiteSpaceIcon = cells[9].querySelector('i');
+        const whiteSpaceIcon = cells[8].querySelector('i');
         updatedObject['UseFullNameWhiteSpace'] = whiteSpaceIcon ? whiteSpaceIcon.classList.contains('fa-check-square-o') : false;
     }
 
-    const shortFormCheckbox = cells[10].querySelector('input[type="checkbox"]');
+    const shortFormCheckbox = cells[9].querySelector('input[type="checkbox"]');
     if (shortFormCheckbox) {
         updatedObject['UseShortFullNameForm'] = shortFormCheckbox.checked;
     } else {
-        const shortFormIcon = cells[10].querySelector('i');
+        const shortFormIcon = cells[9].querySelector('i');
         updatedObject['UseShortFullNameForm'] = shortFormIcon ? shortFormIcon.classList.contains('fa-check-square-o') : false;
     }
 }
@@ -970,9 +1033,9 @@ function _addValidationHandlers(row) {
         let rowMap;
         if (row.closest('.users-table')) {
             rowMap = {
-                0: 'bool', 1: 'combobox-ug', 2: 'text', 3: 'text', 4: 'text', 
-                5: 'text', 6: 'text', 7: 'combobox-lic', 8: 'bool', 
-                9: 'bool', 10: 'bool', 11: 'ignore'
+                0: 'bool', 1: 'text', 2: 'text', 3: 'text', 
+                4: 'text', 5: 'text', 6: 'combobox-lic', 7: 'bool', 
+                8: 'bool', 9: 'bool', 10: 'ignore'
             };
         } else if (row.closest('.licences-table')) {
             rowMap = {
@@ -980,8 +1043,8 @@ function _addValidationHandlers(row) {
             };
         } else if (row.closest('.qp-method-table')) {
             rowMap = {
-                0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 
-                4: 'number', 5: 'text', 6: 'ignore'
+                0: 'bool', 1: 'text', 2: 'bool', 
+                3: 'number', 4: 'text', 5: 'ignore'
             };
         } else {
             return; // Если таблица не распознана, выходим
@@ -1099,6 +1162,29 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
             let newNumNode = document.createTextNode(previewNode.value.replaceAll('.', ','));
             cell.replaceChild(newNumNode, cell.childNodes[0])
             break;
+        // Добавлено: возвращаем иконку для "Контроль мин. значения" и "Применять по умолчанию"
+        case 'qp-method-limit':
+            let cb = cell.querySelector('input[type="checkbox"]');
+            let icon = document.createElement('i');
+            icon.classList.add('fa');
+            icon.classList.add(cb && cb.checked ? 'fa-check-square-o' : 'fa-square-o');
+            icon.ariaHidden = true;
+            cell.replaceChild(icon, cell.childNodes[0]);
+            break;
+        case 'qp-method-default':
+            let cbDef = cell.querySelector('input[type="checkbox"].default-method-checkbox');
+            let iconDef = document.createElement('i');
+            iconDef.classList.add('fa');
+            iconDef.classList.add(cbDef && cbDef.checked ? 'fa-check-square-o' : 'fa-square-o');
+            iconDef.ariaHidden = true;
+            
+            // Добавляем обработчик для взаимоисключающих чекбоксов
+            cbDef.addEventListener('change', function(e) {
+                _handleDefaultMethodCheckboxChange(e.target);
+            });
+            
+            cell.replaceChild(iconDef, cell.childNodes[0]);
+            break;
         default:
             break
     }
@@ -1111,6 +1197,19 @@ function _convertEditCellToStableCell(cell, type, usersGroupArray, licensesArray
 */
 function _convertStableRowToEditRow(row, rowMap) {
     let cells = row.querySelectorAll('td');
+    // Для таблицы методов паспорта качества используем специальную карту типов
+    if (row.closest('.qp-method-table')) {
+        // Индексы: 0 - Активен, 1 - Метод, 2 - Контроль мин. значения, 3 - Мин. значение, 4 - Сообщение, 5 - Применять по умолчанию, 6 - Действия
+        rowMap = {
+            0: 'bool',
+            1: 'text',
+            2: 'qp-method-limit',
+            3: 'number',
+            4: 'text',
+            5: 'qp-method-default',
+            6: 'ignore'
+        };
+    }
     for (let i = 0; i < cells.length; i++) {
         _convertStableCellToEditCell(cells[i], rowMap[i])
     }
@@ -1222,6 +1321,30 @@ function _convertStableCellToEditCell(cell, type) {
                 cell.replaceChild(newElement, previewNode)
             } else cell.append(newElement);
             break;
+        // Добавлено: чекбокс для "Контроль мин. значения" (индекс 2) и "Применять по умолчанию" (индекс 5)
+        case 'qp-method-limit':
+            // Контроль мин. значения
+            let icon = cell.querySelector('i');
+            let cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = icon && icon.classList.contains('fa-check-square-o');
+            cell.replaceChild(cb, cell.childNodes[0]);
+            break;
+        case 'qp-method-default':
+            // Применять по умолчанию
+            let iconDef = cell.querySelector('i');
+            let cbDef = document.createElement('input');
+            cbDef.type = 'checkbox';
+            cbDef.classList.add('default-method-checkbox');
+            cbDef.checked = iconDef && iconDef.classList.contains('fa-check-square-o');
+            
+            // Добавляем обработчик для взаимоисключающих чекбоксов
+            cbDef.addEventListener('change', function(e) {
+                _handleDefaultMethodCheckboxChange(e.target);
+            });
+            
+            cell.replaceChild(cbDef, cell.childNodes[0]);
+            break;
         default:
             break
     }
@@ -1301,13 +1424,15 @@ function _addLicHandler() {
 */
 function _addUserHandler() {
     document.querySelector('.add-user-btn').addEventListener('click', function () {
+        let selector = document.querySelector('#users-group-selector');
+        let selectedGroupId = selector ? Number(selector.value) : (appDictionaries['UsersGroup'][0]?.Id || 1);
         let maxId = appDictionaries['Users'].length !== 0 ? appDictionaries['Users'].reduce((aid, cid) => {
             return aid > cid ? aid : cid;
         })['Id'] : 0;
         appDictionaries['Users'].push({
             Use: false,
             Id: maxId + 1, 
-            IdGroup: 1,
+            IdGroup: selectedGroupId,
             F: "",
             I: "", 
             O: "", 
@@ -1318,7 +1443,7 @@ function _addUserHandler() {
             UseShortFullNameForm:true,
         })
         _clearRowTable('.users-table')
-        _renderAndAddHandlerUserTable();
+        _renderAndAddHandlerUserTable(selectedGroupId);
         _scrollToBottomTable(' #users >.table-container> .table-content');
 
         let lastRow = document.querySelector('.users-table').lastChild;
@@ -1371,6 +1496,9 @@ async function _checkIntentSaving() {
         return true;
 
     } else {
+        await confirm('Изменения отсутствуют. Сохранение не требуется.', {
+            'title': 'Информация', 'yesBtnName': 'ОК', 'noBtnName': null, 'iconClass': "fa fa-info-circle text-info"
+        });
         return false;
     }
 }
@@ -1438,6 +1566,8 @@ function _addSaveButtonHandler() {
             AddClassToElement('.modal-header>.close-menu >.btn > i > .fa-flooppy', 'd-none')
             try {
                 _saveQpAndDict();
+                // Закрытие модального окна после успешного сохранения
+                $('#modal-window').modal('hide');
             } finally {
                 RemoveClassToElement('.modal-header>.close-menu> .btn > i > .fa-flooppy', 'd-none')
                 AddClassToElement('.modal-header>.close-menu> .btn >  i > .fa-spin', 'd-none')
@@ -1453,15 +1583,33 @@ function _addSaveButtonHandler() {
    методов и параметров
 */
 function _loadQPConfigsDictionaries() {
-    $.ajax({
-        async: false, url: dictFetchOptions.getQpCfg, type: dictFetchOptions.getMethod, success: function (data) {
-            qpCfgsDictionaries = JSON.parse(data['qpCfgJsonRaw']);
-            hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
-        }, error: function (xhr, ajaxOptions, thrownError) {
-            appDictionaries = {};
-            hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
-        }
-    })
+    logTrace('Начало загрузки конфигураций паспортов качества');
+    try {
+        $.ajax({
+            async: false, url: dictFetchOptions.getQpCfg, type: dictFetchOptions.getMethod, success: function (data) {
+                try {
+                    qpCfgsDictionaries = JSON.parse(data['qpCfgJsonRaw']);
+                    hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+                    logInfo('Конфигурации паспортов качества успешно загружены');
+                    logDebug(`Загружено конфигураций QP: ${qpCfgsDictionaries?.QpsInfo?.length || 0}, HashCode: ${hashCodeLoadedQpConfigs}`);
+                } catch (parseError) {
+                    logError('Ошибка парсинга JSON данных конфигураций QP: ' + parseError.message);
+                    qpCfgsDictionaries = {};
+                    hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+                    throw parseError;
+                }
+            }, error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка загрузки конфигураций QP: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                qpCfgsDictionaries = {};
+                hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+            }
+        });
+    } catch (error) {
+        logError('Критическая ошибка при загрузке конфигураций QP: ' + error.message);
+        qpCfgsDictionaries = {};
+        hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+    }
 }
 
 
@@ -1499,7 +1647,7 @@ function _renderQpConfigs() {
     let counter = 0;
     for (let qp of qpCfgsDictionaries["QpsInfo"]) {
         let liItem = document.createElement('li');
-        liItem.classList.add("list-group-item");
+        liItem.classList.add('list-group-item', 'side-menu-item');
         liItem.textContent = qp["Name"];
         liItem.dataset.target = "#qpId" + counter;
         qpList.append(liItem)
@@ -1532,38 +1680,73 @@ function _renderQpConfigs() {
  * @private
  */
 function _saveQpAndDict() {
-    $.ajax({
-        async: false,
-        url: dictFetchOptions.setUrlDir,
-        type: dictFetchOptions.setMethod,
-        contentType: 'application/json; charset=UTF-8',
-        data: JSON.stringify({
-            dirJsonRaw: JSON.stringify(appDictionaries)
-        }),
-        success: function () {
-            _reRenderUserAndLicTable();
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            appDictionaries = {};
-        },
-    });
+    logTrace('Начало сохранения словарей и конфигураций QP');
+    let dictSaveSuccess = false;
+    let qpSaveSuccess = false;
 
-    $.ajax({
-        async: false,
-        url: dictFetchOptions.setQpCfg,
-        type: dictFetchOptions.setMethod,
-        contentType: 'application/json; charset=UTF-8',
-        data: JSON.stringify({
-            qpCfgJsonRaw: JSON.stringify(qpCfgsDictionaries)
-        }),
-        error: function (xhr, ajaxOptions, thrownError) {
-            qpCfgsDictionaries = {};
+    try {
+        // Сохранение словарей приложения
+        logDebug('Сохранение словарей приложения на сервере');
+        $.ajax({
+            async: false,
+            url: dictFetchOptions.setUrlDir,
+            type: dictFetchOptions.setMethod,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify({
+                dirJsonRaw: JSON.stringify(appDictionaries)
+            }),
+            success: function () {
+                logInfo('Словари приложения успешно сохранены на сервере');
+                dictSaveSuccess = true;
+                _reRenderUserAndLicTable();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка сохранения словарей: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                appDictionaries = {};
+            },
+        });
 
-        },
+        // Сохранение конфигураций QP
+        logDebug('Сохранение конфигураций паспортов качества на сервере');
+        $.ajax({
+            async: false,
+            url: dictFetchOptions.setQpCfg,
+            type: dictFetchOptions.setMethod,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify({
+                qpCfgJsonRaw: JSON.stringify(qpCfgsDictionaries)
+            }),
+            success: function () {
+                logInfo('Конфигурации паспортов качества успешно сохранены на сервере');
+                qpSaveSuccess = true;
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                const errorMsg = `Ошибка сохранения конфигураций QP: ${xhr.status} ${xhr.statusText} - ${thrownError}`;
+                logError(errorMsg);
+                qpCfgsDictionaries = {};
+            },
+        });
 
-    });
-    hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
-    hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+        if (dictSaveSuccess && qpSaveSuccess) {
+            logInfo('Все данные справочников успешно сохранены');
+        } else if (dictSaveSuccess) {
+            logWarn('Словари сохранены, но конфигурации QP сохранить не удалось');
+        } else if (qpSaveSuccess) {
+            logWarn('Конфигурации QP сохранены, но словари сохранить не удалось');
+        } else {
+            logError('Не удалось сохранить ни словари, ни конфигурации QP');
+        }
+
+        // Обновление хэш-кодов после сохранения
+        hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
+        hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
+        logDebug(`Обновлены хэш-коды: Dict=${hashCodeLoadedCodeDict}, QP=${hashCodeLoadedQpConfigs}`);
+
+    } catch (error) {
+        logError('Критическая ошибка при сохранении справочников: ' + error.message);
+        throw error;
+    }
 }
 
 /*
@@ -1603,45 +1786,98 @@ function _addBtnToAddQp(qpId) {
     btnDiv.appendChild(btn);
 
     btn.addEventListener('click', function (event) {
-        let item = event.target;
-        if (event.target.tagName === "I" || event.target.tagName === "LABEL") {
-            item = event.target.closest('button');
-        }
-        let qpId = item.dataset.qpId;
-        let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0 ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
-            return accumId > curId ? accumId : curId;
-        }) ['Id'] : 1;
-        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
-            Id: maxId + 1, Use: false, IdParameter: 0, Name: '', LimitValueActivate: false, LimitValue: 0, LimitValueString: ''
-        });
-
-        _clearQpsConfig();
-        _renderQpConfigs();
-
-        for (let liItem of document.querySelectorAll('#qp-list>li')) {
-            if (liItem.classList.contains('active')) {
-                liItem.classList.remove('active');
+        try {
+            let item = event.target;
+            if (event.target.tagName === "I" || event.target.tagName === "LABEL") {
+                item = event.target.closest('button');
             }
-        }
+            let qpId = item.dataset.qpId;
+            logTrace(`Добавление нового метода для QP ID: ${qpId}`);
 
-        for (let qpDirItem of document.querySelectorAll('.qp-dir-item')) {
-            if (!qpDirItem.classList.contains('d-none')) {
-                qpDirItem.classList.add('d-none');
+            // Получаем текущий выбранный параметр
+            let currentParameterId = item.dataset.currentParameterId;
+            if (!currentParameterId) {
+                // Если параметр не установлен, берем первый доступный
+                let container = document.querySelector(`.methods-tables-container[data-qp-id="${qpId}"]`);
+                let selector = container ? container.parentElement.querySelector('.parameter-select') : null;
+                if (selector && selector.options.length > 0) {
+                    currentParameterId = parseInt(selector.value);
+                    logDebug(`Выбран параметр по умолчанию: ${currentParameterId}`);
+                } else {
+                    logWarn('Нет доступных параметров для добавления метода');
+                    alert('Нет доступных параметров для добавления метода');
+                    return;
+                }
+            } else {
+                logDebug(`Используется предустановленный параметр: ${currentParameterId}`);
             }
-        }
 
-        let li = document.querySelector('li[data-target="' + '#qpId' + item.dataset.qpId + '"]');
-        li.classList.add('active');
-        document.querySelector(li.dataset.target).classList.remove('d-none');
-        _scrollToBottomTable(li.dataset.target + ' > .table-container > .table-content');
-        
-        let lastRow = document.querySelector(li.dataset.target + '> .table-container > .table-content > table').lastChild;
-        let itemBtn = lastRow.querySelector('.edit-methods-btn');
-        if (!itemBtn || !lastRow) return;
-        
-        // Устанавливаем режим инициализации для новой строки
-        itemBtn.dataset.mode = 'init';
-        _editQpMethod(lastRow, itemBtn);
+            let maxId = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].length !== 0 ? qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].reduce((accumId, curId) => {
+                return accumId > curId ? accumId : curId;
+            }) ['Id'] : 1;
+
+            const newMethodId = maxId + 1;
+            logDebug(`Создание нового метода с ID: ${newMethodId}, для параметра: ${currentParameterId}`);
+
+            // Создаем новый метод с привязкой к текущему параметру
+            qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].push({
+                Id: newMethodId,
+                Use: true, // По умолчанию активен
+                IdParameter: parseInt(currentParameterId),
+                Name: '',
+                LimitValueActivate: false,
+                LimitValue: 0,
+                LimitValueString: '',
+                IsDefault: false // Новое поле
+            });
+
+            logInfo(`Новый метод успешно добавлен: ID=${newMethodId}, Parameter=${currentParameterId}, Active=true`);
+
+            _clearQpsConfig();
+            _renderQpConfigs();
+
+            for (let liItem of document.querySelectorAll('#qp-list>li')) {
+                if (liItem.classList.contains('active')) {
+                    liItem.classList.remove('active');
+                }
+            }
+
+            for (let qpDirItem of document.querySelectorAll('.qp-dir-item')) {
+                if (!qpDirItem.classList.contains('d-none')) {
+                    qpDirItem.classList.add('d-none');
+                }
+            }
+
+            let li = document.querySelector('li[data-target="' + '#qpId' + item.dataset.qpId + '"]');
+            li.classList.add('active');
+            document.querySelector(li.dataset.target).classList.remove('d-none');
+
+            // Переключаемся на таблицу нужного параметра
+            _switchParameterTable(qpId, parseInt(currentParameterId));
+
+            // Находим текущую видимую таблицу и последнюю строку в ней
+            let visibleTable = document.querySelector(`[data-qp-id="${qpId}"] .parameter-table-wrapper:not(.d-none) table`);
+            if (!visibleTable) {
+                logWarn('Не удалось найти видимую таблицу для редактирования нового метода');
+                return;
+            }
+
+            let lastRow = visibleTable.lastChild;
+            let itemBtn = lastRow.querySelector('.edit-methods-btn');
+            if (!itemBtn || !lastRow) {
+                logWarn('Не удалось найти кнопку редактирования или строку для нового метода');
+                return;
+            }
+
+            // Устанавливаем режим инициализации для новой строки
+            itemBtn.dataset.mode = 'init';
+            _editQpMethod(lastRow, itemBtn);
+            logDebug('Новый метод переведен в режим редактирования');
+
+        } catch (error) {
+            logError('Ошибка при добавлении нового метода: ' + error.message);
+            throw error;
+        }
     });
 
     let img = document.createElement('i');
@@ -1673,31 +1909,100 @@ function _clearQpsConfig() {
 }
 
 /*
-* Рендеринг методов паспортов качества 
+* Рендеринг методов паспортов качества с группировкой по параметрам
 */
 function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
+    let methods = qps["Methods"];
+    let parameters = qps["Parameters"];
+    if (!methods || !parameters) return;
+
+    // Создаем контейнер для навигации по параметрам
+    let navigationDiv = document.createElement('div');
+    navigationDiv.classList.add('parameter-navigation', 'mb-3');
+    baseDiv.appendChild(navigationDiv);
+    
+    // Создаем выпадающий список параметров
+    _renderParameterSelector(counter, qps, navigationDiv);
+    
+    // Группируем методы по параметрам
+    let methodsByParameter = _groupMethodsByParameter(methods, parameters);
+    
+    // Создаем контейнер для таблиц
+    let tablesContainer = document.createElement('div');
+    tablesContainer.classList.add('methods-tables-container');
+    tablesContainer.dataset.qpId = counter;
+    baseDiv.appendChild(tablesContainer);
+    
+    // Создаем таблицу для каждого параметра
+    for (let [parameterId, parameterMethods] of Object.entries(methodsByParameter)) {
+        let parameter = parameters.find(p => p.Id === parseInt(parameterId));
+        if (!parameter) continue;
+        
+        _createParameterMethodsTable(counter, parameter, parameterMethods, tablesContainer);
+    }
+    
+    // Показываем первую таблицу по умолчанию
+    _showFirstParameterTable(tablesContainer);
+}
+
+/*
+* Группировка методов по параметрам
+*/
+function _groupMethodsByParameter(methods, parameters) {
+    let methodsByParameter = {};
+    
+    for (let method of methods) {
+        let parameterId = method['IdParameter'] || 0;
+        if (!methodsByParameter[parameterId]) {
+            methodsByParameter[parameterId] = [];
+        }
+        methodsByParameter[parameterId].push(method);
+    }
+    
+    return methodsByParameter;
+}
+
+/*
+* Создание таблицы методов для конкретного параметра
+*/
+function _createParameterMethodsTable(qpId, parameter, methods, container) {
+    let tableWrapper = document.createElement('div');
+    tableWrapper.classList.add('parameter-table-wrapper', 'd-none');
+    tableWrapper.dataset.parameterId = parameter.Id;
+    container.appendChild(tableWrapper);
+    
     let methodsTable = document.createElement('table');
     methodsTable.classList.add('table', 'table-bordered', 'inner-item-center', 'qp-method-table');
-    methodsTable.dataset.qpId = counter;
-    baseDiv.appendChild(methodsTable);
+    methodsTable.dataset.qpId = qpId;
+    methodsTable.dataset.parameterId = parameter.Id;
+    tableWrapper.appendChild(methodsTable);
+    
+    // Создание заголовка таблицы (без колонки "Параметр")
     let tbMethodsHead = document.createElement('thead');
     methodsTable.appendChild(tbMethodsHead);
     let hRow = document.createElement('tr');
     hRow.classList.add('table-primary');
     tbMethodsHead.appendChild(hRow);
+    
     hRow.appendChild(_createTableColumnHeader("Активен"));
     hRow.appendChild(_createTableColumnHeader("Метод"));
-    hRow.appendChild(_createTableColumnHeader("Параметр"));
     hRow.appendChild(_createTableColumnHeader("Контроль мин. значения"));
     hRow.appendChild(_createTableColumnHeader("Мин. значение"));
     hRow.appendChild(_createTableColumnHeader("Сообщение"));
-    hRow.appendChild(_createTableColumnHeader("Действия"));
-    let methods = qps["Methods"];
-    if (!methods) return;
+    // Новая колонка
+    hRow.appendChild(_createTableColumnHeader("Применять по умолчанию"));
+    let actionsTh = _createTableColumnHeader("Действия");
+    actionsTh.classList.add('action-buttons-header');
+    hRow.appendChild(actionsTh);
+    
+    // Создание строк для методов данного параметра
     for (let method of methods) {
+        if (typeof method.IsDefault === 'undefined') method.IsDefault = false;
         let row = document.createElement('tr');
         row.classList.add('data-row');
         row.dataset.id = method['Id'];
+        row.dataset.parameterId = parameter.Id;
+        // Активен
         let usedSquare = document.createElement('i')
         usedSquare.classList.add('fa');
         usedSquare.classList.add(method['Use'] === true ? 'fa-check-square-o' : 'fa-square-o');
@@ -1706,17 +2011,12 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
         usedTd.appendChild(usedSquare);
         _addCellStyle(usedTd)
         row.appendChild(usedTd);
+        // Метод
         let methodName = document.createElement('td');
         methodName.innerText = method['Name'];
         _addCellStyle(methodName);
         row.appendChild(methodName);
-        let paramsArray = qps["Parameters"];
-        let param = paramsArray.filter(item => item["Id"] === method["IdParameter"])[0];
-        let paramCell = document.createElement('td')
-        _addCellStyle(paramCell)
-        paramCell.innerText = param ? param["Name"] : " - ";
-        paramCell.dataset.paramId = param ? param["Id"] : 0;
-        row.appendChild(paramCell);
+        // Контроль мин. значения (только иконка, чекбокс будет в режиме редактирования)
         let limitActive = document.createElement('i')
         limitActive.classList.add('fa');
         limitActive.classList.add(method['LimitValueActivate'] === true ? 'fa-check-square-o' : 'fa-square-o');
@@ -1725,19 +2025,34 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
         limitActiveCell.appendChild(limitActive);
         _addCellStyle(limitActiveCell)
         row.appendChild(limitActiveCell);
+        // Мин. значение
         let LimitValueCell = document.createElement('td');
         LimitValueCell.innerText = method['LimitValue'];
         _addCellStyle(LimitValueCell);
         row.appendChild(LimitValueCell);
+        // Сообщение
         let LimitValueStringCell = document.createElement('td');
         LimitValueStringCell.innerText = !method['LimitValueString'] ? '-' : method['LimitValueString'];
         _addCellStyle(LimitValueStringCell);
         row.appendChild(LimitValueStringCell);
+        // Применять по умолчанию (только иконка, чекбокс будет в режиме редактирования)
+        let defaultCell = document.createElement('td');
+        let defaultIcon = document.createElement('i');
+        defaultIcon.classList.add('fa');
+        defaultIcon.classList.add(method.IsDefault ? 'fa-check-square-o' : 'fa-square-o');
+        defaultIcon.ariaHidden = true;
+        defaultCell.appendChild(defaultIcon);
+        _addCellStyle(defaultCell);
+        row.appendChild(defaultCell);
+        // Действия
         let actionCell = document.createElement('td');
+        actionCell.classList.add('action-buttons-cell');
         let editDivElement = document.createElement('div');
-        editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
+        editDivElement.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary'));
         let deleteDivElement = document.createElement('div');
-        deleteDivElement.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+        deleteDivElement.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger'));
+        editDivElement.firstChild.classList.add('action-btn');
+        deleteDivElement.firstChild.classList.add('action-btn');
         actionCell.appendChild(editDivElement);
         actionCell.appendChild(deleteDivElement);
         _addCellStyle(actionCell);
@@ -1746,13 +2061,109 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
     }
 }
 
+/*
+* Создание выпадающего списка для выбора параметра
+*/
+function _renderParameterSelector(qpId, qps, container) {
+    let selectorDiv = document.createElement('div');
+    selectorDiv.classList.add('parameter-selector');
+    
+    let label = document.createElement('label');
+    label.textContent = 'Параметр:';
+    selectorDiv.appendChild(label);
+    
+    let select = document.createElement('select');
+    select.classList.add('parameter-select');
+    select.dataset.qpId = qpId;
+    selectorDiv.appendChild(select);
+    
+    // Получаем уникальные параметры из методов
+    let parameters = qps["Parameters"];
+    let methods = qps["Methods"];
+    let usedParameterIds = [...new Set(methods.map(m => m.IdParameter))];
+    
+    // Добавляем опции для каждого используемого параметра
+    for (let parameterId of usedParameterIds) {
+        let parameter = parameters.find(p => p.Id === parameterId);
+        if (!parameter) continue;
+        
+        let option = document.createElement('option');
+        option.value = parameterId;
+        option.textContent = parameter.Name || `Параметр ${parameterId}`;
+        select.appendChild(option);
+    }
+    
+    // Обработчик изменения выбора параметра
+    select.addEventListener('change', function(e) {
+        _switchParameterTable(qpId, parseInt(e.target.value));
+    });
+    
+    container.appendChild(selectorDiv);
+}
+
+/*
+* Переключение между таблицами параметров
+*/
+function _switchParameterTable(qpId, parameterId) {
+    let container = document.querySelector(`.methods-tables-container[data-qp-id="${qpId}"]`);
+    if (!container) return;
+    
+    // Скрываем все таблицы
+    let allTables = container.querySelectorAll('.parameter-table-wrapper');
+    allTables.forEach(table => {
+        table.classList.add('d-none');
+    });
+    
+    // Показываем таблицу для выбранного параметра
+    let selectedTable = container.querySelector(`[data-parameter-id="${parameterId}"]`);
+    if (selectedTable) {
+        selectedTable.classList.remove('d-none');
+    }
+    
+    // Обновляем кнопку "Добавить" для текущего параметра
+    _updateAddButtonForParameter(qpId, parameterId);
+}
+
+/*
+* Показать первую таблицу по умолчанию
+*/
+function _showFirstParameterTable(container) {
+    let firstTable = container.querySelector('.parameter-table-wrapper');
+    if (firstTable) {
+        firstTable.classList.remove('d-none');
+        
+        // Обновляем селектор
+        let qpId = container.dataset.qpId;
+        let parameterId = firstTable.dataset.parameterId;
+        // Ищем селектор в родительском элементе контейнера
+        let selector = container.parentElement.querySelector('.parameter-select');
+        if (selector) {
+            selector.value = parameterId;
+        }
+        
+        // Обновляем кнопку добавления
+        _updateAddButtonForParameter(qpId, parseInt(parameterId));
+    }
+}
+
+/*
+* Обновление кнопки "Добавить" для текущего параметра
+*/
+function _updateAddButtonForParameter(qpId, parameterId) {
+    let addButton = document.querySelector(`.add-qp-btn[data-qp-id="${qpId}"]`);
+    if (addButton) {
+        addButton.dataset.currentParameterId = parameterId;
+    }
+}
+
 
 /*
     Создание кнопки удаления методов из паспортов качества
 */
-function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createDeleteQpMethodsBtn(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, 'btn-outline-danger');
     btn.classList.add('delete-btn');
+    btn.classList.add('action-btn'); // обязательно для кастомных стилей!
     btn.addEventListener('click', function(e) {
         let row = e.target.closest('tr');
         if (!row) return;
@@ -1770,34 +2181,17 @@ function _createDeleteQpMethodsBtn(faClass, buttonClass, margin) {
 /*
     Создание кнопки редактирования методов
 */
-function _createEditQpMethodsBtn(faClass, buttonClass, margin) {
-    let btn = _createWithOnlyImgButton(faClass, buttonClass, margin);
+function _createEditQpMethodsBtn(faClass, buttonClass) {
+    let btn = _createWithOnlyImgButton(faClass, 'btn-outline-primary');
     btn.dataset.mode = 'stable';
     btn.classList.add('edit-methods-btn');
-    
-    // Обновляем иконку в зависимости от режима
-    const updateIcon = () => {
-        const icon = btn.querySelector('i');
-        if (icon) {
-            icon.className = 'fa';
-            icon.classList.add(btn.dataset.mode === 'stable' ? 'fa-lock' : 'fa-unlock');
-        }
-    };
-    
-    // Обновляем иконку при изменении режима
-    const observer = new MutationObserver(updateIcon);
-    observer.observe(btn, { attributes: true, attributeFilter: ['data-mode'] });
-    
+    btn.classList.add('action-btn');
     btn.addEventListener('click', function(e) {
         let item = e.target.tagName === 'I' ? e.target.closest('button') : e.target;
         let row = item.closest('tr');
         if (!row) return;
         _editQpMethod(row, item);
     });
-    
-    // Инициализируем иконку
-    updateIcon();
-    
     return btn;
 }
 
@@ -1807,15 +2201,38 @@ function _createEditQpMethodsBtn(faClass, buttonClass, margin) {
     @param event - возникшее событие.
 */
 function _deleteQpMethodsBtnHandler(event) {
-    let row = event.target.closest('tr');
-    if (!row) return;
-    let table = row.closest('table');
-    if (!table) return;
-    let qpId = Number(table.dataset.qpId);
-    qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries["QpsInfo"][qpId]['Methods'].filter(function (item) {
-        return item["Id"] !== Number(row.dataset.id);
-    });
-    row.remove();
+    try {
+        let row = event.target.closest('tr');
+        if (!row) {
+            logWarn('Не удалось найти строку для удаления метода');
+            return;
+        }
+
+        let table = row.closest('table');
+        if (!table) {
+            logWarn('Не удалось найти таблицу для удаления метода');
+            return;
+        }
+
+        let qpId = Number(table.dataset.qpId);
+        let methodId = Number(row.dataset.id);
+
+        logTrace(`Удаление метода ID: ${methodId} для QP ID: ${qpId}`);
+
+        // Находим метод для логирования его названия перед удалением
+        let methodToDelete = qpCfgsDictionaries['QpsInfo'][qpId]['Methods'].find(m => m.Id === methodId);
+        let methodName = methodToDelete ? methodToDelete.Name || 'Без названия' : 'Неизвестно';
+
+        qpCfgsDictionaries['QpsInfo'][qpId]['Methods'] = qpCfgsDictionaries["QpsInfo"][qpId]['Methods'].filter(function (item) {
+            return item["Id"] !== methodId;
+        });
+
+        row.remove();
+        logInfo(`Метод успешно удален: ID=${methodId}, Name="${methodName}"`);
+
+    } catch (error) {
+        logError('Ошибка при удалении метода: ' + error.message);
+    }
 }
 
 /*
@@ -1823,18 +2240,31 @@ function _deleteQpMethodsBtnHandler(event) {
     @param event - возникшее событие.
 */
 function _editQpMethodBtnHandler(event) {
-    let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
-    let row = item.closest('tr');
-    if (!row) return;
-    
-    // Если это кнопка отмены, вызываем соответствующую функцию
-    if (item.classList.contains('cancel-edit-btn')) {
-        _cancelEditQpMethod(row, Number(row.dataset.id));
-        return;
+    try {
+        let item = event.target.tagName === 'I' ? event.target.closest('button') : event.target;
+        let row = item.closest('tr');
+        if (!row) {
+            logWarn('Не удалось найти строку для редактирования метода');
+            return;
+        }
+
+        let methodId = Number(row.dataset.id);
+        logTrace(`Обработка действия редактирования для метода ID: ${methodId}`);
+
+        // Если это кнопка отмены, вызываем соответствующую функцию
+        if (item.classList.contains('cancel-edit-btn')) {
+            logDebug(`Отмена редактирования метода ID: ${methodId}`);
+            _cancelEditQpMethod(row, methodId);
+            return;
+        }
+
+        // В противном случае обрабатываем как обычное редактирование
+        logDebug(`Начало редактирования метода ID: ${methodId}`);
+        _editQpMethod(row, item);
+
+    } catch (error) {
+        logError('Ошибка в обработчике редактирования метода: ' + error.message);
     }
-    
-    // В противном случае обрабатываем как обычное редактирование
-    _editQpMethod(row, item);
 }
 
 /*
@@ -1846,7 +2276,7 @@ function _editQpMethod(row, itemBtn) {
     if (!row || !itemBtn) return;
     
     let rowMap = {
-        0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
+        0: 'bool', 1: 'text', 2: 'bool', 3: 'number', 4: 'text', 5: 'ignore'
     }
 
     if (itemBtn.dataset.mode === 'stable' || itemBtn.dataset.mode === 'init') {
@@ -1887,11 +2317,11 @@ function _editQpMethod(row, itemBtn) {
             deleteDiv.innerHTML = '';
             
             // Добавляем кнопки редактирования
-            let editBtn = _createEditQpMethodsBtn('fa-unlock', 'btn-outline-primary', 'me-1');
+            let editBtn = _createEditQpMethodsBtn('fa-unlock', 'btn-outline-primary');
             editBtn.dataset.mode = 'edit';
             editDiv.appendChild(editBtn);
             
-            let cancelBtn = _createCancelEditButton('fa-times', 'btn-outline-danger', '');
+            let cancelBtn = _createCancelEditButton('fa-times', 'btn-outline-danger');
             deleteDiv.appendChild(cancelBtn);
         }
         
@@ -1929,11 +2359,11 @@ function _editQpMethod(row, itemBtn) {
             deleteDiv.innerHTML = '';
             
             // Добавляем кнопки просмотра
-            let editBtn = _createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1');
+            let editBtn = _createEditQpMethodsBtn('fa-lock', 'btn-outline-primary');
             editBtn.dataset.mode = 'stable';
             editDiv.appendChild(editBtn);
             
-            let deleteBtn = _createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', '');
+            let deleteBtn = _createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger');
             deleteDiv.appendChild(deleteBtn);
         }
         
@@ -1951,10 +2381,11 @@ function _getCurrentQpMethodState(rowItem) {
     return {
         use: cells[0].querySelector('i')?.classList.contains('fa-check-square-o') || false,
         name: cells[1].textContent.trim(),
-        paramId: cells[2].dataset.paramId || "0",
-        limitValueActivate: cells[3].querySelector('i')?.classList.contains('fa-check-square-o') || false,
-        limitValue: cells[4].textContent.trim(),
-        limitValueString: cells[5].textContent.trim()
+        paramId: rowItem.dataset.parameterId || "0",
+        limitValueActivate: cells[2].querySelector('i')?.classList.contains('fa-check-square-o') || false,
+        limitValue: cells[3].textContent.trim(),
+        limitValueString: cells[4].textContent.trim(),
+        isDefault: cells[5].querySelector('input[type="checkbox"].default-method-checkbox')?.checked || false
     };
 }
 
@@ -1988,7 +2419,7 @@ function _cancelEditQpMethod(rowItem, itemId) {
     }
 
     let rowMap = {
-        0: 'bool', 1: 'text', 2: 'combobox-params', 3: 'bool', 4: 'number', 5: 'text', 6: 'ignore'
+        0: 'bool', 1: 'text', 2: 'bool', 3: 'number', 4: 'text', 5: 'ignore'
     };
     
     // Восстанавливаем предыдущее состояние
@@ -2018,7 +2449,7 @@ function _cancelEditQpMethod(rowItem, itemId) {
     
     // Добавляем кнопки просмотра
     editDiv.appendChild(_createEditQpMethodsBtn('fa-lock', 'btn-outline-primary', 'me-1'));
-    deleteDiv.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', ''));
+    deleteDiv.appendChild(_createDeleteQpMethodsBtn('fa-trash', 'btn-outline-danger', '0 2px'));
 }
 
 /*
@@ -2039,22 +2470,28 @@ function _restoreQpMethodState(rowItem, previousState) {
     // Восстанавливаем название метода
     cells[1].textContent = previousState.name;
     
-    // Восстанавливаем параметр
-    const param = qpCfgsDictionaries['QpsInfo'][Number(rowItem.closest('table').dataset.qpId)]['Parameters']
-        .find(p => p.Id === Number(previousState.paramId));
-    cells[2].textContent = param ? param.Name : "Параметр не выбран";
-    cells[2].dataset.paramId = previousState.paramId;
+    // Параметр теперь хранится в dataset строки (колонка удалена)
+    rowItem.dataset.parameterId = previousState.paramId;
     
-    // Восстанавливаем флаг контроля минимального значения
+    // Восстанавливаем флаг контроля минимального значения (теперь индекс 2)
     const limitIcon = document.createElement('i');
     limitIcon.classList.add('fa', previousState.limitValueActivate ? 'fa-check-square-o' : 'fa-square-o');
     limitIcon.ariaHidden = true;
-    cells[3].innerHTML = '';
-    cells[3].appendChild(limitIcon);
+    cells[2].innerHTML = '';
+    cells[2].appendChild(limitIcon);
     
-    // Восстанавливаем минимальное значение и сообщение
-    cells[4].textContent = previousState.limitValue;
-    cells[5].textContent = previousState.limitValueString;
+    // Восстанавливаем минимальное значение и сообщение (индексы сдвинулись)
+    cells[3].textContent = previousState.limitValue;
+    cells[4].textContent = previousState.limitValueString;
+    // Восстанавливаем чекбокс IsDefault (индекс 5)
+    if (cells[5]) {
+        // Создаем иконку для отображения в стабильном режиме
+        let defaultIcon = document.createElement('i');
+        defaultIcon.classList.add('fa', previousState.isDefault ? 'fa-check-square-o' : 'fa-square-o');
+        defaultIcon.ariaHidden = true;
+        cells[5].innerHTML = '';
+        cells[5].appendChild(defaultIcon);
+    }
 }
 
 /*
@@ -2077,35 +2514,58 @@ function _applyQpMethodsChanged(rowItem, itemId, qpId) {
     // Имя метода
     const nameInput = cells[1].querySelector('input');
     updatedObject['Name'] = nameInput ? nameInput.value : cells[1].textContent;
-    // Параметр
-    const paramSelect = cells[2].querySelector('select');
-    if (paramSelect) {
-        updatedObject['IdParameter'] = Number(paramSelect.value);
-    } else {
-        let parameter = qpCfgsDictionaries["QpsInfo"][qpId]["Parameters"].filter(item => item["Name"] === cells[2].textContent)[0];
-        if (parameter) {
-            updatedObject['IdParameter'] = parameter['Id'];
-        } else {
-            updatedObject['IdParameter'] = 0;
-        }
+    // Параметр берем из dataset строки (поскольку колонка "Параметр" удалена)
+    if (rowItem.dataset.parameterId) {
+        updatedObject['IdParameter'] = Number(rowItem.dataset.parameterId);
     }
-    // Контроль мин. значения
-    const limitCheckbox = cells[3].querySelector('input[type="checkbox"]');
+    // Контроль мин. значения (теперь индекс 2 вместо 3)
+    const limitCheckbox = cells[2].querySelector('input[type="checkbox"]');
     if (limitCheckbox) {
         updatedObject['LimitValueActivate'] = limitCheckbox.checked;
     } else {
-        updatedObject['LimitValueActivate'] = cells[3].childNodes[0].classList.contains('fa-check-square-o');
+        updatedObject['LimitValueActivate'] = cells[2].childNodes[0].classList.contains('fa-check-square-o');
     }
-    // Мин. значение
-    const limitValueInput = cells[4].querySelector('input');
-    updatedObject['LimitValue'] = limitValueInput ? Number.parseFloat(limitValueInput.value.replaceAll(',', '.')) : Number.parseFloat(cells[4].textContent.replaceAll(',', '.'));
-    // Сообщение
-    const msgInput = cells[5].querySelector('input');
-    let msg = msgInput ? msgInput.value : cells[5].textContent;
+    // Мин. значение (теперь индекс 3 вместо 4)
+    const limitValueInput = cells[3].querySelector('input');
+    updatedObject['LimitValue'] = limitValueInput ? Number.parseFloat(limitValueInput.value.replaceAll(',', '.')) : Number.parseFloat(cells[3].textContent.replaceAll(',', '.'));
+    // Сообщение (теперь индекс 4 вместо 5)
+    const msgInput = cells[4].querySelector('input');
+    let msg = msgInput ? msgInput.value : cells[4].textContent;
     if (!msg) {
         updatedObject['LimitValueString'] = '-';
     } else {
         updatedObject['LimitValueString'] = msg;
+    }
+    // Новая колонка IsDefault (индекс 5)
+    const defaultCheckbox = cells[5].querySelector('input[type="checkbox"].default-method-checkbox');
+    
+    // Обрабатываем состояние чекбокса "Применять по умолчанию"
+    if (defaultCheckbox) {
+        updatedObject.IsDefault = defaultCheckbox.checked;
+        
+        // Если чекбокс установлен, убеждаемся что у других методов этого параметра сброшен флаг IsDefault
+        // (это уже должно быть сделано обработчиком _handleDefaultMethodCheckboxChange в режиме реального времени,
+        // но добавляем для надежности)
+        if (defaultCheckbox.checked) {
+            let paramId = updatedObject.IdParameter;
+            let methodsArr = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].filter(m => m.IdParameter === paramId && m.Id !== itemId);
+            methodsArr.forEach(m => m.IsDefault = false);
+        }
+    } else {
+        // Если чекбокс не найден (например, в стабильном режиме), читаем из иконки
+        let paramId = updatedObject.IdParameter;
+        let methodsArr = qpCfgsDictionaries["QpsInfo"][qpId]["Methods"].filter(m => m.IdParameter === paramId);
+        
+        // Проверяем иконку в ячейке
+        let icon = cells[5].querySelector('i');
+        let isDefault = icon && icon.classList.contains('fa-check-square-o');
+        
+        if (isDefault) {
+            methodsArr.forEach(m => m.IsDefault = false);
+            updatedObject.IsDefault = true;
+        } else {
+            updatedObject.IsDefault = false;
+        }
     }
 }
 
@@ -2182,7 +2642,7 @@ function _modificateElementClasses(selector, className, isRemove) {
     @param buttonClass - набор классов для кнопки. Разделитель ":"
     @param margin - конфигурация отсутупов
 */
-function _createWithOnlyImgButton(faClass, buttonClass, margin) {
+function _createWithOnlyImgButton(faClass, buttonClass) {
     let img = document.createElement('i');
     img.classList.add('fa');
     if (typeof faClass === 'string') {
@@ -2212,7 +2672,6 @@ function _createWithOnlyImgButton(faClass, buttonClass, margin) {
         }
     }
     btn.appendChild(img);
-    btn.style.margin = margin;
     btn.style.alignSelf = 'center';
     return btn;
 }
@@ -2443,7 +2902,82 @@ function _cancelEditLicence(rowItem, itemId) {
     deleteDiv.innerHTML = '';
     
     // Добавляем кнопки просмотра
-    editDiv.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary', 'me-1'));
-    deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger', ''));
+    editDiv.appendChild(_createEditLicensesButton('fa-lock', 'btn-outline-primary'));
+    deleteDiv.appendChild(_createDeleteLicenseBtn('fa-trash', 'btn-outline-danger'));
+}
+
+// 1. Функция рендера комбобокса выбора группы
+function _renderUserGroupSelector() {
+    let container = document.querySelector('#users-group-selector-container');
+    if (!container) {
+        let usersSection = document.querySelector('#users');
+        container = document.createElement('div');
+        container.id = 'users-group-selector-container';
+        container.classList.add('parameter-navigation');
+        usersSection.prepend(container);
+    } else {
+        container.innerHTML = '';
+        container.classList.add('parameter-navigation');
+    }
+    // Создаём обёртку для label и select
+    let selectorDiv = document.createElement('div');
+    selectorDiv.classList.add('parameter-selector');
+    let label = document.createElement('label');
+    label.textContent = 'Группа:';
+    label.setAttribute('for', 'users-group-selector');
+    selectorDiv.appendChild(label);
+    let select = document.createElement('select');
+    select.id = 'users-group-selector';
+    select.classList.add('parameter-select');
+    for (let group of appDictionaries['UsersGroup']) {
+        let option = document.createElement('option');
+        option.value = group.Id;
+        option.textContent = group.Name;
+        select.appendChild(option);
+    }
+    selectorDiv.appendChild(select);
+    container.appendChild(selectorDiv);
+    select.addEventListener('change', function() {
+        _clearRowTable('.users-table');
+        _renderAndAddHandlerUserTable(Number(this.value));
+    });
+}
+
+/*
+    Обработчик изменения чекбокса "Применять по умолчанию"
+    Обеспечивает взаимоисключающее поведение - только один чекбокс может быть активен для каждого параметра
+    @param checkbox - измененный чекбокс
+*/
+function _handleDefaultMethodCheckboxChange(checkbox) {
+    if (!checkbox.checked) {
+        // Если чекбокс снят, ничего не делаем
+        return;
+    }
+    
+    // Находим строку таблицы
+    let row = checkbox.closest('tr');
+    if (!row) return;
+    
+    // Находим таблицу
+    let table = row.closest('table');
+    if (!table) return;
+    
+    // Получаем ID параметра из dataset строки
+    let currentParameterId = row.dataset.parameterId;
+    if (!currentParameterId) return;
+    
+    // Находим все строки в таблице с тем же параметром
+    let allRows = table.querySelectorAll('tr[data-parameter-id="' + currentParameterId + '"]');
+    
+    // Снимаем флаги "Применять по умолчанию" у всех других методов этого параметра
+    allRows.forEach(function(otherRow) {
+        if (otherRow === row) return; // Пропускаем текущую строку
+        
+        // Находим чекбокс "Применять по умолчанию" в строке (последний чекбокс с классом default-method-checkbox)
+        let otherCheckbox = otherRow.querySelector('input[type="checkbox"].default-method-checkbox');
+        if (otherCheckbox) {
+            otherCheckbox.checked = false;
+        }
+    });
 }
 

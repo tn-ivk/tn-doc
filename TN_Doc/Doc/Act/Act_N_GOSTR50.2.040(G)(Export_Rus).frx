@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/16/2025 08:49:21" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/13/2025 01:04:13" ReportInfo.CreatorVersion="2024.2.20.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -38,13 +38,6 @@ namespace FastReport
      
     private void Page_StartPage(object sender, EventArgs e)
     {
-      //using (var sr = new StreamReader(&quot;C:/SVN/FastReport/Входящие данные от Алексея (классы и json)/11_Act/DocAct.json&quot;))
-      //{                                                                                          
-      // Read the stream as a string
-      //   Report.SetParameterValue(&quot;Act&quot;, sr.ReadToEnd());
-      //}
-      //// Десериализация данных (формат json) из входного параметра - Json    
-      
       string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
       Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
       settings.TypeNameHandling = TypeNameHandling.All;         
@@ -99,8 +92,14 @@ namespace FastReport
       bool ShowResultColumn = SettingsData.ShowResultColumn;
       int ColumnsCount = 0; 
       List&lt;TN.Doc.Act&gt; listShiftsData;
-      listShiftsData = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act.Where(i =&gt; ! i.Vol_LastShift.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Vol_LastShift) == false).ToList();
-         
+      string usedShiftStrInit = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
+      int usedShiftInit;
+      var listActs = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act;
+      if (int.TryParse(usedShiftStrInit, out usedShiftInit) &amp;&amp; usedShiftInit &gt;= 1)
+        listShiftsData = listActs.Take(usedShiftInit).ToList();
+      else
+        listShiftsData = listActs.Where(i =&gt; !i.Vol_LastShift.Contains(&quot;-&quot;) &amp;&amp; !String.IsNullOrEmpty(i.Vol_LastShift)).ToList();
+      
       if (Engine.FinalPass == true)
       {
         if (ShowResultColumn)
@@ -142,15 +141,26 @@ namespace FastReport
         TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
             
         // Fill TableAct with data
-        string shiftCountStr = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
-        if (!int.TryParse(shiftCountStr, out int shiftCount) || shiftCount &lt; 1)
-          shiftCount = 1;
-        double hoursPerShift = 24.0 / shiftCount;
-        
-        for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
+        string begin = string.Empty;
+        string end = string.Empty;
+        int samplingBeginTs = 0;
+        int samplingEndTs = 0;
+
+        for (int i = 0; i &lt; (listShiftsData.Count); i++)
         {
-          string begin = FormatTime(i * hoursPerShift);
-          string end = FormatTime((i + 1) * hoursPerShift);
+          begin = string.Empty;
+          end = string.Empty;
+          if(i &lt; DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT.Count)
+          {
+            samplingBeginTs = DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].Begin;
+            samplingEndTs = DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].End;
+          }
+
+          if(samplingBeginTs &gt; 0 &amp;&amp; samplingEndTs &gt; 0)
+          {
+            begin = tools.UnixTimestampToDatetime(samplingBeginTs).ToString(&quot;HH:mm&quot;);
+            end = tools.UnixTimestampToDatetime(samplingEndTs).ToString(&quot;HH:mm&quot;).Replace(&quot;00:00&quot;, &quot;24:00&quot;);
+          }
           TableAct[(2+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
           TableAct[(2+i),2].Text = $&quot;{begin}-{end}&quot;;            
           TableAct[(2+i),3].Text = $&quot;Смена {i+1}&quot;;  
@@ -189,17 +199,7 @@ namespace FastReport
       }
     }      
     
-    private string FormatTime(double totalHours)
-    {
-      int hours = (int)totalHours;
-      int minutes = (int)((totalHours - hours) * 60);
-
-      if (hours == 24)
-        return &quot;24:00&quot;;
-
-      return $&quot;{hours:00}:{minutes:00}&quot;;
-    }
-    
+        
     private void TableAdditionlInfo_ManualBuild(object sender, EventArgs e)
     {
       // Setup Last Column width
@@ -364,7 +364,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="185.4" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="186.11" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="7.56" Width="567" Height="511.13" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="302.4"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -534,7 +534,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="689.19" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="690.6" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Top="9.45" Width="336.42" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="336.42"/>
         <TableRow Name="Row195">
@@ -545,7 +545,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="740.44" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="742.56" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="85.05" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -597,7 +597,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="837.05" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="839.87" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

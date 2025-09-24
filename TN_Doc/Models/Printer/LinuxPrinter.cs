@@ -1,58 +1,105 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using TN_DocGeneral.Services;
 
-namespace TN_Doc.Models.Printer
+namespace TN_Doc.Models.Printer;
+
+/// <summary>
+/// Класс принтера для взаимодействия с печатью под Linux
+/// </summary>
+public sealed class LinuxPrinter(IReportBuffer buffer) : AbsPrinter(buffer)
 {
     /// <summary>
-    /// Класс принтера для взаимодействия с печатью под Linux
+    /// Получение списка доступных принтеров в системе
     /// </summary>
-    public sealed class LinuxPrinter : AbsPrinter
+    /// <returns>Список доступных принтеров</returns>
+    [SupportedOSPlatform("linux")]
+    public override IEnumerable<string> GetAvailablePrinters()
     {
-        /// <summary>
-        /// Получение списка доступных принтеров в системе
-        /// </summary>
-        /// <returns>Список доступных принтеров</returns>
-        public override IEnumerable<string> GetAvailablePrinters()
+        if (!OperatingSystem.IsLinux())
         {
-            using var process = new Process();
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.StartInfo.Arguments = "-e";
-            process.StartInfo.FileName = "lpstat";
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            process.WaitForExit();
-            foreach (var item in process.StandardOutput.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries))
-                yield return item;
+            throw new PlatformNotSupportedException("Получение списка принтеров поддерживается только в Linux");
         }
 
-        /// <summary>
-        /// Печать сформированного отчёта на заданном принтере
-        /// </summary>
-        /// <param name="printerName">Название принтера</param>
-        public override Task PrintDocAsync(string printerName)
+        using var process = new Process();
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        process.StartInfo.Arguments = "-e";
+        process.StartInfo.FileName = "lpstat";
+        process.StartInfo.CreateNoWindow = true;
+        
+        if (!process.Start())
         {
-            return Task.Run(() =>
-            {
-                var printersName = GetAvailablePrinters();
-                if (!printersName.Contains(printerName))
-                    return;
-                var consoleStr = $"-H localhost -P  {printerName} -ol {Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PDF", "PDF.pdf")}";
-                using var process = new Process();
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                process.StartInfo.Arguments = consoleStr;
-                process.StartInfo.FileName = "lpr";
-                process.StartInfo.CreateNoWindow = true;
-                process.Start();
-                process.WaitForExit();
-            });
+            throw new InvalidOperationException("Не удалось запустить процесс lpstat для получения списка принтеров");
         }
+        
+        process.WaitForExit();
+        
+        if (process.ExitCode != 0)
+        {
+            var error = process.StandardError.ReadToEnd();
+            throw new InvalidOperationException($"Ошибка выполнения lpstat: {error}");
+        }
+        
+        var output = process.StandardOutput.ReadToEnd();
+        return output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    /// <summary>
+    /// Печать сформированного отчёта на заданном принтере
+    /// </summary>
+    /// <param name="printerName">Название принтера</param>
+    [SupportedOSPlatform("linux")]
+    public override Task PrintDocAsync(string printerName)
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            throw new PlatformNotSupportedException("Печать поддерживается только в Linux");
+        }
+
+        return Task.Run(() =>
+        {
+            var printersName = GetAvailablePrinters();
+            if (!printersName.Contains(printerName))
+                throw new InvalidOperationException($"Принтер '{printerName}' не доступен");
+                
+            var pdfBytes = _buffer.GetPdfBytes();
+            if (pdfBytes is null || pdfBytes.Length == 0)
+                throw new InvalidOperationException("Отсутствуют подготовленные данные для печати");
+                
+            using var process = new Process();
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardInput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.Arguments = $"-d {printerName} -t \"TN_Doc\"";
+            process.StartInfo.FileName = "lp";
+            process.StartInfo.CreateNoWindow = true;
+            
+            if (!process.Start())
+            {
+                throw new InvalidOperationException("Не удалось запустить процесс lp для печати");
+            }
+            
+            using (var stdin = process.StandardInput.BaseStream)
+            {
+                stdin.Write(pdfBytes, 0, pdfBytes.Length);
+                stdin.Flush();
+            }
+            
+            process.WaitForExit();
+            
+            if (process.ExitCode != 0)
+            {
+                var error = process.StandardError.ReadToEnd();
+                throw new InvalidOperationException($"Ошибка печати через lp: {error}");
+            }
+        });
     }
 }

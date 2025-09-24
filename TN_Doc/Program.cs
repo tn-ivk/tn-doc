@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using NLog;
-using TN_Doc.Models.Services;
+using TN_Doc.Services;
 
 namespace TN_Doc;
 

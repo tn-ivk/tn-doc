@@ -1,0 +1,35 @@
+﻿/* Стили для навигации по параметрам методов испытаний */
+.parameter-navigation {
+    margin-bottom: 15px;
+    padding: 5px;
+}
+
+.parameter-selector {
+    display: flex;
+    align-items: center;
+}
+
+.parameter-selector label {
+    font-weight: bold;
+    font-size: var(--dictionary-font-size);
+    white-space: nowrap;
+    margin: 0 10px 0 0;
+}
+
+.parameter-select {
+    flex: 1;
+    font-size: var(--dictionary-font-size);
+    padding: 5px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+    background-color: white ;
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+}
+
+.parameter-select:focus {
+    border-color: #0d6efd;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}

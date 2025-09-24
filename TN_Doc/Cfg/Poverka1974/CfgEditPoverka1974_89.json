@@ -103,6 +103,22 @@
       "Key": "StaffData",
       "Type": "text",
       "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 14,
+      "Use": true,
+      "Edit": true,
+      "Key": "ViscForFirstMeas",
+      "Type": "text",
+      "Name": "Вязкость нефти для первого измерения"
+    },
+    {
+      "Id": 15,
+      "Use": true,
+      "Edit": true,
+      "Key": "ViscForEndMeas",
+      "Type": "text",
+      "Name": "Вязкость нефти для последнего измерения"
     }
   ]
 }
