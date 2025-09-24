@@ -7,6 +7,12 @@ variables:
     DOTNET_RT_VERSION: "8.0.13"   
     PROJECT_NAME: "TN_Doc"  
 
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - when: never
+
 stages:          
   - build
   - package
@@ -15,8 +21,6 @@ stages:
 build-job:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   tags:
     - orpovy
   before_script:
@@ -42,8 +46,6 @@ build-job:
 extract-version-job:       
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   tags:
     - orpovy
   script:
@@ -101,8 +103,6 @@ extract-version-job:
 package-job:      # This job runs in the deploy stage.
   stage: package
   image: ubuntu:latest
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   needs:
     - build-job
     - extract-version-job
@@ -504,8 +504,6 @@ package-job:      # This job runs in the deploy stage.
 package-minimal-job:      # Minimal package without dependencies
   stage: package
   image: ubuntu:latest
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   needs:
     - build-job
     - extract-version-job
@@ -775,8 +773,6 @@ package-minimal-job:      # Minimal package without dependencies
 package-net-runtime-job:      # .NET Runtime standalone package
   stage: package
   image: ubuntu:latest
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   needs:
     - extract-version-job
   tags:
@@ -1008,8 +1004,6 @@ package-net-runtime-job:      # .NET Runtime standalone package
 package-fonts-job:      # System fonts standalone package
   stage: package
   image: ubuntu:latest
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   needs:
     - extract-version-job
   tags:
@@ -1194,8 +1188,6 @@ package-fonts-job:      # System fonts standalone package
 notify-telegram-job:      # Telegram notifications with file uploads
   stage: notify
   image: ubuntu:latest
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
   needs:
     - package-job
     - package-minimal-job
