@@ -97,13 +97,21 @@
                     
                     document.getElementById("Delive_Factory").value = user.Factory || '';
                     document.getElementById("Delive_FIO").value = user.FIO || '';
-                    
+
+                    // Применяем валидацию к автоматически заполненным полям
+                    InputStringCheck(document.getElementById("Delive_Factory"));
+                    InputStringCheck(document.getElementById("Delive_FIO"));
+
                     let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
                     if (license) {
                         logTrace(`UserChangeEvent: найдена доверенность для сдающей стороны - номер: ${license.LicensesNumber || 'не указан'}, дата: ${license.LicensesDate || 'не указана'}`);
-                        
+
                         document.getElementById("Delive_Lic_Date").value = license.LicensesDate || '';
                         document.getElementById("Delive_Lic_Number").value = license.LicensesNumber || '';
+
+                        // Применяем валидацию к полям доверенности
+                        InputStringCheck(document.getElementById("Delive_Lic_Date"));
+                        InputStringCheck(document.getElementById("Delive_Lic_Number"));
                     } else {
                         logWarn(`UserChangeEvent: доверенность для пользователя сдающей стороны не найдена, LicId: ${user['LicId'] || 'не указан'}`);
                         document.getElementById("Delive_Lic_Date").value = '';
@@ -126,13 +134,21 @@
                     
                     document.getElementById("Receive_Factory").value = user.Factory || '';
                     document.getElementById("Receive_FIO").value = user.FIO || '';
-                    
+
+                    // Применяем валидацию к автоматически заполненным полям
+                    InputStringCheck(document.getElementById("Receive_Factory"));
+                    InputStringCheck(document.getElementById("Receive_FIO"));
+
                     let license = dictionaries.Licenses.filter(licenses => licenses["Id"] === user['LicId'])[0];
                     if (license) {
                         logTrace(`UserChangeEvent: найдена доверенность для принимающей стороны - номер: ${license.LicensesNumber || 'не указан'}, дата: ${license.LicensesDate || 'не указана'}`);
-                        
+
                         document.getElementById("Receive_Lic_Date").value = license.LicensesDate || '';
                         document.getElementById("Receive_Lic_Number").value = license.LicensesNumber || '';
+
+                        // Применяем валидацию к полям доверенности
+                        InputStringCheck(document.getElementById("Receive_Lic_Date"));
+                        InputStringCheck(document.getElementById("Receive_Lic_Number"));
                     } else {
                         logWarn(`UserChangeEvent: доверенность для пользователя принимающей стороны не найдена, LicId: ${user['LicId'] || 'не указан'}`);
                         document.getElementById("Receive_Lic_Date").value = '';
