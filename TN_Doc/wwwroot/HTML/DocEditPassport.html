@@ -78,7 +78,11 @@
                         
                         document.getElementById("Laboratory_Post").value = user[0].Post || '';
                         document.getElementById("Laboratory_Factory").value = user[0].Factory || '';
-                        
+
+                        // Применяем валидацию к автоматически заполненным полям
+                        InputStringCheck(document.getElementById("Laboratory_Post"));
+                        InputStringCheck(document.getElementById("Laboratory_Factory"));
+
                         logTrace(`UserChangeEvent: обновлены поля должности и предприятия для лаборатории`);
                     } else {
                         logWarn(`UserChangeEvent: пользователь с ID ${selectObject.value} не найден в словаре лаборатории`);
@@ -94,7 +98,11 @@
                         
                         document.getElementById("Delive_Post").value = user[0].Post || '';
                         document.getElementById("Delive_Factory").value = user[0].Factory || '';
-                        
+
+                        // Применяем валидацию к автоматически заполненным полям
+                        InputStringCheck(document.getElementById("Delive_Post"));
+                        InputStringCheck(document.getElementById("Delive_Factory"));
+
                         logTrace(`UserChangeEvent: обновлены поля должности и предприятия для сдающей стороны`);
                     } else {
                         logWarn(`UserChangeEvent: пользователь с ID ${selectObject.value} не найден в словаре сдающей стороны`);
@@ -110,7 +118,11 @@
                         
                         document.getElementById("Receive_Post").value = user[0].Post || '';
                         document.getElementById("Receive_Factory").value = user[0].Factory || '';
-                        
+
+                        // Применяем валидацию к автоматически заполненным полям
+                        InputStringCheck(document.getElementById("Receive_Post"));
+                        InputStringCheck(document.getElementById("Receive_Factory"));
+
                         logTrace(`UserChangeEvent: обновлены поля должности и предприятия для принимающей стороны`);
                     } else {
                         logWarn(`UserChangeEvent: пользователь с ID ${selectObject.value} не найден в словаре принимающей стороны`);
