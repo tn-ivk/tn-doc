@@ -53,6 +53,8 @@ public class Startup
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
+		services.AddMemoryCache(); // Добавляем кэширование в памяти для статусов
+		services.AddStatusServices(); // Добавляем сервисы мониторинга статусов
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();

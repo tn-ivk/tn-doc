@@ -281,13 +281,47 @@
 </div>
 
 
+<!-- Status Bar -->
+<div id="status-bar" class="status-bar">
+    <div id="device-indicators" class="status-section">
+        <!-- Динамически генерируемые индикаторы устройств -->
+    </div>
+    <div id="opc-indicators" class="status-section">
+        <!-- Динамически генерируемые индикаторы OPC серверов -->
+    </div>
+    <div id="service-indicators" class="status-section">
+        <span id="signalr-status" class="status-indicator status-signalr" data-service="signalr">
+            <span class="status-text">SignalR</span>
+            <div class="status-tooltip">Подключение к SignalR Hub</div>
+        </span>
+        <span id="elis-status" class="status-indicator status-elis" data-service="elis" style="display: none;">
+            <span class="status-text">ELIS</span>
+            <div class="status-tooltip">Лабораторная информационная система</div>
+        </span>
+    </div>
+    <div id="system-info" class="status-section">
+        <span id="app-version" class="status-info">TN_Doc v@ViewData["Version"]</span>
+        <span id="current-time" class="status-info status-time"></span>
+        <div class="status-controls">
+            <button id="refresh-status" class="status-refresh-btn" title="Обновить статусы">
+                ↻
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
         RedefinitionConfirmWindow();
         InitElement();
-        // загрузка статичного html    
+        // загрузка статичного html
         $(document).ready(function () {
             $("#ErrorDialogContent").load("/HTML/ErrorDialogWindow.html");
             $("#ElisRequestContent").load("/HTML/ElisRequestWindow.html");
+
+            // Инициализация строки состояния
+            if (typeof StatusBarManager !== 'undefined') {
+                window.statusBar = new StatusBarManager();
+            }
         });
 </script>
 </body>

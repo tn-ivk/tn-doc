@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using TN_Doc.Models.Printer;
 using TN_Doc.Services;
+using TN_Doc.Services.Status;
 using TN.Utils;
 
 namespace TN_Doc.Extensions;
@@ -60,6 +61,20 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton(appInfoProvider);
 		var logger = LogManager.GetCurrentClassLogger();
 		logger.Info($"Запуск приложения: {assembly.GetName().Name} версии: {appInfoProvider.Version}");
+	}
+
+	/// <summary>
+	/// Добавление сервисов мониторинга статусов
+	/// </summary>
+	/// <param name="services">Коллекция сервисов</param>
+	public static void AddStatusServices(this IServiceCollection services)
+	{
+		// Основной сервис проверки подключений
+		services.AddSingleton<IConnectionStatusService, ConnectionStatusService>();
+
+		// TODO: Добавить OPC и ELIS сервисы когда они будут реализованы
+		// services.AddSingleton<IOpcStatusService, OpcStatusService>();
+		// services.AddSingleton<IElisStatusService, ElisStatusService>();
 	}
 
 	private static bool IsWindows => Environment.OSVersion.Platform != PlatformID.Unix &&
