@@ -8,8 +8,7 @@ namespace TN_Doc.Services;
 /// </summary>
 public class LoggingPathService
 {
-    //private const string LinuxLogDirectory = "/var/log/TN_Doc";
-    private const string LinuxLogDirectory = "/opt/TN_Doc/logs";
+    private const string LinuxLogDirectory = "/var/log/TN_Doc";
     private const string WindowsLogDirectory = "logs";
 
     /// <summary>

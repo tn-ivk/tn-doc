@@ -1274,8 +1274,8 @@ notify-telegram-job:      # Telegram notifications with file uploads
     
     # Отправка пакетов приложения
     - echo "Отправляем пакеты приложения..."
-    - send_file "$FULL_PACKAGE" "📦 Полный пакет TN_Doc v${VERSION}" "$FULL_SIZE_BYTES"
-    - send_file "$MINIMAL_PACKAGE" "📦 Минимальный пакет TN_Doc v${VERSION}" "$MINIMAL_SIZE_BYTES"
+    - send_file "$FULL_PACKAGE" "📦 Полный (+ .NET Runtime) пакет TN_Doc v${VERSION}" "$FULL_SIZE_BYTES"
+    - send_file "$MINIMAL_PACKAGE" "📦 TN_Doc" "$MINIMAL_SIZE_BYTES"
     
     # Пауза между группами сообщений
     - sleep 2
@@ -1299,7 +1299,7 @@ notify-telegram-job:      # Telegram notifications with file uploads
     # Отправка пакетов зависимостей
     - echo "Отправляем пакеты зависимостей..."
     - send_file "$RUNTIME_PACKAGE" "⚙️ .NET Runtime 8.0.13 для TN приложений" "$RUNTIME_SIZE_BYTES"
-    - send_file "$FONTS_PACKAGE" "⚙️ Системные шрифты для TN приложений v${VERSION}" "$FONTS_SIZE_BYTES"
+    - send_file "$FONTS_PACKAGE" "⚙️ Системные шрифты для TN приложений" "$FONTS_SIZE_BYTES"
     
     - echo "Telegram notifications and files sent successfully"
   artifacts:
