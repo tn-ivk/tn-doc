@@ -754,15 +754,15 @@ package-minimal-job:      # Minimal package without dependencies
     - chmod 755 deb-minimal/opt/TN_Doc/TN_Doc
     - chmod 644 deb-minimal/opt/TN_Doc/*.dll 2>/dev/null || true
     - echo "Creating minimal control.tar.xz..."
-    - tar -cJf control-minimal.tar.xz -C deb-minimal/DEBIAN .
+    - tar -cJf control.tar.xz -C deb-minimal/DEBIAN .
     - echo "Creating minimal data.tar.xz..."
-    - tar -cJf data-minimal.tar.xz -C deb-minimal --exclude=DEBIAN .
+    - tar -cJf data.tar.xz -C deb-minimal --exclude=DEBIAN .
     - echo "Creating minimal debian-binary..."
-    - echo "2.0" > debian-binary-minimal
+    - echo "2.0" > debian-binary
     - echo "Building minimal .deb package..."
     - mkdir -p packages
-    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary-minimal control-minimal.tar.xz data-minimal.tar.xz
-    - rm -f debian-binary-minimal control-minimal.tar.xz data-minimal.tar.xz
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+    - rm -f debian-binary control.tar.xz data.tar.xz
     - ls -l ./packages/${DEB_NAME}_amd64.deb
     - echo "Current directory:$(pwd)"
   artifacts:
@@ -985,15 +985,15 @@ package-net-runtime-job:      # .NET Runtime standalone package
     # Установка прав
     - chmod 644 deb-runtime/DEBIAN/control
     - echo "Creating runtime control.tar.xz..."
-    - tar -cJf control-runtime.tar.xz -C deb-runtime/DEBIAN .
+    - tar -cJf control.tar.xz -C deb-runtime/DEBIAN .
     - echo "Creating runtime data.tar.xz..."
-    - tar -cJf data-runtime.tar.xz -C deb-runtime --exclude=DEBIAN .
+    - tar -cJf data.tar.xz -C deb-runtime --exclude=DEBIAN .
     - echo "Creating runtime debian-binary..."
-    - echo "2.0" > debian-binary-runtime
+    - echo "2.0" > debian-binary
     - echo "Building .NET Runtime .deb package..."
     - mkdir -p packages
-    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary-runtime control-runtime.tar.xz data-runtime.tar.xz
-    - rm -f debian-binary-runtime control-runtime.tar.xz data-runtime.tar.xz
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+    - rm -f debian-binary control.tar.xz data.tar.xz
     - ls -l ./packages/${DEB_NAME}_amd64.deb
     - echo "Current directory:$(pwd)"
   artifacts:
@@ -1169,15 +1169,15 @@ package-fonts-job:      # System fonts standalone package
     - find deb-fonts/usr/share/fonts -name "*.ttf" -exec chmod 644 {} \;
     - find deb-fonts/usr/share/fonts -name "*.TTF" -exec chmod 644 {} \;
     - echo "Creating fonts control.tar.xz..."
-    - tar -cJf control-fonts.tar.xz -C deb-fonts/DEBIAN .
+    - tar -cJf control.tar.xz -C deb-fonts/DEBIAN .
     - echo "Creating fonts data.tar.xz..."
-    - tar -cJf data-fonts.tar.xz -C deb-fonts --exclude=DEBIAN .
+    - tar -cJf data.tar.xz -C deb-fonts --exclude=DEBIAN .
     - echo "Creating fonts debian-binary..."
-    - echo "2.0" > debian-binary-fonts
+    - echo "2.0" > debian-binary
     - echo "Building fonts .deb package..."
     - mkdir -p packages
-    - ar r ./packages/${DEB_NAME}.deb debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
-    - rm -f debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
+    - ar r ./packages/${DEB_NAME}.deb debian-binary control.tar.xz data.tar.xz
+    - rm -f debian-binary control.tar.xz data.tar.xz
     - ls -l ./packages/${DEB_NAME}.deb
     - echo "Current directory:$(pwd)"
   artifacts:
