@@ -235,16 +235,28 @@
     }
 
     function updateTooltip(element) {
+        // Проверяем наличие id у элемента перед использованием jQuery селектора
+        if (!element.id) {
+            return;
+        }
+
+        const $element = $('#' + element.id);
+
+        // Проверяем, инициализирован ли tooltip для элемента
+        if (!$element.hasClass('ui-tooltip-trigger') && !$element.data('ui-tooltip')) {
+            // Инициализируем tooltip для элемента
+            $element.tooltip();
+        }
+
         if(element.classList.contains("incorrect-value"))
         {
-            $('#' + element.id)
-                .tooltip("enable")
+            $element.tooltip("enable")
                 .tooltip("option", "content", element.getAttribute("title"));
         }
 
         if(element.classList.contains("correct-value"))
         {
-            $('#' + element.id).tooltip("disable");
+            $element.tooltip("disable");
         }
     }
 </script>
