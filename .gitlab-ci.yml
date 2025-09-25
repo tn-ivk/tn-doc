@@ -797,9 +797,10 @@ package-net-runtime-job:      # .NET Runtime standalone package
       Section: libs
       Priority: optional
       Architecture: amd64
-      Depends: libc6, libgcc-s1, libstdc++6
-      Provides: dotnet-runtime-8.0
-      Conflicts: dotnet-runtime-8.0
+      Depends: libc6, libstdc++6
+      Provides: dotnet-runtime-8.0 (= 8.0.13)
+      Replaces: dotnet-runtime-8.0
+      Breaks: dotnet-runtime-8.0
       Maintainer: DadonovAD <dadonovad@transneft.ru>
       Description: Microsoft .NET Runtime 8.0.13 для TN приложений.
        Автономная установка .NET Runtime 8.0.13 в /usr/bin/dotnet.
