@@ -50,98 +50,138 @@ public class HomeController : Controller
 
     public List<ListItem> GetListDevices()
     {
-        _logger.LogDebug($"Загрузка списка устройств");
-        var usedDevices = _cfgApp.Devices
-            .Where(x => x.Use)
-            .ToList();
-        if (!usedDevices.Any())
+        try
         {
-            _logger.LogError("В конфигурации нет используемых устройств");
+            _logger.LogDebug($"Загрузка списка устройств");
+            var usedDevices = _cfgApp.Devices
+                .Where(x => x.Use)
+                .ToList();
+            if (!usedDevices.Any())
+            {
+                _logger.LogError("В конфигурации нет используемых устройств");
+                return new List<ListItem>();
+            }
+            var devices = usedDevices.Select(u => new ListItem { Id = u.IdDevice, Name = u.Name })
+                .ToList();
+            _logger.LogTrace($"Загружен список устройств: {string.Join(',', devices.Select(x => x.Name))}");
+            return devices;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при загрузке списка устройств");
             return new List<ListItem>();
         }
-        var devices = usedDevices.Select(u => new ListItem { Id = u.IdDevice, Name = u.Name })
-            .ToList();
-        _logger.LogTrace($"Загружен список устройств: {string.Join(',', devices.Select(x => x.Name))}");
-        return devices;
     }
 
     public string GetNameDBForDevice(int IdDevice)
     {
-        _logger.LogDebug($"Получение имени базы данных из конфигурации для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        var device = _appConfig.GetDeviceCfg(IdDevice);
-        if (device is null)
+        try
         {
-            _logger.LogError("В конфигурации отсутствуют устройства");
+            _logger.LogDebug($"Получение имени базы данных из конфигурации для устройства {_appConfig.GetDeviceName(IdDevice)}");
+            var device = _appConfig.GetDeviceCfg(IdDevice);
+            if (device is null)
+            {
+                _logger.LogError("В конфигурации отсутствуют устройства");
+                return string.Empty;
+            }
+            var dbName = device.DBConnectionStrings?.FirstOrDefault(x => x.Use)?.Database;
+            if (string.IsNullOrEmpty(dbName))
+            {
+                _logger.LogError($"Невозможно определить имя БД ИВК для устройства {_appConfig.GetDeviceName(IdDevice)}");
+                return String.Empty;
+            }
+            _logger.LogDebug($"Получение имени базы данных: {dbName}");
+            return dbName;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при получении имени базы данных для устройства {IdDevice}");
             return string.Empty;
         }
-        var dbName = device.DBConnectionStrings?.FirstOrDefault(x => x.Use)?.Database;
-        if (string.IsNullOrEmpty(dbName))
-        {
-            _logger.LogError($"Невозможно определить имя БД ИВК для устройства {_appConfig.GetDeviceName(IdDevice)}");
-            return String.Empty;
-        }
-        _logger.LogDebug($"Получение имени базы данных: {dbName}");
-        return dbName;
     }
 
     public List<ListItem> GetListDocs(int IdDevice)
     {
-        _logger.LogDebug($"Загрузка списка документов для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        var device = _appConfig.GetDeviceCfg(IdDevice);
-        if (device is null)
+        try
         {
-            _logger.LogError($"В конфигурации отсутствует устройства {_appConfig.GetDeviceName(IdDevice)}");
-            return [];
-        }
+            _logger.LogDebug($"Загрузка списка документов для устройства {_appConfig.GetDeviceName(IdDevice)}");
+            var device = _appConfig.GetDeviceCfg(IdDevice);
+            if (device is null)
+            {
+                _logger.LogError($"В конфигурации отсутствует устройства {_appConfig.GetDeviceName(IdDevice)}");
+                return [];
+            }
 
-        var usedDocs = device.Docs.Where(x => x.Use).ToList();
-        if (!usedDocs.Any())
+            var usedDocs = device.Docs.Where(x => x.Use).ToList();
+            if (!usedDocs.Any())
+            {
+                _logger.LogError($"Устройство {device.Name} не имеет документов");
+                return [];
+            }
+            var list = usedDocs.Select(u => new ListItem { Id = (int)u.IdDoc, Name = u.Name })
+                .ToList();
+            _logger.LogTrace($"Загружено {list.Count} документов для устройства {device.Name}");
+            return list;
+        }
+        catch (Exception ex)
         {
-            _logger.LogError($"Устройство {device.Name} не имеет документов");
+            _logger.LogError(ex, $"Ошибка при загрузке списка документов для устройства {IdDevice}");
             return [];
         }
-        var list = usedDocs.Select(u => new ListItem { Id = (int)u.IdDoc, Name = u.Name })
-            .ToList();
-        _logger.LogTrace($"Загружено {list.Count} документов для устройства {device.Name}");
-        return list;
     }
 
     public List<ListItem> GetTemplatesDoc(int IdDevice, IdDoc idDoc)
     {
-        _logger.LogTrace($"Загрузка шаблонов документа {idDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        var device = _appConfig.GetDeviceCfg(IdDevice);
-        if (device is null)
+        try
         {
-            _logger.LogError($"В конфигурации отсутствует устройства с идентификатором {IdDevice}");
+            _logger.LogTrace($"Загрузка шаблонов документа {idDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
+            var device = _appConfig.GetDeviceCfg(IdDevice);
+            if (device is null)
+            {
+                _logger.LogError($"В конфигурации отсутствует устройства с идентификатором {IdDevice}");
+                return [];
+            }
+            var doc = _appConfig.GetDocCfg(IdDevice, idDoc);
+            if (doc is null)
+            {
+                _logger.LogError($"Отсутствует документ {idDoc}");
+                return [];
+            }
+            var usedTemplates = doc.TemplateDocs.Where(x => x.Use).ToList();
+            if (!usedTemplates.Any())
+            {
+                _logger.LogError($"Отсутствует шаблон документа {idDoc}");
+                return [];
+            }
+            var templates = usedTemplates.Select(x => new ListItem() { Id = x.Id, Name = x.Name })
+                .ToList();
+            _logger.LogDebug($"Загружено {templates.Count} шаблонов документа {doc.Name}");
+            return templates;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при загрузке шаблонов документа {idDoc} для устройства {IdDevice}");
             return [];
         }
-        var doc = _appConfig.GetDocCfg(IdDevice, idDoc);
-        if (doc is null)
-        {
-            _logger.LogError($"Отсутствует документ {idDoc}");
-            return [];
-        }
-        var usedTemplates = doc.TemplateDocs.Where(x => x.Use).ToList();
-        if (!usedTemplates.Any())
-        {
-            _logger.LogError($"Отсутствует шаблон документа {idDoc}");
-            return [];
-        }
-        var templates = usedTemplates.Select(x => new ListItem() { Id = x.Id, Name = x.Name })
-            .ToList();
-        _logger.LogDebug($"Загружено {templates.Count} шаблонов документа {doc.Name}");
-        return templates;
     }
 
     public List<ListItem> GetListProtocolNumber(int IdDevice, IdDoc idDoc)
     {
-        _logger.LogDebug($"Загрузка списка протоколов для документа {idDoc} для устройства  {_appConfig.GetDeviceName(IdDevice)}");
-        var list = new List<ListItem>
+        try
         {
-            new() { Id = 1, Name = "Протокол 1" },
-            new() { Id = 2, Name = "Протокол 2" }
-        };
-        return list;
+            _logger.LogDebug($"Загрузка списка протоколов для документа {idDoc} для устройства  {_appConfig.GetDeviceName(IdDevice)}");
+            var list = new List<ListItem>
+            {
+                new() { Id = 1, Name = "Протокол 1" },
+                new() { Id = 2, Name = "Протокол 2" }
+            };
+            return list;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при загрузке списка протоколов для документа {idDoc} для устройства {IdDevice}");
+            return new List<ListItem>();
+        }
     }
 
     /// <summary>
@@ -152,7 +192,14 @@ public class HomeController : Controller
     /// <param name="idTemplateDoc">Id открытого документа</param>
     public void SetIdTemplateDoc(int IdDevice, IdDoc IdDoc, int idTemplateDoc)
     {
-        _appConfig.SetLastUsedTemplateId(IdDevice, IdDoc, idTemplateDoc);
+        try
+        {
+            _appConfig.SetLastUsedTemplateId(IdDevice, IdDoc, idTemplateDoc);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при сохранении ID шаблона документа {IdDoc} для устройства {IdDevice}");
+        }
     }
     
     public int GetIdTemplateDoc(int IdDevice, IdDoc IdDoc)
@@ -217,48 +264,74 @@ public class HomeController : Controller
     /// <returns></returns>
     public Dictionary<string, string> GetDataForRegistrationDeviceInELIS(int IdDevice)
     {
-        _logger.LogDebug($"Получение данных для регистрации устройства {_appConfig.GetDeviceName(IdDevice)} в ЕЛИС");
-        var device = _appConfig.GetDeviceCfg(IdDevice);
+        try
+        {
+            _logger.LogDebug($"Получение данных для регистрации устройства {_appConfig.GetDeviceName(IdDevice)} в ЕЛИС");
+            var device = _appConfig.GetDeviceCfg(IdDevice);
 
-        if (device.Elis == null)
-            if (_cfgApp.Elis == null)
-            {                    
-            }
-            else 
+            if (device.Elis == null)
+                if (_cfgApp.Elis == null)
+                {                    
+                }
+                else 
+                    return new Dictionary<string, string>()
+                    {
+                        { "ostKey", _cfgApp.Elis.OstKey },
+                        { "siknKey", _cfgApp.Elis.SiknKey },
+                        { "clientName", _cfgApp.Elis.ClientName }
+                    };
+            else
                 return new Dictionary<string, string>()
                 {
-                    { "ostKey", _cfgApp.Elis.OstKey },
-                    { "siknKey", _cfgApp.Elis.SiknKey },
-                    { "clientName", _cfgApp.Elis.ClientName }
+                    { "ostKey", device.Elis.OstKey },
+                    { "siknKey", device.Elis.SiknKey },
+                    { "clientName", device.Elis.ClientName }
                 };
-        else
-            return new Dictionary<string, string>()
-            {
-                { "ostKey", device.Elis.OstKey },
-                { "siknKey", device.Elis.SiknKey },
-                { "clientName", device.Elis.ClientName }
-            };
 
-        return null;
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при получении данных для регистрации устройства {IdDevice} в ЕЛИС");
+            return null;
+        }
     }
 
     public Dictionary<string, string> GetClientToken(int IdDevice)
     {
-        string clientToken = string.Empty;
-        var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
+        try
+        {
+            string clientToken = string.Empty;
+            var device = _cfgApp.Devices.Single(x => x.IdDevice == IdDevice);
 
-        if (device.Elis == null)
-            if (_cfgApp.Elis == null) clientToken = string.Empty;
-            else clientToken = _cfgApp.Elis.ClientToken;
-        else clientToken = device.Elis.ClientToken;
+            if (device.Elis == null)
+                if (_cfgApp.Elis == null) clientToken = string.Empty;
+                else clientToken = _cfgApp.Elis.ClientToken;
+            else clientToken = device.Elis.ClientToken;
 
-        return String.IsNullOrEmpty(clientToken)
-            ? new Dictionary<string, string>() { { "clientToken", null } }
-            : new Dictionary<string, string>() { { "clientToken", clientToken } };
+            return String.IsNullOrEmpty(clientToken)
+                ? new Dictionary<string, string>() { { "clientToken", null } }
+                : new Dictionary<string, string>() { { "clientToken", clientToken } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при получении клиентского токена для устройства {IdDevice}");
+            return new Dictionary<string, string>() { { "clientToken", null } };
+        }
     }
 
-    public bool SetClientToken(int IdDevice, string clientToken) =>
-        _appConfig.SetElisClientToken(IdDevice, clientToken);
+    public bool SetClientToken(int IdDevice, string clientToken)
+    {
+        try
+        {
+            return _appConfig.SetElisClientToken(IdDevice, clientToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при установке клиентского токена для устройства {IdDevice}");
+            return false;
+        }
+    }
     
     public string GetElisData() => String.Empty;
  
@@ -430,20 +503,28 @@ public class HomeController : Controller
 
     public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
     {
-        _logger.LogDebug($"Отображение формы редактирования документа устройства {_appConfig.GetDeviceName(IdDevice)}, документа {IdDoc} c ИД: {id}");
-        if (id == 0)
+        try
         {
-            _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
+            _logger.LogDebug($"Отображение формы редактирования документа устройства {_appConfig.GetDeviceName(IdDevice)}, документа {IdDoc} c ИД: {id}");
+            if (id == 0)
+            {
+                _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
+                return string.Empty;
+            }
+            
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
+            if (doc is null)
+            {
+                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
+                return string.Empty;
+            }
+            return doc.GetEditDoc(id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при получении формы редактирования документа {IdDoc} для устройства {IdDevice}");
             return string.Empty;
         }
-        
-        var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
-        if (doc is null)
-        {
-            _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-            return string.Empty;
-        }
-        return doc.GetEditDoc(id);
     }
 
 
