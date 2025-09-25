@@ -738,7 +738,7 @@ package-minimal-job:      # Minimal package without dependencies
 
       [Service]
       WorkingDirectory=/opt/TN_Doc/
-      ExecStart=dotnet /opt/TN_Doc/TN_Doc.dll
+      ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
       Restart=always
       RestartSec=10
       SyslogIdentifier=dotnet-TN_Doc
