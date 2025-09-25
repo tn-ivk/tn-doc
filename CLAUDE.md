@@ -6,10 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents and reports from measurement system data (ИВК - Измерительно-вычислительный комплекс). The system generates quality certificates, verification protocols, acceptance acts, and various measurement reports using FastReport templates.
 
-**Version**: 1.4.1  
-**Target Framework**: .NET 8.0  
+**Version**: 1.4.2
+**Target Framework**: .NET 8.0
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
 **Current Branch**: develop (active development branch)
+**Note**: Recent work on status bar improvements (removed time display and version info from status bar)
 
 ## Build and Development Commands
 
@@ -231,6 +232,15 @@ The application uses dependency injection with the following key services:
 
 Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
 
+### Status Bar Architecture
+The application includes a real-time status bar (`/TN_Doc/wwwroot/js/statusBar.js`) that monitors system health:
+- **Device Indicators**: Database connectivity for each configured ИВК device
+- **OPC Indicators**: OPC DA/UA server connection status
+- **Service Indicators**: SignalR Hub and ELIS laboratory system status
+- **Real-time Updates**: SignalR-based push notifications for status changes
+- **Manual Refresh**: Click individual indicators or global refresh button
+- **Configuration-Driven**: Dynamically creates indicators based on `CfgApp.json` device/OPC settings
+
 ### Document Generation Architecture  
 The system uses a factory pattern with dynamic module loading:
 - **IAppConfigService**: Singleton that manages configuration and provides `GetDocumentClass(idDevice, idDoc)` factory method
@@ -413,7 +423,12 @@ Configuration follows a layered approach:
 - **Exception Boundaries**: Controllers catch exceptions and return appropriate HTTP status codes
 - **Resource Cleanup**: Explicit disposal of FastReport objects and streams in finally blocks
 
-### Recent Changes (v1.4.1)
+### Recent Changes (v1.4.2)
+- Updated docgeneral to version 1.2.2
+- ⚠️ Status bar improvements: Removed time display and project version info from status bar
+- Cleaned up status bar JavaScript to remove unused time update functionality
+
+### Previous Changes (v1.4.1)
 - 🐞 Fixed incorrect population of Act shifts when filling "reverse" passports
 - Sorting of Acts by date and documents in KMH and verifications by date
 - Display of values in locked cells for quality passport editing forms
