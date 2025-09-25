@@ -14,7 +14,6 @@ class StatusBarManager {
         this.maxRetries = 3;
 
         // Привязка методов к контексту
-        this.updateTime = this.updateTime.bind(this);
         this.refreshStatus = this.refreshStatus.bind(this);
         this.handleRefreshClick = this.handleRefreshClick.bind(this);
 
@@ -34,7 +33,6 @@ class StatusBarManager {
             this.initializeSignalR();
             this.setupEventListeners();
             this.startPeriodicUpdates();
-            this.updateTime();
 
             this.isInitialized = true;
             console.log('[StatusBar] Строка состояния инициализирована');
@@ -243,9 +241,6 @@ class StatusBarManager {
      * Запуск периодических обновлений
      */
     startPeriodicUpdates() {
-        // Обновляем время каждую секунду
-        setInterval(this.updateTime, 1000);
-
         // Обновляем статусы каждые 30 секунд
         setInterval(() => {
             this.refreshStatus();
@@ -257,16 +252,6 @@ class StatusBarManager {
         }, 2000);
     }
 
-    /**
-     * Обновление текущего времени
-     */
-    updateTime() {
-        const timeElement = document.getElementById('current-time');
-        if (timeElement) {
-            const now = new Date();
-            timeElement.textContent = now.toLocaleTimeString('ru-RU');
-        }
-    }
 
     /**
      * Обновление всех статусов

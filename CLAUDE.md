@@ -10,6 +10,7 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **Target Framework**: .NET 8.0  
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
 **Current Branch**: develop (active development branch)
+**Note**: Currently working on `feature/status-bar` branch
 
 ## Build and Development Commands
 
@@ -282,15 +283,50 @@ Current development focus on solving file locking issues:
 
 ### Deployment Process
 
+#### GitLab CI/CD Pipeline (`.gitlab-ci.yml`)
+The project uses GitLab CI/CD with the following stages:
+- **Build**: Compiles application using .NET SDK 8.0 Docker image
+- **Package**: Creates multiple .deb packages for different deployment scenarios
+- **Notify**: Sends packages to Telegram with file uploads
+
+**Pipeline Triggers**:
+- Push to `master` branch
+- Merge requests targeting `master` branch
+
+**Build Process**:
+1. Adds NuGet sources (ortpr.ru and FastReport)
+2. Builds entire solution with `dotnet build`
+3. Publishes for Linux x64 runtime to `./publish/`
+4. Extracts version from `TN_Doc.csproj` and manages build numbers via GitLab API
+
+**Package Types Created**:
+- **tn.doc-full**: Complete package with embedded .NET Runtime 8.0.13
+- **tn.doc**: Minimal package requiring system .NET Runtime
+- **tn.dotnet-runtime**: Standalone .NET Runtime 8.0.13 package
+- **tn.fonts**: System fonts package (Arial, Segoe UI, Tahoma)
+
+**Package Features**:
+- Creates `alphadaemon` user and proper permissions
+- Installs systemd service (`TN_Doc.service`)
+- Manages .NET Runtime installation and environment variables
+- Updates font cache for document rendering
+- Comprehensive pre/post install/removal scripts
+
+**Required CI/CD Variables**:
+- `FR_NUGET_USERNAME` / `FR_NUGET_PASSWORD`: FastReport NuGet credentials
+- `PROJECT_API_TOKEN`: GitLab API token for build number management
+- `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`: Telegram notification credentials
+
 #### Linux Deployment (via GitLab CI/CD)
 1. Tag push triggers pipeline (e.g., `v1.3.5`)
 2. Docker builds with .NET SDK 8.0
-3. Creates `.deb` package with:
-   - Application files in `/opt/TN_Doc/`
-   - Systemd service as `tn-doc.service` (runs with `ASPNETCORE_ENVIRONMENT=Production`)
-   - Log directory at `/var/log/TN_Doc/`
-4. Package validates .NET Runtime 8.0.13+
+3. Creates multiple `.deb` packages:
+   - Full package: Application + .NET Runtime + fonts
+   - Minimal package: Application only (requires system .NET)
+   - Dependency packages: .NET Runtime and fonts separately
+4. All packages validate .NET Runtime 8.0.13+ requirement
 5. Pre/post-install scripts create `alphadaemon` user and set permissions
+6. Telegram notifications sent with package files (< 75MB limit)
 
 #### Windows Deployment
 1. Publish as self-contained or framework-dependent
