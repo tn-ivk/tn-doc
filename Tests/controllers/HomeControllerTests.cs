@@ -730,13 +730,21 @@ public class HomeControllerTests
     }
 
     /// <summary>
-    /// GetClientToken: проверяет обработку несуществующего устройства
+    /// GetClientToken: для несуществующего устройства возвращает словарь с clientToken=null
     /// </summary>
     [Test]
-    public void GetClientToken_NonExistentDevice_ThrowsException()
+    public void GetClientToken_NonExistentDevice_ReturnsNullTokenDictionary()
     {
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => _controller.GetClientToken(999));
+        // Arrange - выбираем заведомо несуществующий ID устройства
+        var nonExistentId = _cfgApp.Devices.Max(d => d.IdDevice) + 1;
+
+        // Act
+        var result = _controller.GetClientToken(nonExistentId);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.ContainsKey("clientToken"), Is.True);
+        Assert.That(result["clientToken"], Is.Null);
     }
 
     /// <summary>
