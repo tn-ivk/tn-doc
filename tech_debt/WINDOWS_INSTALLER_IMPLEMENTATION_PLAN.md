@@ -193,3 +193,4 @@ Get-Content "C:\\Program Files\\TN_Doc\\logs\\*.log" -ErrorAction SilentlyContin
 В пайплайне появится артефакт `dist/TN_Doc-Setup-<version>.exe`, который устанавливает приложение в `C:\\Program Files\\TN_Doc`, создаёт и запускает службу `TN_Doc`, добавляет ярлыки и деинсталлятор.
 
 
+
