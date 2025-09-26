@@ -352,7 +352,7 @@ public class HomeController : Controller
             };
             _fr.Width = "100%";
             _fr.Height = "auto";
-            _fr.Report.Load(Path.Combine(Directory.GetCurrentDirectory(), "Doc", "01_Report_2022-05-05_Release_version.frx"));
+            _fr.Report.Load(Path.Combine(AppContext.BaseDirectory, "Doc", "01_Report_2022-05-05_Release_version.frx"));
             _fr.Render();             
         }
         catch (Exception ex)
@@ -374,7 +374,7 @@ public class HomeController : Controller
         try
         {
             var (unixTimeBegin, unixTimeEnd) = ParseDateRange(data.DTBegin, data.DTEnd);
-            var doc = _docModuleLoader.LoadDocsModule(_options, data.IdDevice, data.IdDoc, Directory.GetCurrentDirectory());
+            var doc = _docModuleLoader.LoadDocsModule(_options, data.IdDevice, data.IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {data.IdDoc}");
@@ -438,7 +438,7 @@ public class HomeController : Controller
 
         try
         {
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -512,7 +512,7 @@ public class HomeController : Controller
                 return string.Empty;
             }
             
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -533,7 +533,7 @@ public class HomeController : Controller
         _logger.LogDebug($"Сохранение документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -565,7 +565,7 @@ public class HomeController : Controller
                 return;                
             }
             
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
@@ -585,7 +585,7 @@ public class HomeController : Controller
         _logger.LogDebug($"Получение периода документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");

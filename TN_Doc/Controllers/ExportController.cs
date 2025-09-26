@@ -36,7 +36,7 @@ public class ExportController : Controller
         _logger.LogDebug($"Экспорт документа {IdDoc} c ИД: {id}, номер протокола {protocolNumber} для устройства {_appConfig.GetDeviceName(IdDevice)}");
         try
         {
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, Directory.GetCurrentDirectory());
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");

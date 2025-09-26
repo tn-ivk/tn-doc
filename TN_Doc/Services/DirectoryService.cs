@@ -38,8 +38,8 @@ public sealed class DirectoryService : IDisposable
         if (string.IsNullOrEmpty(mainAppCfgFile))
             throw new ArgumentNullException(nameof(mainAppCfgFile), @"Отсутствует путь главной конфигурации приложения");
 
-        _mainCfgFile = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), dirName, mainCfgFile));
-        _mainAppCfgFile = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), dirName, mainAppCfgFile));
+        _mainCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, dirName, mainCfgFile));
+        _mainAppCfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, dirName, mainAppCfgFile));
         FileNotFoundThrowExceptionHelper(_mainCfgFile);
         FileNotFoundThrowExceptionHelper(_mainAppCfgFile);
         _cacheDirectoriesJson = null;
@@ -162,7 +162,7 @@ public sealed class DirectoryService : IDisposable
         JObject modifJo = JObject.Parse(modifQpJson);
         foreach (JToken qpi in modifJo["QpsInfo"]!)
         {
-            FileInfo fileInfo = new(Directory.GetCurrentDirectory() + qpi["EditConfigFilePath"]!);
+            FileInfo fileInfo = new(Path.Combine(AppContext.BaseDirectory, qpi["EditConfigFilePath"]!.ToString()));
             FileNotFoundThrowExceptionHelper(fileInfo);
             JObject jObject = JObject.Parse(File.ReadAllText(fileInfo.FullName));
             jObject["Methods"]!.Replace(qpi["Methods"]!);
@@ -192,7 +192,7 @@ public sealed class DirectoryService : IDisposable
 
         foreach (JToken qps in qpsInfo["QpsInfo"])
         {
-            FileInfo cfgFile = new FileInfo(Directory.GetCurrentDirectory()+ qps["EditConfigFilePath"]!);
+            FileInfo cfgFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, qps["EditConfigFilePath"]!.ToString()));
             FileNotFoundThrowExceptionHelper(cfgFile);
             JObject fullPassCfgJson = JObject.Parse(File.ReadAllText(cfgFile.FullName));
             qps["Methods"] = fullPassCfgJson["Methods"];

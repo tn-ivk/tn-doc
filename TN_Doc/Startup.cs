@@ -44,9 +44,7 @@ public class Startup
 					.SetIsOriginAllowed((host) => true)
 					.AllowCredentials();
 			}));
-		#if RELEASE
 		services.ConfigAppDirectory();
-		#endif
 		services.AddAppInfoProvider();
 		services.AddPrinters();
 		services.AddPrinterService();
