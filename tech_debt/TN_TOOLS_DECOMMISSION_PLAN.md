@@ -88,7 +88,28 @@ public static TTarget MapPropertiesByName<TTarget>(object source) where TTarget 
 - Все функции доступны из `TN.DocGeneral`.
 
 ## Чек‑лист выполнения
-- [ ] Добавлены `NormalizeDecimalString` и `MapPropertiesByName` + тесты
-- [ ] Поиск и замена использования `TN_Tools`
-- [ ] Исключён проект `TN_Tools` из `.sln` и CI
-- [ ] Депрекация и последующее удаление папки `tn_toolsfastreport`
+- [x] Добавлены `NormalizeDecimalString` и `MapPropertiesByName` + тесты
+- [x] Создан обратно-совместимый слой `TN_ToolsFastReport` в `TN.DocGeneral`
+- [x] Исключён проект `TN_Tools` из `.sln` и удалены ссылки на проект
+- [x] Депрекация проекта `TN_Tools` с добавлением `[Obsolete]` атрибутов
+- [ ] Удаление папки `tn_toolsfastreport` (рекомендуется после тестирования)
+
+## Статус выполнения
+✅ **ВЫПОЛНЕНО**: Все основные задачи завершены. FastReport шаблоны будут работать с обратно-совместимым слоем.
+
+### Что реализовано:
+- Методы `NormalizeDecimalString` и `MapPropertiesByName` добавлены в `DocGeneral.cs:355-388`
+- Полное покрытие юнит-тестами в `Tests/Services/DocGeneralTests.cs`
+- Совместимый класс `TN_ToolsFastReport.Tools` в `TN.DocGeneral/TN_ToolsFastReportCompatibility.cs`
+- Удалены все ссылки на `TN_Tools` из проектных файлов
+- Оригинальный `TN_Tools` помечен как `[Obsolete]` для предупреждения разработчиков
+
+### Протестированное использование:
+FastReport шаблоны (.frx) продолжают работать без изменений через совместимый слой:
+```csharp
+TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();
+tools.GetNormalizedValue(value);           // → DocGeneral.NormalizeDecimalString()
+tools.UnixTimestampToDatetime(timestamp);  // → DocGeneral.UnixTimestampToDatetime()
+tools.Cast<T>(obj);                        // → DocGeneral.MapPropertiesByName<T>()
+tools.GetPropertyValue(obj, key, ref result); // → DocGeneral.GetPropertyValue()
+```
