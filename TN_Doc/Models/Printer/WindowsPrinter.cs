@@ -60,7 +60,7 @@ public sealed class WindowsPrinter(IReportBuffer buffer) : AbsPrinter(buffer)
 
                 try
                 {
-                    var curDir = Directory.GetCurrentDirectory();
+                    var curDir = AppContext.BaseDirectory;
                     using var process = new Process();
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;

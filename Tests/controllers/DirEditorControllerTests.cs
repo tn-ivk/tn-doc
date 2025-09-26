@@ -95,7 +95,7 @@ public class DirEditorControllerTests
         File.WriteAllText(_testCfgPath, JsonConvert.SerializeObject(testRoot, Formatting.Indented));
 
         // Prepare dummy edit config file for QP with Methods/Parameters
-        var currentDir = Directory.GetCurrentDirectory();
+        var currentDir = AppContext.BaseDirectory;
         var qpRelPath = "\\TestQp.json"; // will be appended to currentDir inside service
         var qpFullPath = Path.Combine(currentDir + qpRelPath);
         File.WriteAllText(qpFullPath, JsonConvert.SerializeObject(new { Methods = new object[] { }, Parameters = new object[] { } }, Formatting.Indented));
