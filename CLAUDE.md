@@ -215,9 +215,9 @@ Real-time data acquisition from measurement systems:
 
 ### Output Directories
 - `/TN_Doc/wwwroot/PDF/` - Generated PDF documents
-- **Log Directories** (Platform-specific as of v1.3.4):
-  - Windows: `{basedir}/TN_Doc/logs/`
-  - Linux: `/opt/TN_Doc/logs/` (temporary, subject to change)
+- **Log Directories** (Platform-specific as of v1.4.1):
+  - Windows: `TN_Doc/logs/`
+  - Linux: `/opt/TN_Doc/logs/`
 - `/TN_Doc/UserPreference/` - User preferences (last used templates)
 
 ## Development Notes
@@ -377,7 +377,7 @@ The system contains the following document libraries that require test coverage:
 ### Version Management
 - Version is centrally managed in `TN_Doc.csproj`
 - Changes are documented in `/TN_Doc/changes.md`
-- Current version: 1.4.1 (.NET 8.0)
+- Current version: 1.4.2 (.NET 8.0)
 
 ### Git Workflow Notes
 - **Main branches**: `master` (production), `develop` (active development)
