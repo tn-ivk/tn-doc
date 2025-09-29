@@ -37,7 +37,11 @@ TN_Doc/
 │   │       ├── App.vue
 │   │       ├── components/
 │   │       │   ├── StatusBar.vue
-│   │       │   └── StatusIndicator.vue
+│   │       │   ├── StatusIndicator.vue
+│   │       │   └── icons/
+│   │       │       ├── IconRefresh.vue
+│   │       │       ├── IconWifi.vue
+│   │       │       └── IconWarning.vue
 │   │       ├── stores/
 │   │       │   └── statusStore.ts
 │   │       ├── composables/
@@ -517,9 +521,7 @@ export function useSignalR(hubUrl: string) {
           :disabled="store.isLoading"
           title="Обновить статус"
         >
-          <!-- Замените на SVG, если Font Awesome не подключён -->
-          <svg v-if="!store.isLoading" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5a5 5 0 0 1-9.9 1H5.02A7.002 7.002 0 0 0 19 13c0-3.87-3.13-7-7-7z"/></svg>
-          <svg v-else width="16" height="16" viewBox="0 0 24 24" class="spin"><path fill="currentColor" d="M12 4V2A10 10 0 1 0 22 12h-2a8 8 0 1 1-8-8z"/></svg>
+          <IconRefresh :spinning="store.isLoading" />
         </button>
 
         <span v-if="store.lastUpdate" class="status-bar__timestamp">
@@ -531,14 +533,14 @@ export function useSignalR(hubUrl: string) {
           :class="`status-bar__connection--${signalRState}`"
           :title="`SignalR: ${signalRState}`"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21l-4-4h8l-4 4zm-8-8l-4-4h24l-4 4H4zm4-8L4 1h16l-4 4H8z"/></svg>
+          <IconWifi />
         </span>
       </div>
     </div>
 
     <!-- Error notification -->
     <div v-if="store.error" class="status-bar__error">
-      <i class="fa fa-exclamation-triangle"></i>
+      <IconWarning />
       {{ store.error }}
     </div>
   </div>
@@ -550,6 +552,9 @@ import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
 import StatusIndicator from './StatusIndicator.vue';
+import IconRefresh from './icons/IconRefresh.vue';
+import IconWifi from './icons/IconWifi.vue';
+import IconWarning from './icons/IconWarning.vue';
 import type { DeviceStatus, StatusResponse } from '../types/status.types';
 
 const store = useStatusStore();
@@ -692,7 +697,91 @@ function formatTime(date: Date): string {
 </style>
 ```
 
-#### 3.6 Индикатор компонент
+#### 3.6 SVG Иконки компоненты
+
+```vue
+<!-- TN_Doc/Client/statusbar/src/components/icons/IconRefresh.vue -->
+<template>
+  <svg :width="size" :height="size" viewBox="0 0 24 24" :class="{ 'spin': spinning }">
+    <path
+      fill="currentColor"
+      :d="spinning ? spinPath : refreshPath"
+    />
+  </svg>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  size?: number;
+  spinning?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  size: 16,
+  spinning: false
+});
+
+const refreshPath = "M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5a5 5 0 0 1-9.9 1H5.02A7.002 7.002 0 0 0 19 13c0-3.87-3.13-7-7-7z";
+const spinPath = "M12 4V2A10 10 0 1 0 22 12h-2a8 8 0 1 1-8-8z";
+</script>
+
+<style scoped>
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
+```
+
+```vue
+<!-- TN_Doc/Client/statusbar/src/components/icons/IconWifi.vue -->
+<template>
+  <svg :width="size" :height="size" viewBox="0 0 24 24">
+    <path
+      fill="currentColor"
+      d="M12 21l-4-4h8l-4 4zm-8-8l-4-4h24l-4 4H4zm4-8L4 1h16l-4 4H8z"
+    />
+  </svg>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  size?: number;
+}
+
+withDefaults(defineProps<Props>(), {
+  size: 16
+});
+</script>
+```
+
+```vue
+<!-- TN_Doc/Client/statusbar/src/components/icons/IconWarning.vue -->
+<template>
+  <svg :width="size" :height="size" viewBox="0 0 24 24">
+    <path
+      fill="currentColor"
+      d="M12 2L2 20h20L12 2zm0 3.5L19.5 18.5h-15L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"
+    />
+  </svg>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  size?: number;
+}
+
+withDefaults(defineProps<Props>(), {
+  size: 16
+});
+</script>
+```
+
+#### 3.7 Индикатор компонент
 ```vue
 <!-- TN_Doc/Client/statusbar/src/components/StatusIndicator.vue -->
 <template>
@@ -831,11 +920,73 @@ import StatusBar from './components/StatusBar.vue';
 // TN_Doc/Startup.cs - добавить в ConfigureServices
 services.AddSignalR();
 services.AddMemoryCache();
-services.AddRateLimiter(options => { /* лимиты на /api/status */ });
+
+// HttpClient конфигурация
+services.AddHttpClient();
+services.AddHttpClient("MessagingService", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5010");
+    client.Timeout = TimeSpan.FromSeconds(2);
+    client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.0");
+});
+
+services.AddHttpClient("Elis", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(5);
+    client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.0");
+});
+
+// Health Checks
+services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database")
+    .AddCheck<MessagingServiceHealthCheck>("messaging")
+    .AddCheck<ElisHealthCheck>("elis", tags: new[] { "external" });
+
+// Rate Limiting
+services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("api-status", config =>
+    {
+        config.PermitLimit = 10;
+        config.Window = TimeSpan.FromSeconds(10);
+        config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        config.QueueLimit = 2;
+    });
+
+    options.AddGlobalLimiter(PartitionedRateLimiter.Create<HttpContext, string>(
+        httpContext => RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Connection.RemoteIpAddress?.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1)
+            })));
+});
+
+// Services
 services.AddScoped<IStatusProvider, StatusProvider>();
 services.AddHostedService<StatusMonitoringService>();
 
 // TN_Doc/Startup.cs - добавить в Configure
+app.UseRateLimiter();
+
+// Health Checks endpoints
+app.UseHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+app.UseHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
+app.UseHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live")
+});
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<StatusHub>("/statusHub");
@@ -843,6 +994,185 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
+```
+
+#### 4.1.1 Health Checks реализация
+```csharp
+// TN_Doc/HealthChecks/DatabaseHealthCheck.cs
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MySqlConnector;
+
+public class DatabaseHealthCheck : IHealthCheck
+{
+    private readonly IAppConfigService _configService;
+    private readonly ILogger<DatabaseHealthCheck> _logger;
+
+    public DatabaseHealthCheck(IAppConfigService configService, ILogger<DatabaseHealthCheck> logger)
+    {
+        _configService = configService;
+        _logger = logger;
+    }
+
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var config = _configService.GetAppCfg();
+            var devices = config.Devices.Where(d => d.Use).ToList();
+
+            if (!devices.Any())
+            {
+                return HealthCheckResult.Unhealthy("No active devices configured");
+            }
+
+            var tasks = devices.Select(async device =>
+            {
+                try
+                {
+                    var csb = new MySqlConnectionStringBuilder(device.ConnString)
+                    {
+                        ConnectionTimeout = 1,
+                        DefaultCommandTimeout = 1
+                    };
+
+                    using var connection = new MySqlConnection(csb.ConnectionString);
+                    await connection.OpenAsync(cancellationToken);
+
+                    using var command = connection.CreateCommand();
+                    command.CommandText = "SELECT 1";
+                    await command.ExecuteScalarAsync(cancellationToken);
+
+                    return (device.Name, Success: true, Error: (string?)null);
+                }
+                catch (Exception ex)
+                {
+                    return (device.Name, Success: false, Error: ex.Message);
+                }
+            });
+
+            var results = await Task.WhenAll(tasks);
+            var failed = results.Where(r => !r.Success).ToList();
+
+            if (failed.Count == devices.Count)
+            {
+                return HealthCheckResult.Unhealthy(
+                    "All database connections failed",
+                    data: failed.ToDictionary(f => f.Name, f => (object)f.Error));
+            }
+
+            if (failed.Any())
+            {
+                return HealthCheckResult.Degraded(
+                    $"{failed.Count} of {devices.Count} database connections failed",
+                    data: failed.ToDictionary(f => f.Name, f => (object)f.Error));
+            }
+
+            return HealthCheckResult.Healthy(
+                $"All {devices.Count} database connections are healthy");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Health check failed");
+            return HealthCheckResult.Unhealthy("Health check execution failed", ex);
+        }
+    }
+}
+
+// TN_Doc/HealthChecks/MessagingServiceHealthCheck.cs
+public class MessagingServiceHealthCheck : IHealthCheck
+{
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<MessagingServiceHealthCheck> _logger;
+
+    public MessagingServiceHealthCheck(
+        IHttpClientFactory httpClientFactory,
+        ILogger<MessagingServiceHealthCheck> logger)
+    {
+        _httpClientFactory = httpClientFactory;
+        _logger = logger;
+    }
+
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var client = _httpClientFactory.CreateClient("MessagingService");
+            var response = await client.GetAsync("/health", cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return HealthCheckResult.Healthy("Messaging service is responding");
+            }
+
+            return HealthCheckResult.Unhealthy(
+                $"Messaging service returned {response.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Messaging service health check failed");
+            return HealthCheckResult.Unhealthy("Messaging service is unreachable", ex);
+        }
+    }
+}
+
+// TN_Doc/HealthChecks/ElisHealthCheck.cs
+public class ElisHealthCheck : IHealthCheck
+{
+    private readonly IAppConfigService _configService;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<ElisHealthCheck> _logger;
+
+    public ElisHealthCheck(
+        IAppConfigService configService,
+        IHttpClientFactory httpClientFactory,
+        ILogger<ElisHealthCheck> logger)
+    {
+        _configService = configService;
+        _httpClientFactory = httpClientFactory;
+        _logger = logger;
+    }
+
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var config = _configService.GetAppCfg();
+
+            if (config.Elis?.Use != true)
+            {
+                return HealthCheckResult.Healthy("ELIS is disabled");
+            }
+
+            if (string.IsNullOrEmpty(config.Elis.LabHubUrl))
+            {
+                return HealthCheckResult.Unhealthy("ELIS URL is not configured");
+            }
+
+            using var client = _httpClientFactory.CreateClient("Elis");
+            client.BaseAddress = new Uri(config.Elis.LabHubUrl);
+            var response = await client.GetAsync("/health", cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return HealthCheckResult.Healthy("ELIS service is responding");
+            }
+
+            return HealthCheckResult.Unhealthy(
+                $"ELIS service returned {response.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "ELIS health check failed");
+            return HealthCheckResult.Unhealthy("ELIS service is unreachable", ex);
+        }
+    }
+}
 ```
 
 #### 4.2 Status Controller
@@ -858,6 +1188,7 @@ namespace TN_Doc.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("api-status")]
 public class StatusController : ControllerBase
 {
     private readonly IAppConfigService _configService;
@@ -1154,23 +1485,240 @@ public class StatusMonitoringService : BackgroundService
 
 #### 4.5 Интерфейс и реализация провайдера статусов
 ```csharp
+// TN_Doc/Services/IStatusProvider.cs
 public interface IStatusProvider
 {
     Task<StatusResponse> GetStatusAsync(CancellationToken ct = default);
 }
 
+// TN_Doc/Services/StatusProvider.cs
 public class StatusProvider : IStatusProvider
 {
     private readonly IAppConfigService _configService;
     private readonly ILogger<StatusProvider> _logger;
-    public StatusProvider(IAppConfigService cfg, ILogger<StatusProvider> logger)
-    { _configService = cfg; _logger = logger; }
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public StatusProvider(
+        IAppConfigService configService,
+        ILogger<StatusProvider> logger,
+        IHttpClientFactory httpClientFactory)
+    {
+        _configService = configService;
+        _logger = logger;
+        _httpClientFactory = httpClientFactory;
+    }
 
     public async Task<StatusResponse> GetStatusAsync(CancellationToken ct = default)
     {
         var config = _configService.GetAppCfg();
-        // TODO: реализовать проверки БД/сервисов с отменой ct
-        return new StatusResponse { Devices = new(), Services = new(), Timestamp = DateTime.UtcNow.ToString("o") };
+        var devices = new List<DeviceStatus>();
+
+        // Параллельная проверка всех устройств
+        var deviceTasks = config.Devices
+            .Where(d => d.Use)
+            .Select(device => CheckDeviceAsync(device, ct));
+
+        devices.AddRange(await Task.WhenAll(deviceTasks));
+
+        // Проверка сервисов параллельно
+        var servicesTasks = new List<Task<(string name, ConnectionStatus status)>>
+        {
+            Task.Run(async () => ("MessagingService", await CheckMessagingServiceAsync(ct)), ct)
+        };
+
+        if (config.Elis?.Use == true)
+        {
+            servicesTasks.Add(Task.Run(async () => ("Elis", await CheckElisServiceAsync(ct)), ct));
+        }
+
+        if (config.OpcConnectionSettings?.Any(o => o.Type == "DA") == true)
+        {
+            servicesTasks.Add(Task.Run(async () => ("OpcDa", await CheckOpcDaServiceAsync(ct)), ct));
+        }
+
+        if (config.OpcConnectionSettings?.Any(o => o.Type == "UA") == true)
+        {
+            servicesTasks.Add(Task.Run(async () => ("OpcUa", await CheckOpcUaServiceAsync(ct)), ct));
+        }
+
+        var serviceResults = await Task.WhenAll(servicesTasks);
+
+        var services = new ServiceStatus
+        {
+            MessagingService = serviceResults.First(s => s.name == "MessagingService").status
+        };
+
+        // Добавляем опциональные сервисы
+        foreach (var (name, status) in serviceResults.Where(s => s.name != "MessagingService"))
+        {
+            switch (name)
+            {
+                case "Elis": services.Elis = status; break;
+                case "OpcDa": services.OpcDa = status; break;
+                case "OpcUa": services.OpcUa = status; break;
+            }
+        }
+
+        return new StatusResponse
+        {
+            Devices = devices,
+            Services = services,
+            Timestamp = DateTime.UtcNow.ToString("o")
+        };
+    }
+
+    private async Task<DeviceStatus> CheckDeviceAsync(Device device, CancellationToken ct)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var status = new DeviceStatus
+        {
+            Id = device.IdDevice.ToString(),
+            Name = device.Name,
+            Type = "database",
+            IsConnected = false
+        };
+
+        try
+        {
+            // Получить активную строку подключения устройства
+            var activeConnString = device.ConnString;
+            if (string.IsNullOrEmpty(activeConnString))
+            {
+                throw new InvalidOperationException("Connection string is not configured");
+            }
+
+            var csb = new MySqlConnectionStringBuilder(activeConnString)
+            {
+                ConnectionTimeout = 2,
+                DefaultCommandTimeout = 2
+            };
+
+            using var connection = new MySqlConnection(csb.ConnectionString);
+            await connection.OpenAsync(ct);
+
+            // Простой запрос для проверки соединения
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT 1";
+            command.CommandTimeout = 2;
+            await command.ExecuteScalarAsync(ct);
+
+            status.IsConnected = true;
+            status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning($"Database connection check was cancelled for {device.Name}");
+            status.Error = "Operation cancelled";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Database connection check failed for {device.Name}: {ex.Message}");
+            status.Error = ex.Message;
+        }
+        finally
+        {
+            status.LastChecked = DateTime.Now;
+            stopwatch.Stop();
+        }
+
+        return status;
+    }
+
+    private async Task<ConnectionStatus> CheckMessagingServiceAsync(CancellationToken ct)
+    {
+        var status = new ConnectionStatus { IsConnected = false };
+        var stopwatch = Stopwatch.StartNew();
+
+        try
+        {
+            using var client = _httpClientFactory.CreateClient("MessagingService");
+            var response = await client.GetAsync("/health", ct);
+
+            status.IsConnected = response.IsSuccessStatusCode;
+            status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Messaging service check was cancelled");
+            status.Error = "Operation cancelled";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Messaging service check failed: {ex.Message}");
+            status.Error = ex.Message;
+        }
+        finally
+        {
+            status.LastChecked = DateTime.Now;
+            stopwatch.Stop();
+        }
+
+        return status;
+    }
+
+    private async Task<ConnectionStatus> CheckElisServiceAsync(CancellationToken ct)
+    {
+        var status = new ConnectionStatus { IsConnected = false };
+        var stopwatch = Stopwatch.StartNew();
+
+        try
+        {
+            var config = _configService.GetAppCfg();
+            var elisConfig = config.Elis;
+
+            if (elisConfig?.Use != true || string.IsNullOrEmpty(elisConfig.LabHubUrl))
+            {
+                throw new InvalidOperationException("ELIS configuration is not valid");
+            }
+
+            using var client = _httpClientFactory.CreateClient("Elis");
+            client.BaseAddress = new Uri(elisConfig.LabHubUrl);
+            var response = await client.GetAsync("/health", ct);
+
+            status.IsConnected = response.IsSuccessStatusCode;
+            status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("ELIS service check was cancelled");
+            status.Error = "Operation cancelled";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"ELIS service check failed: {ex.Message}");
+            status.Error = ex.Message;
+        }
+        finally
+        {
+            status.LastChecked = DateTime.Now;
+            stopwatch.Stop();
+        }
+
+        return status;
+    }
+
+    private async Task<ConnectionStatus> CheckOpcDaServiceAsync(CancellationToken ct)
+    {
+        // Заглушка для OPC DA проверки
+        await Task.Delay(10, ct);
+        return new ConnectionStatus
+        {
+            IsConnected = true,
+            LatencyMs = 15,
+            LastChecked = DateTime.Now
+        };
+    }
+
+    private async Task<ConnectionStatus> CheckOpcUaServiceAsync(CancellationToken ct)
+    {
+        // Заглушка для OPC UA проверки
+        await Task.Delay(10, ct);
+        return new ConnectionStatus
+        {
+            IsConnected = true,
+            LatencyMs = 12,
+            LastChecked = DateTime.Now
+        };
     }
 }
 ```
@@ -1264,11 +1812,18 @@ build:backend:
 ## 🚀 План миграции
 
 ### Этап 1: MVP строки состояния (2 недели)
-- [x] Настройка инфраструктуры Vue + Vite
-- [x] Базовая строка состояния
-- [x] SignalR интеграция
-- [x] API endpoint
-- [x] CI/CD pipeline
+- [ ] **Неделя 1**: Инфраструктура и базовая реализация
+  - [ ] Настройка workspace структуры `TN_Doc/Client/`
+  - [ ] Конфигурация Vite + TypeScript + Pinia
+  - [ ] Создание SVG компонентов иконок
+  - [ ] Базовый StatusBar компонент
+  - [ ] API endpoint и StatusProvider
+- [ ] **Неделя 2**: Интеграция и полировка
+  - [ ] SignalR интеграция и fallback на polling
+  - [ ] Health Checks и Rate Limiting
+  - [ ] Интеграция в Layout
+  - [ ] CI/CD pipeline обновление
+  - [ ] Тестирование и отладка
 
 ### Этап 2: Расширение функциональности (1 неделя)
 - [ ] История изменений статуса
@@ -1291,20 +1846,42 @@ build:backend:
 ## 📊 Мониторинг и метрики
 
 ### Метрики производительности
-- Время загрузки страницы
-- Размер bundle
-- Время отклика API
-- Задержка SignalR
+- Время загрузки страницы (`performance.mark`)
+- Размер bundle статус-бара (< 100KB)
+- Время отклика API `/api/status` (< 200ms)
+- Задержка SignalR соединения
+- Memory usage Vue приложения
 
 ### Метрики надёжности
-- Uptime каждого сервиса
-- Количество reconnect'ов SignalR
-- Частота ошибок API
+- Uptime каждого сервиса (БД, MS, ELIS, OPC)
+- Количество reconnect'ов SignalR за час
+- Частота ошибок API (HTTP 4xx, 5xx)
+- Success rate проверок статуса
+- Частота fallback на polling
 
 ### Метрики использования
-- Количество пользователей
-- Частота обновлений
-- Использование функций
+- Количество активных пользователей
+- Частота ручных обновлений
+- Количество кликов по индикаторам
+- Время сессии со строкой состояния
+
+### Мониторинг через NLog
+```csharp
+// Добавить в StatusProvider
+_logger.LogInformation("Status check completed: {DeviceCount} devices, {HealthyCount} healthy, {Duration}ms",
+    devices.Count,
+    devices.Count(d => d.IsConnected),
+    stopwatch.ElapsedMilliseconds);
+
+// Метрики для Performance Counters
+_logger.LogInformation("StatusBar.Performance", new
+{
+    ApiResponseTime = stopwatch.ElapsedMilliseconds,
+    DeviceCount = devices.Count,
+    HealthyDevices = devices.Count(d => d.IsConnected),
+    Timestamp = DateTime.UtcNow
+});
+```
 
 ## 🔒 Безопасность
 
