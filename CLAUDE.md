@@ -19,6 +19,9 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 # Add required NuGet sources
 dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
 dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "<USERNAME>" --password "<PASSWORD>" --store-password-in-clear-text
+
+# Restore NuGet packages
+dotnet restore
 ```
 
 ### Building the Solution
@@ -29,24 +32,39 @@ dotnet build
 # Build specific project
 dotnet build TN_Doc/TN_Doc.csproj
 
+# Build in Release mode
+dotnet build -c Release
+
 # Publish for production (Linux)
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
 
+# Publish for production (Windows)
+dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish
+
 # Clean build
 dotnet clean && dotnet build
+
+# Rebuild solution
+dotnet clean && dotnet restore && dotnet build
 ```
 
 ### Running the Application
 ```bash
-# Run in development mode
+# Run in development mode (from solution root)
 cd TN_Doc
 dotnet run
+
+# Run from solution root
+dotnet run --project TN_Doc/TN_Doc.csproj
 
 # Run with specific environment
 ASPNETCORE_ENVIRONMENT=Development dotnet run
 
-# Run with specific URLs
+# Run with specific URLs (default ports)
 dotnet run --urls="http://localhost:38509;https://localhost:44357"
+
+# Run with verbose output for debugging
+dotnet run --verbosity detailed
 ```
 
 ### Testing
@@ -81,6 +99,52 @@ dotnet test /p:CollectCoverage=true
   - Use mocks/fakes for external services and databases
   - Cover negative scenarios and validation errors
   - Follow AAA pattern: Arrange-Act-Assert
+
+### Code Quality and Linting
+```bash
+# Format code
+dotnet format
+
+# Check code style violations
+dotnet format --verify-no-changes
+
+# Analyze code with built-in analyzers
+dotnet build /p:TreatWarningsAsErrors=true
+
+# Run code analysis (if analyzers are configured)
+dotnet build /p:RunAnalyzersDuringBuild=true
+```
+
+### Debugging and Diagnostics
+```bash
+# Check .NET runtime and SDK versions
+dotnet --info
+
+# List installed .NET runtimes
+dotnet --list-runtimes
+
+# List installed .NET SDKs
+dotnet --list-sdks
+
+# Check project dependencies
+dotnet list package
+
+# Check for outdated packages
+dotnet list package --outdated
+
+# Check for vulnerable packages
+dotnet list package --vulnerable
+
+# View detailed build logs
+dotnet build -v detailed > build.log 2>&1
+
+# Debug application with verbose logging
+ASPNETCORE_ENVIRONMENT=Development dotnet run --verbosity detailed
+
+# Check application logs (platform-specific)
+# Linux: tail -f /opt/TN_Doc/logs/*.log
+# Windows: Get-Content TN_Doc\logs\*.log -Tail 50 -Wait
+```
 
 ### Related Projects Setup
 The following projects must be deployed at the same level (all share TN_Doc configuration):
@@ -328,6 +392,9 @@ Current development focus on solving file locking issues:
 - **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
 - **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
 - **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
+- **FastReport license errors**: Ensure FastReport NuGet source is configured with valid credentials
+- **Runtime version mismatch**: Verify .NET Runtime 8.0.13+ is installed (`dotnet --info`)
+- **Permission issues on Linux**: Ensure `alphadaemon` user has access to `/opt/TN_Doc/` and `/var/log/TN_Doc/`
 
 ### Working with Document Modules
 When working on specific document types:
