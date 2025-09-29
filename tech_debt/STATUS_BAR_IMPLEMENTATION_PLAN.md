@@ -179,7 +179,7 @@ export default defineConfig({
       input: resolve(__dirname, 'src/main.ts'),
       output: {
         entryFileNames: 'status-bar.js',
-        chunkFileNames: 'status-bar-[hash].js',
+        chunkFileNames: 'status-bar.chunk.js',
         assetFileNames: 'status-bar.[ext]'
       }
     }
@@ -524,10 +524,6 @@ export function useSignalR(hubUrl: string) {
           <IconRefresh :spinning="store.isLoading" />
         </button>
 
-        <span v-if="store.lastUpdate" class="status-bar__timestamp">
-          Обновлено: {{ formatTime(store.lastUpdate) }}
-        </span>
-
         <span
           class="status-bar__connection"
           :class="`status-bar__connection--${signalRState}`"
@@ -588,9 +584,6 @@ function handleDeviceClick(device: DeviceStatus) {
   // Future: Show device details modal
 }
 
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString('ru-RU');
-}
 </script>
 
 <style lang="scss">
@@ -657,8 +650,8 @@ function formatTime(date: Date): string {
   }
 
   &__timestamp {
-    color: #6c757d;
-    font-size: 12px;
+    /* timestamp disabled */
+    display: none;
   }
 
   &__connection {
