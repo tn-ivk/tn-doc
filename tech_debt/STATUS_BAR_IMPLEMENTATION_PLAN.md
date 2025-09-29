@@ -298,7 +298,7 @@ export const apiClient = new ApiClient();
 // TN_Doc/Client/statusbar/src/stores/statusStore.ts
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { StatusResponse, DeviceStatus } from '../types/status.types';
+import type { StatusResponse, DeviceStatus, ServiceStatus } from '../types/status.types';
 import { apiClient } from '@shared/api/ApiClient';
 
 export const useStatusStore = defineStore('status', () => {
@@ -517,7 +517,9 @@ export function useSignalR(hubUrl: string) {
           :disabled="store.isLoading"
           title="Обновить статус"
         >
-          <i class="fa fa-refresh" :class="{ 'fa-spin': store.isLoading }"></i>
+          <!-- Замените на SVG, если Font Awesome не подключён -->
+          <svg v-if="!store.isLoading" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5a5 5 0 0 1-9.9 1H5.02A7.002 7.002 0 0 0 19 13c0-3.87-3.13-7-7-7z"/></svg>
+          <svg v-else width="16" height="16" viewBox="0 0 24 24" class="spin"><path fill="currentColor" d="M12 4V2A10 10 0 1 0 22 12h-2a8 8 0 1 1-8-8z"/></svg>
         </button>
 
         <span v-if="store.lastUpdate" class="status-bar__timestamp">
@@ -529,7 +531,7 @@ export function useSignalR(hubUrl: string) {
           :class="`status-bar__connection--${signalRState}`"
           :title="`SignalR: ${signalRState}`"
         >
-          <i class="fa fa-wifi"></i>
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21l-4-4h8l-4 4zm-8-8l-4-4h24l-4 4H4zm4-8L4 1h16l-4 4H8z"/></svg>
         </span>
       </div>
     </div>
@@ -679,12 +681,14 @@ function formatTime(date: Date): string {
     text-align: center;
     font-size: 12px;
   }
+  .spin { animation: spin 1s linear infinite; }
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+@keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
 </style>
 ```
 
@@ -826,7 +830,9 @@ import StatusBar from './components/StatusBar.vue';
 ```csharp
 // TN_Doc/Startup.cs - добавить в ConfigureServices
 services.AddSignalR();
-services.AddSingleton<IMemoryCache, MemoryCache>();
+services.AddMemoryCache();
+services.AddRateLimiter(options => { /* лимиты на /api/status */ });
+services.AddScoped<IStatusProvider, StatusProvider>();
 services.AddHostedService<StatusMonitoringService>();
 
 // TN_Doc/Startup.cs - добавить в Configure
@@ -887,38 +893,15 @@ public class StatusController : ControllerBase
         return Ok(response);
     }
 
-    private async Task<StatusResponse> GenerateStatusResponse()
+    // РЕКОМЕНДАЦИЯ: вынести в IStatusProvider
+    private async Task<StatusResponse> GenerateStatusResponse(CancellationToken ct = default)
     {
-        var config = _configService.GetAppCfg();
-        var devices = new List<DeviceStatus>();
-
-        // Check database connections for each device
-        foreach (var device in config.Devices.Where(d => d.Use))
-        {
-            var status = await CheckDatabaseConnection(device);
-            devices.Add(status);
-        }
-
-        // Check services
-        var services = new ServiceStatus
-        {
-            MessagingService = await CheckMessagingService(),
-            Elis = config.Elis?.Use == true ? await CheckElisService() : null,
-            OpcDa = config.OpcConnectionSettings?.Any(o => o.Type == "DA") == true
-                ? await CheckOpcDaService() : null,
-            OpcUa = config.OpcConnectionSettings?.Any(o => o.Type == "UA") == true
-                ? await CheckOpcUaService() : null
-        };
-
-        return new StatusResponse
-        {
-            Devices = devices,
-            Services = services,
-            Timestamp = DateTime.Now.ToString("o")
-        };
+        var provider = HttpContext.RequestServices.GetRequiredService<IStatusProvider>();
+        return await provider.GetStatusAsync(ct);
     }
 
-    private async Task<DeviceStatus> CheckDatabaseConnection(Device device)
+    // Пример корректной проверки БД через строку подключения с таймаутом
+    private async Task<DeviceStatus> CheckDatabaseConnection(Device device, CancellationToken ct = default)
     {
         var stopwatch = Stopwatch.StartNew();
         var status = new DeviceStatus
@@ -931,14 +914,16 @@ public class StatusController : ControllerBase
 
         try
         {
-            using var connection = new MySqlConnection(device.ConnString);
-            connection.ConnectionTimeout = 2; // 2 second timeout
-            await connection.OpenAsync();
+            // Получить активную строку подключения устройства (пример)
+            var activeConn = device.DBConnectionStrings?.FirstOrDefault(c => c.Use)?.GetConnectionString();
+            var csb = new MySqlConnectionStringBuilder(activeConn) { ConnectionTimeout = 2 };
+            using var connection = new MySqlConnection(csb.ConnectionString);
+            await connection.OpenAsync(ct);
 
             // Simple query to verify connection
             using var command = connection.CreateCommand();
             command.CommandText = "SELECT 1";
-            await command.ExecuteScalarAsync();
+            await command.ExecuteScalarAsync(ct);
 
             status.IsConnected = true;
             status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
@@ -956,7 +941,7 @@ public class StatusController : ControllerBase
         return status;
     }
 
-    private async Task<ConnectionStatus> CheckMessagingService()
+    private async Task<ConnectionStatus> CheckMessagingService(CancellationToken ct = default)
     {
         var status = new ConnectionStatus { IsConnected = false };
         var stopwatch = Stopwatch.StartNew();
@@ -964,7 +949,7 @@ public class StatusController : ControllerBase
         try
         {
             using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-            var response = await client.GetAsync("http://localhost:5010/health");
+            var response = await client.GetAsync("http://localhost:5010/health", ct);
 
             status.IsConnected = response.IsSuccessStatusCode;
             status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
@@ -982,7 +967,7 @@ public class StatusController : ControllerBase
         return status;
     }
 
-    private async Task<ConnectionStatus> CheckElisService()
+    private async Task<ConnectionStatus> CheckElisService(CancellationToken ct = default)
     {
         // Implementation for ELIS service check
         return new ConnectionStatus
@@ -993,7 +978,7 @@ public class StatusController : ControllerBase
         };
     }
 
-    private async Task<ConnectionStatus> CheckOpcDaService()
+    private async Task<ConnectionStatus> CheckOpcDaService(CancellationToken ct = default)
     {
         // Implementation for OPC DA check
         return new ConnectionStatus
@@ -1004,7 +989,7 @@ public class StatusController : ControllerBase
         };
     }
 
-    private async Task<ConnectionStatus> CheckOpcUaService()
+    private async Task<ConnectionStatus> CheckOpcUaService(CancellationToken ct = default)
     {
         // Implementation for OPC UA check
         return new ConnectionStatus
@@ -1118,13 +1103,8 @@ public class StatusMonitoringService : BackgroundService
             try
             {
                 using var scope = _serviceProvider.CreateScope();
-                var statusController = new StatusController(
-                    scope.ServiceProvider.GetRequiredService<IAppConfigService>(),
-                    scope.ServiceProvider.GetRequiredService<IMemoryCache>(),
-                    scope.ServiceProvider.GetRequiredService<ILogger<StatusController>>()
-                );
-
-                var currentStatus = await statusController.GenerateStatusResponse();
+                var provider = scope.ServiceProvider.GetRequiredService<IStatusProvider>();
+                var currentStatus = await provider.GetStatusAsync(stoppingToken);
 
                 // Check if status changed
                 if (HasStatusChanged(currentStatus))
@@ -1172,6 +1152,29 @@ public class StatusMonitoringService : BackgroundService
 }
 ```
 
+#### 4.5 Интерфейс и реализация провайдера статусов
+```csharp
+public interface IStatusProvider
+{
+    Task<StatusResponse> GetStatusAsync(CancellationToken ct = default);
+}
+
+public class StatusProvider : IStatusProvider
+{
+    private readonly IAppConfigService _configService;
+    private readonly ILogger<StatusProvider> _logger;
+    public StatusProvider(IAppConfigService cfg, ILogger<StatusProvider> logger)
+    { _configService = cfg; _logger = logger; }
+
+    public async Task<StatusResponse> GetStatusAsync(CancellationToken ct = default)
+    {
+        var config = _configService.GetAppCfg();
+        // TODO: реализовать проверки БД/сервисов с отменой ct
+        return new StatusResponse { Devices = new(), Services = new(), Timestamp = DateTime.UtcNow.ToString("o") };
+    }
+}
+```
+
 ### Фаза 5: Интеграция в Layout
 
 ```html
@@ -1188,7 +1191,7 @@ public class StatusMonitoringService : BackgroundService
     <!-- ... other styles ... -->
 
     <!-- Status bar styles -->
-    <link rel="stylesheet" href="/statusbar/status-bar.css?v=@ViewData["Version"]" />
+    <link rel="stylesheet" href="/statusbar/status-bar.css" asp-append-version="true" />
 </head>
 <body>
     <div class="container">
@@ -1203,7 +1206,7 @@ public class StatusMonitoringService : BackgroundService
     @await RenderSectionAsync("Scripts", required: false)
 
     <!-- Status bar script -->
-    <script type="module" src="/statusbar/status-bar.js?v=@ViewData["Version"]"></script>
+    <script type="module" src="/statusbar/status-bar.js" asp-append-version="true"></script>
 </body>
 </html>
 ```
