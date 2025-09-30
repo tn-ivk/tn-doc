@@ -10,6 +10,7 @@ using TN_Doc.Extensions;
 using TN_Doc.Services;
 using TN.Doc;
 using TN_DocGeneral.Services;
+using TN_Doc.Hubs;
 
 namespace TN_Doc;
 
@@ -52,6 +53,26 @@ public class Startup
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
 		services.AddControllersWithViews();
+		services.AddSignalR();
+		services.AddMemoryCache();
+
+		services.AddHttpClient("MessagingService", client =>
+		{
+			client.BaseAddress = new Uri("http://localhost:5010");
+			client.Timeout = TimeSpan.FromSeconds(2);
+			client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.4.2");
+		});
+
+		services.AddHttpClient("Elis", client =>
+		{
+			client.Timeout = TimeSpan.FromSeconds(5);
+			client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.4.2");
+		});
+
+
+
+		services.AddScoped<IStatusProvider, StatusProvider>();
+		services.AddHostedService<StatusMonitoringService>();
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
 	}
@@ -93,6 +114,10 @@ public class Startup
 		app.UseStaticFiles();
 		app.UseRouting();
 		app.UseCors("CorsPolicy");
-		app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}"); });
+		app.UseEndpoints(endpoints =>
+		{
+			endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+			endpoints.MapHub<StatusHub>("/statusHub");
+		});
 	}
 }

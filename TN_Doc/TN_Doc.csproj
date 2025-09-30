@@ -18,6 +18,11 @@
     <None Remove="wwwroot\lib\jquery-ui\**" />
   </ItemGroup>
 
+  <!-- Клиентский фронтенд статус-бара -->
+  <ItemGroup>
+    <None Include="wwwroot\statusbar\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!-- Копирование Development-конфигураций только в Debug -->
   <ItemGroup>
     <Content Update="appsettings.Development.json;Cfg\CfgApp.Development.json;Cfg\Cfg.Development.json">

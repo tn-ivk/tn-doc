@@ -1,0 +1,20 @@
+{
+  "name": "@tn-doc/client",
+  "private": true,
+  "workspaces": [
+    "statusbar",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=statusbar",
+    "build": "npm run build --workspace=statusbar",
+    "build:all": "npm run build --workspaces --if-present",
+    "type-check": "npm run type-check --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.5"
+  }
+}
+
+
