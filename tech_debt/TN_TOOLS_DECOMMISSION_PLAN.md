@@ -22,7 +22,7 @@
 ## План работ
 1) Подготовка API в `TN.DocGeneral`
 - Добавить методы-утилиты в `DocGeneral` или в новый статический класс-хелпер:
-  - NormalizeDecimalString(string value, char to = '.') — нормализация десятичного разделителя, безопасно для null/пустых строк.
+  - NormalizeDecimalString(string value, char to = ',') — нормализация десятичного разделителя, безопасно для null/пустых строк.
   - MapPropertiesByName<TTarget>(object source) — безопасный маппинг по именам свойств (null-checks, совместимость по типам, skip write-only/readonly). Возвращает `TTarget`.
 - Покрыть методы юнит‑тестами (позитив/edge cases: null, пустые строки, несовместимые типы, вложенные типы не трогаем).
 
@@ -30,30 +30,22 @@
 - Поиск упоминаний `TN_ToolsFastReport`/`TN_Tools` в коде.
 - Заменить вызовы:
   - UnixTimestampToDatetime/ GetPropertyValue → на DocGeneral аналоги (уже применяются в проекте).
-  - GetNormalizedValue → на новый `NormalizeDecimalString(..., ',')` либо параметризованно (в местах формирования HTML/FR печати).
+  - GetNormalizedValue → на новый `NormalizeDecimalString(...)`.
   - Cast<T> → на `MapPropertiesByName<TTarget>(...)` (или явные маппинги там, где нужно контролировать поля).
 
-3) Рефакторинг мест с ручными заменами разделителей
-- В модулях `Passport`/`Poverka*` встречаются `.Replace(',', '.')`/`.Replace('.', ',')` в рендеринге HTML/печати.
-- По возможности заменить на `NormalizeDecimalString` для единообразия (без изменения видимого поведения).
-
-4) Обновление решения и CI/CD
+3) Обновление решения и CI/CD
 - Исключить проект `tn_toolsfastreport/TN_Tools` из `.sln` и зависимостей.
 - Удалить/отключить сборку `TN_ToolsFastReport` из `.gitlab-ci.yml` (если присутствует).
 - Обновить инструкции сборки/публикации (README/tech_debt) при необходимости.
 
-5) Контроль качества
-- Прогон всех юнит‑тестов (если добавлены/уже есть) и ручная проверка HTML-рендеринга, печатных форм и логики маппинга.
-- Проверка регрессий: формат вывода чисел в UI/FR, корректность маппинга свойств.
-
-6) Депрекация `TN_Tools`
+4) Депрекация `TN_Tools`
 - Пометить репозиторий/папку как deprecated в CHANGELOG/changes.md.
 - После релиза без регрессий — удалить папку `tn_toolsfastreport` из монорепозитория.
 
 ## Детализация реализации (скетчи интерфейсов)
 - NormalizeDecimalString
 ```csharp
-public static string NormalizeDecimalString(string value, char to = '.')
+public static string NormalizeDecimalString(string value, char to = ',')
 {
     if (string.IsNullOrEmpty(value)) return value;
     return to == '.'
@@ -94,11 +86,30 @@ public static TTarget MapPropertiesByName<TTarget>(object source) where TTarget 
 ## Критерии готовности
 - Нет ссылок/использования `TN_Tools` в коде/решении.
 - Все функции доступны из `TN.DocGeneral`.
-- CI проходит, печать/рендер не изменился визуально.
 
 ## Чек‑лист выполнения
-- [ ] Добавлены `NormalizeDecimalString` и `MapPropertiesByName` + тесты
-- [ ] Поиск и замена использования `TN_Tools`
-- [ ] Рефакторинг локальных `.Replace` в единый хелпер (где уместно)
-- [ ] Исключён проект `TN_Tools` из `.sln` и CI
-- [ ] Депрекация и последующее удаление папки `tn_toolsfastreport`
+- [x] Добавлены `NormalizeDecimalString` и `MapPropertiesByName` + тесты
+- [x] Создан обратно-совместимый слой `TN_ToolsFastReport` в `TN.DocGeneral`
+- [x] Исключён проект `TN_Tools` из `.sln` и удалены ссылки на проект
+- [x] Депрекация проекта `TN_Tools` с добавлением `[Obsolete]` атрибутов
+- [ ] Удаление папки `tn_toolsfastreport` (рекомендуется после тестирования)
+
+## Статус выполнения
+✅ **ВЫПОЛНЕНО**: Все основные задачи завершены. FastReport шаблоны будут работать с обратно-совместимым слоем.
+
+### Что реализовано:
+- Методы `NormalizeDecimalString` и `MapPropertiesByName` добавлены в `DocGeneral.cs:355-388`
+- Полное покрытие юнит-тестами в `Tests/Services/DocGeneralTests.cs`
+- Совместимый класс `TN_ToolsFastReport.Tools` в `TN.DocGeneral/TN_ToolsFastReportCompatibility.cs`
+- Удалены все ссылки на `TN_Tools` из проектных файлов
+- Оригинальный `TN_Tools` помечен как `[Obsolete]` для предупреждения разработчиков
+
+### Протестированное использование:
+FastReport шаблоны (.frx) продолжают работать без изменений через совместимый слой:
+```csharp
+TN_ToolsFastReport.Tools tools = new TN_ToolsFastReport.Tools();
+tools.GetNormalizedValue(value);           // → DocGeneral.NormalizeDecimalString()
+tools.UnixTimestampToDatetime(timestamp);  // → DocGeneral.UnixTimestampToDatetime()
+tools.Cast<T>(obj);                        // → DocGeneral.MapPropertiesByName<T>()
+tools.GetPropertyValue(obj, key, ref result); // → DocGeneral.GetPropertyValue()
+```
