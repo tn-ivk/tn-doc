@@ -75,8 +75,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Report", "tn.docgeneral\Rep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TN.Utils", "tn.docgeneral\tn.utils\TN.Utils\TN.Utils.csproj", "{2C5698E2-0CBA-4E0A-8E73-023D0EFBAFB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TN_Tools", "tn_toolsfastreport\TN_Tools\TN_Tools.csproj", "{CE15B8E0-9F3E-48CD-A069-E75BA28FEB5E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Poverka3267", "tn.docgeneral\Poverka3267\Poverka3267.csproj", "{A6013896-5A60-4A1E-9CE6-FB1B3C2AD138}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Poverka3266", "tn.docgeneral\Poverka3266\Poverka3266.csproj", "{B717FC7D-A225-4A60-8CDF-F92B7B43018E}"
@@ -251,10 +249,6 @@ Global
 		{2C5698E2-0CBA-4E0A-8E73-023D0EFBAFB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C5698E2-0CBA-4E0A-8E73-023D0EFBAFB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C5698E2-0CBA-4E0A-8E73-023D0EFBAFB8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE15B8E0-9F3E-48CD-A069-E75BA28FEB5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE15B8E0-9F3E-48CD-A069-E75BA28FEB5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE15B8E0-9F3E-48CD-A069-E75BA28FEB5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE15B8E0-9F3E-48CD-A069-E75BA28FEB5E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A6013896-5A60-4A1E-9CE6-FB1B3C2AD138}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A6013896-5A60-4A1E-9CE6-FB1B3C2AD138}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6013896-5A60-4A1E-9CE6-FB1B3C2AD138}.Release|Any CPU.ActiveCfg = Release|Any CPU
