@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/16/2025 10:05:24" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/30/2025 13:43:55" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -242,8 +242,8 @@ namespace FastReport
          
       Delive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Delive_IOF; 
       Receive_IOF.Text = DataIVK.TableResultActAndPassport.AdditionalInfo.Receive_IOF;
-      if (!string.IsNullOrEmpty(Footer.LabMIDensity))
-        LabMIDensity.Text = $&quot;*) заполняют при отказе поточного преобразователя плотности (определяют по {Footer.LabMIDensity})&quot;;
+      //if (!string.IsNullOrEmpty(Footer.LabMIDensity))
+      //  LabMIDensity.Text = $&quot;*) заполняют при отказе поточного преобразователя плотности (определяют по {Footer.LabMIDensity})&quot;;
     }  
       
     private void PageFooter_BeforeLayout(object sender, EventArgs e)
@@ -360,7 +360,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="185.4" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="184.18" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="7.56" Width="567" Height="511.13" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="302.4"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -530,7 +530,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="689.19" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="686.75" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Top="9.45" Width="336.42" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="336.42"/>
         <TableRow Name="Row195">
@@ -541,7 +541,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="740.44" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="736.77" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="85.05" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -582,7 +582,7 @@ namespace FastReport
           <TableCell Name="Cell85" Padding="0, 0, 0, 0" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt, style=Bold" FontWidthRatio="0.85"/>
         </TableRow>
         <TableRow Name="Row198" Height="28.35">
-          <TableCell Name="LabMIDensity" Text="*) заполняют при отказе поточного преобразователя плотности (определяют по МИ 2153)" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="8"/>
+          <TableCell Name="LabMIDensity" Text="*) заполняют при отказе поточного преобразователя плотности (определяют по аттестованной методике определения плотности)" VertAlign="Bottom" Font="Arial, 8pt" FontWidthRatio="0.85" ColSpan="8"/>
           <TableCell Name="Cell1575" Font="Arial, 10pt"/>
           <TableCell Name="Cell1576" Font="Arial, 10pt"/>
           <TableCell Name="Cell1577" Font="Arial, 10pt"/>
@@ -593,7 +593,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="837.05" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="832.16" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
