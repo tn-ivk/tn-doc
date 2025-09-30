@@ -213,7 +213,7 @@ namespace TN_Doc.Services
             return status;
         }
 
-        private async Task<ConnectionStatus> CheckElisServiceAsync(TN.DocData.Elis elisConfig, CancellationToken ct)
+        private Task<ConnectionStatus> CheckElisServiceAsync(TN.DocData.Elis elisConfig, CancellationToken ct)
         {
             var status = new ConnectionStatus { IsConnected = false, LastChecked = DateTime.Now };
 
