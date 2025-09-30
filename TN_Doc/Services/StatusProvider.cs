@@ -215,37 +215,35 @@ namespace TN_Doc.Services
 
         private async Task<ConnectionStatus> CheckElisServiceAsync(TN.DocData.Elis elisConfig, CancellationToken ct)
         {
-            var stopwatch = Stopwatch.StartNew();
-            var status = new ConnectionStatus { IsConnected = false };
+            var status = new ConnectionStatus { IsConnected = false, LastChecked = DateTime.Now };
 
             try
             {
-                if (string.IsNullOrEmpty(elisConfig.LabHubUrl))
+                // ELIS проверка через TN.ElisConnector (отдельный сервис)
+                // Пока просто проверяем, что конфигурация заполнена
+                if (!string.IsNullOrEmpty(elisConfig.ClientName) &&
+                    !string.IsNullOrEmpty(elisConfig.OstKey))
                 {
-                    status.Error = "ELIS URL not configured";
-                    status.LastChecked = DateTime.Now;
-                    return status;
+                    // Считаем ELIS настроенным, если есть ключевые параметры
+                    status.IsConnected = true;
+                    _logger.LogDebug("ELIS configuration is present");
+                }
+                else
+                {
+                    status.Error = "ELIS configuration incomplete";
+                    _logger.LogDebug("ELIS configuration is incomplete");
                 }
 
-                using var client = _httpClientFactory.CreateClient("Elis");
-                client.BaseAddress = new Uri(elisConfig.LabHubUrl);
-                var response = await client.GetAsync("/health", ct);
-
-                status.IsConnected = response.IsSuccessStatusCode;
-                status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
-                status.LastChecked = DateTime.Now;
-
-                _logger.LogDebug("ELIS Service check: {Status} in {LatencyMs}ms",
-                    status.IsConnected ? "Connected" : "Disconnected", status.LatencyMs);
+                // TODO: Реализовать реальную проверку через TN.ElisConnector
+                // когда будет известен endpoint для health check
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "ELIS Service check failed: {ErrorMessage}", ex.Message);
+                _logger.LogWarning(ex, "ELIS configuration check failed: {ErrorMessage}", ex.Message);
                 status.Error = ex.Message;
-                status.LastChecked = DateTime.Now;
             }
 
-            return status;
+            return Task.FromResult(status);
         }
     }
 }
