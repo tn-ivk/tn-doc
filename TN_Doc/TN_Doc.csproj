@@ -102,7 +102,6 @@
   <!-- Ссылки на проекты -->
   <ItemGroup>
     <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
-    <ProjectReference Include="..\tn_toolsfastreport\TN_Tools\TN_Tools.csproj" />
   </ItemGroup>
 
   <ProjectExtensions>
