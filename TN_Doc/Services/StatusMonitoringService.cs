@@ -1,0 +1,175 @@
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using TN_Doc.Hubs;
+using TN_Doc.Models.Status;
+
+namespace TN_Doc.Services
+{
+    /// <summary>
+    /// Background service для мониторинга статуса и отправки обновлений через SignalR
+    /// </summary>
+    public class StatusMonitoringService : BackgroundService
+    {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IHubContext<StatusHub> _hubContext;
+        private readonly ILogger<StatusMonitoringService> _logger;
+        private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(10);
+        private StatusResponse _lastStatus;
+        private int _consecutiveErrors = 0;
+        private const int MAX_CONSECUTIVE_ERRORS = 5;
+
+        public StatusMonitoringService(
+            IServiceProvider serviceProvider,
+            IHubContext<StatusHub> hubContext,
+            ILogger<StatusMonitoringService> logger)
+        {
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation(
+                "Status monitoring background service started with {CheckInterval}s interval",
+                _checkInterval.TotalSeconds);
+
+            // Даем системе время на инициализацию
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var cycleStart = DateTime.UtcNow;
+
+                try
+                {
+                    using var scope = _serviceProvider.CreateScope();
+                    var provider = scope.ServiceProvider.GetRequiredService<IStatusProvider>();
+                    var currentStatus = await provider.GetStatusAsync(stoppingToken);
+
+                    var hasChanges = HasStatusChanged(currentStatus);
+
+                    if (hasChanges)
+                    {
+                        _lastStatus = currentStatus;
+
+                        _logger.LogInformation(
+                            "Status changed detected, broadcasting update. " +
+                            "Devices: {HealthyDevices}/{TotalDevices}, MS: {MsStatus}",
+                            currentStatus.Devices.Count(d => d.IsConnected),
+                            currentStatus.Devices.Count,
+                            currentStatus.Services.MessagingService?.IsConnected ?? false);
+
+                        await _hubContext.Clients.All.SendAsync(
+                            "statusUpdated",
+                            currentStatus,
+                            stoppingToken);
+                    }
+                    else
+                    {
+                        _logger.LogTrace("No status changes detected in monitoring cycle");
+                    }
+
+                    // Сброс счетчика ошибок при успешном выполнении
+                    _consecutiveErrors = 0;
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    _logger.LogInformation("Status monitoring service is shutting down");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _consecutiveErrors++;
+                    var cycleDuration = DateTime.UtcNow - cycleStart;
+
+                    if (_consecutiveErrors <= MAX_CONSECUTIVE_ERRORS)
+                    {
+                        _logger.LogWarning(ex,
+                            "Error #{ErrorCount} in status monitoring cycle (took {CycleDurationMs}ms): {ErrorMessage}",
+                            _consecutiveErrors, cycleDuration.TotalMilliseconds, ex.Message);
+                    }
+                    else
+                    {
+                        _logger.LogError(ex,
+                            "Critical: {ErrorCount} consecutive errors in status monitoring. " +
+                            "Latest cycle took {CycleDurationMs}ms. Service stability compromised.",
+                            _consecutiveErrors, cycleDuration.TotalMilliseconds);
+                    }
+
+                    // Увеличиваем интервал при множественных ошибках
+                    if (_consecutiveErrors > 3)
+                    {
+                        var delayMultiplier = Math.Min(_consecutiveErrors - 2, 5);
+                        await Task.Delay(TimeSpan.FromSeconds(_checkInterval.TotalSeconds * delayMultiplier), stoppingToken);
+                        continue;
+                    }
+                }
+
+                await Task.Delay(_checkInterval, stoppingToken);
+            }
+
+            _logger.LogInformation("Status monitoring background service stopped");
+        }
+
+        private bool HasStatusChanged(StatusResponse current)
+        {
+            if (_lastStatus == null)
+            {
+                _logger.LogDebug("First status check, marking as changed");
+                return true;
+            }
+
+            var changes = new List<string>();
+
+            // Сравниваем устройства
+            foreach (var device in current.Devices)
+            {
+                var lastDevice = _lastStatus.Devices.FirstOrDefault(d => d.Id == device.Id);
+                if (lastDevice == null)
+                {
+                    changes.Add($"New device: {device.Name}");
+                }
+                else if (lastDevice.IsConnected != device.IsConnected)
+                {
+                    changes.Add($"Device {device.Name}: {(device.IsConnected ? "connected" : "disconnected")}");
+                }
+            }
+
+            // Сравниваем сервисы
+            if (current.Services.MessagingService?.IsConnected != _lastStatus.Services.MessagingService?.IsConnected)
+            {
+                changes.Add($"MessagingService: {(current.Services.MessagingService?.IsConnected == true ? "connected" : "disconnected")}");
+            }
+
+            if (current.Services.Elis?.IsConnected != _lastStatus.Services.Elis?.IsConnected)
+            {
+                changes.Add($"ELIS: {(current.Services.Elis?.IsConnected == true ? "connected" : "disconnected")}");
+            }
+
+            if (current.Services.OpcDa?.IsConnected != _lastStatus.Services.OpcDa?.IsConnected)
+            {
+                changes.Add($"OPC DA: {(current.Services.OpcDa?.IsConnected == true ? "connected" : "disconnected")}");
+            }
+
+            if (current.Services.OpcUa?.IsConnected != _lastStatus.Services.OpcUa?.IsConnected)
+            {
+                changes.Add($"OPC UA: {(current.Services.OpcUa?.IsConnected == true ? "connected" : "disconnected")}");
+            }
+
+            if (changes.Any())
+            {
+                _logger.LogInformation("Status changes detected: {Changes}", string.Join(", ", changes));
+                return true;
+            }
+
+            return false;
+        }
+    }
+}
