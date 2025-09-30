@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/11/2025 16:49:26" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/30/2025 11:16:56" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -245,7 +245,7 @@ namespace FastReport
     <PageHeaderBand Name="PageHeader1" Width="718.2" Height="18.9">
       <TextObject Name="PageHeaderText" Left="9.45" Width="708.75" Height="18.9" Text="PageHeaderText" HorzAlign="Right" Font="Arial, 8.25pt"/>
     </PageHeaderBand>
-    <ReportTitleBand Name="ReportTitle" Top="23.61" Width="718.2" Height="139.86" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportTitleBand Name="ReportTitle" Top="21.68" Width="718.2" Height="139.86" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableHeader" Width="717.82" Height="139.86">
         <TableColumn Name="Column01" Width="325.89"/>
         <TableColumn Name="Column03" Width="391.93"/>
@@ -279,7 +279,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="168.17" Width="718.2" Height="468.72" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="164.32" Width="718.2" Height="468.72" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="459.27" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="425.25"/>
@@ -383,7 +383,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="641.6" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="635.81" Width="718.2" Height="338.31" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="328.86">
         <TableColumn Name="Column29" Width="245.7"/>
         <TableColumn Name="Column31" Width="202.23"/>
