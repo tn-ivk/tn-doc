@@ -1,33 +1,23 @@
 <template>
   <div
     class="status-indicator"
-    :class="{ 'status-indicator--clickable': clickable }"
+    :class="[
+      `status-indicator--${status}`,
+      { 'status-indicator--clickable': clickable }
+    ]"
     @click="handleClick"
+    v-tooltip.top="tooltip"
   >
-    <Badge
-      :value="label"
-      :severity="badgeSeverity"
-      :pt="{
-        root: { class: 'status-indicator__badge' }
-      }"
-      v-tooltip.top="tooltip"
-    >
-      <template #value>
-        <div class="status-indicator__content">
-          <i :class="statusIconClass" class="status-indicator__icon"></i>
-          <span class="status-indicator__label">{{ label }}</span>
-          <span v-if="latency !== undefined" class="status-indicator__latency">
-            {{ latency }}ms
-          </span>
-        </div>
-      </template>
-    </Badge>
+    <i :class="statusIconClass" class="status-indicator__icon"></i>
+    <span class="status-indicator__label">{{ label }}</span>
+    <span v-if="latency !== undefined" class="status-indicator__latency">
+      {{ latency }}ms
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import Badge from 'primevue/badge';
 import type { IndicatorStatus } from '../types/status.types';
 
 interface Props {
@@ -45,19 +35,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   click: []
 }>();
-
-const badgeSeverity = computed(() => {
-  switch (props.status) {
-    case 'online':
-      return 'success';
-    case 'offline':
-      return 'danger';
-    case 'warning':
-      return 'warn';
-    default:
-      return 'secondary';
-  }
-});
 
 const statusIconClass = computed(() => {
   switch (props.status) {
@@ -83,33 +60,45 @@ function handleClick() {
 .status-indicator {
   display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
   user-select: none;
+  border: 1px solid transparent;
+
+  &--online {
+    background: var(--p-green-100);
+    color: var(--p-green-700);
+    border-color: var(--p-green-200);
+  }
+
+  &--offline {
+    background: var(--p-red-100);
+    color: var(--p-red-700);
+    border-color: var(--p-red-200);
+  }
+
+  &--warning {
+    background: var(--p-yellow-100);
+    color: var(--p-yellow-700);
+    border-color: var(--p-yellow-200);
+  }
 
   &--clickable {
     cursor: pointer;
 
-    &:hover :deep(.status-indicator__badge) {
+    &:hover {
       opacity: 0.85;
       transform: scale(1.02);
     }
   }
 
-  :deep(.status-indicator__badge) {
-    transition: all 0.2s ease;
-    padding: 0.35rem 0.65rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 4px;
-  }
-
-  &__content {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
   &__icon {
     font-size: 0.75rem;
+    flex-shrink: 0;
 
     &--blink {
       animation: blink 1.5s ease-in-out infinite;
@@ -119,12 +108,13 @@ function handleClick() {
   &__label {
     font-weight: 500;
     font-size: 0.813rem;
+    white-space: nowrap;
   }
 
   &__latency {
     font-size: 0.688rem;
     opacity: 0.8;
-    margin-left: 0.15rem;
+    white-space: nowrap;
   }
 }
 
