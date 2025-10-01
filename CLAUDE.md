@@ -8,8 +8,9 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 **Version**: 1.4.2
 **Target Framework**: .NET 8.0
+**SDK Compatibility**: Works with .NET SDK 8.0+ and 9.0+
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
-**Current Branch**: develop (active development branch)
+**Main Development Branch**: develop
 **Note**: Recent work on status bar improvements (removed time display and version info from status bar)
 
 ## Build and Development Commands
@@ -288,11 +289,16 @@ Real-time data acquisition from measurement systems:
 
 ### Service Architecture
 The application uses dependency injection with the following key services:
-- **IAppConfigService**: Singleton configuration management
+- **IAppConfigService**: Singleton configuration management and document class factory
 - **PrinterService**: Platform-specific printing (Windows/Linux)
 - **DirectoryService**: File system operations
 - **DbContext**: Entity Framework database context
 - **AppInfoProvider**: Application version information
+- **IReportBuffer**: Singleton for in-memory PDF storage
+- **IDbSchemaCache**: Scoped service for caching database schema information
+- **IDocModuleLoader**: Singleton for dynamic loading of document modules
+- **IStatusProvider**: Scoped service for system health monitoring
+- **StatusMonitoringService**: Background hosted service for continuous status monitoring
 
 Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
 
@@ -301,9 +307,14 @@ The application includes a real-time status bar (`/TN_Doc/wwwroot/js/statusBar.j
 - **Device Indicators**: Database connectivity for each configured ИВК device
 - **OPC Indicators**: OPC DA/UA server connection status
 - **Service Indicators**: SignalR Hub and ELIS laboratory system status
-- **Real-time Updates**: SignalR-based push notifications for status changes
+- **Real-time Updates**: SignalR-based push notifications for status changes via `/statusHub` endpoint
 - **Manual Refresh**: Click individual indicators or global refresh button
 - **Configuration-Driven**: Dynamically creates indicators based on `CfgApp.json` device/OPC settings
+- **Backend Components**:
+  - `StatusHub`: SignalR hub at `/statusHub` for broadcasting status updates
+  - `StatusMonitoringService`: Background service that periodically checks system health
+  - `StatusProvider`: Service that queries database, OPC, MessagingService, and ELIS endpoints
+  - HTTP clients configured with timeouts (2s for MessagingService, 5s for ELIS)
 
 ### Document Generation Architecture  
 The system uses a factory pattern with dynamic module loading:
@@ -317,11 +328,13 @@ The system uses a factory pattern with dynamic module loading:
 - **Template Resolution**: FastReport templates (.frx files) paths resolved through document configuration files
 
 ### Memory Management and PDF Generation
-Current development focus on solving file locking issues:
-- **Problem**: PDF generation saves to static `wwwroot/PDF/PDF.pdf` causing "file in use" errors
-- **Solution**: Move to in-memory generation using MemoryStream and `File()` returns
-- **FastReport Integration**: Use `report.Export(exporter, memoryStream)` instead of file paths
+The application uses in-memory PDF generation (implemented in v1.4.1):
+- **IReportBuffer**: Singleton service that stores generated PDF bytes in memory
+- **Middleware Interceptor**: Custom middleware in `Startup.cs` intercepts `/PDF/PDF.pdf` requests and serves from memory buffer
+- **Cache Control**: Responses include `no-store, no-cache, must-revalidate` headers to prevent browser caching
+- **FastReport Integration**: Reports exported to `MemoryStream`, then stored in `IReportBuffer`
 - **Printer Support**: Temporary files still needed for physical printing (winprutil.exe/CUPS)
+- **Benefits**: Eliminates "file in use" errors and concurrent access issues
 
 ### Multi-platform Support
 - **Windows**:
@@ -491,6 +504,9 @@ Configuration follows a layered approach:
 - **Resource Cleanup**: Explicit disposal of FastReport objects and streams in finally blocks
 
 ### Recent Changes (v1.4.2)
+- Removed TN.Tools project (obsolete functionality)
+- Simplified file path determination logic
+- Updated KMH_MI2816 for IVK version 7.12.14.3000 protocol changes
 - Updated docgeneral to version 1.2.2
 - ⚠️ Status bar improvements: Removed time display and project version info from status bar
 - Cleaned up status bar JavaScript to remove unused time update functionality
