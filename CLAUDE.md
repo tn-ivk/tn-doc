@@ -68,6 +68,23 @@ dotnet run --urls="http://localhost:38509;https://localhost:44357"
 dotnet run --verbosity detailed
 ```
 
+### Building Vue Components (StatusBar)
+```bash
+# Navigate to StatusBar project
+cd TN_Doc/Client/statusbar
+
+# Install dependencies (first time only)
+npm install
+
+# Development mode with hot reload
+npm run dev
+
+# Build for production
+npm run build
+
+# The build output goes to dist/ and is automatically served by ASP.NET Core
+```
+
 ### Testing
 ```bash
 # Run all tests
@@ -303,7 +320,14 @@ The application uses dependency injection with the following key services:
 Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
 
 ### Status Bar Architecture
-The application includes a real-time status bar (`/TN_Doc/wwwroot/js/statusBar.js`) that monitors system health:
+The application includes a real-time status bar built with **Vue 3 + PrimeVue** that monitors system health:
+- **Frontend Stack**:
+  - Vue 3.4.21 with TypeScript
+  - **PrimeVue 4.2+** - Enterprise UI component library
+  - Pinia for state management
+  - SignalR client for real-time updates
+  - Vite as build tool
+  - Source: `/TN_Doc/Client/statusbar/`
 - **Device Indicators**: Database connectivity for each configured ИВК device
 - **OPC Indicators**: OPC DA/UA server connection status
 - **Service Indicators**: SignalR Hub and ELIS laboratory system status
@@ -315,6 +339,12 @@ The application includes a real-time status bar (`/TN_Doc/wwwroot/js/statusBar.j
   - `StatusMonitoringService`: Background service that periodically checks system health
   - `StatusProvider`: Service that queries database, OPC, MessagingService, and ELIS endpoints
   - HTTP clients configured with timeouts (2s for MessagingService, 5s for ELIS)
+- **PrimeVue Components Used**:
+  - Badge: Status indicators with color coding
+  - Button: Refresh action with loading state
+  - Tag: SignalR connection indicator
+  - Message: Error notifications
+  - Tooltip: Contextual help
 
 ### Document Generation Architecture  
 The system uses a factory pattern with dynamic module loading:

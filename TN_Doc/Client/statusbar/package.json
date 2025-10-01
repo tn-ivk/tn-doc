@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@microsoft/signalr": "^8.0.5",
+    "@primevue/themes": "^4.2.6",
     "@vueuse/core": "^10.7.0",
     "pinia": "^2.1.7",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.2.6",
     "vue": "^3.4.21"
   },
   "devDependencies": {

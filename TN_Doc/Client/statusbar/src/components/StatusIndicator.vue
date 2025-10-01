@@ -1,19 +1,33 @@
 <template>
   <div
     class="status-indicator"
-    :class="[`status-indicator--${status}`, { 'status-indicator--clickable': clickable }]"
-    :title="tooltip"
+    :class="{ 'status-indicator--clickable': clickable }"
     @click="handleClick"
   >
-    <span class="status-indicator__dot"></span>
-    <span class="status-indicator__label">{{ label }}</span>
-    <span v-if="latency !== undefined" class="status-indicator__latency">
-      {{ latency }}ms
-    </span>
+    <Badge
+      :value="label"
+      :severity="badgeSeverity"
+      :pt="{
+        root: { class: 'status-indicator__badge' }
+      }"
+      v-tooltip.top="tooltip"
+    >
+      <template #value>
+        <div class="status-indicator__content">
+          <i :class="statusIconClass" class="status-indicator__icon"></i>
+          <span class="status-indicator__label">{{ label }}</span>
+          <span v-if="latency !== undefined" class="status-indicator__latency">
+            {{ latency }}ms
+          </span>
+        </div>
+      </template>
+    </Badge>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import Badge from 'primevue/badge';
 import type { IndicatorStatus } from '../types/status.types';
 
 interface Props {
@@ -32,6 +46,32 @@ const emit = defineEmits<{
   click: []
 }>();
 
+const badgeSeverity = computed(() => {
+  switch (props.status) {
+    case 'online':
+      return 'success';
+    case 'offline':
+      return 'danger';
+    case 'warning':
+      return 'warn';
+    default:
+      return 'secondary';
+  }
+});
+
+const statusIconClass = computed(() => {
+  switch (props.status) {
+    case 'online':
+      return 'pi pi-check-circle';
+    case 'offline':
+      return 'pi pi-times-circle status-indicator__icon--blink';
+    case 'warning':
+      return 'pi pi-exclamation-triangle';
+    default:
+      return 'pi pi-circle';
+  }
+});
+
 function handleClick() {
   if (props.clickable) {
     emit('click');
@@ -39,60 +79,52 @@ function handleClick() {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.2s;
   user-select: none;
 
   &--clickable {
     cursor: pointer;
 
-    &:hover {
-      background: rgba(0, 0, 0, 0.05);
+    &:hover :deep(.status-indicator__badge) {
+      opacity: 0.85;
+      transform: scale(1.02);
     }
   }
 
-  &--online {
-    .status-indicator__dot {
-      background: #28a745;
-      box-shadow: 0 0 4px #28a745;
-    }
+  :deep(.status-indicator__badge) {
+    transition: all 0.2s ease;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 4px;
   }
 
-  &--offline {
-    .status-indicator__dot {
-      background: #dc3545;
-      animation: blink 1s infinite;
-    }
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
   }
 
-  &--warning {
-    .status-indicator__dot {
-      background: #ffc107;
-    }
-  }
+  &__icon {
+    font-size: 0.75rem;
 
-  &__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    transition: all 0.3s;
+    &--blink {
+      animation: blink 1.5s ease-in-out infinite;
+    }
   }
 
   &__label {
     font-weight: 500;
-    color: #212529;
-    font-size: 13px;
+    font-size: 0.813rem;
   }
 
   &__latency {
-    font-size: 11px;
-    color: #6c757d;
+    font-size: 0.688rem;
+    opacity: 0.8;
+    margin-left: 0.15rem;
   }
 }
 

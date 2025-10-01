@@ -1,7 +1,8 @@
 <template>
   <div class="status-bar" :class="`status-bar--${store.overallHealth}`">
+    <!-- Основной контейнер статус-бара -->
     <div class="status-bar__container">
-      <!-- Devices Section -->
+      <!-- Секция устройств -->
       <div v-if="store.devices.length > 0" class="status-bar__section">
         <span class="status-bar__label">Устройства:</span>
         <StatusIndicator
@@ -15,7 +16,7 @@
         />
       </div>
 
-      <!-- Services Section -->
+      <!-- Секция сервисов -->
       <div class="status-bar__section">
         <span class="status-bar__label">Сервисы:</span>
         <StatusIndicator
@@ -47,37 +48,48 @@
         />
       </div>
 
-      <!-- Actions Section -->
+      <!-- Секция действий -->
       <div class="status-bar__section status-bar__section--actions">
-        <button
-          class="status-bar__refresh"
+        <Button
+          icon="pi pi-refresh"
+          :loading="store.isLoading"
+          severity="secondary"
+          text
+          rounded
           @click="refresh"
-          :disabled="store.isLoading"
-          title="Обновить статус"
-        >
-          <IconRefresh :spinning="store.isLoading" />
-        </button>
+          v-tooltip.top="'Обновить статус'"
+          aria-label="Обновить статус"
+        />
 
-        <span
-          class="status-bar__connection"
-          :class="`status-bar__connection--${signalRState}`"
-          :title="`SignalR: ${signalRStateText}`"
-        >
-          <IconWifi />
-        </span>
+        <Tag
+          :icon="signalRIconClass"
+          :severity="signalRSeverity"
+          :value="signalRStateText"
+          v-tooltip.top="`SignalR: ${signalRStateText}`"
+        />
 
-        <span v-if="store.lastUpdate" class="status-bar__last-update" title="Последнее обновление">
+        <span v-if="store.lastUpdate" class="status-bar__last-update">
+          <i class="pi pi-clock" style="font-size: 0.75rem; margin-right: 0.25rem"></i>
           {{ formattedLastUpdate }}
         </span>
       </div>
     </div>
 
-    <!-- Error notification -->
-    <div v-if="store.error" class="status-bar__error" @click="store.clearError()">
-      <IconWarning />
-      <span>{{ store.error }}</span>
-      <button class="status-bar__error-close" title="Закрыть">&times;</button>
-    </div>
+    <!-- Уведомление об ошибке -->
+    <Transition name="error">
+      <Message
+        v-if="store.error"
+        severity="error"
+        :closable="true"
+        @close="store.clearError()"
+        class="status-bar__error"
+      >
+        <template #icon>
+          <i class="pi pi-exclamation-triangle"></i>
+        </template>
+        {{ store.error }}
+      </Message>
+    </Transition>
   </div>
 </template>
 
@@ -86,16 +98,40 @@ import { onMounted, computed } from 'vue';
 import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
+import Button from 'primevue/button';
+import Tag from 'primevue/tag';
+import Message from 'primevue/message';
 import StatusIndicator from './StatusIndicator.vue';
-import IconRefresh from './icons/IconRefresh.vue';
-import IconWifi from './icons/IconWifi.vue';
-import IconWarning from './icons/IconWarning.vue';
 import type { DeviceStatus, StatusResponse } from '../types/status.types';
 
 const store = useStatusStore();
 const { connectionState, on } = useSignalR('/statusHub');
 
-const signalRState = computed(() => connectionState.value);
+const signalRSeverity = computed(() => {
+  switch (connectionState.value) {
+    case 'connected':
+      return 'success';
+    case 'connecting':
+      return 'warn';
+    case 'disconnected':
+      return 'danger';
+    default:
+      return 'secondary';
+  }
+});
+
+const signalRIconClass = computed(() => {
+  switch (connectionState.value) {
+    case 'connected':
+      return 'pi pi-wifi';
+    case 'connecting':
+      return 'pi pi-spin pi-spinner';
+    case 'disconnected':
+      return 'pi pi-wifi status-bar__icon--disconnected';
+    default:
+      return 'pi pi-question-circle';
+  }
+});
 
 const signalRStateText = computed(() => {
   switch (connectionState.value) {
@@ -116,19 +152,19 @@ const formattedLastUpdate = computed(() => {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
 });
 
-// Auto-refresh every 10 seconds as fallback when SignalR is not connected
+// Автообновление каждые 10 секунд если SignalR не подключен
 const { pause, resume } = useIntervalFn(() => {
   if (connectionState.value !== 'connected') {
     store.fetchStatus();
   }
 }, 10000);
 
-// SignalR real-time updates
+// SignalR real-time обновления
 on('statusUpdated', (data: StatusResponse) => {
   store.updateFromSignalR(data);
 });
 
-// Initial fetch
+// Начальная загрузка
 onMounted(() => {
   store.fetchStatus();
 });
@@ -139,139 +175,141 @@ function refresh() {
 
 function handleDeviceClick(device: DeviceStatus) {
   console.log('Device clicked:', device);
-  // Future: Show device details modal
+  // Будущее: показать модальное окно с деталями устройства
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .status-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  background: var(--p-surface-0);
+  border-top: 2px solid var(--p-surface-200);
   z-index: 1000;
-  font-size: 14px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.875rem;
+  font-family: var(--p-font-family);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 
   &--critical {
-    background: #fff5f5;
-    border-top-color: #dc3545;
+    background: var(--p-red-50);
+    border-top-color: var(--p-red-500);
   }
 
   &--warning {
-    background: #fffaf0;
-    border-top-color: #ffc107;
+    background: var(--p-yellow-50);
+    border-top-color: var(--p-yellow-500);
   }
 
   &__container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
+    padding: 0.625rem 1rem;
     max-width: 1400px;
     margin: 0 auto;
-    gap: 16px;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+    }
   }
 
   &__section {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 
     &--actions {
       margin-left: auto;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      gap: 0.5rem;
     }
   }
 
   &__label {
     font-weight: 600;
-    color: #495057;
-    font-size: 13px;
-  }
-
-  &__refresh {
-    background: none;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    color: #495057;
-
-    &:hover:not(:disabled) {
-      background: #e9ecef;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
-  &__connection {
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-
-    &--connected {
-      color: #28a745;
-    }
-
-    &--connecting {
-      color: #ffc107;
-      animation: pulse 1s infinite;
-    }
-
-    &--disconnected {
-      color: #dc3545;
-    }
+    color: var(--p-text-muted-color);
+    font-size: 0.813rem;
+    white-space: nowrap;
   }
 
   &__last-update {
-    font-size: 11px;
-    color: #6c757d;
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--p-text-muted-color);
+    padding: 0.25rem 0.5rem;
+    background: var(--p-surface-100);
+    border-radius: var(--p-border-radius);
   }
 
   &__error {
-    background: #dc3545;
-    color: white;
-    padding: 4px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 12px;
-    cursor: pointer;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid var(--p-red-400);
+
+    :deep(.p-message-close) {
+      margin-left: 0.5rem;
+    }
+  }
+
+  &__icon--disconnected {
     position: relative;
 
-    &-close {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 20px;
-      line-height: 1;
-      cursor: pointer;
-      padding: 0 4px;
-      margin-left: 8px;
-
-      &:hover {
-        opacity: 0.8;
-      }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 120%;
+      height: 2px;
+      background: currentColor;
     }
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
+// Анимация появления/исчезновения ошибки
+.error-enter-active,
+.error-leave-active {
+  transition: all 0.3s ease;
+}
+
+.error-enter-from {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.error-leave-to {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+// Адаптивность
+@media (max-width: 1024px) {
+  .status-bar {
+    &__container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__section {
+      justify-content: flex-start;
+
+      &--actions {
+        margin-left: 0;
+        justify-content: flex-end;
+      }
+    }
   }
 }
 </style>
