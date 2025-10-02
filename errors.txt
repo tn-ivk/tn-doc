@@ -3,10 +3,7 @@ e @ status-bar.js?v=Ti0tx_pqzg88rLhBr2EM4vffZ3UnBl7q24M9YMwtldA:226
 status-bar.js?v=Ti0tx_pqzg88rLhBr2EM4vffZ3UnBl7q24M9YMwtldA:226 [StatusBar] Attempting to connect to SignalR hub: /statusHub undefined
 status-bar.js?v=Ti0tx_pqzg88rLhBr2EM4vffZ3UnBl7q24M9YMwtldA:1367 [StatusBar] Application initialized successfully
 :5000/api/ClientLog:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-Utils.ts:188 [2025-10-02T06:26:17.591Z] Information: WebSocket connected to ws://localhost:5010/SignalRApp?id=xJWFvyBvd4V5PsCoZ6BbWw.
+Utils.ts:188 [2025-10-02T07:03:59.022Z] Information: WebSocket connected to ws://localhost:5010/SignalRApp?id=pDPy5p85TaTYAqMplDDG9A.
 :5000/api/ClientLog:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-status-bar.woff2:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-status-bar.woff:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-status-bar.ttf:1  Failed to load resource: the server responded with a status of 404 (Not Found)
-status-bar.js?v=Ti0tx_pqzg88rLhBr2EM4vffZ3UnBl7q24M9YMwtldA:226 [StatusBar] SignalR connected successfully to /statusHub with ID: 6U1LX5EVgn-M22HaHuINBA undefined
+status-bar.js?v=Ti0tx_pqzg88rLhBr2EM4vffZ3UnBl7q24M9YMwtldA:226 [StatusBar] SignalR connected successfully to /statusHub with ID: EIrvv0TZoIsmjbg7PO0lbA undefined
 :5000/api/ClientLog:1  Failed to load resource: the server responded with a status of 404 (Not Found)
