@@ -19,15 +19,12 @@ export function useStatusLogging() {
   async function logToServer(entry: LogEntry) {
     try {
       const logData = {
-        level: entry.level.toUpperCase(),
-        message: `[StatusBar] ${entry.message}`,
-        data: entry.data ? JSON.stringify(entry.data) : null,
-        timestamp: entry.timestamp || new Date().toISOString(),
-        source: 'StatusBar'
+        Level: entry.level.charAt(0).toUpperCase() + entry.level.slice(1),
+        Message: `[StatusBar] ${entry.message}${entry.data ? ` | Data: ${JSON.stringify(entry.data)}` : ''}`
       };
 
       // Интеграция с существующим ClientLogController TN_Doc
-      await fetch('/api/ClientLog', {
+      await fetch('/api/ClientLog/logging', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(logData)
