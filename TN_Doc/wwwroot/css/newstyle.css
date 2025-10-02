@@ -3,6 +3,7 @@
     height: 100vh;
     margin: 0!important;
     padding: 0.5vh!important;
+    padding-bottom: 0!important;
 }
 
 body>div.container {
@@ -11,6 +12,7 @@ body>div.container {
     max-width: initial!important;
     margin: 0!important;
     padding: 0!important;
+    padding-bottom: 0!important;
 }
 
 .cont {
