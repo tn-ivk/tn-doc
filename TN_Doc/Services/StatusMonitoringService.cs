@@ -35,10 +35,15 @@ public class StatusMonitoringService : BackgroundService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <summary>
+    /// Основной метод фонового сервиса мониторинга
+    /// Периодически проверяет статус устройств и сервисов, отправляя обновления через SignalR при изменениях
+    /// </summary>
+    /// <param name="stoppingToken">Токен остановки сервиса</param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(
-            "Status monitoring background service started with {CheckInterval}s interval",
+            "Фоновый сервис мониторинга статуса запущен с интервалом {CheckInterval}с",
             _checkInterval.TotalSeconds);
 
         // Даем системе время на инициализацию
@@ -61,8 +66,8 @@ public class StatusMonitoringService : BackgroundService
                     _lastStatus = currentStatus;
 
                     _logger.LogInformation(
-                        "Status changed detected, broadcasting update. " +
-                        "Devices: {HealthyDevices}/{TotalDevices}, MS: {MsStatus}",
+                        "Обнаружены изменения статуса, отправка обновления. " +
+                        "Устройства: {HealthyDevices}/{TotalDevices}, MS: {MsStatus}",
                         currentStatus.Devices.Count(d => d.IsConnected),
                         currentStatus.Devices.Count,
                         currentStatus.Services.MessagingService?.IsConnected ?? false);
@@ -74,7 +79,7 @@ public class StatusMonitoringService : BackgroundService
                 }
                 else
                 {
-                    _logger.LogTrace("No status changes detected in monitoring cycle");
+                    _logger.LogTrace("Изменений статуса не обнаружено в цикле мониторинга");
                 }
 
                 // Сброс счетчика ошибок при успешном выполнении
@@ -82,7 +87,7 @@ public class StatusMonitoringService : BackgroundService
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Status monitoring service is shutting down");
+                _logger.LogInformation("Сервис мониторинга статуса останавливается");
                 break;
             }
             catch (Exception ex)
@@ -93,14 +98,14 @@ public class StatusMonitoringService : BackgroundService
                 if (_consecutiveErrors <= MAX_CONSECUTIVE_ERRORS)
                 {
                     _logger.LogWarning(ex,
-                        "Error #{ErrorCount} in status monitoring cycle (took {CycleDurationMs}ms): {ErrorMessage}",
+                        "Ошибка #{ErrorCount} в цикле мониторинга статуса (выполнено за {CycleDurationMs}мс): {ErrorMessage}",
                         _consecutiveErrors, cycleDuration.TotalMilliseconds, ex.Message);
                 }
                 else
                 {
                     _logger.LogError(ex,
-                        "Critical: {ErrorCount} consecutive errors in status monitoring. " +
-                        "Latest cycle took {CycleDurationMs}ms. Service stability compromised.",
+                        "Критическая ситуация: {ErrorCount} последовательных ошибок в мониторинге статуса. " +
+                        "Последний цикл выполнен за {CycleDurationMs}мс. Стабильность сервиса под угрозой.",
                         _consecutiveErrors, cycleDuration.TotalMilliseconds);
                 }
 
@@ -116,14 +121,19 @@ public class StatusMonitoringService : BackgroundService
             await Task.Delay(_checkInterval, stoppingToken);
         }
 
-        _logger.LogInformation("Status monitoring background service stopped");
+        _logger.LogInformation("Фоновый сервис мониторинга статуса остановлен");
     }
 
+    /// <summary>
+    /// Сравнивает текущий статус с предыдущим и определяет наличие изменений
+    /// </summary>
+    /// <param name="current">Текущий статус для сравнения</param>
+    /// <returns>true если обнаружены изменения, иначе false</returns>
     private bool HasStatusChanged(StatusResponse current)
     {
         if (_lastStatus == null)
         {
-            _logger.LogDebug("First status check, marking as changed");
+            _logger.LogDebug("Первая проверка статуса, помечено как изменение");
             return true;
         }
 
@@ -135,38 +145,38 @@ public class StatusMonitoringService : BackgroundService
             var lastDevice = _lastStatus.Devices.FirstOrDefault(d => d.Id == device.Id);
             if (lastDevice == null)
             {
-                changes.Add($"New device: {device.Name}");
+                changes.Add($"Новое устройство: {device.Name}");
             }
             else if (lastDevice.IsConnected != device.IsConnected)
             {
-                changes.Add($"Device {device.Name}: {(device.IsConnected ? "connected" : "disconnected")}");
+                changes.Add($"Устройство {device.Name}: {(device.IsConnected ? "подключено" : "отключено")}");
             }
         }
 
         // Сравниваем сервисы
         if (current.Services.MessagingService?.IsConnected != _lastStatus.Services.MessagingService?.IsConnected)
         {
-            changes.Add($"MessagingService: {(current.Services.MessagingService?.IsConnected == true ? "connected" : "disconnected")}");
+            changes.Add($"MessagingService: {(current.Services.MessagingService?.IsConnected == true ? "подключен" : "отключен")}");
         }
 
         if (current.Services.Elis?.IsConnected != _lastStatus.Services.Elis?.IsConnected)
         {
-            changes.Add($"ELIS: {(current.Services.Elis?.IsConnected == true ? "connected" : "disconnected")}");
+            changes.Add($"ELIS: {(current.Services.Elis?.IsConnected == true ? "подключен" : "отключен")}");
         }
 
         if (current.Services.OpcDa?.IsConnected != _lastStatus.Services.OpcDa?.IsConnected)
         {
-            changes.Add($"OPC DA: {(current.Services.OpcDa?.IsConnected == true ? "connected" : "disconnected")}");
+            changes.Add($"OPC DA: {(current.Services.OpcDa?.IsConnected == true ? "подключен" : "отключен")}");
         }
 
         if (current.Services.OpcUa?.IsConnected != _lastStatus.Services.OpcUa?.IsConnected)
         {
-            changes.Add($"OPC UA: {(current.Services.OpcUa?.IsConnected == true ? "connected" : "disconnected")}");
+            changes.Add($"OPC UA: {(current.Services.OpcUa?.IsConnected == true ? "подключен" : "отключен")}");
         }
 
         if (changes.Any())
         {
-            _logger.LogInformation("Status changes detected: {Changes}", string.Join(", ", changes));
+            _logger.LogInformation("Обнаружены изменения статуса: {Changes}", string.Join(", ", changes));
             return true;
         }
 

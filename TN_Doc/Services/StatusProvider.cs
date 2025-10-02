@@ -29,21 +29,26 @@ public class StatusProvider : IStatusProvider
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     }
 
+    /// <summary>
+    /// Получает текущий статус всех устройств и сервисов
+    /// </summary>
+    /// <param name="ct">Токен отмены операции</param>
+    /// <returns>Объект StatusResponse со статусом устройств и сервисов</returns>
     public async Task<StatusResponse> GetStatusAsync(CancellationToken ct = default)
     {
         var stopwatch = Stopwatch.StartNew();
-        _logger.LogDebug("Starting status check for all devices and services");
+        _logger.LogDebug("Начинается проверка статуса всех устройств и сервисов");
 
         try
         {
             var appConfig = _appConfigService.GetAppCfg();
             if (appConfig == null)
             {
-                _logger.LogError("Failed to retrieve application configuration");
+                _logger.LogError("Не удалось получить конфигурацию приложения");
                 return new StatusResponse();
             }
 
-            _logger.LogDebug("Retrieved app configuration with {DeviceCount} devices", appConfig.Devices?.Count ?? 0);
+            _logger.LogDebug("Получена конфигурация с {DeviceCount} устройствами", appConfig.Devices?.Count ?? 0);
 
             var devices = new List<DeviceStatus>();
             var healthyDevices = 0;
@@ -61,7 +66,7 @@ public class StatusProvider : IStatusProvider
                 healthyDevices = devices.Count(d => d.IsConnected);
 
                 _logger.LogInformation(
-                    "Device status check completed: {HealthyCount}/{TotalCount} devices healthy",
+                    "Проверка устройств завершена: {HealthyCount}/{TotalCount} устройств доступны",
                     healthyDevices, devices.Count);
             }
 
@@ -76,7 +81,7 @@ public class StatusProvider : IStatusProvider
             };
 
             _logger.LogDebug(
-                "Status check completed in {ElapsedMs}ms - Devices: {HealthyDevices}/{TotalDevices}, MS: {MsStatus}",
+                "Проверка статуса завершена за {ElapsedMs}мс - Устройства: {HealthyDevices}/{TotalDevices}, MS: {MsStatus}",
                 stopwatch.ElapsedMilliseconds,
                 healthyDevices,
                 devices.Count,
@@ -86,12 +91,18 @@ public class StatusProvider : IStatusProvider
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to retrieve status information after {ElapsedMs}ms",
+            _logger.LogError(ex, "Не удалось получить информацию о статусе за {ElapsedMs}мс",
                 stopwatch.ElapsedMilliseconds);
             throw;
         }
     }
 
+    /// <summary>
+    /// Проверяет доступность устройства через подключение к его базе данных
+    /// </summary>
+    /// <param name="device">Устройство для проверки</param>
+    /// <param name="ct">Токен отмены операции</param>
+    /// <returns>Статус устройства с информацией о подключении и задержке</returns>
     private async Task<DeviceStatus> CheckDeviceAsync(TN.DocData.Device device, CancellationToken ct)
     {
         var deviceStopwatch = Stopwatch.StartNew();
@@ -103,7 +114,7 @@ public class StatusProvider : IStatusProvider
             IsConnected = false
         };
 
-        _logger.LogDebug("Checking device {DeviceName} (ID: {DeviceId})", device.Name, device.IdDevice);
+        _logger.LogDebug("Проверка устройства {DeviceName} (ID: {DeviceId})", device.Name, device.IdDevice);
 
         try
         {
@@ -113,7 +124,7 @@ public class StatusProvider : IStatusProvider
 
             if (connectionString == null)
             {
-                throw new InvalidOperationException($"No active connection string for device {device.Name}");
+                throw new InvalidOperationException($"Отсутствует активная строка подключения для устройства {device.Name}");
             }
 
             // Формируем строку подключения MySQL
@@ -138,18 +149,18 @@ public class StatusProvider : IStatusProvider
             status.IsConnected = true;
             status.LatencyMs = (int)deviceStopwatch.ElapsedMilliseconds;
 
-            _logger.LogDebug("Device {DeviceName} connection successful in {LatencyMs}ms",
+            _logger.LogDebug("Устройство {DeviceName} успешно подключено за {LatencyMs}мс",
                 device.Name, status.LatencyMs);
         }
         catch (OperationCanceledException)
         {
-            _logger.LogWarning("Device {DeviceName} connection check was cancelled", device.Name);
-            status.Error = "Operation cancelled";
+            _logger.LogWarning("Проверка устройства {DeviceName} была отменена", device.Name);
+            status.Error = "Операция отменена";
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex,
-                "Device {DeviceName} connection check failed in {ElapsedMs}ms: {ErrorMessage}",
+                "Не удалось подключиться к устройству {DeviceName} за {ElapsedMs}мс: {ErrorMessage}",
                 device.Name, deviceStopwatch.ElapsedMilliseconds, ex.Message);
             status.Error = ex.Message;
         }
@@ -161,6 +172,12 @@ public class StatusProvider : IStatusProvider
         return status;
     }
 
+    /// <summary>
+    /// Проверяет статус всех внешних сервисов (Messaging Service, ELIS, OPC)
+    /// </summary>
+    /// <param name="appConfig">Конфигурация приложения</param>
+    /// <param name="ct">Токен отмены операции</param>
+    /// <returns>Объект ServiceStatus со статусом всех сервисов</returns>
     private async Task<ServiceStatus> CheckServicesAsync(TN.DocData.CfgApp appConfig, CancellationToken ct)
     {
         var services = new ServiceStatus();
@@ -181,6 +198,11 @@ public class StatusProvider : IStatusProvider
         return services;
     }
 
+    /// <summary>
+    /// Проверяет доступность Messaging Service через health endpoint
+    /// </summary>
+    /// <param name="ct">Токен отмены операции</param>
+    /// <returns>Статус подключения к Messaging Service</returns>
     private async Task<ConnectionStatus> CheckMessagingServiceAsync(CancellationToken ct)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -195,12 +217,12 @@ public class StatusProvider : IStatusProvider
             status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
             status.LastChecked = DateTime.Now;
 
-            _logger.LogDebug("Messaging Service check: {Status} in {LatencyMs}ms",
-                status.IsConnected ? "Connected" : "Disconnected", status.LatencyMs);
+            _logger.LogDebug("Проверка Messaging Service: {Status} за {LatencyMs}мс",
+                status.IsConnected ? "Подключен" : "Отключен", status.LatencyMs);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Messaging Service check failed: {ErrorMessage}", ex.Message);
+            _logger.LogWarning(ex, "Не удалось подключиться к Messaging Service: {ErrorMessage}", ex.Message);
             status.Error = ex.Message;
             status.LastChecked = DateTime.Now;
         }
@@ -208,6 +230,13 @@ public class StatusProvider : IStatusProvider
         return status;
     }
 
+    /// <summary>
+    /// Проверяет конфигурацию ELIS (Единая Лабораторная Информационная Система)
+    /// Пока проверяет только наличие конфигурации, реальная проверка подключения будет добавлена позже
+    /// </summary>
+    /// <param name="elisConfig">Конфигурация ELIS</param>
+    /// <param name="ct">Токен отмены операции</param>
+    /// <returns>Статус подключения к ELIS</returns>
     private Task<ConnectionStatus> CheckElisServiceAsync(TN.DocData.Elis elisConfig, CancellationToken ct)
     {
         var status = new ConnectionStatus { IsConnected = false, LastChecked = DateTime.Now };
@@ -221,12 +250,12 @@ public class StatusProvider : IStatusProvider
             {
                 // Считаем ELIS настроенным, если есть ключевые параметры
                 status.IsConnected = true;
-                _logger.LogDebug("ELIS configuration is present");
+                _logger.LogDebug("Конфигурация ELIS присутствует");
             }
             else
             {
-                status.Error = "ELIS configuration incomplete";
-                _logger.LogDebug("ELIS configuration is incomplete");
+                status.Error = "Конфигурация ELIS неполная";
+                _logger.LogDebug("Конфигурация ELIS неполная");
             }
 
             // TODO: Реализовать реальную проверку через TN.ElisConnector
@@ -234,7 +263,7 @@ public class StatusProvider : IStatusProvider
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "ELIS configuration check failed: {ErrorMessage}", ex.Message);
+            _logger.LogWarning(ex, "Не удалось проверить конфигурацию ELIS: {ErrorMessage}", ex.Message);
             status.Error = ex.Message;
         }
 
