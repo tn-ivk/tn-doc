@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using MySqlConnector;
 using TN_Doc.Models.Status;
 using TN_DocGeneral.Services;
+using TN.DocData;
 
 namespace TN_Doc.Services;
 
@@ -103,7 +104,7 @@ public class StatusProvider : IStatusProvider
     /// <param name="device">Устройство для проверки</param>
     /// <param name="ct">Токен отмены операции</param>
     /// <returns>Статус устройства с информацией о подключении и задержке</returns>
-    private async Task<DeviceStatus> CheckDeviceAsync(TN.DocData.Device device, CancellationToken ct)
+    private async Task<DeviceStatus> CheckDeviceAsync(Device device, CancellationToken ct)
     {
         var deviceStopwatch = Stopwatch.StartNew();
         var status = new DeviceStatus
