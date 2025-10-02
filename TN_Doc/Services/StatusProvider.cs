@@ -179,7 +179,7 @@ public class StatusProvider : IStatusProvider
     /// <param name="appConfig">Конфигурация приложения</param>
     /// <param name="ct">Токен отмены операции</param>
     /// <returns>Объект ServiceStatus со статусом всех сервисов</returns>
-    private async Task<ServiceStatus> CheckServicesAsync(TN.DocData.CfgApp appConfig, CancellationToken ct)
+    private async Task<ServiceStatus> CheckServicesAsync(CfgApp appConfig, CancellationToken ct)
     {
         var services = new ServiceStatus();
 
@@ -238,7 +238,7 @@ public class StatusProvider : IStatusProvider
     /// <param name="elisConfig">Конфигурация ELIS</param>
     /// <param name="ct">Токен отмены операции</param>
     /// <returns>Статус подключения к ELIS</returns>
-    private Task<ConnectionStatus> CheckElisServiceAsync(TN.DocData.Elis elisConfig, CancellationToken ct)
+    private Task<ConnectionStatus> CheckElisServiceAsync(Elis elisConfig, CancellationToken ct)
     {
         var status = new ConnectionStatus { IsConnected = false, LastChecked = DateTime.Now };
 
