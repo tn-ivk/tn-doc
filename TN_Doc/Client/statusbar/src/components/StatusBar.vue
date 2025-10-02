@@ -148,7 +148,7 @@ function handleDeviceClick(device: DeviceStatus) {
   &__container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 0.25rem 0.5rem;
     max-width: 1400px;
     margin: 0 auto;
@@ -168,11 +168,10 @@ function handleDeviceClick(device: DeviceStatus) {
     flex-wrap: wrap;
 
     &--services {
-      margin-left: 1rem; // Увеличенный отступ для визуального разделения от устройств
+      // Секция сервисов без дополнительного отступа
     }
 
     &--actions {
-      margin-left: auto;
       gap: 0.35rem;
     }
 
