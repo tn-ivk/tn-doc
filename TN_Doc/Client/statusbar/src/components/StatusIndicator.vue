@@ -60,10 +60,10 @@ function handleClick() {
 .status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.813rem;
   font-weight: 500;
   transition: all 0.2s ease;
   user-select: none;
@@ -107,12 +107,12 @@ function handleClick() {
 
   &__label {
     font-weight: 500;
-    font-size: 0.813rem;
+    font-size: 0.75rem;
     white-space: nowrap;
   }
 
   &__latency {
-    font-size: 0.688rem;
+    font-size: 0.625rem;
     opacity: 0.8;
     white-space: nowrap;
   }

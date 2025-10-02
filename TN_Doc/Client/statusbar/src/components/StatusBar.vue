@@ -1,5 +1,5 @@
 <template>
-  <div class="status-bar" :class="`status-bar--${store.overallHealth}`">
+  <div class="status-bar">
     <!-- Основной контейнер статус-бара -->
     <div class="status-bar__container">
       <!-- Секция устройств -->
@@ -192,45 +192,35 @@ function handleDeviceClick(device: DeviceStatus) {
   font-family: var(--p-font-family);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 
-  &--critical {
-    background: var(--p-red-50);
-    border-top-color: var(--p-red-500);
-  }
-
-  &--warning {
-    background: var(--p-yellow-50);
-    border-top-color: var(--p-yellow-500);
-  }
-
   &__container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.625rem 1rem;
+    padding: 0.4rem 0.75rem;
     max-width: 1400px;
     margin: 0 auto;
-    gap: 1rem;
+    gap: 0.65rem;
     flex-wrap: wrap;
 
     @media (max-width: 768px) {
-      gap: 0.75rem;
-      padding: 0.5rem 0.75rem;
+      gap: 0.5rem;
+      padding: 0.35rem 0.65rem;
     }
   }
 
   &__section {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
 
     &--actions {
       margin-left: auto;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
 
     @media (max-width: 768px) {
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
   }
 
