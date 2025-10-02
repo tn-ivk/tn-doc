@@ -23,12 +23,14 @@ public class StatusProvider : IStatusProvider
     private readonly IAppConfigService _appConfigService;
     private readonly ILogger<StatusProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ConnectionTracker _connectionTracker;
 
-    public StatusProvider(IAppConfigService appConfigService, ILogger<StatusProvider> logger, IHttpClientFactory httpClientFactory)
+    public StatusProvider(IAppConfigService appConfigService, ILogger<StatusProvider> logger, IHttpClientFactory httpClientFactory, ConnectionTracker connectionTracker)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+        _connectionTracker = connectionTracker ?? throw new ArgumentNullException(nameof(connectionTracker));
     }
 
     /// <summary>
@@ -175,6 +177,7 @@ public class StatusProvider : IStatusProvider
 
     /// <summary>
     /// Проверяет статус всех внешних сервисов (Messaging Service, ELIS, OPC)
+    /// Проверка выполняется только если есть активные клиенты
     /// </summary>
     /// <param name="appConfig">Конфигурация приложения</param>
     /// <param name="ct">Токен отмены операции</param>
@@ -182,6 +185,22 @@ public class StatusProvider : IStatusProvider
     private async Task<ServiceStatus> CheckServicesAsync(CfgApp appConfig, CancellationToken ct)
     {
         var services = new ServiceStatus();
+
+        // Проверяем сервисы только если есть активные клиенты
+        if (!_connectionTracker.HasActiveConnections)
+        {
+            _logger.LogTrace("Пропуск проверки сервисов: нет активных клиентов");
+
+            // Возвращаем статусы по умолчанию (отключено)
+            services.MessagingService = new ConnectionStatus { IsConnected = false, LastChecked = DateTime.Now };
+
+            if (appConfig.Elis?.Use == true)
+            {
+                services.Elis = new ConnectionStatus { IsConnected = false, LastChecked = DateTime.Now };
+            }
+
+            return services;
+        }
 
         // Проверка Messaging Service
         services.MessagingService = await CheckMessagingServiceAsync(ct);
