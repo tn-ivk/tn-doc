@@ -9,6 +9,9 @@ export function useSignalR(hubUrl: string) {
   const error = ref<string | null>(null);
   const { log } = useStatusLogging();
 
+  // Очередь отложенных подписок, которые будут применены после подключения
+  const pendingSubscriptions = new Map<string, ((...args: any[]) => void)[]>();
+
   async function connect() {
     try {
       connectionState.value = 'connecting';
@@ -52,6 +55,17 @@ export function useSignalR(hubUrl: string) {
       connectionState.value = 'connected';
       error.value = null;
       log('info', `SignalR connected successfully to ${hubUrl} with ID: ${connection.value.connectionId}`);
+
+      // Применяем все отложенные подписки после успешного подключения
+      if (pendingSubscriptions.size > 0) {
+        log('debug', `Applying ${pendingSubscriptions.size} pending subscription(s)`);
+        pendingSubscriptions.forEach((callbacks, eventName) => {
+          callbacks.forEach(callback => {
+            connection.value!.on(eventName, callback);
+          });
+        });
+        pendingSubscriptions.clear();
+      }
     } catch (err) {
       connectionState.value = 'disconnected';
       error.value = err instanceof Error ? err.message : 'Connection failed';
@@ -60,10 +74,17 @@ export function useSignalR(hubUrl: string) {
   }
 
   function on(eventName: string, callback: (...args: any[]) => void) {
-    if (!connection.value) {
-      log('warn', `Cannot subscribe to event ${eventName}: connection not initialized`);
+    if (!connection.value || connectionState.value !== 'connected') {
+      // Добавляем подписку в очередь, если подключение еще не установлено
+      if (!pendingSubscriptions.has(eventName)) {
+        pendingSubscriptions.set(eventName, []);
+      }
+      pendingSubscriptions.get(eventName)!.push(callback);
+      log('debug', `Queued subscription for event ${eventName} (connection not ready)`);
       return;
     }
+
+    // Подключение установлено - подписываемся сразу
     connection.value.on(eventName, callback);
     log('debug', `Subscribed to SignalR event: ${eventName}`);
   }

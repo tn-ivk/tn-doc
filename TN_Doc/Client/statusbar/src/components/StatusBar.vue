@@ -324,3 +324,11 @@ function handleDeviceClick(device: DeviceStatus) {
   }
 }
 </style>
+
+<style lang="scss">
+// Глобальный стиль для резервирования места под статус-бар
+// ВАЖНО: Этот стиль должен применяться глобально (без scoped)
+body {
+  padding-bottom: 2.5rem !important; // Резервируем место под fixed статус-бар
+}
+</style>
