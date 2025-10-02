@@ -274,6 +274,6 @@ function handleDeviceClick(device: DeviceStatus) {
 <style lang="scss">
 // Глобальное резервирование места под fixed статус-бар
 body {
-  padding-bottom: 2.5rem !important;
+  padding-bottom: 1.8rem !important;
 }
 </style>
