@@ -175,16 +175,6 @@ public class StatusMonitoringService : BackgroundService
             changes.Add($"ELIS: {(current.Services.Elis?.IsConnected == true ? "подключен" : "отключен")}");
         }
 
-        if (current.Services.OpcDa?.IsConnected != _lastStatus.Services.OpcDa?.IsConnected)
-        {
-            changes.Add($"OPC DA: {(current.Services.OpcDa?.IsConnected == true ? "подключен" : "отключен")}");
-        }
-
-        if (current.Services.OpcUa?.IsConnected != _lastStatus.Services.OpcUa?.IsConnected)
-        {
-            changes.Add($"OPC UA: {(current.Services.OpcUa?.IsConnected == true ? "подключен" : "отключен")}");
-        }
-
         if (changes.Any())
         {
             _logger.LogInformation("Обнаружены изменения статуса: {Changes}", string.Join(", ", changes));
