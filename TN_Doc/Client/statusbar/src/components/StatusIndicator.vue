@@ -60,10 +60,10 @@ function handleClick() {
 .status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.15rem 0.35rem;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 500;
   line-height: 1;
   transition: all 0.2s ease;
@@ -98,7 +98,7 @@ function handleClick() {
   }
 
   &__icon {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     flex-shrink: 0;
 
     &--blink {
@@ -108,7 +108,7 @@ function handleClick() {
 
   &__label {
     font-weight: 500;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     white-space: nowrap;
   }
 
