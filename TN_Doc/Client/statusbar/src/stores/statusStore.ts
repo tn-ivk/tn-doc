@@ -59,7 +59,7 @@ export const useStatusStore = defineStore('status', () => {
       error.value = err instanceof Error ? err.message : 'Ошибка загрузки статуса';
       console.error('Failed to fetch status:', err);
 
-      // При ошибке соединения с сервером устанавливаем все индикаторы в offline
+      // При ошибке соединения с сервером устанавливаем все индикаторы в offline с ошибкой
       devices.value = devices.value.map(d => ({
         ...d,
         isConnected: false,
@@ -67,8 +67,8 @@ export const useStatusStore = defineStore('status', () => {
       }));
 
       services.value = {
-        messagingService: { isConnected: false },
-        ...(services.value.elis && { elis: { isConnected: false } })
+        messagingService: { isConnected: false, error: 'Нет связи с сервером' },
+        ...(services.value.elis && { elis: { isConnected: false, error: 'Нет связи с сервером' } })
       };
 
       lastUpdate.value = new Date();

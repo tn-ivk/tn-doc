@@ -42,6 +42,8 @@ const statusIconClass = computed(() => {
       return 'pi pi-link';
     case 'offline':
       return 'pi pi-times-circle status-indicator__icon--blink';
+    case 'ndv':
+      return 'pi pi-question-circle';
     case 'warning':
       return 'pi pi-exclamation-triangle';
     default:
@@ -77,6 +79,12 @@ function handleClick() {
   }
 
   &--offline {
+    background: var(--p-red-100);
+    color: var(--p-red-700);
+    border-color: var(--p-red-200);
+  }
+
+  &--ndv {
     background: var(--p-surface-100);
     color: var(--p-surface-700);
     border-color: var(--p-surface-300);

@@ -34,4 +34,4 @@ export interface StatusResponse {
 
 export type HealthStatus = 'healthy' | 'warning' | 'critical';
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
-export type IndicatorStatus = 'online' | 'offline' | 'warning';
+export type IndicatorStatus = 'online' | 'offline' | 'ndv' | 'warning';
