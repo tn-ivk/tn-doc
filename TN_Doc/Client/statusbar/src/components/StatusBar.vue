@@ -272,6 +272,8 @@ function handleDeviceClick(device: DeviceStatus) {
 </style>
 
 <style lang="scss">
-/* Убрали глобальное резервирование места под статус-бар,
-   чтобы не появлялся постоянный зазор после исчезновения сообщений */
+// Глобальное резервирование места под fixed статус-бар
+body {
+  padding-bottom: 2.5rem !important;
+}
 </style>
