@@ -58,6 +58,7 @@ public class Startup
 		// Status Bar сервисы
 		services.AddSignalR();
 		services.AddMemoryCache();
+		services.AddSingleton<ConnectionTracker>();
 
 		// HTTP клиенты для проверки внешних сервисов
 		services.AddHttpClient("MessagingService", client =>
