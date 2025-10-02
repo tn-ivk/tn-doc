@@ -22,10 +22,7 @@ public class StatusProvider : IStatusProvider
     private readonly ILogger<StatusProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public StatusProvider(
-        IAppConfigService appConfigService,
-        ILogger<StatusProvider> logger,
-        IHttpClientFactory httpClientFactory)
+    public StatusProvider(IAppConfigService appConfigService, ILogger<StatusProvider> logger, IHttpClientFactory httpClientFactory)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -35,20 +32,18 @@ public class StatusProvider : IStatusProvider
     public async Task<StatusResponse> GetStatusAsync(CancellationToken ct = default)
     {
         var stopwatch = Stopwatch.StartNew();
-        _logger.LogInformation("Starting status check for all devices and services");
+        _logger.LogDebug("Starting status check for all devices and services");
 
         try
         {
             var appConfig = _appConfigService.GetAppCfg();
-
             if (appConfig == null)
             {
                 _logger.LogError("Failed to retrieve application configuration");
                 return new StatusResponse();
             }
 
-            _logger.LogDebug("Retrieved app configuration with {DeviceCount} devices",
-                appConfig.Devices?.Count ?? 0);
+            _logger.LogDebug("Retrieved app configuration with {DeviceCount} devices", appConfig.Devices?.Count ?? 0);
 
             var devices = new List<DeviceStatus>();
             var healthyDevices = 0;
@@ -80,7 +75,7 @@ public class StatusProvider : IStatusProvider
                 Timestamp = DateTime.UtcNow.ToString("o")
             };
 
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "Status check completed in {ElapsedMs}ms - Devices: {HealthyDevices}/{TotalDevices}, MS: {MsStatus}",
                 stopwatch.ElapsedMilliseconds,
                 healthyDevices,
