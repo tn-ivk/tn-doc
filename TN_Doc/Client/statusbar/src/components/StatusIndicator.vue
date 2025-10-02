@@ -77,9 +77,9 @@ function handleClick() {
   }
 
   &--offline {
-    background: var(--p-red-100);
-    color: var(--p-red-700);
-    border-color: var(--p-red-200);
+    background: var(--p-surface-100);
+    color: var(--p-surface-700);
+    border-color: var(--p-surface-300);
   }
 
   &--warning {
