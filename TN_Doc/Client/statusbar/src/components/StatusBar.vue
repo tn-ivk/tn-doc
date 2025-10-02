@@ -60,11 +60,6 @@
           :value="signalRStateText"
           v-tooltip.top="`SignalR: ${signalRStateText}`"
         />
-
-        <span v-if="store.lastUpdate" class="status-bar__last-update">
-          <i class="pi pi-clock" style="font-size: 0.75rem; margin-right: 0.25rem"></i>
-          {{ formattedLastUpdate }}
-        </span>
       </div>
     </div>
   </div>
@@ -120,12 +115,6 @@ const signalRStateText = computed(() => {
     default:
       return 'Неизвестно';
   }
-});
-
-const formattedLastUpdate = computed(() => {
-  if (!store.lastUpdate) return '';
-  const date = store.lastUpdate;
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
 });
 
 // Автообновление каждые 10 секунд если SignalR не подключен
@@ -202,16 +191,6 @@ function handleDeviceClick(device: DeviceStatus) {
     @media (max-width: 768px) {
       gap: 0.35rem;
     }
-  }
-
-  &__last-update {
-    display: flex;
-    align-items: center;
-    font-size: 0.7rem;
-    color: var(--p-text-muted-color);
-    padding: 0.15rem 0.35rem;
-    background: var(--p-surface-100);
-    border-radius: var(--p-border-radius);
   }
 
   &__icon--disconnected {
