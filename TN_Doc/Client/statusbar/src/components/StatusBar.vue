@@ -8,7 +8,7 @@
           v-for="device in store.devices"
           :key="device.id"
           :label="device.name"
-          :status="device.isConnected ? 'online' : 'offline'"
+          :status="getDeviceStatus(device)"
           :tooltip="`${device.name}: ${device.isConnected ? 'Подключено' : 'Отключено'}${device.error ? ` - ${device.error}` : ''}`"
           @click="handleDeviceClick(device)"
         />
@@ -18,13 +18,13 @@
       <div class="status-bar__section status-bar__section--services">
         <StatusIndicator
           label="MS"
-          :status="store.services.messagingService.isConnected ? 'online' : 'offline'"
+          :status="getServiceStatus(store.services.messagingService.isConnected, store.services.messagingService.error)"
           tooltip="Messaging Service"
         />
         <StatusIndicator
           v-if="store.services.elis"
           label="ELIS"
-          :status="store.services.elis.isConnected ? 'online' : 'offline'"
+          :status="getServiceStatus(store.services.elis.isConnected, store.services.elis.error)"
           tooltip="Лабораторная система"
         />
       </div>
@@ -38,7 +38,7 @@ import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
 import StatusIndicator from './StatusIndicator.vue';
-import type { DeviceStatus, StatusResponse } from '../types/status.types';
+import type { DeviceStatus, StatusResponse, IndicatorStatus } from '../types/status.types';
 
 const store = useStatusStore();
 const { connectionState, on } = useSignalR('/statusHub');
@@ -64,6 +64,29 @@ function handleDeviceClick(device: DeviceStatus) {
   console.log('Device clicked:', device);
   // Будущее: показать модальное окно с деталями устройства
 }
+
+function getDeviceStatus(device: DeviceStatus): IndicatorStatus {
+  if (device.isConnected) {
+    return 'online';
+  }
+  // Если есть ошибка "Нет связи с сервером", то это ndv (недостоверно)
+  if (device.error?.includes('Нет связи с сервером')) {
+    return 'ndv';
+  }
+  // Иначе устройство просто не на связи
+  return 'offline';
+}
+
+function getServiceStatus(isConnected: boolean, error?: string): IndicatorStatus {
+  if (isConnected) {
+    return 'online';
+  }
+  // Если есть ошибка "Нет связи с сервером", то это ndv (недостоверно)
+  if (error?.includes('Нет связи с сервером')) {
+    return 'ndv';
+  }
+  return 'offline';
+}
 </script>
 
 <style lang="scss" scoped>
@@ -78,15 +101,14 @@ function handleDeviceClick(device: DeviceStatus) {
   font-size: 0.875rem;
   font-family: var(--p-font-family);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
-  padding: 0; // DEBUG: убираем возможный padding
 
   &__container {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0.25rem 0.5rem 0.25rem 0.5rem; // DEBUG: убрали padding слева и справа
-    max-width: none; // DEBUG: убрали ограничение ширины
-    margin: 0; // DEBUG: убрали auto-центрирование
+    padding: 0.25rem 0.5rem;
+    max-width: none;
+    margin: 0;
     gap: 0.5rem;
     flex-wrap: wrap;
 
@@ -101,8 +123,8 @@ function handleDeviceClick(device: DeviceStatus) {
     align-items: center;
     gap: 0.4rem;
     flex-wrap: wrap;
-    margin: 0; // DEBUG: убираем возможный margin
-    padding: 0; // DEBUG: убираем возможный padding
+    margin: 0;
+    padding: 0;
 
     &--services {
       // Секция сервисов без дополнительного отступа
