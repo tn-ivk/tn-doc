@@ -28,20 +28,6 @@
           tooltip="Лабораторная система"
         />
       </div>
-
-      <!-- Секция действий -->
-      <div class="status-bar__section status-bar__section--actions">
-        <Button
-          icon="pi pi-refresh"
-          :loading="store.isLoading"
-          severity="secondary"
-          text
-          rounded
-          @click="refresh"
-          v-tooltip.top="'Обновить статус'"
-          aria-label="Обновить статус"
-        />
-      </div>
     </div>
   </div>
 </template>
@@ -51,7 +37,6 @@ import { onMounted } from 'vue';
 import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
-import Button from 'primevue/button';
 import StatusIndicator from './StatusIndicator.vue';
 import type { DeviceStatus, StatusResponse } from '../types/status.types';
 
@@ -74,10 +59,6 @@ on('statusUpdated', (data: StatusResponse) => {
 onMounted(() => {
   store.fetchStatus();
 });
-
-function refresh() {
-  store.fetchStatus();
-}
 
 function handleDeviceClick(device: DeviceStatus) {
   console.log('Device clicked:', device);
@@ -124,29 +105,10 @@ function handleDeviceClick(device: DeviceStatus) {
       // Секция сервисов без дополнительного отступа
     }
 
-    &--actions {
-      gap: 0.35rem;
-    }
-
     @media (max-width: 768px) {
       gap: 0.35rem;
     }
   }
-}
-
-// Сжатие размеров кнопок PrimeVue внутри статус-бара
-.status-bar :deep(.p-button) {
-  min-height: 0;
-  height: 1.5rem;
-  padding: 0 0.35rem;
-}
-
-.status-bar :deep(.p-button .p-button-icon) {
-  font-size: 0.85rem;
-}
-
-.status-bar :deep(.p-button.p-button-rounded) {
-  width: 1.5rem;
 }
 
 // Адаптивность
@@ -159,11 +121,6 @@ function handleDeviceClick(device: DeviceStatus) {
 
     &__section {
       justify-content: flex-start;
-
-      &--actions {
-        margin-left: 0;
-        justify-content: flex-end;
-      }
     }
   }
 }
