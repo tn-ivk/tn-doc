@@ -41,69 +41,22 @@
           v-tooltip.top="'Обновить статус'"
           aria-label="Обновить статус"
         />
-
-        <Tag
-          :icon="signalRIconClass"
-          :severity="signalRSeverity"
-          :value="signalRStateText"
-          v-tooltip.top="`SignalR: ${signalRStateText}`"
-        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { onMounted } from 'vue';
 import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
 import Button from 'primevue/button';
-import Tag from 'primevue/tag';
 import StatusIndicator from './StatusIndicator.vue';
 import type { DeviceStatus, StatusResponse } from '../types/status.types';
 
 const store = useStatusStore();
 const { connectionState, on } = useSignalR('/statusHub');
-
-const signalRSeverity = computed(() => {
-  switch (connectionState.value) {
-    case 'connected':
-      return 'success';
-    case 'connecting':
-      return 'warn';
-    case 'disconnected':
-      return 'danger';
-    default:
-      return 'secondary';
-  }
-});
-
-const signalRIconClass = computed(() => {
-  switch (connectionState.value) {
-    case 'connected':
-      return 'pi pi-wifi';
-    case 'connecting':
-      return 'pi pi-spin pi-spinner';
-    case 'disconnected':
-      return 'pi pi-wifi status-bar__icon--disconnected';
-    default:
-      return 'pi pi-question-circle';
-  }
-});
-
-const signalRStateText = computed(() => {
-  switch (connectionState.value) {
-    case 'connected':
-      return 'Подключено';
-    case 'connecting':
-      return 'Подключение...';
-    case 'disconnected':
-      return 'Отключено';
-    default:
-      return 'Неизвестно';
-  }
-});
 
 // Автообновление каждые 10 секунд если SignalR не подключен
 const { pause, resume } = useIntervalFn(() => {
@@ -179,24 +132,9 @@ function handleDeviceClick(device: DeviceStatus) {
       gap: 0.35rem;
     }
   }
-
-  &__icon--disconnected {
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(45deg);
-      width: 120%;
-      height: 2px;
-      background: currentColor;
-    }
-  }
 }
 
-// Сжатие размеров кнопок и тегов PrimeVue внутри статус-бара
+// Сжатие размеров кнопок PrimeVue внутри статус-бара
 .status-bar :deep(.p-button) {
   min-height: 0;
   height: 1.5rem;
@@ -209,12 +147,6 @@ function handleDeviceClick(device: DeviceStatus) {
 
 .status-bar :deep(.p-button.p-button-rounded) {
   width: 1.5rem;
-}
-
-.status-bar :deep(.p-tag) {
-  padding: 0.05rem 0.35rem;
-  line-height: 1;
-  font-size: 0.7rem;
 }
 
 // Адаптивность
