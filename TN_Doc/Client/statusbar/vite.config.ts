@@ -6,6 +6,7 @@ import { createBaseConfig } from '../vite.config.base';
 export default defineConfig({
   ...createBaseConfig(__dirname),
   plugins: [vue()],
+  base: '/statusbar/',
   build: {
     outDir: resolve(__dirname, '../../wwwroot/statusbar'),
     emptyOutDir: true,

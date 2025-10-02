@@ -20,7 +20,8 @@
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(npm run build:*)",
-      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet run --project TN_Doc/TN_Doc.csproj --urls=\"http://localhost:38509\")"
+      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet run --project TN_Doc/TN_Doc.csproj --urls=\"http://localhost:38509\")",
+      "Read(//home/snafu/**)"
     ],
     "deny": [],
     "ask": []
