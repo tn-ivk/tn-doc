@@ -67,22 +67,6 @@
         </span>
       </div>
     </div>
-
-    <!-- Уведомление об ошибке -->
-    <Transition name="error">
-      <Message
-        v-if="store.error"
-        severity="error"
-        :closable="true"
-        @close="store.clearError()"
-        class="status-bar__error"
-      >
-        <template #icon>
-          <i class="pi pi-exclamation-triangle"></i>
-        </template>
-        {{ store.error }}
-      </Message>
-    </Transition>
   </div>
 </template>
 
@@ -93,7 +77,6 @@ import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import Message from 'primevue/message';
 import StatusIndicator from './StatusIndicator.vue';
 import type { DeviceStatus, StatusResponse } from '../types/status.types';
 
@@ -231,17 +214,6 @@ function handleDeviceClick(device: DeviceStatus) {
     border-radius: var(--p-border-radius);
   }
 
-  &__error {
-    margin: 0;
-    border-radius: 0;
-    border: none;
-    border-top: 1px solid var(--p-red-400);
-
-    :deep(.p-message-close) {
-      margin-left: 0.5rem;
-    }
-  }
-
   &__icon--disconnected {
     position: relative;
 
@@ -256,12 +228,6 @@ function handleDeviceClick(device: DeviceStatus) {
       background: currentColor;
     }
   }
-}
-
-// Анимация появления/исчезновения ошибки
-.error-enter-active,
-.error-leave-active {
-  transition: all 0.3s ease;
 }
 
 // Сжатие размеров кнопок и тегов PrimeVue внутри статус-бара
@@ -283,16 +249,6 @@ function handleDeviceClick(device: DeviceStatus) {
   padding: 0.05rem 0.35rem;
   line-height: 1;
   font-size: 0.7rem;
-}
-
-.error-enter-from {
-  opacity: 0;
-  transform: translateY(-100%);
-}
-
-.error-leave-to {
-  opacity: 0;
-  transform: translateY(100%);
 }
 
 // Адаптивность
