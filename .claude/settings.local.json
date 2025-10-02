@@ -23,7 +23,9 @@
       "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet run --project TN_Doc/TN_Doc.csproj --urls=\"http://localhost:38509\")",
       "Read(//home/snafu/**)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(netstat:*)",
+      "Bash(ss:*)"
     ],
     "deny": [],
     "ask": []
