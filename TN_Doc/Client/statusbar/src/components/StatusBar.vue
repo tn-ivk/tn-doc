@@ -78,14 +78,15 @@ function handleDeviceClick(device: DeviceStatus) {
   font-size: 0.875rem;
   font-family: var(--p-font-family);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  padding: 0; // DEBUG: убираем возможный padding
 
   &__container {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0.25rem 0.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 0.25rem 0; // DEBUG: убрали padding слева и справа
+    max-width: none; // DEBUG: убрали ограничение ширины
+    margin: 0; // DEBUG: убрали auto-центрирование
     gap: 0.5rem;
     flex-wrap: wrap;
 
@@ -100,6 +101,8 @@ function handleDeviceClick(device: DeviceStatus) {
     align-items: center;
     gap: 0.4rem;
     flex-wrap: wrap;
+    margin: 0; // DEBUG: убираем возможный margin
+    padding: 0; // DEBUG: убираем возможный padding
 
     &--services {
       // Секция сервисов без дополнительного отступа
