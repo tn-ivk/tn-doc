@@ -4,46 +4,39 @@
     <div class="status-bar__container">
       <!-- Секция устройств -->
       <div v-if="store.devices.length > 0" class="status-bar__section">
-        <span class="status-bar__label">Устройства:</span>
         <StatusIndicator
           v-for="device in store.devices"
           :key="device.id"
           :label="device.name"
           :status="device.isConnected ? 'online' : 'offline'"
-          :latency="device.latencyMs"
           :tooltip="`${device.name}: ${device.isConnected ? 'Подключено' : 'Отключено'}${device.error ? ` - ${device.error}` : ''}`"
           @click="handleDeviceClick(device)"
         />
       </div>
 
       <!-- Секция сервисов -->
-      <div class="status-bar__section">
-        <span class="status-bar__label">Сервисы:</span>
+      <div class="status-bar__section status-bar__section--services">
         <StatusIndicator
           label="MS"
           :status="store.services.messagingService.isConnected ? 'online' : 'offline'"
-          :latency="store.services.messagingService.latencyMs"
           tooltip="Messaging Service"
         />
         <StatusIndicator
           v-if="store.services.elis"
           label="ELIS"
           :status="store.services.elis.isConnected ? 'online' : 'offline'"
-          :latency="store.services.elis.latencyMs"
           tooltip="Лабораторная система"
         />
         <StatusIndicator
           v-if="store.services.opcDa"
           label="OPC DA"
           :status="store.services.opcDa.isConnected ? 'online' : 'offline'"
-          :latency="store.services.opcDa.latencyMs"
           tooltip="OPC DA сервер"
         />
         <StatusIndicator
           v-if="store.services.opcUa"
           label="OPC UA"
           :status="store.services.opcUa.isConnected ? 'online' : 'offline'"
-          :latency="store.services.opcUa.latencyMs"
           tooltip="OPC UA сервер"
         />
       </div>
@@ -214,6 +207,10 @@ function handleDeviceClick(device: DeviceStatus) {
     gap: 0.4rem;
     flex-wrap: wrap;
 
+    &--services {
+      margin-left: 1rem; // Увеличенный отступ для визуального разделения от устройств
+    }
+
     &--actions {
       margin-left: auto;
       gap: 0.35rem;
@@ -222,13 +219,6 @@ function handleDeviceClick(device: DeviceStatus) {
     @media (max-width: 768px) {
       gap: 0.35rem;
     }
-  }
-
-  &__label {
-    font-weight: 600;
-    color: var(--p-text-muted-color);
-    font-size: 0.813rem;
-    white-space: nowrap;
   }
 
   &__last-update {
