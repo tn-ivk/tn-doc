@@ -1,5 +1,9 @@
 ﻿@import url("newstyle.css");
 
+:root {
+  --status-bar-height: 28px;
+}
+
 *{
   box-sizing: border-box;
 }
