@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using MySqlConnector;
 using TN_Doc.Models.Status;
 using TN_DocGeneral.Services;
+using TN_DocGeneral.Extensions;
 using TN.DocData;
 
 namespace TN_Doc.Services;
@@ -120,21 +121,20 @@ public class StatusProvider : IStatusProvider
         try
         {
             // Получаем строку подключения из первого активного подключения
-            var connectionString = device.DBConnectionStrings?
+            var dbConnectionString = device.DBConnectionStrings?
                 .FirstOrDefault(cs => cs.Use);
 
-            if (connectionString == null)
+            if (dbConnectionString == null)
             {
                 throw new InvalidOperationException($"Отсутствует активная строка подключения для устройства {device.Name}");
             }
 
-            // Формируем строку подключения MySQL
-            var csb = new MySqlConnectionStringBuilder
+            // Получаем строку подключения с расшифрованным паролем через extension метод
+            var connectionString = dbConnectionString.GetConnectionString();
+
+            // Устанавливаем таймауты для проверки статуса
+            var csb = new MySqlConnectionStringBuilder(connectionString)
             {
-                Server = connectionString.Server,
-                UserID = connectionString.Userid,
-                Password = connectionString.Password,
-                Database = connectionString.Database,
                 ConnectionTimeout = 2,
                 DefaultCommandTimeout = 2
             };
