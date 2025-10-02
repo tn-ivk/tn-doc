@@ -189,7 +189,7 @@ function handleDeviceClick(device: DeviceStatus) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.5rem 0.25rem 0;
     max-width: 1400px;
     margin: 0 auto;
     gap: 0.5rem;

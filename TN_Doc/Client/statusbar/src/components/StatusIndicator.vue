@@ -39,7 +39,7 @@ const emit = defineEmits<{
 const statusIconClass = computed(() => {
   switch (props.status) {
     case 'online':
-      return 'pi pi-check-circle';
+      return 'pi pi-link';
     case 'offline':
       return 'pi pi-times-circle status-indicator__icon--blink';
     case 'warning':
