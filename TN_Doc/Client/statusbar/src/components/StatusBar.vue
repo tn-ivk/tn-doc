@@ -84,7 +84,7 @@ function handleDeviceClick(device: DeviceStatus) {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0.25rem 0; // DEBUG: убрали padding слева и справа
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem; // DEBUG: убрали padding слева и справа
     max-width: none; // DEBUG: убрали ограничение ширины
     margin: 0; // DEBUG: убрали auto-центрирование
     gap: 0.5rem;
