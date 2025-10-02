@@ -68,9 +68,7 @@ export const useStatusStore = defineStore('status', () => {
 
       services.value = {
         messagingService: { isConnected: false },
-        ...(services.value.elis && { elis: { isConnected: false } }),
-        ...(services.value.opcDa && { opcDa: { isConnected: false } }),
-        ...(services.value.opcUa && { opcUa: { isConnected: false } })
+        ...(services.value.elis && { elis: { isConnected: false } })
       };
 
       lastUpdate.value = new Date();

@@ -7,7 +7,5 @@ namespace TN_Doc.Models.Status
     {
         public ConnectionStatus MessagingService { get; set; } = new();
         public ConnectionStatus? Elis { get; set; }
-        public ConnectionStatus? OpcDa { get; set; }
-        public ConnectionStatus? OpcUa { get; set; }
     }
 }

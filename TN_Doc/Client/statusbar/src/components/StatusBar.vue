@@ -27,18 +27,6 @@
           :status="store.services.elis.isConnected ? 'online' : 'offline'"
           tooltip="Лабораторная система"
         />
-        <StatusIndicator
-          v-if="store.services.opcDa"
-          label="OPC DA"
-          :status="store.services.opcDa.isConnected ? 'online' : 'offline'"
-          tooltip="OPC DA сервер"
-        />
-        <StatusIndicator
-          v-if="store.services.opcUa"
-          label="OPC UA"
-          :status="store.services.opcUa.isConnected ? 'online' : 'offline'"
-          tooltip="OPC UA сервер"
-        />
       </div>
 
       <!-- Секция действий -->

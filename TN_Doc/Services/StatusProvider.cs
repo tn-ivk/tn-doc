@@ -211,10 +211,6 @@ public class StatusProvider : IStatusProvider
             services.Elis = await CheckElisServiceAsync(appConfig.Elis, ct);
         }
 
-        // TODO: Добавить проверку OPC DA/UA через TN_MessagingService
-        // services.OpcDa = await CheckOpcDaAsync(ct);
-        // services.OpcUa = await CheckOpcUaAsync(ct);
-
         return services;
     }
 
