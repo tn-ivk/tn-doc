@@ -60,11 +60,12 @@ function handleClick() {
 .status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.25rem 0.5rem;
+  gap: 0.25rem;
+  padding: 0.15rem 0.35rem;
   border-radius: 4px;
-  font-size: 0.813rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  line-height: 1;
   transition: all 0.2s ease;
   user-select: none;
   border: 1px solid transparent;
@@ -97,7 +98,7 @@ function handleClick() {
   }
 
   &__icon {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     flex-shrink: 0;
 
     &--blink {
@@ -107,12 +108,12 @@ function handleClick() {
 
   &__label {
     font-weight: 500;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     white-space: nowrap;
   }
 
   &__latency {
-    font-size: 0.625rem;
+    font-size: 0.6rem;
     opacity: 0.8;
     white-space: nowrap;
   }

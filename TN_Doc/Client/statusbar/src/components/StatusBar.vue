@@ -186,7 +186,7 @@ function handleDeviceClick(device: DeviceStatus) {
   left: 0;
   right: 0;
   background: var(--p-surface-0);
-  border-top: 2px solid var(--p-surface-200);
+  border-top: 1px solid var(--p-surface-200);
   z-index: 1000;
   font-size: 0.875rem;
   font-family: var(--p-font-family);
@@ -196,31 +196,31 @@ function handleDeviceClick(device: DeviceStatus) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.4rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     max-width: 1400px;
     margin: 0 auto;
-    gap: 0.65rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
 
     @media (max-width: 768px) {
-      gap: 0.5rem;
-      padding: 0.35rem 0.65rem;
+      gap: 0.45rem;
+      padding: 0.25rem 0.5rem;
     }
   }
 
   &__section {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
     flex-wrap: wrap;
 
     &--actions {
       margin-left: auto;
-      gap: 0.4rem;
+      gap: 0.35rem;
     }
 
     @media (max-width: 768px) {
-      gap: 0.4rem;
+      gap: 0.35rem;
     }
   }
 
@@ -234,9 +234,9 @@ function handleDeviceClick(device: DeviceStatus) {
   &__last-update {
     display: flex;
     align-items: center;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--p-text-muted-color);
-    padding: 0.25rem 0.5rem;
+    padding: 0.15rem 0.35rem;
     background: var(--p-surface-100);
     border-radius: var(--p-border-radius);
   }
@@ -272,6 +272,27 @@ function handleDeviceClick(device: DeviceStatus) {
 .error-enter-active,
 .error-leave-active {
   transition: all 0.3s ease;
+}
+
+// Сжатие размеров кнопок и тегов PrimeVue внутри статус-бара
+.status-bar :deep(.p-button) {
+  min-height: 0;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+}
+
+.status-bar :deep(.p-button .p-button-icon) {
+  font-size: 0.85rem;
+}
+
+.status-bar :deep(.p-button.p-button-rounded) {
+  width: 1.5rem;
+}
+
+.status-bar :deep(.p-tag) {
+  padding: 0.05rem 0.35rem;
+  line-height: 1;
+  font-size: 0.7rem;
 }
 
 .error-enter-from {
