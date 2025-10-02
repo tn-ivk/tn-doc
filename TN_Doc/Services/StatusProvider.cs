@@ -162,7 +162,7 @@ public class StatusProvider : IStatusProvider
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Не удалось подключиться к устройству {DeviceName} за {ElapsedMs}мс", device.Name, deviceStopwatch.ElapsedMilliseconds);
+            _logger.LogWarning("Не удалось подключиться к устройству {DeviceName} за {ElapsedMs}мс", device.Name, deviceStopwatch.ElapsedMilliseconds);
             status.Error = ex.Message;
         }
         finally
