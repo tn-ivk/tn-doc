@@ -9,6 +9,8 @@
   - `GET /api/configurator/validate` - валидация настроек
 - Создать DTO модели для конфигурации (общие настройки, устройства)
 - Добавить сервис **ConfigurationService** для работы с CfgApp.json
+- Использовать существующий **AppConfigService** для чтения/записи настроек; при необходимости, **ConfigurationService** как фасад над ним.
+- Вынести парсинг и валидаторы OPC/DB в отдельные классы в `TN_Doc/Services` (например, `OpcConfigValidator`, `DbConfigValidator`), контроллер оставить тонким.
 
 ### Frontend (Vue 3)
 - Создать новый проект: `/TN_Doc/Client/configurator/`
@@ -61,6 +63,7 @@ Actions:
 - Кнопка "Применить" внизу (fixed position)
 - Обработка валидации перед сохранением
 - Toast для уведомлений (PrimeVue)
+- Предохранитель о несохранённых изменениях: `beforeunload` + `route guard` на основе `isDirty`.
 
 ### GeneralTab.vue
 - **InputText** для ExportDoc.Path (обязательное поле)
@@ -77,6 +80,7 @@ Actions:
 ### DeviceList.vue
 - **IconField** с поиском (фильтрация по имени)
 - **Listbox** с `multiple` режимом
+- Виртуализация больших списков: PrimeVue `VirtualScroller` (или кастомная реализация) + debounce поиска.
 - Computed: filtered devices
 
 ### DeviceEditor.vue
@@ -106,6 +110,7 @@ Props: `isMixed`, `type` (checkbox/input/select)
 - **TabView** - вкладки
 - **Splitter** - разделение панелей
 - **Listbox** - список устройств
+- **VirtualScroller** - виртуализация списка устройств
 - **InputText** / **InputNumber** - поля ввода
 - **InputSwitch** - переключатели
 - **SelectButton** / **RadioButton** - выбор типа
@@ -123,6 +128,10 @@ Props: `isMixed`, `type` (checkbox/input/select)
 - saveConfig(config: Config): Promise<void>
 - validateConfig(config: Config): Promise<ValidationResult>
 ```
+
+### Аудит и логирование изменений
+- Логировать через NLog каждое изменение конфигурации: кто (пользователь/роль), когда, что изменил (до/после) с вычислением diff по ключам.
+- Добавить корреляционный идентификатор в логи запросов сохранения.
 
 ## 7. Интеграция в ASP.NET Core
 
