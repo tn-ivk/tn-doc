@@ -155,10 +155,6 @@ table.mainTable button:disabled {
     background-color: #cccccc;
 }
 
-/* Убираем стрелку у dropdown-toggle кнопки меню */
-table.mainTable button.dropdown-toggle::after {
-    display: none;
-}
 
 
 #DataTable_wrapper > div.dataTables_scroll > div.dataTables_scrollHead > div > table{
