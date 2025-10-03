@@ -34,7 +34,7 @@ public class Startup
 			builder.ClearProviders();
 			builder.AddNLog();
 		});
-		
+
 		services.AddCors(options => options.AddPolicy("CorsPolicy",
 			builder =>
 			{
@@ -54,6 +54,28 @@ public class Startup
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
+
+		// Status Bar сервисы
+		services.AddSignalR();
+		services.AddMemoryCache();
+		services.AddSingleton<ConnectionTracker>();
+
+		// HTTP клиенты для проверки внешних сервисов
+		services.AddHttpClient("MessagingService", client =>
+		{
+			client.BaseAddress = new System.Uri("http://localhost:5010");
+			client.Timeout = System.TimeSpan.FromSeconds(2);
+			client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.4.2");
+		});
+
+		services.AddHttpClient("Elis", client =>
+		{
+			client.Timeout = System.TimeSpan.FromSeconds(5);
+			client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.4.2");
+		});
+
+		services.AddScoped<IStatusProvider, StatusProvider>();
+		services.AddHostedService<StatusMonitoringService>();
 	}
 
 	// This method gets called by the runtime. Use this method to configure
@@ -93,6 +115,10 @@ public class Startup
 		app.UseStaticFiles();
 		app.UseRouting();
 		app.UseCors("CorsPolicy");
-		app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}"); });
+		app.UseEndpoints(endpoints =>
+		{
+			endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+			endpoints.MapHub<TN_Doc.Hubs.StatusHub>("/statusHub");
+		});
 	}
 }

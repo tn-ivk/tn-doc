@@ -33,13 +33,23 @@
     <script src="~/js/Logger.js"></script>
     <script src="~/js/Common.js"></script>
     <script src="~/js/loading-spinner.js"></script>
+
+    <!-- Status Bar styles -->
+    <link rel="stylesheet" href="~/statusbar/status-bar.css" asp-append-version="true" />
 </head>
 <body>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-0" style="padding-bottom: 0;">
             @RenderBody()
         </main>
     </div>
+
+    <!-- Status bar container -->
+    <div id="status-bar"></div>
+
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Status bar script -->
+    <script type="module" src="~/statusbar/status-bar.js" asp-append-version="true"></script>
 </body>
 </html>

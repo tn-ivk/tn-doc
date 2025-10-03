@@ -8,8 +8,9 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 **Version**: 1.4.2
 **Target Framework**: .NET 8.0
+**SDK Compatibility**: Works with .NET SDK 8.0+ and 9.0+
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
-**Current Branch**: develop (active development branch)
+**Main Development Branch**: develop
 **Note**: Recent work on status bar improvements (removed time display and version info from status bar)
 
 ## Build and Development Commands
@@ -19,6 +20,9 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 # Add required NuGet sources
 dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
 dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "<USERNAME>" --password "<PASSWORD>" --store-password-in-clear-text
+
+# Restore NuGet packages
+dotnet restore
 ```
 
 ### Building the Solution
@@ -29,24 +33,56 @@ dotnet build
 # Build specific project
 dotnet build TN_Doc/TN_Doc.csproj
 
+# Build in Release mode
+dotnet build -c Release
+
 # Publish for production (Linux)
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
 
+# Publish for production (Windows)
+dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish
+
 # Clean build
 dotnet clean && dotnet build
+
+# Rebuild solution
+dotnet clean && dotnet restore && dotnet build
 ```
 
 ### Running the Application
 ```bash
-# Run in development mode
+# Run in development mode (from solution root)
 cd TN_Doc
 dotnet run
+
+# Run from solution root
+dotnet run --project TN_Doc/TN_Doc.csproj
 
 # Run with specific environment
 ASPNETCORE_ENVIRONMENT=Development dotnet run
 
-# Run with specific URLs
+# Run with specific URLs (default ports)
 dotnet run --urls="http://localhost:38509;https://localhost:44357"
+
+# Run with verbose output for debugging
+dotnet run --verbosity detailed
+```
+
+### Building Vue Components (StatusBar)
+```bash
+# Navigate to StatusBar project
+cd TN_Doc/Client/statusbar
+
+# Install dependencies (first time only)
+npm install
+
+# Development mode with hot reload
+npm run dev
+
+# Build for production
+npm run build
+
+# The build output goes to dist/ and is automatically served by ASP.NET Core
 ```
 
 ### Testing
@@ -81,6 +117,52 @@ dotnet test /p:CollectCoverage=true
   - Use mocks/fakes for external services and databases
   - Cover negative scenarios and validation errors
   - Follow AAA pattern: Arrange-Act-Assert
+
+### Code Quality and Linting
+```bash
+# Format code
+dotnet format
+
+# Check code style violations
+dotnet format --verify-no-changes
+
+# Analyze code with built-in analyzers
+dotnet build /p:TreatWarningsAsErrors=true
+
+# Run code analysis (if analyzers are configured)
+dotnet build /p:RunAnalyzersDuringBuild=true
+```
+
+### Debugging and Diagnostics
+```bash
+# Check .NET runtime and SDK versions
+dotnet --info
+
+# List installed .NET runtimes
+dotnet --list-runtimes
+
+# List installed .NET SDKs
+dotnet --list-sdks
+
+# Check project dependencies
+dotnet list package
+
+# Check for outdated packages
+dotnet list package --outdated
+
+# Check for vulnerable packages
+dotnet list package --vulnerable
+
+# View detailed build logs
+dotnet build -v detailed > build.log 2>&1
+
+# Debug application with verbose logging
+ASPNETCORE_ENVIRONMENT=Development dotnet run --verbosity detailed
+
+# Check application logs (platform-specific)
+# Linux: tail -f /opt/TN_Doc/logs/*.log
+# Windows: Get-Content TN_Doc\logs\*.log -Tail 50 -Wait
+```
 
 ### Related Projects Setup
 The following projects must be deployed at the same level (all share TN_Doc configuration):
@@ -224,22 +306,45 @@ Real-time data acquisition from measurement systems:
 
 ### Service Architecture
 The application uses dependency injection with the following key services:
-- **IAppConfigService**: Singleton configuration management
+- **IAppConfigService**: Singleton configuration management and document class factory
 - **PrinterService**: Platform-specific printing (Windows/Linux)
 - **DirectoryService**: File system operations
 - **DbContext**: Entity Framework database context
 - **AppInfoProvider**: Application version information
+- **IReportBuffer**: Singleton for in-memory PDF storage
+- **IDbSchemaCache**: Scoped service for caching database schema information
+- **IDocModuleLoader**: Singleton for dynamic loading of document modules
+- **IStatusProvider**: Scoped service for system health monitoring
+- **StatusMonitoringService**: Background hosted service for continuous status monitoring
 
 Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
 
 ### Status Bar Architecture
-The application includes a real-time status bar (`/TN_Doc/wwwroot/js/statusBar.js`) that monitors system health:
+The application includes a real-time status bar built with **Vue 3 + PrimeVue** that monitors system health:
+- **Frontend Stack**:
+  - Vue 3.4.21 with TypeScript
+  - **PrimeVue 4.2+** - Enterprise UI component library
+  - Pinia for state management
+  - SignalR client for real-time updates
+  - Vite as build tool
+  - Source: `/TN_Doc/Client/statusbar/`
 - **Device Indicators**: Database connectivity for each configured ИВК device
 - **OPC Indicators**: OPC DA/UA server connection status
 - **Service Indicators**: SignalR Hub and ELIS laboratory system status
-- **Real-time Updates**: SignalR-based push notifications for status changes
+- **Real-time Updates**: SignalR-based push notifications for status changes via `/statusHub` endpoint
 - **Manual Refresh**: Click individual indicators or global refresh button
 - **Configuration-Driven**: Dynamically creates indicators based on `CfgApp.json` device/OPC settings
+- **Backend Components**:
+  - `StatusHub`: SignalR hub at `/statusHub` for broadcasting status updates
+  - `StatusMonitoringService`: Background service that periodically checks system health
+  - `StatusProvider`: Service that queries database, OPC, MessagingService, and ELIS endpoints
+  - HTTP clients configured with timeouts (2s for MessagingService, 5s for ELIS)
+- **PrimeVue Components Used**:
+  - Badge: Status indicators with color coding
+  - Button: Refresh action with loading state
+  - Tag: SignalR connection indicator
+  - Message: Error notifications
+  - Tooltip: Contextual help
 
 ### Document Generation Architecture  
 The system uses a factory pattern with dynamic module loading:
@@ -253,11 +358,13 @@ The system uses a factory pattern with dynamic module loading:
 - **Template Resolution**: FastReport templates (.frx files) paths resolved through document configuration files
 
 ### Memory Management and PDF Generation
-Current development focus on solving file locking issues:
-- **Problem**: PDF generation saves to static `wwwroot/PDF/PDF.pdf` causing "file in use" errors
-- **Solution**: Move to in-memory generation using MemoryStream and `File()` returns
-- **FastReport Integration**: Use `report.Export(exporter, memoryStream)` instead of file paths
+The application uses in-memory PDF generation (implemented in v1.4.1):
+- **IReportBuffer**: Singleton service that stores generated PDF bytes in memory
+- **Middleware Interceptor**: Custom middleware in `Startup.cs` intercepts `/PDF/PDF.pdf` requests and serves from memory buffer
+- **Cache Control**: Responses include `no-store, no-cache, must-revalidate` headers to prevent browser caching
+- **FastReport Integration**: Reports exported to `MemoryStream`, then stored in `IReportBuffer`
 - **Printer Support**: Temporary files still needed for physical printing (winprutil.exe/CUPS)
+- **Benefits**: Eliminates "file in use" errors and concurrent access issues
 
 ### Multi-platform Support
 - **Windows**:
@@ -328,6 +435,9 @@ Current development focus on solving file locking issues:
 - **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
 - **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
 - **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
+- **FastReport license errors**: Ensure FastReport NuGet source is configured with valid credentials
+- **Runtime version mismatch**: Verify .NET Runtime 8.0.13+ is installed (`dotnet --info`)
+- **Permission issues on Linux**: Ensure `alphadaemon` user has access to `/opt/TN_Doc/` and `/var/log/TN_Doc/`
 
 ### Working with Document Modules
 When working on specific document types:
@@ -424,6 +534,9 @@ Configuration follows a layered approach:
 - **Resource Cleanup**: Explicit disposal of FastReport objects and streams in finally blocks
 
 ### Recent Changes (v1.4.2)
+- Removed TN.Tools project (obsolete functionality)
+- Simplified file path determination logic
+- Updated KMH_MI2816 for IVK version 7.12.14.3000 protocol changes
 - Updated docgeneral to version 1.2.2
 - ⚠️ Status bar improvements: Removed time display and project version info from status bar
 - Cleaned up status bar JavaScript to remove unused time update functionality
@@ -451,3 +564,4 @@ Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+- комить и пуш изменения при окончании доработок
