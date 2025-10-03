@@ -29,7 +29,8 @@
       "Bash(npm install)",
       "Bash(cat:*)",
       "Bash(npm run build:configurator:*)",
-      "Bash(npm run build:all:*)"
+      "Bash(npm run build:all:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
