@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using TN.DocData;
 using TN_Doc.Services.Validators;
 using TN_DocGeneral.Services;
@@ -19,9 +18,7 @@ public class ConfigurationService : IConfigurationService
     private readonly DbConfigValidator _dbValidator;
     private readonly ILogger<ConfigurationService> _logger;
 
-    public ConfigurationService(
-        IAppConfigService appConfigService,
-        ILogger<ConfigurationService> logger)
+    public ConfigurationService(IAppConfigService appConfigService, ILogger<ConfigurationService> logger)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
