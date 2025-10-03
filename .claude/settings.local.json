@@ -26,7 +26,10 @@
       "Bash(git stash:*)",
       "Bash(netstat:*)",
       "Bash(ss:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(cat:*)",
+      "Bash(npm run build:configurator:*)",
+      "Bash(npm run build:all:*)"
     ],
     "deny": [],
     "ask": []
