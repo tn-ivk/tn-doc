@@ -25,7 +25,8 @@
       "Bash(git pull:*)",
       "Bash(git stash:*)",
       "Bash(netstat:*)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "Bash(npm install)"
     ],
     "deny": [],
     "ask": []
