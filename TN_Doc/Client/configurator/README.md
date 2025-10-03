@@ -38,20 +38,35 @@
 ## Разработка
 
 ### Установка зависимостей
+Из корня проекта `/TN_Doc/Client`:
 ```bash
 npm install
 ```
 
 ### Запуск в режиме разработки
+Из корня проекта `/TN_Doc/Client`:
 ```bash
-npm run dev
+npm run dev:configurator
 ```
 Приложение будет доступно на http://localhost:5174
 
-### Сборка для продакшена
+Или непосредственно в директории конфигуратора:
 ```bash
-npm run build
+cd configurator
+npm run dev
 ```
+
+### Сборка для продакшена
+Из корня проекта `/TN_Doc/Client`:
+```bash
+npm run build:configurator
+```
+
+Или для сборки всех проектов (statusbar + configurator):
+```bash
+npm run build:all
+```
+
 Результат сборки помещается в `/TN_Doc/wwwroot/configurator/`
 
 ## API Endpoints
