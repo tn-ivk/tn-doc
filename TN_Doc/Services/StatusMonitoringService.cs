@@ -26,11 +26,7 @@ public class StatusMonitoringService : BackgroundService
     private int _consecutiveErrors = 0;
     private const int MAX_CONSECUTIVE_ERRORS = 5;
 
-    public StatusMonitoringService(
-        IServiceProvider serviceProvider,
-        IHubContext<StatusHub> hubContext,
-        ILogger<StatusMonitoringService> logger,
-        ConnectionTracker connectionTracker)
+    public StatusMonitoringService(IServiceProvider serviceProvider, IHubContext<StatusHub> hubContext, ILogger<StatusMonitoringService> logger, ConnectionTracker connectionTracker)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
