@@ -146,7 +146,7 @@ function handleCancel() {
 .configurator-content {
   flex: 1;
   overflow: auto;
-  padding: 1rem;
+  padding: 0.25rem 1rem;
 }
 
 .configurator-footer {
@@ -220,5 +220,21 @@ function handleCancel() {
 .py-5 {
   padding-top: 3rem;
   padding-bottom: 3rem;
+}
+
+/* Компактные вкладки */
+:deep(.p-tablist) {
+  padding: 0.125rem 0.5rem;
+  gap: 0.25rem;
+}
+
+:deep(.p-tab) {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.9rem;
+  min-height: auto;
+}
+
+:deep(.p-tabpanels) {
+  padding: 0;
 }
 </style>
