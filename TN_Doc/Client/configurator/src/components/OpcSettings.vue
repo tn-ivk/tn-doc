@@ -1,7 +1,6 @@
 <template>
   <div class="opc-settings">
-    <div v-if="showTypeSelector" class="field">
-      <label>Тип OPC</label>
+    <div v-if="showTypeSelector" class="field field-type-selector">
       <SelectButton
         v-model="localSettings.Type"
         :options="opcTypes"
@@ -151,17 +150,22 @@ function handleTypeChange() {
 .opc-settings {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
+}
+
+.field-type-selector {
+  gap: 0;
 }
 
 .field label {
   font-weight: 600;
   color: var(--text-color);
+  font-size: 0.9rem;
 }
 </style>

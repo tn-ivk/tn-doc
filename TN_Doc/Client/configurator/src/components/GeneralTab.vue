@@ -2,34 +2,26 @@
   <div class="general-tab">
     <Panel header="Путь экспорта документов">
       <div class="field">
-        <label for="export-path" class="required">Путь для сохранения экспортируемых документов</label>
         <InputText
           id="export-path"
           v-model="exportPath"
-          placeholder="/opt/TN_Doc/Export"
+          placeholder="Путь для сохранения экспортируемых документов"
           class="w-full"
         />
         <small v-if="!exportPath" class="p-error">Обязательное поле</small>
       </div>
     </Panel>
 
-    <Panel header="Функции безопасности" class="mt-3">
-      <div class="field">
-        <div class="form-check form-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            id="use-security"
-            v-model="useSecurityFeatures"
-          />
-          <label class="form-check-label" for="use-security">
-            Использовать функции безопасности (ролевой доступ, шифрование паролей БД)
-          </label>
-        </div>
+    <Panel header="Функции безопасности" class="mt-2">
+      <div class="field field-switch">
+        <InputSwitch
+          id="use-security"
+          v-model="useSecurityFeatures"
+        />
       </div>
     </Panel>
 
-    <Panel header="Настройки локального OPC-клиента" class="mt-3">
+    <Panel header="Настройки локального OPC-клиента" class="mt-2">
       <OpcSettings
         v-model="armOpcSettings"
         :show-type-selector="true"
@@ -82,18 +74,19 @@ const armOpcSettings = computed({
 
 <style scoped>
 .general-tab {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .field {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .field label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   font-weight: 600;
   color: var(--text-color);
+  font-size: 0.9rem;
 }
 
 .field label.required::after {
@@ -101,11 +94,15 @@ const armOpcSettings = computed({
   color: var(--red-500);
 }
 
+.field-switch {
+  margin-bottom: 0;
+}
+
 .w-full {
   width: 100%;
 }
 
-.mt-3 {
-  margin-top: 1rem;
+.mt-2 {
+  margin-top: 0.75rem;
 }
 </style>
