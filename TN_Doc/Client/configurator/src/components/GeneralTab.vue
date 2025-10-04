@@ -153,7 +153,7 @@ const armOpcSettings = computed({
 }
 
 .field {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .field-horizontal {
