@@ -1119,14 +1119,14 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.11",
+          "Server": "192.168.233.201",
           "Userid": "user",
           "Password": "$1$83F+qTyYmHOfVHKPsApmT1xgFnO64A/lEkxNn9k8VKs=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": true,
+          "Use": false,
           "GuidDevice": 0,
           "Server": "192.168.233.139",
           "Userid": "user",
@@ -1163,7 +1163,7 @@
       "InvalidChars" : ["\"", "'", "\\"]
     },
     {
-      "Use": false,
+      "Use": true,
       "IdDevice": 1,
       "Name": "ИВК-2",
       "Description": "",
@@ -2281,14 +2281,14 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.233.12",
+          "Server": "192.168.233.202",
           "Userid": "user",
           "Password": "$1$lWYmN8fbjJBXRxMriPw5JLsfa6PbyzBcZthtH5hRJQ8=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": true,
+          "Use": false,
           "GuidDevice": 1,
           "Server": "192.168.233.140",
           "Userid": "user",
@@ -2325,7 +2325,7 @@
       "InvalidChars" : ["\"", "'", "\\"]
     },
     {
-      "Use": false,
+      "Use": true,
       "IdDevice": 2,
       "Name": "ИВК-РСУ",
       "Description": "",
@@ -3443,14 +3443,14 @@
         {
           "Use": true,
           "GuidDevice": 2,
-          "Server": "192.168.233.13",
+          "Server": "192.168.233.203",
           "Userid": "user",
           "Password": "$1$tMxr/hnj4vSosbFKfg4zl3FS3gSxe/whDp4SZFPTL+I=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
-          "Use": true,
+          "Use": false,
           "GuidDevice": 2,
           "Server": "192.168.233.141",
           "Userid": "user",
