@@ -17,9 +17,7 @@ public class ConfiguratorController : ControllerBase
     private readonly IConfigurationService _configurationService;
     private readonly ILogger<ConfiguratorController> _logger;
 
-    public ConfiguratorController(
-        IConfigurationService configurationService,
-        ILogger<ConfiguratorController> logger)
+    public ConfiguratorController(IConfigurationService configurationService, ILogger<ConfiguratorController> logger)
     {
         _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
