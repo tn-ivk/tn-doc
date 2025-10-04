@@ -31,7 +31,8 @@
       "Bash(npm run build:configurator:*)",
       "Bash(npm run build:all:*)",
       "Bash(curl:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(npm run build:statusbar:*)"
     ],
     "deny": [],
     "ask": []
