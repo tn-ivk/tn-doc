@@ -9,6 +9,9 @@ variables:
 
 workflow:
   rules:
+    # Разрешаем запуск пайплайна по тегу в ЛЮБОЙ ветке
+    - if: '$CI_COMMIT_TAG'
+    # Оставляем существующие правила для master
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
     - when: never
@@ -23,6 +26,10 @@ build-job:
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   tags:
     - orpovy
+  rules:
+    # Строить при теге в любой ветке и при обычных правилах workflow
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
   before_script:
     # Создание директории для публикации
     - mkdir -p ./publish
@@ -48,6 +55,9 @@ extract-version-job:
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   tags:
     - orpovy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
   script:
     # Установка curl для работы с GitLab API
     - apt-get update && apt-get install -y curl
@@ -57,6 +67,13 @@ extract-version-job:
     - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
     # Извлечение версии из .csproj
     - VERSION=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" $CSPROJ_FILE 2>/dev/null || grep -oP '<Version>\K[^<]+' $CSPROJ_FILE)
+    # Если запущено по тегу вида v1.2.3 или 1.2.3, то переопределяем VERSION из тега
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        TAG_CLEAN=$(echo "$CI_COMMIT_TAG" | sed 's/^v//')
+        echo "Tag detected: $CI_COMMIT_TAG -> $TAG_CLEAN"
+        VERSION=$TAG_CLEAN
+      fi
     - echo "Extracted version:$VERSION"
     # Проверка версии
     - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
@@ -108,6 +125,9 @@ package-job:      # This job runs in the deploy stage.
     - extract-version-job
   tags:
     - orpovy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
   before_script:
     - apt-get update && apt-get install -y dpkg-dev
   script:
@@ -509,6 +529,9 @@ package-minimal-job:      # Minimal package without dependencies
     - extract-version-job
   tags:
     - orpovy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
   before_script:
     - apt-get update && apt-get install -y dpkg-dev
   script:
@@ -777,6 +800,9 @@ package-net-runtime-job:      # .NET Runtime standalone package
     - extract-version-job
   tags:
     - orpovy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
   before_script:
     - apt-get update && apt-get install -y dpkg-dev
   script:
@@ -1009,6 +1035,9 @@ package-fonts-job:      # System fonts standalone package
     - extract-version-job
   tags:
     - orpovy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
   before_script:
     - apt-get update && apt-get install -y dpkg-dev
   script:
@@ -1196,6 +1225,9 @@ notify-telegram-job:      # Telegram notifications with file uploads
     - package-fonts-job
   tags:
     - orpovy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
   before_script:
     - apt-get update && apt-get install -y curl
   script:

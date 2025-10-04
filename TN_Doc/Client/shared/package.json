@@ -1,0 +1,11 @@
+{
+  "name": "@tn-doc/shared",
+  "version": "1.4.2",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

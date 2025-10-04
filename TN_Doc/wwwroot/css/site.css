@@ -1,5 +1,9 @@
 ﻿@import url("newstyle.css");
 
+:root {
+  --status-bar-height: 28px;
+}
+
 *{
   box-sizing: border-box;
 }
@@ -64,7 +68,7 @@ html {
 
 body {
   /* Margin bottom by footer height */
-  margin-bottom: 60px;
+  margin-bottom: 0;
 }
 .footer {
   position: absolute;
