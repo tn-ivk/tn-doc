@@ -78,11 +78,11 @@ const armOpcSettings = computed({
 
 <style scoped>
 .general-tab {
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0.5rem;
 }
 
 .field {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .field-horizontal {
@@ -126,6 +126,40 @@ const armOpcSettings = computed({
 }
 
 .mt-2 {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* Компактные панели */
+:deep(.p-panel) {
+  font-size: 0.9rem;
+}
+
+:deep(.p-panel-header) {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+:deep(.p-panel-content) {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Компактные input элементы */
+:deep(.p-inputtext),
+:deep(.p-inputnumber-input) {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+:deep(.p-inputswitch) {
+  width: 2.5rem;
+  height: 1.5rem;
+}
+
+:deep(.p-inputswitch .p-inputswitch-slider) {
+  transform: translateX(0);
+}
+
+:deep(.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider) {
+  transform: translateX(1rem);
 }
 </style>

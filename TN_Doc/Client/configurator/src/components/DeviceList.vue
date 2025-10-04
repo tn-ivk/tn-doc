@@ -11,7 +11,7 @@
     >
       <template #option="slotProps">
         <div class="device-item">
-          <i :class="slotProps.option.Use ? 'pi pi-check-circle text-green-500' : 'pi pi-times-circle text-red-500'" />
+          <i :class="slotProps.option.Use ? 'pi pi-check-circle text-blue-500' : 'pi pi-times-circle text-red-500'" />
           <span class="device-name">{{ slotProps.option.Name }}</span>
           <span v-if="slotProps.option.Description" class="device-description">
             {{ slotProps.option.Description }}
@@ -54,7 +54,7 @@ const selectedIds = computed({
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .device-listbox {
@@ -87,8 +87,8 @@ const selectedIds = computed({
   color: var(--text-color-secondary);
 }
 
-.text-green-500 {
-  color: var(--green-500);
+.text-blue-500 {
+  color: var(--blue-500);
 }
 
 .text-red-500 {

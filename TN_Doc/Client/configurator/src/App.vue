@@ -146,7 +146,7 @@ function handleCancel() {
 .configurator-content {
   flex: 1;
   overflow: auto;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .configurator-footer {

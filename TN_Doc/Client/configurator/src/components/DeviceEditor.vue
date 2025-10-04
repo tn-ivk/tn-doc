@@ -288,7 +288,7 @@ const invalidChars = computed({
 .device-editor {
   height: 100%;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .no-selection {
@@ -322,14 +322,15 @@ const invalidChars = computed({
 }
 
 .field {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .field label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   font-weight: 600;
   color: var(--text-color);
+  font-size: 0.9rem;
 }
 
 .field-checkbox {
@@ -357,7 +358,30 @@ const invalidChars = computed({
 }
 
 .mt-3 {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
+}
+
+/* Компактные панели */
+:deep(.p-panel-header) {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+:deep(.p-panel-content) {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Компактные input элементы */
+:deep(.p-inputtext),
+:deep(.p-inputnumber-input),
+:deep(.p-multiselect) {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+:deep(.p-inputswitch) {
+  width: 2.5rem;
+  height: 1.5rem;
 }
 
 .ml-2 {
