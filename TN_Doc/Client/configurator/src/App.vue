@@ -221,4 +221,16 @@ function handleCancel() {
   padding-top: 3rem;
   padding-bottom: 3rem;
 }
+
+/* Компактные вкладки */
+:deep(.p-tablist) {
+  padding: 0.25rem 0.5rem;
+  gap: 0.25rem;
+}
+
+:deep(.p-tab) {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.9rem;
+  min-height: auto;
+}
 </style>

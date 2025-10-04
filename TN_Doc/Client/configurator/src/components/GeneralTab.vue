@@ -1,19 +1,23 @@
 <template>
   <div class="general-tab">
     <Panel header="Путь экспорта документов">
-      <div class="field">
-        <InputText
-          id="export-path"
-          v-model="exportPath"
-          placeholder="Путь для сохранения экспортируемых документов"
-          class="w-full"
-        />
-        <small v-if="!exportPath" class="p-error">Обязательное поле</small>
+      <div class="field field-horizontal">
+        <label for="export-path">Путь:</label>
+        <div class="field-input">
+          <InputText
+            id="export-path"
+            v-model="exportPath"
+            placeholder="Путь для сохранения экспортируемых документов"
+            class="w-full"
+          />
+          <small v-if="!exportPath" class="p-error">Обязательное поле</small>
+        </div>
       </div>
     </Panel>
 
     <Panel header="Функции безопасности" class="mt-2">
-      <div class="field field-switch">
+      <div class="field field-horizontal">
+        <label for="use-security">Использовать:</label>
         <InputSwitch
           id="use-security"
           v-model="useSecurityFeatures"
@@ -81,6 +85,29 @@ const armOpcSettings = computed({
   margin-bottom: 0.5rem;
 }
 
+.field-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.field-horizontal label {
+  flex-shrink: 0;
+  min-width: 100px;
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.field-input {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .field label {
   display: block;
   margin-bottom: 0.25rem;
@@ -92,10 +119,6 @@ const armOpcSettings = computed({
 .field label.required::after {
   content: " *";
   color: var(--red-500);
-}
-
-.field-switch {
-  margin-bottom: 0;
 }
 
 .w-full {

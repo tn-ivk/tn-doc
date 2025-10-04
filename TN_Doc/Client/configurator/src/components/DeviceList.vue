@@ -6,8 +6,6 @@
       option-label="Name"
       option-value="IdDevice"
       multiple
-      filter
-      :filter-fields="['Name', 'Description']"
       class="device-listbox"
       listStyle="height: 100%"
     >
