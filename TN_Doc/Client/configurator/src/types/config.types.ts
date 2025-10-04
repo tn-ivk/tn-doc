@@ -46,11 +46,25 @@ export interface UsedSI {
   UsedSecondSI_PVS: boolean;
 }
 
+export interface TemplateDoc {
+  Use: boolean;
+  Id: number;
+  Name: string;
+  Description: string;
+  PathToDocTemplateFile: string;
+  PathToDocEditConfigFile: string;
+}
+
 export interface Document {
   Use: boolean;
   IdDoc: number;
   Name: string;
   Description: string;
+  PathToDocDll?: string;
+  PathToDocConfigFile?: string;
+  PathToDocEditConfigFile?: string;
+  LastUsedTemplateId?: number;
+  TemplateDocs?: TemplateDoc[];
 }
 
 export interface Device {

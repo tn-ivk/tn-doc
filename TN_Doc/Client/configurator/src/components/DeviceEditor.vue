@@ -18,10 +18,10 @@
       <div class="editor-sections">
         <!-- Использование устройства -->
         <Panel header="Основные настройки">
-          <div class="field">
-            <label>Использовать устройство</label>
+          <div class="field field-horizontal">
+            <label for="device-use">Использовать устройство:</label>
             <div class="flex align-items-center">
-              <InputSwitch v-model="deviceUse" />
+              <InputSwitch id="device-use" v-model="deviceUse" />
               <MixedStateWarning v-if="isMixed('Use')" class="ml-2" />
             </div>
           </div>
@@ -41,6 +41,17 @@
               display="chip"
             />
             <MixedStateWarning v-if="isMixed('Docs')" class="mt-2" />
+          </div>
+
+          <!-- Шаблоны документов -->
+          <div v-if="!hasMultipleSelection" class="templates-section mt-2">
+            <DocumentTemplates
+              v-for="doc in selectedDevices[0]?.Docs || []"
+              :key="doc.IdDoc"
+              :document="doc"
+              :device-id="selectedDevices[0].IdDevice"
+              @update:template="handleTemplateUpdate"
+            />
           </div>
         </Panel>
 
@@ -123,9 +134,8 @@
               />
               <label for="char-backslash">Обратный слеш (\\)</label>
             </div>
-
-            <MixedStateWarning v-if="isMixed('InvalidChars')" class="mt-2" />
           </div>
+          <MixedStateWarning v-if="isMixed('InvalidChars')" class="mt-2" />
         </Panel>
       </div>
     </div>
@@ -148,6 +158,7 @@ import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
 import OpcSettings from './OpcSettings.vue';
 import MixedStateWarning from './MixedStateWarning.vue';
+import DocumentTemplates from './DocumentTemplates.vue';
 
 const configStore = useConfigStore();
 const { selectedDevices, hasMultipleSelection } = storeToRefs(configStore);
@@ -282,6 +293,10 @@ const invalidChars = computed({
     });
   }
 });
+
+function handleTemplateUpdate(deviceId: number, docId: number, templateId: number, use: boolean) {
+  configStore.updateDocumentTemplate(deviceId, docId, templateId, use);
+}
 </script>
 
 <style scoped>
@@ -346,7 +361,30 @@ const invalidChars = computed({
 }
 
 .invalid-chars-section {
-  padding: 0.5rem 0;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.field-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.field-horizontal label {
+  flex-shrink: 0;
+  min-width: 180px;
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.templates-section {
+  border-top: 1px solid var(--surface-200);
+  padding-top: 0.5rem;
 }
 
 .w-full {

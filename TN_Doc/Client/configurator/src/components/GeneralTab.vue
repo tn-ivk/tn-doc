@@ -1,29 +1,22 @@
 <template>
   <div class="general-tab">
-    <Panel header="Путь экспорта документов">
-      <div class="field field-horizontal">
-        <label for="export-path">Путь:</label>
-        <div class="field-input">
-          <InputText
-            id="export-path"
-            v-model="exportPath"
-            placeholder="Путь для сохранения экспортируемых документов"
-            class="w-full"
-          />
-          <small v-if="!exportPath" class="p-error">Обязательное поле</small>
-        </div>
-      </div>
-    </Panel>
+    <div class="field field-horizontal">
+      <label for="export-path">Путь экспорта документов:</label>
+      <InputText
+        id="export-path"
+        v-model="exportPath"
+        placeholder="Путь для сохранения экспортируемых документов"
+        class="field-input-flex"
+      />
+    </div>
 
-    <Panel header="Функции безопасности" class="mt-2">
-      <div class="field field-horizontal">
-        <label for="use-security">Использовать:</label>
-        <InputSwitch
-          id="use-security"
-          v-model="useSecurityFeatures"
-        />
-      </div>
-    </Panel>
+    <div class="field field-horizontal">
+      <label for="use-security">Функции безопасности:</label>
+      <InputSwitch
+        id="use-security"
+        v-model="useSecurityFeatures"
+      />
+    </div>
 
     <Panel header="Настройки локального OPC-клиента" class="mt-2">
       <OpcSettings
@@ -94,18 +87,15 @@ const armOpcSettings = computed({
 
 .field-horizontal label {
   flex-shrink: 0;
-  min-width: 100px;
+  min-width: 180px;
   font-weight: 600;
   color: var(--text-color);
   font-size: 0.9rem;
   margin: 0;
 }
 
-.field-input {
+.field-input-flex {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
 }
 
 .field label {
