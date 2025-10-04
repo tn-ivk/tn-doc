@@ -18,12 +18,15 @@
       />
     </div>
 
-    <Panel header="Настройки локального OPC-клиента" class="mt-2">
-      <OpcSettings
-        v-model="armOpcSettings"
-        :show-type-selector="true"
+    <div class="field field-horizontal">
+      <label>Настройки локального OPC-клиента:</label>
+      <SelectButton
+        v-model="opcType"
+        :options="opcTypes"
+        option-label="label"
+        option-value="value"
       />
-    </Panel>
+    </div>
   </div>
 </template>
 
@@ -36,7 +39,8 @@ import type { OpcConnectionSettings } from '../types/config.types';
 import Panel from 'primevue/panel';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
-import OpcSettings from './OpcSettings.vue';
+import SelectButton from 'primevue/selectbutton';
+import { OpcType } from '../types/config.types';
 
 const configStore = useConfigStore();
 const { currentConfig } = storeToRefs(configStore);
@@ -59,12 +63,41 @@ const useSecurityFeatures = computed({
   }
 });
 
-const armOpcSettings = computed({
-  get: () => currentConfig.value?.ArmOpcConnectionSettings,
-  set: (value: OpcConnectionSettings | undefined) => {
-    configStore.updateGeneralSettings({
-      ArmOpcConnectionSettings: value
-    });
+const opcTypes = [
+  { label: 'OPC DA', value: OpcType.DA },
+  { label: 'OPC UA', value: OpcType.UA }
+];
+
+const opcType = computed({
+  get: () => currentConfig.value?.ArmOpcConnectionSettings?.Type || OpcType.UA,
+  set: (value: OpcType) => {
+    const currentSettings = currentConfig.value?.ArmOpcConnectionSettings;
+    if (currentSettings) {
+      configStore.updateGeneralSettings({
+        ArmOpcConnectionSettings: {
+          ...currentSettings,
+          Type: value
+        }
+      });
+    } else {
+      // Создаем новые настройки с дефолтными значениями
+      configStore.updateGeneralSettings({
+        ArmOpcConnectionSettings: {
+          Type: value,
+          DaSettings: {
+            Host: '127.0.0.1',
+            ProgId: 'psregulopcda_01',
+            StartPrefix: 'Root.PLC1.IVK_TN_01',
+            UpdateRate: 500
+          },
+          UaSettings: {
+            ConfigFilename: 'opcua-config.xml',
+            StartPrefix: 'ns=2;s=Root.PLC1',
+            UpdateRate: 500
+          }
+        }
+      });
+    }
   }
 });
 </script>
@@ -75,7 +108,7 @@ const armOpcSettings = computed({
 }
 
 .field {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
 }
 
 .field-horizontal {
