@@ -1,8 +1,8 @@
 <template>
   <div class="general-tab">
-    <Panel header="Общие настройки">
+    <Panel header="Путь экспорта документов">
       <div class="field">
-        <label for="export-path" class="required">Путь экспорта документов</label>
+        <label for="export-path" class="required">Путь для сохранения экспортируемых документов</label>
         <InputText
           id="export-path"
           v-model="exportPath"
@@ -11,13 +11,21 @@
         />
         <small v-if="!exportPath" class="p-error">Обязательное поле</small>
       </div>
+    </Panel>
 
+    <Panel header="Функции безопасности" class="mt-3">
       <div class="field">
-        <label for="use-security">Использовать функции безопасности</label>
-        <InputSwitch
-          id="use-security"
-          v-model="useSecurityFeatures"
-        />
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="use-security"
+            v-model="useSecurityFeatures"
+          />
+          <label class="form-check-label" for="use-security">
+            Использовать функции безопасности (ролевой доступ, шифрование паролей БД)
+          </label>
+        </div>
       </div>
     </Panel>
 

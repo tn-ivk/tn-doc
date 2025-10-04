@@ -95,7 +95,7 @@
                                                     <i class="fa fa-book" aria-hidden="true"></i>
                                                     <span>Справочники</span>
                                                 </a>
-                                                <a class="dropdown-item custom-dropdown-item" href="/configurator" id="MenuItemConfigurator" target="_blank">
+                                                <a class="dropdown-item custom-dropdown-item" href="#" id="MenuItemConfigurator" data-toggle="modal" data-target="#configurator-window" data-backdrop="static" data-keyboard="false">
                                                     <i class="fa fa-cog" aria-hidden="true"></i>
                                                     <span>Конфигуратор</span>
                                                 </a>
@@ -265,15 +265,14 @@
     </div>
 </div>
 
-    @* Модальное окно конфигуратора - заменено на полноценную страницу /configurator *@
-    @*
+    @* Модальное окно конфигуратора *@
     <div class="modal fade"
          onselectstart="return false"
          oncontextmenu="return false"
          id="configurator-window"
          tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width: 95%;">
+            <div class="modal-content" style="height: 90vh;">
                 <div class="modal-header">
                     <h5 class="modal-title">
                         <i class="fa fa-cog" aria-hidden="true"></i> Конфигуратор настроек
@@ -282,19 +281,15 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12 text-center">
-                                <p class="lead">Функционал в разработке.</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="modal-body" style="padding: 0; overflow: hidden;">
+                    <iframe id="configurator-iframe"
+                            src="/configurator"
+                            style="width: 100%; height: 100%; border: none;"
+                            frameborder="0"></iframe>
                 </div>
             </div>
         </div>
     </div>
-    *@
 
     <div id="ErrorDialogContent">
         <!-- Здесь будет загружен HTML файл -->
@@ -328,10 +323,17 @@
 <script>
         RedefinitionConfirmWindow();
         InitElement();
-        // загрузка статичного html    
+        // загрузка статичного html
         $(document).ready(function () {
             $("#ErrorDialogContent").load("/HTML/ErrorDialogWindow.html");
             $("#ElisRequestContent").load("/HTML/ElisRequestWindow.html");
+        });
+
+        // Обработчик сообщений из iframe конфигуратора
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.action === 'closeConfiguratorModal') {
+                $('#configurator-window').modal('hide');
+            }
         });
 </script>
 </body>

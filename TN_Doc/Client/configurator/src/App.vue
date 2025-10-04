@@ -1,17 +1,17 @@
 <template>
   <div class="configurator-container">
-    <div class="configurator-header">
-      <h1>Конфигуратор настроек приложения</h1>
-    </div>
-
     <Toast />
 
     <div class="configurator-content">
-      <Message v-if="error" severity="error" :closable="false">
+      <div v-if="error" class="alert alert-danger" role="alert">
         {{ error }}
-      </Message>
+      </div>
 
-      <ProgressBar v-if="isLoading" mode="indeterminate" class="loading-bar" />
+      <div v-if="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Загрузка...</span>
+        </div>
+      </div>
 
       <TabView v-else-if="currentConfig">
         <TabPanel header="Общие" value="0">
@@ -24,23 +24,24 @@
     </div>
 
     <div class="configurator-footer">
-      <Button
-        label="Применить"
-        icon="pi pi-check"
+      <button
+        type="button"
+        class="btn btn-outline-primary"
         @click="handleSave"
         :disabled="!isDirty || isSaving"
-        :loading="isSaving"
-        severity="success"
-      />
-      <Button
-        label="Сбросить"
-        icon="pi pi-times"
-        @click="handleReset"
-        :disabled="!isDirty"
-        severity="secondary"
-        outlined
-        class="ml-2"
-      />
+      >
+        <i v-if="isSaving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+        <i v-else class="fa fa-floppy-o" aria-hidden="true"></i>
+        {{ isSaving ? 'Сохранение...' : 'Применить' }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-danger ml-2"
+        @click="handleCancel"
+      >
+        <i class="fa fa-times" aria-hidden="true"></i>
+        Отмена
+      </button>
     </div>
   </div>
 </template>
@@ -53,10 +54,7 @@ import { useConfigStore } from './stores/configStore';
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
-import Button from 'primevue/button';
 import Toast from 'primevue/toast';
-import Message from 'primevue/message';
-import ProgressBar from 'primevue/progressbar';
 
 import GeneralTab from './components/GeneralTab.vue';
 import DevicesTab from './components/DevicesTab.vue';
@@ -111,14 +109,20 @@ async function handleSave() {
   }
 }
 
-function handleReset() {
+function handleCancel() {
+  if (isDirty.value) {
+    if (!confirm('У вас есть несохранённые изменения. Закрыть без сохранения?')) {
+      return;
+    }
+  }
+
+  // Сбросить изменения
   configStore.resetConfig();
-  toast.add({
-    severity: 'info',
-    summary: 'Сброшено',
-    detail: 'Изменения отменены',
-    life: 3000
-  });
+
+  // Закрыть модальное окно (если открыто в iframe)
+  if (window.parent !== window) {
+    window.parent.postMessage({ action: 'closeConfiguratorModal' }, '*');
+  }
 }
 </script>
 
@@ -126,40 +130,30 @@ function handleReset() {
 .configurator-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.configurator-header {
-  margin-bottom: 1rem;
-}
-
-.configurator-header h1 {
-  margin: 0;
-  font-size: 1.75rem;
-  color: var(--primary-color);
+  height: 100%;
+  min-height: calc(90vh - 56px); /* вычитаем высоту modal-header */
 }
 
 .configurator-content {
   flex: 1;
   overflow: auto;
-  margin-bottom: 1rem;
-}
-
-.loading-bar {
-  height: 4px;
+  padding: 1rem;
 }
 
 .configurator-footer {
-  border-top: 1px solid var(--surface-border);
-  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem;
   display: flex;
   justify-content: flex-end;
+  background-color: #f8f9fa;
 }
 
 .ml-2 {
   margin-left: 0.5rem;
+}
+
+.py-5 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 </style>
