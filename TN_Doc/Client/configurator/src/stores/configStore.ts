@@ -140,6 +140,26 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
+  function updateDocumentTemplate(
+    deviceId: number,
+    docId: number,
+    templateId: number,
+    use: boolean
+  ) {
+    if (!currentConfig.value) return;
+
+    const device = currentConfig.value.Devices.find(d => d.IdDevice === deviceId);
+    if (!device) return;
+
+    const doc = device.Docs.find(d => d.IdDoc === docId);
+    if (!doc || !doc.TemplateDocs) return;
+
+    const template = doc.TemplateDocs.find(t => t.Id === templateId);
+    if (template) {
+      template.Use = use;
+    }
+  }
+
   function resetConfig() {
     if (originalConfig.value) {
       currentConfig.value = _.cloneDeep(originalConfig.value);
@@ -167,6 +187,7 @@ export const useConfigStore = defineStore('config', () => {
     updateGeneralSettings,
     updateDeviceSettings,
     updateMultipleDevicesSettings,
+    updateDocumentTemplate,
     selectDevices,
     validateConfig,
     resetConfig
