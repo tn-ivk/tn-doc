@@ -32,7 +32,7 @@
     <div class="configurator-footer">
       <button
         type="button"
-        class="btn btn-outline-primary save-btn"
+        class="btn btn-primary save-btn"
         @click="handleSave"
         :disabled="!isDirty || isSaving"
       >
@@ -42,7 +42,7 @@
       </button>
       <button
         type="button"
-        class="btn btn-outline-danger cancel-btn ml-2"
+        class="btn btn-danger cancel-btn ml-2"
         @click="handleCancel"
       >
         <i class="fa fa-times" aria-hidden="true"></i>
@@ -151,21 +151,19 @@ function handleCancel() {
 
 .configurator-footer {
   border-top: 1px solid #dee2e6;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   display: flex;
   justify-content: flex-end;
   background-color: #f8f9fa;
 }
 
-/* Стили кнопок в стиле главного окна */
+/* Стили кнопок - компактные filled кнопки */
 .configurator-footer button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 120px;
-  height: 40px;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.9rem;
   font-weight: 400;
   line-height: 1.5;
   text-align: center;
@@ -173,32 +171,31 @@ function handleCancel() {
   vertical-align: middle;
   cursor: pointer;
   user-select: none;
-  border: 1px solid;
-  border-radius: 0.375rem;
-  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.configurator-footer button.btn-outline-primary {
-  color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.configurator-footer button.btn-outline-primary:hover:not(:disabled) {
+.configurator-footer button.btn-primary {
   color: #fff;
   background-color: #0d6efd;
   border-color: #0d6efd;
 }
 
-.configurator-footer button.btn-outline-danger {
-  color: #dc3545;
-  border-color: #dc3545;
+.configurator-footer button.btn-primary:hover:not(:disabled) {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
 }
 
-.configurator-footer button.btn-outline-danger:hover:not(:disabled) {
+.configurator-footer button.btn-danger {
   color: #fff;
   background-color: #dc3545;
   border-color: #dc3545;
+}
+
+.configurator-footer button.btn-danger:hover:not(:disabled) {
+  background-color: #bb2d3b;
+  border-color: #b02a37;
 }
 
 .configurator-footer button:disabled {
@@ -208,7 +205,7 @@ function handleCancel() {
 }
 
 .configurator-footer button i {
-  font-size: 1.1em;
+  font-size: 1em;
   vertical-align: middle;
 }
 

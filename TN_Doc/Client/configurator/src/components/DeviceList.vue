@@ -1,16 +1,5 @@
 <template>
   <div class="device-list">
-    <div class="search-field">
-      <IconField iconPosition="left">
-        <InputIcon class="pi pi-search" />
-        <InputText
-          v-model="searchQuery"
-          placeholder="Поиск устройств..."
-          class="w-full"
-        />
-      </IconField>
-    </div>
-
     <Listbox
       v-model="selectedIds"
       :options="filteredDevices"
@@ -20,7 +9,7 @@
       filter
       :filter-fields="['Name', 'Description']"
       class="device-listbox"
-      listStyle="height: 520px"
+      listStyle="height: 100%"
     >
       <template #option="slotProps">
         <div class="device-item">
@@ -45,29 +34,13 @@ import { storeToRefs } from 'pinia';
 import { useConfigStore } from '../stores/configStore';
 
 import Listbox from 'primevue/listbox';
-import InputText from 'primevue/inputtext';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
 
 const configStore = useConfigStore();
 const { currentConfig, selectedDeviceIds } = storeToRefs(configStore);
 
-const searchQuery = ref('');
-
 const filteredDevices = computed(() => {
   if (!currentConfig.value?.Devices) return [];
-
-  let devices = currentConfig.value.Devices;
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    devices = devices.filter(d =>
-      d.Name.toLowerCase().includes(query) ||
-      (d.Description && d.Description.toLowerCase().includes(query))
-    );
-  }
-
-  return devices;
+  return currentConfig.value.Devices;
 });
 
 const selectedIds = computed({
@@ -84,14 +57,6 @@ const selectedIds = computed({
   flex-direction: column;
   height: 100%;
   padding: 1rem;
-}
-
-.search-field {
-  margin-bottom: 1rem;
-}
-
-.w-full {
-  width: 100%;
 }
 
 .device-listbox {

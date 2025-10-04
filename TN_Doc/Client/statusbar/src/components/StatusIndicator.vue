@@ -103,6 +103,32 @@ function handleClick() {
       opacity: 0.85;
       transform: scale(1.02);
     }
+
+    // Кастомный стиль фокуса вместо стандартного outline
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    }
+  }
+
+  // Специфичные стили фокуса для каждого статуса
+  &--online.status-indicator--clickable:focus-visible {
+    box-shadow: 0 0 0 3px var(--p-green-200);
+  }
+
+  &--offline.status-indicator--clickable:focus-visible {
+    box-shadow: 0 0 0 3px var(--p-red-200);
+  }
+
+  &--warning.status-indicator--clickable:focus-visible {
+    box-shadow: 0 0 0 3px var(--p-yellow-200);
+  }
+
+  &--ndv.status-indicator--clickable:focus-visible {
+    box-shadow: 0 0 0 3px var(--p-surface-300);
   }
 
   &__icon {
