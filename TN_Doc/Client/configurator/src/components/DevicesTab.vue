@@ -20,6 +20,6 @@ import DeviceEditor from './DeviceEditor.vue';
 
 <style scoped>
 .devices-tab {
-  padding: 1rem;
+  padding: 0.5rem;
 }
 </style>
