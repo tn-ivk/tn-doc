@@ -20,13 +20,44 @@
 
     <div class="field field-horizontal">
       <label>Настройки локального OPC-клиента:</label>
-      <SelectButton
-        v-model="opcType"
-        :options="opcTypes"
-        option-label="label"
-        option-value="value"
-      />
+      <div class="opc-controls">
+        <SelectButton
+          v-model="opcType"
+          :options="opcTypes"
+          option-label="label"
+          option-value="value"
+        />
+        <Button
+          icon="pi pi-ellipsis-h"
+          @click="showOpcDialog = true"
+          severity="secondary"
+          text
+          size="small"
+          aria-label="Настройки OPC"
+        />
+      </div>
     </div>
+
+    <!-- Модальное окно настроек OPC -->
+    <Dialog
+      v-model:visible="showOpcDialog"
+      modal
+      header="Настройки OPC"
+      :style="{ width: '500px' }"
+    >
+      <OpcSettings
+        v-model="armOpcSettings"
+        :show-type-selector="false"
+      />
+      <template #footer>
+        <Button
+          label="Закрыть"
+          icon="pi pi-times"
+          @click="showOpcDialog = false"
+          severity="secondary"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -40,10 +71,15 @@ import Panel from 'primevue/panel';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
 import SelectButton from 'primevue/selectbutton';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import OpcSettings from './OpcSettings.vue';
 import { OpcType } from '../types/config.types';
 
 const configStore = useConfigStore();
 const { currentConfig } = storeToRefs(configStore);
+
+const showOpcDialog = ref(false);
 
 const exportPath = computed({
   get: () => currentConfig.value?.ExportDoc?.Path || '',
@@ -100,6 +136,15 @@ const opcType = computed({
     }
   }
 });
+
+const armOpcSettings = computed({
+  get: () => currentConfig.value?.ArmOpcConnectionSettings,
+  set: (value: OpcConnectionSettings | undefined) => {
+    configStore.updateGeneralSettings({
+      ArmOpcConnectionSettings: value
+    });
+  }
+});
 </script>
 
 <style scoped>
@@ -146,6 +191,12 @@ const opcType = computed({
 
 .w-full {
   width: 100%;
+}
+
+.opc-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .mt-2 {
