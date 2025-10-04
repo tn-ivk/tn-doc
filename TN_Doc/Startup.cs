@@ -52,12 +52,7 @@ public class Startup
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
 		services.AddScoped<IConfigurationService, ConfigurationService>();
-		services.AddControllersWithViews()
-			.AddJsonOptions(options =>
-			{
-				// Сохранять PascalCase в JSON (вместо camelCase по умолчанию)
-				options.JsonSerializerOptions.PropertyNamingPolicy = null;
-			});
+		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
 

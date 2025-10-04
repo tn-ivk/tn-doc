@@ -157,21 +157,59 @@ function handleCancel() {
   background-color: #f8f9fa;
 }
 
+/* Стили кнопок в стиле главного окна */
 .configurator-footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 120px;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  transition: all 0.15s ease-in-out;
+  height: 40px;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid;
+  border-radius: 0.375rem;
+  background-color: transparent;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.configurator-footer button.btn-outline-primary {
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.configurator-footer button.btn-outline-primary:hover:not(:disabled) {
+  color: #fff;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.configurator-footer button.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.configurator-footer button.btn-outline-danger:hover:not(:disabled) {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
 }
 
 .configurator-footer button:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .configurator-footer button i {
   font-size: 1.1em;
+  vertical-align: middle;
 }
 
 .ml-1 {
