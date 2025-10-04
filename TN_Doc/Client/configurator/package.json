@@ -1,0 +1,35 @@
+{
+  "name": "@tn-doc/configurator",
+  "version": "1.4.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "type-check": "vue-tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@primevue/themes": "^4.2.6",
+    "@vueuse/core": "^10.7.0",
+    "axios": "^1.6.7",
+    "lodash": "^4.17.21",
+    "pinia": "^2.1.7",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.2.6",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/tsconfig": "^0.5.1",
+    "sass": "^1.71.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0",
+    "vue-tsc": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

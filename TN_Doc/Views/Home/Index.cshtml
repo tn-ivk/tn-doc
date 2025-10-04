@@ -86,8 +86,21 @@
                                                onclick="ExportDoc()">
                                         <select id="ComboboxPrinterName">Принтер</select>
                                         <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
-                                        <input class="bExport" id="ButtonDictionaries" type="button" value="Справочники" data-toggle="modal" data-target="#modal-window"
-                                               data-backdrop="static" data-keyboard="false">
+                                        <div class="dropdown" style="display: inline-block;">
+                                            <button class="dropdown-toggle" type="button" id="MenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-bars" aria-hidden="true"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right custom-dropdown-menu" aria-labelledby="MenuButton">
+                                                <a class="dropdown-item custom-dropdown-item" href="#" id="MenuItemDictionaries" data-toggle="modal" data-target="#modal-window" data-backdrop="static" data-keyboard="false">
+                                                    <i class="fa fa-book" aria-hidden="true"></i>
+                                                    <span>Справочники</span>
+                                                </a>
+                                                <a class="dropdown-item custom-dropdown-item" href="#" id="MenuItemConfigurator" data-toggle="modal" data-target="#configurator-window" data-backdrop="static" data-keyboard="false">
+                                                    <i class="fa fa-cog" aria-hidden="true"></i>
+                                                    <span>Конфигуратор</span>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </td>
                                 </table>
                             </td>
@@ -252,6 +265,32 @@
     </div>
 </div>
 
+    @* Модальное окно конфигуратора *@
+    <div class="modal fade"
+         onselectstart="return false"
+         oncontextmenu="return false"
+         id="configurator-window"
+         tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document" style="max-width: 95%;">
+            <div class="modal-content" style="height: 90vh;">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fa fa-cog" aria-hidden="true"></i> Конфигуратор настроек
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 0; overflow: hidden;">
+                    <iframe id="configurator-iframe"
+                            src="/configurator"
+                            style="width: 100%; height: 100%; border: none;"
+                            frameborder="0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="ErrorDialogContent">
         <!-- Здесь будет загружен HTML файл -->
     </div>
@@ -284,10 +323,17 @@
 <script>
         RedefinitionConfirmWindow();
         InitElement();
-        // загрузка статичного html    
+        // загрузка статичного html
         $(document).ready(function () {
             $("#ErrorDialogContent").load("/HTML/ErrorDialogWindow.html");
             $("#ElisRequestContent").load("/HTML/ElisRequestWindow.html");
+        });
+
+        // Обработчик сообщений из iframe конфигуратора
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.action === 'closeConfiguratorModal') {
+                $('#configurator-window').modal('hide');
+            }
         });
 </script>
 </body>

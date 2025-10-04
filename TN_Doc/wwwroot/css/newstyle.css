@@ -132,7 +132,8 @@ table.mainTable select  {
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-table.mainTable input[type=button] {
+table.mainTable input[type=button],
+table.mainTable button {
     background-color: #1b6ec2;
     color: #ffffff;
     border: none;
@@ -143,14 +144,17 @@ table.mainTable input[type=button] {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-table.mainTable input[type=button]:hover {
+table.mainTable input[type=button]:hover,
+table.mainTable button:hover {
     background-color: #155a9e;
 }
 
-table.mainTable input[type=button]:disabled {
+table.mainTable input[type=button]:disabled,
+table.mainTable button:disabled {
     color: #666666;
     background-color: #cccccc;
 }
+
 
 
 #DataTable_wrapper > div.dataTables_scroll > div.dataTables_scrollHead > div > table{

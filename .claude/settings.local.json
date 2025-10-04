@@ -25,7 +25,13 @@
       "Bash(git pull:*)",
       "Bash(git stash:*)",
       "Bash(netstat:*)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "Bash(npm install)",
+      "Bash(cat:*)",
+      "Bash(npm run build:configurator:*)",
+      "Bash(npm run build:all:*)",
+      "Bash(curl:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []
