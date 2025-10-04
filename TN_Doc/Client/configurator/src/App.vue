@@ -13,34 +13,40 @@
         </div>
       </div>
 
-      <TabView v-else-if="currentConfig">
-        <TabPanel header="Общие" value="0">
-          <GeneralTab />
-        </TabPanel>
-        <TabPanel header="Устройства" value="1">
-          <DevicesTab />
-        </TabPanel>
-      </TabView>
+      <Tabs v-else-if="currentConfig" value="0">
+        <TabList>
+          <Tab value="0">Общие</Tab>
+          <Tab value="1">Устройства</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel value="0">
+            <GeneralTab />
+          </TabPanel>
+          <TabPanel value="1">
+            <DevicesTab />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </div>
 
     <div class="configurator-footer">
       <button
         type="button"
-        class="btn btn-outline-primary"
+        class="btn btn-outline-primary save-btn"
         @click="handleSave"
         :disabled="!isDirty || isSaving"
       >
         <i v-if="isSaving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
         <i v-else class="fa fa-floppy-o" aria-hidden="true"></i>
-        {{ isSaving ? 'Сохранение...' : 'Применить' }}
+        <span class="ml-1">{{ isSaving ? 'Сохранение...' : 'Применить' }}</span>
       </button>
       <button
         type="button"
-        class="btn btn-outline-danger ml-2"
+        class="btn btn-outline-danger cancel-btn ml-2"
         @click="handleCancel"
       >
         <i class="fa fa-times" aria-hidden="true"></i>
-        Отмена
+        <span class="ml-1">Отмена</span>
       </button>
     </div>
   </div>
@@ -52,7 +58,10 @@ import { storeToRefs } from 'pinia';
 import { useToast } from 'primevue/usetoast';
 import { useConfigStore } from './stores/configStore';
 
-import TabView from 'primevue/tabview';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import Toast from 'primevue/toast';
 
@@ -146,6 +155,27 @@ function handleCancel() {
   display: flex;
   justify-content: flex-end;
   background-color: #f8f9fa;
+}
+
+.configurator-footer button {
+  min-width: 120px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.configurator-footer button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.configurator-footer button i {
+  font-size: 1.1em;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
 }
 
 .ml-2 {
