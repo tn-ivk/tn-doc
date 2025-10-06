@@ -29,7 +29,7 @@ public class Startup
 		{
 			var logLevel = Configuration.GetValue<string>("Logging:LogLevel:Default");
 			LogManager.Configuration.Variables["logLevel"] = logLevel;
-			LogManager.Configuration.Variables["logDirectory"] = LoggingPathService.GetLogDirectory();
+			LogManager.Configuration.Variables["logDirectory"] = LoggingPathService.GetLogDirectory("TN_Doc");
 
 			builder.ClearProviders();
 			builder.AddNLog();

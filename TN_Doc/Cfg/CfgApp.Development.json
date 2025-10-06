@@ -1141,9 +1141,9 @@
         "UsedPP": true,
         "UsedPVL": true,
         "UsedPVS": true,
-        "UsedSecondSI_PP": false,
-        "UsedSecondSI_PVL": false,
-        "UsedSecondSI_PVS": false
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
       },
       "UsedProcedureTypePR": null,
       "OpcConnectionSettings": {
@@ -2303,9 +2303,9 @@
         "UsedPP": true,
         "UsedPVL": true,
         "UsedPVS": true,
-        "UsedSecondSI_PP": false,
-        "UsedSecondSI_PVL": false,
-        "UsedSecondSI_PVS": false
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
       },
       "UsedProcedureTypePR": null,
       "OpcConnectionSettings": {
@@ -3465,9 +3465,9 @@
         "UsedPP": true,
         "UsedPVL": true,
         "UsedPVS": true,
-        "UsedSecondSI_PP": false,
-        "UsedSecondSI_PVL": false,
-        "UsedSecondSI_PVS": false
+        "UsedSecondSI_PP": true,
+        "UsedSecondSI_PVL": true,
+        "UsedSecondSI_PVS": true
       },
       "UsedProcedureTypePR": null,
       "OpcConnectionSettings": {
