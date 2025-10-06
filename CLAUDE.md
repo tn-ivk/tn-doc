@@ -167,7 +167,7 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run --verbosity detailed
 ### Related Projects Setup
 The following projects must be deployed at the same level (all share TN_Doc configuration):
 - TN_KMH: `git clone http://192.168.100.100/orpovy/ivk/tn_kmh.git`
-- TN_MessagingService: `git clone http://192.168.100.100/orpovy/ivk/tn_messagingservice.git` 
+- TN_MessagingService: `git clone http://192.168.100.100/orpovy/ivk/tn_messagingservice.git`
   - Use "samara_build" branch for OPC DA support (older IVK systems)
   - Master branch for standard OPC UA communication
 - TN.ElisConnector (for ELIS integration): `git clone http://192.168.100.100/orpovy/ivk/tn.elisconnector.git`
@@ -201,7 +201,7 @@ The following projects must be deployed at the same level (all share TN_Doc conf
 ### Document Module Pattern
 Each document type module implements a consistent pattern:
 - **Class Library**: Contains document-specific business logic
-- **Configuration Files**: 
+- **Configuration Files**:
   - Document config: `TN_Doc/Cfg/Cfg{DocumentType}.json`
   - Edit form config: `TN_Doc/Cfg/CfgEdit{DocumentType}.json`
 - **FastReport Template**: `TN_Doc/Doc/{Number}_{DocumentType}.frx`
@@ -346,7 +346,7 @@ The application includes a real-time status bar built with **Vue 3 + PrimeVue** 
   - Message: Error notifications
   - Tooltip: Contextual help
 
-### Document Generation Architecture  
+### Document Generation Architecture
 The system uses a factory pattern with dynamic module loading:
 - **IAppConfigService**: Singleton that manages configuration and provides `GetDocumentClass(idDevice, idDoc)` factory method
 - **Document Classes**: Each document type implements standard interface with methods:
@@ -558,10 +558,3 @@ Configuration follows a layered approach:
 - **v1.3.6**: Template corrections and passport improvements
 - **v1.3.5**: Fixed document loading for IVK-2/IVK-3 devices
 - **v1.3.4**: Platform-specific log paths, PVL/PVS enabled by default
-
-# important-instruction-reminders
-Do what has been asked; nothing more, nothing less.
-NEVER create files unless they're absolutely necessary for achieving your goal.
-ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
-- комить и пуш изменения при окончании доработок
