@@ -3494,9 +3494,9 @@
     "Path": "/archive/cpa.reports"
   },
   "Elis": {
-    "Use": false,
-    "OstKey": "ostKey",
-    "SiknKey": "siknKey",
+    "Use": true,
+    "OstKey": "4",
+    "SiknKey": "J-00282",
     "ClientName": "clientName",
     "ClientToken": ""
   },
