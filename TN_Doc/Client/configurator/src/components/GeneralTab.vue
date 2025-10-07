@@ -237,4 +237,41 @@ const armOpcSettings = computed({
 :deep(.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider) {
   transform: translateX(1rem);
 }
+
+/* Кастомные стили для переключателя OPC */
+:deep(.p-selectbutton .p-togglebutton) {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.9rem !important;
+  border: 1px solid #dee2e6 !important;
+  background-color: #ffffff !important;
+  color: #495057 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton:hover) {
+  background-color: #f8f9fa !important;
+  border-color: #adb5bd !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
+  background-color: #0b5ed7 !important;
+  border-color: #0a58ca !important;
+}
+
+/* Исправляем внутренний контент активной кнопки */
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
 </style>
