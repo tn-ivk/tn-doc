@@ -160,7 +160,7 @@ const armOpcSettings = computed({
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0;
+  margin-bottom: 0.75rem;
 }
 
 .field-horizontal label {
@@ -196,7 +196,8 @@ const armOpcSettings = computed({
 .opc-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  flex: 1;
 }
 
 .mt-2 {
