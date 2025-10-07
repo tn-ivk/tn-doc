@@ -258,17 +258,16 @@ public class StatusProvider : IStatusProvider
         {
             // ELIS проверка через TN.ElisConnector (отдельный сервис)
             // Пока просто проверяем, что конфигурация заполнена
-            if (!string.IsNullOrEmpty(elisConfig.ClientName) &&
-                !string.IsNullOrEmpty(elisConfig.OstKey))
+            if (elisConfig.Use)
             {
                 // Считаем ELIS настроенным, если есть ключевые параметры
                 status.IsConnected = true;
-                _logger.LogDebug("Конфигурация ELIS присутствует");
+                _logger.LogDebug("Конфигурация ELIS используется");
             }
             else
             {
-                status.Error = "Конфигурация ELIS неполная";
-                _logger.LogDebug("Конфигурация ELIS неполная");
+                status.Error = "Конфигурация ELIS не используется";
+                _logger.LogDebug("Конфигурация ELIS не используется");
             }
 
             // TODO: Реализовать реальную проверку через TN.ElisConnector
