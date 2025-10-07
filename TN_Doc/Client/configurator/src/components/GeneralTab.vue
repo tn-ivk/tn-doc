@@ -274,4 +274,19 @@ const armOpcSettings = computed({
   background-color: transparent !important;
   color: #ffffff !important;
 }
+
+/* Стили для кнопки настроек OPC (многоточие) */
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
+  background-color: #e9ecef !important;
+  color: #212529 !important;
+  border-color: #adb5bd !important;
+}
 </style>
