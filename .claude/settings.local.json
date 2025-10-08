@@ -33,7 +33,12 @@
       "Bash(curl:*)",
       "Bash(git log:*)",
       "Bash(npm run build:statusbar:*)",
-      "Bash(git -C tn.docgeneral log --oneline -5)"
+      "Bash(git -C tn.docgeneral log --oneline -5)",
+      "Bash(git -C tn.docgeneral add .)",
+      "Bash(git -C tn.docgeneral status)",
+      "Bash(git -C tn.docgeneral log --oneline -3)",
+      "Bash(git -C tn.docgeneral commit -m \"$(cat <<''EOF''\nДобавлено логирование сохранения HTML форм в GetEditDoc во всех 37 библиотеках документов\n\n- Заменена конкатенация строк на Path.Combine для кроссплатформенности\n- Добавлено логирование успешного сохранения с указанием полного пути к файлу\n- Обновлены все библиотеки: Act, Poverka (18), KMH (18)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -C tn.docgeneral push)"
     ],
     "deny": [],
     "ask": []
