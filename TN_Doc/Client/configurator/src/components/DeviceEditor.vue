@@ -29,31 +29,60 @@
 
         <!-- Список документов -->
         <Panel header="Документы" class="mt-3">
-          <div class="field">
-            <label>Используемые документы</label>
-            <MultiSelect
-              v-model="deviceDocs"
-              :options="availableDocs"
-              option-label="Name"
-              option-value="IdDoc"
-              placeholder="Выберите документы"
-              class="w-full"
-              display="chip"
-            />
-            <MixedStateWarning v-if="isMixed('Docs')" class="mt-2" />
-          </div>
-
-          <!-- Шаблоны документов -->
-          <div v-if="!hasMultipleSelection" class="templates-section mt-2">
-            <DocumentTemplates
-              v-for="doc in selectedDevices[0]?.Docs || []"
-              :key="doc.IdDoc"
-              :document="doc"
-              :device-id="selectedDevices[0].IdDevice"
-              @update:template="handleTemplateUpdate"
-            />
-          </div>
+          <template v-if="!hasMultipleSelection">
+            <DataTable :value="docsList" dataKey="IdDoc" :rows="10" responsive-layout="scroll">
+              <Column field="Name" header="Документ" />
+              <Column header="Использовать" :style="{ width: '180px' }">
+                <template #body="{ data }">
+                  <div class="flex align-items-center gap-2">
+                    <InputSwitch :model-value="data.Use" @update:model-value="v => onToggleDocUse(data.IdDoc, v)" />
+                    <MixedStateWarning v-if="isMixed('Docs')" />
+                  </div>
+                </template>
+              </Column>
+              <Column header="Шаблоны">
+                <template #body="{ data }">
+                  <div class="flex align-items-center gap-2 flex-wrap">
+                    <template v-if="getSelectedTemplates(data)?.length">
+                      <Tag v-for="(tpl, i) in getSelectedTemplates(data).slice(0, 3)" :key="tpl.Id" :value="tpl.Name" rounded />
+                      <span v-if="getSelectedTemplates(data).length > 3">+{{ getSelectedTemplates(data).length - 3 }}</span>
+                    </template>
+                    <Button label="Изменить…" size="small" text @click="openTemplatesDialog(data.IdDoc)" />
+                  </div>
+                </template>
+              </Column>
+            </DataTable>
+          </template>
+          <template v-else>
+            <Message severity="info">Настройка документов доступна при выборе одного устройства</Message>
+          </template>
         </Panel>
+
+        <!-- Диалог выбора шаблонов для документа -->
+        <Dialog v-model:visible="templatesDialogVisible" modal header="Выбор шаблонов" :style="{ width: '720px' }">
+          <div class="grid">
+            <div class="col-7">
+              <MultiSelect
+                v-model="dialogTemplateIds"
+                :options="dialogTemplatesAll"
+                option-label="Name"
+                option-value="Id"
+                filter
+                class="w-full"
+                placeholder="Найдите шаблон…"
+              />
+            </div>
+            <div class="col-5">
+              <div class="flex gap-2 flex-wrap">
+                <Tag v-for="tid in dialogTemplateIds" :key="tid" :value="templateNameById(tid)" rounded />
+              </div>
+            </div>
+          </div>
+          <template #footer>
+            <Button label="Отмена" severity="secondary" @click="templatesDialogVisible = false" />
+            <Button label="Сохранить" class="btn-primary" @click="saveTemplatesForCurrentDoc" />
+          </template>
+        </Dialog>
 
         <!-- База данных -->
         <Panel header="Подключение к БД" class="mt-3">
@@ -239,6 +268,9 @@ import Message from 'primevue/message';
 import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Tag from 'primevue/tag';
 import OpcSettings from './OpcSettings.vue';
 import MixedStateWarning from './MixedStateWarning.vue';
 import DocumentTemplates from './DocumentTemplates.vue';
@@ -253,11 +285,60 @@ const opcTypes = [
   { label: 'OPC UA', value: OpcType.UA }
 ];
 
-// Все доступные документы (из первого устройства как пример)
-const availableDocs = computed(() => {
-  if (selectedDevices.value.length === 0) return [];
+// Документы текущего устройства (только при одиночном выборе)
+const docsList = computed(() => {
+  if (selectedDevices.value.length !== 1) return [] as Device['Docs'];
   return selectedDevices.value[0].Docs || [];
 });
+
+function onToggleDocUse(docId: number, use: boolean) {
+  if (selectedDevices.value.length !== 1) return;
+  const device = selectedDevices.value[0];
+  const updatedDocs = device.Docs.map(d => d.IdDoc === docId ? { ...d, Use: use } : d);
+  configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
+}
+
+function getSelectedTemplates(doc: Device['Docs'][number]) {
+  return (doc.TemplateDocs || []).filter(t => t.Use);
+}
+
+// Состояние диалога выбора шаблонов
+const templatesDialogVisible = ref(false);
+const dialogDocId = ref<number | null>(null);
+const dialogTemplateIds = ref<number[]>([]);
+
+const dialogTemplatesAll = computed(() => {
+  if (selectedDevices.value.length !== 1 || dialogDocId.value == null) return [] as any[];
+  const device = selectedDevices.value[0];
+  const doc = device.Docs.find(d => d.IdDoc === dialogDocId.value);
+  return doc?.TemplateDocs || [];
+});
+
+function templateNameById(id: number): string {
+  const all = dialogTemplatesAll.value as any[];
+  return all.find(t => t.Id === id)?.Name || String(id);
+}
+
+function openTemplatesDialog(docId: number) {
+  if (selectedDevices.value.length !== 1) return;
+  dialogDocId.value = docId;
+  const device = selectedDevices.value[0];
+  const doc = device.Docs.find(d => d.IdDoc === docId);
+  dialogTemplateIds.value = (doc?.TemplateDocs || []).filter(t => t.Use).map(t => t.Id);
+  templatesDialogVisible.value = true;
+}
+
+function saveTemplatesForCurrentDoc() {
+  if (selectedDevices.value.length !== 1 || dialogDocId.value == null) return;
+  const device = selectedDevices.value[0];
+  const updatedDocs = device.Docs.map(d => {
+    if (d.IdDoc !== dialogDocId.value) return d;
+    const templates = (d.TemplateDocs || []).map(t => ({ ...t, Use: dialogTemplateIds.value.includes(t.Id) }));
+    return { ...d, TemplateDocs: templates };
+  });
+  configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
+  templatesDialogVisible.value = false;
+}
 
 // Проверка наличия подключений к БД
 const hasDBConnections = computed(() => {
