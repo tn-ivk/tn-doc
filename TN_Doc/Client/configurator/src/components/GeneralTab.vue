@@ -110,8 +110,8 @@ const opcType = computed({
     const apiType = currentConfig.value?.ArmOpcConnectionSettings?.Type;
     
     // Маппинг числовых значений в строковые
-    if ((apiType as any) === 1) return OpcType.DA;
-    if ((apiType as any) === 2) return OpcType.UA;
+    if ((apiType as any) === 0) return OpcType.DA;
+    if ((apiType as any) === 1) return OpcType.UA;
     
     // Если значение уже строковое, возвращаем как есть
     if (apiType === OpcType.DA || apiType === OpcType.UA) return apiType;
@@ -123,7 +123,7 @@ const opcType = computed({
     const currentSettings = currentConfig.value?.ArmOpcConnectionSettings;
     if (currentSettings) {
       // Маппинг строковых значений в числовые для API
-      const numericValue = value === OpcType.DA ? 1 : 2;
+      const numericValue = value === OpcType.DA ? 0 : 1;
       
       configStore.updateGeneralSettings({
         ArmOpcConnectionSettings: {
@@ -133,7 +133,7 @@ const opcType = computed({
       });
     } else {
       // Создаем новые настройки с дефолтными значениями
-      const numericValue = value === OpcType.DA ? 1 : 2;
+      const numericValue = value === OpcType.DA ? 0 : 1;
       
       configStore.updateGeneralSettings({
         ArmOpcConnectionSettings: {
