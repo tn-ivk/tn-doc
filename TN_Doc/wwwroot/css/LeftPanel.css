@@ -315,6 +315,13 @@ select.invalid-cell-content {
     padding-top: 1px;
 }
 
+/* Стили для заголовка таблицы DataTable */
+#DataTable thead th {
+    padding: 0.25rem 0.5rem;
+    height: auto;
+    line-height: 1.2;
+}
+
 /* Стили для строки поиска DataTables */
 #DataTable_filter label {
     display: flex;
