@@ -177,14 +177,20 @@ function handleCancel() {
 }
 
 .configurator-footer button.btn-primary {
-  color: #fff;
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+  color: #ffffff; /* Белый текст */
+  background-color: #1b6ec2; /* Основной синий */
+  border-color: #1861ac; /* Синий (темнее) для границы */
 }
 
 .configurator-footer button.btn-primary:hover:not(:disabled) {
-  background-color: #0b5ed7;
-  border-color: #0a58ca;
+  background-color: #155a9e; /* Темно-синий при наведении */
+  border-color: #155a9e;
+}
+
+.configurator-footer button.btn-primary:disabled {
+  background-color: #cccccc; /* Серый для disabled */
+  border-color: #cccccc;
+  color: #666666; /* Темно-серый текст для disabled */
 }
 
 .configurator-footer button.btn-danger {
