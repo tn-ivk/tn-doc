@@ -17,7 +17,7 @@
 
       <div class="editor-sections">
         <!-- Использование устройства -->
-        <Panel header="Основные настройки">
+        <Panel>
           <div class="field field-horizontal">
             <label for="device-use">Использовать устройство:</label>
             <div class="flex align-items-center">
