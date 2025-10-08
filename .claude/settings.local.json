@@ -32,7 +32,8 @@
       "Bash(npm run build:all:*)",
       "Bash(curl:*)",
       "Bash(git log:*)",
-      "Bash(npm run build:statusbar:*)"
+      "Bash(npm run build:statusbar:*)",
+      "Bash(git -C tn.docgeneral log --oneline -5)"
     ],
     "deny": [],
     "ask": []
