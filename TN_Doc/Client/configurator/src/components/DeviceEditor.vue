@@ -69,6 +69,28 @@
             </div>
 
             <div class="field">
+              <label>Пользователь</label>
+              <InputText
+                v-model="dbUser"
+                placeholder="user"
+                class="w-full"
+              />
+              <MixedStateWarning v-if="isMixed('DBConnectionStrings.Userid')" class="mt-2" />
+            </div>
+
+            <div class="field">
+              <label>Пароль</label>
+              <Password
+                v-model="dbPassword"
+                placeholder="Введите пароль"
+                :feedback="false"
+                toggleMask
+                class="w-full"
+              />
+              <MixedStateWarning v-if="isMixed('DBConnectionStrings.Password')" class="mt-2" />
+            </div>
+
+            <div class="field">
               <label>База данных</label>
               <InputText
                 v-model="dbDatabase"
@@ -79,13 +101,29 @@
             </div>
 
             <div class="field">
-              <label>Таймаут (сек)</label>
+              <label>Таймаут соединения (сек)</label>
               <InputNumber
                 v-model="dbTimeout"
                 :min="1"
                 :max="300"
               />
               <MixedStateWarning v-if="isMixed('DBConnectionStrings.ConnectionTimeout')" class="mt-2" />
+            </div>
+
+            <!-- Информация о всех соединениях -->
+            <div v-if="allDBConnections.length > 1" class="field">
+              <label>Все подключения для устройства</label>
+              <div class="db-connections-info">
+                <div v-for="(conn, index) in allDBConnections" :key="index" class="connection-item">
+                  <div class="connection-header">
+                    <i :class="conn.Use ? 'pi pi-check-circle text-green-500' : 'pi pi-times-circle text-red-500'" />
+                    <span class="connection-title">Подключение {{ index + 1 }}</span>
+                  </div>
+                  <div class="connection-details">
+                    <small>Сервер: {{ conn.Server }} | Пользователь: {{ conn.Userid }} | БД: {{ conn.Database }}</small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <Message v-else severity="info">
@@ -95,44 +133,84 @@
 
         <!-- OPC настройки -->
         <Panel header="OPC подключение" class="mt-3">
-          <OpcSettings
-            v-if="deviceOpcSettings"
-            v-model="deviceOpcSettings"
-            :show-type-selector="true"
-          />
+          <div v-if="deviceOpcSettings" class="opc-settings-container">
+            <div class="field field-horizontal">
+              <label>Тип OPC:</label>
+              <div class="opc-controls">
+                <SelectButton
+                  v-model="deviceOpcType"
+                  :options="opcTypes"
+                  option-label="label"
+                  option-value="value"
+                />
+                <Button
+                  icon="pi pi-ellipsis-h"
+                  @click="showOpcDialog = true"
+                  severity="secondary"
+                  text
+                  size="small"
+                  aria-label="Настройки OPC"
+                />
+              </div>
+            </div>
+          </div>
           <Message v-else severity="info">
             OPC настройки не заданы
           </Message>
         </Panel>
 
+        <!-- Модальное окно настроек OPC -->
+        <Dialog
+          v-model:visible="showOpcDialog"
+          modal
+          header="Настройки OPC"
+          :style="{ width: '500px' }"
+        >
+          <OpcSettings
+            v-model="deviceOpcSettings"
+            :show-type-selector="false"
+          />
+          <template #footer>
+            <Button
+              label="Закрыть"
+              icon="pi pi-times"
+              @click="showOpcDialog = false"
+              severity="secondary"
+            />
+          </template>
+        </Dialog>
+
         <!-- Недопустимые символы -->
         <Panel header="Недопустимые символы" class="mt-3">
-          <div class="invalid-chars-section">
-            <div class="field-checkbox">
-              <Checkbox
-                v-model="invalidChars"
-                input-id="char-quote"
-                value='"'
-              />
-              <label for="char-quote">Двойные кавычки (")</label>
-            </div>
+          <div class="field field-horizontal">
+            <label>Недопустимые символы:</label>
+            <div class="invalid-chars-section">
+              <div class="field-checkbox">
+                <Checkbox
+                  v-model="invalidChars"
+                  input-id="char-quote"
+                  value='"'
+                />
+                <label for="char-quote">Двойные кавычки (")</label>
+              </div>
 
-            <div class="field-checkbox">
-              <Checkbox
-                v-model="invalidChars"
-                input-id="char-apostrophe"
-                value="'"
-              />
-              <label for="char-apostrophe">Одинарные кавычки (')</label>
-            </div>
+              <div class="field-checkbox">
+                <Checkbox
+                  v-model="invalidChars"
+                  input-id="char-apostrophe"
+                  value="'"
+                />
+                <label for="char-apostrophe">Одинарные кавычки (')</label>
+              </div>
 
-            <div class="field-checkbox">
-              <Checkbox
-                v-model="invalidChars"
-                input-id="char-backslash"
-                value="\\"
-              />
-              <label for="char-backslash">Обратный слеш (\\)</label>
+              <div class="field-checkbox">
+                <Checkbox
+                  v-model="invalidChars"
+                  input-id="char-backslash"
+                  value="\\"
+                />
+                <label for="char-backslash">Обратный слеш (\\)</label>
+              </div>
             </div>
           </div>
           <MixedStateWarning v-if="isMixed('InvalidChars')" class="mt-2" />
@@ -143,25 +221,37 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useConfigStore } from '../stores/configStore';
 import type { Device, OpcConnectionSettings } from '../types/config.types';
+import { OpcType } from '../types/config.types';
 import _ from 'lodash';
 
 import Panel from 'primevue/panel';
 import InputSwitch from 'primevue/inputswitch';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
+import Password from 'primevue/password';
 import MultiSelect from 'primevue/multiselect';
 import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
+import SelectButton from 'primevue/selectbutton';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
 import OpcSettings from './OpcSettings.vue';
 import MixedStateWarning from './MixedStateWarning.vue';
 import DocumentTemplates from './DocumentTemplates.vue';
 
 const configStore = useConfigStore();
 const { selectedDevices, hasMultipleSelection } = storeToRefs(configStore);
+
+const showOpcDialog = ref(false);
+
+const opcTypes = [
+  { label: 'OPC DA', value: OpcType.DA },
+  { label: 'OPC UA', value: OpcType.UA }
+];
 
 // Все доступные документы (из первого устройства как пример)
 const availableDocs = computed(() => {
@@ -232,6 +322,42 @@ const dbServer = computed({
   }
 });
 
+// DB User
+const dbUser = computed({
+  get: () => {
+    if (selectedDevices.value.length === 0) return '';
+    const conn = selectedDevices.value[0].DBConnectionStrings?.[0];
+    return conn?.Userid || '';
+  },
+  set: (value: string) => {
+    selectedDevices.value.forEach(device => {
+      if (device.DBConnectionStrings && device.DBConnectionStrings.length > 0) {
+        const updated = [...device.DBConnectionStrings];
+        updated[0] = { ...updated[0], Userid: value };
+        configStore.updateDeviceSettings(device.IdDevice, 'DBConnectionStrings', updated);
+      }
+    });
+  }
+});
+
+// DB Password
+const dbPassword = computed({
+  get: () => {
+    if (selectedDevices.value.length === 0) return '';
+    const conn = selectedDevices.value[0].DBConnectionStrings?.[0];
+    return conn?.Password || '';
+  },
+  set: (value: string) => {
+    selectedDevices.value.forEach(device => {
+      if (device.DBConnectionStrings && device.DBConnectionStrings.length > 0) {
+        const updated = [...device.DBConnectionStrings];
+        updated[0] = { ...updated[0], Password: value };
+        configStore.updateDeviceSettings(device.IdDevice, 'DBConnectionStrings', updated);
+      }
+    });
+  }
+});
+
 // DB Database
 const dbDatabase = computed({
   get: () => {
@@ -268,6 +394,12 @@ const dbTimeout = computed({
   }
 });
 
+// All DB Connections
+const allDBConnections = computed(() => {
+  if (selectedDevices.value.length === 0) return [];
+  return selectedDevices.value[0].DBConnectionStrings || [];
+});
+
 // OPC Settings
 const deviceOpcSettings = computed({
   get: () => {
@@ -277,6 +409,56 @@ const deviceOpcSettings = computed({
   set: (value: OpcConnectionSettings | undefined) => {
     selectedDevices.value.forEach(device => {
       configStore.updateDeviceSettings(device.IdDevice, 'OpcConnectionSettings', value);
+    });
+  }
+});
+
+// OPC Type
+const deviceOpcType = computed({
+  get: () => {
+    if (selectedDevices.value.length === 0) return OpcType.UA;
+    const settings = selectedDevices.value[0].OpcConnectionSettings;
+    if (!settings) return OpcType.UA;
+    
+    // Маппинг числовых значений в строковые
+    if ((settings.Type as any) === 0) return OpcType.DA;
+    if ((settings.Type as any) === 1) return OpcType.UA;
+    
+    // Если значение уже строковое, возвращаем как есть
+    if (settings.Type === OpcType.DA || settings.Type === OpcType.UA) return settings.Type;
+    
+    return OpcType.UA;
+  },
+  set: (value: OpcType) => {
+    selectedDevices.value.forEach(device => {
+      const currentSettings = device.OpcConnectionSettings;
+      if (currentSettings) {
+        // Маппинг строковых значений в числовые для API
+        const numericValue = value === OpcType.DA ? 0 : 1;
+        
+        configStore.updateDeviceSettings(device.IdDevice, 'OpcConnectionSettings', {
+          ...currentSettings,
+          Type: numericValue as any
+        });
+      } else {
+        // Создаем новые настройки с дефолтными значениями
+        const numericValue = value === OpcType.DA ? 0 : 1;
+        
+        configStore.updateDeviceSettings(device.IdDevice, 'OpcConnectionSettings', {
+          Type: numericValue as any,
+          DaSettings: {
+            Host: '127.0.0.1',
+            ProgId: 'psregulopcda_01',
+            StartPrefix: 'Root.PLC1.IVK_TN_01',
+            UpdateRate: 500
+          },
+          UaSettings: {
+            ConfigFilename: 'opcua-config.xml',
+            StartPrefix: 'ns=2;s=Root.PLC1',
+            UpdateRate: 500
+          }
+        });
+      }
     });
   }
 });
@@ -364,6 +546,7 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
   display: flex;
   gap: 1.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .field-horizontal {
@@ -432,5 +615,117 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
 
 .align-items-center {
   align-items: center;
+}
+
+/* Стили для информации о подключениях к БД */
+.db-connections-info {
+  border: 1px solid var(--surface-200);
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  background-color: var(--surface-50);
+}
+
+.connection-item {
+  margin-bottom: 0.5rem;
+  padding: 0.375rem;
+  border-radius: 0.25rem;
+  background-color: var(--surface-0);
+  border: 1px solid var(--surface-100);
+}
+
+.connection-item:last-child {
+  margin-bottom: 0;
+}
+
+.connection-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.connection-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.connection-details {
+  color: var(--text-color-secondary);
+  font-size: 0.8rem;
+}
+
+.text-green-500 {
+  color: #10b981;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+/* Стили для OPC контролов */
+.opc-settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.opc-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+/* Кастомные стили для переключателя OPC */
+:deep(.p-selectbutton .p-togglebutton) {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.9rem !important;
+  border: 1px solid #dee2e6 !important;
+  background-color: #ffffff !important;
+  color: #495057 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton:hover) {
+  background-color: #f8f9fa !important;
+  border-color: #adb5bd !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
+  background-color: #0b5ed7 !important;
+  border-color: #0a58ca !important;
+}
+
+/* Исправляем внутренний контент активной кнопки */
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+/* Стили для кнопки настроек OPC (многоточие) */
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
+  background-color: #e9ecef !important;
+  color: #212529 !important;
+  border-color: #adb5bd !important;
 }
 </style>
