@@ -306,16 +306,22 @@ Real-time data acquisition from measurement systems:
 
 ### Service Architecture
 The application uses dependency injection with the following key services:
+
+**TN_Doc Services:**
 - **IAppConfigService**: Singleton configuration management and document class factory
 - **PrinterService**: Platform-specific printing (Windows/Linux)
 - **DirectoryService**: File system operations
 - **DbContext**: Entity Framework database context
 - **AppInfoProvider**: Application version information
-- **IReportBuffer**: Singleton for in-memory PDF storage
 - **IDbSchemaCache**: Scoped service for caching database schema information
 - **IDocModuleLoader**: Singleton for dynamic loading of document modules
 - **IStatusProvider**: Scoped service for system health monitoring
 - **StatusMonitoringService**: Background hosted service for continuous status monitoring
+- **ConnectionTracker**: Tracks active SignalR connections to optimize background checks
+
+**TN.DocGeneral Shared Services:**
+- **IReportBuffer**: Singleton for in-memory PDF storage (no external dependencies)
+- **LoggingPathService**: Static utility for platform-specific log paths (accepts `applicationName` parameter)
 
 Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
 
@@ -336,9 +342,15 @@ The application includes a real-time status bar built with **Vue 3 + PrimeVue** 
 - **Configuration-Driven**: Dynamically creates indicators based on `CfgApp.json` device/OPC settings
 - **Backend Components**:
   - `StatusHub`: SignalR hub at `/statusHub` for broadcasting status updates
-  - `StatusMonitoringService`: Background service that periodically checks system health
+  - `StatusMonitoringService`: Background service that periodically checks system health (every 60s)
   - `StatusProvider`: Service that queries database, OPC, MessagingService, and ELIS endpoints
+  - `StatusController`: REST API endpoint `/api/status` with 5-second caching
   - HTTP clients configured with timeouts (2s for MessagingService, 5s for ELIS)
+- **ELIS Indicator Logic**:
+  - Shown only when `CfgApp.json → Elis.Use = true`
+  - Current implementation: checks if ELIS configuration is enabled (not real connection test)
+  - TODO: Implement real health check via TN.ElisConnector endpoint
+  - Status determined by `CheckElisServiceAsync()` in StatusProvider
 - **PrimeVue Components Used**:
   - Badge: Status indicators with color coding
   - Button: Refresh action with loading state
@@ -540,6 +552,8 @@ Configuration follows a layered approach:
 - Updated docgeneral to version 1.2.2
 - ⚠️ Status bar improvements: Removed time display and project version info from status bar
 - Cleaned up status bar JavaScript to remove unused time update functionality
+- **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/LoggingPathService.cs` for reusability across projects (TN_Doc, TN_KMH, etc.). Now accepts `applicationName` parameter for dynamic log paths
+- **ReportBuffer cleanup**: Removed unused `_preparedReport` field and FastReport dependency. Class now only stores PDF bytes without external dependencies
 
 ### Previous Changes (v1.4.1)
 - 🐞 Fixed incorrect population of Act shifts when filling "reverse" passports
