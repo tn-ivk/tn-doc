@@ -705,8 +705,17 @@ function InitTableDocs() {
 
             columns:
                 [
-                    {data: 'dt'},
-                    {data: 'description'}
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            // Для отображения и фильтрации объединяем дату и описание
+                            if (type === 'display' || type === 'filter') {
+                                return row.dt + ' ' + row.description;
+                            }
+                            // Для сортировки используем дату
+                            return row.dt;
+                        }
+                    }
                 ],
         });
 
