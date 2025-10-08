@@ -105,21 +105,39 @@ const opcTypes = [
 ];
 
 const opcType = computed({
-  get: () => currentConfig.value?.ArmOpcConnectionSettings?.Type || OpcType.UA,
+  get: () => {
+    // Получаем значение из API (может быть числом или строкой)
+    const apiType = currentConfig.value?.ArmOpcConnectionSettings?.Type;
+    
+    // Маппинг числовых значений в строковые
+    if ((apiType as any) === 1) return OpcType.DA;
+    if ((apiType as any) === 2) return OpcType.UA;
+    
+    // Если значение уже строковое, возвращаем как есть
+    if (apiType === OpcType.DA || apiType === OpcType.UA) return apiType;
+    
+    // Если не удалось замапить, возвращаем undefined для неопределенного состояния
+    return undefined;
+  },
   set: (value: OpcType) => {
     const currentSettings = currentConfig.value?.ArmOpcConnectionSettings;
     if (currentSettings) {
+      // Маппинг строковых значений в числовые для API
+      const numericValue = value === OpcType.DA ? 1 : 2;
+      
       configStore.updateGeneralSettings({
         ArmOpcConnectionSettings: {
           ...currentSettings,
-          Type: value
+          Type: numericValue as any // Временно используем any для обхода типов
         }
       });
     } else {
       // Создаем новые настройки с дефолтными значениями
+      const numericValue = value === OpcType.DA ? 1 : 2;
+      
       configStore.updateGeneralSettings({
         ArmOpcConnectionSettings: {
-          Type: value,
+          Type: numericValue as any, // Временно используем any для обхода типов
           DaSettings: {
             Host: '127.0.0.1',
             ProgId: 'psregulopcda_01',
