@@ -155,21 +155,23 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
 }
 
 /* Buttons */
-.btn, table.mainTable input[type=button], table.mainTable button, .filterButton {
+.btn, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   border-radius: var(--md-radius) !important;
   padding: 6px 12px !important; /* Reduced padding to fit height */
   font-weight: 600;
   letter-spacing: .01em;
   height: 37px !important; /* Match select height */
   line-height: 1.2 !important;
+  vertical-align: middle !important; /* Align with comboboxes */
+  margin-top: -3px !important; /* Fine-tune vertical alignment */
 }
 
-.btn-primary, table.mainTable input[type=button], table.mainTable button, .filterButton {
+.btn-primary, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   background: var(--md-primary) !important;
   color: #fff !important;
   border: 1px solid color-mix(in srgb, var(--md-primary) 80%, #000) !important;
 }
-.btn-primary:hover, table.mainTable input[type=button]:hover, table.mainTable button:hover, .filterButton:hover {
+.btn-primary:hover, table.mainTable input[type=button]:hover, table.mainTable button:hover, .filterButton:hover, button:hover {
   background: var(--md-primary-hover) !important;
 }
 .btn-outline-primary {
@@ -226,7 +228,8 @@ select option:checked, select option[selected] {
   color: white !important;
 }
 select option:hover {
-  background: var(--md-surface-variant) !important;
+  background: var(--md-primary) !important;
+  color: white !important;
 }
 
 /* Nav pills / Tabs */
