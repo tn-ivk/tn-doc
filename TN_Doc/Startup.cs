@@ -54,7 +54,7 @@ public class Startup
 		services.AddScoped<IConfigurationService, ConfigurationService>();
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
-		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
+		services.AddSingleton<IDocModuleLoader, CachedDocModuleLoader>();
 
 		// Status Bar сервисы
 		services.AddSignalR();
