@@ -131,8 +131,12 @@ function handleDeviceItemClick(event: MouseEvent, deviceId: number) {
 }
 
 .selection-info {
-  margin-top: 0.5rem;
-  padding: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0 0.5rem;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--surface-50);
   border-radius: 4px;
   text-align: center;
