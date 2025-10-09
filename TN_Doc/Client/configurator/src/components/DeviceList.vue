@@ -16,7 +16,7 @@
           :data-device-id="slotProps.option.IdDevice"
           @click="handleDeviceItemClick($event, slotProps.option.IdDevice)"
         >
-          <i :class="slotProps.option.Use ? 'pi pi-check-circle text-blue-500' : 'pi pi-times-circle text-red-500'" />
+          <i :class="getDeviceIconClass(slotProps.option)" />
           <span class="device-name">{{ slotProps.option.Name }}</span>
           <span v-if="slotProps.option.Description" class="device-description">
             {{ slotProps.option.Description }}
@@ -100,6 +100,13 @@ function handleDeviceItemClick(event: MouseEvent, deviceId: number) {
     configStore.selectDevices([deviceId]);
   }
 }
+
+function getDeviceIconClass(device: { Use?: boolean } | undefined) {
+  if (device?.Use) {
+    return 'pi pi-bolt text-blue-500';
+  }
+  return 'pi pi-lock text-gray-500';
+}
 </script>
 
 <style scoped>
@@ -151,5 +158,9 @@ function handleDeviceItemClick(event: MouseEvent, deviceId: number) {
 
 .text-red-500 {
   color: var(--red-500);
+}
+
+.text-gray-500 {
+  color: var(--text-color-secondary);
 }
 </style>

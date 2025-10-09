@@ -16,23 +16,21 @@
       </div>
 
       <div class="editor-sections">
-        <!-- Использование устройства -->
-        <Panel>
-          <div class="field field-horizontal">
-            <label for="device-use">Использовать устройство:</label>
+        <!-- Использование устройства (без панели для уменьшения высоты) -->
+        <div class="field field-horizontal compact-section">
+          <label for="device-use">Использовать устройство:</label>
             <div class="flex align-items-center">
               <InputSwitch id="device-use" v-model="deviceUse" />
               <MixedStateWarning v-if="isMixed('Use')" class="ml-2" />
             </div>
           </div>
-        </Panel>
 
         <!-- Список документов -->
         <Panel header="Документы" class="mt-3">
           <template v-if="!hasMultipleSelection">
-            <DataTable :value="docsList" dataKey="IdDoc" :rows="10" responsive-layout="scroll">
-              <Column field="Name" header="Документ" />
-              <Column header="Использовать" :style="{ width: '180px' }">
+            <DataTable :value="docsList" dataKey="IdDoc" :rows="10" responsive-layout="scroll" class="docs-table">
+              <Column field="Name" />
+              <Column :bodyStyle="{ width: '3rem' }" :headerStyle="{ width: '3rem' }" bodyClass="col-use" class="col-use">
                 <template #body="{ data }">
                   <div class="flex align-items-center gap-2">
                     <InputSwitch :model-value="data.Use" @update:model-value="v => onToggleDocUse(data.IdDoc, v)" />
@@ -40,11 +38,18 @@
                   </div>
                 </template>
               </Column>
-              <Column header="Шаблоны">
+              <Column>
                 <template #body="{ data }">
                   <div class="flex align-items-center gap-2 flex-wrap">
                     <template v-if="getSelectedTemplates(data)?.length">
-                      <Tag v-for="(tpl, i) in getSelectedTemplates(data).slice(0, 3)" :key="tpl.Id" :value="tpl.Name" rounded />
+                      <Tag 
+                        v-for="(tpl, i) in getSelectedTemplates(data).slice(0, 3)" 
+                        :key="tpl.Id" 
+                        :value="tpl.Name" 
+                        rounded 
+                        class="template-tag-clickable"
+                        @click="toggleTemplateUse(data.IdDoc, tpl.Id)"
+                      />
                       <span v-if="getSelectedTemplates(data).length > 3">+{{ getSelectedTemplates(data).length - 3 }}</span>
                     </template>
                     <Button label="Изменить…" size="small" text @click="openTemplatesDialog(data.IdDoc)" />
@@ -61,95 +66,97 @@
         <!-- Диалог выбора шаблонов для документа -->
         <Dialog v-model:visible="templatesDialogVisible" modal header="Выбор шаблонов" :style="{ width: '720px' }">
           <div class="grid">
-            <div class="col-7">
+            <div class="col-12">
               <MultiSelect
                 v-model="dialogTemplateIds"
                 :options="dialogTemplatesAll"
                 option-label="Name"
                 option-value="Id"
-                filter
                 class="w-full"
-                placeholder="Найдите шаблон…"
+                placeholder="Выберите шаблоны…"
               />
-            </div>
-            <div class="col-5">
-              <div class="flex gap-2 flex-wrap">
-                <Tag v-for="tid in dialogTemplateIds" :key="tid" :value="templateNameById(tid)" rounded />
-              </div>
             </div>
           </div>
           <template #footer>
-            <Button label="Отмена" severity="secondary" @click="templatesDialogVisible = false" />
             <Button label="Сохранить" class="btn-primary" @click="saveTemplatesForCurrentDoc" />
+            <Button label="Отмена" severity="secondary" @click="templatesDialogVisible = false" />
           </template>
         </Dialog>
 
         <!-- База данных -->
         <Panel header="Подключение к БД" class="mt-3">
           <div v-if="hasDBConnections">
-            <div class="field">
-              <label>Сервер</label>
-              <InputText
-                v-model="dbServer"
-                placeholder="localhost"
-                class="w-full"
-              />
-              <MixedStateWarning v-if="isMixed('DBConnectionStrings.Server')" class="mt-2" />
-            </div>
-
-            <div class="field">
-              <label>Пользователь</label>
-              <InputText
-                v-model="dbUser"
-                placeholder="user"
-                class="w-full"
-              />
-              <MixedStateWarning v-if="isMixed('DBConnectionStrings.Userid')" class="mt-2" />
-            </div>
-
-            <div class="field">
-              <label>Пароль</label>
-              <Password
-                v-model="dbPassword"
-                placeholder="Введите пароль"
-                :feedback="false"
-                toggleMask
-                class="w-full"
-              />
-              <MixedStateWarning v-if="isMixed('DBConnectionStrings.Password')" class="mt-2" />
-            </div>
-
-            <div class="field">
-              <label>База данных</label>
-              <InputText
-                v-model="dbDatabase"
-                placeholder="ivk_db"
-                class="w-full"
-              />
-              <MixedStateWarning v-if="isMixed('DBConnectionStrings.Database')" class="mt-2" />
-            </div>
-
-            <div class="field">
-              <label>Таймаут соединения (сек)</label>
-              <InputNumber
-                v-model="dbTimeout"
-                :min="1"
-                :max="300"
-              />
-              <MixedStateWarning v-if="isMixed('DBConnectionStrings.ConnectionTimeout')" class="mt-2" />
-            </div>
-
-            <!-- Информация о всех соединениях -->
-            <div v-if="allDBConnections.length > 1" class="field">
-              <label>Все подключения для устройства</label>
-              <div class="db-connections-info">
-                <div v-for="(conn, index) in allDBConnections" :key="index" class="connection-item">
-                  <div class="connection-header">
+            <!-- Карточки подключений к БД -->
+            <div class="db-connections-cards">
+              <div 
+                v-for="(conn, index) in allDBConnections" 
+                :key="index" 
+                class="db-connection-card"
+                :class="{ 'connection-active': conn.Use, 'connection-inactive': !conn.Use }"
+              >
+                <div class="card-header">
+                  <div class="connection-status">
                     <i :class="conn.Use ? 'pi pi-check-circle text-green-500' : 'pi pi-times-circle text-red-500'" />
                     <span class="connection-title">Подключение {{ index + 1 }}</span>
                   </div>
-                  <div class="connection-details">
-                    <small>Сервер: {{ conn.Server }} | Пользователь: {{ conn.Userid }} | БД: {{ conn.Database }}</small>
+                  <div class="connection-toggle">
+                    <InputSwitch 
+                      :model-value="conn.Use" 
+                      @update:model-value="v => toggleConnectionUse(index, v)"
+                    />
+                  </div>
+                </div>
+                
+                <div class="card-content">
+                  <div class="connection-field-horizontal">
+                    <label>Сервер:</label>
+                    <InputText
+                      :model-value="conn.Server"
+                      @update:model-value="v => updateConnectionField(index, 'Server', v)"
+                      placeholder="localhost"
+                      class="w-full"
+                    />
+                  </div>
+                  
+                  <div class="connection-field-horizontal">
+                    <label>Пользователь:</label>
+                    <InputText
+                      :model-value="conn.Userid"
+                      @update:model-value="v => updateConnectionField(index, 'Userid', v)"
+                      placeholder="user"
+                      class="w-full"
+                    />
+                  </div>
+                  
+                  <div class="connection-field-horizontal">
+                    <label>Пароль:</label>
+                    <InputText
+                      :model-value="conn.Password"
+                      placeholder="Пароль скрыт"
+                      type="password"
+                      readonly
+                      class="w-full password-readonly"
+                    />
+                  </div>
+                  
+                  <div class="connection-field-horizontal">
+                    <label>База данных:</label>
+                    <InputText
+                      :model-value="conn.Database"
+                      @update:model-value="v => updateConnectionField(index, 'Database', v)"
+                      placeholder="ivk_db"
+                      class="w-full"
+                    />
+                  </div>
+                  
+                  <div class="connection-field-horizontal">
+                    <label>Таймаут (сек):</label>
+                    <InputNumber
+                      :model-value="conn.ConnectionTimeout"
+                      @update:model-value="v => updateConnectionField(index, 'ConnectionTimeout', v)"
+                      :min="1"
+                      :max="300"
+                    />
                   </div>
                 </div>
               </div>
@@ -560,6 +567,55 @@ const invalidChars = computed({
 function handleTemplateUpdate(deviceId: number, docId: number, templateId: number, use: boolean) {
   configStore.updateDocumentTemplate(deviceId, docId, templateId, use);
 }
+
+// Переключение использования шаблона по клику на тег
+function toggleTemplateUse(docId: number, templateId: number) {
+  if (selectedDevices.value.length !== 1) return;
+  
+  const device = selectedDevices.value[0];
+  const doc = device.Docs.find(d => d.IdDoc === docId);
+  if (!doc) return;
+  
+  const template = doc.TemplateDocs?.find(t => t.Id === templateId);
+  if (!template) return;
+  
+  // Переключаем признак использования шаблона
+  const updatedDocs = device.Docs.map(d => {
+    if (d.IdDoc !== docId) return d;
+    const templates = (d.TemplateDocs || []).map(t => 
+      t.Id === templateId ? { ...t, Use: !t.Use } : t
+    );
+    return { ...d, TemplateDocs: templates };
+  });
+  
+  configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
+}
+
+// Переключение использования подключения к БД
+function toggleConnectionUse(connectionIndex: number, use: boolean) {
+  if (selectedDevices.value.length !== 1) return;
+  
+  const device = selectedDevices.value[0];
+  if (!device.DBConnectionStrings || connectionIndex >= device.DBConnectionStrings.length) return;
+  
+  const updatedConnections = [...device.DBConnectionStrings];
+  updatedConnections[connectionIndex] = { ...updatedConnections[connectionIndex], Use: use };
+  
+  configStore.updateDeviceSettings(device.IdDevice, 'DBConnectionStrings', updatedConnections);
+}
+
+// Обновление поля подключения к БД
+function updateConnectionField(connectionIndex: number, field: string, value: any) {
+  if (selectedDevices.value.length !== 1) return;
+  
+  const device = selectedDevices.value[0];
+  if (!device.DBConnectionStrings || connectionIndex >= device.DBConnectionStrings.length) return;
+  
+  const updatedConnections = [...device.DBConnectionStrings];
+  updatedConnections[connectionIndex] = { ...updatedConnections[connectionIndex], [field]: value };
+  
+  configStore.updateDeviceSettings(device.IdDevice, 'DBConnectionStrings', updatedConnections);
+}
 </script>
 
 <style scoped>
@@ -587,7 +643,7 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
 .editor-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .editor-header h3 {
@@ -636,6 +692,10 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
   align-items: center;
   gap: 1rem;
   margin-bottom: 0;
+}
+
+.compact-section {
+  padding: 0.25rem 0.25rem; /* компактнее, чем panel-content */
 }
 
 .field-horizontal label {
@@ -809,5 +869,167 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
   background-color: #e9ecef !important;
   color: #212529 !important;
   border-color: #adb5bd !important;
+}
+
+/* Скрытие заголовков таблицы документов */
+.docs-table :deep(.p-datatable-thead) {
+  display: none;
+}
+
+/* Компактная высота строк таблицы документов */
+.docs-table :deep(.p-datatable-tbody > tr) {
+  line-height: 1.1;
+}
+
+.docs-table :deep(.p-datatable-tbody > tr > td) {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+/* Чуть компактнее переключатель, чтобы строка стала ниже */
+.docs-table :deep(.p-datatable-tbody > tr > td .p-inputswitch) {
+  width: 2.25rem !important;
+  height: 1.25rem !important;
+}
+
+/* Компактные теги шаблонов */
+.docs-table :deep(.p-tag) {
+  padding: 0.15rem 0.4rem !important;
+  font-size: 0.85rem !important;
+  line-height: 1.1 !important;
+}
+
+/* Кнопка "Изменить…" в строке — компактнее */
+.docs-table :deep(.p-button.p-button-text.p-button-sm) {
+  padding: 0.2rem 0.35rem !important;
+  line-height: 1.1 !important;
+}
+
+/* Фиксация узкой ширины второго столбца (переключатель) */
+.docs-table :deep(.p-datatable-tbody > tr > td.col-use),
+.docs-table :deep(.p-datatable-thead > tr > th.col-use) {
+  width: 3rem !important;
+  min-width: 3rem !important;
+  max-width: 3rem !important;
+  padding-left: 0.25rem !important;
+  padding-right: 0.25rem !important;
+  text-align: center;
+}
+
+.docs-table :deep(.p-datatable-tbody > tr > td.col-use .flex.align-items-center) {
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+/* Стили для кликабельных тегов шаблонов */
+.template-tag-clickable {
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.template-tag-clickable:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Стили для карточек подключений к БД */
+.db-connections-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.db-connection-card {
+  border: 2px solid var(--surface-200);
+  border-radius: 0.5rem;
+  background-color: var(--surface-0);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.db-connection-card.connection-active {
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+}
+
+.db-connection-card.connection-inactive {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+  opacity: 0.7;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--surface-50);
+  border-bottom: 1px solid var(--surface-200);
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connection-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.connection-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.connection-field-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.connection-field-horizontal label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  margin: 0;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.connection-field-horizontal .w-full {
+  flex: 1;
+}
+
+/* Стили для заблокированного поля пароля */
+.password-readonly {
+  background-color: var(--surface-100) !important;
+  color: var(--text-color-secondary) !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+}
+
+.password-readonly:focus {
+  box-shadow: none !important;
+  border-color: var(--surface-300) !important;
+}
+
+.text-green-500 {
+  color: #10b981;
+}
+
+.text-red-500 {
+  color: #ef4444;
 }
 </style>
