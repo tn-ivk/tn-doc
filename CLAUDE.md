@@ -554,6 +554,10 @@ Configuration follows a layered approach:
 - Cleaned up status bar JavaScript to remove unused time update functionality
 - **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/LoggingPathService.cs` for reusability across projects (TN_Doc, TN_KMH, etc.). Now accepts `applicationName` parameter for dynamic log paths
 - **ReportBuffer cleanup**: Removed unused `_preparedReport` field and FastReport dependency. Class now only stores PDF bytes without external dependencies
+- **GetEditDoc logging enhancement**: Added logging to HTML form save operations in all 37 document libraries
+  - Replaced string concatenation with `Path.Combine()` for cross-platform compatibility
+  - Added trace logging with full file path on successful save: `_logger.Trace($"HTML форма документа {IdDoc} (id={id}) сохранена: {htmlPath}")`
+  - Affects: Act, all Poverka libraries (18), all KMH libraries (18)
 
 ### Previous Changes (v1.4.1)
 - 🐞 Fixed incorrect population of Act shifts when filling "reverse" passports
