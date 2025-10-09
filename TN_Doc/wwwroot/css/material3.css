@@ -1,0 +1,283 @@
+/* Material Design 3 tokens and Bootstrap/jQuery UI overrides for TN_Doc */
+
+/*
+  Токены (Light by default). Приоритет: :root → [data-theme="dark"] → prefers-color-scheme
+  Не меняем разметку, только визуальные стили. Все селекторы подобраны для переопределения существующих.
+*/
+
+:root {
+  --md-primary: #1E88E5;               /* Blue 600 */
+  --md-primary-hover: #1565C0;         /* Blue 700 */
+  --md-secondary: #43A047;             /* M3 green-ish secondary */
+  --md-error: #E53935;
+  --md-warning: #F9A825;
+  --md-surface: #FAFAFA;               /* Background */
+  --md-surface-variant: #F1F3F4;       /* Cards, table headers */
+  --md-outline: #CFD8DC;               /* Borders */
+  --md-text: #212121;                  /* Primary text */
+  --md-text-secondary: #5F6368;        /* Secondary text */
+
+  --md-radius: 8px;
+  --md-spacing-1: 8px;
+  --md-spacing-2: 16px;
+  --md-shadow-1: 0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.10);
+  --md-shadow-2: 0 2px 6px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08);
+
+  /* Mapping for StatusBar (Prime-like tokens used by compiled CSS) */
+  --p-surface-0: var(--md-surface);
+  --p-surface-100: var(--md-surface-variant);
+  --p-surface-200: var(--md-outline);
+  --p-surface-300: color-mix(in srgb, var(--md-outline) 60%, #fff);
+  --p-surface-700: var(--md-text-secondary);
+
+  --p-green-100: #E8F5E9;  /* online bg */
+  --p-green-200: #C8E6C9;
+  --p-green-700: #2E7D32;  /* online text */
+
+  --p-red-100: #FFEBEE;    /* offline bg */
+  --p-red-200: #FFCDD2;
+  --p-red-700: #C62828;    /* offline text */
+
+  --p-yellow-100: #FFF8E1; /* warning bg */
+  --p-yellow-200: #FFECB3;
+  --p-yellow-700: #F9A825; /* warning text */
+}
+
+/* Dark theme tokens */
+[data-theme="dark"] {
+  --md-primary: #64B5F6;               /* Slightly lighter primary in dark */
+  --md-primary-hover: #42A5F5;
+  --md-secondary: #66BB6A;
+  --md-error: #EF5350;
+  --md-warning: #FFCA28;
+  --md-surface: #121212;
+  --md-surface-variant: #1E1F22;
+  --md-outline: #3A3F44;
+  --md-text: #EAECEF;
+  --md-text-secondary: #B0B6BC;
+
+  /* StatusBar mapping (dark) */
+  --p-surface-0: var(--md-surface);
+  --p-surface-100: var(--md-surface-variant);
+  --p-surface-200: var(--md-outline);
+  --p-surface-300: color-mix(in srgb, var(--md-outline) 60%, #000);
+  --p-surface-700: var(--md-text-secondary);
+
+  --p-green-100: color-mix(in srgb, #66BB6A 20%, #121212);
+  --p-green-200: color-mix(in srgb, #66BB6A 35%, #121212);
+  --p-green-700: #81C784;
+
+  --p-red-100: color-mix(in srgb, #EF5350 20%, #121212);
+  --p-red-200: color-mix(in srgb, #EF5350 35%, #121212);
+  --p-red-700: #E57373;
+
+  --p-yellow-100: color-mix(in srgb, #FFCA28 20%, #121212);
+  --p-yellow-200: color-mix(in srgb, #FFCA28 35%, #121212);
+  --p-yellow-700: #FFD54F;
+}
+
+/* Gray theme: нейтральная материальная палитра с преобладанием серого */
+[data-theme="gray"] {
+  --md-primary: #757575;               /* Grey 600 */
+  --md-primary-hover: #616161;         /* Grey 700 */
+  --md-secondary: #9E9E9E;             /* Grey 500 as secondary */
+  --md-error: #E53935;
+  --md-warning: #F9A825;
+  --md-surface: #F5F5F5;               /* Grey 100 */
+  --md-surface-variant: #EEEEEE;       /* Grey 200 */
+  --md-outline: #E0E0E0;               /* Grey 300 */
+  --md-text: #212121;
+  --md-text-secondary: #5F6368;
+
+  /* StatusBar mapping (gray) */
+  --p-surface-0: var(--md-surface);
+  --p-surface-100: var(--md-surface-variant);
+  --p-surface-200: var(--md-outline);
+  --p-surface-300: color-mix(in srgb, var(--md-outline) 60%, #fff);
+  --p-surface-700: var(--md-text-secondary);
+}
+
+/* Respect system preference if тема не принудительно задана */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --md-primary: #64B5F6;
+    --md-primary-hover: #42A5F5;
+    --md-secondary: #66BB6A;
+    --md-error: #EF5350;
+    --md-warning: #FFCA28;
+    --md-surface: #121212;
+    --md-surface-variant: #1E1F22;
+    --md-outline: #3A3F44;
+    --md-text: #EAECEF;
+    --md-text-secondary: #B0B6BC;
+  }
+}
+
+/* Base */
+html, body {
+  background: var(--md-surface);
+  color: var(--md-text);
+}
+
+/* Links */
+a { color: var(--md-primary); }
+a:hover { color: var(--md-primary-hover); text-decoration: none; }
+
+/* Generic surfaces (cards, panels) */
+.card, .modal-content, .dropdown-menu, .list-group-item, .table, .navbar, .nav, .popover, .toast {
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface);
+}
+
+/* Elevation */
+.modal-content { box-shadow: var(--md-shadow-2); }
+.dropdown-menu, .popover, .toast { box-shadow: var(--md-shadow-2); }
+.card, .list-group-item { box-shadow: var(--md-shadow-1); }
+
+/* Borders */
+.table, .table-bordered, .modal-content, .dropdown-menu, .list-group-item, .form-control, select, input, textarea {
+  border-color: var(--md-outline) !important;
+}
+
+/* Forms */
+input[type="text"], input[type="date"], input[type="number"], input[type="search"],
+select, textarea, .form-control, .filterDatepicker, select.filterSelect {
+  background: var(--md-surface);
+  color: var(--md-text);
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline);
+  padding: 8px 10px;
+}
+input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicker:focus, select.filterSelect:focus {
+  outline: none;
+  border-color: var(--md-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+/* Buttons */
+.btn, table.mainTable input[type=button], table.mainTable button, .filterButton {
+  border-radius: var(--md-radius) !important;
+  padding: 6px 12px !important; /* Reduced padding to fit height */
+  font-weight: 600;
+  letter-spacing: .01em;
+  height: 37px !important; /* Match select height */
+  line-height: 1.2 !important;
+}
+
+.btn-primary, table.mainTable input[type=button], table.mainTable button, .filterButton {
+  background: var(--md-primary) !important;
+  color: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--md-primary) 80%, #000) !important;
+}
+.btn-primary:hover, table.mainTable input[type=button]:hover, table.mainTable button:hover, .filterButton:hover {
+  background: var(--md-primary-hover) !important;
+}
+.btn-outline-primary {
+  color: var(--md-primary) !important;
+  border: 1px solid var(--md-primary) !important;
+  background: transparent !important;
+}
+.btn-outline-primary:hover {
+  color: #fff !important;
+  background: var(--md-primary) !important;
+}
+.btn-secondary { background: var(--md-secondary) !important; color: #fff !important; }
+.btn-danger { background: var(--md-error) !important; color: #fff !important; }
+.btn-warning { background: var(--md-warning) !important; color: #212121 !important; }
+
+/* Dropdowns (custom menu) */
+.custom-dropdown-menu {
+  background: var(--md-surface-variant) !important;
+  border: 1px solid var(--md-outline) !important;
+  border-radius: var(--md-radius) !important;
+  box-shadow: var(--md-shadow-2) !important;
+}
+.custom-dropdown-item {
+  color: var(--md-text) !important;
+  border-radius: calc(var(--md-radius) - 2px) !important;
+}
+.custom-dropdown-item:hover, .custom-dropdown-item:focus {
+  background: var(--md-primary) !important;
+  color: #fff !important;
+}
+
+/* Standard dropdown items */
+.dropdown-item {
+  color: var(--md-text) !important;
+  padding: 8px 16px !important;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+  background: var(--md-surface-variant) !important;
+  color: var(--md-text) !important;
+}
+.dropdown-item.active, .dropdown-item:active, .dropdown-item.selected {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+
+/* Select options */
+select option {
+  background: var(--md-surface) !important;
+  color: var(--md-text) !important;
+  padding: 8px 12px !important;
+}
+select option:checked, select option[selected] {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+select option:hover {
+  background: var(--md-surface-variant) !important;
+}
+
+/* Nav pills / Tabs */
+.nav-pills .nav-link {
+  color: var(--md-text-secondary);
+  border-radius: var(--md-radius) !important;
+}
+.nav-pills .nav-link:hover { background: color-mix(in srgb, var(--md-primary) 10%, transparent); color: var(--md-text); }
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff !important;
+  background: var(--md-primary) !important;
+  border: 1px solid color-mix(in srgb, var(--md-primary) 80%, #000) !important;
+}
+
+/* Tables */
+table, .table { color: var(--md-text); }
+.table thead th { background: var(--md-surface-variant); color: var(--md-text); border-bottom-color: var(--md-outline) !important; }
+.table td, .table th { border-color: var(--md-outline) !important; }
+.table tbody tr:hover { background: color-mix(in srgb, var(--md-primary) 7%, var(--md-surface)); }
+
+/* DataTables specific */
+#DataTable_wrapper .dataTables_filter input[type="search"] {
+  border-radius: var(--md-radius) !important;
+}
+
+/* Modal tweaks */
+.modal-header, .modal-body, .modal-footer {
+  background: var(--md-surface);
+  color: var(--md-text);
+}
+
+/* Status bar overrides to match scheme */
+.status-bar {
+  background: var(--md-surface-variant) !important;
+  border-top: 1px solid var(--md-outline) !important;
+}
+
+/* Utilities */
+.surface {
+  background: var(--md-surface) !important;
+}
+.surface-variant {
+  background: var(--md-surface-variant) !important;
+}
+.text-secondary { color: var(--md-text-secondary) !important; }
+
+/* Fix legacy borders in layout tables */
+table.mainTable > tbody > tr > td,
+table.filterTable td,
+.searched-table {
+  border-color: var(--md-outline) !important;
+}
+
+
