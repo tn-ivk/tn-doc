@@ -21,5 +21,6 @@ import DeviceEditor from './DeviceEditor.vue';
 <style scoped>
 .devices-tab {
   padding: 0.5rem;
+  box-sizing: border-box;
 }
 </style>

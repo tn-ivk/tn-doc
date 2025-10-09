@@ -108,6 +108,7 @@ function handleDeviceItemClick(event: MouseEvent, deviceId: number) {
   flex-direction: column;
   height: 100%;
   padding: 0.5rem;
+  box-sizing: border-box;
 }
 
 .device-listbox {

@@ -145,7 +145,8 @@ function handleCancel() {
 
 .configurator-content {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
+  min-height: 0; /* важно для корректной усадки flex-элемента и отсутствия лишнего скролла */
   padding: 0.25rem 1rem;
 }
 

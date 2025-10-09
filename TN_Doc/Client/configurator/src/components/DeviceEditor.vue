@@ -565,8 +565,9 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
 <style scoped>
 .device-editor {
   height: 100%;
-  overflow-y: auto;
+  overflow: auto; /* и вертикальный, и горизонтальный при необходимости внутри правой панели */
   padding: 0.5rem;
+  box-sizing: border-box;
 }
 
 .no-selection {
