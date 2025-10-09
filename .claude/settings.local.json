@@ -38,7 +38,12 @@
       "Bash(git -C tn.docgeneral status)",
       "Bash(git -C tn.docgeneral log --oneline -3)",
       "Bash(git -C tn.docgeneral commit -m \"$(cat <<''EOF''\nДобавлено логирование сохранения HTML форм в GetEditDoc во всех 37 библиотеках документов\n\n- Заменена конкатенация строк на Path.Combine для кроссплатформенности\n- Добавлено логирование успешного сохранения с указанием полного пути к файлу\n- Обновлены все библиотеки: Act, Poverka (18), KMH (18)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git -C tn.docgeneral push)"
+      "Bash(git -C tn.docgeneral push)",
+      "Bash(git -C tn.docgeneral log --oneline -15 -- Passport/DocPassport.cs)",
+      "Bash(git -C tn.docgeneral log --all --since=\"2024-01-01\" --grep=\"colgroup\\|col-num\\|GetEditDoc\" --oneline)",
+      "Read(///**)",
+      "Bash(git -C tn.docgeneral add TN.DocGeneral/Services/CachedDocModuleLoader.cs)",
+      "Bash(git -C tn.docgeneral commit -m \"$(cat <<''EOF''\nДобавлен CachedDocModuleLoader с LRU-кэшированием модулей документов\n\n- Реализовано кэширование Assembly и Type для устранения повторной рефлексии\n- Используется LRU (Least Recently Used) стратегия вытеснения\n- Максимальный размер кэша: 5 модулей (константа MAX_CACHED_MODULES)\n- Экземпляры DocGeneral создаются свежие на каждый запрос (thread-safe)\n- Потокобезопасность обеспечена через ConcurrentDictionary + lock\n- Добавлены методы GetCacheStatistics() и ClearCache() для мониторинга\n- Подробное логирование всех операций с кэшем\n- Ожидаемое ускорение загрузки модулей в 10-20 раз\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
