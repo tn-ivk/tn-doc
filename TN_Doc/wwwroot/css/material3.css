@@ -1,7 +1,7 @@
 /* Material Design 3 tokens and Bootstrap/jQuery UI overrides for TN_Doc */
 
 /*
-  Токены (Light by default). Приоритет: :root → [data-theme="dark"] → prefers-color-scheme
+  Токены для светлой темы Material Design 3.
   Не меняем разметку, только визуальные стили. Все селекторы подобраны для переопределения существующих.
 */
 
@@ -51,75 +51,8 @@
   --p-yellow-700: #F9A825; /* warning text */
 }
 
-/* Dark theme tokens */
-[data-theme="dark"] {
-  --md-primary: #64B5F6;               /* Slightly lighter primary in dark */
-  --md-primary-hover: #42A5F5;
-  --md-secondary: #66BB6A;
-  --md-error: #EF5350;
-  --md-warning: #FFCA28;
-  --md-surface: #121212;
-  --md-surface-variant: #1E1F22;
-  --md-outline: #3A3F44;
-  --md-text: #EAECEF;
-  --md-text-secondary: #B0B6BC;
 
-  /* StatusBar mapping (dark) */
-  --p-surface-0: var(--md-surface);
-  --p-surface-100: var(--md-surface-variant);
-  --p-surface-200: var(--md-outline);
-  --p-surface-300: color-mix(in srgb, var(--md-outline) 60%, #000);
-  --p-surface-700: var(--md-text-secondary);
 
-  --p-green-100: color-mix(in srgb, #66BB6A 20%, #121212);
-  --p-green-200: color-mix(in srgb, #66BB6A 35%, #121212);
-  --p-green-700: #81C784;
-
-  --p-red-100: color-mix(in srgb, #EF5350 20%, #121212);
-  --p-red-200: color-mix(in srgb, #EF5350 35%, #121212);
-  --p-red-700: #E57373;
-
-  --p-yellow-100: color-mix(in srgb, #FFCA28 20%, #121212);
-  --p-yellow-200: color-mix(in srgb, #FFCA28 35%, #121212);
-  --p-yellow-700: #FFD54F;
-}
-
-/* Gray theme: нейтральная материальная палитра с преобладанием серого */
-[data-theme="gray"] {
-  --md-primary: #757575;               /* Grey 600 */
-  --md-primary-hover: #616161;         /* Grey 700 */
-  --md-secondary: #9E9E9E;             /* Grey 500 as secondary */
-  --md-error: #E53935;
-  --md-warning: #F9A825;
-  --md-surface: #F5F5F5;               /* Grey 100 */
-  --md-surface-variant: #EEEEEE;       /* Grey 200 */
-  --md-outline: #E0E0E0;               /* Grey 300 */
-  --md-text: #212121;
-  --md-text-secondary: #5F6368;
-
-  /* StatusBar mapping (gray) */
-  --p-surface-0: var(--md-surface);
-  --p-surface-100: var(--md-surface-variant);
-  --p-surface-200: var(--md-outline);
-  --p-surface-300: color-mix(in srgb, var(--md-outline) 60%, #fff);
-  --p-surface-700: var(--md-text-secondary);
-}
-
-/* Respect system preference if тема не принудительно задана */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --md-primary: #64B5F6;
-    --md-primary-hover: #42A5F5;
-    --md-secondary: #66BB6A;
-    --md-error: #EF5350;
-    --md-warning: #FFCA28;
-    --md-surface: #121212;
-    --md-surface-variant: #1E1F22;
-    --md-outline: #3A3F44;
-    --md-text: #EAECEF;
-    --md-text-secondary: #B0B6BC;
-  }
-}
 
 /* Base */
 html, body {
