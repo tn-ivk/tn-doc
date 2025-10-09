@@ -23,6 +23,14 @@
   --md-shadow-1: 0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.10);
   --md-shadow-2: 0 2px 6px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08);
 
+  /* Typography tokens */
+  --md-font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --md-font-size-base: 15px;
+  --md-font-size-button: 15px;
+  --md-font-weight-normal: 400;
+  --md-font-weight-medium: 500;
+  --md-font-weight-semibold: 600;
+
   /* Mapping for StatusBar (Prime-like tokens used by compiled CSS) */
   --p-surface-0: var(--md-surface);
   --p-surface-100: var(--md-surface-variant);
@@ -117,6 +125,16 @@
 html, body {
   background: var(--md-surface);
   color: var(--md-text);
+  font-family: var(--md-font-family);
+  font-size: var(--md-font-size-base);
+  font-weight: var(--md-font-weight-normal);
+}
+
+/* Typography - Global font settings */
+body, input, select, textarea, label, td, th, span, div, p {
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+  font-weight: var(--md-font-weight-normal) !important;
 }
 
 /* Links */
@@ -146,7 +164,8 @@ select, textarea, .form-control, .filterDatepicker, select.filterSelect {
   color: var(--md-text);
   border-radius: var(--md-radius) !important;
   border: 1px solid var(--md-outline);
-  padding: 8px 10px;
+  padding: 6px 10px; /* Reduced vertical padding to match button height */
+  height: 37px !important; /* Fixed height to match buttons */
 }
 input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicker:focus, select.filterSelect:focus {
   outline: none;
@@ -158,7 +177,9 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
 .btn, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   border-radius: var(--md-radius) !important;
   padding: 6px 12px !important; /* Reduced padding to fit height */
-  font-weight: 600;
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-button) !important;
+  font-weight: var(--md-font-weight-semibold) !important;
   letter-spacing: .01em;
   height: 37px !important; /* Match select height */
   line-height: 1.2 !important;
