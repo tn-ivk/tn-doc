@@ -952,6 +952,13 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   line-height: 1.1 !important;
 }
 
+/* Текст кнопки "Изменить…" — синий (--md-primary) */
+.docs-table :deep(.p-button.p-button-text.p-button-sm),
+.docs-table :deep(.p-button.p-button-text.p-button-sm .p-button-label) {
+  color: var(--md-primary, #1E88E5) !important;
+  font-weight: 400 !important; /* обычный */
+}
+
 /* Фиксация узкой ширины второго столбца (переключатель) */
 .docs-table :deep(.p-datatable-tbody > tr > td.col-use),
 .docs-table :deep(.p-datatable-thead > tr > th.col-use) {
