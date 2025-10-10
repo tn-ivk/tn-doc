@@ -185,6 +185,35 @@ public class HomeController : Controller
     }
 
     /// <summary>
+    /// Проверяет, использует ли документ номер протокола
+    /// </summary>
+    /// <param name="idDoc">Идентификатор документа</param>
+    /// <returns>true, если документ использует номер протокола</returns>
+    public bool IsProtocolNumberUsed(IdDoc idDoc)
+    {
+        try
+        {
+            _logger.LogTrace($"Проверка использования номера протокола для документа {idDoc}");
+            var usesProtocolNumber = idDoc switch
+            {
+                IdDoc.KMH_PP_Areom => true,
+                IdDoc.KMH_PV => true,
+                IdDoc.KMH_PW => true,
+                IdDoc.Poverka2816 => true,
+                IdDoc.KMH_MI2816 => true,
+                _ => false
+            };
+            _logger.LogDebug($"Документ {idDoc} {(usesProtocolNumber ? "использует" : "не использует")} номер протокола");
+            return usesProtocolNumber;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка при проверке использования номера протокола для документа {idDoc}");
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Сохранение Id последнего открытого документа
     /// </summary>
     /// <param name="IdDevice">Id устройства</param>
