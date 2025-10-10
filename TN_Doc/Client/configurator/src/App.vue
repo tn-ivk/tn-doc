@@ -136,7 +136,7 @@ function handleCancel() {
 </script>
 
 <style scoped>
-@import url('./configurator.css');
+@import url('../configurator.css');
 
 .configurator-container {
   display: flex;
