@@ -926,6 +926,25 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   line-height: 1.1 !important;
 }
 
+/* Визуальный стиль тегов шаблонов документов: прозрачная заливка, синяя рамка и текст */
+.docs-table :deep(.p-tag) {
+  background-color: transparent !important;
+  color: var(--md-primary, #1E88E5) !important;
+  border: 1px solid var(--md-primary, #1E88E5) !important;
+}
+
+/* Hover — лёгкое подкрашивание рамки, без заливки */
+.docs-table :deep(.p-tag:hover) {
+  border-color: var(--md-primary-hover, #1565C0) !important;
+  color: var(--md-primary-hover, #1565C0) !important;
+}
+
+/* Активное состояние (по клику) — оставляем без заливки, только более тёмная рамка */
+.docs-table :deep(.p-tag:active) {
+  border-color: var(--md-primary-hover, #1565C0) !important;
+  color: var(--md-primary-hover, #1565C0) !important;
+}
+
 /* Кнопка "Изменить…" в строке — компактнее */
 .docs-table :deep(.p-button.p-button-text.p-button-sm) {
   padding: 0.2rem 0.35rem !important;
