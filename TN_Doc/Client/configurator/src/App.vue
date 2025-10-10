@@ -240,11 +240,12 @@ function handleCancel() {
   font-size: 0.9rem;
   min-height: auto;
   color: #212121; /* Цвет заголовков вкладок - черный */
+  font-weight: 400; /* Обычный вес шрифта для неактивных вкладок */
 }
 
 :deep(.p-tab.p-tab-selected) {
   color: #212121; /* Цвет активной вкладки - черный */
-  font-weight: 600;
+  font-weight: 600; /* Полужирный для активной вкладки */
 }
 
 :deep(.p-tabpanels) {
