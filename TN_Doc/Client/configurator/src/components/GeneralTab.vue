@@ -6,7 +6,7 @@
         id="export-path"
         v-model="exportPath"
         placeholder="Путь для сохранения экспортируемых документов"
-        class="field-input-flex"
+        class="field-input-flex export-path-input"
       />
     </div>
 
@@ -34,6 +34,7 @@
           text
           size="small"
           aria-label="Настройки OPC"
+          class="opc-settings-button"
         />
       </div>
     </div>
@@ -227,5 +228,44 @@ const armOpcSettings = computed({
 
 .mt-2 {
   margin-top: var(--configurator-spacing-1);
+}
+
+/* Стили для поля пути экспорта */
+.export-path-input {
+  background: #E3F2FD !important;
+  border: 2px solid var(--configurator-primary) !important;
+  color: var(--configurator-text) !important;
+  font-weight: var(--configurator-font-weight-semibold) !important;
+}
+
+.export-path-input:focus {
+  background: #BBDEFB !important;
+  border-color: var(--configurator-primary-hover) !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.3) !important;
+}
+
+/* Стили для кнопки настроек OPC */
+.opc-settings-button {
+  background: var(--configurator-primary) !important;
+  color: white !important;
+  border: 2px solid var(--configurator-primary) !important;
+  border-radius: var(--configurator-radius) !important;
+  padding: 8px 12px !important;
+  height: 37px !important;
+  min-width: 37px !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: 0 2px 4px rgba(30, 136, 229, 0.3) !important;
+}
+
+.opc-settings-button:hover {
+  background: var(--configurator-primary-hover) !important;
+  border-color: var(--configurator-primary-hover) !important;
+  box-shadow: 0 4px 8px rgba(30, 136, 229, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.opc-settings-button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 4px rgba(30, 136, 229, 0.3) !important;
 }
 </style>

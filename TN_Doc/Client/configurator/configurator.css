@@ -41,11 +41,13 @@ button, .btn {
   font-family: var(--configurator-font-family) !important;
   font-size: var(--configurator-font-size-button) !important;
   font-weight: var(--configurator-font-weight-semibold) !important;
-  border-radius: var(--configurator-radius) !important;
-  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
   height: 37px !important;
   line-height: 1.2 !important;
   transition: all 0.2s ease-in-out !important;
+  border: none !important;
+  cursor: pointer !important;
 }
 
 /* Кнопки в футере конфигуратора */
@@ -53,62 +55,55 @@ button, .btn {
   font-family: var(--configurator-font-family) !important;
   font-size: var(--configurator-font-size-button) !important;
   font-weight: var(--configurator-font-weight-semibold) !important;
-  border-radius: var(--configurator-radius) !important;
-  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
   height: 37px !important;
   line-height: 1.2 !important;
   transition: all 0.2s ease-in-out !important;
+  border: none !important;
+  cursor: pointer !important;
 }
 
 .configurator-footer button.btn-primary {
-  background-color: var(--configurator-primary) !important;
-  border-color: var(--configurator-primary) !important;
+  background-color: #1b6ec2 !important;
   color: white !important;
 }
 
 .configurator-footer button.btn-primary:hover:not(:disabled) {
-  background-color: var(--configurator-primary-hover) !important;
-  border-color: var(--configurator-primary-hover) !important;
+  background-color: #155a9e !important;
 }
 
 .configurator-footer button.btn-danger {
-  background-color: var(--configurator-error) !important;
-  border-color: var(--configurator-error) !important;
+  background-color: #6c757d !important;
   color: white !important;
 }
 
 .configurator-footer button.btn-danger:hover:not(:disabled) {
-  background-color: #C62828 !important;
-  border-color: #C62828 !important;
+  background-color: #5a6268 !important;
 }
 
 /* Основные стили кнопок */
 button.btn-primary, .btn-primary {
-  background-color: var(--configurator-primary) !important;
-  border-color: var(--configurator-primary) !important;
+  background-color: #1b6ec2 !important;
   color: white !important;
 }
 
 button.btn-primary:hover:not(:disabled), .btn-primary:hover:not(:disabled) {
-  background-color: var(--configurator-primary-hover) !important;
-  border-color: var(--configurator-primary-hover) !important;
+  background-color: #155a9e !important;
 }
 
 button.btn-danger, .btn-danger {
-  background-color: var(--configurator-error) !important;
-  border-color: var(--configurator-error) !important;
+  background-color: #6c757d !important;
   color: white !important;
 }
 
 button.btn-danger:hover:not(:disabled), .btn-danger:hover:not(:disabled) {
-  background-color: #C62828 !important;
-  border-color: #C62828 !important;
+  background-color: #5a6268 !important;
 }
 
 button:disabled, .btn:disabled {
-  background-color: var(--configurator-outline) !important;
-  border-color: var(--configurator-outline) !important;
-  color: var(--configurator-text-secondary) !important;
+  background-color: #cccccc !important;
+  color: #666666 !important;
   opacity: 0.7 !important;
   cursor: not-allowed !important;
 }
@@ -120,6 +115,8 @@ button:disabled, .btn:disabled {
   border-radius: var(--configurator-radius) var(--configurator-radius) 0 0 !important;
   padding: 0 var(--configurator-spacing-2) !important;
   box-shadow: none !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
 }
 
 .configurator-container :deep(.p-tab) {
@@ -129,10 +126,12 @@ button:disabled, .btn:disabled {
   color: var(--configurator-text-secondary) !important;
   border-radius: 0 !important;
   padding: var(--configurator-spacing-2) var(--configurator-spacing-2) !important;
-  margin-right: var(--configurator-spacing-1) !important;
+  margin-right: 0 !important;
   border-bottom: 2px solid transparent !important;
   transition: all 0.2s ease-in-out !important;
   background: transparent !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 .configurator-container :deep(.p-tab.p-tab-selected) {
@@ -242,11 +241,24 @@ button:disabled, .btn:disabled {
   font-weight: var(--configurator-font-weight-semibold) !important;
   background: var(--configurator-surface) !important;
   color: var(--configurator-text) !important;
-  border: 1px solid var(--configurator-outline) !important;
+  border: 2px solid var(--configurator-outline) !important;
   border-radius: var(--configurator-radius) !important;
   padding: 8px 16px !important;
   height: 37px !important;
   transition: all 0.2s ease-in-out !important;
+  margin-right: 0 !important;
+  border-right: 1px solid var(--configurator-outline) !important;
+}
+
+.configurator-container :deep(.p-selectbutton .p-togglebutton:first-child) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.configurator-container :deep(.p-selectbutton .p-togglebutton:last-child) {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-right: 2px solid var(--configurator-outline) !important;
 }
 
 .configurator-container :deep(.p-selectbutton .p-togglebutton:hover) {
@@ -259,11 +271,13 @@ button:disabled, .btn:disabled {
   background: var(--configurator-primary) !important;
   border-color: var(--configurator-primary) !important;
   color: white !important;
+  box-shadow: 0 2px 4px rgba(30, 136, 229, 0.3) !important;
 }
 
 .configurator-container :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
   background: var(--configurator-primary-hover) !important;
   border-color: var(--configurator-primary-hover) !important;
+  box-shadow: 0 4px 8px rgba(30, 136, 229, 0.4) !important;
 }
 
 /* Кнопки действий */
