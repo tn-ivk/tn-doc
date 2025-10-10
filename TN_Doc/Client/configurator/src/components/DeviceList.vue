@@ -114,8 +114,9 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--configurator-spacing-1);
+  padding: var(--configurator-spacing-2);
   box-sizing: border-box;
+  background: var(--configurator-surface);
 }
 
 .device-listbox {
@@ -125,19 +126,30 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
 
 .device-item {
   display: flex;
-  align-items: center;
-  gap: var(--configurator-spacing-1);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: var(--configurator-spacing-1);
+  border-radius: var(--configurator-radius);
+  transition: background-color 0.2s ease;
+}
+
+.device-item:hover {
+  background-color: var(--configurator-surface-variant);
 }
 
 .device-name {
   font-weight: var(--configurator-font-weight-semibold);
   font-size: var(--configurator-font-size-base);
   color: var(--configurator-text);
+  line-height: 1.2;
 }
 
 .device-description {
   font-size: 13px;
   color: var(--configurator-text-secondary);
+  line-height: 1.3;
+  margin-left: 1.5rem;
 }
 
 .selection-info {

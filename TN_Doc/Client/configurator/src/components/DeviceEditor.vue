@@ -622,8 +622,9 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .device-editor {
   height: 100%;
   overflow: auto;
-  padding: var(--configurator-spacing-1);
+  padding: var(--configurator-spacing-2);
   box-sizing: border-box;
+  background: var(--configurator-surface);
 }
 
 .no-selection {
@@ -647,17 +648,25 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   gap: var(--configurator-spacing-1);
 }
 
+.editor-header {
+  margin-bottom: var(--configurator-spacing-2);
+  padding-bottom: var(--configurator-spacing-1);
+  border-bottom: 2px solid var(--configurator-outline);
+}
+
 .editor-header h3 {
   margin: 0;
   color: var(--configurator-primary);
   font-family: var(--configurator-font-family);
-  font-size: var(--configurator-font-size-base);
+  font-size: 1.25rem;
   font-weight: var(--configurator-font-weight-semibold);
+  line-height: 1.3;
 }
 
 .editor-sections {
   display: flex;
   flex-direction: column;
+  gap: var(--configurator-spacing-2);
 }
 
 .field {
@@ -700,7 +709,10 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .compact-section {
-  padding: var(--configurator-spacing-1);
+  padding: var(--configurator-spacing-2);
+  background: var(--configurator-surface-variant);
+  border-radius: var(--configurator-radius);
+  border: 1px solid var(--configurator-outline);
 }
 
 .field-horizontal label {
@@ -799,7 +811,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 /* Карточки подключений к БД */
 .db-connections-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--configurator-spacing-2);
   margin-bottom: var(--configurator-spacing-2);
 }

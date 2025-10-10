@@ -167,18 +167,25 @@ const armOpcSettings = computed({
 
 <style scoped>
 .general-tab {
-  padding: var(--configurator-spacing-1) var(--configurator-spacing-2);
+  padding: var(--configurator-spacing-2);
+  background: var(--configurator-surface);
+  height: 100%;
+  overflow: auto;
 }
 
 .field {
   margin-bottom: var(--configurator-spacing-2);
+  padding: var(--configurator-spacing-2);
+  background: var(--configurator-surface-variant);
+  border-radius: var(--configurator-radius);
+  border: 1px solid var(--configurator-outline);
 }
 
 .field-horizontal {
   display: flex;
   align-items: center;
   gap: var(--configurator-spacing-2);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
 }
 
 .field-horizontal label {

@@ -1,10 +1,10 @@
 <template>
   <div class="devices-tab">
-    <Splitter style="height: 550px">
-      <SplitterPanel :size="15" :minSize="15">
+    <Splitter style="height: calc(100vh - 200px); min-height: 600px;">
+      <SplitterPanel :size="25" :minSize="20" :maxSize="35">
         <DeviceList />
       </SplitterPanel>
-      <SplitterPanel :size="70">
+      <SplitterPanel :size="75">
         <DeviceEditor />
       </SplitterPanel>
     </Splitter>

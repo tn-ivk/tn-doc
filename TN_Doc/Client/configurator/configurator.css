@@ -181,11 +181,13 @@ button:disabled, .btn:disabled {
   border-top: none !important;
   border-radius: 0 0 var(--configurator-radius) var(--configurator-radius) !important;
   box-shadow: var(--configurator-shadow-2) !important;
+  min-height: calc(100vh - 300px);
 }
 
 .configurator-container :deep(.p-tabpanel) {
-  padding: var(--configurator-spacing-2) !important;
+  padding: 0 !important;
   background: var(--configurator-surface) !important;
+  height: 100%;
 }
 
 /* Поля ввода */
@@ -493,4 +495,42 @@ button:disabled, .btn:disabled {
   .configurator-container .field-horizontal label {
     min-width: auto !important;
   }
+  
+  .configurator-container :deep(.p-tabpanels) {
+    min-height: calc(100vh - 250px) !important;
+  }
+  
+  .db-connections-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .configurator-container :deep(.p-splitter-panel) {
+    min-width: 200px !important;
+  }
+}
+
+/* Дополнительные стили для улучшенного макета */
+.configurator-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 600px;
+}
+
+.configurator-content {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  padding: 0;
+}
+
+.configurator-footer {
+  border-top: 1px solid var(--configurator-outline);
+  padding: var(--configurator-spacing-2);
+  display: flex;
+  justify-content: flex-end;
+  background-color: var(--configurator-surface-variant);
+  flex-shrink: 0;
 }
