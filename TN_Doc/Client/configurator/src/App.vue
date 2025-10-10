@@ -163,10 +163,11 @@ function handleCancel() {
 }
 
 .configurator-header {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem 0.75rem 1rem;
   border-bottom: 1px solid #dee2e6;
   background-color: #f8f9fa;
   flex-shrink: 0;
+  overflow: visible;
 }
 
 .header-buttons {
@@ -174,6 +175,7 @@ function handleCancel() {
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
+  margin-top: -5px;
 }
 
 /* Стили кнопок - компактные filled кнопки */
@@ -181,7 +183,7 @@ function handleCancel() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   font-size: 0.9rem;
   font-weight: 400;
   line-height: 1.5;
@@ -249,10 +251,11 @@ function handleCancel() {
 
 /* Компактные вкладки */
 :deep(.p-tablist) {
-  padding: 0.125rem 0.5rem;
+  padding: 0.5rem 0.5rem;
   gap: 0.25rem;
   display: flex;
   align-items: center;
+  min-height: 55px;
 }
 
 /* Контейнер для вкладок (левая часть) */
@@ -267,7 +270,7 @@ function handleCancel() {
 }
 
 :deep(.p-tab) {
-  padding: 0.25rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
   min-height: auto;
   color: #212121; /* Цвет заголовков вкладок - черный */
@@ -284,5 +287,26 @@ function handleCancel() {
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+:deep(.p-tabpanel) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:deep(.p-tabs) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+:deep(.p-tabs .p-tabview) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 </style>

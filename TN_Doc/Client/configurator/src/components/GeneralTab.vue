@@ -39,6 +39,9 @@
       </div>
     </div>
 
+    <!-- Заполнитель для растягивания по высоте -->
+    <div class="spacer"></div>
+
     <!-- Модальное окно настроек OPC -->
     <Dialog
       v-model:visible="showOpcDialog"
@@ -169,10 +172,14 @@ const armOpcSettings = computed({
 <style scoped>
 .general-tab {
   padding: 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .field {
   margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
 .field-horizontal {
@@ -221,6 +228,11 @@ const armOpcSettings = computed({
 
 .mt-2 {
   margin-top: 0.5rem;
+}
+
+.spacer {
+  flex: 1;
+  min-height: 0;
 }
 
 /* Компактные панели */
