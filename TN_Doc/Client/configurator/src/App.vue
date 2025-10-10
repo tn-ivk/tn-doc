@@ -239,11 +239,11 @@ function handleCancel() {
   padding: 0.25rem 0.75rem;
   font-size: 0.9rem;
   min-height: auto;
-  color: #1b6ec2; /* Цвет заголовков вкладок */
+  color: #212121; /* Цвет заголовков вкладок - черный */
 }
 
 :deep(.p-tab.p-tab-selected) {
-  color: #1b6ec2; /* Цвет активной вкладки */
+  color: #212121; /* Цвет активной вкладки - черный */
   font-weight: 600;
 }
 

@@ -823,26 +823,26 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 :deep(.p-selectbutton .p-togglebutton) {
   padding: 0.375rem 0.75rem !important;
   font-size: 0.9rem !important;
-  border: 1px solid #dee2e6 !important;
+  border: 1px solid #CFD8DC !important;
   background-color: #ffffff !important;
-  color: #495057 !important;
+  color: #212121 !important;
   transition: all 0.15s ease-in-out !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton:hover) {
-  background-color: #f8f9fa !important;
-  border-color: #adb5bd !important;
+  background-color: #F1F3F4 !important;
+  border-color: #B0BEC5 !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+  background-color: #1E88E5 !important;
+  border-color: #1E88E5 !important;
   color: #ffffff !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
-  background-color: #0b5ed7 !important;
-  border-color: #0a58ca !important;
+  background-color: #1565C0 !important;
+  border-color: #1565C0 !important;
 }
 
 /* Исправляем внутренний контент активной кнопки */

@@ -236,11 +236,26 @@ const armOpcSettings = computed({
   padding: 0.5rem 0.75rem;
 }
 
-/* Компактные input элементы */
-:deep(.p-inputtext),
-:deep(.p-inputnumber-input) {
-  padding: 0.375rem 0.5rem;
-  font-size: 0.9rem;
+/* Стили для поля "Путь экспорта документов" */
+:deep(.p-inputtext#export-path) {
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.p-inputtext#export-path:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
+}
+
+:deep(.p-inputtext#export-path:hover) {
+  border-color: #B0BEC5 !important;
 }
 
 :deep(.p-inputswitch) {
@@ -260,26 +275,26 @@ const armOpcSettings = computed({
 :deep(.p-selectbutton .p-togglebutton) {
   padding: 0.375rem 0.75rem !important;
   font-size: 0.9rem !important;
-  border: 1px solid #dee2e6 !important;
+  border: 1px solid #CFD8DC !important;
   background-color: #ffffff !important;
-  color: #495057 !important;
+  color: #212121 !important;
   transition: all 0.15s ease-in-out !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton:hover) {
-  background-color: #f8f9fa !important;
-  border-color: #adb5bd !important;
+  background-color: #F1F3F4 !important;
+  border-color: #B0BEC5 !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+  background-color: #1E88E5 !important;
+  border-color: #1E88E5 !important;
   color: #ffffff !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
-  background-color: #0b5ed7 !important;
-  border-color: #0a58ca !important;
+  background-color: #1565C0 !important;
+  border-color: #1565C0 !important;
 }
 
 /* Исправляем внутренний контент активной кнопки */
