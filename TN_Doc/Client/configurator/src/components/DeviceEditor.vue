@@ -1,7 +1,7 @@
 <template>
   <div class="device-editor">
     <div v-if="selectedDevices.length === 0" class="no-selection">
-      <i class="pi pi-info-circle" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
+      <i class="pi pi-info-circle" style="font-size: 2rem; color: var(--configurator-text-secondary)"></i>
       <p>Выберите устройство из списка для редактирования</p>
     </div>
 
@@ -621,8 +621,8 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 <style scoped>
 .device-editor {
   height: 100%;
-  overflow: auto; /* и вертикальный, и горизонтальный при необходимости внутри правой панели */
-  padding: 0.5rem;
+  overflow: auto;
+  padding: var(--configurator-spacing-1);
   box-sizing: border-box;
 }
 
@@ -632,23 +632,27 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: var(--text-color-secondary);
+  color: var(--configurator-text-secondary);
 }
 
 .no-selection p {
   margin-top: 1rem;
   font-size: 1.1rem;
+  font-family: var(--configurator-font-family);
 }
 
 .editor-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--configurator-spacing-1);
 }
 
 .editor-header h3 {
   margin: 0;
-  color: var(--primary-color);
+  color: var(--configurator-primary);
+  font-family: var(--configurator-font-family);
+  font-size: var(--configurator-font-size-base);
+  font-weight: var(--configurator-font-weight-semibold);
 }
 
 .editor-sections {
@@ -662,22 +666,23 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 .field label {
   display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 0.9rem;
+  margin-bottom: var(--configurator-spacing-1);
+  font-weight: var(--configurator-font-weight-semibold);
+  color: var(--configurator-text);
+  font-size: var(--configurator-font-size-base);
+  font-family: var(--configurator-font-family);
 }
 
 .field-checkbox {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--configurator-spacing-1);
   margin-bottom: 0.75rem;
 }
 
 .field-checkbox label {
   margin: 0;
-  font-weight: normal;
+  font-weight: var(--configurator-font-weight-normal);
 }
 
 .invalid-chars-section {
@@ -690,26 +695,27 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .field-horizontal {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--configurator-spacing-2);
   margin-bottom: 0;
 }
 
 .compact-section {
-  padding: 0.25rem 0.25rem; /* компактнее, чем panel-content */
+  padding: var(--configurator-spacing-1);
 }
 
 .field-horizontal label {
   flex-shrink: 0;
   min-width: 180px;
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 0.9rem;
+  font-weight: var(--configurator-font-weight-semibold);
+  color: var(--configurator-text);
+  font-size: var(--configurator-font-size-base);
+  font-family: var(--configurator-font-family);
   margin: 0;
 }
 
 .templates-section {
-  border-top: 1px solid var(--surface-200);
-  padding-top: 0.5rem;
+  border-top: 1px solid var(--configurator-outline);
+  padding-top: var(--configurator-spacing-1);
 }
 
 .w-full {
@@ -717,38 +723,15 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .mt-2 {
-  margin-top: 0.5rem;
+  margin-top: var(--configurator-spacing-1);
 }
 
 .mt-3 {
   margin-top: 0.75rem;
 }
 
-/* Компактные панели */
-:deep(.p-panel-header) {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
-}
-
-:deep(.p-panel-content) {
-  padding: 0.5rem 0.75rem;
-}
-
-/* Компактные input элементы */
-:deep(.p-inputtext),
-:deep(.p-inputnumber-input),
-:deep(.p-multiselect) {
-  padding: 0.375rem 0.5rem;
-  font-size: 0.9rem;
-}
-
-:deep(.p-inputswitch) {
-  width: 2.5rem;
-  height: 1.5rem;
-}
-
 .ml-2 {
-  margin-left: 0.5rem;
+  margin-left: var(--configurator-spacing-1);
 }
 
 .flex {
@@ -761,18 +744,18 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 /* Стили для информации о подключениях к БД */
 .db-connections-info {
-  border: 1px solid var(--surface-200);
-  border-radius: 0.375rem;
-  padding: 0.5rem;
-  background-color: var(--surface-50);
+  border: 1px solid var(--configurator-outline);
+  border-radius: var(--configurator-radius);
+  padding: var(--configurator-spacing-1);
+  background-color: var(--configurator-surface-variant);
 }
 
 .connection-item {
-  margin-bottom: 0.5rem;
-  padding: 0.375rem;
-  border-radius: 0.25rem;
-  background-color: var(--surface-0);
-  border: 1px solid var(--surface-100);
+  margin-bottom: var(--configurator-spacing-1);
+  padding: var(--configurator-spacing-1);
+  border-radius: var(--configurator-radius);
+  background-color: var(--configurator-surface);
+  border: 1px solid var(--configurator-outline);
 }
 
 .connection-item:last-child {
@@ -782,34 +765,28 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .connection-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  gap: var(--configurator-spacing-1);
+  margin-bottom: var(--configurator-spacing-1);
 }
 
 .connection-title {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-color);
+  font-weight: var(--configurator-font-weight-semibold);
+  font-size: var(--configurator-font-size-base);
+  font-family: var(--configurator-font-family);
+  color: var(--configurator-text);
 }
 
 .connection-details {
-  color: var(--text-color-secondary);
-  font-size: 0.8rem;
-}
-
-.text-green-500 {
-  color: #10b981;
-}
-
-.text-red-500 {
-  color: #ef4444;
+  color: var(--configurator-text-secondary);
+  font-size: 13px;
+  font-family: var(--configurator-font-family);
 }
 
 /* Стили для OPC контролов */
 .opc-settings-container {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--configurator-spacing-1);
 }
 
 .opc-controls {
@@ -819,56 +796,87 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   flex: 1;
 }
 
-/* Кастомные стили для переключателя OPC */
-:deep(.p-selectbutton .p-togglebutton) {
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.9rem !important;
-  border: 1px solid #dee2e6 !important;
-  background-color: #ffffff !important;
-  color: #495057 !important;
-  transition: all 0.15s ease-in-out !important;
+/* Карточки подключений к БД */
+.db-connections-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--configurator-spacing-2);
+  margin-bottom: var(--configurator-spacing-2);
 }
 
-:deep(.p-selectbutton .p-togglebutton:hover) {
-  background-color: #f8f9fa !important;
-  border-color: #adb5bd !important;
+.db-connection-card {
+  border: 2px solid var(--configurator-outline);
+  border-radius: var(--configurator-radius);
+  background-color: var(--configurator-surface);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: var(--configurator-shadow-2);
 }
 
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
-  color: #ffffff !important;
+.db-connection-card.connection-active {
+  border-color: var(--configurator-secondary);
+  box-shadow: 0 0 0 1px rgba(67, 160, 71, 0.2);
 }
 
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
-  background-color: #0b5ed7 !important;
-  border-color: #0a58ca !important;
+.db-connection-card.connection-inactive {
+  border-color: var(--configurator-error);
+  box-shadow: 0 0 0 1px rgba(229, 57, 53, 0.2);
+  opacity: 0.7;
 }
 
-/* Исправляем внутренний контент активной кнопки */
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content) {
-  background-color: transparent !important;
-  color: #ffffff !important;
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem var(--configurator-spacing-2);
+  background-color: var(--configurator-surface-variant);
+  border-bottom: 1px solid var(--configurator-outline);
 }
 
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
-  background-color: transparent !important;
-  color: #ffffff !important;
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: var(--configurator-spacing-1);
 }
 
-/* Стили для кнопки настроек OPC (многоточие) */
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.15s ease-in-out !important;
+.connection-title {
+  font-weight: var(--configurator-font-weight-semibold);
+  font-size: var(--configurator-font-size-base);
+  font-family: var(--configurator-font-family);
+  color: var(--configurator-text);
 }
 
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
-  background-color: #e9ecef !important;
-  color: #212529 !important;
-  border-color: #adb5bd !important;
+.connection-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.card-content {
+  padding: var(--configurator-spacing-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.connection-field-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--configurator-spacing-1);
+}
+
+.connection-field-horizontal label {
+  font-size: 13px;
+  font-weight: var(--configurator-font-weight-semibold);
+  color: var(--configurator-text-secondary);
+  margin: 0;
+  min-width: 120px;
+  flex-shrink: 0;
+  font-family: var(--configurator-font-family);
+}
+
+.connection-field-horizontal .w-full {
+  flex: 1;
 }
 
 /* Скрытие заголовков таблицы документов */
@@ -899,13 +907,13 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   line-height: 1.1 !important;
 }
 
-/* Кнопка "Изменить…" в строке — компактнее */
+/* Компактные кнопки в таблице документов */
 .docs-table :deep(.p-button.p-button-text.p-button-sm) {
   padding: 0.2rem 0.35rem !important;
   line-height: 1.1 !important;
 }
 
-/* Фиксация узкой ширины второго столбца (переключатель) */
+/* Фиксированная ширина колонки "Использовать" */
 .docs-table :deep(.p-datatable-tbody > tr > td.col-use),
 .docs-table :deep(.p-datatable-thead > tr > th.col-use) {
   width: 3rem !important;
@@ -921,7 +929,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   gap: 0.25rem;
 }
 
-/* Стили для кликабельных тегов шаблонов */
+/* Кликабельные теги шаблонов */
 .template-tag-clickable {
   cursor: pointer !important;
   transition: all 0.2s ease !important;
@@ -932,104 +940,16 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Стили для карточек подключений к БД */
-.db-connections-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.db-connection-card {
-  border: 2px solid var(--surface-200);
-  border-radius: 0.5rem;
-  background-color: var(--surface-0);
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.db-connection-card.connection-active {
-  border-color: #10b981;
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
-}
-
-.db-connection-card.connection-inactive {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
-  opacity: 0.7;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background-color: var(--surface-50);
-  border-bottom: 1px solid var(--surface-200);
-}
-
-.connection-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.connection-title {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-color);
-}
-
-.connection-toggle {
-  display: flex;
-  align-items: center;
-}
-
-.card-content {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.connection-field-horizontal {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.connection-field-horizontal label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-color-secondary);
-  margin: 0;
-  min-width: 120px;
-  flex-shrink: 0;
-}
-
-.connection-field-horizontal .w-full {
-  flex: 1;
-}
-
 /* Стили для заблокированного поля пароля */
 .password-readonly {
-  background-color: var(--surface-100) !important;
-  color: var(--text-color-secondary) !important;
+  background-color: var(--configurator-surface-variant) !important;
+  color: var(--configurator-text-secondary) !important;
   cursor: not-allowed !important;
   opacity: 0.7 !important;
 }
 
 .password-readonly:focus {
   box-shadow: none !important;
-  border-color: var(--surface-300) !important;
-}
-
-.text-green-500 {
-  color: #10b981;
-}
-
-.text-red-500 {
-  color: #ef4444;
+  border-color: var(--configurator-outline) !important;
 }
 </style>

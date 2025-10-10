@@ -136,6 +136,8 @@ function handleCancel() {
 </script>
 
 <style scoped>
+@import url('./configurator.css');
+
 .configurator-container {
   display: flex;
   flex-direction: column;
@@ -151,69 +153,11 @@ function handleCancel() {
 }
 
 .configurator-footer {
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid var(--configurator-outline);
   padding: 0.5rem 1rem;
   display: flex;
   justify-content: flex-end;
-  background-color: #f8f9fa;
-}
-
-/* Стили кнопок - компактные filled кнопки */
-.configurator-footer button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.9rem;
-  font-weight: 400;
-  line-height: 1.5;
-  text-align: center;
-  text-decoration: none;
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.configurator-footer button.btn-primary {
-  color: #ffffff; /* Белый текст */
-  background-color: #1b6ec2; /* Основной синий */
-  border-color: #1861ac; /* Синий (темнее) для границы */
-}
-
-.configurator-footer button.btn-primary:hover:not(:disabled) {
-  background-color: #155a9e; /* Темно-синий при наведении */
-  border-color: #155a9e;
-}
-
-.configurator-footer button.btn-primary:disabled {
-  background-color: #cccccc; /* Серый для disabled */
-  border-color: #cccccc;
-  color: #666666; /* Темно-серый текст для disabled */
-}
-
-.configurator-footer button.btn-danger {
-  color: #fff;
-  background-color: #dc3545;
-  border-color: #dc3545;
-}
-
-.configurator-footer button.btn-danger:hover:not(:disabled) {
-  background-color: #bb2d3b;
-  border-color: #b02a37;
-}
-
-.configurator-footer button:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.configurator-footer button i {
-  font-size: 1em;
-  vertical-align: middle;
+  background-color: var(--configurator-surface-variant);
 }
 
 .ml-1 {
@@ -227,27 +171,5 @@ function handleCancel() {
 .py-5 {
   padding-top: 3rem;
   padding-bottom: 3rem;
-}
-
-/* Компактные вкладки */
-:deep(.p-tablist) {
-  padding: 0.125rem 0.5rem;
-  gap: 0.25rem;
-}
-
-:deep(.p-tab) {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.9rem;
-  min-height: auto;
-  color: #1b6ec2; /* Цвет заголовков вкладок */
-}
-
-:deep(.p-tab.p-tab-selected) {
-  color: #1b6ec2; /* Цвет активной вкладки */
-  font-weight: 600;
-}
-
-:deep(.p-tabpanels) {
-  padding: 0;
 }
 </style>

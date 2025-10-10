@@ -167,26 +167,26 @@ const armOpcSettings = computed({
 
 <style scoped>
 .general-tab {
-  padding: 0.25rem 0.5rem;
+  padding: var(--configurator-spacing-1) var(--configurator-spacing-2);
 }
 
 .field {
-  margin-bottom: 1rem;
+  margin-bottom: var(--configurator-spacing-2);
 }
 
 .field-horizontal {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--configurator-spacing-2);
   margin-bottom: 0.75rem;
 }
 
 .field-horizontal label {
   flex-shrink: 0;
   min-width: 180px;
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 0.9rem;
+  font-weight: var(--configurator-font-weight-semibold);
+  color: var(--configurator-text);
+  font-size: var(--configurator-font-size-base);
   margin: 0;
 }
 
@@ -196,15 +196,15 @@ const armOpcSettings = computed({
 
 .field label {
   display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 0.9rem;
+  margin-bottom: var(--configurator-spacing-1);
+  font-weight: var(--configurator-font-weight-semibold);
+  color: var(--configurator-text);
+  font-size: var(--configurator-font-size-base);
 }
 
 .field label.required::after {
   content: " *";
-  color: var(--red-500);
+  color: var(--configurator-error);
 }
 
 .w-full {
@@ -219,92 +219,6 @@ const armOpcSettings = computed({
 }
 
 .mt-2 {
-  margin-top: 0.5rem;
-}
-
-/* Компактные панели */
-:deep(.p-panel) {
-  font-size: 0.9rem;
-}
-
-:deep(.p-panel-header) {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
-}
-
-:deep(.p-panel-content) {
-  padding: 0.5rem 0.75rem;
-}
-
-/* Компактные input элементы */
-:deep(.p-inputtext),
-:deep(.p-inputnumber-input) {
-  padding: 0.375rem 0.5rem;
-  font-size: 0.9rem;
-}
-
-:deep(.p-inputswitch) {
-  width: 2.5rem;
-  height: 1.5rem;
-}
-
-:deep(.p-inputswitch .p-inputswitch-slider) {
-  transform: translateX(0);
-}
-
-:deep(.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider) {
-  transform: translateX(1rem);
-}
-
-/* Кастомные стили для переключателя OPC */
-:deep(.p-selectbutton .p-togglebutton) {
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.9rem !important;
-  border: 1px solid #dee2e6 !important;
-  background-color: #ffffff !important;
-  color: #495057 !important;
-  transition: all 0.15s ease-in-out !important;
-}
-
-:deep(.p-selectbutton .p-togglebutton:hover) {
-  background-color: #f8f9fa !important;
-  border-color: #adb5bd !important;
-}
-
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
-  color: #ffffff !important;
-}
-
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
-  background-color: #0b5ed7 !important;
-  border-color: #0a58ca !important;
-}
-
-/* Исправляем внутренний контент активной кнопки */
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content) {
-  background-color: transparent !important;
-  color: #ffffff !important;
-}
-
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
-  background-color: transparent !important;
-  color: #ffffff !important;
-}
-
-/* Стили для кнопки настроек OPC (многоточие) */
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.15s ease-in-out !important;
-}
-
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
-  background-color: #e9ecef !important;
-  color: #212529 !important;
-  border-color: #adb5bd !important;
+  margin-top: var(--configurator-spacing-1);
 }
 </style>

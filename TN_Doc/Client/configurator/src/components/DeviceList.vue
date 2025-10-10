@@ -114,7 +114,7 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0.5rem;
+  padding: var(--configurator-spacing-1);
   box-sizing: border-box;
 }
 
@@ -126,41 +126,31 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
 .device-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--configurator-spacing-1);
 }
 
 .device-name {
-  font-weight: 600;
+  font-weight: var(--configurator-font-weight-semibold);
+  font-size: var(--configurator-font-size-base);
+  color: var(--configurator-text);
 }
 
 .device-description {
-  font-size: 0.875rem;
-  color: var(--text-color-secondary);
+  font-size: 13px;
+  color: var(--configurator-text-secondary);
 }
 
 .selection-info {
-  margin-top: 0.25rem;
-  padding: 0 0.5rem;
+  margin-top: var(--configurator-spacing-1);
+  padding: 0 var(--configurator-spacing-1);
   height: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--surface-50);
-  border-radius: 4px;
+  background-color: var(--configurator-surface-variant);
+  border-radius: var(--configurator-radius);
   text-align: center;
-  font-size: 0.875rem;
-  color: var(--text-color-secondary);
-}
-
-.text-blue-500 {
-  color: var(--blue-500);
-}
-
-.text-red-500 {
-  color: var(--red-500);
-}
-
-.text-gray-500 {
-  color: var(--text-color-secondary);
+  font-size: 13px;
+  color: var(--configurator-text-secondary);
 }
 </style>
