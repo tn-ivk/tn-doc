@@ -170,14 +170,18 @@ function handleCancel() {
   padding: 0.5rem 1rem 0 1rem;
   border-bottom: 1px solid #dee2e6;
   background-color: #f8f9fa;
-  flex-shrink: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   overflow: visible;
 }
 
 .tabs-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .header-row {
