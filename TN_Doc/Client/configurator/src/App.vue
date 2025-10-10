@@ -16,43 +16,45 @@
       <div v-else-if="currentConfig" class="configurator-main">
         <!-- Верхняя панель с вкладками и кнопками -->
         <div class="configurator-header">
-          <div class="header-row">
-            <Tabs value="0" class="tabs-container">
+          <Tabs value="0" class="tabs-container">
+            <!-- Строка с заголовками вкладок и кнопками -->
+            <div class="header-row">
               <TabList>
                 <Tab value="0">Общие</Tab>
                 <Tab value="1">Устройства</Tab>
               </TabList>
-              <TabPanels>
-                <TabPanel value="0">
-                  <GeneralTab />
-                </TabPanel>
-                <TabPanel value="1">
-                  <DevicesTab />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-            <!-- Кнопки вынесены за пределы компонента Tabs -->
-            <div class="header-buttons">
-              <button
-                type="button"
-                class="btn btn-primary save-btn"
-                @click="handleSave"
-                :disabled="!isDirty || isSaving"
-              >
-                <i v-if="isSaving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                <i v-else class="fa fa-floppy-o" aria-hidden="true"></i>
-                <span class="ml-1">{{ isSaving ? 'Сохранение...' : 'Применить' }}</span>
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger cancel-btn ml-2"
-                @click="handleCancel"
-              >
-                <i class="fa fa-times" aria-hidden="true"></i>
-                <span class="ml-1">Отмена</span>
-              </button>
+              <!-- Кнопки на одном уровне с TabList -->
+              <div class="header-buttons">
+                <button
+                  type="button"
+                  class="btn btn-primary save-btn"
+                  @click="handleSave"
+                  :disabled="!isDirty || isSaving"
+                >
+                  <i v-if="isSaving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                  <i v-else class="fa fa-floppy-o" aria-hidden="true"></i>
+                  <span class="ml-1">{{ isSaving ? 'Сохранение...' : 'Применить' }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger cancel-btn ml-2"
+                  @click="handleCancel"
+                >
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                  <span class="ml-1">Отмена</span>
+                </button>
+              </div>
             </div>
-          </div>
+            <!-- Контент вкладок на всю ширину -->
+            <TabPanels>
+              <TabPanel value="0">
+                <GeneralTab />
+              </TabPanel>
+              <TabPanel value="1">
+                <DevicesTab />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </div>
       </div>
     </div>
@@ -165,30 +167,32 @@ function handleCancel() {
 }
 
 .configurator-header {
+  padding: 0.5rem 1rem 0 1rem;
   border-bottom: 1px solid #dee2e6;
   background-color: #f8f9fa;
   flex-shrink: 0;
   overflow: visible;
 }
 
-.header-row {
+.tabs-container {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 0.5rem 1rem 0 1rem;
+  flex-direction: column;
+  height: 100%;
 }
 
-.tabs-container {
-  flex: 1;
-  min-width: 0;
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
 }
 
 .header-buttons {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-left: auto;
   flex-shrink: 0;
-  padding-top: 0.5rem;
 }
 
 /* Стили кнопок - компактные filled кнопки */
@@ -264,10 +268,12 @@ function handleCancel() {
 
 /* Компактные вкладки */
 :deep(.p-tablist) {
-  padding: 0.5rem 0.5rem;
+  padding: 0;
   gap: 0.25rem;
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 :deep(.p-tab) {
@@ -299,7 +305,7 @@ function handleCancel() {
   min-height: 0;
 }
 
-.tabs-container :deep(.p-tabs) {
+:deep(.p-tabs) {
   display: flex;
   flex-direction: column;
   height: 100%;
