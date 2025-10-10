@@ -743,6 +743,31 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   font-size: 0.9rem;
 }
 
+/* Стили для текстбоксов в карточках подключения к БД согласно дизайн-документу */
+.connection-field-horizontal :deep(.p-inputtext),
+.connection-field-horizontal :deep(.p-inputnumber-input) {
+  height: 37px !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  border: 1px solid #CFD8DC !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.connection-field-horizontal :deep(.p-inputtext:hover),
+.connection-field-horizontal :deep(.p-inputnumber-input:hover) {
+  border-color: #B0BEC5 !important;
+}
+
+.connection-field-horizontal :deep(.p-inputtext:focus),
+.connection-field-horizontal :deep(.p-inputnumber-input:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
+}
+
 :deep(.p-inputswitch) {
   width: 2.5rem;
   height: 1.5rem;
@@ -1002,9 +1027,9 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .connection-field-horizontal label {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-color-secondary);
+  color: #212121;
   margin: 0;
   min-width: 120px;
   flex-shrink: 0;
@@ -1016,15 +1041,20 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 /* Стили для заблокированного поля пароля */
 .password-readonly {
-  background-color: var(--surface-100) !important;
-  color: var(--text-color-secondary) !important;
+  background-color: #F1F3F4 !important;
+  color: #5F6368 !important;
   cursor: not-allowed !important;
-  opacity: 0.7 !important;
+}
+
+.password-readonly:deep(.p-inputtext) {
+  background-color: #F1F3F4 !important;
+  color: #5F6368 !important;
+  cursor: not-allowed !important;
 }
 
 .password-readonly:focus {
+  border-color: #CFD8DC !important;
   box-shadow: none !important;
-  border-color: var(--surface-300) !important;
 }
 
 .text-green-500 {

@@ -13,42 +13,48 @@
         </div>
       </div>
 
-      <Tabs v-else-if="currentConfig" value="0">
-        <TabList>
-          <Tab value="0">Общие</Tab>
-          <Tab value="1">Устройства</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel value="0">
-            <GeneralTab />
-          </TabPanel>
-          <TabPanel value="1">
-            <DevicesTab />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <div v-else-if="currentConfig" class="configurator-main">
+        <!-- Верхняя панель с вкладками и кнопками -->
+        <div class="configurator-header">
+          <Tabs value="0">
+            <TabList>
+              <Tab value="0">Общие</Tab>
+              <Tab value="1">Устройства</Tab>
+              <!-- Кнопки как часть заголовка вкладок -->
+              <div class="header-buttons">
+                <button
+                  type="button"
+                  class="btn btn-primary save-btn"
+                  @click="handleSave"
+                  :disabled="!isDirty || isSaving"
+                >
+                  <i v-if="isSaving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                  <i v-else class="fa fa-floppy-o" aria-hidden="true"></i>
+                  <span class="ml-1">{{ isSaving ? 'Сохранение...' : 'Применить' }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger cancel-btn ml-2"
+                  @click="handleCancel"
+                >
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                  <span class="ml-1">Отмена</span>
+                </button>
+              </div>
+            </TabList>
+            <TabPanels>
+              <TabPanel value="0">
+                <GeneralTab />
+              </TabPanel>
+              <TabPanel value="1">
+                <DevicesTab />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </div>
+      </div>
     </div>
 
-    <div class="configurator-footer">
-      <button
-        type="button"
-        class="btn btn-primary save-btn"
-        @click="handleSave"
-        :disabled="!isDirty || isSaving"
-      >
-        <i v-if="isSaving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-        <i v-else class="fa fa-floppy-o" aria-hidden="true"></i>
-        <span class="ml-1">{{ isSaving ? 'Сохранение...' : 'Применить' }}</span>
-      </button>
-      <button
-        type="button"
-        class="btn btn-danger cancel-btn ml-2"
-        @click="handleCancel"
-      >
-        <i class="fa fa-times" aria-hidden="true"></i>
-        <span class="ml-1">Отмена</span>
-      </button>
-    </div>
   </div>
 </template>
 
@@ -147,19 +153,31 @@ function handleCancel() {
   flex: 1;
   overflow: hidden;
   min-height: 0; /* важно для корректной усадки flex-элемента и отсутствия лишнего скролла */
-  padding: 0.25rem 1rem;
+  padding: 0;
 }
 
-.configurator-footer {
-  border-top: 1px solid #dee2e6;
-  padding: 0.5rem 1rem;
+.configurator-main {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  height: 100%;
+}
+
+.configurator-header {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #dee2e6;
   background-color: #f8f9fa;
+  flex-shrink: 0;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
 /* Стили кнопок - компактные filled кнопки */
-.configurator-footer button {
+.header-buttons button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -177,41 +195,41 @@ function handleCancel() {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.configurator-footer button.btn-primary {
+.header-buttons button.btn-primary {
   color: #ffffff; /* Белый текст */
   background-color: #1b6ec2; /* Основной синий */
   border-color: #1861ac; /* Синий (темнее) для границы */
 }
 
-.configurator-footer button.btn-primary:hover:not(:disabled) {
+.header-buttons button.btn-primary:hover:not(:disabled) {
   background-color: #155a9e; /* Темно-синий при наведении */
   border-color: #155a9e;
 }
 
-.configurator-footer button.btn-primary:disabled {
+.header-buttons button.btn-primary:disabled {
   background-color: #cccccc; /* Серый для disabled */
   border-color: #cccccc;
   color: #666666; /* Темно-серый текст для disabled */
 }
 
-.configurator-footer button.btn-danger {
+.header-buttons button.btn-danger {
   color: #fff;
   background-color: #dc3545;
   border-color: #dc3545;
 }
 
-.configurator-footer button.btn-danger:hover:not(:disabled) {
+.header-buttons button.btn-danger:hover:not(:disabled) {
   background-color: #bb2d3b;
   border-color: #b02a37;
 }
 
-.configurator-footer button:disabled {
+.header-buttons button:disabled {
   opacity: 0.65;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-.configurator-footer button i {
+.header-buttons button i {
   font-size: 1em;
   vertical-align: middle;
 }
@@ -233,6 +251,19 @@ function handleCancel() {
 :deep(.p-tablist) {
   padding: 0.125rem 0.5rem;
   gap: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Контейнер для вкладок (левая часть) */
+:deep(.p-tablist > .p-tab) {
+  flex-shrink: 0;
+}
+
+/* Контейнер для кнопок (правая часть) */
+:deep(.p-tablist .header-buttons) {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 :deep(.p-tab) {
@@ -249,6 +280,9 @@ function handleCancel() {
 }
 
 :deep(.p-tabpanels) {
-  padding: 0;
+  padding: 0.25rem 1rem;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
 }
 </style>
