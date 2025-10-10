@@ -1,6 +1,6 @@
 <template>
   <div class="devices-tab">
-    <Splitter style="height: 550px">
+    <Splitter style="height: 650px">
       <SplitterPanel :size="15" :minSize="15">
         <DeviceList />
       </SplitterPanel>

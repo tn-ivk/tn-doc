@@ -6,6 +6,7 @@
         :options="opcTypes"
         option-label="label"
         option-value="value"
+        :allowEmpty="false"
         @update:modelValue="handleTypeChange"
       />
     </div>
@@ -167,5 +168,43 @@ function handleTypeChange() {
   font-weight: 600;
   color: var(--text-color);
   font-size: 0.9rem;
+}
+
+/* Кастомные стили для переключателя OPC */
+:deep(.p-selectbutton .p-togglebutton) {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.8rem !important;
+  border: 1px solid #CFD8DC !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  transition: all 0.15s ease-in-out !important;
+  min-height: 28px !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton:hover) {
+  background-color: #F1F3F4 !important;
+  border-color: #B0BEC5 !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
+  background-color: #1E88E5 !important;
+  border-color: #1E88E5 !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
+  background-color: #1565C0 !important;
+  border-color: #1565C0 !important;
+}
+
+/* Исправляем внутренний контент активной кнопки */
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
+  background-color: transparent !important;
+  color: #ffffff !important;
 }
 </style>

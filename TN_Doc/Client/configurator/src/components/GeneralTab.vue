@@ -26,6 +26,7 @@
           :options="opcTypes"
           option-label="label"
           option-value="value"
+          :allowEmpty="false"
         />
         <Button
           icon="pi pi-ellipsis-h"
@@ -271,14 +272,30 @@ const armOpcSettings = computed({
   transform: translateX(1rem);
 }
 
+/* Стили для кнопки настроек OPC (многоточие) */
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
+  background-color: #e9ecef !important;
+  color: #212529 !important;
+  border-color: #adb5bd !important;
+}
+
 /* Кастомные стили для переключателя OPC */
 :deep(.p-selectbutton .p-togglebutton) {
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.8rem !important;
   border: 1px solid #CFD8DC !important;
   background-color: #ffffff !important;
   color: #212121 !important;
   transition: all 0.15s ease-in-out !important;
+  min-height: 28px !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton:hover) {
@@ -306,20 +323,5 @@ const armOpcSettings = computed({
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
   background-color: transparent !important;
   color: #ffffff !important;
-}
-
-/* Стили для кнопки настроек OPC (многоточие) */
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.15s ease-in-out !important;
-}
-
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
-  background-color: #e9ecef !important;
-  color: #212529 !important;
-  border-color: #adb5bd !important;
 }
 </style>

@@ -178,6 +178,7 @@
                   :options="opcTypes"
                   option-label="label"
                   option-value="value"
+                  :allowEmpty="false"
                 />
                 <Button
                   icon="pi pi-ellipsis-h"
@@ -821,12 +822,13 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 /* Кастомные стили для переключателя OPC */
 :deep(.p-selectbutton .p-togglebutton) {
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.8rem !important;
   border: 1px solid #CFD8DC !important;
   background-color: #ffffff !important;
   color: #212121 !important;
   transition: all 0.15s ease-in-out !important;
+  min-height: 28px !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton:hover) {
