@@ -963,8 +963,8 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .db-connections-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem; /* было 1rem */
+  margin-bottom: 0.75rem; /* чуть компактнее отступ снизу */
 }
 
 .db-connection-card {
@@ -990,7 +990,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem; /* было 0.75rem 1rem */
   background-color: var(--surface-50);
   border-bottom: 1px solid var(--surface-200);
 }
@@ -1013,17 +1013,17 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .card-content {
-  padding: 1rem;
+  padding: 0.5rem 0.75rem; /* было 1rem */
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem; /* было 0.75rem */
 }
 
 .connection-field-horizontal {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  gap: 0.5rem; /* было 0.75rem */
+  margin-bottom: 0.25rem; /* было 0.5rem */
 }
 
 .connection-field-horizontal label {
