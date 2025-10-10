@@ -1,9 +1,12 @@
-/* Общие layout-стили для справочников */
+/* Общие layout-стили для справочников - Material Design 3 */
 
 :root {
-    --dictionary-font-size: 12px;
-    --dictionary-active-bg: #1b6ec2;
-    --dictionary-active-color: #fff;
+    --dictionary-font-size: 15px; /* Увеличено с 12px до 15px согласно M3 */
+    --dictionary-font-family: 'Roboto', sans-serif; /* Прямое указание шрифта */
+    --dictionary-active-bg: #1E88E5; /* Прямое указание цвета */
+    --dictionary-active-color: white;
+    --dictionary-hover-bg: #F1F3F4; /* Прямое указание цвета */
+    --dictionary-border-radius: 8px; /* Прямое указание радиуса */
 }
 
 .qp-dir-item, .dir-item {

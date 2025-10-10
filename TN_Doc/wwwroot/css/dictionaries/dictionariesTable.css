@@ -1,4 +1,4 @@
-/* Универсальные стили для таблиц справочников (Группы пользователей, Доверенности, Пользователи, Методы испытаний) */
+/* Универсальные стили для таблиц справочников - Material Design 3 */
 
 .dictionaries-table,
 .user-group-table,
@@ -8,13 +8,13 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    font-family: Arial, sans-serif;
-    font-size: var(--dictionary-font-size);
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px 0 rgba(27, 110, 194, 0.08), 0 1.5px 4px 0 rgba(27, 110, 194, 0.06);
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px; /* Прямое указание размера */
+    background: #FAFAFA; /* Прямое указание цвета */
+    border-radius: 8px; /* Прямое указание радиуса */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
     overflow: hidden;
-    border: 1px solid #e0e6ef;
+    border: 1px solid #CFD8DC; /* Прямое указание цвета */
 }
 
 .dictionaries-table th,
@@ -22,13 +22,14 @@
 .licences-table th,
 .users-table th,
 .qp-method-table th {
-    background: #e6f0ff;
-    color: #102040;
-    font-weight: bold;
+    background: #F1F3F4; /* Прямое указание цвета */
+    color: #212121; /* Прямое указание цвета */
+    font-weight: 600; /* Прямое указание веса */
     text-align: center;
-    padding: 0.7em 1em;
+    padding: 16px; /* Увеличено согласно M3 spacing */
     border: none;
-    font-size: var(--dictionary-font-size);
+    font-size: 15px; /* Прямое указание размера */
+    font-family: 'Roboto', sans-serif;
 }
 
 .dictionaries-table thead tr th:first-child,
@@ -36,14 +37,14 @@
 .licences-table thead tr th:first-child,
 .users-table thead tr th:first-child,
 .qp-method-table thead tr th:first-child {
-    border-top-left-radius: 12px;
+    border-top-left-radius: 8px; /* Прямое указание радиуса */
 }
 .dictionaries-table thead tr th:last-child,
 .user-group-table thead tr th:last-child,
 .licences-table thead tr th:last-child,
 .users-table thead tr th:last-child,
 .qp-method-table thead tr th:last-child {
-    border-top-right-radius: 12px;
+    border-top-right-radius: 8px; /* Прямое указание радиуса */
 }
 
 .dictionaries-table td,
@@ -52,12 +53,13 @@
 .users-table td,
 .qp-method-table td {
     border: none;
-    border-bottom: 1px solid #e0e6ef;
-    padding: 0.6em 1em;
+    border-bottom: 1px solid #CFD8DC; /* Прямое указание цвета */
+    padding: 12px 16px; /* Увеличено согласно M3 spacing */
     text-align: center;
     vertical-align: middle;
-    font-size: var(--dictionary-font-size);
-    background: #fff;
+    font-size: 15px; /* Прямое указание размера */
+    font-family: 'Roboto', sans-serif;
+    background: #FAFAFA; /* Прямое указание цвета */
     transition: background 0.2s;
 }
 
@@ -66,7 +68,7 @@
 .licences-table tr.data-row:hover,
 .users-table tr.data-row:hover,
 .qp-method-table tr.data-row:hover {
-    background: #f5faff;
+    background: #F1F3F4; /* Прямое указание цвета */
     transition: background 0.2s;
 }
 
@@ -83,7 +85,7 @@
 .licences-table thead tr,
 .users-table thead tr,
 .qp-method-table thead tr {
-    background: #e6f0ff;
+    background: #F1F3F4; /* Прямое указание цвета */
 }
 
 /* Центрирование чекбоксов и иконок */
@@ -102,7 +104,7 @@
 .licences-table td:empty,
 .users-table td:empty,
 .qp-method-table td:empty {
-    background: #fafbfc;
+    background: #F1F3F4; /* Прямое указание цвета */
 }
 
 /* Убираем нижнюю границу у последней строки */
@@ -116,7 +118,7 @@
 
 .group-selector-wrapper {
     flex: 0 0 auto;
-    margin-bottom: 10px;
+    margin-bottom: 16px; /* Увеличено согласно M3 spacing */
 }
 .table-container {
     display: flex;
@@ -133,5 +135,5 @@
     flex: 0 0 auto;
     display: flex;
     justify-content: flex-end;
-    margin-top: 10px;
+    margin-top: 16px; /* Увеличено согласно M3 spacing */
 } 
