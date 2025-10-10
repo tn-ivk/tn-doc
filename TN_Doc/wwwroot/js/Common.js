@@ -863,9 +863,9 @@ async function GetDoc() {
 }
 
 function GetEditDoc() {
-    if(currentId == null) 
+    if(currentId == null)
         return;
-    
+
     $.ajax(
         {
             async: false,
@@ -876,17 +876,26 @@ function GetEditDoc() {
                 IdDoc: $('#ComboboxDocGUID').val(),
                 id: currentId
             },
-            success: function (data) {
+            success: function (htmlContent) {
+                // Создаём Blob из HTML-контента
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                // Освобождаем предыдущий Blob URL, если он существует
                 $('.FR').each(function () {
-                    $(this).attr('src', '/HTML/html.html');
+                    const oldSrc = $(this).attr('src');
+                    if (oldSrc && oldSrc.startsWith('blob:')) {
+                        URL.revokeObjectURL(oldSrc);
+                    }
+                    $(this).attr('src', blobUrl);
                 });
 
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
-                
+
             }
         });
-    
+
     isViewing = false;
     $('#viewModeButton').prop('value', '     Просмотр     ');
 }
