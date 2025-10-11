@@ -59,7 +59,7 @@
   --md-shadow-2: 0 2px 6px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08);
 
   /* Size tokens */
-  --md-control-height: 37px;           /* Standard height for buttons, inputs, selects */
+  --md-control-height: 35px;           /* Standard height for buttons, inputs, selects */
   --md-control-height-sm: 30px;        /* Small controls (topPanel, etc) */
   --md-control-height-lg: 40px;        /* Large buttons */
   --md-status-bar-height: 28px;        /* Status bar height */
