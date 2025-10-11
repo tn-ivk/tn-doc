@@ -314,8 +314,19 @@ select.invalid-cell-content {
     align-items: center;
 }
 
+/* Одинаковая ширина для обеих кнопок */
+.modal-header .close-menu .save-btn,
+.modal-header .close-menu .close-modal-wnd-btn {
+    min-width: 50px;
+}
+
 /* Увеличенная иконка дискеты в кнопке "Сохранить" */
 .modal-header .close-menu .save-btn .fa-floppy-o {
+    font-size: 1.25rem;
+}
+
+/* Увеличенная иконка крестика в кнопке "Отмена" */
+.modal-header .close-menu .close-modal-wnd-btn .fa-times {
     font-size: 1.25rem;
 }
 
