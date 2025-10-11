@@ -342,6 +342,11 @@ select.invalid-cell-content {
     border-color: var(--md-gray-700) !important;
 }
 
+.modal-header .close-menu .close-modal-wnd-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 .padding-one-px-top {
     padding-top: 1px;
 }
