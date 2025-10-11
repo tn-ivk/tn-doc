@@ -17,8 +17,8 @@
 #elis .modal-header {
   border: none !important;
   margin-bottom: 15px;
-  background-color: #1b6ec2 !important;
-  color: white !important; 
+  background-color: var(--md-primary) !important;
+  color: var(--md-white) !important;
 }
 
 #elis .modal-title {
@@ -36,7 +36,7 @@
   align-items: start;
   padding: 0 !important;
   margin: 0 !important;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--md-outline-light);
 }
 
 #elis .modal-info {
@@ -59,8 +59,8 @@
 /* Кнопки */
 #elis .btn {
   min-width: 120px;
-  background-color: #1b6ec2;
-  color: #ffffff;
+  background-color: var(--md-primary);
+  color: var(--md-white);
   border: none;
   border-radius: 6px;
   padding: 10px 20px;
@@ -73,25 +73,25 @@
 
 /* Эффект при наведении на кнопку */
 #elis .btn:hover {
-  background-color: #155a9e;
+  background-color: var(--md-primary-hover);
 }
 
 /* Эффект при нажатии на кнопку */
 #elis .btn:active {
-  background-color: #10487d;
+  background-color: var(--md-primary-active);
 }
 
 #elis .btn-secondary {
-  background-color: #6c757d; /* Серый цвет для кнопки Закрыть */
+  background-color: var(--md-gray-600); /* Серый цвет для кнопки Закрыть */
   margin-right: 0;
 }
 
 #elis .btn-secondary:hover {
-  background-color: #5a6268; /* Темно-серый при наведении */
+  background-color: var(--md-gray-700); /* Темно-серый при наведении */
 }
 
 #elis .btn-secondary:active {
-  background-color: #545b62; /* Еще темнее при нажатии */
+  background-color: var(--md-gray-800); /* Еще темнее при нажатии */
 }
 
 #elis div.modal-content {

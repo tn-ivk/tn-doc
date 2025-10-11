@@ -6,17 +6,52 @@
 */
 
 :root {
+  /* Primary colors */
   --md-primary: #1E88E5;               /* Blue 600 */
   --md-primary-hover: #1565C0;         /* Blue 700 */
+  --md-primary-active: #0D47A1;        /* Blue 800 - для active состояния */
+
+  /* Secondary colors */
   --md-secondary: #43A047;             /* M3 green-ish secondary */
+
+  /* Status colors */
   --md-error: #E53935;
+  --md-error-bootstrap: #DC3545;       /* Bootstrap danger color */
+  --md-error-light: #FFF8F8;           /* Light error background */
   --md-warning: #F9A825;
+
+  /* Surfaces and backgrounds */
   --md-surface: #FAFAFA;               /* Background */
   --md-surface-variant: #F1F3F4;       /* Cards, table headers */
+  --md-white: #FFFFFF;                 /* Pure white */
+  --md-primary-light: #E7F1FF;         /* Light primary background */
+  --md-gray-light: #CCCCCC;            /* Light gray */
+
+  /* Borders and outlines */
   --md-outline: #CFD8DC;               /* Borders */
+  --md-outline-light: #E0E0E0;         /* Lighter borders */
+  --md-border: #CED4DA;                /* Input borders */
+  --md-border-light: #E5E5E5;          /* Very light borders */
+
+  /* Text colors */
   --md-text: #212121;                  /* Primary text */
   --md-text-secondary: #5F6368;        /* Secondary text */
+  --md-text-tertiary: #333333;         /* Tertiary text */
+  --md-text-muted: #495057;            /* Muted text */
+  --md-text-light: #666666;            /* Light gray text */
 
+  /* Gray scale for secondary buttons */
+  --md-gray-600: #6C757D;              /* Gray buttons */
+  --md-gray-700: #5A6268;              /* Gray hover */
+  --md-gray-800: #545B62;              /* Gray active */
+
+  /* ELIS integration colors */
+  --md-elis-highlight: #8FD19E;        /* ELIS data highlight */
+
+  /* Disabled state */
+  --md-disabled-bg: #F5F5F5;           /* Disabled background */
+
+  /* Layout tokens */
   --md-radius: 8px;
   --md-spacing-1: 8px;
   --md-spacing-2: 16px;

@@ -7,7 +7,7 @@ table.mainTable button.dropdown-toggle::after {
 
 /* Контейнер dropdown меню */
 .custom-dropdown-menu {
-    border: 1px solid #ced4da;
+    border: 1px solid var(--md-border);
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     padding: 5px;
@@ -21,7 +21,7 @@ table.mainTable button.dropdown-toggle::after {
     padding: 8px 12px;
     margin: 2px 0;
     border-radius: 4px;
-    color: #495057;
+    color: var(--md-text-muted);
     text-decoration: none;
     transition: all 0.2s ease;
     font-size: 14px;
@@ -42,30 +42,30 @@ table.mainTable button.dropdown-toggle::after {
 
 /* Вариант 1: Синий фон как у основных кнопок */
 .custom-dropdown-item:hover {
-    background-color: #1b6ec2;
-    color: #ffffff;
+    background-color: var(--md-primary);
+    color: var(--md-white);
     text-decoration: none;
 }
 
 /* Вариант 2: Светлый фон с синей рамкой (закомментирован)
 .custom-dropdown-item:hover {
-    background-color: #e7f1ff;
-    color: #1b6ec2;
-    border: 1px solid #1b6ec2;
+    background-color: var(--md-primary-light);
+    color: var(--md-primary);
+    border: 1px solid var(--md-primary);
     text-decoration: none;
 }
 */
 
 /* Вариант 3: Градиент (закомментирован)
 .custom-dropdown-item:hover {
-    background: linear-gradient(135deg, #1b6ec2 0%, #155a9e 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-primary-hover) 100%);
+    color: var(--md-white);
     text-decoration: none;
 }
 */
 
 /* Состояние активного клика */
 .custom-dropdown-item:active {
-    background-color: #155a9e;
-    color: #ffffff;
+    background-color: var(--md-primary-hover);
+    color: var(--md-white);
 }
