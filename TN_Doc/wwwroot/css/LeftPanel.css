@@ -309,7 +309,26 @@ select.invalid-cell-content {
 
 .close-menu {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Увеличенная иконка дискеты в кнопке "Сохранить" */
+.modal-header .close-menu .save-btn .fa-floppy-o {
+    font-size: 1.25rem;
+}
+
+/* Серая кнопка "Отмена" с крестиком */
+.modal-header .close-menu .close-modal-wnd-btn {
+    background-color: var(--md-gray-600) !important;
+    color: var(--md-white) !important;
+    border-color: var(--md-gray-600) !important;
+}
+
+.modal-header .close-menu .close-modal-wnd-btn:hover {
+    background-color: var(--md-gray-700) !important;
+    border-color: var(--md-gray-700) !important;
 }
 
 .padding-one-px-top {
