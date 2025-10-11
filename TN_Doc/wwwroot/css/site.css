@@ -66,6 +66,10 @@ select#ComboboxTemplateDoc {
 }
 
 /* Vertical alignment for top panel with controls */
+#viewPanel {
+  vertical-align: middle !important;
+}
+
 #viewPanel table td {
   vertical-align: middle !important;
 }
@@ -77,6 +81,11 @@ select#ComboboxTemplateDoc {
   display: inline-block;
   vertical-align: middle !important;
   margin: 0 !important;
+}
+
+/* Parent row alignment */
+.docTable > tbody > tr:first-child > td {
+  vertical-align: middle !important;
 }
 
 /* Sticky footer styles
