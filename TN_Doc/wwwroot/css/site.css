@@ -62,7 +62,7 @@ button.accept-policy {
 
 /* Template document combobox */
 select#ComboboxTemplateDoc {
-  max-width: 200px;
+  max-width: 450px;
 }
 
 /* Sticky footer styles

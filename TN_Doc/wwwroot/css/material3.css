@@ -147,6 +147,11 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
 }
 
+/* Align selects with buttons */
+select, select.filterSelect {
+  vertical-align: middle !important;
+}
+
 /* Buttons */
 .btn, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   border-radius: var(--md-radius) !important;
@@ -165,10 +170,6 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
   /* margin-top removed - using standard alignment */
 }
 
-/* Fix alignment for top panel buttons */
-input.bExport, input#ButtonPrint, button.dropdown-toggle {
-  margin-top: -3.25px !important; /* Align with comboboxes */
-}
 
 .btn-primary, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   background: var(--md-primary) !important;
