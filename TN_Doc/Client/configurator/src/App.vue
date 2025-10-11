@@ -27,21 +27,23 @@
               <div class="header-buttons">
                 <button
                   type="button"
-                  class="btn btn-primary save-btn"
+                  class="icon-btn save-btn"
                   @click="handleSave"
                   :disabled="!isDirty || isSaving"
+                  aria-label="Применить"
+                  title="Применить"
                 >
-                  <i v-if="isSaving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                  <i v-else class="fa fa-floppy-o" aria-hidden="true"></i>
-                  <span class="ml-1">{{ isSaving ? 'Сохранение...' : 'Применить' }}</span>
+                  <i class="pi pi-save" aria-hidden="true"></i>
+                  <i v-if="isSaving" class="pi pi-spinner pi-spin busy-spinner" aria-hidden="true"></i>
                 </button>
                 <button
                   type="button"
-                  class="btn btn-danger cancel-btn ml-2"
+                  class="icon-btn cancel-btn ml-2"
                   @click="handleCancel"
+                  aria-label="Отмена"
+                  title="Отмена"
                 >
-                  <i class="fa fa-times" aria-hidden="true"></i>
-                  <span class="ml-1">Отмена</span>
+                  <i class="pi pi-times" aria-hidden="true"></i>
                 </button>
               </div>
             </div>
@@ -204,10 +206,10 @@ function handleCancel() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.375rem 0.75rem;
+  padding: 0;
   font-size: 0.9rem;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1;
   text-align: center;
   text-decoration: none;
   vertical-align: middle;
@@ -218,32 +220,57 @@ function handleCancel() {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.header-buttons button.btn-primary {
-  color: #ffffff; /* Белый текст */
-  background-color: #1b6ec2; /* Основной синий */
-  border-color: #1861ac; /* Синий (темнее) для границы */
+/* Иконочные кнопки под макет */
+.header-buttons .icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border-width: 2px;
+  border-style: solid;
+  background-color: #ffffff;
+  color: #1b6ec2; /* для иконки по умолчанию */
+  border-color: #1b6ec2; /* контурная синяя */
 }
 
-.header-buttons button.btn-primary:hover:not(:disabled) {
-  background-color: #155a9e; /* Темно-синий при наведении */
-  border-color: #155a9e;
+.header-buttons .icon-btn i { font-size: 18px; line-height: 1; }
+.header-buttons .icon-btn .busy-spinner {
+  position: absolute;
+  font-size: 14px;
 }
 
-.header-buttons button.btn-primary:disabled {
-  background-color: #cccccc; /* Серый для disabled */
-  border-color: #cccccc;
-  color: #666666; /* Темно-серый текст для disabled */
+/* Применить: hover/active — синяя заливка и белая иконка */
+.header-buttons .save-btn:hover:not(:disabled),
+.header-buttons .save-btn:active:not(:disabled) {
+  background-color: #1b6ec2;
+  color: #ffffff;
 }
 
-.header-buttons button.btn-danger {
-  color: #fff;
-  background-color: #dc3545;
-  border-color: #dc3545;
+.header-buttons .save-btn:disabled {
+  background-color: #ffffff;
+  color: #9aa6b2;
+  border-color: #d0d7de;
+  opacity: 1;
 }
 
-.header-buttons button.btn-danger:hover:not(:disabled) {
-  background-color: #bb2d3b;
-  border-color: #b02a37;
+/* Отмена: тёмно-серая заливка всегда */
+.header-buttons .cancel-btn {
+  background-color: #616b74;
+  color: #ffffff;
+  border-color: #616b74;
+}
+
+.header-buttons .cancel-btn:hover:not(:disabled) {
+  background-color: #556068;
+  border-color: #556068;
+}
+
+/* Фокус-ринги (особенно заметен на «Отмена») */
+.header-buttons .icon-btn:focus-visible { outline: none; }
+.header-buttons .save-btn:focus-visible {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #1b6ec2; /* белый + синий */
+}
+.header-buttons .cancel-btn:focus-visible {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #1b6ec2; /* белый + синий */
 }
 
 .header-buttons button:disabled {
@@ -252,10 +279,7 @@ function handleCancel() {
   pointer-events: none;
 }
 
-.header-buttons button i {
-  font-size: 1em;
-  vertical-align: middle;
-}
+.header-buttons button i { vertical-align: middle; }
 
 .ml-1 {
   margin-left: 0.25rem;
