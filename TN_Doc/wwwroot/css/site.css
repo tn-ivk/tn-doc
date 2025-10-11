@@ -2,7 +2,7 @@
 @import url("material3.css");
 
 :root {
-  --status-bar-height: 28px;
+  --status-bar-height: var(--md-status-bar-height);
 }
 
 *{

@@ -58,6 +58,12 @@
   --md-shadow-1: 0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.10);
   --md-shadow-2: 0 2px 6px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08);
 
+  /* Size tokens */
+  --md-control-height: 37px;           /* Standard height for buttons, inputs, selects */
+  --md-control-height-sm: 30px;        /* Small controls (topPanel, etc) */
+  --md-control-height-lg: 40px;        /* Large buttons */
+  --md-status-bar-height: 28px;        /* Status bar height */
+
   /* Typography tokens */
   --md-font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   --md-font-size-base: 15px;
@@ -133,7 +139,7 @@ select, textarea, .form-control, .filterDatepicker, select.filterSelect {
   border-radius: var(--md-radius) !important;
   border: 1px solid var(--md-outline);
   padding: 6px 10px; /* Reduced vertical padding to match button height */
-  height: 37px !important; /* Fixed height to match buttons */
+  height: var(--md-control-height) !important;
 }
 input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicker:focus, select.filterSelect:focus {
   outline: none;
@@ -149,7 +155,7 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
   font-size: var(--md-font-size-button) !important;
   font-weight: var(--md-font-weight-semibold) !important;
   letter-spacing: .01em;
-  height: 37px !important; /* Match select height */
+  height: var(--md-control-height) !important;
   line-height: 1.2 !important;
   vertical-align: middle !important; /* Align with comboboxes */
 }

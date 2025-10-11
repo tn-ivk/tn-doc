@@ -34,7 +34,7 @@ input[type=number] {
 }
 
 .topPanel {
-    height: 30px;
+    height: var(--md-control-height-sm);
 }
 
 .leftPanel {
@@ -290,7 +290,7 @@ select.invalid-cell-content {
 }
 
 .default-btn-size {
-    height: 40px;
+    height: var(--md-control-height-lg);
     width: 115px;
 }
 
