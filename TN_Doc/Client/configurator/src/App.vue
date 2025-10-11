@@ -38,7 +38,7 @@
                 </button>
                 <button
                   type="button"
-                  class="icon-btn cancel-btn ml-2"
+                  class="icon-btn cancel-btn"
                   @click="handleCancel"
                   aria-label="Отмена"
                   title="Отмена"
@@ -196,7 +196,7 @@ function handleCancel() {
 .header-buttons {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   margin-left: auto;
   flex-shrink: 0;
 }
