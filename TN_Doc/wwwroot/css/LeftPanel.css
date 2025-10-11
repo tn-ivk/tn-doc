@@ -317,7 +317,7 @@ select.invalid-cell-content {
 /* Одинаковая ширина для обеих кнопок */
 .modal-header .close-menu .save-btn,
 .modal-header .close-menu .close-modal-wnd-btn {
-    min-width: 50px;
+    min-width: 40px;
 }
 
 /* Увеличенная иконка дискеты в кнопке "Сохранить" */
