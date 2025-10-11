@@ -147,10 +147,7 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
 }
 
-/* Align selects with buttons */
-select, select.filterSelect {
-  vertical-align: middle !important;
-}
+/* Align selects with buttons - reverted */
 
 /* Buttons */
 .btn, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
@@ -167,9 +164,8 @@ select, select.filterSelect {
 
 /* Specific alignment for filter button */
 .filterButton {
-  /* margin-top removed - using standard alignment */
+  /* keep default alignment */
 }
-
 
 .btn-primary, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   background: var(--md-primary) !important;
