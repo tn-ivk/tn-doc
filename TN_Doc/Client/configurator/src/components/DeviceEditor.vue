@@ -168,10 +168,10 @@
         </Panel>
 
         <!-- OPC настройки -->
-        <Panel header="OPC подключение" class="mt-3">
+        <Panel class="mt-3 opc-panel" :toggleable="false">
           <div v-if="deviceOpcSettings" class="opc-settings-container">
             <div class="field field-horizontal">
-              <label>Тип OPC:</label>
+              <label>Тип OPC-клиента:</label>
               <div class="opc-controls">
                 <SelectButton
                   v-model="deviceOpcType"
@@ -218,7 +218,7 @@
         </Dialog>
 
         <!-- Недопустимые символы -->
-        <Panel header="Недопустимые символы" class="mt-3">
+        <Panel class="mt-3 invalid-chars-panel" :toggleable="false">
           <div class="field field-horizontal">
             <label>Недопустимые символы:</label>
             <div class="invalid-chars-section">
@@ -733,6 +733,12 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 :deep(.p-panel-content) {
   padding: 0.5rem 0.75rem;
+}
+
+/* Уменьшенный верхний отступ для панелей OPC и недопустимых символов (без заголовка) */
+.opc-panel :deep(.p-panel-content),
+.invalid-chars-panel :deep(.p-panel-content) {
+  padding-top: 0.25rem;
 }
 
 /* Компактные input элементы */
