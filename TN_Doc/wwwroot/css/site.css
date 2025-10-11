@@ -60,6 +60,11 @@ button.accept-policy {
   line-height: inherit;
 }
 
+/* Template document combobox */
+select#ComboboxTemplateDoc {
+  max-width: 200px;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
