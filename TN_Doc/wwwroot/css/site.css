@@ -70,6 +70,15 @@ select#ComboboxTemplateDoc {
   vertical-align: middle !important;
 }
 
+/* Ensure all controls in top panel are aligned */
+#viewPanel select,
+#viewPanel input[type="button"],
+#viewPanel button {
+  display: inline-block;
+  vertical-align: middle !important;
+  margin: 0 !important;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
