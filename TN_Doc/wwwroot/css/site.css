@@ -65,6 +65,11 @@ select#ComboboxTemplateDoc {
   max-width: 450px;
 }
 
+/* Vertical alignment for top panel with controls */
+#viewPanel table td {
+  vertical-align: middle !important;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
