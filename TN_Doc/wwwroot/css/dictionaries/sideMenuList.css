@@ -29,7 +29,7 @@
 .side-menu-list .side-menu-item:active {
     background: #1E88E5; /* Прямое указание цвета */
     color: white;
-    font-weight: 600; /* Прямое указание веса */
+    font-weight: 400; /* Нормальный вес, без полужирного */
     border-radius: 8px; /* Прямое указание радиуса */
 }
 
@@ -60,7 +60,7 @@
 .list-group.side-menu-list .list-group-item.side-menu-item:active {
     background: #1E88E5; /* Прямое указание цвета */
     color: white;
-    font-weight: 600; /* Прямое указание веса */
+    font-weight: 400; /* Нормальный вес, без полужирного */
     border-radius: 8px; /* Прямое указание радиуса */
 }
 
