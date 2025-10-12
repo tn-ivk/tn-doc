@@ -11,7 +11,7 @@
 
 .qp-dir-item, .dir-item {
     height: 80vh !important;
-} 
+}
 
 /* Обеспечиваем растягивание модального окна-справочника по высоте
    и корректную работу flex-раскладки внутри, чтобы нижнее меню
@@ -55,6 +55,14 @@
 }
 
 #modal-window .dir-item {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Вкладка "Методы испытаний": гарантируем растяжение контейнера */
+#modal-window .qp-dir-item {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
