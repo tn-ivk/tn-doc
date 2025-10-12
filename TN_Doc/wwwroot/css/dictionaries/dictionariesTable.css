@@ -136,4 +136,8 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 16px; /* Увеличено согласно M3 spacing */
+    position: sticky;
+    bottom: 0;
+    background: #FAFAFA; /* фон как у таблицы, чтобы перекрывать контент прилипанием */
+    padding-top: 8px;
 } 

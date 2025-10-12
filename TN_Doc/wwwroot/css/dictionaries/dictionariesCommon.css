@@ -12,3 +12,51 @@
 .qp-dir-item, .dir-item {
     height: 80vh !important;
 } 
+
+/* Обеспечиваем растягивание модального окна-справочника по высоте
+   и корректную работу flex-раскладки внутри, чтобы нижнее меню
+   (кнопка "Добавить") оставалось у нижней кромки */
+#modal-window .modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh !important;
+}
+
+#modal-window .modal-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* важно для прокрутки вложенных контейнеров */
+}
+
+#modal-window .modal-body > .container-fluid {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#modal-window .modal-body > .container-fluid > .row.tab-item {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#modal-window .modal-body .col-9 {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#modal-window .dictionaries {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#modal-window .dir-item {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
