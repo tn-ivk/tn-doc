@@ -373,12 +373,12 @@ function saveTemplatesForCurrentDoc() {
   const device = selectedDevices.value[0];
   const doc = device.Docs.find(d => d.IdDoc === dialogDocId.value);
 
-  // Проверка: если документ включен, должен быть выбран хотя бы один шаблон
-  if (doc && doc.Use && dialogTemplateIds.value.length === 0) {
+  // Проверка: у документа должен быть выбран хотя бы один шаблон (независимо от того, включен документ или нет)
+  if (doc && dialogTemplateIds.value.length === 0) {
     toast.add({
       severity: 'warn',
       summary: 'Предупреждение',
-      detail: `У включенного документа "${doc.Name}" должен быть выбран хотя бы один шаблон`,
+      detail: `У документа "${doc.Name}" должен быть выбран хотя бы один шаблон`,
       life: 4000
     });
     return;
@@ -625,14 +625,14 @@ function toggleTemplateUse(docId: number, templateId: number) {
   const template = doc.TemplateDocs?.find(t => t.Id === templateId);
   if (!template) return;
 
-  // Проверка: если пытаемся отключить шаблон, проверяем, не последний ли он у включенного документа
-  if (template.Use && doc.Use) {
+  // Проверка: если пытаемся отключить шаблон, проверяем, не последний ли он у документа (независимо от того, включен документ или нет)
+  if (template.Use) {
     const enabledTemplatesCount = (doc.TemplateDocs || []).filter(t => t.Use).length;
     if (enabledTemplatesCount === 1) {
       toast.add({
         severity: 'warn',
         summary: 'Предупреждение',
-        detail: `Невозможно отключить последний шаблон у включенного документа "${doc.Name}"`,
+        detail: `Невозможно отключить последний шаблон у документа "${doc.Name}"`,
         life: 4000
       });
       return;
