@@ -43,6 +43,27 @@
         #AdditionalInfo {
             width: 100%;
             margin-bottom: 15px;
+            table-layout: fixed;
+        }
+
+        /* Первая колонка - ширина по содержимому, но не более 70% */
+        #AdditionalInfo td:first-child {
+            width: auto;
+            max-width: 70%;
+            white-space: nowrap;
+        }
+
+        /* Вторая колонка - заполняет оставшееся место */
+        #AdditionalInfo td:nth-child(2) {
+            width: auto;
+        }
+
+        /* Элементы ввода во второй колонке растягиваются на всю ширину */
+        #AdditionalInfo td:nth-child(2) input,
+        #AdditionalInfo td:nth-child(2) select,
+        #AdditionalInfo td:nth-child(2) textarea {
+            width: 100%;
+            box-sizing: border-box;
         }
 
         /* Обычные строки */
