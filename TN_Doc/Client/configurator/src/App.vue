@@ -170,8 +170,8 @@ function handleCancel() {
 
 .configurator-header {
   padding: 0.5rem 1rem 0 1rem;
-  border-bottom: 1px solid #dee2e6;
-  background-color: #f8f9fa;
+  border-bottom: 1px solid var(--md-outline, #CFD8DC);
+  background-color: var(--md-surface, #FAFAFA);
   flex: 1;
   display: flex;
   flex-direction: column;

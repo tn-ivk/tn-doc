@@ -286,17 +286,17 @@ const armOpcSettings = computed({
 
 /* Стили для кнопки настроек OPC (многоточие) */
 :deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
-  border: 1px solid #dee2e6 !important;
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text-muted, #495057) !important;
+  border: 1px solid var(--md-outline, #CFD8DC) !important;
   border-radius: 0.25rem !important;
   transition: all 0.15s ease-in-out !important;
 }
 
 :deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
-  background-color: #e9ecef !important;
-  color: #212529 !important;
-  border-color: #adb5bd !important;
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text, #212121) !important;
+  border-color: var(--md-outline-light, #E0E0E0) !important;
 }
 
 /* Кастомные стили для переключателя OPC */
