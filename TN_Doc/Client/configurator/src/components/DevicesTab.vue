@@ -1,7 +1,7 @@
 <template>
   <div class="devices-tab">
-    <Splitter style="height: 600px">
-      <SplitterPanel :size="30" :minSize="20">
+    <Splitter class="devices-splitter">
+      <SplitterPanel :size="15" :minSize="15">
         <DeviceList />
       </SplitterPanel>
       <SplitterPanel :size="70">
@@ -21,5 +21,27 @@ import DeviceEditor from './DeviceEditor.vue';
 <style scoped>
 .devices-tab {
   padding: 0.5rem;
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.devices-splitter {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Прозрачный фон для Splitter и его панелей */
+:deep(.p-splitter) {
+  background-color: transparent;
+}
+
+:deep(.p-splitter-panel) {
+  background-color: transparent;
+}
+
+:deep(.p-splitter-gutter) {
+  background-color: var(--md-outline, #CFD8DC);
 }
 </style>

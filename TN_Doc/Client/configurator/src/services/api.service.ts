@@ -14,6 +14,11 @@ function toPascalCase(obj: any): any {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
       result[pascalKey] = toPascalCase(obj[key]);
+      
+      // Специальная обработка для dbConnectionStrings
+      if (key === 'dbConnectionStrings') {
+        result['DBConnectionStrings'] = toPascalCase(obj[key]);
+      }
     }
   }
   return result;
@@ -32,6 +37,11 @@ function toCamelCase(obj: any): any {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
       result[camelKey] = toCamelCase(obj[key]);
+      
+      // Специальная обработка для DBConnectionStrings
+      if (key === 'DBConnectionStrings') {
+        result['dbConnectionStrings'] = toCamelCase(obj[key]);
+      }
     }
   }
   return result;

@@ -606,22 +606,43 @@ function InitExportFormat() {
 function InitProtocolNumber() {
     $('#ComboboxProtocolNumber').empty();
 
-    $.ajax(
-        {
-            async: false,
-            url: 'Home/GetListProtocolNumber',
-            type: 'GET',
-            data:
-                {
-                    IdDevice: $('#ComboboxDevice').val(),
-                    IdDoc: $('#ComboboxDocGUID').val(),
-                },
-            success: function (data) {
-                data.forEach((item) => {
-                    $('#ComboboxProtocolNumber').append('<option value=' + item.id + '>' + item.name + '</option>');
-                });
+    // Проверяем на сервере, использует ли документ номер протокола
+    $.ajax({
+        async: false,
+        url: 'Home/IsProtocolNumberUsed',
+        type: 'GET',
+        data: {
+            idDoc: $('#ComboboxDocGUID').val()
+        },
+        success: function (isUsed) {
+            if (!isUsed) {
+                $('#ComboboxProtocolNumber').hide();
+                return;
             }
-        });
+
+            $('#ComboboxProtocolNumber').show();
+
+            // Загружаем список протоколов
+            $.ajax({
+                async: false,
+                url: 'Home/GetListProtocolNumber',
+                type: 'GET',
+                data: {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val()
+                },
+                success: function (data) {
+                    data.forEach((item) => {
+                        $('#ComboboxProtocolNumber').append('<option value=' + item.id + '>' + item.name + '</option>');
+                    });
+                }
+            });
+        },
+        error: function() {
+            // В случае ошибки скрываем комбобокс
+            $('#ComboboxProtocolNumber').hide();
+        }
+    });
 }
 
 function InitDatepickerBegin() {
@@ -705,8 +726,17 @@ function InitTableDocs() {
 
             columns:
                 [
-                    {data: 'dt'},
-                    {data: 'description'}
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            // Для отображения и фильтрации объединяем дату и описание
+                            if (type === 'display' || type === 'filter') {
+                                return row.dt + ' ' + row.description;
+                            }
+                            // Для сортировки используем дату
+                            return row.dt;
+                        }
+                    }
                 ],
         });
 
@@ -854,9 +884,9 @@ async function GetDoc() {
 }
 
 function GetEditDoc() {
-    if(currentId == null) 
+    if(currentId == null)
         return;
-    
+
     $.ajax(
         {
             async: false,
@@ -867,17 +897,26 @@ function GetEditDoc() {
                 IdDoc: $('#ComboboxDocGUID').val(),
                 id: currentId
             },
-            success: function (data) {
+            success: function (htmlContent) {
+                // Создаём Blob из HTML-контента
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                // Освобождаем предыдущий Blob URL, если он существует
                 $('.FR').each(function () {
-                    $(this).attr('src', '/HTML/html.html');
+                    const oldSrc = $(this).attr('src');
+                    if (oldSrc && oldSrc.startsWith('blob:')) {
+                        URL.revokeObjectURL(oldSrc);
+                    }
+                    $(this).attr('src', blobUrl);
                 });
 
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
-                
+
             }
         });
-    
+
     isViewing = false;
     $('#viewModeButton').prop('value', '     Просмотр     ');
 }

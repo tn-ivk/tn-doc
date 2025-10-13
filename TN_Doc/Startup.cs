@@ -51,10 +51,11 @@ public class Startup
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
+		services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
 		services.AddScoped<IConfigurationService, ConfigurationService>();
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
-		services.AddSingleton<IDocModuleLoader, DocModuleLoader>();
+		services.AddSingleton<IDocModuleLoader, CachedDocModuleLoader>();
 
 		// Status Bar сервисы
 		services.AddSignalR();

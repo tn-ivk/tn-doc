@@ -1,6 +1,6 @@
 :root {
-    --elis-active-color: #8fd19e;
-    --elis-disabled-color: #8fd19e;
+    --elis-active-color: var(--md-elis-highlight);
+    --elis-disabled-color: var(--md-elis-highlight);
 }
 
 /* Стили для ячеек с данными из ЕЛИС */

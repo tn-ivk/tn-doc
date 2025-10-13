@@ -2657,8 +2657,9 @@ function _createWithOnlyImgButton(faClass, buttonClass) {
         }
     }
     img.ariaHidden = true;
-    img.style.fontSize = '1.5em';
-    
+    // Удалён inline style для fontSize - размер теперь контролируется через CSS классы
+    // img.style.fontSize = '1.5em';
+
     let btn = document.createElement('button');
     if (typeof buttonClass === 'string') {
         if (buttonClass.includes(':')) {

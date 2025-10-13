@@ -26,6 +26,7 @@
           :options="opcTypes"
           option-label="label"
           option-value="value"
+          :allowEmpty="false"
         />
         <Button
           icon="pi pi-ellipsis-h"
@@ -37,6 +38,9 @@
         />
       </div>
     </div>
+
+    <!-- Заполнитель для растягивания по высоте -->
+    <div class="spacer"></div>
 
     <!-- Модальное окно настроек OPC -->
     <Dialog
@@ -105,21 +109,39 @@ const opcTypes = [
 ];
 
 const opcType = computed({
-  get: () => currentConfig.value?.ArmOpcConnectionSettings?.Type || OpcType.UA,
+  get: () => {
+    // Получаем значение из API (может быть числом или строкой)
+    const apiType = currentConfig.value?.ArmOpcConnectionSettings?.Type;
+    
+    // Маппинг числовых значений в строковые
+    if ((apiType as any) === 0) return OpcType.DA;
+    if ((apiType as any) === 1) return OpcType.UA;
+    
+    // Если значение уже строковое, возвращаем как есть
+    if (apiType === OpcType.DA || apiType === OpcType.UA) return apiType;
+    
+    // Если не удалось замапить, возвращаем undefined для неопределенного состояния
+    return undefined;
+  },
   set: (value: OpcType) => {
     const currentSettings = currentConfig.value?.ArmOpcConnectionSettings;
     if (currentSettings) {
+      // Маппинг строковых значений в числовые для API
+      const numericValue = value === OpcType.DA ? 0 : 1;
+      
       configStore.updateGeneralSettings({
         ArmOpcConnectionSettings: {
           ...currentSettings,
-          Type: value
+          Type: numericValue as any // Временно используем any для обхода типов
         }
       });
     } else {
       // Создаем новые настройки с дефолтными значениями
+      const numericValue = value === OpcType.DA ? 0 : 1;
+      
       configStore.updateGeneralSettings({
         ArmOpcConnectionSettings: {
-          Type: value,
+          Type: numericValue as any, // Временно используем any для обхода типов
           DaSettings: {
             Host: '127.0.0.1',
             ProgId: 'psregulopcda_01',
@@ -150,17 +172,21 @@ const armOpcSettings = computed({
 <style scoped>
 .general-tab {
   padding: 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .field {
   margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
 .field-horizontal {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0;
+  margin-bottom: 0.75rem;
 }
 
 .field-horizontal label {
@@ -196,11 +222,17 @@ const armOpcSettings = computed({
 .opc-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  flex: 1;
 }
 
 .mt-2 {
   margin-top: 0.5rem;
+}
+
+.spacer {
+  flex: 1;
+  min-height: 0;
 }
 
 /* Компактные панели */
@@ -217,11 +249,26 @@ const armOpcSettings = computed({
   padding: 0.5rem 0.75rem;
 }
 
-/* Компактные input элементы */
-:deep(.p-inputtext),
-:deep(.p-inputnumber-input) {
-  padding: 0.375rem 0.5rem;
-  font-size: 0.9rem;
+/* Стили для поля "Путь экспорта документов" */
+:deep(.p-inputtext#export-path) {
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.p-inputtext#export-path:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
+}
+
+:deep(.p-inputtext#export-path:hover) {
+  border-color: #B0BEC5 !important;
 }
 
 :deep(.p-inputswitch) {
@@ -235,5 +282,58 @@ const armOpcSettings = computed({
 
 :deep(.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider) {
   transform: translateX(1rem);
+}
+
+/* Стили для кнопки настроек OPC (многоточие) */
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text-muted, #495057) !important;
+  border: 1px solid var(--md-outline, #CFD8DC) !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text, #212121) !important;
+  border-color: var(--md-outline-light, #E0E0E0) !important;
+}
+
+/* Кастомные стили для переключателя OPC */
+:deep(.p-selectbutton .p-togglebutton) {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.8rem !important;
+  border: 1px solid #CFD8DC !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  transition: all 0.15s ease-in-out !important;
+  min-height: 28px !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton:hover) {
+  background-color: #F1F3F4 !important;
+  border-color: #B0BEC5 !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
+  background-color: #1E88E5 !important;
+  border-color: #1E88E5 !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
+  background-color: #1565C0 !important;
+  border-color: #1565C0 !important;
+}
+
+/* Исправляем внутренний контент активной кнопки */
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-content) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
+  background-color: transparent !important;
+  color: #ffffff !important;
 }
 </style>

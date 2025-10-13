@@ -32,6 +32,9 @@
     <None Include="appsettings.json;Config.xml;nlog.config;prutils\winprutil.exe;wwwroot\HTML\DocEditAct.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+      <None Include="wwwroot\HTML\*.html">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     <!-- Условное включение PDF.pdf, если файл существует -->
     <None Include="wwwroot\PDF\PDF.pdf" Condition="Exists('wwwroot\PDF\PDF.pdf')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

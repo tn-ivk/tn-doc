@@ -6,12 +6,17 @@
       option-label="Name"
       option-value="IdDevice"
       multiple
+      :metaKeySelection="true"
       class="device-listbox"
       listStyle="height: 100%"
     >
       <template #option="slotProps">
-        <div class="device-item">
-          <i :class="slotProps.option.Use ? 'pi pi-check-circle text-blue-500' : 'pi pi-times-circle text-red-500'" />
+        <div 
+          class="device-item" 
+          :data-device-id="slotProps.option.IdDevice"
+          @click="handleDeviceItemClick($event, slotProps.option.IdDevice)"
+        >
+          <i :class="getDeviceIconClass(slotProps.option)" />
           <span class="device-name">{{ slotProps.option.Name }}</span>
           <span v-if="slotProps.option.Description" class="device-description">
             {{ slotProps.option.Description }}
@@ -47,6 +52,61 @@ const selectedIds = computed({
     configStore.selectDevices(value);
   }
 });
+
+// Обработка кликов на элементах устройств
+function handleDeviceItemClick(event: MouseEvent, deviceId: number) {
+  // Одиночный клик без модификаторов — выбрать только один элемент
+  if (!event.ctrlKey && !event.shiftKey) {
+    event.preventDefault();
+    event.stopPropagation();
+    configStore.selectDevices([deviceId]);
+    return;
+  }
+
+  // С Ctrl/Shift — множественный выбор вручную, не полагаясь на Listbox
+  event.preventDefault();
+  event.stopPropagation();
+
+  const current = [...selectedIds.value];
+  const idx = current.indexOf(deviceId);
+
+  if (event.ctrlKey) {
+    // Ctrl — toggle элемента
+    if (idx >= 0) {
+      current.splice(idx, 1);
+    } else {
+      current.push(deviceId);
+    }
+    configStore.selectDevices(current);
+    return;
+  }
+
+  if (event.shiftKey) {
+    // Shift — диапазон от последнего выбранного к текущему
+    // Берём последний выбранный как якорь, если есть
+    const anchor = selectedIds.value.length > 0 ? selectedIds.value[selectedIds.value.length - 1] : deviceId;
+    const idsOrdered = filteredDevices.value.map(d => d.IdDevice);
+    const aIndex = idsOrdered.indexOf(anchor);
+    const bIndex = idsOrdered.indexOf(deviceId);
+    if (aIndex >= 0 && bIndex >= 0) {
+      const [start, end] = aIndex <= bIndex ? [aIndex, bIndex] : [bIndex, aIndex];
+      const range = idsOrdered.slice(start, end + 1);
+      const set = new Set(current);
+      range.forEach(id => set.add(id));
+      configStore.selectDevices(Array.from(set));
+      return;
+    }
+    // fallback: если не нашли индексы — выбрать только кликнутый
+    configStore.selectDevices([deviceId]);
+  }
+}
+
+function getDeviceIconClass(device: { Use?: boolean } | undefined) {
+  if (device?.Use) {
+    return 'pi pi-bolt text-blue-500';
+  }
+  return 'pi pi-lock text-gray-500';
+}
 </script>
 
 <style scoped>
@@ -55,6 +115,7 @@ const selectedIds = computed({
   flex-direction: column;
   height: 100%;
   padding: 0.5rem;
+  box-sizing: border-box;
 }
 
 .device-listbox {
@@ -78,8 +139,12 @@ const selectedIds = computed({
 }
 
 .selection-info {
-  margin-top: 0.5rem;
-  padding: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0 0.5rem;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--surface-50);
   border-radius: 4px;
   text-align: center;
@@ -93,5 +158,23 @@ const selectedIds = computed({
 
 .text-red-500 {
   color: var(--red-500);
+}
+
+.text-gray-500 {
+  color: var(--text-color-secondary);
+}
+
+/* Прозрачный фон для Listbox */
+:deep(.p-listbox) {
+  background-color: transparent;
+  border: 1px solid var(--md-outline, #CFD8DC);
+}
+
+:deep(.p-listbox-list-container) {
+  background-color: transparent;
+}
+
+:deep(.p-listbox-list) {
+  background-color: transparent;
 }
 </style>
