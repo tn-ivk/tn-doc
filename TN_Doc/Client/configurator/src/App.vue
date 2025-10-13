@@ -327,6 +327,7 @@ function handleCancel() {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  background-color: transparent; /* Прозрачный фон, наследует от родителя */
 }
 
 :deep(.p-tabpanel) {
@@ -334,11 +335,13 @@ function handleCancel() {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  background-color: transparent; /* Прозрачный фон для панели вкладки */
 }
 
 :deep(.p-tabs) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: transparent; /* Прозрачный фон для контейнера вкладок */
 }
 </style>
