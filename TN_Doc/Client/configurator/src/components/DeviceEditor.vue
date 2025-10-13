@@ -1125,4 +1125,45 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .text-red-500 {
   color: #ef4444;
 }
+
+/* Выравнивание чекбоксов в секции недопустимых символов */
+.invalid-chars-panel .field-horizontal {
+  align-items: center;
+}
+
+.invalid-chars-panel .field-horizontal > label {
+  align-self: center;
+  line-height: 1.5;
+}
+
+.invalid-chars-panel .invalid-chars-section {
+  align-items: center;
+}
+
+.invalid-chars-panel .field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+.invalid-chars-panel .field-checkbox :deep(.p-checkbox) {
+  flex-shrink: 0;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.invalid-chars-panel .field-checkbox :deep(.p-checkbox-box) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.invalid-chars-panel .field-checkbox label {
+  margin: 0;
+  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+}
 </style>
