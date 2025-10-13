@@ -74,7 +74,7 @@
 .users-table .action-buttons-cell .action-btn i,
 .qp-method-table .action-buttons-cell .action-btn i,
 .action-btn i {
-    font-size: 1.2em !important; /* !important для гарантии применения */
+    font-size: 1.5em !important; /* Увеличен до 1.5em для соответствия кнопкам на вкладке Персонал */
     vertical-align: middle !important;
 }
 
