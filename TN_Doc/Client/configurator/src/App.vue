@@ -302,19 +302,22 @@ function handleCancel() {
   align-items: center;
   flex: 1;
   min-width: 0;
+  background-color: transparent; /* Прозрачный фон, наследует от родителя */
 }
 
 :deep(.p-tab) {
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
   min-height: auto;
-  color: #212121; /* Цвет заголовков вкладок - черный */
+  color: var(--md-text, #212121); /* Цвет заголовков вкладок - черный */
   font-weight: 400; /* Обычный вес шрифта для неактивных вкладок */
+  background-color: transparent; /* Прозрачный фон */
 }
 
 :deep(.p-tab.p-tab-selected) {
-  color: #212121; /* Цвет активной вкладки - черный */
+  color: var(--md-text, #212121); /* Цвет активной вкладки - черный */
   font-weight: 600; /* Полужирный для активной вкладки */
+  background-color: transparent; /* Прозрачный фон для активной вкладки */
 }
 
 :deep(.p-tabpanels) {
