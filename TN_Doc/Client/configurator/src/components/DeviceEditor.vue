@@ -743,10 +743,17 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   background-color: transparent;
 }
 
-/* Уменьшенный верхний отступ для панелей OPC и недопустимых символов (без заголовка) */
 .opc-panel :deep(.p-panel-content),
 .invalid-chars-panel :deep(.p-panel-content) {
-  padding-top: 0.25rem;
+  padding-top: 0.5rem;
+}
+
+/* Скрываем шапку у панелей без заголовка (OPC, недопустимые символы) */
+.opc-panel :deep(.p-panel-header),
+.invalid-chars-panel :deep(.p-panel-header) {
+  display: none;
+  padding: 0;
+  border: 0;
 }
 
 /* Компактные input элементы */
