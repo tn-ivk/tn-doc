@@ -64,6 +64,47 @@
         #AdditionalInfo td:nth-child(2) textarea {
             width: 100%;
             box-sizing: border-box;
+            height: 35px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #CFD8DC; /* --md-outline */
+            background-color: white;
+            color: #212121; /* --md-text */
+            font-size: 15px;
+            font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        /* Textarea - автоматическая высота */
+        #AdditionalInfo td:nth-child(2) textarea {
+            height: auto;
+            min-height: 35px;
+            resize: vertical;
+        }
+
+        /* Hover состояние для элементов ввода */
+        #AdditionalInfo td:nth-child(2) input:hover,
+        #AdditionalInfo td:nth-child(2) select:hover,
+        #AdditionalInfo td:nth-child(2) textarea:hover {
+            border-color: #B0BEC5;
+        }
+
+        /* Focus состояние для элементов ввода */
+        #AdditionalInfo td:nth-child(2) input:focus,
+        #AdditionalInfo td:nth-child(2) select:focus,
+        #AdditionalInfo td:nth-child(2) textarea:focus {
+            outline: none;
+            border-color: #1E88E5; /* --md-primary */
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35);
+        }
+
+        /* Disabled состояние для элементов ввода */
+        #AdditionalInfo td:nth-child(2) input:disabled,
+        #AdditionalInfo td:nth-child(2) select:disabled,
+        #AdditionalInfo td:nth-child(2) textarea:disabled {
+            background-color: #F1F3F4; /* --md-surface-variant */
+            color: #5F6368; /* --md-text-secondary */
+            cursor: not-allowed;
         }
 
         /* Обычные строки */
