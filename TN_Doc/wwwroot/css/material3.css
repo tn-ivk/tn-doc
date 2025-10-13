@@ -162,6 +162,23 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
   vertical-align: middle !important; /* Align with comboboxes */
 }
 
+/* Default icon size in all buttons (was previously set via inline style in JS) */
+/* Размер иконок для обычных кнопок - 1.5em */
+/* Для action-кнопок в справочниках размер переопределяется в actionButtons.css */
+button i.fa {
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+/* Для кнопок в таблицах справочников используем унифицированный размер */
+.users-table button i.fa,
+.licences-table button i.fa,
+.qp-method-table button i.fa,
+.dictionaries-table button i.fa {
+  font-size: 1.2em !important;
+  vertical-align: middle !important;
+}
+
 /* Specific alignment for filter button */
 .filterButton {
   /* keep default alignment */
