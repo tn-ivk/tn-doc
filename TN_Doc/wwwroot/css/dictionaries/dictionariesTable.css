@@ -89,14 +89,8 @@
 }
 
 /* Центрирование чекбоксов и иконок */
-.dictionaries-table td i,
-.user-group-table td i,
-.licences-table td i,
-.users-table td i,
-.qp-method-table td i {
-    font-size: 1.2em;
-    vertical-align: middle;
-}
+/* Убрано общее правило для всех иконок - стили теперь централизованы в actionButtons.css */
+/* Это правило конфликтовало с action-кнопками из-за большей специфичности селектора */
 
 /* Стили для пустых ячеек */
 .dictionaries-table td:empty,
