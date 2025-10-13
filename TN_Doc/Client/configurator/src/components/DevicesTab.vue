@@ -31,4 +31,17 @@ import DeviceEditor from './DeviceEditor.vue';
   flex: 1;
   min-height: 0;
 }
+
+/* Прозрачный фон для Splitter и его панелей */
+:deep(.p-splitter) {
+  background-color: transparent;
+}
+
+:deep(.p-splitter-panel) {
+  background-color: transparent;
+}
+
+:deep(.p-splitter-gutter) {
+  background-color: var(--md-outline, #CFD8DC);
+}
 </style>

@@ -726,13 +726,21 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 /* Компактные панели */
+:deep(.p-panel) {
+  background-color: transparent;
+  border: 1px solid var(--md-outline, #CFD8DC);
+}
+
 :deep(.p-panel-header) {
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
+  background-color: transparent;
+  border-bottom: 1px solid var(--md-outline, #CFD8DC);
 }
 
 :deep(.p-panel-content) {
   padding: 0.5rem 0.75rem;
+  background-color: transparent;
 }
 
 /* Уменьшенный верхний отступ для панелей OPC и недопустимых символов (без заголовка) */
@@ -902,6 +910,19 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   background-color: var(--md-surface-variant, #F1F3F4) !important;
   color: var(--md-text, #212121) !important;
   border-color: var(--md-outline-light, #E0E0E0) !important;
+}
+
+/* Прозрачный фон для таблицы документов */
+.docs-table :deep(.p-datatable) {
+  background-color: transparent;
+}
+
+.docs-table :deep(.p-datatable-wrapper) {
+  background-color: transparent;
+}
+
+.docs-table :deep(.p-datatable-tbody) {
+  background-color: transparent;
 }
 
 /* Скрытие заголовков таблицы документов */
