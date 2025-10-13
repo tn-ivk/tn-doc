@@ -1,5 +1,5 @@
 :root {
-    --disabled-bg-color: #F5F5F5;
+    --disabled-bg-color: var(--md-disabled-bg);
 }
 
 /*chrome*/

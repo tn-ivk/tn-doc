@@ -3,7 +3,10 @@
     "allow": [
       "Bash(grep:*)",
       "Bash(rg:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_install"
     ],
     "deny": []
   }

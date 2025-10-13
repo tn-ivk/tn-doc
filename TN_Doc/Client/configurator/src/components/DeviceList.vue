@@ -163,4 +163,18 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
 .text-gray-500 {
   color: var(--text-color-secondary);
 }
+
+/* Прозрачный фон для Listbox */
+:deep(.p-listbox) {
+  background-color: transparent;
+  border: 1px solid var(--md-outline, #CFD8DC);
+}
+
+:deep(.p-listbox-list-container) {
+  background-color: transparent;
+}
+
+:deep(.p-listbox-list) {
+  background-color: transparent;
+}
 </style>

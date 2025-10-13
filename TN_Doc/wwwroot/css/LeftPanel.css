@@ -34,7 +34,7 @@ input[type=number] {
 }
 
 .topPanel {
-    height: 30px;
+    height: var(--md-control-height-sm);
 }
 
 .leftPanel {
@@ -53,6 +53,11 @@ input[type=number] {
 .filterTable > tbody > tr > td {
     border: 1px solid black;
     border-collapse: collapse;
+}
+
+/* Left padding for filter labels (exclude row with DataTable) */
+.filterTable > tbody > tr:not(:has(#DataTable)) > td:first-child {
+    padding-left: 4px;
 }
 
 .searched-table {
@@ -96,8 +101,8 @@ select.filterSelect {
 .filterButton {
     width: 40%;
     display: inline-flex;
-    background-color: #1b6ec2;
-    color: #ffffff;
+    background-color: var(--md-primary);
+    color: var(--md-white);
     border: none;
     border-radius: 6px;
     padding: 5px 10px;
@@ -201,13 +206,13 @@ select.filterSelect {
 }
 
 .invalid-cell-content {
-    border: 2px solid #dc3545 !important;
-    background-color: #fff8f8 !important;
+    border: 2px solid var(--md-error-bootstrap) !important;
+    background-color: var(--md-error-light) !important;
     transition: all 0.3s ease-in-out;
 }
 
 .validation-message {
-    color: #dc3545;
+    color: var(--md-error-bootstrap);
     font-size: 12px;
     margin-top: 4px;
     display: block;
@@ -217,7 +222,7 @@ select.filterSelect {
 
 .validation-tooltip {
     position: absolute;
-    background-color: #dc3545;
+    background-color: var(--md-error-bootstrap);
     color: white;
     padding: 5px 10px;
     border-radius: 4px;
@@ -241,7 +246,7 @@ select.filterSelect {
     transform: translateX(-50%);
     border-width: 0 5px 5px;
     border-style: solid;
-    border-color: transparent transparent #dc3545;
+    border-color: transparent transparent var(--md-error-bootstrap);
 }
 
 td {
@@ -250,7 +255,7 @@ td {
 
 input.invalid-cell-content,
 select.invalid-cell-content {
-    border: 2px solid #dc3545 !important;
+    border: 2px solid var(--md-error-bootstrap) !important;
     box-shadow: 0 0 5px rgba(220, 53, 69, 0.5) !important;
     animation: shake 0.5s ease-in-out;
 }
@@ -290,7 +295,7 @@ select.invalid-cell-content {
 }
 
 .default-btn-size {
-    height: 40px;
+    height: var(--md-control-height-lg);
     width: 115px;
 }
 
@@ -309,7 +314,42 @@ select.invalid-cell-content {
 
 .close-menu {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Одинаковая ширина для обеих кнопок */
+.modal-header .close-menu .save-btn,
+.modal-header .close-menu .close-modal-wnd-btn {
+    min-width: 40px;
+}
+
+/* Увеличенная иконка дискеты в кнопке "Сохранить" */
+.modal-header .close-menu .save-btn .fa-floppy-o {
+    font-size: 1.25rem;
+}
+
+/* Увеличенная иконка крестика в кнопке "Отмена" */
+.modal-header .close-menu .close-modal-wnd-btn .fa-times {
+    font-size: 1.25rem;
+}
+
+/* Серая кнопка "Отмена" с крестиком */
+.modal-header .close-menu .close-modal-wnd-btn {
+    background-color: var(--md-gray-600) !important;
+    color: var(--md-white) !important;
+    border-color: var(--md-gray-600) !important;
+}
+
+.modal-header .close-menu .close-modal-wnd-btn:hover {
+    background-color: var(--md-gray-700) !important;
+    border-color: var(--md-gray-700) !important;
+}
+
+.modal-header .close-menu .close-modal-wnd-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .padding-one-px-top {
@@ -324,6 +364,9 @@ select.invalid-cell-content {
 }
 
 /* Стили для строки поиска DataTables */
+#DataTable_filter {
+    padding-left: 4px;
+}
 #DataTable_filter label {
     display: flex;
     align-items: center;

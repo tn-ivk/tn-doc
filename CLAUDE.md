@@ -11,11 +11,27 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **SDK Compatibility**: Works with .NET SDK 8.0+ and 9.0+
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
 **Main Development Branch**: develop
-**Note**: Recent work on status bar improvements (removed time display and version info from status bar)
+**Current Branch**: feature/ui-theme-2 (UI theme centralization and Configurator enhancements)
+
+**Important Notes:**
+- Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, and status bar cleanup
+- Global user instruction: Do not mention AI or code generation in commit messages
 
 ## Build and Development Commands
 
 ### Prerequisites
+
+**Required Software:**
+- .NET SDK 8.0 or higher
+- .NET Runtime 8.0.13 or higher
+- Node.js 18+ and npm 8+ (for Vue applications)
+- MySQL/MariaDB server (for production)
+
+**Linux-specific:**
+- libgdiplus package (required for FastReport rendering)
+- CUPS printing system (for physical printing)
+
+**NuGet Source Configuration:**
 ```bash
 # Add required NuGet sources
 dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
@@ -66,23 +82,46 @@ dotnet run --urls="http://localhost:38509;https://localhost:44357"
 
 # Run with verbose output for debugging
 dotnet run --verbosity detailed
+
+# Application will be available at:
+# - Default ports: http://localhost:38509 and https://localhost:44357
+# - Custom port: http://localhost:5000 (when using --urls="http://localhost:5000")
+# - StatusBar: Available on main page as embedded component
+# - Configurator UI: http://localhost:PORT/configurator
+# - API endpoints: http://localhost:PORT/api/*
 ```
 
-### Building Vue Components (StatusBar)
+### Building Vue Components (StatusBar & Configurator)
 ```bash
-# Navigate to StatusBar project
-cd TN_Doc/Client/statusbar
+# Navigate to Client project root (monorepo workspace)
+cd TN_Doc/Client
 
-# Install dependencies (first time only)
+# Install all dependencies (first time only)
 npm install
 
-# Development mode with hot reload
+# Development mode - StatusBar with hot reload
 npm run dev
+# or explicitly
+npm run dev --workspace=statusbar
 
-# Build for production
+# Development mode - Configurator with hot reload
+npm run dev:configurator
+
+# Build StatusBar for production
 npm run build
 
-# The build output goes to dist/ and is automatically served by ASP.NET Core
+# Build Configurator for production
+npm run build:configurator
+
+# Build all Vue apps (StatusBar + Configurator)
+npm run build:all
+
+# Type checking across all workspaces
+npm run type-check
+
+# Build outputs:
+# - StatusBar: TN_Doc/wwwroot/statusbar/
+# - Configurator: TN_Doc/wwwroot/configurator/
 ```
 
 ### Testing
@@ -183,8 +222,14 @@ The following projects must be deployed at the same level (all share TN_Doc conf
   - Views: `TN_Doc/Views/`
   - Static files: `TN_Doc/wwwroot/`
   - Configuration: `TN_Doc/appsettings.json`, `TN_Doc/nlog.config`
+- **TN_Doc/Client/**: Frontend applications (npm workspace monorepo)
+  - `statusbar/`: Real-time status monitoring Vue 3 app
+  - `configurator/`: Configuration management Vue 3 app
+  - `shared/`: Shared TypeScript utilities and API client
+  - `package.json`: Workspace root with unified scripts
+  - `vite.config.base.ts`: Shared Vite configuration
 - **TN.DocGeneral**: Core business logic and shared utilities
-- **Ivk.DataBase**: Database library
+- **Ivk.DataBase**: Database library for IVK measurement system data access
 - **tn.docgeneral/** (Document modules organized by type):
   - Individual document implementations (Passport, Poverka*, KMH*, Act, Report, Jornal)
   - Sikn425 modules in separate subfolder
@@ -234,6 +279,12 @@ Each document type module implements a consistent pattern:
   - Development configs: `*.Development.json`
   - Only copied to output in Debug builds
   - Removed before deployment to avoid conflicts
+- **Configuration Management**:
+  - Web-based configurator UI at `/configurator` endpoint (Vue 3 SPA)
+  - ConfigurationService provides thread-safe config updates
+  - Validators ensure OPC and DB settings correctness before save
+  - Change logging with diff calculation for audit trails
+  - REST API at `/api/configurator/` for programmatic access
 
 ## Key Dependencies and External Systems
 
@@ -358,6 +409,36 @@ The application includes a real-time status bar built with **Vue 3 + PrimeVue** 
   - Message: Error notifications
   - Tooltip: Contextual help
 
+### Configurator Architecture
+The application includes a web-based configuration interface built with **Vue 3 + PrimeVue**:
+- **Frontend Stack**:
+  - Vue 3.4.21 with TypeScript
+  - **PrimeVue 4.2+** - Enterprise UI component library
+  - Pinia for state management
+  - Axios HTTP client
+  - Vite as build tool
+  - Source: `/TN_Doc/Client/configurator/`
+- **Features**:
+  - General settings tab: export paths, security features, local OPC client config
+  - Devices tab: device list with search, multi-select for batch editing, mixed-state indicators
+  - Per-device configuration: enabled state, document templates, DB connections, OPC settings
+  - Real-time validation with backend validators (OpcConfigValidator, DbConfigValidator)
+  - Unsaved changes protection (browser beforeunload warning)
+  - Change logging with diff calculation
+- **Backend Components**:
+  - `ConfiguratorController`: REST API at `/api/configurator/`
+  - `ConfigurationService`: Business logic and config file management
+  - `OpcConfigValidator`, `DbConfigValidator`: Server-side validation
+- **PrimeVue Components Used**:
+  - TabView/TabPanel: Main navigation
+  - DataTable: Device list with search/selection
+  - InputSwitch: Toggle controls
+  - MultiSelect: Document template selection
+  - InputText/Password: Form inputs
+  - Button: Actions with loading states
+  - Message: Validation errors and warnings
+  - Tag: Document template badges
+
 ### Document Generation Architecture
 The system uses a factory pattern with dynamic module loading:
 - **IAppConfigService**: Singleton that manages configuration and provides `GetDocumentClass(idDevice, idDoc)` factory method
@@ -440,16 +521,33 @@ The application uses in-memory PDF generation (implemented in v1.4.1):
 - **Deployment from develop branch**: All three projects should be deployed from develop folder
 
 ### Common Issues and Solutions
+
+**Build and Dependencies:**
 - **Build errors**: Ensure NuGet sources are configured (ortpr and FastReport)
-- **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
-- **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
-- **Document generation failures**: Check logs and validate JSON data structure
-- **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
-- **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
-- **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
 - **FastReport license errors**: Ensure FastReport NuGet source is configured with valid credentials
 - **Runtime version mismatch**: Verify .NET Runtime 8.0.13+ is installed (`dotnet --info`)
+- **Node.js/npm errors**: Ensure Node.js 18+ and npm 8+ are installed for Vue components
+
+**Vue Component Issues:**
+- **Build fails for StatusBar/Configurator**: Run `npm install` in `TN_Doc/Client/` first
+- **Hot reload not working**: Check Vite dev server is running on correct port
+- **TypeScript errors**: Run `npm run type-check` to see all type issues
+- **Stale build output**: Run `npm run clean` in `TN_Doc/Client/` and rebuild
+
+**Document Generation:**
+- **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
+- **Document generation failures**: Check logs and validate JSON data structure
+- **"File in use" errors**: Should not occur in v1.4.1+ due to in-memory PDF generation
+
+**Database and Integration:**
+- **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
+- **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
+- **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
+
+**Platform-specific:**
+- **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
 - **Permission issues on Linux**: Ensure `alphadaemon` user has access to `/opt/TN_Doc/` and `/var/log/TN_Doc/`
+- **libgdiplus errors on Linux**: Install via `sudo apt install libgdiplus` (Debian/Ubuntu)
 
 ### Working with Document Modules
 When working on specific document types:
@@ -460,7 +558,7 @@ When working on specific document types:
 - FastReport templates (.frx files) are binary - use FastReport Designer for editing
 - Pre-compiled modules available in `Dll/` directory
 
-#### Complete Document Libraries List (43 libraries)
+#### Complete Document Libraries List (42 libraries)
 The system contains the following document libraries that require test coverage:
 
 **Core Documents (4)**:
@@ -550,6 +648,25 @@ Configuration follows a layered approach:
 - Simplified file path determination logic
 - Updated KMH_MI2816 for IVK version 7.12.14.3000 protocol changes
 - Updated docgeneral to version 1.2.2
+- ⚠️ **UI Theme Improvements** (feature/ui-theme-2 branch):
+  - **Centralized color management**: All colors moved to CSS variables in `material3.css`
+  - Replaced hardcoded HEX colors with CSS variables across all stylesheets:
+    * `elisRequestWindow.css` - 10 replacements
+    * `errorDialogWindow.css` - 6 replacements
+    * `LeftPanel.css` - 4 replacements
+    * `menu-dropdown.css` - 6 replacements
+    * `site.css` - 6 replacements including tab selector styling
+    * `newstyle.css` - 9 replacements
+    * `elisEditForm.css` - 2 replacements
+    * `commonEditForm.css` - 1 replacement
+  - **Centralized control sizes**: Heights defined via CSS variables (standard height: 35px)
+  - **Configurator UI enhancements**:
+    * Apply/Cancel buttons with improved styling
+    * Device editor optimization and vertical alignment
+    * Template tag styling improvements
+  - **Top panel improvements**: Precise vertical alignment of controls and comboboxes
+  - **Dictionary buttons**: Enhanced styling and icon sizing
+  - **Document template selector**: Optimized combobox width
 - ⚠️ Status bar improvements: Removed time display and project version info from status bar
 - Cleaned up status bar JavaScript to remove unused time update functionality
 - **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/LoggingPathService.cs` for reusability across projects (TN_Doc, TN_KMH, etc.). Now accepts `applicationName` parameter for dynamic log paths

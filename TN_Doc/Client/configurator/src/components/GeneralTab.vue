@@ -26,6 +26,7 @@
           :options="opcTypes"
           option-label="label"
           option-value="value"
+          :allowEmpty="false"
         />
         <Button
           icon="pi pi-ellipsis-h"
@@ -37,6 +38,9 @@
         />
       </div>
     </div>
+
+    <!-- Заполнитель для растягивания по высоте -->
+    <div class="spacer"></div>
 
     <!-- Модальное окно настроек OPC -->
     <Dialog
@@ -168,10 +172,14 @@ const armOpcSettings = computed({
 <style scoped>
 .general-tab {
   padding: 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .field {
   margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
 .field-horizontal {
@@ -222,6 +230,11 @@ const armOpcSettings = computed({
   margin-top: 0.5rem;
 }
 
+.spacer {
+  flex: 1;
+  min-height: 0;
+}
+
 /* Компактные панели */
 :deep(.p-panel) {
   font-size: 0.9rem;
@@ -236,11 +249,26 @@ const armOpcSettings = computed({
   padding: 0.5rem 0.75rem;
 }
 
-/* Компактные input элементы */
-:deep(.p-inputtext),
-:deep(.p-inputnumber-input) {
-  padding: 0.375rem 0.5rem;
-  font-size: 0.9rem;
+/* Стили для поля "Путь экспорта документов" */
+:deep(.p-inputtext#export-path) {
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.p-inputtext#export-path:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
+}
+
+:deep(.p-inputtext#export-path:hover) {
+  border-color: #B0BEC5 !important;
 }
 
 :deep(.p-inputswitch) {
@@ -256,30 +284,46 @@ const armOpcSettings = computed({
   transform: translateX(1rem);
 }
 
-/* Кастомные стили для переключателя OPC */
-:deep(.p-selectbutton .p-togglebutton) {
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.9rem !important;
-  border: 1px solid #dee2e6 !important;
-  background-color: #ffffff !important;
-  color: #495057 !important;
+/* Стили для кнопки настроек OPC (многоточие) */
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text-muted, #495057) !important;
+  border: 1px solid var(--md-outline, #CFD8DC) !important;
+  border-radius: 0.25rem !important;
   transition: all 0.15s ease-in-out !important;
 }
 
+:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text, #212121) !important;
+  border-color: var(--md-outline-light, #E0E0E0) !important;
+}
+
+/* Кастомные стили для переключателя OPC */
+:deep(.p-selectbutton .p-togglebutton) {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.8rem !important;
+  border: 1px solid #CFD8DC !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  transition: all 0.15s ease-in-out !important;
+  min-height: 28px !important;
+}
+
 :deep(.p-selectbutton .p-togglebutton:hover) {
-  background-color: #f8f9fa !important;
-  border-color: #adb5bd !important;
+  background-color: #F1F3F4 !important;
+  border-color: #B0BEC5 !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+  background-color: #1E88E5 !important;
+  border-color: #1E88E5 !important;
   color: #ffffff !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
-  background-color: #0b5ed7 !important;
-  border-color: #0a58ca !important;
+  background-color: #1565C0 !important;
+  border-color: #1565C0 !important;
 }
 
 /* Исправляем внутренний контент активной кнопки */
@@ -291,20 +335,5 @@ const armOpcSettings = computed({
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
   background-color: transparent !important;
   color: #ffffff !important;
-}
-
-/* Стили для кнопки настроек OPC (многоточие) */
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.15s ease-in-out !important;
-}
-
-:deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
-  background-color: #e9ecef !important;
-  color: #212529 !important;
-  border-color: #adb5bd !important;
 }
 </style>

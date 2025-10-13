@@ -168,16 +168,17 @@
         </Panel>
 
         <!-- OPC настройки -->
-        <Panel header="OPC подключение" class="mt-3">
+        <Panel class="mt-3 opc-panel" :toggleable="false">
           <div v-if="deviceOpcSettings" class="opc-settings-container">
             <div class="field field-horizontal">
-              <label>Тип OPC:</label>
+              <label>Тип OPC-клиента:</label>
               <div class="opc-controls">
                 <SelectButton
                   v-model="deviceOpcType"
                   :options="opcTypes"
                   option-label="label"
                   option-value="value"
+                  :allowEmpty="false"
                 />
                 <Button
                   icon="pi pi-ellipsis-h"
@@ -217,7 +218,7 @@
         </Dialog>
 
         <!-- Недопустимые символы -->
-        <Panel header="Недопустимые символы" class="mt-3">
+        <Panel class="mt-3 invalid-chars-panel" :toggleable="false">
           <div class="field field-horizontal">
             <label>Недопустимые символы:</label>
             <div class="invalid-chars-section">
@@ -259,6 +260,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useToast } from 'primevue/usetoast';
 import { useConfigStore } from '../stores/configStore';
 import type { Device, OpcConnectionSettings } from '../types/config.types';
 import { OpcType } from '../types/config.types';
@@ -282,6 +284,7 @@ import OpcSettings from './OpcSettings.vue';
 import MixedStateWarning from './MixedStateWarning.vue';
 import DocumentTemplates from './DocumentTemplates.vue';
 
+const toast = useToast();
 const configStore = useConfigStore();
 const { selectedDevices, hasMultipleSelection } = storeToRefs(configStore);
 
@@ -301,6 +304,36 @@ const docsList = computed(() => {
 function onToggleDocUse(docId: number, use: boolean) {
   if (selectedDevices.value.length !== 1) return;
   const device = selectedDevices.value[0];
+  const doc = device.Docs.find(d => d.IdDoc === docId);
+
+  // Проверка при включении документа
+  if (use && doc) {
+    const templates = doc.TemplateDocs || [];
+
+    // Проверка 1: есть ли шаблоны вообще
+    if (templates.length === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Предупреждение',
+        detail: `Невозможно включить документ "${doc.Name}": у документа нет шаблонов`,
+        life: 4000
+      });
+      return;
+    }
+
+    // Проверка 2: есть ли хотя бы один включенный шаблон
+    const enabledTemplatesCount = templates.filter(t => t.Use).length;
+    if (enabledTemplatesCount === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Предупреждение',
+        detail: `Невозможно включить документ "${doc.Name}": необходимо выбрать хотя бы один шаблон`,
+        life: 4000
+      });
+      return;
+    }
+  }
+
   const updatedDocs = device.Docs.map(d => d.IdDoc === docId ? { ...d, Use: use } : d);
   configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
 }
@@ -338,6 +371,19 @@ function openTemplatesDialog(docId: number) {
 function saveTemplatesForCurrentDoc() {
   if (selectedDevices.value.length !== 1 || dialogDocId.value == null) return;
   const device = selectedDevices.value[0];
+  const doc = device.Docs.find(d => d.IdDoc === dialogDocId.value);
+
+  // Проверка: у документа должен быть выбран хотя бы один шаблон (независимо от того, включен документ или нет)
+  if (doc && dialogTemplateIds.value.length === 0) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Предупреждение',
+      detail: `У документа "${doc.Name}" должен быть выбран хотя бы один шаблон`,
+      life: 4000
+    });
+    return;
+  }
+
   const updatedDocs = device.Docs.map(d => {
     if (d.IdDoc !== dialogDocId.value) return d;
     const templates = (d.TemplateDocs || []).map(t => ({ ...t, Use: dialogTemplateIds.value.includes(t.Id) }));
@@ -571,23 +617,37 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
 // Переключение использования шаблона по клику на тег
 function toggleTemplateUse(docId: number, templateId: number) {
   if (selectedDevices.value.length !== 1) return;
-  
+
   const device = selectedDevices.value[0];
   const doc = device.Docs.find(d => d.IdDoc === docId);
   if (!doc) return;
-  
+
   const template = doc.TemplateDocs?.find(t => t.Id === templateId);
   if (!template) return;
-  
+
+  // Проверка: если пытаемся отключить шаблон, проверяем, не последний ли он у документа (независимо от того, включен документ или нет)
+  if (template.Use) {
+    const enabledTemplatesCount = (doc.TemplateDocs || []).filter(t => t.Use).length;
+    if (enabledTemplatesCount === 1) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Предупреждение',
+        detail: `Невозможно отключить последний шаблон у документа "${doc.Name}"`,
+        life: 4000
+      });
+      return;
+    }
+  }
+
   // Переключаем признак использования шаблона
   const updatedDocs = device.Docs.map(d => {
     if (d.IdDoc !== docId) return d;
-    const templates = (d.TemplateDocs || []).map(t => 
+    const templates = (d.TemplateDocs || []).map(t =>
       t.Id === templateId ? { ...t, Use: !t.Use } : t
     );
     return { ...d, TemplateDocs: templates };
   });
-  
+
   configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
 }
 
@@ -725,13 +785,34 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 /* Компактные панели */
+:deep(.p-panel) {
+  background-color: transparent;
+  border: 1px solid var(--md-outline, #CFD8DC);
+}
+
 :deep(.p-panel-header) {
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
+  background-color: transparent;
+  border-bottom: 1px solid var(--md-outline, #CFD8DC);
 }
 
 :deep(.p-panel-content) {
   padding: 0.5rem 0.75rem;
+  background-color: transparent;
+}
+
+.opc-panel :deep(.p-panel-content),
+.invalid-chars-panel :deep(.p-panel-content) {
+  padding-top: 0.5rem;
+}
+
+/* Скрываем шапку у панелей без заголовка (OPC, недопустимые символы) */
+.opc-panel :deep(.p-panel-header),
+.invalid-chars-panel :deep(.p-panel-header) {
+  display: none;
+  padding: 0;
+  border: 0;
 }
 
 /* Компактные input элементы */
@@ -740,6 +821,31 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 :deep(.p-multiselect) {
   padding: 0.375rem 0.5rem;
   font-size: 0.9rem;
+}
+
+/* Стили для текстбоксов в карточках подключения к БД согласно дизайн-документу */
+.connection-field-horizontal :deep(.p-inputtext),
+.connection-field-horizontal :deep(.p-inputnumber-input) {
+  height: 37px !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  border: 1px solid #CFD8DC !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.connection-field-horizontal :deep(.p-inputtext:hover),
+.connection-field-horizontal :deep(.p-inputnumber-input:hover) {
+  border-color: #B0BEC5 !important;
+}
+
+.connection-field-horizontal :deep(.p-inputtext:focus),
+.connection-field-horizontal :deep(.p-inputnumber-input:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
 }
 
 :deep(.p-inputswitch) {
@@ -821,28 +927,29 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 /* Кастомные стили для переключателя OPC */
 :deep(.p-selectbutton .p-togglebutton) {
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.9rem !important;
-  border: 1px solid #dee2e6 !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.8rem !important;
+  border: 1px solid #CFD8DC !important;
   background-color: #ffffff !important;
-  color: #495057 !important;
+  color: #212121 !important;
   transition: all 0.15s ease-in-out !important;
+  min-height: 28px !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton:hover) {
-  background-color: #f8f9fa !important;
-  border-color: #adb5bd !important;
+  background-color: #F1F3F4 !important;
+  border-color: #B0BEC5 !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+  background-color: #1E88E5 !important;
+  border-color: #1E88E5 !important;
   color: #ffffff !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
-  background-color: #0b5ed7 !important;
-  border-color: #0a58ca !important;
+  background-color: #1565C0 !important;
+  border-color: #1565C0 !important;
 }
 
 /* Исправляем внутренний контент активной кнопки */
@@ -858,17 +965,30 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 /* Стили для кнопки настроек OPC (многоточие) */
 :deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm) {
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
-  border: 1px solid #dee2e6 !important;
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text-muted, #495057) !important;
+  border: 1px solid var(--md-outline, #CFD8DC) !important;
   border-radius: 0.25rem !important;
   transition: all 0.15s ease-in-out !important;
 }
 
 :deep(.p-button.p-button-icon-only.p-button-secondary.p-button-text.p-button-sm:hover) {
-  background-color: #e9ecef !important;
-  color: #212529 !important;
-  border-color: #adb5bd !important;
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
+  color: var(--md-text, #212121) !important;
+  border-color: var(--md-outline-light, #E0E0E0) !important;
+}
+
+/* Прозрачный фон для таблицы документов */
+.docs-table :deep(.p-datatable) {
+  background-color: transparent;
+}
+
+.docs-table :deep(.p-datatable-wrapper) {
+  background-color: transparent;
+}
+
+.docs-table :deep(.p-datatable-tbody) {
+  background-color: transparent;
 }
 
 /* Скрытие заголовков таблицы документов */
@@ -899,10 +1019,37 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   line-height: 1.1 !important;
 }
 
+/* Визуальный стиль тегов шаблонов документов: прозрачная заливка, синяя рамка и текст */
+.docs-table :deep(.p-tag) {
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important; /* текст чёрный */
+  font-weight: 400 !important; /* обычный вес */
+  border: 1px solid var(--md-primary, #1E88E5) !important; /* синяя рамка */
+}
+
+/* Hover — усиливаем только контур, текст остаётся чёрным */
+.docs-table :deep(.p-tag:hover) {
+  border-color: var(--md-primary-hover, #1565C0) !important;
+  color: var(--md-text, #212121) !important;
+}
+
+/* Active — также без заливки, только более тёмная рамка */
+.docs-table :deep(.p-tag:active) {
+  border-color: var(--md-primary-hover, #1565C0) !important;
+  color: var(--md-text, #212121) !important;
+}
+
 /* Кнопка "Изменить…" в строке — компактнее */
 .docs-table :deep(.p-button.p-button-text.p-button-sm) {
   padding: 0.2rem 0.35rem !important;
   line-height: 1.1 !important;
+}
+
+/* Текст кнопки "Изменить…" — синий (--md-primary) */
+.docs-table :deep(.p-button.p-button-text.p-button-sm),
+.docs-table :deep(.p-button.p-button-text.p-button-sm .p-button-label) {
+  color: var(--md-primary, #1E88E5) !important;
+  font-weight: 400 !important; /* обычный */
 }
 
 /* Фиксация узкой ширины второго столбца (переключатель) */
@@ -936,8 +1083,8 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .db-connections-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem; /* было 1rem */
+  margin-bottom: 0.75rem; /* чуть компактнее отступ снизу */
 }
 
 .db-connection-card {
@@ -963,7 +1110,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem; /* было 0.75rem 1rem */
   background-color: var(--surface-50);
   border-bottom: 1px solid var(--surface-200);
 }
@@ -986,23 +1133,23 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .card-content {
-  padding: 1rem;
+  padding: 0.5rem 0.75rem; /* было 1rem */
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem; /* было 0.75rem */
 }
 
 .connection-field-horizontal {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  gap: 0.5rem; /* было 0.75rem */
+  margin-bottom: 0.25rem; /* было 0.5rem */
 }
 
 .connection-field-horizontal label {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-color-secondary);
+  color: #212121;
   margin: 0;
   min-width: 120px;
   flex-shrink: 0;
@@ -1014,15 +1161,20 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 /* Стили для заблокированного поля пароля */
 .password-readonly {
-  background-color: var(--surface-100) !important;
-  color: var(--text-color-secondary) !important;
+  background-color: #F1F3F4 !important;
+  color: #5F6368 !important;
   cursor: not-allowed !important;
-  opacity: 0.7 !important;
+}
+
+.password-readonly:deep(.p-inputtext) {
+  background-color: #F1F3F4 !important;
+  color: #5F6368 !important;
+  cursor: not-allowed !important;
 }
 
 .password-readonly:focus {
+  border-color: #CFD8DC !important;
   box-shadow: none !important;
-  border-color: var(--surface-300) !important;
 }
 
 .text-green-500 {
@@ -1031,5 +1183,46 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 .text-red-500 {
   color: #ef4444;
+}
+
+/* Выравнивание чекбоксов в секции недопустимых символов */
+.invalid-chars-panel .field-horizontal {
+  align-items: center;
+}
+
+.invalid-chars-panel .field-horizontal > label {
+  align-self: center;
+  line-height: 1.5;
+}
+
+.invalid-chars-panel .invalid-chars-section {
+  align-items: center;
+}
+
+.invalid-chars-panel .field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+.invalid-chars-panel .field-checkbox :deep(.p-checkbox) {
+  flex-shrink: 0;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.invalid-chars-panel .field-checkbox :deep(.p-checkbox-box) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.invalid-chars-panel .field-checkbox label {
+  margin: 0;
+  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
 }
 </style>
