@@ -33,7 +33,9 @@
       "Bash(npm run build:*)",
       "Bash(git checkout:*)",
       "Bash(git restore:*)",
-      "Bash(npm run build:configurator:*)"
+      "Bash(npm run build:configurator:*)",
+      "Bash(netstat:*)",
+      "Bash(ss:*)"
     ],
     "deny": [],
     "ask": []
