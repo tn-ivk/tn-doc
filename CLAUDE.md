@@ -12,11 +12,26 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
 **Main Development Branch**: develop
 **Current Branch**: feature/ui-theme-2 (UI theme centralization and Configurator enhancements)
-**Note**: Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, and status bar cleanup
+
+**Important Notes:**
+- Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, and status bar cleanup
+- Global user instruction: Do not mention AI or code generation in commit messages
 
 ## Build and Development Commands
 
 ### Prerequisites
+
+**Required Software:**
+- .NET SDK 8.0 or higher
+- .NET Runtime 8.0.13 or higher
+- Node.js 18+ and npm 8+ (for Vue applications)
+- MySQL/MariaDB server (for production)
+
+**Linux-specific:**
+- libgdiplus package (required for FastReport rendering)
+- CUPS printing system (for physical printing)
+
+**NuGet Source Configuration:**
 ```bash
 # Add required NuGet sources
 dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
@@ -67,6 +82,13 @@ dotnet run --urls="http://localhost:38509;https://localhost:44357"
 
 # Run with verbose output for debugging
 dotnet run --verbosity detailed
+
+# Application will be available at:
+# - Default ports: http://localhost:38509 and https://localhost:44357
+# - Custom port: http://localhost:5000 (when using --urls="http://localhost:5000")
+# - StatusBar: Available on main page as embedded component
+# - Configurator UI: http://localhost:PORT/configurator
+# - API endpoints: http://localhost:PORT/api/*
 ```
 
 ### Building Vue Components (StatusBar & Configurator)
@@ -207,7 +229,7 @@ The following projects must be deployed at the same level (all share TN_Doc conf
   - `package.json`: Workspace root with unified scripts
   - `vite.config.base.ts`: Shared Vite configuration
 - **TN.DocGeneral**: Core business logic and shared utilities
-- **Ivk.DataBase**: Database library
+- **Ivk.DataBase**: Database library for IVK measurement system data access
 - **tn.docgeneral/** (Document modules organized by type):
   - Individual document implementations (Passport, Poverka*, KMH*, Act, Report, Jornal)
   - Sikn425 modules in separate subfolder
@@ -258,10 +280,11 @@ Each document type module implements a consistent pattern:
   - Only copied to output in Debug builds
   - Removed before deployment to avoid conflicts
 - **Configuration Management**:
-  - Web-based configurator UI at `/configurator` endpoint
+  - Web-based configurator UI at `/configurator` endpoint (Vue 3 SPA)
   - ConfigurationService provides thread-safe config updates
   - Validators ensure OPC and DB settings correctness before save
   - Change logging with diff calculation for audit trails
+  - REST API at `/api/configurator/` for programmatic access
 
 ## Key Dependencies and External Systems
 
@@ -498,16 +521,33 @@ The application uses in-memory PDF generation (implemented in v1.4.1):
 - **Deployment from develop branch**: All three projects should be deployed from develop folder
 
 ### Common Issues and Solutions
+
+**Build and Dependencies:**
 - **Build errors**: Ensure NuGet sources are configured (ortpr and FastReport)
-- **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
-- **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
-- **Document generation failures**: Check logs and validate JSON data structure
-- **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
-- **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
-- **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
 - **FastReport license errors**: Ensure FastReport NuGet source is configured with valid credentials
 - **Runtime version mismatch**: Verify .NET Runtime 8.0.13+ is installed (`dotnet --info`)
+- **Node.js/npm errors**: Ensure Node.js 18+ and npm 8+ are installed for Vue components
+
+**Vue Component Issues:**
+- **Build fails for StatusBar/Configurator**: Run `npm install` in `TN_Doc/Client/` first
+- **Hot reload not working**: Check Vite dev server is running on correct port
+- **TypeScript errors**: Run `npm run type-check` to see all type issues
+- **Stale build output**: Run `npm run clean` in `TN_Doc/Client/` and rebuild
+
+**Document Generation:**
+- **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
+- **Document generation failures**: Check logs and validate JSON data structure
+- **"File in use" errors**: Should not occur in v1.4.1+ due to in-memory PDF generation
+
+**Database and Integration:**
+- **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
+- **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
+- **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
+
+**Platform-specific:**
+- **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
 - **Permission issues on Linux**: Ensure `alphadaemon` user has access to `/opt/TN_Doc/` and `/var/log/TN_Doc/`
+- **libgdiplus errors on Linux**: Install via `sudo apt install libgdiplus` (Debian/Ubuntu)
 
 ### Working with Document Modules
 When working on specific document types:
@@ -518,7 +558,7 @@ When working on specific document types:
 - FastReport templates (.frx files) are binary - use FastReport Designer for editing
 - Pre-compiled modules available in `Dll/` directory
 
-#### Complete Document Libraries List (43 libraries)
+#### Complete Document Libraries List (42 libraries)
 The system contains the following document libraries that require test coverage:
 
 **Core Documents (4)**:
