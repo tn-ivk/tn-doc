@@ -16,17 +16,45 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
-        
-        td, th 
-        {
-            font-size: 70%;             /* Размер шрифта в процентах */
-            padding: 2px;               /* Поля вокруг содержимого таблицы */
-            border: 0.5px solid black;  /* Параметры рамки */
+
+        /* Базовые стили для всех таблиц */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
         }
 
-        Edit 
-        {
-            border-collapse: collapse;  /* Убираем двойные линии между ячейками */
+        /* Стили для ячеек */
+        td, th {
+            font-size: 15px;
+            padding: 6px 10px;
+            border: 1px solid #CFD8DC; /* --md-outline */
+            color: #212121; /* --md-text */
+        }
+
+        /* Заголовки таблиц */
+        th {
+            background-color: #F1F3F4; /* --md-surface-variant */
+            font-weight: 600;
+            text-align: left;
+        }
+
+        /* Таблица AdditionalInfo */
+        #AdditionalInfo {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        /* Обычные строки */
+        tbody td {
+            background-color: white;
+        }
+
+        /* Строки с выделением */
+        tr.selected td,
+        tr.active td {
+            background-color: #1E88E5; /* --md-primary */
+            color: white;
         }
     </style>
 
