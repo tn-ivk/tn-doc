@@ -260,6 +260,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useToast } from 'primevue/usetoast';
 import { useConfigStore } from '../stores/configStore';
 import type { Device, OpcConnectionSettings } from '../types/config.types';
 import { OpcType } from '../types/config.types';
@@ -283,6 +284,7 @@ import OpcSettings from './OpcSettings.vue';
 import MixedStateWarning from './MixedStateWarning.vue';
 import DocumentTemplates from './DocumentTemplates.vue';
 
+const toast = useToast();
 const configStore = useConfigStore();
 const { selectedDevices, hasMultipleSelection } = storeToRefs(configStore);
 
@@ -302,6 +304,22 @@ const docsList = computed(() => {
 function onToggleDocUse(docId: number, use: boolean) {
   if (selectedDevices.value.length !== 1) return;
   const device = selectedDevices.value[0];
+  const doc = device.Docs.find(d => d.IdDoc === docId);
+
+  // Проверка при включении документа: должен быть хотя бы один включенный шаблон
+  if (use && doc) {
+    const enabledTemplatesCount = (doc.TemplateDocs || []).filter(t => t.Use).length;
+    if (enabledTemplatesCount === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Предупреждение',
+        detail: `Невозможно включить документ "${doc.Name}": необходимо выбрать хотя бы один шаблон`,
+        life: 4000
+      });
+      return;
+    }
+  }
+
   const updatedDocs = device.Docs.map(d => d.IdDoc === docId ? { ...d, Use: use } : d);
   configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
 }
@@ -339,6 +357,19 @@ function openTemplatesDialog(docId: number) {
 function saveTemplatesForCurrentDoc() {
   if (selectedDevices.value.length !== 1 || dialogDocId.value == null) return;
   const device = selectedDevices.value[0];
+  const doc = device.Docs.find(d => d.IdDoc === dialogDocId.value);
+
+  // Проверка: если документ включен, должен быть выбран хотя бы один шаблон
+  if (doc && doc.Use && dialogTemplateIds.value.length === 0) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Предупреждение',
+      detail: `У включенного документа "${doc.Name}" должен быть выбран хотя бы один шаблон`,
+      life: 4000
+    });
+    return;
+  }
+
   const updatedDocs = device.Docs.map(d => {
     if (d.IdDoc !== dialogDocId.value) return d;
     const templates = (d.TemplateDocs || []).map(t => ({ ...t, Use: dialogTemplateIds.value.includes(t.Id) }));
@@ -572,23 +603,37 @@ function handleTemplateUpdate(deviceId: number, docId: number, templateId: numbe
 // Переключение использования шаблона по клику на тег
 function toggleTemplateUse(docId: number, templateId: number) {
   if (selectedDevices.value.length !== 1) return;
-  
+
   const device = selectedDevices.value[0];
   const doc = device.Docs.find(d => d.IdDoc === docId);
   if (!doc) return;
-  
+
   const template = doc.TemplateDocs?.find(t => t.Id === templateId);
   if (!template) return;
-  
+
+  // Проверка: если пытаемся отключить шаблон, проверяем, не последний ли он у включенного документа
+  if (template.Use && doc.Use) {
+    const enabledTemplatesCount = (doc.TemplateDocs || []).filter(t => t.Use).length;
+    if (enabledTemplatesCount === 1) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Предупреждение',
+        detail: `Невозможно отключить последний шаблон у включенного документа "${doc.Name}"`,
+        life: 4000
+      });
+      return;
+    }
+  }
+
   // Переключаем признак использования шаблона
   const updatedDocs = device.Docs.map(d => {
     if (d.IdDoc !== docId) return d;
-    const templates = (d.TemplateDocs || []).map(t => 
+    const templates = (d.TemplateDocs || []).map(t =>
       t.Id === templateId ? { ...t, Use: !t.Use } : t
     );
     return { ...d, TemplateDocs: templates };
   });
-  
+
   configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
 }
 
