@@ -11,7 +11,7 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **SDK Compatibility**: Works with .NET SDK 8.0+ and 9.0+
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
 **Main Development Branch**: develop
-**Current Branch**: feature/ui-theme-2 (UI theme centralization and Configurator enhancements)
+**Current Branch**: developWork
 
 **Important Notes:**
 - Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, and status bar cleanup
@@ -118,6 +118,9 @@ npm run build:all
 
 # Type checking across all workspaces
 npm run type-check
+
+# Clean all node_modules (useful for troubleshooting)
+npm run clean
 
 # Build outputs:
 # - StatusBar: TN_Doc/wwwroot/statusbar/
@@ -242,6 +245,13 @@ The following projects must be deployed at the same level (all share TN_Doc conf
 - **Dll/**: Pre-compiled document module assemblies
 - **prutils/**: Contains winprutil.exe for Windows PDF printing
 - **Template/Config packages**: `TN_Doc/Doc/`, `TN_Doc/Cfg/`, `TN_Doc/DLL/`
+- **docs/**: Comprehensive documentation structure
+  - `architecture/`: System architecture decisions and design
+  - `development/`: Development guides and setup instructions
+  - `deployment/`: Deployment procedures for Linux and Windows
+  - `integration/`: External system integration guides (ELIS, OPC)
+  - `api/`: API documentation and endpoints
+  - `ui-design.md`: Material Design 3 UI design system details
 
 ### Document Module Pattern
 Each document type module implements a consistent pattern:
@@ -352,6 +362,12 @@ Real-time data acquisition from measurement systems:
   - Windows: `TN_Doc/logs/`
   - Linux: `/opt/TN_Doc/logs/`
 - `/TN_Doc/UserPreference/` - User preferences (last used templates)
+
+### Design and Documentation
+- `/DESIGN_DOCUMENTATION.md` - Material Design 3 UI/UX design system documentation
+- `/CHANGELOG.md` - Version history and detailed change log
+- `/docs/` - Additional documentation (architecture, API, deployment, integration guides)
+- `/README.md` - Project overview and quick start guide
 
 ## Development Notes
 
