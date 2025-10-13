@@ -37,12 +37,106 @@
             width: 100%;
         }
 
-        td,
+        /* Базовые стили для всех таблиц */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* Стили для ячеек */
+        td, th {
+            font-size: 15px;
+            padding: 6px 10px;
+            border: 1px solid #CFD8DC; /* --md-outline */
+            color: #212121; /* --md-text */
+        }
+
+        /* Заголовки таблиц */
         th {
-            font-size: 14px;
-            font-family: Arial,sans-serif;
-            padding: 2px;
-            border: 0.5px solid black;
+            background-color: #F1F3F4; /* --md-surface-variant */
+            font-weight: 600;
+            text-align: left;
+        }
+
+        /* Таблица AdditionalInfo */
+        #AdditionalInfo {
+            width: 100%;
+            margin-bottom: 15px;
+            table-layout: fixed;
+        }
+
+        /* Первая колонка - ширина по содержимому, но не более 70% */
+        #AdditionalInfo td:first-child {
+            width: auto;
+            max-width: 70%;
+            white-space: nowrap;
+        }
+
+        /* Вторая колонка - заполняет оставшееся место */
+        #AdditionalInfo td:nth-child(2) {
+            width: auto;
+        }
+
+        /* Элементы ввода во второй колонке растягиваются на всю ширину */
+        #AdditionalInfo td:nth-child(2) input,
+        #AdditionalInfo td:nth-child(2) select,
+        #AdditionalInfo td:nth-child(2) textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 30px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #CFD8DC; /* --md-outline */
+            background-color: white;
+            color: #212121; /* --md-text */
+            font-size: 15px;
+            font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        /* Textarea - автоматическая высота */
+        #AdditionalInfo td:nth-child(2) textarea {
+            height: auto;
+            min-height: 30px;
+            resize: vertical;
+        }
+
+        /* Hover состояние для элементов ввода */
+        #AdditionalInfo td:nth-child(2) input:hover,
+        #AdditionalInfo td:nth-child(2) select:hover,
+        #AdditionalInfo td:nth-child(2) textarea:hover {
+            border-color: #B0BEC5;
+        }
+
+        /* Focus состояние для элементов ввода */
+        #AdditionalInfo td:nth-child(2) input:focus,
+        #AdditionalInfo td:nth-child(2) select:focus,
+        #AdditionalInfo td:nth-child(2) textarea:focus {
+            outline: none;
+            border-color: #1E88E5; /* --md-primary */
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35);
+        }
+
+        /* Disabled состояние для элементов ввода */
+        #AdditionalInfo td:nth-child(2) input:disabled,
+        #AdditionalInfo td:nth-child(2) select:disabled,
+        #AdditionalInfo td:nth-child(2) textarea:disabled {
+            background-color: #F1F3F4; /* --md-surface-variant */
+            color: #5F6368; /* --md-text-secondary */
+            cursor: not-allowed;
+        }
+
+        /* Обычные строки */
+        tbody td {
+            background-color: white;
+        }
+
+        /* Строки с выделением */
+        tr.selected td,
+        tr.active td {
+            background-color: #1E88E5; /* --md-primary */
+            color: white;
         }
 
         Edit {
