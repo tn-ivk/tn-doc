@@ -59,14 +59,15 @@
 }
 
 .action-btn.btn-outline-danger {
-    color: var(--md-gray-600); /* Серый цвет из CSS-переменных */
-    border-color: var(--md-gray-600); /* Серый цвет из CSS-переменных */
+    color: white !important; /* Белая иконка */
+    border-color: var(--md-gray-600) !important; /* Серая граница */
+    background-color: var(--md-gray-600) !important; /* Серый фон */
 }
 
 .action-btn.btn-outline-danger:hover {
-    color: white;
-    background-color: var(--md-gray-700); /* Серый hover из CSS-переменных */
-    border-color: var(--md-gray-700); /* Серый hover из CSS-переменных */
+    color: white !important; /* Белая иконка */
+    background-color: var(--md-gray-700) !important; /* Более темный серый фон при hover */
+    border-color: var(--md-gray-700) !important; /* Более темная граница при hover */
 }
 
 /* Более специфичный селектор для иконок в action-кнопках */
