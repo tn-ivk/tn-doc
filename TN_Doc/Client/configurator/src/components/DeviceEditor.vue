@@ -306,9 +306,23 @@ function onToggleDocUse(docId: number, use: boolean) {
   const device = selectedDevices.value[0];
   const doc = device.Docs.find(d => d.IdDoc === docId);
 
-  // Проверка при включении документа: должен быть хотя бы один включенный шаблон
+  // Проверка при включении документа
   if (use && doc) {
-    const enabledTemplatesCount = (doc.TemplateDocs || []).filter(t => t.Use).length;
+    const templates = doc.TemplateDocs || [];
+
+    // Проверка 1: есть ли шаблоны вообще
+    if (templates.length === 0) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Предупреждение',
+        detail: `Невозможно включить документ "${doc.Name}": у документа нет шаблонов`,
+        life: 4000
+      });
+      return;
+    }
+
+    // Проверка 2: есть ли хотя бы один включенный шаблон
+    const enabledTemplatesCount = templates.filter(t => t.Use).length;
     if (enabledTemplatesCount === 0) {
       toast.add({
         severity: 'warn',
