@@ -68,7 +68,20 @@
     border-color: #E53935; /* Прямое указание цвета */
 }
 
+/* Более специфичный селектор для иконок в action-кнопках */
+/* Повышенный приоритет, чтобы не перебивался правилами из dictionariesTable.css */
+.action-buttons-cell .action-btn i,
+.users-table .action-buttons-cell .action-btn i,
+.qp-method-table .action-buttons-cell .action-btn i,
 .action-btn i {
-    font-size: 1.2em; /* Уменьшено для лучшего соответствия размеру кнопки */
-    vertical-align: middle;
+    font-size: 1.2em !important; /* !important для гарантии применения */
+    vertical-align: middle !important;
+}
+
+/* Убираем влияние класса .disabled-item на action-кнопки */
+/* Кнопки действий должны оставаться видимыми и не становиться полупрозрачными */
+.disabled-item .action-buttons-cell,
+.disabled-item .action-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
 } 
