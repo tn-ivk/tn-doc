@@ -244,7 +244,7 @@
                 <Checkbox
                   v-model="invalidChars"
                   input-id="char-backslash"
-                  value="\\"
+                  value="\"
                 />
                 <label for="char-backslash">Обратный слеш (\\)</label>
               </div>
