@@ -340,6 +340,52 @@ $(document).ready
     }
 );
 
+// Перенос фокуса за пределы модалки до установки aria-hidden
+function moveFocusOutsideModal(modalElement, fallbackFocusSelector) {
+    try {
+        const activeElement = document.activeElement;
+        if (activeElement && modalElement.contains(activeElement)) {
+            // Сначала убираем фокус с элемента внутри модалки
+            if (typeof activeElement.blur === 'function') {
+                activeElement.blur();
+            }
+        }
+
+        // Затем переводим фокус на указанный fallback-элемент или на body
+        const fallback = (fallbackFocusSelector && document.querySelector(fallbackFocusSelector)) || document.body;
+        if (fallback && typeof fallback.focus === 'function') {
+            // Делаем это асинхронно, чтобы не мешать текущему циклу обработки событий Bootstrap
+            setTimeout(function () { fallback.focus(); }, 0);
+        }
+    } catch (e) {
+        // В случае любых проблем просто пытаемся сфокусировать body
+        try { document.body && document.body.focus && document.body.focus(); } catch (_) {}
+    }
+}
+
+// Устанавливает guard на событие скрытия модального окна, чтобы избежать предупреждения
+function installModalA11yFocusGuard(modalSelector, fallbackFocusSelector) {
+    try {
+        $(modalSelector).on('hide.bs.modal', function () {
+            moveFocusOutsideModal(this, fallbackFocusSelector);
+        });
+
+        // Дополнительно, если закрываем по кнопке с data-dismiss, переносим фокус по mousedown
+        // чтобы ещё до фазы hide.bs.modal убрать фокус из модалки
+        $(document).on('mousedown', modalSelector + ' .close-modal-wnd-btn,[data-dismiss="modal"]', function () {
+            try {
+                if (typeof this.blur === 'function') {
+                    this.blur();
+                }
+                const fallback = (fallbackFocusSelector && document.querySelector(fallbackFocusSelector)) || document.body;
+                if (fallback && typeof fallback.focus === 'function') {
+                    setTimeout(function () { fallback.focus(); }, 0);
+                }
+            } catch (_) {}
+        });
+    } catch (_) {}
+}
+
 function InitDevices() {
     $.ajax(
         {
@@ -782,6 +828,12 @@ function InitElement() {
     InitPrinterName();
     InitExportFormat();
     InitProtocolNumber();
+
+    // A11y: предотвращаем предупреждение "Blocked aria-hidden ... descendant retained focus"
+    // Возвращаем фокус на кнопку меню после закрытия любых модалок
+    installModalA11yFocusGuard('#modal-window', '#MenuButton');
+    installModalA11yFocusGuard('#configurator-window', '#MenuButton');
+    installModalA11yFocusGuard('#PromiseConfirm', '#MenuButton');
     $('#ComboboxDocGUID').change(async function () {
         if (table != null) $('#DataTable').DataTable().clear().draw();
         $('.FR').attr('src', '');
