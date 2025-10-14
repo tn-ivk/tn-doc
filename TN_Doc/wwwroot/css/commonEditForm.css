@@ -49,6 +49,21 @@ th {
 input.incorrect-value,
 select.incorrect-value {
     border: 2px solid rgb(255, 105, 105) !important;
+    border-radius: 6px; /* лёгкое скругление углов красной рамки */
+}
+
+/* Для таблицы Edit: делаем красную рамку вплотную к границам ячейки */
+#Edit td:has(input.incorrect-value),
+#Edit td:has(select.incorrect-value),
+#Edit td:has(.print-cell-input.incorrect-value) {
+    padding: 0; /* убираем внутренние отступы, чтобы рамка примыкала к границам ячейки */
+}
+
+#Edit input.incorrect-value,
+#Edit select.incorrect-value,
+#Edit .print-cell-input.incorrect-value {
+    width: 100% !important;   /* перекрываем 92%/95% для колонок */
+    box-sizing: border-box;    /* включая рамку и паддинги внутрь ширины */
 }
 
 .manual-input--disabled{
