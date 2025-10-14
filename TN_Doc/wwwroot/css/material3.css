@@ -304,7 +304,7 @@ table tbody tr[style*="background"] td {
   width: 1rem;           /* match spinner-border-sm */
   height: 1rem;
   vertical-align: text-bottom;
-  border: 0.25em solid currentColor !important;
+  border: 0.18em solid currentColor !important;
   border-right-color: transparent !important;
   border-radius: 50% !important;
   /* prevent ellipse distortion inside flex button */
