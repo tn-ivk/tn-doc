@@ -898,6 +898,17 @@ function GetEditDoc() {
                 id: currentId
             },
             success: function (htmlContent) {
+                // Нормализуем базовый URL для ресурсов внутри blob-документа
+                try {
+                    const baseHref = window.location.origin + '/';
+                    if (typeof htmlContent === 'string' && !/\bbase\s+href=/i.test(htmlContent)) {
+                        htmlContent = htmlContent.replace('<head>', '<head><base href="' + baseHref + '">');
+                    }
+                } catch (e) {
+                    // если по какой-то причине не удалось модифицировать HTML, продолжаем без падения
+                    console && console.warn && console.warn('Не удалось вставить <base href> для blob HTML:', e);
+                }
+
                 // Создаём Blob из HTML-контента
                 const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
                 const blobUrl = URL.createObjectURL(blob);
