@@ -298,6 +298,27 @@ table tbody tr[style*="background"] td {
   border-radius: var(--md-radius) !important;
 }
 
+/* Spinners - ensure Bootstrap spinner renders as a ring, not a line */
+.filterButton .spinner-border {
+  display: inline-block !important;
+  width: 1rem;           /* match spinner-border-sm */
+  height: 1rem;
+  vertical-align: text-bottom;
+  border: 0.25em solid currentColor !important;
+  border-right-color: transparent !important;
+  border-radius: 50% !important;
+  /* prevent ellipse distortion inside flex button */
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  box-sizing: content-box;
+}
+
+/* Respect [hidden] attribute to fully hide spinner */
+.filterButton .spinner-border[hidden] {
+  display: none !important;
+}
+
 /* Modal tweaks */
 .modal-header, .modal-body, .modal-footer {
   background: var(--md-surface);
