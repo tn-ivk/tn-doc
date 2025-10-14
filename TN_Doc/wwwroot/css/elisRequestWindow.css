@@ -68,7 +68,7 @@
   font-family: Arial, sans-serif;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
-  margin: 10px 10px;
+  margin: 10px 6px; /* меньшее расстояние между кнопками */
 }
 
 /* Эффект при наведении на кнопку */
@@ -82,16 +82,16 @@
 }
 
 #elis .btn-secondary {
-  background-color: var(--md-gray-600); /* Серый цвет для кнопки Закрыть */
-  margin-right: 0;
+  background-color: var(--md-gray-600) !important; /* Серый цвет для кнопки Закрыть */
+  margin-right: 10px !important; /* отступ от правой границы окна */
 }
 
 #elis .btn-secondary:hover {
-  background-color: var(--md-gray-700); /* Темно-серый при наведении */
+  background-color: var(--md-gray-700) !important; /* Темно-серый при наведении */
 }
 
 #elis .btn-secondary:active {
-  background-color: var(--md-gray-800); /* Еще темнее при нажатии */
+  background-color: var(--md-gray-800) !important; /* Еще темнее при нажатии */
 }
 
 #elis div.modal-content {
