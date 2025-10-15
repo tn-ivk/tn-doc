@@ -49,7 +49,9 @@
   --md-elis-highlight: #8FD19E;        /* ELIS data highlight */
 
   /* Disabled state */
-  --md-disabled-bg: #F5F5F5;           /* Disabled background */
+  --md-disabled-bg: #EDEFF2;           /* Disabled background (cool gray) */
+  --md-disabled-text: #6B7280;         /* Disabled text (slate 500) */
+  --md-disabled-border: #BFCAD6;       /* Disabled border (cool gray) */
 
   /* Layout tokens */
   --md-radius: 8px;
@@ -195,6 +197,22 @@ button i.fa {
 .btn-secondary { background: var(--md-secondary) !important; color: #fff !important; }
 .btn-danger { background: var(--md-error) !important; color: #fff !important; }
 .btn-warning { background: var(--md-warning) !important; color: #212121 !important; }
+
+/* Disabled states (centralized) */
+.btn:disabled,
+.btn.disabled,
+button:disabled,
+input[type="button"]:disabled,
+.filterButton:disabled,
+table.mainTable input[type=button]:disabled,
+table.mainTable button:disabled,
+.icon-btn.save-btn:disabled {
+  background: var(--md-disabled-bg) !important;
+  color: var(--md-disabled-text) !important;
+  border-color: var(--md-disabled-border) !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
 
 /* Dropdowns (custom menu) */
 .custom-dropdown-menu {
