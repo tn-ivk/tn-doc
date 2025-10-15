@@ -392,10 +392,10 @@ const notifyParentWindow = () => {
 ### Этап 4: Логика Passport (DocEditPassport.html)
 
 **Задачи:**
-- [ ] Расширить валидацию для числовых полей с округлением
-- [ ] Добавить обработку для Laboratory_IOF в useUserChange
-- [ ] Реализовать генерацию уникальных ID (utils/idGenerator.ts)
-- [ ] Обработка ELIS данных (если применимо к AdditionalInfo)
+- [x] Расширить валидацию для числовых полей с округлением
+- [x] Добавить обработку для Laboratory_IOF в useUserChange
+- [x] Реализовать генерацию уникальных ID (utils/idGenerator.ts)
+- [x] Обработка ELIS данных (если применимо к AdditionalInfo)
 
 **Расширенная валидация:**
 ```typescript

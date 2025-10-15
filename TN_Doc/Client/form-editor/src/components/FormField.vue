@@ -28,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const formStore = useFormStore()
-const { validate } = useValidation(formStore.invalidChars)
+const { validate, validateNumber } = useValidation(formStore.invalidChars)
 
 const internalValue = ref(props.modelValue)
 const validationResult = ref<ValidationResult>({ valid: true })
@@ -74,7 +74,14 @@ const handleInput = (event: Event) => {
 
   // Валидация
   const rules = formStore.getValidationRules(props.field.name)
-  validationResult.value = validate(value, rules)
+
+  // Используем validateNumber для числовых полей
+  if (props.field.type === 'number') {
+    validationResult.value = validateNumber(value, rules)
+  } else {
+    validationResult.value = validate(value, rules)
+  }
+
   formStore.setValidationResult(props.field.name, validationResult.value)
 
   // Отправка сообщения в родительское окно
