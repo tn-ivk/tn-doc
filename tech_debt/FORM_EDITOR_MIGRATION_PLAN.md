@@ -464,7 +464,7 @@ if (field.name === 'Laboratory_IOF') {
 - [x] Создать класс `FieldConfig` для конфигурации полей
 - [x] Создать пример использования FormEditorConfigBuilder.Example.cs
 - [ ] Обновить методы `GetEditDoc` во всех документных библиотеках:
-  - [ ] Act
+  - [x] Act ✅ **(Завершено 2025-10-15)**
   - [ ] Passport
   - [ ] Report
   - [ ] Jornal
@@ -642,8 +642,15 @@ private string GenerateVueFormHtml(string configJson)
 
 ### Этап 6: Удаление legacy кода
 
-**Задачи:**
-- [ ] Создать backup старых HTML файлов
+**Статус:** ⏸️ **Приостановлен до завершения миграции большинства библиотек**
+
+**Прогресс:**
+- [x] Создать backup старых HTML файлов ✅ **(Создан backup_20251015)**
+- [ ] 🔒 **БЛОКИРОВАНО:** Удаление legacy кода ожидает миграции минимум 80% библиотек (34 из 42)
+
+**Причина блокировки:** Старые HTML шаблоны (DocEdit.html, DocEditAct.html, DocEditPassport.html) и legacy JavaScript код все еще используются 41 библиотекой, которые не мигрированы на FormEditor. Удаление кода сейчас сломает функциональность.
+
+**Задачи (после разблокировки):**
 - [ ] Удалить `<script id="ElementChangeEventHandling">` из HTML
 - [ ] Удалить jQuery UI инициализацию
 - [ ] Удалить funcOnLoad(), UserChangeEvent(), InputStringCheck() и др.
