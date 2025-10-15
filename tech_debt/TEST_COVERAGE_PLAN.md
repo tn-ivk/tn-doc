@@ -1,5 +1,13 @@
 # План покрытия тестами библиотек TN_Doc
 
+> **⚠️ ВАЖНО**: Данный план был проанализирован и оптимизирован. См. [TEST_COVERAGE_PLAN_ANALYSIS.md](./TEST_COVERAGE_PLAN_ANALYSIS.md) для:
+> - Критического анализа текущего плана
+> - Оптимизированной версии с параметризованными тестами
+> - Уменьшения дублирования кода на 80%
+> - Сокращения времени реализации на 27% (11 недель вместо 15)
+> - Добавления интеграционных тестов (90+)
+> - Учета специфики v1.4.2 (GetEditDoc logging)
+
 ## 📋 Текущее состояние проекта тестов
 
 ### 🎯 Существующая структура `Tests/`
@@ -12,16 +20,22 @@
 - **HtmlAgilityPack** (1.12.1) - парсинг HTML
 - **coverlet.collector** (6.0.4) - покрытие кода
 
-#### ✅ Существующие тесты:
+#### ✅ Существующие тесты (13+ файлов):
 - **Controllers/**: `HomeController`, `PdfController`, `PrintController`, `ExportController`, `DirEditorController`, `ElisController`, `ClientLogController`
-- **Services/**: `AppConfigService`
+- **Services/**: `AppConfigService`, `DocGeneral`, `CfgAppSync`, `DbSchemaCache`
 - **Users/**: `UsersTests`
 
 #### ✅ Project References:
 - `TN_Doc.csproj` (основное веб-приложение)
 - `TN.DocGeneral.csproj` (общая библиотека)
-- `Act.csproj`, `Passport.csproj` (документные модули)
+- `Act.csproj`, `Passport.csproj` (документные модули) ✅ **УЖЕ ДОБАВЛЕНЫ**
 - `TN.Utils.csproj` (утилиты)
+
+#### 📊 Актуальное количество библиотек: **45** (включая все варианты)
+- Core Documents: 6 (Act, ActProducer, ActRoute, Passport, Jornal, Report)
+- KMH модули: 17 (включая KMX_Sikn425)
+- Poverka модули: 20
+- Common модули: 2 (CommonPoverka1974, CommonSikn425)
 
 ### 🎯 Namespace Convention
 Существующие тесты используют: `Tests.Controllers`, `Tests.Services`
@@ -158,9 +172,9 @@ public class {LibraryName}DocumentTests
 
 ---
 
-## 1. **Act (Акты приема-сдачи)**
+## 1. **Act (Акты приема-сдачи) - 3 варианта**
 
-### Файл: `ActDocumentTests.cs`
+### 1.1 Файл: `ActDocumentTests.cs`
 ### Класс: `ActDocumentTests`
 ### Приоритет: ВЫСОКИЙ
 
@@ -174,6 +188,8 @@ public class {LibraryName}DocumentTests
 - `GetPathConfigFile_ReturnsExistingConfigPath`
 - `GetPathEditConfigFile_ReturnsExistingEditConfigPath`
 - `GetEditDoc_WithValidId_ReturnsValidHtmlString`
+- `GetEditDoc_UsesPathCombine_ForCrossPlatformCompatibility` (v1.4.2)
+- `GetEditDoc_AddsTraceLogging_OnSuccessfulSave` (v1.4.2)
 - `GetEditDoc_WithInvalidId_ReturnsDefaultOrError`
 - `SetDocFromJson_WithValidJson_DoesNotThrowException`
 - `SetDocFromJson_WithInvalidJson_ThrowsException`
@@ -181,6 +197,28 @@ public class {LibraryName}DocumentTests
 
 #### Интеграционные тесты:
 - Полный цикл: создание → редактирование → сохранение → генерация отчета
+
+### 1.2 Файл: `ActProducerDocumentTests.cs`
+### Класс: `ActProducerDocumentTests`
+### Приоритет: СРЕДНИЙ
+
+#### Тестовые методы:
+- `Constructor_WithValidParameters_InitializesCorrectly`
+- `GetViewDoc_WithProducerData_ReturnsValidJsonString`
+- `ValidateProducerSpecificFields_InJson_ArePresent`
+- `GetEditDoc_WithValidId_ReturnsValidHtmlString`
+- `GetEditDoc_UsesPathCombine_ForCrossPlatformCompatibility` (v1.4.2)
+
+### 1.3 Файл: `ActRouteDocumentTests.cs`
+### Класс: `ActRouteDocumentTests`
+### Приоритет: СРЕДНИЙ
+
+#### Тестовые методы:
+- `Constructor_WithValidParameters_InitializesCorrectly`
+- `GetViewDoc_WithRouteData_ReturnsValidJsonString`
+- `ValidateRouteSpecificFields_InJson_ArePresent`
+- `GetEditDoc_WithValidId_ReturnsValidHtmlString`
+- `GetEditDoc_UsesPathCombine_ForCrossPlatformCompatibility` (v1.4.2)
 
 ---
 

@@ -11,11 +11,47 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **SDK Compatibility**: Works with .NET SDK 8.0+ and 9.0+
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
 **Main Development Branch**: develop
-**Current Branch**: developWork
 
 **Important Notes:**
+- NEVER mention AI, code generation, or "Claude" in commit messages
 - Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, and status bar cleanup
-- Global user instruction: Do not mention AI or code generation in commit messages
+
+## Quick Start for New Developers
+
+If this is your first time working with the codebase:
+
+1. **Setup NuGet sources** (required for FastReport and internal packages):
+   ```bash
+   dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
+   dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget \
+     --username "<USERNAME>" --password "<PASSWORD>" --store-password-in-clear-text
+   ```
+
+2. **Install dependencies and build**:
+   ```bash
+   dotnet restore
+   dotnet build
+   ```
+
+3. **Build Vue components** (StatusBar and Configurator):
+   ```bash
+   cd TN_Doc/Client
+   npm install
+   npm run build:all
+   cd ../..
+   ```
+
+4. **Run the application**:
+   ```bash
+   cd TN_Doc
+   dotnet run
+   # Visit http://localhost:38509
+   ```
+
+5. **Run tests to verify everything works**:
+   ```bash
+   dotnet test
+   ```
 
 ## Build and Development Commands
 
@@ -525,16 +561,94 @@ The application uses in-memory PDF generation (implemented in v1.4.1):
 4. Ensure `prutils/winprutil.exe` is accessible
 5. Grant necessary permissions to service account
 
-### Development Workflow Tips
+### Development Workflow
+
+#### Daily Development Cycle
+1. **Start with fresh environment**:
+   ```bash
+   git pull origin develop
+   dotnet restore
+   dotnet build
+   ```
+
+2. **Run application locally** (from solution root):
+   ```bash
+   cd TN_Doc
+   ASPNETCORE_ENVIRONMENT=Development dotnet run
+   ```
+
+3. **Work on Vue components** (parallel terminal):
+   ```bash
+   cd TN_Doc/Client
+   npm run dev              # StatusBar with hot reload
+   npm run dev:configurator  # Configurator with hot reload
+   ```
+
+4. **Run tests frequently**:
+   ```bash
+   dotnet test
+   dotnet test --filter "ClassName=YourTestClass"
+   ```
+
+5. **Before committing**:
+   ```bash
+   dotnet format                        # Format code
+   dotnet build                          # Ensure it builds
+   dotnet test                           # Run all tests
+   cd TN_Doc/Client && npm run build:all # Build Vue components
+   ```
+
+#### Common Development Tasks
+
+**Adding a new document type:**
+1. Create new library in `tn.docgeneral/{DocumentType}/`
+2. Implement standard interface (GetViewDoc, GetEditDoc, GetPathTemplateFile, SetDocFromJson)
+3. Add logging with `Path.Combine()` in GetEditDoc
+4. Create FastReport template in `TN_Doc/Doc/{DocumentType}/`
+5. Add configuration files: `Cfg{DocumentType}.json`, `CfgEdit{DocumentType}.json`
+6. Register in IAppConfigService factory
+7. Write unit tests in `Tests/`
+
+**Modifying a FastReport template:**
+1. ALWAYS make a backup copy first
+2. Use FastReport Designer to edit .frx files
+3. Test with real data from multiple devices
+4. Validate all export formats (PDF, Excel, ODS)
+5. Check logs for any rendering errors
+
+**Working with configurations:**
+- `CfgApp.json`: Main app settings (devices, ELIS, OPC)
+- `Cfg{DocumentType}.json`: Template paths, report settings
+- `CfgEdit{DocumentType}.json`: Edit form field mappings
+- Use Configurator UI (`/configurator`) for runtime changes
+- Changes to CfgApp.json require app restart
+
+**Debugging tips:**
 - Use `ASPNETCORE_ENVIRONMENT=Development` for local debugging
 - Development configs auto-loaded in Debug builds
-- Check logs for detailed error information (platform-specific paths)
+- Check logs for detailed error information:
+  - Linux: `/opt/TN_Doc/logs/`
+  - Windows: `TN_Doc/logs/`
+- Enable verbose logging in `nlog.config` for troubleshooting
 - Test document generation with various IDs before deployment
 - Validate FastReport templates with test data
+
+**Pre-deployment checklist:**
 - Remove `appsettings.Development.json` before production deployment
+- Build Vue components: `cd TN_Doc/Client && npm run build:all`
+- Run full test suite: `dotnet test`
+- Check for hardcoded development URLs or paths
+- Verify database connection strings are correct
 - When working with OPC DA, ensure all tags are pre-registered
-- **Windows Service Deployment**: Use `NT AUTHORITY\NETWORK SERVICE` account (no password)
-- **Deployment from develop branch**: All three projects should be deployed from develop folder
+
+**Windows Service Deployment:**
+- Use `NT AUTHORITY\NETWORK SERVICE` account (no password)
+- Grant appropriate file system permissions
+
+**Multi-project Deployment:**
+- All three projects (TN_Doc, TN_KMH, TN_MessagingService) should be deployed from develop branch
+- They share the same `CfgApp.json` configuration file
+- Deploy at the same directory level
 
 ### Common Issues and Solutions
 
@@ -573,6 +687,40 @@ When working on specific document types:
 - Test document generation thoroughly before modifying templates
 - FastReport templates (.frx files) are binary - use FastReport Designer for editing
 - Pre-compiled modules available in `Dll/` directory
+
+#### Standard Document Module Interface
+All document modules must implement these methods:
+
+1. **GetViewDoc(id)**: Returns JSON data for report generation
+   - Fetches document data from database
+   - Transforms to format expected by FastReport template
+   - Returns JSON string with "JsonDoc" parameter
+
+2. **GetPathTemplateFile()**: Returns path to .frx template
+   - Resolves path from document configuration
+   - Returns absolute path to FastReport template file
+
+3. **GetEditDoc(id)**: Returns HTML for editing forms
+   - Generates HTML editing form
+   - **IMPORTANT**: Always use `Path.Combine()` for cross-platform compatibility
+   - **IMPORTANT**: Add trace logging on successful save:
+     ```csharp
+     string htmlPath = Path.Combine(wwwrootPath, "HTML", "html.html");
+     _logger.Trace($"HTML форма документа {IdDoc} (id={id}) сохранена: {htmlPath}");
+     ```
+   - Saves to `wwwroot/HTML/` directory
+   - Returns HTML as string or returns direct file path
+
+4. **SetDocFromJson(json)**: Updates document data from JSON
+   - Parses JSON from client
+   - Validates input data
+   - Updates database records
+
+#### Recent GetEditDoc Improvements (v1.4.2)
+As of version 1.4.2, all 42 document libraries now include enhanced logging in GetEditDoc:
+- Replaced string concatenation with `Path.Combine()` for cross-platform compatibility
+- Added trace logging with full file path on successful save
+- Consistent logging pattern across all libraries
 
 #### Complete Document Libraries List (42 libraries)
 The system contains the following document libraries that require test coverage:
@@ -616,10 +764,33 @@ The system contains the following document libraries that require test coverage:
 - Current version: 1.4.2 (.NET 8.0)
 
 ### Git Workflow Notes
-- **Main branches**: `master` (production), `develop` (active development)
+
+**Branch Strategy:**
+- **master**: Production branch (stable releases)
+- **develop**: Main development branch (active development)
+- **developWork**: Personal/experimental work branch (temporary)
+- **feature/**: Feature branches for specific tasks
+- **bugs/**: Bug fix branches
+- **projects/**: Project-specific branches (e.g., projects/sikn-531-gazprom)
+
+**Branch Guidelines:**
+- Always branch from `develop` for new features
+- Merge back to `develop` after testing
+- Use descriptive branch names (e.g., `feature/status-bar-improvements`)
+- Delete feature branches after merging
+
+**Commit Message Rules:**
+- NEVER mention AI, automated generation, or "Claude" in commit messages
+- Use Russian language for commit messages
+- Follow conventional commits style: "Тип: краткое описание"
+- Include detailed description in commit body if needed
+- Reference issue numbers when applicable
+
+**Important Warnings:**
 - Large number of configuration files are tracked - be careful with bulk changes
 - Many binary .frx templates are in the repository - use FastReport Designer for editing
-- Current working directory is on `develop` branch with many modified files
+- Do NOT commit Development config files to production branches
+- Always test document generation before committing template changes
 
 ### Key Development Patterns
 
