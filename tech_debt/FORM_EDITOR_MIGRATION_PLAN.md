@@ -465,13 +465,17 @@ if (field.name === 'Laboratory_IOF') {
 - [x] Создать пример использования FormEditorConfigBuilder.Example.cs
 - [ ] Обновить методы `GetEditDoc` во всех документных библиотеках:
   - [x] Act ✅ **(Завершено 2025-10-15)**
-  - [ ] Passport
-  - [ ] Report
-  - [ ] Jornal
+  - [x] Report ✅ **(Завершено 2025-10-15)**
+  - [x] Jornal ✅ **(Завершено 2025-10-15)**
+  - [ ] Passport (отложен - сложная структура)
   - [ ] Poverka* (все 21 библиотека)
   - [ ] KMH* (все 14 библиотек)
+  - [ ] Common* (3 библиотеки)
 - [x] Создать метод `GenerateVueFormHtml` для генерации HTML с Vue (пример готов)
 - [ ] Удалить старые методы генерации HTML таблиц
+
+**Текущий прогресс:** 26/42 библиотеки (61.9%)
+**Цель для разблокировки Этапа 6:** 34/42 библиотеки (80%)
 
 **FormEditorConfigBuilder.cs:**
 ```csharp
@@ -635,6 +639,75 @@ private string GenerateVueFormHtml(string configJson)
 1. Определения конфигурации полей специфичной для документа
 2. Обновления метода GetEditDoc
 3. Удаления старого кода генерации HTML
+
+---
+
+## Детальный чеклист миграции библиотек
+
+**Прогресс:** 26/42 (61.9%)
+**Цель:** 34/42 (80%) для разблокировки удаления legacy кода
+
+### Core документы (4)
+- [x] **Act** ✅ (2025-10-15) - Commits: c8ab475, 035fa59, 5d531fc
+- [x] **Report** ✅ (2025-10-15) - Commit: 5d531fc
+- [x] **Jornal** ✅ (2025-10-15) - Commit: ba8d181
+- [ ] **Passport** ⏸️ (отложен - сложная структура с 2 таблицами + ELIS)
+
+### Poverka документы (21)
+
+#### GOST R 8.1011-2022 (4)
+- [x] **Poverka1974** ✅ (2025-10-15) - Main variant, reflection-based
+- [x] **Poverka1974_04** ✅ (2025-10-15) - 2004 variant, 15 fields with conditional viscosity
+- [x] **Poverka1974_89** ✅ (2025-10-15) - 1989 variant, 15 fields with conditional viscosity
+- [x] **Poverka1974_95** ✅ (2025-10-15) - 1995 variant, 15 fields with conditional viscosity
+
+#### MI и другие стандарты (17)
+- [x] **Poverka2816** ✅ (2025-10-15) - Commit: e75a170 (MI 2816, 10 текстовых полей)
+- [x] **Poverka3151** ✅ (2025-10-15) - Commit: a9bf574 (MI 3151-2008, 21 поле: 19 text + 2 select)
+- [x] **Poverka3189** ✅ (2025-10-15) - Commit: 5bc3457 (MI 3189-2009, 20 полей: 19 text/number + 1 select)
+- [x] **Poverka3265_PR_PU** ✅ (2025-10-15) - GOST 3265 PR→PU, 13 полей: 12 text + 1 select
+- [x] **Poverka3265_UPR_PR** ✅ (2025-10-15) - GOST 3265 UPR→PR, 13 полей: 12 text + 1 select
+- [x] **Poverka3265_UPR_PU** ✅ (2025-10-15) - GOST 3265 UPR→PU, 13 полей: 12 text + 1 select
+- [ ] ~~Poverka3266~~ (не существует в проекте)
+- [x] **Poverka3267** ✅ (2025-10-15) - GOST 3267, reflection-based field loading
+- [x] **Poverka3272** ✅ (2025-10-15) - GOST 3272, reflection-based field loading
+- [x] **Poverka3287** ✅ (2025-10-15) - GOST 3287, reflection-based field loading
+- [x] **Poverka3288** ✅ (2025-10-15) - GOST 3288, reflection-based field loading
+- [x] **Poverka3312_PR_PU** ✅ (2025-10-15) - GOST 3312 PR→PU, reflection-based
+- [x] **Poverka3312_UPR_PR** ✅ (2025-10-15) - GOST 3312 UPR→PR, reflection-based
+- [x] **Poverka3380** ✅ (2025-10-15) - GOST 3380, reflection-based field loading
+- [x] **PoverkaSikn425_PR_PR** ✅ (2025-10-15) - SIKN-425 PR→PR, reflection-based
+- [x] **PoverkaSikn425_PR_PU** ✅ (2025-10-15) - SIKN-425 PR→PU, reflection-based
+
+### KMH документы (14)
+
+#### GOST качество (5)
+- [x] **KMH3265_PR_PU** ✅ (2025-10-15) - GOST 3265, reflection-based
+- [x] **KMH3265_UPR_PR** ✅ (2025-10-15) - GOST 3265, reflection-based
+- [x] **KMH3288_MPR_TPR** ✅ (2025-10-15) - GOST 3288, reflection-based
+- [x] **KMH3312_PR_PU** ✅ (2025-10-15) - GOST 3312, reflection-based
+- [ ] KMH3312_UPR_PR (GOST 3312)
+
+#### Контроль параметров (9)
+- [ ] KMH_MI2816 (MI 2816)
+- [ ] KMH_MPR_MPR (Масса + Давление)
+- [ ] KMH_MPR_PU (Масса + Давление → Объем)
+- [ ] KMH_MPR_TPR (Масса + Давление + Температура)
+- [ ] KMH_PP (Плотность + Давление)
+- [ ] KMH_PP_Areom (Плотность + Давление ареометр)
+- [ ] KMH_PR_PR (Давление + Давление)
+- [ ] KMH_PR_PU (Давление → Объем)
+- [ ] KMH_PV (Объем)
+- [ ] KMH_PW (Масса)
+- [ ] KMX_Sikn425_PR_PR (SIKN-425)
+- [ ] KMX_Sikn425_PR_PU (SIKN-425)
+
+### Common библиотеки (3)
+- [ ] CommonPoverka1974 (Общая функциональность GOST R 8.1011-2022)
+- [ ] CommonSikn425 (Общая функциональность SIKN-425)
+- [ ] *(третья не идентифицирована)*
+
+---
 
 **Время:** 2-3 дня
 
