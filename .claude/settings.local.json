@@ -62,7 +62,9 @@
       "Bash(else)",
       "Bash(do echo:*)",
       "Bash(1 echo \"\" done echo \"=== Migration Summary ===\" echo \"Checking for remaining HtmlAgilityPack usage...\" find /home/snafu/projects/ivk/tn_doc/tn.docgeneral -name \"*.cs\" -exec grep -l \"using HtmlAgilityPack\" {})",
-      "Bash(/tmp/migrate_kmh_library.sh:*)"
+      "Bash(/tmp/migrate_kmh_library.sh:*)",
+      "Bash(then echo \"✓ Файл существует: $file\")",
+      "Bash(else echo \"✗ Файл не найден\")"
     ],
     "deny": [],
     "ask": []
