@@ -72,6 +72,11 @@ function handleClick() {
   user-select: none;
   border: 1px solid transparent;
 
+  // Принудительно отключаем outline для всех индикаторов
+  &:focus {
+    outline: none !important;
+  }
+
   &--online {
     background: var(--p-green-100);
     color: var(--p-green-700);
@@ -106,7 +111,7 @@ function handleClick() {
 
     // Кастомный стиль фокуса вместо стандартного outline
     &:focus {
-      outline: none;
+      outline: none !important;
     }
 
     &:focus-visible {
