@@ -20,7 +20,7 @@
         <div class="field field-horizontal compact-section">
           <label for="device-use">Использовать устройство:</label>
             <div class="flex align-items-center">
-              <InputSwitch id="device-use" v-model="deviceUse" />
+              <ToggleSwitch id="device-use" v-model="deviceUse" />
               <MixedStateWarning v-if="isMixed('Use')" class="ml-2" />
             </div>
           </div>
@@ -33,7 +33,7 @@
               <Column :bodyStyle="{ width: '3rem' }" :headerStyle="{ width: '3rem' }" bodyClass="col-use" class="col-use">
                 <template #body="{ data }">
                   <div class="flex align-items-center gap-2">
-                    <InputSwitch :model-value="data.Use" @update:model-value="v => onToggleDocUse(data.IdDoc, v)" />
+                    <ToggleSwitch :model-value="data.Use" @update:model-value="v => onToggleDocUse(data.IdDoc, v)" />
                     <MixedStateWarning v-if="isMixed('Docs')" />
                   </div>
                 </template>
@@ -100,7 +100,7 @@
                     <span class="connection-title">Подключение {{ index + 1 }}</span>
                   </div>
                   <div class="connection-toggle">
-                    <InputSwitch 
+                    <ToggleSwitch 
                       :model-value="conn.Use" 
                       @update:model-value="v => toggleConnectionUse(index, v)"
                     />
@@ -267,7 +267,7 @@ import { OpcType } from '../types/config.types';
 import _ from 'lodash';
 
 import Panel from 'primevue/panel';
-import InputSwitch from 'primevue/inputswitch';
+import ToggleSwitch from 'primevue/toggleswitch';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Password from 'primevue/password';
