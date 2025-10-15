@@ -8,5 +8,118 @@
 <body>
   <div id="form-editor-root"></div>
   <script type="module" src="/src/main.ts"></script>
+  <script type="module">
+    // Тестовые данные для разработки
+    window.addEventListener('DOMContentLoaded', () => {
+      // Небольшая задержка чтобы main.ts успел загрузиться
+      setTimeout(() => {
+        if (window.initFormEditor) {
+          const testConfig = {
+            fields: [
+              {
+                name: 'Delive_IOF',
+                label: 'Сдал (ФИО)',
+                type: 'select',
+                required: true,
+                autoFill: ['Delive_Post', 'Delive_Factory', 'Delive_FIO', 'Delive_Lic_Number', 'Delive_Lic_Date']
+              },
+              {
+                name: 'Delive_Post',
+                label: 'Должность (сдал)',
+                type: 'text',
+                required: true,
+                disabled: true
+              },
+              {
+                name: 'Delive_Factory',
+                label: 'Предприятие (сдал)',
+                type: 'text',
+                required: true,
+                disabled: true
+              },
+              {
+                name: 'Delive_FIO',
+                label: 'ФИО (сдал)',
+                type: 'text',
+                required: true,
+                disabled: true
+              },
+              {
+                name: 'Receive_IOF',
+                label: 'Принял (ФИО)',
+                type: 'select',
+                required: true,
+                autoFill: ['Receive_Post', 'Receive_Factory', 'Receive_FIO']
+              },
+              {
+                name: 'Receive_Post',
+                label: 'Должность (принял)',
+                type: 'text',
+                required: true,
+                disabled: true
+              },
+              {
+                name: 'Receive_Factory',
+                label: 'Предприятие (принял)',
+                type: 'text',
+                required: true,
+                disabled: true
+              },
+              {
+                name: 'Description',
+                label: 'Примечание',
+                type: 'textarea',
+                required: false
+              }
+            ],
+            data: {
+              Delive_IOF: null,
+              Delive_Post: '',
+              Delive_Factory: '',
+              Delive_FIO: '',
+              Receive_IOF: null,
+              Receive_Post: '',
+              Receive_Factory: '',
+              Description: ''
+            },
+            dictionaries: {
+              Users: [
+                {
+                  Id: 1,
+                  Name: 'Иванов Иван Иванович',
+                  Post: 'Инженер',
+                  Factory: 'ООО "Газпром"',
+                  LicenseNumber: '123456',
+                  LicenseDate: '2024-01-15'
+                },
+                {
+                  Id: 2,
+                  Name: 'Петров Петр Петрович',
+                  Post: 'Мастер',
+                  Factory: 'ООО "Лукойл"',
+                  LicenseNumber: '654321',
+                  LicenseDate: '2023-06-20'
+                },
+                {
+                  Id: 3,
+                  Name: 'Сидоров Сидор Сидорович',
+                  Post: 'Техник',
+                  Factory: 'ПАО "Роснефть"',
+                  LicenseNumber: '789012',
+                  LicenseDate: '2024-03-10'
+                }
+              ]
+            },
+            invalidChars: ['<', '>', '"', "'", '&']
+          }
+
+          window.initFormEditor(testConfig)
+          console.log('Тестовая конфигурация загружена')
+        } else {
+          console.error('initFormEditor не доступен!')
+        }
+      }, 100)
+    })
+  </script>
 </body>
 </html>
