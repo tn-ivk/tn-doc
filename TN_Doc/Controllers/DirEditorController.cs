@@ -18,16 +18,18 @@ public class DirEditorController : ControllerBase
 {
     private readonly ILogger<DirEditorController> _logger;
     private readonly IAppConfigService _service;
+    private readonly IConfigurationCacheService _configCache;
 
     /// <summary>
     /// Инициализация объекта
     /// </summary>
     /// <param name="service">Сервис для взаимодействия с со справочниками</param>
     /// <exception cref="ArgumentNullException">При отсутствие сервиса взаимодействия со справочниками</exception>
-    public DirEditorController(ILogger<DirEditorController> logger, IConfiguration configuration)
+    public DirEditorController(ILogger<DirEditorController> logger, IConfiguration configuration, IConfigurationCacheService configCache)
     {
         _service = AppConfigService.GetInstance(configuration);
         _logger = logger;
+        _configCache = configCache;
     }
 
 
@@ -56,6 +58,7 @@ public class DirEditorController : ControllerBase
     {
         _logger.LogTrace("Установка нового значения словарей");
         await _service.SetDirectoriesJsonAsync(jsonPatch.DirJsonRaw);
+        _configCache.ClearCache();
         return Ok();
     }
 
@@ -82,6 +85,7 @@ public class DirEditorController : ControllerBase
     {
         _logger.LogTrace("Установка новой конфигурации проекта");
         await _service.SetQpConfigFromJsonAsync(jsonPatch.QpCfgJsonRaw);
+        _configCache.ClearCache();
         return Ok();
     }
 }
