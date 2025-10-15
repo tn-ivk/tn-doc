@@ -460,8 +460,9 @@ if (field.name === 'Laboratory_IOF') {
 ### Этап 5: Обновление C# кода
 
 **Задачи:**
-- [ ] Создать базовый класс `FormEditorConfigBuilder` в TN.DocGeneral
-- [ ] Создать класс `FieldConfig` для конфигурации полей
+- [x] Создать базовый класс `FormEditorConfigBuilder` в TN.DocGeneral
+- [x] Создать класс `FieldConfig` для конфигурации полей
+- [x] Создать пример использования FormEditorConfigBuilder.Example.cs
 - [ ] Обновить методы `GetEditDoc` во всех документных библиотеках:
   - [ ] Act
   - [ ] Passport
@@ -469,7 +470,7 @@ if (field.name === 'Laboratory_IOF') {
   - [ ] Jornal
   - [ ] Poverka* (все 21 библиотека)
   - [ ] KMH* (все 14 библиотек)
-- [ ] Создать метод `GenerateVueFormHtml` для генерации HTML с Vue
+- [x] Создать метод `GenerateVueFormHtml` для генерации HTML с Vue (пример готов)
 - [ ] Удалить старые методы генерации HTML таблиц
 
 **FormEditorConfigBuilder.cs:**
