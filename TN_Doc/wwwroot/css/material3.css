@@ -67,7 +67,7 @@
   --md-status-bar-height: 28px;        /* Status bar height */
 
   /* Typography tokens */
-  --md-font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --md-font-family: 'Segoe UI', 'PT Astra Sans', 'Helvetica Neue', Arial, sans-serif;
   --md-font-size-base: 15px;
   --md-font-size-button: 15px;
   --md-font-weight-normal: 400;
