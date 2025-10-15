@@ -1,13 +1,13 @@
 ## Миграция таблицы AdditionalInfo на Vue-компонент
 
-Цель: заменить статическую таблицу `#AdditionalInfo` в формах редактирования документов на Vue-компонент, сохранив текущие API, валидации, интеграцию с ЕЛИС и `SaveDoc`, а также привести стили к требованиям дизайн-документа (`tn.docgeneral/DESIGN_DOCUMENTATION.md`). Реализация в рамках существующего стека (jQuery, jQuery UI tooltip, Common.js/EditDoc.js) без сборщиков.
+Цель: заменить статическую таблицу `#AdditionalInfo` в формах редактирования документов на Vue-компонент, сохранив текущие API, валидации, интеграцию с ЕЛИС и `SaveDoc`, а также привести стили к требованиям дизайн-документа (`tn.docgeneral/DESIGN_DOCUMENTATION.md`). 
 
 ### 1. Область охвата
 - Файлы форм:
   - `TN_Doc/wwwroot/HTML/DocEdit.html`
   - `TN_Doc/wwwroot/HTML/DocEditAct.html`
   - `TN_Doc/wwwroot/HTML/DocEditPassport.html`
-- Скрипты и функции, которые должны работать без изменений:
+- Скрипты и функции, функционал которых должен быть повторен:
   - `GetUsers()`, `GetInvalideChars()` из `Common.js`
   - Валидации: `InputStringCheck`, `InputValueCheck`, `CheckEmpty`, `CheckInvalidChars`
   - Сохранение: `SaveDoc`, `SaveDocPassport`
