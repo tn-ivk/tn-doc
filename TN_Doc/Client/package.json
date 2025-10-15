@@ -5,16 +5,19 @@
   "workspaces": [
     "statusbar",
     "configurator",
+    "form-editor",
     "shared"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=statusbar",
     "dev:configurator": "npm run dev --workspace=configurator",
+    "dev:form-editor": "npm run dev --workspace=form-editor",
     "build": "npm run build --workspace=statusbar",
     "build:configurator": "npm run build --workspace=configurator",
+    "build:form-editor": "npm run build --workspace=form-editor",
     "build:all": "npm run build --workspaces --if-present",
     "type-check": "npm run type-check --workspaces --if-present",
-    "clean": "rm -rf statusbar/node_modules configurator/node_modules shared/node_modules node_modules"
+    "clean": "rm -rf statusbar/node_modules configurator/node_modules form-editor/node_modules shared/node_modules node_modules"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
