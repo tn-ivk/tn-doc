@@ -55,7 +55,14 @@
       "Bash(if [ -f \"$file\" ])",
       "Bash(then echo \"Processing $dir\")",
       "Bash(do if grep -q \"using HtmlAgilityPack\" \"$file\")",
-      "Bash(then echo \"FOUND: $file\")"
+      "Bash(then echo \"FOUND: $file\")",
+      "Bash(file=\"/home/snafu/projects/ivk/tn_doc/tn.docgeneral/$dir/$dir.cs\")",
+      "Bash(then)",
+      "Bash(if grep -q \"using HtmlAgilityPack\" \"$file\")",
+      "Bash(else)",
+      "Bash(do echo:*)",
+      "Bash(1 echo \"\" done echo \"=== Migration Summary ===\" echo \"Checking for remaining HtmlAgilityPack usage...\" find /home/snafu/projects/ivk/tn_doc/tn.docgeneral -name \"*.cs\" -exec grep -l \"using HtmlAgilityPack\" {})",
+      "Bash(/tmp/migrate_kmh_library.sh:*)"
     ],
     "deny": [],
     "ask": []
