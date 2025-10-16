@@ -39,18 +39,25 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         // Настройка мока кэша конфигурации
         _mockConfigCache = new Mock<IConfigurationCacheService>();
 
-        // Setup common mocks using helper
-        MockConfigHelper.SetupMockAppConfig(MockAppConfig, idDevice: 1);
+        // Setup common mocks using helper with custom device configuration
+        // Устанавливаем пустой DBConnectionStrings список, чтобы OnModelCreating не пытался подключаться к БД
+        MockConfigHelper.SetupMockAppConfig(MockAppConfig, idDevice: 1, customizeDevice: device =>
+        {
+            device.DBConnectionStrings = new List<DBConnectionString>(); // Пустой список для тестов
+        });
+
+        // Создание необходимых конфигурационных файлов для тестов
+        CreateTestConfigFiles();
     }
 
     protected override void SetupAdditional()
     {
         _mockReportLogger = new Mock<ILogger<DocReport>>();
 
-        // Инициализация тестируемого объекта
+        // Инициализация тестируемого объекта (используем TestableDocReport вместо DocReport)
         try
         {
-            _reportDocument = new DocReport(
+            _reportDocument = new TestableDocReport(
                 DbOptions,
                 MockAppConfig.Object,
                 _mockConfigCache.Object,
@@ -72,7 +79,7 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
     public void Constructor_WithValidParameters_InitializesCorrectly()
     {
         // Arrange & Act
-        var report = new DocReport(
+        var report = new TestableDocReport(
             DbOptions,
             MockAppConfig.Object,
             _mockConfigCache.Object,
@@ -93,7 +100,7 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         // Note: DbContext throws ArgumentNullException when options is null, which is a subclass of ArgumentException
         Assert.Throws<ArgumentNullException>(() =>
         {
-            var report = new DocReport(
+            var report = new TestableDocReport(
                 null,
                 MockAppConfig.Object,
                 _mockConfigCache.Object,
@@ -111,7 +118,7 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         // Note: Constructor accepts null ConfigCache (does not validate this parameter)
         Assert.DoesNotThrow(() =>
         {
-            var report = new DocReport(
+            var report = new TestableDocReport(
                 DbOptions,
                 MockAppConfig.Object,
                 null,
@@ -126,7 +133,7 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
     public void Constructor_InitializesIncompleteReportTypes_WithDefaultValues()
     {
         // Arrange & Act
-        var report = new DocReport(
+        var report = new TestableDocReport(
             DbOptions,
             MockAppConfig.Object,
             _mockConfigCache.Object,
@@ -908,6 +915,125 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
     #region Helper Methods
 
     /// <summary>
+    /// Создание конфигурационных файлов для тестов Report
+    /// </summary>
+    private void CreateTestConfigFiles()
+    {
+        // Создаем директорию Cfg в тестовом каталоге
+        var cfgDir = Path.Combine(TestBasePath, "Cfg");
+        Directory.CreateDirectory(cfgDir);
+
+        // Создаем минимальный CfgReport.json
+        var cfgReportPath = Path.Combine(cfgDir, "CfgReport.json");
+        var cfgReportContent = @"{
+  ""Doc"": {
+    ""Version"": ""1.0.0"",
+    ""GUID"": 0,
+    ""Settings"": {
+      ""General"": {
+        ""ObjType"": 1,
+        ""NefType"": 1,
+        ""PageSettings"": {
+          ""PaperWidth"": 297,
+          ""PaperHeight"": 210,
+          ""TopMargin"": 10,
+          ""BottomMargin"": 5,
+          ""LeftMargin"": 10,
+          ""RightMargin"": 10
+        },
+        ""FileNameForExportDoc"": """",
+        ""ProtocolNumber"": 1
+      },
+      ""Header"": {
+        ""Prefix_SIKN_Name"": ""СИКН"",
+        ""NameIVK"": ""ИВК-TEST""
+      },
+      ""Data"": {
+        ""ShowInvalidValues"": false,
+        ""TableBIK"": {
+          ""Visible"": true,
+          ""Parameters"": []
+        },
+        ""TableLine"": {
+          ""Visible"": true,
+          ""ShowNumberColumns"": 1,
+          ""ColumnsWidth"": 100,
+          ""Parameters"": [],
+          ""ColumnSIKN"": {
+            ""Visible"": true,
+            ""Name"": ""СИКН"",
+            ""Width"": 0
+          }
+        },
+        ""IncompleteReports"": [
+          {
+            ""Use"": true,
+            ""Id"": 1,
+            ""Name"": ""Отчет за два часа"",
+            ""ShortName"": ""Отчет за 2ч""
+          },
+          {
+            ""Use"": true,
+            ""Id"": 2,
+            ""Name"": ""Отчет за смену"",
+            ""ShortName"": ""Отчет за см""
+          },
+          {
+            ""Use"": true,
+            ""Id"": 3,
+            ""Name"": ""Отчет за сутки"",
+            ""ShortName"": ""Отчет за сут""
+          },
+          {
+            ""Use"": true,
+            ""Id"": 4,
+            ""Name"": ""Отчет за месяц"",
+            ""ShortName"": ""Отчет за м""
+          },
+          {
+            ""Use"": true,
+            ""Id"": 5,
+            ""Name"": ""Отчет за ТКО"",
+            ""ShortName"": ""Отчет за ТКО""
+          }
+        ]
+      },
+      ""Footer"": {
+        ""Signers"": []
+      },
+      ""Dictionarys"": {}
+    },
+    ""DataIVK"": {},
+    ""DataArm"": {}
+  }
+}";
+        File.WriteAllText(cfgReportPath, cfgReportContent);
+
+        // Создаем минимальный CfgEditReport.json
+        var cfgEditReportPath = Path.Combine(cfgDir, "CfgEditReport.json");
+        var cfgEditReportContent = @"{
+  ""Doc"": {
+    ""Version"": ""1.0.0""
+  }
+}";
+        File.WriteAllText(cfgEditReportPath, cfgEditReportContent);
+
+        // Создаем директорию Doc для шаблонов
+        var docDir = Path.Combine(TestBasePath, "Doc");
+        Directory.CreateDirectory(docDir);
+
+        // Создаем минимальный Report.frx (пустой XML файл FastReport)
+        var templatePath = Path.Combine(docDir, "Report.frx");
+        var templateContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<Report ScriptLanguage=""CSharp"" ReportInfo.Created=""01/01/2024 00:00:00"">
+</Report>";
+        File.WriteAllText(templatePath, templateContent);
+
+        TestContext.WriteLine($"Created test config files in: {cfgDir}");
+        TestContext.WriteLine($"Created test template file: {templatePath}");
+    }
+
+    /// <summary>
     /// Добавление тестовых данных отчета в БД
     /// </summary>
     private void SeedTestReportData(int id)
@@ -1003,4 +1129,71 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
     }
 
     #endregion
+}
+
+/// <summary>
+/// Тестовый класс DocReport, который не требует реального подключения к MySQL
+/// </summary>
+internal class TestableDocReport : TN.Doc.DocReport
+{
+    // Публичные DbSets для тестов (базовый класс имеет private DbSets)
+    public DbSet<TN.Doc.TableReportList> ListDocPublic { get; set; }
+    public DbSet<TN.Doc.TableReportData> DataDocPublic { get; set; }
+
+    public TestableDocReport(
+        DbContextOptions<TN.Doc.DocGeneral> options,
+        IAppConfigService appConfig,
+        IConfigurationCacheService configCache,
+        int idDevice,
+        IdDoc idDoc,
+        string path)
+        : base(options, appConfig, configCache, idDevice, idDoc, path)
+    {
+        // После конструктора базового класса копируем public DbSets в private DbSets
+        // используя Reflection, потому что Entity Framework инициализирует только public DbSets
+        InitializePrivateDbSets();
+    }
+
+    /// <summary>
+    /// Инициализирует private DbSets базового класса из public DbSets
+    /// </summary>
+    private void InitializePrivateDbSets()
+    {
+        // Получаем ссылки на private DbSets через Reflection
+        var listDocProperty = typeof(TN.Doc.DocReport).GetProperty("ListDoc",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var dataDocProperty = typeof(TN.Doc.DocReport).GetProperty("DataDoc",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Устанавливаем значения private DbSets из public DbSets
+        if (listDocProperty != null)
+            listDocProperty.SetValue(this, this.ListDocPublic);
+
+        if (dataDocProperty != null)
+            dataDocProperty.SetValue(this, this.DataDocPublic);
+    }
+
+    /// <summary>
+    /// Переопределяем OnModelCreating чтобы избежать подключения к реальной БД через DBtService
+    /// </summary>
+    protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
+    {
+        // Для InMemory базы в тестах не нужно проверять схему через DBtService
+        // Настраиваем модель для InMemory БД вручную
+
+        // Настраиваем TableReportList с ключом и связью
+        modelBuilder.Entity<TN.Doc.TableReportList>()
+            .HasKey(x => x.id);
+
+        modelBuilder.Entity<TN.Doc.TableReportList>()
+            .HasOne(x => x.Data)
+            .WithOne()
+            .HasForeignKey<TN.Doc.TableReportList>(x => x.id);
+
+        // Настраиваем TableReportData с ключом
+        modelBuilder.Entity<TN.Doc.TableReportData>()
+            .HasKey(x => x.id);
+
+        // НЕ вызываем base.OnModelCreating(modelBuilder), потому что он пытается использовать DBtService
+    }
 }
