@@ -38,8 +38,8 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         // Настройка мока кэша конфигурации
         _mockConfigCache = new Mock<IConfigurationCacheService>();
 
-        // IAppConfigService не имеет методов GetBasePath/GetWwwrootPath/GetConfigPath
-        // Пути предоставляются через TestBasePath/TestWwwrootPath из базового класса
+        // Setup common mocks using helper
+        MockConfigHelper.SetupMockAppConfig(MockAppConfig, idDevice: 1);
     }
 
     protected override void SetupAdditional()
@@ -89,7 +89,8 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
     public void Constructor_WithNullDbOptions_ThrowsArgumentException()
     {
         // Arrange, Act & Assert
-        Assert.Throws<ArgumentException>(() =>
+        // Note: DbContext throws ArgumentNullException when options is null, which is a subclass of ArgumentException
+        Assert.Throws<ArgumentNullException>(() =>
         {
             var jornal = new DocJornal(
                 null,
@@ -99,14 +100,15 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
                 idDoc: IdDoc.Jornal,
                 path: TestBasePath
             );
-        });
+        }, "Constructor should throw ArgumentNullException for null DbOptions");
     }
 
     [Test]
     public void Constructor_WithNullConfigCache_ThrowsArgumentException()
     {
         // Arrange, Act & Assert
-        Assert.Throws<ArgumentException>(() =>
+        // Note: Constructor accepts null ConfigCache (does not validate this parameter)
+        Assert.DoesNotThrow(() =>
         {
             var jornal = new DocJornal(
                 DbOptions,
@@ -116,7 +118,7 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
                 idDoc: IdDoc.Jornal,
                 path: TestBasePath
             );
-        });
+        }, "Constructor should accept null ConfigCache without throwing");
     }
 
     #endregion

@@ -35,14 +35,8 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
 
     protected override void SetupCommonMocks()
     {
-        // Настройка мока конфигурации (пути предоставляются через TestBasePath/TestWwwrootPath)
-
-        // Настройка путей к конфигурационным файлам
-        var configPath = Path.Combine(TestBasePath, "Cfg", "CfgPassport.json");
-        var editConfigPath = Path.Combine(TestBasePath, "Cfg", "CfgEditPassport.json");
-
-        // IAppConfigService не имеет методов GetBasePath/GetWwwrootPath/GetConfigPath
-        // Используем пути напрямую из базового класса
+        // Setup common mocks using helper
+        MockConfigHelper.SetupMockAppConfig(MockAppConfig, idDevice: 1);
     }
 
     protected override void SetupAdditional()
@@ -92,7 +86,8 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
     public void Constructor_WithNullDbOptions_ThrowsArgumentException()
     {
         // Arrange, Act & Assert
-        Assert.Throws<ArgumentException>(() =>
+        // Note: DbContext throws ArgumentNullException when options is null, which is a subclass of ArgumentException
+        Assert.Throws<ArgumentNullException>(() =>
         {
             var passport = new PassportClass(
                 null,
@@ -102,7 +97,7 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
                 idDoc: IdDoc.Passport,
                 path: TestBasePath
             );
-        });
+        }, "Constructor should throw ArgumentNullException for null DbOptions");
     }
 
     #endregion
