@@ -147,23 +147,22 @@ select:focus {
 
 /* Ширины колонок таблицы редактирования */
 #Edit .col-num { width: 3%; }
-#Edit:not(.no-elis) .col-name { width: 25%; }
-#Edit:not(.no-elis) .col-method { width: 18%; }
+#Edit:not(.no-elis) .col-name { width: 32%; }
+#Edit:not(.no-elis) .col-method { width: 20%; }
+#Edit:not(.no-elis) .col-elis { width: 8%; }
 #Edit:not(.no-elis) .col-ivk { width: 8%; }
-#Edit:not(.no-elis) .col-elis { width: 12%; }
-#Edit:not(.no-elis) .col-hal { width: 11%; }
-#Edit:not(.no-elis) .col-result-value { width: 11%; }
-#Edit:not(.no-elis) .col-result-text { width: 12%; }
+#Edit:not(.no-elis) .col-hal { width: 8%; }
+#Edit:not(.no-elis) .col-result-value { width: 8%; }
+#Edit:not(.no-elis) .col-result-text { width: 8%; }
 
 /* Режим без ЕЛИС */
-#Edit.no-elis .col-elis { width: 0; }
 #Edit.no-elis th.th-documents,
 #Edit.no-elis td.td-documents,
 #Edit.no-elis col.col-elis { display: none; }
-#Edit.no-elis .col-name { width: 33%; }
-#Edit.no-elis .col-method { width: 22%; }
+#Edit.no-elis .col-name { width: 38%; }
+#Edit.no-elis .col-method { width: 26%; }
 #Edit.no-elis .col-ivk { width: 10%; }
-#Edit.no-elis .col-hal { width: 12%; }
+#Edit.no-elis .col-hal { width: 10%; }
 #Edit.no-elis .col-result-value { width: 10%; }
 #Edit.no-elis .col-result-text { width: 10%; }
 
@@ -173,30 +172,7 @@ select:focus {
     display: table-column;
 }
 
-/* Стили для ячеек данных */
-#Edit td:nth-child(1) { 
-    text-align: center; 
-}
-
-#Edit td:nth-child(2) { 
-    text-align: left; 
-    padding-left: 8px;
-}
-
-#Edit input {
-    width: 95%;
-    box-sizing: border-box;
-    min-width: 0;
-}
-
-#Edit select {
-    width: 98%;
-    box-sizing: border-box;
-    min-width: 0;
-}
-
-/* Стили для центрирования ячеек данных (ИВК, Документы, ХАЛ, Результат) */
-/* С Документами - выравнивание по центру только для числовых столбцов */
+/* Центрирование ячеек */
 #Edit:not(.no-elis) td:nth-child(4),
 #Edit:not(.no-elis) td:nth-child(5),
 #Edit:not(.no-elis) td:nth-child(6),
@@ -205,7 +181,6 @@ select:focus {
     text-align: center; 
 }
 
-/* Без Документов - колонки 4, 5, 6, 7 (ИВК, ХАЛ, Результат-Значение, Результат-Текст) */
 #Edit.no-elis td:nth-child(4),
 #Edit.no-elis td:nth-child(5),
 #Edit.no-elis td:nth-child(6),
@@ -213,25 +188,29 @@ select:focus {
     text-align: center; 
 }
 
-/* Актуализация позиционирования для двух строк заголовков */
-#Edit thead tr:first-child th[colspan="2"] {
-    border-bottom: none;
-}
-#Edit thead tr:nth-child(2) th {
-    border-top: none;
+/* Без ЕЛИС - настройка ширины input ХАЛ (6-я колонка) */
+#Edit input {
+    width: 93%;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 /* Специальные стили для колонки "Измерение ХАЛ" */
-/* С Документами - ХАЛ, Результат имеют достаточную ширину */
-#Edit:not(.no-elis) td:nth-child(6) input { width: 96%; }
+#Edit:not(.no-elis) td:nth-child(6) input {
+    width: 88%;
+    display: block;
+    margin: 0 auto;
+}
 #Edit:not(.no-elis) td:nth-child(7),
 #Edit:not(.no-elis) td:nth-child(8) { white-space: nowrap; }
 
-/* Без Документов - "Измерение ХАЛ" становится 5-й колонкой (№, Наименование, Метод, ИВК, ХАЛ) */
-#Edit.no-elis td:nth-child(5) input {
-    width: 92%;
+/* Без ЕЛИС - "Измерение ХАЛ" остаётся 6-й колонкой (№, Наименование, Метод, Документы скрыты, ИВК, ХАЛ) */
+#Edit.no-elis td:nth-child(6) input {
+    width: 88%;
     font-size: 13px;
     padding: 2px 4px;
+    display: block;
+    margin: 0 auto;
 }
 
 
