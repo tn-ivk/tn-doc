@@ -8,7 +8,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 2,
@@ -28,7 +28,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 4,
@@ -48,7 +48,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 6,
@@ -68,7 +68,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 8,
@@ -88,7 +88,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 10,
@@ -108,7 +108,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 12,
@@ -128,7 +128,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 14,
@@ -148,7 +148,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 16,
@@ -168,7 +168,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 18,
@@ -188,7 +188,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 20,
@@ -208,7 +208,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 22,
@@ -228,7 +228,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": false
+      "IsDefault": true
     },
     {
       "Id": 24,
@@ -325,10 +325,10 @@
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ Р 00017-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-",
-      "IsDefault": false
+      "LimitValueActivate": true,
+      "LimitValue": 2,
+      "LimitValueString": "Менее 2",
+      "IsDefault": true
     },
     {
       "Id": 34,
@@ -345,10 +345,10 @@
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ Р 00018-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-",
-      "IsDefault": false
+      "LimitValueActivate": true,
+      "LimitValue": 4,
+      "LimitValueString": "Менее 4",
+      "IsDefault": true
     },
     {
       "Id": 36,
@@ -365,10 +365,10 @@
       "Use": true,
       "IdParameter": 19,
       "Name": "ГОСТ Р 00019-2001 Метод А",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "-",
-      "IsDefault": false
+      "LimitValueActivate": true,
+      "LimitValue": 0.5,
+      "LimitValueString": "Менее 0,5",
+      "IsDefault": true
     },
     {
       "Id": 38,

@@ -12,43 +12,37 @@ namespace TN_Doc.Hubs
     public class StatusHub : Hub
     {
         private readonly ILogger<StatusHub> _logger;
-        private readonly ConnectionTracker _connectionTracker;
 
-        public StatusHub(ILogger<StatusHub> logger, ConnectionTracker connectionTracker)
+        public StatusHub(ILogger<StatusHub> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _connectionTracker = connectionTracker ?? throw new ArgumentNullException(nameof(connectionTracker));
         }
 
         public override async Task OnConnectedAsync()
         {
-            _connectionTracker.IncrementConnections();
-
             var clientIp = Context.GetHttpContext()?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             _logger.LogInformation(
-                "StatusHub: Client connected - ConnectionId: {ConnectionId}, IP: {ClientIP}, Active connections: {ActiveConnections}",
-                Context.ConnectionId, clientIp, _connectionTracker.ActiveConnectionCount);
+                "StatusHub: Client connected - ConnectionId: {ConnectionId}, IP: {ClientIP}",
+                Context.ConnectionId, clientIp);
 
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            _connectionTracker.DecrementConnections();
-
             var clientIp = Context.GetHttpContext()?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
             if (exception != null)
             {
                 _logger.LogWarning(exception,
-                    "StatusHub: Client disconnected with error - ConnectionId: {ConnectionId}, IP: {ClientIP}, Active connections: {ActiveConnections}",
-                    Context.ConnectionId, clientIp, _connectionTracker.ActiveConnectionCount);
+                    "StatusHub: Client disconnected with error - ConnectionId: {ConnectionId}, IP: {ClientIP}",
+                    Context.ConnectionId, clientIp);
             }
             else
             {
                 _logger.LogInformation(
-                    "StatusHub: Client disconnected - ConnectionId: {ConnectionId}, IP: {ClientIP}, Active connections: {ActiveConnections}",
-                    Context.ConnectionId, clientIp, _connectionTracker.ActiveConnectionCount);
+                    "StatusHub: Client disconnected - ConnectionId: {ConnectionId}, IP: {ClientIP}",
+                    Context.ConnectionId, clientIp);
             }
 
             await base.OnDisconnectedAsync(exception);

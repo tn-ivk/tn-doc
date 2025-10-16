@@ -20,18 +20,18 @@ public class StatusMonitoringService : BackgroundService
     private readonly IServiceProvider _serviceProvider;
     private readonly IHubContext<StatusHub> _hubContext;
     private readonly ILogger<StatusMonitoringService> _logger;
-    private readonly ConnectionTracker _connectionTracker;
+    private readonly AppClientTracker _clientTracker;
     private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(60);
     private StatusResponse _lastStatus;
     private int _consecutiveErrors = 0;
     private const int MAX_CONSECUTIVE_ERRORS = 5;
 
-    public StatusMonitoringService(IServiceProvider serviceProvider, IHubContext<StatusHub> hubContext, ILogger<StatusMonitoringService> logger, ConnectionTracker connectionTracker)
+    public StatusMonitoringService(IServiceProvider serviceProvider, IHubContext<StatusHub> hubContext, ILogger<StatusMonitoringService> logger, AppClientTracker clientTracker)
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _connectionTracker = connectionTracker ?? throw new ArgumentNullException(nameof(connectionTracker));
+        _clientTracker = clientTracker ?? throw new ArgumentNullException(nameof(clientTracker));
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class StatusMonitoringService : BackgroundService
             var cycleStart = DateTime.UtcNow;
 
             // Проверяем наличие активных подключений перед выполнением проверки
-            if (!_connectionTracker.HasActiveConnections)
+            if (!_clientTracker.HasActiveClients)
             {
                 _logger.LogTrace("Пропуск проверки статуса: нет активных клиентов");
                 await Task.Delay(_checkInterval, stoppingToken);

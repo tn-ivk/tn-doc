@@ -567,8 +567,8 @@
             <col class="col-num">
             <col class="col-name">
             <col class="col-method">
-            <col class="col-ivk">
             <col class="col-elis">
+            <col class="col-ivk">
             <col class="col-hal">
             <col class="col-result-value">
             <col class="col-result-text">
@@ -605,44 +605,55 @@
             }
         });
 
-        // Автоматическое определение наличия колонки Документы и применение соответствующего класса
-        // Должно быть выполнено ПЕРВЫМ для корректного отображения таблицы
-        setupTableLayout();
-        
-        // Инициализация состояния ячеек печати
-        const metodSelects = document.querySelectorAll('select[data-tag="Metod"]');
-        metodSelects.forEach(select => {
-            TogglePrintCellEditable(select);
+        // Получаем признак ЕЛИС с сервера и настраиваем layout/логику
+        initElisLayout().then(() => {
+            // Инициализация состояния ячеек печати (только если ЕЛИС включен)
+            if (!document.getElementById('Edit').classList.contains('no-elis')) {
+                const metodSelects = document.querySelectorAll('select[data-tag="Metod"]');
+                metodSelects.forEach(select => {
+                    TogglePrintCellEditable(select);
+                });
+            }
         });
     });
     
-    function setupTableLayout() {
+    async function initElisLayout() {
         const table = document.getElementById('Edit');
         if (!table) return;
-        
-        // Проверяем наличие колонки "Документы" в заголовках
-        const hasElisColumn = table.querySelector('th') && 
-                            Array.from(table.querySelectorAll('th')).some(th => 
-                                th.textContent.includes('Документы'));
-        
-        // Добавляем соответствующий класс к таблице
-        if (!hasElisColumn) {
-            table.classList.add('no-elis');
-            
-            // Корректируем colgroup - скрываем колонку Документы
-            const elisCol = table.querySelector('.col-elis');
-            if (elisCol) {
-                elisCol.style.display = 'none';
+
+        const defaultNoElis = table.classList.contains('no-elis');
+        const deviceId = window.parent && window.parent.$ ? Number(window.parent.$('#ComboboxDevice').val()) : Number($('#ComboboxDevice').val());
+        let isElisUsed;
+
+        try {
+            if (!isNaN(deviceId) && deviceId > 0) {
+                const resp = await $.get('/Home/IsElisUsed', { idDevice: deviceId });
+                if (resp && (resp.isElisUsed === true || resp.isElisUsed === 'true')) {
+                    isElisUsed = true;
+                } else if (resp && (resp.isElisUsed === false || resp.isElisUsed === 'false')) {
+                    isElisUsed = false;
+                }
             }
+        } catch (e) {
+            console.error('Не удалось получить признак использования ЕЛИС:', e);
+        }
+
+        if (typeof isElisUsed !== 'boolean') {
+            isElisUsed = !defaultNoElis;
+        }
+
+        if (!isElisUsed) {
+            table.classList.add('no-elis');
         } else {
             table.classList.remove('no-elis');
-            
-            // Показываем колонку Документы если она была скрыта
-            const elisCol = table.querySelector('.col-elis');
-            if (elisCol) {
-                elisCol.style.display = '';
-            }
         }
+
+        const elisCol = table.querySelector('.col-elis');
+        if (elisCol) {
+            elisCol.style.display = isElisUsed ? '' : 'none';
+        }
+
+        return isElisUsed;
     }
     
     function CheckElisInput(){
