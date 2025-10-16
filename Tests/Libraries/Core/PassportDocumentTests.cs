@@ -35,16 +35,14 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
 
     protected override void SetupCommonMocks()
     {
-        // Настройка мока конфигурации
-        MockAppConfig.Setup(x => x.GetBasePath()).Returns(TestBasePath);
-        MockAppConfig.Setup(x => x.GetWwwrootPath()).Returns(TestWwwrootPath);
+        // Настройка мока конфигурации (пути предоставляются через TestBasePath/TestWwwrootPath)
 
         // Настройка путей к конфигурационным файлам
         var configPath = Path.Combine(TestBasePath, "Cfg", "CfgPassport.json");
         var editConfigPath = Path.Combine(TestBasePath, "Cfg", "CfgEditPassport.json");
 
-        MockAppConfig.Setup(x => x.GetConfigPath(It.Is<IdDoc>(id => id == IdDoc.Passport)))
-            .Returns(configPath);
+        // IAppConfigService не имеет методов GetBasePath/GetWwwrootPath/GetConfigPath
+        // Используем пути напрямую из базового класса
     }
 
     protected override void SetupAdditional()
@@ -57,9 +55,10 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
             _passportDocument = new PassportClass(
                 DbOptions,
                 MockAppConfig.Object,
+                null, // configCache
                 idDevice: 1,
                 idDoc: IdDoc.Passport,
-                basePath: TestBasePath
+                path: TestBasePath
             );
         }
         catch (Exception ex)
@@ -78,9 +77,10 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
         var passport = new PassportClass(
             DbOptions,
             MockAppConfig.Object,
+            null, // configCache
             idDevice: 1,
             idDoc: IdDoc.Passport,
-            basePath: TestBasePath
+            path: TestBasePath
         );
 
         // Assert
@@ -97,9 +97,10 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
             var passport = new PassportClass(
                 null,
                 MockAppConfig.Object,
+                null, // configCache
                 idDevice: 1,
                 idDoc: IdDoc.Passport,
-                basePath: TestBasePath
+                path: TestBasePath
             );
         });
     }
@@ -127,9 +128,10 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
         // Assert
         if (result != null)
         {
-            AssertValidJson(result);
-            DocumentTestHelpers.AssertJsonContainsField(result, "JsonDoc");
-            TestContext.WriteLine($"GetViewDoc returned valid JSON ({result.Length} characters)");
+            var jsonString = result.ToString();
+            AssertValidJson(jsonString);
+            DocumentTestHelpers.AssertJsonContainsField(jsonString, "JsonDoc");
+            TestContext.WriteLine($"GetViewDoc returned valid JSON ({jsonString.Length} characters)");
         }
         else
         {
@@ -176,7 +178,8 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
         // Assert
         if (result != null)
         {
-            AssertValidJson(result);
+            var jsonString = result.ToString();
+            AssertValidJson(jsonString);
             // В реальном тесте проверяем наличие параметров качества в JSON
             TestContext.WriteLine("GetViewDoc should include quality parameters in JSON");
         }
@@ -326,64 +329,31 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
 
     #endregion
 
+    // NOTE: SetDocFromJson() не существует в DocPassport
+    // Этот класс не реализует интерфейс IDocUpdater с методом SetDocFromJson
+    /*
     #region SetDocFromJson Tests
 
     [Test]
     public void SetDocFromJson_WithValidJson_DoesNotThrowException()
     {
-        // Arrange
-        if (_passportDocument == null)
-        {
-            Assert.Inconclusive("PassportClass not initialized");
-            return;
-        }
-
-        var testJson = DocumentTestDataFixture.CreatePassportJson(id: 1, idDevice: 1);
-
-        // Act & Assert
-        Assert.DoesNotThrow(() =>
-        {
-            _passportDocument.SetDocFromJson(testJson);
-        }, "SetDocFromJson should handle valid JSON without exceptions");
+        // SetDocFromJson() не существует в DocPassport
     }
 
     [Test]
     public void SetDocFromJson_WithInvalidJson_ThrowsException()
     {
-        // Arrange
-        if (_passportDocument == null)
-        {
-            Assert.Inconclusive("PassportClass not initialized");
-            return;
-        }
-
-        var invalidJson = "{ invalid json }";
-
-        // Act & Assert
-        Assert.Throws<Exception>(() =>
-        {
-            _passportDocument.SetDocFromJson(invalidJson);
-        }, "SetDocFromJson should throw exception for invalid JSON");
+        // SetDocFromJson() не существует в DocPassport
     }
 
     [Test]
     public void SetDocFromJson_WithEmptyJson_ThrowsException()
     {
-        // Arrange
-        if (_passportDocument == null)
-        {
-            Assert.Inconclusive("PassportClass not initialized");
-            return;
-        }
-
-        // Act & Assert
-        Assert.Throws<Exception>(() =>
-        {
-            _passportDocument.SetDocFromJson(string.Empty);
-        }, "SetDocFromJson should throw exception for empty JSON");
+        // SetDocFromJson() не существует в DocPassport
     }
 
     #endregion
+    */
 
     #region ELIS Integration Tests
 
@@ -406,72 +376,42 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
         // Assert
         if (result != null)
         {
-            AssertValidJson(result);
+            var jsonString = result.ToString();
+            AssertValidJson(jsonString);
             // В реальном тесте проверяем наличие данных ELIS в JSON
             TestContext.WriteLine("GetViewDoc with ELIS should include laboratory data");
         }
     }
 
+    /*
     [Test]
     public void SetDocFromJson_WithElisJson_UpdatesElisFields()
     {
-        // Arrange
-        if (_passportDocument == null)
-        {
-            Assert.Inconclusive("PassportClass not initialized");
-            return;
-        }
-
-        var testJson = DocumentTestDataFixture.CreatePassportWithElisJson(id: 1, idDevice: 1);
-
-        // Act & Assert
-        Assert.DoesNotThrow(() =>
-        {
-            _passportDocument.SetDocFromJson(testJson);
-        }, "SetDocFromJson should handle ELIS data correctly");
+        // SetDocFromJson() не существует в DocPassport
     }
+    */
 
     #endregion
 
     #region Configuration Tests
 
+    // NOTE: GetPathConfigFile() и GetPathEditConfigFile() являются protected методами
+    // базового класса DocGeneral и не могут быть вызваны напрямую из тестов.
+    // Эти методы тестируются косвенно через GetPathTemplateFile() который public.
+
+    /*
     [Test]
     public void GetPathConfigFile_ReturnsExistingConfigPath()
     {
-        // Arrange
-        if (_passportDocument == null)
-        {
-            Assert.Inconclusive("PassportClass not initialized");
-            return;
-        }
-
-        // Act
-        var configPath = _passportDocument.GetPathConfigFile();
-
-        // Assert
-        DocumentTestHelpers.AssertConfigFileIsValid(configPath);
-        Assert.That(configPath, Does.Contain("CfgPassport.json"));
-        TestContext.WriteLine($"Config path: {configPath}");
+        // GetPathConfigFile() is protected - cannot be called from tests
     }
 
     [Test]
     public void GetPathEditConfigFile_ReturnsExistingEditConfigPath()
     {
-        // Arrange
-        if (_passportDocument == null)
-        {
-            Assert.Inconclusive("PassportClass not initialized");
-            return;
-        }
-
-        // Act
-        var editConfigPath = _passportDocument.GetPathEditConfigFile();
-
-        // Assert
-        DocumentTestHelpers.AssertConfigFileIsValid(editConfigPath);
-        Assert.That(editConfigPath, Does.Contain("CfgEditPassport.json"));
-        TestContext.WriteLine($"Edit config path: {editConfigPath}");
+        // GetPathEditConfigFile() is protected - cannot be called from tests
     }
+    */
 
     #endregion
 

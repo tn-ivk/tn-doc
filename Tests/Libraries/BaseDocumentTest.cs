@@ -94,7 +94,9 @@ public abstract class BaseDocumentTest<T> where T : class
             .EnableSensitiveDataLogging()
             .Options;
 
-        DbContext = new DocGeneral(DbOptions);
+        // DocGeneral конструктор с DbOptions требует также path параметр
+        // Для тестов используем parameterless конструктор
+        DbContext = new DocGeneral();
 
         // Инициализация моков
         MockAppConfig = new Mock<IAppConfigService>();

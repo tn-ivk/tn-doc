@@ -80,9 +80,8 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
 
     protected override void SetupCommonMocks()
     {
-        // Настройка мока конфигурации для возврата базового пути
-        MockAppConfig.Setup(x => x.GetBasePath()).Returns(TestBasePath);
-        MockAppConfig.Setup(x => x.GetWwwrootPath()).Returns(TestWwwrootPath);
+        // IAppConfigService не имеет методов GetBasePath/GetWwwrootPath
+        // Пути предоставляются через TestBasePath/TestWwwrootPath из базового класса
     }
 
     /// <summary>
@@ -199,10 +198,16 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
     public void SetDocFromJson_ForAllLibraries_WithValidJson_DoesNotThrow(IdDoc idDoc, string documentName)
     {
         // Arrange
-        var testJson = DocumentTestDataFixture.CreateMinimalDocumentJson(1, new Dictionary<string, object>
+        // NOTE: DocumentTestDataFixture.CreateMinimalDocumentJson() метод не существует
+        // Используем специализированные методы для конкретных типов документов
+        string testJson = documentName switch
         {
-            ["documentType"] = documentName
-        });
+            "Act" => DocumentTestDataFixture.CreateActJson(1, 1),
+            "Passport" => DocumentTestDataFixture.CreatePassportJson(1, 1),
+            "Report" => DocumentTestDataFixture.CreateReportJson(1, 1),
+            "Jornal" => DocumentTestDataFixture.CreateJornalJson(1, 1),
+            _ => DocumentTestDataFixture.CreatePassportJson(1, 1)
+        };
 
         // Act & Assert
         Assert.DoesNotThrow(() =>

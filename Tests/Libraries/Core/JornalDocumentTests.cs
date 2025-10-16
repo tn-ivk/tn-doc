@@ -35,19 +35,11 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
 
     protected override void SetupCommonMocks()
     {
-        // Настройка мока конфигурации
-        MockAppConfig.Setup(x => x.GetBasePath()).Returns(TestBasePath);
-        MockAppConfig.Setup(x => x.GetWwwrootPath()).Returns(TestWwwrootPath);
-
         // Настройка мока кэша конфигурации
         _mockConfigCache = new Mock<IConfigurationCacheService>();
 
-        // Настройка путей к конфигурационным файлам
-        var configPath = Path.Combine(TestBasePath, "Cfg", "CfgJornal.json");
-        var editConfigPath = Path.Combine(TestBasePath, "Cfg", "CfgEditJornal.json");
-
-        MockAppConfig.Setup(x => x.GetConfigPath(It.Is<IdDoc>(id => id == IdDoc.Jornal)))
-            .Returns(configPath);
+        // IAppConfigService не имеет методов GetBasePath/GetWwwrootPath/GetConfigPath
+        // Пути предоставляются через TestBasePath/TestWwwrootPath из базового класса
     }
 
     protected override void SetupAdditional()
@@ -709,43 +701,23 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
 
     #region Configuration Tests
 
+    // NOTE: GetPathConfigFile() и GetPathEditConfigFile() являются protected методами
+    // базового класса DocGeneral и не могут быть вызваны напрямую из тестов.
+    // Эти методы тестируются косвенно через GetPathTemplateFile() который public.
+
+    /*
     [Test]
     public void GetPathConfigFile_ReturnsExistingConfigPath()
     {
-        // Arrange
-        if (_jornalDocument == null)
-        {
-            Assert.Inconclusive("DocJornal not initialized");
-            return;
-        }
-
-        // Act
-        var configPath = _jornalDocument.GetPathConfigFile();
-
-        // Assert
-        DocumentTestHelpers.AssertConfigFileIsValid(configPath);
-        Assert.That(configPath, Does.Contain("CfgJornal.json"));
-        TestContext.WriteLine($"Config path: {configPath}");
+        // GetPathConfigFile() is protected - cannot be called from tests
     }
 
     [Test]
     public void GetPathEditConfigFile_ReturnsExistingEditConfigPath()
     {
-        // Arrange
-        if (_jornalDocument == null)
-        {
-            Assert.Inconclusive("DocJornal not initialized");
-            return;
-        }
-
-        // Act
-        var editConfigPath = _jornalDocument.GetPathEditConfigFile();
-
-        // Assert
-        DocumentTestHelpers.AssertConfigFileIsValid(editConfigPath);
-        Assert.That(editConfigPath, Does.Contain("CfgEditJornal.json"));
-        TestContext.WriteLine($"Edit config path: {editConfigPath}");
+        // GetPathEditConfigFile() is protected - cannot be called from tests
     }
+    */
 
     [Test]
     public void GetPathTemplateFile_ReturnsExistingTemplatePath()

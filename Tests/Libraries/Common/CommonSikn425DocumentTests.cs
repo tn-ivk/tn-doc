@@ -34,9 +34,7 @@ public class CommonSikn425DocumentTests : BaseDocumentTest<DeviceInfo>
 {
     protected override void SetupCommonMocks()
     {
-        // Минимальная настройка моков для Common библиотеки
-        MockAppConfig.Setup(x => x.GetBasePath()).Returns(TestBasePath);
-        MockAppConfig.Setup(x => x.GetWwwrootPath()).Returns(TestWwwrootPath);
+        // Common библиотека содержит только DTOs, моки не требуются
     }
 
     #region DeviceInfo Tests
