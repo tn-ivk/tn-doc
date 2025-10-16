@@ -620,51 +620,39 @@
     async function initElisLayout() {
         const table = document.getElementById('Edit');
         if (!table) return;
-        
-        // Определяем IdDevice из окружения страницы (комбобокс устройства должен быть на родительской странице)
+
+        const defaultNoElis = table.classList.contains('no-elis');
         const deviceId = window.parent && window.parent.$ ? Number(window.parent.$('#ComboboxDevice').val()) : Number($('#ComboboxDevice').val());
-        let isElisUsed = false;
+        let isElisUsed;
+
         try {
             if (!isNaN(deviceId) && deviceId > 0) {
                 const resp = await $.get('/Home/IsElisUsed', { idDevice: deviceId });
-                isElisUsed = !!(resp && (resp.isElisUsed === true || resp.isElisUsed === 'true'));
+                if (resp && (resp.isElisUsed === true || resp.isElisUsed === 'true')) {
+                    isElisUsed = true;
+                } else if (resp && (resp.isElisUsed === false || resp.isElisUsed === 'false')) {
+                    isElisUsed = false;
+                }
             }
         } catch (e) {
             console.error('Не удалось получить признак использования ЕЛИС:', e);
         }
 
-        // Доп. защита: сверяемся с фактической разметкой заголовка (если есть колонка "Документы", значит ЕЛИС активен)
-        const hasElisHeader = Array.from(table.querySelectorAll('thead th')).some(th => (th.textContent || '').includes('Документы'));
-        if (hasElisHeader) {
-            isElisUsed = true;
+        if (typeof isElisUsed !== 'boolean') {
+            isElisUsed = !defaultNoElis;
         }
 
-        // Применяем класс только если ЕЛИС реально отключен (по серверу и заголовку)
         if (!isElisUsed) {
             table.classList.add('no-elis');
-            
-            // Корректируем colgroup - скрываем колонку Документы и Результат-Текст
-            const elisCol = table.querySelector('.col-elis');
-            if (elisCol) {
-                elisCol.style.display = 'none';
-            }
-            const resultTextCol = table.querySelector('.col-result-text');
-            if (resultTextCol) {
-                resultTextCol.style.display = 'none';
-            }
         } else {
             table.classList.remove('no-elis');
-            
-            // Показываем колонку Документы/Результат-Текст если они были скрыты
-            const elisCol = table.querySelector('.col-elis');
-            if (elisCol) {
-                elisCol.style.display = '';
-            }
-            const resultTextCol = table.querySelector('.col-result-text');
-            if (resultTextCol) {
-                resultTextCol.style.display = '';
-            }
         }
+
+        const elisCol = table.querySelector('.col-elis');
+        if (elisCol) {
+            elisCol.style.display = isElisUsed ? '' : 'none';
+        }
+
         return isElisUsed;
     }
     

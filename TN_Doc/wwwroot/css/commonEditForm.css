@@ -146,27 +146,32 @@ select:focus {
 .th-spacer { display: none; }
 
 /* Ширины колонок таблицы редактирования */
-
-/* Базовые ширины (для случая с колонкой Документы) */
 #Edit .col-num { width: 3%; }
-#Edit .col-name { width: 28%; }
-#Edit .col-method { width: 16%; }
-/* При включенном ЕЛИС выравниваем ширины пяти технических колонок */
-#Edit .col-ivk,
-#Edit .col-elis,
-#Edit .col-hal,
-#Edit .col-result-value,
-#Edit .col-result-text { width: 6%; }
+#Edit:not(.no-elis) .col-name { width: 25%; }
+#Edit:not(.no-elis) .col-method { width: 18%; }
+#Edit:not(.no-elis) .col-ivk { width: 8%; }
+#Edit:not(.no-elis) .col-elis { width: 12%; }
+#Edit:not(.no-elis) .col-hal { width: 11%; }
+#Edit:not(.no-elis) .col-result-value { width: 11%; }
+#Edit:not(.no-elis) .col-result-text { width: 12%; }
 
-/* Ширины для случая БЕЗ колонки Документы (когда колонка скрыта) */
-#Edit.no-elis .col-num { width: 3%; }
-#Edit.no-elis .col-name { width: 44%; }
-#Edit.no-elis .col-method { width: 26%; }
-#Edit.no-elis .col-ivk { width: 9%; }
-#Edit.no-elis .col-elis { display: none; }    /* Полностью скрываем колонку "Документы" */
-#Edit.no-elis .col-result-text { display: none; } /* Полностью скрываем колонку "Результат-Текст" */
-#Edit.no-elis .col-hal { width: 9%; }
-#Edit.no-elis .col-result-value { width: 9%; } /* Результат той же ширины, что и ИВК/ХАЛ */
+/* Режим без ЕЛИС */
+#Edit.no-elis .col-elis { width: 0; }
+#Edit.no-elis th.th-documents,
+#Edit.no-elis td.td-documents,
+#Edit.no-elis col.col-elis { display: none; }
+#Edit.no-elis .col-name { width: 33%; }
+#Edit.no-elis .col-method { width: 22%; }
+#Edit.no-elis .col-ivk { width: 10%; }
+#Edit.no-elis .col-hal { width: 12%; }
+#Edit.no-elis .col-result-value { width: 10%; }
+#Edit.no-elis .col-result-text { width: 10%; }
+
+/* Сохранение столбца "Результат-Текст" в обоих режимах */
+#Edit .col-result-text,
+#Edit.no-elis .col-result-text {
+    display: table-column;
+}
 
 /* Стили для ячеек данных */
 #Edit td:nth-child(1) { 
@@ -206,6 +211,14 @@ select:focus {
 #Edit.no-elis td:nth-child(6),
 #Edit.no-elis td:nth-child(7) { 
     text-align: center; 
+}
+
+/* Актуализация позиционирования для двух строк заголовков */
+#Edit thead tr:first-child th[colspan="2"] {
+    border-bottom: none;
+}
+#Edit thead tr:nth-child(2) th {
+    border-top: none;
 }
 
 /* Специальные стили для колонки "Измерение ХАЛ" */
