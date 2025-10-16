@@ -35,7 +35,13 @@
       "Bash(git restore:*)",
       "Bash(npm run build:configurator:*)",
       "Bash(netstat:*)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "Bash(dotnet build)",
+      "Bash(dotnet restore)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(for file in KmhFlowTests.cs KmhDensityTests.cs KmhParameterTests.cs KmhStandardTests.cs KmhSikn425Tests.cs)",
+      "Bash(do echo \"Processing $file\")"
     ],
     "deny": [],
     "ask": []
