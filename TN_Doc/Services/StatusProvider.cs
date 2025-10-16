@@ -23,14 +23,14 @@ public class StatusProvider : IStatusProvider
     private readonly IAppConfigService _appConfigService;
     private readonly ILogger<StatusProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ConnectionTracker _connectionTracker;
+    private readonly AppClientTracker _clientTracker;
 
-    public StatusProvider(IAppConfigService appConfigService, ILogger<StatusProvider> logger, IHttpClientFactory httpClientFactory, ConnectionTracker connectionTracker)
+    public StatusProvider(IAppConfigService appConfigService, ILogger<StatusProvider> logger, IHttpClientFactory httpClientFactory, AppClientTracker clientTracker)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-        _connectionTracker = connectionTracker ?? throw new ArgumentNullException(nameof(connectionTracker));
+        _clientTracker = clientTracker ?? throw new ArgumentNullException(nameof(clientTracker));
     }
 
     /// <summary>
@@ -184,7 +184,7 @@ public class StatusProvider : IStatusProvider
         var services = new ServiceStatus();
 
         // Проверяем сервисы только если есть активные клиенты
-        if (!_connectionTracker.HasActiveConnections)
+        if (!_clientTracker.HasActiveClients)
         {
             _logger.LogTrace("Пропуск проверки сервисов: нет активных клиентов");
 

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
 using TN_Doc.Extensions;
+using TN_Doc.Middleware;
 using TN_Doc.Services;
 using TN.Doc;
 using TN_DocGeneral.Services;
@@ -53,6 +54,7 @@ public class Startup
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
 		services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
 		services.AddScoped<IConfigurationService, ConfigurationService>();
+		services.AddSingleton<AppClientTracker>();
 		services.AddControllersWithViews();
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, CachedDocModuleLoader>();
@@ -60,7 +62,6 @@ public class Startup
 		// Status Bar сервисы
 		services.AddSignalR();
 		services.AddMemoryCache();
-		services.AddSingleton<ConnectionTracker>();
 
 		// HTTP клиенты для проверки внешних сервисов
 		services.AddHttpClient("MessagingService", client =>
@@ -117,6 +118,7 @@ public class Startup
 		app.UseStaticFiles();
 		app.UseRouting();
 		app.UseCors("CorsPolicy");
+		app.UseMiddleware<AppClientTrackingMiddleware>();
 		app.UseEndpoints(endpoints =>
 		{
 			endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
