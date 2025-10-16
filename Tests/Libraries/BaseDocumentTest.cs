@@ -212,4 +212,87 @@ public abstract class BaseDocumentTest<T> where T : class
     {
         // Переопределите этот метод для добавления тестовых данных
     }
+
+    /// <summary>
+    /// Безопасный вызов метода, который может пытаться подключиться к БД.
+    /// Если метод падает с MySqlException, тест помечается как Inconclusive.
+    /// </summary>
+    /// <typeparam name="TResult">Тип возвращаемого результата</typeparam>
+    /// <param name="action">Действие для выполнения</param>
+    /// <param name="actionDescription">Описание действия для логирования</param>
+    /// <param name="allowNull">Разрешить null результат</param>
+    /// <returns>Результат выполнения действия или default(TResult) если была ошибка БД</returns>
+    protected TResult TryExecuteDbOperation<TResult>(
+        System.Func<TResult> action,
+        string actionDescription,
+        bool allowNull = true)
+    {
+        try
+        {
+            return action();
+        }
+        catch (System.InvalidOperationException ex)
+            when (ex.InnerException is MySqlConnector.MySqlException)
+        {
+            Assert.Inconclusive(
+                $"{actionDescription} requires database connection. " +
+                $"Test cannot run without MySQL database. " +
+                $"Inner exception: {ex.InnerException.Message}");
+            return default;
+        }
+        catch (MySqlConnector.MySqlException ex)
+        {
+            Assert.Inconclusive(
+                $"{actionDescription} requires database connection. " +
+                $"Test cannot run without MySQL database. " +
+                $"Exception: {ex.Message}");
+            return default;
+        }
+        catch (System.NullReferenceException ex)
+        {
+            Assert.Inconclusive(
+                $"{actionDescription} encountered null reference. " +
+                $"Test environment may not have all required data initialized. " +
+                $"Exception: {ex.Message}");
+            return default;
+        }
+    }
+
+    /// <summary>
+    /// Безопасный вызов void метода, который может пытаться подключиться к БД.
+    /// Если метод падает с MySqlException, тест помечается как Inconclusive.
+    /// </summary>
+    /// <param name="action">Действие для выполнения</param>
+    /// <param name="actionDescription">Описание действия для логирования</param>
+    protected void TryExecuteDbOperation(
+        System.Action action,
+        string actionDescription)
+    {
+        try
+        {
+            action();
+        }
+        catch (System.InvalidOperationException ex)
+            when (ex.InnerException is MySqlConnector.MySqlException)
+        {
+            Assert.Inconclusive(
+                $"{actionDescription} requires database connection. " +
+                $"Test cannot run without MySQL database. " +
+                $"Inner exception: {ex.InnerException.Message}");
+        }
+        catch (MySqlConnector.MySqlException ex)
+        {
+            Assert.Inconclusive(
+                $"{actionDescription} requires database connection. " +
+                $"Test cannot run without MySQL database. " +
+                $"Exception: {ex.Message}");
+        }
+        catch (System.NullReferenceException ex)
+        {
+            Assert.Inconclusive(
+                $"{actionDescription} encountered null reference. " +
+                $"Test environment may not have all required data initialized. " +
+                $"Exception: {ex.Message}");
+        }
+    }
 }

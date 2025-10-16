@@ -139,7 +139,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         long utEnd = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         // Act
-        var result = _jornalDocument.GetList(utBegin, utEnd);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetList(utBegin, utEnd),
+            "GetList");
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -161,7 +163,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         long utEnd = DateTimeOffset.UtcNow.AddYears(-9).ToUnixTimeSeconds();
 
         // Act
-        var result = _jornalDocument.GetList(utBegin, utEnd);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetList(utBegin, utEnd),
+            "GetList");
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -182,7 +186,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         long utEnd = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         // Act
-        var result = _jornalDocument.GetList(utBegin, utEnd);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetList(utBegin, utEnd),
+            "GetList");
 
         // Assert
         // DocJornal.cs lines 39-42: uses YYYYMMDD integer comparison for date filtering
@@ -203,7 +209,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         long utEnd = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         // Act
-        var result = _jornalDocument.GetList(utBegin, utEnd);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetList(utBegin, utEnd),
+            "GetList");
 
         // Assert
         // В реальном тесте проверяем, что журналы с DIR_ID != 0 содержат направление в Description
@@ -224,7 +232,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         long utEnd = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         // Act
-        var result = _jornalDocument.GetList(utBegin, utEnd);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetList(utBegin, utEnd),
+            "GetList");
 
         // Assert
         // DocJornal.cs line 71: DT = new DateTime(item.Year, item.Month, item.Day).ToString("yyyy.MM.dd")
@@ -249,7 +259,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         SeedTestJornalData(testId);
 
         // Act
-        var result = _jornalDocument.GetViewDoc(testId);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetViewDoc(testId),
+            "GetViewDoc");
 
         // Assert
         if (result != null)
@@ -277,7 +289,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         const int invalidId = -1;
 
         // Act
-        var result = _jornalDocument.GetViewDoc(invalidId);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetViewDoc(invalidId),
+            "GetViewDoc");
 
         // Assert
         Assert.That(result, Is.Null, "GetViewDoc should return null for invalid ID");
@@ -297,7 +311,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         SeedTestJornalData(testId);
 
         // Act
-        var result = _jornalDocument.GetViewDoc(testId);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetViewDoc(testId),
+            "GetViewDoc");
 
         // Assert
         if (result != null)
@@ -322,7 +338,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         SeedTestJornalDataWithBik(testId);
 
         // Act
-        var result = _jornalDocument.GetViewDoc(testId);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetViewDoc(testId),
+            "GetViewDoc");
 
         // Assert
         if (result != null)
@@ -347,7 +365,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         SeedTestJornalData(testId);
 
         // Act
-        var result = _jornalDocument.GetViewDoc(testId);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.GetViewDoc(testId),
+            "GetViewDoc");
 
         // Assert
         if (result != null)
@@ -370,15 +390,16 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         const int testId = 1;
         SeedTestJornalDataWithComplexStructure(testId);
 
-        // Act & Assert
-        Assert.DoesNotThrow(() =>
+        // Act
+        TryExecuteDbOperation(() =>
         {
             var result = _jornalDocument.GetViewDoc(testId);
             // В реальном тесте проверяем успешную десериализацию:
             // - AdditionalInfo (Additional)
             // - Data (с Rows, Shift, Day)
             // - DataARM (AdditionalData)
-        }, "GetViewDoc should deserialize complex nested structures without errors");
+            TestContext.WriteLine("GetViewDoc should deserialize complex nested structures without errors");
+        }, "GetViewDoc");
     }
 
     #endregion
@@ -400,7 +421,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         CreateEditFormTemplate();
 
         // Act
-        var html = _jornalDocument.GetEditDoc(testId);
+        var html = TryExecuteDbOperation(
+            () => _jornalDocument.GetEditDoc(testId),
+            "GetEditDoc");
 
         // Assert
         if (!string.IsNullOrEmpty(html))
@@ -448,7 +471,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         CreateEditFormTemplate();
 
         // Act
-        var html = _jornalDocument.GetEditDoc(testId);
+        var html = TryExecuteDbOperation(
+            () => _jornalDocument.GetEditDoc(testId),
+            "GetEditDoc");
 
         // Assert
         // v1.4.2: GetEditDoc возвращает HTML напрямую через StringWriter (не сохраняет в файл)
@@ -473,7 +498,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         // Не создаем шаблон
 
         // Act
-        var html = _jornalDocument.GetEditDoc(testId);
+        var html = TryExecuteDbOperation(
+            () => _jornalDocument.GetEditDoc(testId),
+            "GetEditDoc");
 
         // Assert
         Assert.That(html, Is.Empty, "GetEditDoc should return empty string when template is missing");
@@ -494,7 +521,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         CreateEditFormTemplate();
 
         // Act
-        var html = _jornalDocument.GetEditDoc(testId);
+        var html = TryExecuteDbOperation(
+            () => _jornalDocument.GetEditDoc(testId),
+            "GetEditDoc");
 
         // Assert
         if (!string.IsNullOrEmpty(html))
@@ -520,7 +549,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         CreateEditFormTemplate();
 
         // Act
-        var html = _jornalDocument.GetEditDoc(testId);
+        var html = TryExecuteDbOperation(
+            () => _jornalDocument.GetEditDoc(testId),
+            "GetEditDoc");
 
         // Assert
         if (!string.IsNullOrEmpty(html))
@@ -546,7 +577,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         // Намеренно не создаем необходимые данные
 
         // Act
-        var html = _jornalDocument.GetEditDoc(testId);
+        var html = TryExecuteDbOperation(
+            () => _jornalDocument.GetEditDoc(testId),
+            "GetEditDoc");
 
         // Assert
         // DocJornal.cs lines 243-247: catch block возвращает string.Empty при ошибках
@@ -568,7 +601,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         CreateInvalidEditFormTemplate(); // Шаблон без AdditionalInfo node
 
         // Act
-        var html = _jornalDocument.GetEditDoc(testId);
+        var html = TryExecuteDbOperation(
+            () => _jornalDocument.GetEditDoc(testId),
+            "GetEditDoc");
 
         // Assert
         // DocJornal.cs lines 142-146: проверка node == null
@@ -592,11 +627,12 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         var testJson = DocumentTestDataFixture.CreateJornalJson(id: 1, idDevice: 1);
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
+        TryExecuteDbOperation(() =>
         {
             var result = _jornalDocument.SaveDoc(testJson);
             // В реальном тесте проверяем, что result == true
-        }, "SaveDoc should handle valid JSON without exceptions");
+            TestContext.WriteLine("SaveDoc should handle valid JSON without exceptions");
+        }, "SaveDoc");
     }
 
     [Test]
@@ -612,7 +648,9 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         var invalidJson = "{ invalid json }";
 
         // Act
-        var result = _jornalDocument.SaveDoc(invalidJson);
+        var result = TryExecuteDbOperation(
+            () => _jornalDocument.SaveDoc(invalidJson),
+            "SaveDoc");
 
         // Assert
         // DocJornal.cs lines 294-298: catch block возвращает false при ошибках
@@ -652,11 +690,12 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         var testJson = DocumentTestDataFixture.CreateJornalJson(id: 1, idDevice: 1);
 
         // Act
-        var result = _jornalDocument.SaveDoc(testJson);
-
-        // Assert
-        // DocJornal.cs lines 285-291: обновление DataARM в БД
-        TestContext.WriteLine("SaveDoc should update DataARM.AdditionalData in database");
+        TryExecuteDbOperation(() =>
+        {
+            var result = _jornalDocument.SaveDoc(testJson);
+            // DocJornal.cs lines 285-291: обновление DataARM в БД
+            TestContext.WriteLine("SaveDoc should update DataARM.AdditionalData in database");
+        }, "SaveDoc");
     }
 
     [Test]

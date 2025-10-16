@@ -241,16 +241,21 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
 
         const int testId = 1;
         SeedTestPassportData(testId);
+        CreateEditFormTemplate();
 
         // Act
         var html = _passportDocument.GetEditDoc(testId);
 
         // Assert
-        if (html != null)
+        if (!string.IsNullOrEmpty(html))
         {
             AssertValidHtml(html);
             DocumentTestHelpers.AssertHtmlContainsEditForm(html);
             TestContext.WriteLine($"GetEditDoc returned HTML ({html.Length} characters)");
+        }
+        else
+        {
+            Assert.Inconclusive("GetEditDoc returned empty HTML (template file or data may not exist)");
         }
     }
 
@@ -430,6 +435,34 @@ public class PassportDocumentTests : BaseDocumentTest<PassportClass>
         // В реальном тесте здесь добавляются тестовые записи
         // включая данные от ELIS
         TestContext.WriteLine($"Seeding test passport data with ELIS for ID: {id}");
+    }
+
+    /// <summary>
+    /// Создание шаблона формы редактирования для тестов
+    /// </summary>
+    private void CreateEditFormTemplate()
+    {
+        var templateDir = Path.Combine(TestWwwrootPath, "HTML");
+        Directory.CreateDirectory(templateDir);
+
+        var templatePath = Path.Combine(templateDir, "DocEditPassport.html");
+        var templateContent = @"<!DOCTYPE html>
+<html>
+<head><title>Passport Edit Form</title></head>
+<body>
+    <form>
+        <table id='AdditionalInfo'>
+            <tbody></tbody>
+        </table>
+        <table id='Edit'>
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </form>
+</body>
+</html>";
+        File.WriteAllText(templatePath, templateContent);
+        TestContext.WriteLine($"Created edit form template at: {templatePath}");
     }
 
     #endregion
