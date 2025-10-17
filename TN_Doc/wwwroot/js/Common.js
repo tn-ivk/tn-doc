@@ -1522,11 +1522,11 @@ function FillPassportDataElis() {
                                 logTrace('Заполнение поля Результат-Текст: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey].valueString || '-'));
                             }
 
-                            // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe
+    // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe (только если ЕЛИС включен)
                             try {
                                 let parameterKey = item.dataset.key;
                                 let printCell = iframe.contentWindow.document.querySelector('[data-parameter-key="' + parameterKey + '"]');
-                                if (printCell) {
+                        if (printCell && !document.getElementById('Edit')?.classList.contains('no-elis')) {
                                     let printInput = printCell.querySelector('.print-cell-input');
                                     if (printInput) {
                                         printInput.value = root[currentKey].valueString || '-';
@@ -1717,7 +1717,7 @@ function updatePrintColumnFromInput(valueInput) {
         } else {
             // Fallback к старой логике, если функция не найдена
             let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
-            if (printCell) {
+                        if (printCell && !document.getElementById('Edit')?.classList.contains('no-elis')) {
                 printCell.setAttribute('data-print-value', valueInput.value || '-');
                 printCell.setAttribute('data-elis-filled', 'false');
                 

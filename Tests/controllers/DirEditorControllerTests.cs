@@ -13,6 +13,7 @@ using TN_Doc.Controllers;
 using TN_Doc.Models.DTOs;
 using TN.DocData;
 using TN_DocGeneral.Dictionaries;
+using TN_DocGeneral.Services;
 
 namespace Tests.Controllers;
 
@@ -20,6 +21,7 @@ namespace Tests.Controllers;
 public class DirEditorControllerTests
 {
     private Mock<ILogger<DirEditorController>> _mockLogger;
+    private Mock<IConfigurationCacheService> _mockConfigCache;
     private DirEditorController _controller;
     private IConfiguration _configuration;
     private string _testBasePath;
@@ -53,6 +55,7 @@ public class DirEditorControllerTests
     public void Setup()
     {
         _mockLogger = new Mock<ILogger<DirEditorController>>();
+        _mockConfigCache = new Mock<IConfigurationCacheService>();
         
         // Setup test configuration
         var configDictionary = new Dictionary<string, string>
@@ -71,7 +74,7 @@ public class DirEditorControllerTests
         // Create test data files
         CreateTestConfigFiles();
 
-        _controller = new DirEditorController(_mockLogger.Object, _configuration);
+        _controller = new DirEditorController(_mockLogger.Object, _configuration, _mockConfigCache.Object);
     }
 
     private void CreateTestConfigFiles()
