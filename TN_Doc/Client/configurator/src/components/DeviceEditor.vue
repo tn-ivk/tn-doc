@@ -252,6 +252,90 @@
           </div>
           <MixedStateWarning v-if="isMixed('InvalidChars')" class="mt-2" />
         </Panel>
+
+        <!-- Используемые средства измерения -->
+        <Panel header="Используемые средства измерения" class="mt-3">
+          <div v-if="deviceUsedSI" class="used-si-container">
+            <div class="field field-horizontal">
+              <label>Используемые СИ:</label>
+              <div class="used-si-section">
+                <!-- ПР -->
+                <div class="field-checkbox">
+                  <Checkbox
+                    v-model="usedPR"
+                    input-id="used-pr"
+                    :binary="true"
+                  />
+                  <label for="used-pr">ПР</label>
+                </div>
+
+                <!-- ПП -->
+                <div class="field-checkbox">
+                  <Checkbox
+                    v-model="usedPP"
+                    input-id="used-pp"
+                    :binary="true"
+                  />
+                  <label for="used-pp">ПП</label>
+                </div>
+
+                <!-- 2-ой ПП (отображается только если включен ПП) -->
+                <div v-if="usedPP" class="field-checkbox field-checkbox-secondary">
+                  <Checkbox
+                    v-model="usedSecondSI_PP"
+                    input-id="used-second-pp"
+                    :binary="true"
+                  />
+                  <label for="used-second-pp">2-ой ПП</label>
+                </div>
+
+                <!-- ПВл -->
+                <div class="field-checkbox">
+                  <Checkbox
+                    v-model="usedPVL"
+                    input-id="used-pvl"
+                    :binary="true"
+                  />
+                  <label for="used-pvl">ПВл</label>
+                </div>
+
+                <!-- 2-ой ПВл (отображается только если включен ПВл) -->
+                <div v-if="usedPVL" class="field-checkbox field-checkbox-secondary">
+                  <Checkbox
+                    v-model="usedSecondSI_PVL"
+                    input-id="used-second-pvl"
+                    :binary="true"
+                  />
+                  <label for="used-second-pvl">2-ой ПВл</label>
+                </div>
+
+                <!-- ПВз -->
+                <div class="field-checkbox">
+                  <Checkbox
+                    v-model="usedPVS"
+                    input-id="used-pvs"
+                    :binary="true"
+                  />
+                  <label for="used-pvs">ПВз</label>
+                </div>
+
+                <!-- 2-ой ПВз (отображается только если включен ПВз) -->
+                <div v-if="usedPVS" class="field-checkbox field-checkbox-secondary">
+                  <Checkbox
+                    v-model="usedSecondSI_PVS"
+                    input-id="used-second-pvs"
+                    :binary="true"
+                  />
+                  <label for="used-second-pvs">2-ой ПВз</label>
+                </div>
+              </div>
+            </div>
+            <MixedStateWarning v-if="isMixed('UsedSI')" class="mt-2" />
+          </div>
+          <Message v-else severity="info">
+            Настройки средств измерения не заданы
+          </Message>
+        </Panel>
       </div>
     </div>
   </div>
@@ -262,7 +346,7 @@ import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useToast } from 'primevue/usetoast';
 import { useConfigStore } from '../stores/configStore';
-import type { Device, OpcConnectionSettings } from '../types/config.types';
+import type { Device, OpcConnectionSettings, UsedSI } from '../types/config.types';
 import { OpcType } from '../types/config.types';
 import _ from 'lodash';
 
@@ -608,6 +692,85 @@ const invalidChars = computed({
       configStore.updateDeviceSettings(device.IdDevice, 'InvalidChars', value);
     });
   }
+});
+
+// UsedSI Settings
+const deviceUsedSI = computed(() => {
+  if (selectedDevices.value.length === 0) return null;
+  return selectedDevices.value[0].UsedSI;
+});
+
+// Helper function to update UsedSI field
+function updateUsedSIField(field: keyof UsedSI, value: boolean) {
+  selectedDevices.value.forEach(device => {
+    const currentUsedSI = device.UsedSI || {
+      UsedPR: false,
+      UsedPP: false,
+      UsedPVL: false,
+      UsedPVS: false,
+      UsedSecondSI_PP: false,
+      UsedSecondSI_PVL: false,
+      UsedSecondSI_PVS: false
+    };
+
+    configStore.updateDeviceSettings(device.IdDevice, 'UsedSI', {
+      ...currentUsedSI,
+      [field]: value
+    });
+  });
+}
+
+const usedPR = computed({
+  get: () => deviceUsedSI.value?.UsedPR || false,
+  set: (value: boolean) => updateUsedSIField('UsedPR', value)
+});
+
+const usedPP = computed({
+  get: () => deviceUsedSI.value?.UsedPP || false,
+  set: (value: boolean) => {
+    updateUsedSIField('UsedPP', value);
+    // При выключении ПП автоматически выключаем 2-ой ПП
+    if (!value) {
+      updateUsedSIField('UsedSecondSI_PP', false);
+    }
+  }
+});
+
+const usedSecondSI_PP = computed({
+  get: () => deviceUsedSI.value?.UsedSecondSI_PP || false,
+  set: (value: boolean) => updateUsedSIField('UsedSecondSI_PP', value)
+});
+
+const usedPVL = computed({
+  get: () => deviceUsedSI.value?.UsedPVL || false,
+  set: (value: boolean) => {
+    updateUsedSIField('UsedPVL', value);
+    // При выключении ПВл автоматически выключаем 2-ой ПВл
+    if (!value) {
+      updateUsedSIField('UsedSecondSI_PVL', false);
+    }
+  }
+});
+
+const usedSecondSI_PVL = computed({
+  get: () => deviceUsedSI.value?.UsedSecondSI_PVL || false,
+  set: (value: boolean) => updateUsedSIField('UsedSecondSI_PVL', value)
+});
+
+const usedPVS = computed({
+  get: () => deviceUsedSI.value?.UsedPVS || false,
+  set: (value: boolean) => {
+    updateUsedSIField('UsedPVS', value);
+    // При выключении ПВз автоматически выключаем 2-ой ПВз
+    if (!value) {
+      updateUsedSIField('UsedSecondSI_PVS', false);
+    }
+  }
+});
+
+const usedSecondSI_PVS = computed({
+  get: () => deviceUsedSI.value?.UsedSecondSI_PVS || false,
+  set: (value: boolean) => updateUsedSIField('UsedSecondSI_PVS', value)
 });
 
 function handleTemplateUpdate(deviceId: number, docId: number, templateId: number, use: boolean) {
@@ -1224,5 +1387,30 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   line-height: 1.5;
   display: inline-flex;
   align-items: center;
+}
+
+/* Стили для панели используемых средств измерения */
+.used-si-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.used-si-section {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Вторичные чекбоксы (2-ой ПП, 2-ой ПВл, 2-ой ПВз) с отступом слева */
+.field-checkbox-secondary {
+  margin-left: 1.5rem;
+  color: var(--text-color-secondary);
+}
+
+.field-checkbox-secondary label {
+  color: var(--text-color-secondary);
+  font-size: 0.85rem;
 }
 </style>
