@@ -98,7 +98,8 @@
                       :binary="true"
                   />
                 </div>
-                <div class="used-si-cell used-si-secondary used-si-cell-placeholder" />
+                <div class="used-si-cell used-si-secondary-label used-si-cell-placeholder" />
+                <div class="used-si-cell used-si-secondary-control used-si-cell-placeholder" />
               </div>
 
               <div class="used-si-row">
@@ -112,17 +113,30 @@
                       :binary="true"
                   />
                 </div>
-                <div class="used-si-cell used-si-secondary">
-                  <template v-if="usedPP">
-                    <label for="used-second-pp">Задействовать 2-ой ПП</label>
-                    <Checkbox
-                        v-model="usedSecondSI_PP"
-                        input-id="used-second-pp"
-                        :binary="true"
-                    />
-                  </template>
-                  <div v-else class="used-si-cell-placeholder" />
+                <div
+                  v-if="usedPP"
+                  class="used-si-cell used-si-secondary-label"
+                >
+                  <label for="used-second-pp">Задействовать 2-ой ПП</label>
                 </div>
+                <div
+                  v-else
+                  class="used-si-cell used-si-secondary-label used-si-cell-placeholder"
+                />
+                <div
+                  v-if="usedPP"
+                  class="used-si-cell used-si-secondary-control"
+                >
+                  <Checkbox
+                      v-model="usedSecondSI_PP"
+                      input-id="used-second-pp"
+                      :binary="true"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="used-si-cell used-si-secondary-control used-si-cell-placeholder"
+                />
               </div>
 
               <div class="used-si-row">
@@ -136,17 +150,30 @@
                       :binary="true"
                   />
                 </div>
-                <div class="used-si-cell used-si-secondary">
-                  <template v-if="usedPVL">
-                    <label for="used-second-pvl">Задействовать 2-ой ПВл</label>
-                    <Checkbox
-                        v-model="usedSecondSI_PVL"
-                        input-id="used-second-pvl"
-                        :binary="true"
-                    />
-                  </template>
-                  <div v-else class="used-si-cell-placeholder" />
+                <div
+                  v-if="usedPVL"
+                  class="used-si-cell used-si-secondary-label"
+                >
+                  <label for="used-second-pvl">Задействовать 2-ой ПВл</label>
                 </div>
+                <div
+                  v-else
+                  class="used-si-cell used-si-secondary-label used-si-cell-placeholder"
+                />
+                <div
+                  v-if="usedPVL"
+                  class="used-si-cell used-si-secondary-control"
+                >
+                  <Checkbox
+                      v-model="usedSecondSI_PVL"
+                      input-id="used-second-pvl"
+                      :binary="true"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="used-si-cell used-si-secondary-control used-si-cell-placeholder"
+                />
               </div>
 
               <div class="used-si-row">
@@ -160,17 +187,30 @@
                       :binary="true"
                   />
                 </div>
-                <div class="used-si-cell used-si-secondary">
-                  <template v-if="usedPVS">
-                    <label for="used-second-pvs">Задействовать 2-ой ПВз</label>
-                    <Checkbox
-                        v-model="usedSecondSI_PVS"
-                        input-id="used-second-pvs"
-                        :binary="true"
-                    />
-                  </template>
-                  <div v-else class="used-si-cell-placeholder" />
+                <div
+                  v-if="usedPVS"
+                  class="used-si-cell used-si-secondary-label"
+                >
+                  <label for="used-second-pvs">Задействовать 2-ой ПВз</label>
                 </div>
+                <div
+                  v-else
+                  class="used-si-cell used-si-secondary-label used-si-cell-placeholder"
+                />
+                <div
+                  v-if="usedPVS"
+                  class="used-si-cell used-si-secondary-control"
+                >
+                  <Checkbox
+                      v-model="usedSecondSI_PVS"
+                      input-id="used-second-pvs"
+                      :binary="true"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="used-si-cell used-si-secondary-control used-si-cell-placeholder"
+                />
               </div>
             </div>
             <MixedStateWarning v-if="isMixed('UsedSI')" class="mt-2" />
@@ -1418,8 +1458,8 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 .used-si-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) auto minmax(200px, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: minmax(100px, auto) auto minmax(100px, auto) auto auto;
+  gap: 0.5rem;
   align-items: center;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--surface-200);
@@ -1439,23 +1479,29 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   color: var(--text-color);
 }
 
-.used-si-control :deep(.p-checkbox-box) {
+.used-si-control :deep(.p-checkbox-box),
+.used-si-secondary-control :deep(.p-checkbox-box) {
   width: 1.05rem;
   height: 1.05rem;
 }
 
-.used-si-secondary {
+
+.used-si-secondary-label {
   justify-content: flex-start;
   color: var(--text-color-secondary);
   font-size: 0.9rem;
 }
 
-.used-si-secondary label {
+.used-si-secondary-control {
+  justify-content: flex-start;
+}
+
+.used-si-secondary-label label {
   margin: 0;
   font-weight: 500;
 }
 
-.used-si-secondary :deep(.p-checkbox) {
+.used-si-secondary-control :deep(.p-checkbox) {
   flex-shrink: 0;
 }
 
