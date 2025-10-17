@@ -37,7 +37,8 @@
       "Bash(netstat:*)",
       "Bash(ss:*)",
       "Bash(dotnet build)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": [],
     "ask": []
