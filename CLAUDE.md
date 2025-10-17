@@ -425,6 +425,7 @@ The application uses dependency injection with the following key services:
 **TN.DocGeneral Shared Services:**
 - **IReportBuffer**: Singleton for in-memory PDF storage (no external dependencies)
 - **LoggingPathService**: Static utility for platform-specific log paths (accepts `applicationName` parameter)
+- **IConfigurationCacheService**: Singleton for caching configuration files with JSON-based storage and LRU eviction (max 50 entries)
 
 Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
 
