@@ -83,6 +83,103 @@
           </template>
         </Dialog>
 
+        <!-- Используемые СИ -->
+        <Panel header="Используемые СИ" class="mt-3">
+          <div v-if="deviceUsedSI" class="used-si-container">
+            <div class="used-si-table">
+              <div class="used-si-row">
+                <div class="used-si-cell used-si-label">
+                  <label for="used-pr">Задействовать ПР</label>
+                </div>
+                <div class="used-si-cell used-si-control">
+                  <Checkbox
+                      v-model="usedPR"
+                      input-id="used-pr"
+                      :binary="true"
+                  />
+                </div>
+                <div class="used-si-cell used-si-secondary used-si-cell-placeholder" />
+              </div>
+
+              <div class="used-si-row">
+                <div class="used-si-cell used-si-label">
+                  <label for="used-pp">Задействовать ПП</label>
+                </div>
+                <div class="used-si-cell used-si-control">
+                  <Checkbox
+                      v-model="usedPP"
+                      input-id="used-pp"
+                      :binary="true"
+                  />
+                </div>
+                <div class="used-si-cell used-si-secondary">
+                  <template v-if="usedPP">
+                    <label for="used-second-pp">Задействовать 2-ой ПП</label>
+                    <Checkbox
+                        v-model="usedSecondSI_PP"
+                        input-id="used-second-pp"
+                        :binary="true"
+                    />
+                  </template>
+                  <div v-else class="used-si-cell-placeholder" />
+                </div>
+              </div>
+
+              <div class="used-si-row">
+                <div class="used-si-cell used-si-label">
+                  <label for="used-pvl">Задействовать ПВл</label>
+                </div>
+                <div class="used-si-cell used-si-control">
+                  <Checkbox
+                      v-model="usedPVL"
+                      input-id="used-pvl"
+                      :binary="true"
+                  />
+                </div>
+                <div class="used-si-cell used-si-secondary">
+                  <template v-if="usedPVL">
+                    <label for="used-second-pvl">Задействовать 2-ой ПВл</label>
+                    <Checkbox
+                        v-model="usedSecondSI_PVL"
+                        input-id="used-second-pvl"
+                        :binary="true"
+                    />
+                  </template>
+                  <div v-else class="used-si-cell-placeholder" />
+                </div>
+              </div>
+
+              <div class="used-si-row">
+                <div class="used-si-cell used-si-label">
+                  <label for="used-pvs">Задействовать ПВз</label>
+                </div>
+                <div class="used-si-cell used-si-control">
+                  <Checkbox
+                      v-model="usedPVS"
+                      input-id="used-pvs"
+                      :binary="true"
+                  />
+                </div>
+                <div class="used-si-cell used-si-secondary">
+                  <template v-if="usedPVS">
+                    <label for="used-second-pvs">Задействовать 2-ой ПВз</label>
+                    <Checkbox
+                        v-model="usedSecondSI_PVS"
+                        input-id="used-second-pvs"
+                        :binary="true"
+                    />
+                  </template>
+                  <div v-else class="used-si-cell-placeholder" />
+                </div>
+              </div>
+            </div>
+            <MixedStateWarning v-if="isMixed('UsedSI')" class="mt-2" />
+          </div>
+          <Message v-else severity="info">
+            Настройки средств измерения не заданы
+          </Message>
+        </Panel>
+        
         <!-- База данных -->
         <Panel header="Подключение к БД" class="mt-3">
           <div v-if="hasDBConnections">
@@ -252,90 +349,7 @@
           </div>
           <MixedStateWarning v-if="isMixed('InvalidChars')" class="mt-2" />
         </Panel>
-
-        <!-- Используемые средства измерения -->
-        <Panel header="Используемые средства измерения" class="mt-3">
-          <div v-if="deviceUsedSI" class="used-si-container">
-            <div class="field field-horizontal">
-              <label>Используемые СИ:</label>
-              <div class="used-si-section">
-                <!-- ПР -->
-                <div class="field-checkbox">
-                  <Checkbox
-                    v-model="usedPR"
-                    input-id="used-pr"
-                    :binary="true"
-                  />
-                  <label for="used-pr">ПР</label>
-                </div>
-
-                <!-- ПП -->
-                <div class="field-checkbox">
-                  <Checkbox
-                    v-model="usedPP"
-                    input-id="used-pp"
-                    :binary="true"
-                  />
-                  <label for="used-pp">ПП</label>
-                </div>
-
-                <!-- 2-ой ПП (отображается только если включен ПП) -->
-                <div v-if="usedPP" class="field-checkbox field-checkbox-secondary">
-                  <Checkbox
-                    v-model="usedSecondSI_PP"
-                    input-id="used-second-pp"
-                    :binary="true"
-                  />
-                  <label for="used-second-pp">2-ой ПП</label>
-                </div>
-
-                <!-- ПВл -->
-                <div class="field-checkbox">
-                  <Checkbox
-                    v-model="usedPVL"
-                    input-id="used-pvl"
-                    :binary="true"
-                  />
-                  <label for="used-pvl">ПВл</label>
-                </div>
-
-                <!-- 2-ой ПВл (отображается только если включен ПВл) -->
-                <div v-if="usedPVL" class="field-checkbox field-checkbox-secondary">
-                  <Checkbox
-                    v-model="usedSecondSI_PVL"
-                    input-id="used-second-pvl"
-                    :binary="true"
-                  />
-                  <label for="used-second-pvl">2-ой ПВл</label>
-                </div>
-
-                <!-- ПВз -->
-                <div class="field-checkbox">
-                  <Checkbox
-                    v-model="usedPVS"
-                    input-id="used-pvs"
-                    :binary="true"
-                  />
-                  <label for="used-pvs">ПВз</label>
-                </div>
-
-                <!-- 2-ой ПВз (отображается только если включен ПВз) -->
-                <div v-if="usedPVS" class="field-checkbox field-checkbox-secondary">
-                  <Checkbox
-                    v-model="usedSecondSI_PVS"
-                    input-id="used-second-pvs"
-                    :binary="true"
-                  />
-                  <label for="used-second-pvs">2-ой ПВз</label>
-                </div>
-              </div>
-            </div>
-            <MixedStateWarning v-if="isMixed('UsedSI')" class="mt-2" />
-          </div>
-          <Message v-else severity="info">
-            Настройки средств измерения не заданы
-          </Message>
-        </Panel>
+        
       </div>
     </div>
   </div>
@@ -1393,24 +1407,60 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .used-si-container {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+}
+
+.used-si-table {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
-.used-si-section {
+.used-si-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(200px, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--surface-200);
+  border-radius: 0.5rem;
+  background-color: var(--surface-0);
+}
+
+.used-si-cell {
   display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-/* Вторичные чекбоксы (2-ой ПП, 2-ой ПВл, 2-ой ПВз) с отступом слева */
-.field-checkbox-secondary {
-  margin-left: 1.5rem;
-  color: var(--text-color-secondary);
+.used-si-label label {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
-.field-checkbox-secondary label {
+.used-si-control :deep(.p-checkbox-box) {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.used-si-secondary {
+  justify-content: flex-start;
   color: var(--text-color-secondary);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+}
+
+.used-si-secondary label {
+  margin: 0;
+  font-weight: 500;
+}
+
+.used-si-secondary :deep(.p-checkbox) {
+  flex-shrink: 0;
+}
+
+.used-si-cell-placeholder {
+  width: 100%;
+  height: 1px;
 }
 </style>
