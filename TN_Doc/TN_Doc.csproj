@@ -5,7 +5,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>Генератор отчетов</Title>
     <Company>АО "Транснефть-Автоматизация и Метрология"</Company>
-    <Version>1.4.1</Version>
+    <Version>1.4.2</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
   </PropertyGroup>
@@ -32,6 +32,9 @@
     <None Include="appsettings.json;Config.xml;nlog.config;prutils\winprutil.exe;wwwroot\HTML\DocEditAct.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+      <None Include="wwwroot\HTML\*.html">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     <!-- Условное включение PDF.pdf, если файл существует -->
     <None Include="wwwroot\PDF\PDF.pdf" Condition="Exists('wwwroot\PDF\PDF.pdf')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -97,7 +100,6 @@
   <!-- Ссылки на проекты -->
   <ItemGroup>
     <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
-    <ProjectReference Include="..\tn_toolsfastreport\TN_Tools\TN_Tools.csproj" />
   </ItemGroup>
 
   <ProjectExtensions>

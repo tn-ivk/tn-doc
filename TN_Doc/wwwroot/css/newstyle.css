@@ -124,17 +124,18 @@ div.table-content > table > tr > td > div > button{
 
 table.mainTable select  {
     line-height: 1.5;
-    color: #495057;
-    background-color: #fff;
+    color: var(--md-text-muted);
+    background-color: var(--md-white);
     background-clip: padding-box;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--md-border);
     border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-table.mainTable input[type=button] {
-    background-color: #1b6ec2;
-    color: #ffffff;
+table.mainTable input[type=button],
+table.mainTable button {
+    background-color: var(--md-primary);
+    color: var(--md-white);
     border: none;
     border-radius: 6px;
     padding: 5px 10px;
@@ -143,14 +144,13 @@ table.mainTable input[type=button] {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-table.mainTable input[type=button]:hover {
-    background-color: #155a9e;
+table.mainTable input[type=button]:hover,
+table.mainTable button:hover {
+    background-color: var(--md-primary-hover);
 }
 
-table.mainTable input[type=button]:disabled {
-    color: #666666;
-    background-color: #cccccc;
-}
+/* Disabled стили централизованы в material3.css */
+
 
 
 #DataTable_wrapper > div.dataTables_scroll > div.dataTables_scrollHead > div > table{
@@ -160,8 +160,8 @@ table.mainTable input[type=button]:disabled {
 .sorting_disabled,
 table.filterTable td,
 div.cont > table > tbody > tr > td{
-    border: 1px solid #ced4da !important;
-    
+    border: 1px solid var(--md-border) !important;
+
 }
 
 .searched-table{
@@ -169,7 +169,7 @@ div.cont > table > tbody > tr > td{
 }
 
 .invalid-cell-content {
-    border: 2px solid #dc3545 !important;
+    border: 2px solid var(--md-error-bootstrap) !important;
     background-color: rgba(220, 53, 69, 0.05) !important;
     box-shadow: 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
     transition: all 0.2s ease-in-out !important;
@@ -193,8 +193,8 @@ div.cont > table > tbody > tr > td{
 }
 
 .tooltip-inner {
-    color: #fff !important;
-    background-color: #dc3545 !important;
+    color: var(--md-white) !important;
+    background-color: var(--md-error-bootstrap) !important;
     max-width: 300px !important;
     padding: 8px 12px !important;
     font-size: 0.875rem !important;
@@ -203,5 +203,5 @@ div.cont > table > tbody > tr > td{
 }
 
 .tooltip.bs-tooltip-bottom .arrow::before {
-    border-bottom-color: #dc3545 !important;
+    border-bottom-color: var(--md-error-bootstrap) !important;
 }

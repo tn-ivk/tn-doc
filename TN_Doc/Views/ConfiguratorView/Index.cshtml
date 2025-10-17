@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Конфигуратор настроек";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+
+    <!-- Configurator styles -->
+    <link rel="stylesheet" href="~/configurator/configurator.css" asp-append-version="true" />
+
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'PT Astra Sans', Oxygen, Ubuntu, Cantarell, Arial, sans-serif;
+        }
+        #app {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <!-- Configurator script -->
+    <script type="module" src="~/configurator/configurator.js" asp-append-version="true"></script>
+</body>
+</html>

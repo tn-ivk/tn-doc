@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3272.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/23/2025 17:40:12" ReportInfo.CreatorVersion="2025.2.8.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3272.dll" DoublePass="true" SmoothGraphics="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/23/2025 17:40:12" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;

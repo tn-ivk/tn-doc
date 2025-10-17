@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="08/13/2025 01:04:13" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="10/09/2025 13:36:56" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -218,18 +218,16 @@ namespace FastReport
       TableAdditionlInfo.PrintColumns();                                             
          
       //Fill &amp; Draw dynamic Rows
-      List &lt;string&gt; listExtendGostIndex51858 = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      List &lt;string&gt; listExtendGostIndex51858 = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858 ?? new List&lt;string&gt;() {&quot;-.-.-.-&quot;, &quot;-.-.-.-&quot;, &quot;-.-.-.-&quot;, &quot;-.-.-.-&quot;};
+      List &lt;string&gt; filtredListExtendGostIndex51858 = listExtendGostIndex51858.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
       List &lt;string&gt; distListExtendGostIndex51858 = listExtendGostIndex51858.Distinct().ToList();
       List &lt;string&gt; resultListExtendGostIndex51858 = distListExtendGostIndex51858.Count == 1 ? distListExtendGostIndex51858 : listExtendGostIndex51858;     
       
-      //for (int n = 0; n &lt; resultListExtendGostIndex51858.Count; n++)
-      //{
-        ExtendGostIndex51858.Text = $&quot;Обозначение нефти: &lt;u&gt; {String.Join(&quot; &lt;/u&gt; по ГОСТ Р 51858, &lt;u&gt; &quot;, resultListExtendGostIndex51858.ToArray())}&lt;/u&gt; по ГОСТ Р 51858.&quot;;
-        //ExtendGostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  listExtendGostIndex51858[n]);
-        TableAdditionlInfo.PrintRow(1);
-        TableAdditionlInfo.PrintColumns();                                             
-      //}
-    }
+      ExtendGostIndex51858.Text = $&quot;Обозначение нефти: &lt;u&gt; {String.Join(&quot; &lt;/u&gt; по ГОСТ Р 51858, &lt;u&gt; &quot;, resultListExtendGostIndex51858.ToArray())}&lt;/u&gt; по ГОСТ Р 51858.&quot;;
+      TableAdditionlInfo.PrintRow(1);
+      TableAdditionlInfo.PrintColumns();                                             
+      
+      }
       
     public void  DrawTableSigners()
     {
@@ -364,7 +362,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="186.11" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="184.18" Width="718.2" Height="499.79" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="7.56" Width="567" Height="511.13" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="302.4"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -534,7 +532,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="690.6" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="686.75" Width="718.2" Height="47.25" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Top="9.45" Width="336.42" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="336.42"/>
         <TableRow Name="Row195">
@@ -545,7 +543,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="742.56" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="736.77" Width="718.2" Height="92.61" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="85.05" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -597,7 +595,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="839.87" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="832.16" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>

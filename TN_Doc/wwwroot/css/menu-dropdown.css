@@ -1,0 +1,71 @@
+/* Стили для кастомного dropdown меню */
+
+/* Убираем стрелку у dropdown-toggle кнопки меню */
+table.mainTable button.dropdown-toggle::after {
+    display: none;
+}
+
+/* Контейнер dropdown меню */
+.custom-dropdown-menu {
+    border: 1px solid var(--md-border);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 5px;
+    min-width: 200px;
+}
+
+/* Пункт меню */
+.custom-dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 4px;
+    color: var(--md-text-muted);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+/* Иконка в пункте меню */
+.custom-dropdown-item i {
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+/* Текст в пункте меню */
+.custom-dropdown-item span {
+    flex: 1;
+}
+
+/* Вариант 1: Синий фон как у основных кнопок */
+.custom-dropdown-item:hover {
+    background-color: var(--md-primary);
+    color: var(--md-white);
+    text-decoration: none;
+}
+
+/* Вариант 2: Светлый фон с синей рамкой (закомментирован)
+.custom-dropdown-item:hover {
+    background-color: var(--md-primary-light);
+    color: var(--md-primary);
+    border: 1px solid var(--md-primary);
+    text-decoration: none;
+}
+*/
+
+/* Вариант 3: Градиент (закомментирован)
+.custom-dropdown-item:hover {
+    background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-primary-hover) 100%);
+    color: var(--md-white);
+    text-decoration: none;
+}
+*/
+
+/* Состояние активного клика */
+.custom-dropdown-item:active {
+    background-color: var(--md-primary-hover);
+    color: var(--md-white);
+}

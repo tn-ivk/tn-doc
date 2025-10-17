@@ -340,6 +340,52 @@ $(document).ready
     }
 );
 
+// Перенос фокуса за пределы модалки до установки aria-hidden
+function moveFocusOutsideModal(modalElement, fallbackFocusSelector) {
+    try {
+        const activeElement = document.activeElement;
+        if (activeElement && modalElement.contains(activeElement)) {
+            // Сначала убираем фокус с элемента внутри модалки
+            if (typeof activeElement.blur === 'function') {
+                activeElement.blur();
+            }
+        }
+
+        // Затем переводим фокус на указанный fallback-элемент или на body
+        const fallback = (fallbackFocusSelector && document.querySelector(fallbackFocusSelector)) || document.body;
+        if (fallback && typeof fallback.focus === 'function') {
+            // Делаем это асинхронно, чтобы не мешать текущему циклу обработки событий Bootstrap
+            setTimeout(function () { fallback.focus(); }, 0);
+        }
+    } catch (e) {
+        // В случае любых проблем просто пытаемся сфокусировать body
+        try { document.body && document.body.focus && document.body.focus(); } catch (_) {}
+    }
+}
+
+// Устанавливает guard на событие скрытия модального окна, чтобы избежать предупреждения
+function installModalA11yFocusGuard(modalSelector, fallbackFocusSelector) {
+    try {
+        $(modalSelector).on('hide.bs.modal', function () {
+            moveFocusOutsideModal(this, fallbackFocusSelector);
+        });
+
+        // Дополнительно, если закрываем по кнопке с data-dismiss, переносим фокус по mousedown
+        // чтобы ещё до фазы hide.bs.modal убрать фокус из модалки
+        $(document).on('mousedown', modalSelector + ' .close-modal-wnd-btn,[data-dismiss="modal"]', function () {
+            try {
+                if (typeof this.blur === 'function') {
+                    this.blur();
+                }
+                const fallback = (fallbackFocusSelector && document.querySelector(fallbackFocusSelector)) || document.body;
+                if (fallback && typeof fallback.focus === 'function') {
+                    setTimeout(function () { fallback.focus(); }, 0);
+                }
+            } catch (_) {}
+        });
+    } catch (_) {}
+}
+
 function InitDevices() {
     $.ajax(
         {
@@ -606,22 +652,43 @@ function InitExportFormat() {
 function InitProtocolNumber() {
     $('#ComboboxProtocolNumber').empty();
 
-    $.ajax(
-        {
-            async: false,
-            url: 'Home/GetListProtocolNumber',
-            type: 'GET',
-            data:
-                {
-                    IdDevice: $('#ComboboxDevice').val(),
-                    IdDoc: $('#ComboboxDocGUID').val(),
-                },
-            success: function (data) {
-                data.forEach((item) => {
-                    $('#ComboboxProtocolNumber').append('<option value=' + item.id + '>' + item.name + '</option>');
-                });
+    // Проверяем на сервере, использует ли документ номер протокола
+    $.ajax({
+        async: false,
+        url: 'Home/IsProtocolNumberUsed',
+        type: 'GET',
+        data: {
+            idDoc: $('#ComboboxDocGUID').val()
+        },
+        success: function (isUsed) {
+            if (!isUsed) {
+                $('#ComboboxProtocolNumber').hide();
+                return;
             }
-        });
+
+            $('#ComboboxProtocolNumber').show();
+
+            // Загружаем список протоколов
+            $.ajax({
+                async: false,
+                url: 'Home/GetListProtocolNumber',
+                type: 'GET',
+                data: {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val()
+                },
+                success: function (data) {
+                    data.forEach((item) => {
+                        $('#ComboboxProtocolNumber').append('<option value=' + item.id + '>' + item.name + '</option>');
+                    });
+                }
+            });
+        },
+        error: function() {
+            // В случае ошибки скрываем комбобокс
+            $('#ComboboxProtocolNumber').hide();
+        }
+    });
 }
 
 function InitDatepickerBegin() {
@@ -705,8 +772,17 @@ function InitTableDocs() {
 
             columns:
                 [
-                    {data: 'dt'},
-                    {data: 'description'}
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            // Для отображения и фильтрации объединяем дату и описание
+                            if (type === 'display' || type === 'filter') {
+                                return row.dt + ' ' + row.description;
+                            }
+                            // Для сортировки используем дату
+                            return row.dt;
+                        }
+                    }
                 ],
         });
 
@@ -752,6 +828,12 @@ function InitElement() {
     InitPrinterName();
     InitExportFormat();
     InitProtocolNumber();
+
+    // A11y: предотвращаем предупреждение "Blocked aria-hidden ... descendant retained focus"
+    // Возвращаем фокус на кнопку меню после закрытия любых модалок
+    installModalA11yFocusGuard('#modal-window', '#MenuButton');
+    installModalA11yFocusGuard('#configurator-window', '#MenuButton');
+    installModalA11yFocusGuard('#PromiseConfirm', '#MenuButton');
     $('#ComboboxDocGUID').change(async function () {
         if (table != null) $('#DataTable').DataTable().clear().draw();
         $('.FR').attr('src', '');
@@ -854,9 +936,9 @@ async function GetDoc() {
 }
 
 function GetEditDoc() {
-    if(currentId == null) 
+    if(currentId == null)
         return;
-    
+
     $.ajax(
         {
             async: false,
@@ -867,17 +949,37 @@ function GetEditDoc() {
                 IdDoc: $('#ComboboxDocGUID').val(),
                 id: currentId
             },
-            success: function (data) {
+            success: function (htmlContent) {
+                // Нормализуем базовый URL для ресурсов внутри blob-документа
+                try {
+                    const baseHref = window.location.origin + '/';
+                    if (typeof htmlContent === 'string' && !/\bbase\s+href=/i.test(htmlContent)) {
+                        htmlContent = htmlContent.replace('<head>', '<head><base href="' + baseHref + '">');
+                    }
+                } catch (e) {
+                    // если по какой-то причине не удалось модифицировать HTML, продолжаем без падения
+                    console && console.warn && console.warn('Не удалось вставить <base href> для blob HTML:', e);
+                }
+
+                // Создаём Blob из HTML-контента
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                // Освобождаем предыдущий Blob URL, если он существует
                 $('.FR').each(function () {
-                    $(this).attr('src', '/HTML/html.html');
+                    const oldSrc = $(this).attr('src');
+                    if (oldSrc && oldSrc.startsWith('blob:')) {
+                        URL.revokeObjectURL(oldSrc);
+                    }
+                    $(this).attr('src', blobUrl);
                 });
 
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
-                
+
             }
         });
-    
+
     isViewing = false;
     $('#viewModeButton').prop('value', '     Просмотр     ');
 }
@@ -1420,11 +1522,11 @@ function FillPassportDataElis() {
                                 logTrace('Заполнение поля Результат-Текст: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey].valueString || '-'));
                             }
 
-                            // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe
+    // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe (только если ЕЛИС включен)
                             try {
                                 let parameterKey = item.dataset.key;
                                 let printCell = iframe.contentWindow.document.querySelector('[data-parameter-key="' + parameterKey + '"]');
-                                if (printCell) {
+                        if (printCell && !document.getElementById('Edit')?.classList.contains('no-elis')) {
                                     let printInput = printCell.querySelector('.print-cell-input');
                                     if (printInput) {
                                         printInput.value = root[currentKey].valueString || '-';
@@ -1615,7 +1717,7 @@ function updatePrintColumnFromInput(valueInput) {
         } else {
             // Fallback к старой логике, если функция не найдена
             let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
-            if (printCell) {
+                        if (printCell && !document.getElementById('Edit')?.classList.contains('no-elis')) {
                 printCell.setAttribute('data-print-value', valueInput.value || '-');
                 printCell.setAttribute('data-elis-filled', 'false');
                 

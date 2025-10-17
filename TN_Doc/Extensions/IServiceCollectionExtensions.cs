@@ -6,6 +6,7 @@ using NLog;
 using TN_Doc.Models.Printer;
 using TN_Doc.Services;
 using TN.Utils;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc.Extensions;
 
@@ -43,6 +44,12 @@ public static class ServiceCollectionExtensions
 	/// </summary>
 	/// <param name="services">Коллекция сервисов</param>
 	public static void AddDbSchemaCache(this IServiceCollection services) => services.AddScoped<IDbSchemaCache, DbSchemaCache>();
+
+	/// <summary>
+	/// Добавление сервиса кэширования конфигурационных файлов документов
+	/// </summary>
+	/// <param name="services">Коллекция сервисов</param>
+	public static void AddConfigurationCache(this IServiceCollection services) => services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
 
 	/// <summary>
 	/// Сбор информации о приложение
