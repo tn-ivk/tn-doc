@@ -11,6 +11,7 @@ using TN_Doc.Middleware;
 using TN_Doc.Services;
 using TN.Doc;
 using TN_DocGeneral.Services;
+using TN.Utils.Helpers;
 
 namespace TN_Doc;
 
@@ -85,6 +86,13 @@ public class Startup
 	// the HTTP request pipeline.
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 	{
+		// Регистрируем обработчик инвалидации кэша для CfgFileRW
+		var configCache = app.ApplicationServices.GetService<IConfigurationCacheService>();
+		if (configCache != null)
+		{
+			CfgFileRW.RegisterCacheInvalidator(filePath => configCache.ClearCache(filePath));
+		}
+
 		if (env.IsDevelopment())
 		{
 			app.UseDeveloperExceptionPage();
