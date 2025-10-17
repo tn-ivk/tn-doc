@@ -37,8 +37,21 @@
       "Bash(netstat:*)",
       "Bash(ss:*)",
       "Bash(dotnet build)",
+      "Bash(dotnet restore)",
+      "Bash(dotnet build:*)",
       "Bash(dotnet test:*)",
-      "Bash(npm run type-check:*)"
+      "Bash(for file in KmhFlowTests.cs KmhDensityTests.cs KmhParameterTests.cs KmhStandardTests.cs KmhSikn425Tests.cs)",
+      "Bash(do echo \"Processing $file\")",
+      "Bash(for file in /home/snafu/projects/ivk/tn_doc/Tests/Libraries/KMH/KmhFlowTests.cs )",
+      "Bash(/home/snafu/projects/ivk/tn_doc/Tests/Libraries/KMH/KmhMeasurementTests.cs )",
+      "Bash(/home/snafu/projects/ivk/tn_doc/Tests/Libraries/KMH/KmhParameterTests.cs )",
+      "Bash(/home/snafu/projects/ivk/tn_doc/Tests/Libraries/KMH/KmhSikn425Tests.cs)",
+      "Bash(do)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(/dev/null)"
     ],
     "deny": [],
     "ask": []

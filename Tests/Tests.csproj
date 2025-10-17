@@ -20,11 +20,72 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\tn.docgeneral\Act\Act.csproj" />
-      <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
-      <ProjectReference Include="..\tn.docgeneral\Passport\Passport.csproj" />
-      <ProjectReference Include="..\tn.docgeneral\tn.utils\TN.Utils\TN.Utils.csproj" />
+      <!-- Main Application -->
       <ProjectReference Include="..\TN_Doc\TN_Doc.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\tn.utils\TN.Utils\TN.Utils.csproj" />
+
+      <!-- Common Libraries (Phase 1 - CRITICAL) -->
+      <ProjectReference Include="..\tn.docgeneral\CommonPoverka1974\CommonPoverka1974.csproj">
+        <Aliases>CommonPoverka1974Lib</Aliases>
+      </ProjectReference>
+      <ProjectReference Include="..\tn.docgeneral\CommonSikn425\CommonSikn425.csproj">
+        <Aliases>CommonSikn425Lib</Aliases>
+      </ProjectReference>
+
+      <!-- Core Documents (Phase 1) -->
+      <ProjectReference Include="..\tn.docgeneral\Act\Act.csproj">
+        <Aliases>ActLib</Aliases>
+      </ProjectReference>
+      <ProjectReference Include="..\tn.docgeneral\Passport\Passport.csproj">
+        <Aliases>PassportLib</Aliases>
+      </ProjectReference>
+      <ProjectReference Include="..\tn.docgeneral\Jornal\Jornal.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Report\Report.csproj" />
+
+      <!-- KMH Documents (Phase 2) -->
+      <ProjectReference Include="..\tn.docgeneral\KMH_MPR_MPR\KMH_MPR_MPR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_MPR_PU\KMH_MPR_PU.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_MPR_TPR\KMH_MPR_TPR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_PP\KMH_PP.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_PP_Areom\KMH_PP_Areom.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_PR_PR\KMH_PR_PR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_PR_PU\KMH_PR_PU.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_PV\KMH_PV.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_PW\KMH_PW.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH_MI2816\KMH_MI2816.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH3265_PR_PU\KMH3265_PR_PU.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH3265_UPR_PR\KMH3265_UPR_PR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH3288_MPR_TPR\KMH3288_MPR_TPR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH3312_PR_PU\KMH3312_PR_PU.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMH3312_UPR_PR\KMH3312_UPR_PR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMX_Sikn425_PR_PR\KMX_Sikn425_PR_PR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\KMX_Sikn425_PR_PU\KMX_Sikn425_PR_PU.csproj" />
+
+      <!-- Poverka Documents (Phase 3 - будут добавлены постепенно) -->
+      <!-- Раскомментировать по мере реализации тестов -->
+      <!--
+      <ProjectReference Include="..\tn.docgeneral\Poverka1974\Poverka1974.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka1974_04\Poverka1974_04.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka1974_89\Poverka1974_89.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka1974_95\Poverka1974_95.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka2816\Poverka2816.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3151\Poverka3151.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3189\Poverka3189.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3265_PR_PU\Poverka3265_PR_PU.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3265_UPR_PR\Poverka3265_UPR_PR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3265_UPR_PU\Poverka3265_UPR_PU.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3266\Poverka3266.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3267\Poverka3267.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3272\Poverka3272.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3287\Poverka3287.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3288\Poverka3288.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3312_PR_PU\Poverka3312_PR_PU.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3312_UPR_PR\Poverka3312_UPR_PR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\Poverka3380\Poverka3380.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\PoverkaSikn425_PR_PR\PoverkaSikn425_PR_PR.csproj" />
+      <ProjectReference Include="..\tn.docgeneral\PoverkaSikn425_PR_PU\PoverkaSikn425_PR_PU.csproj" />
+      -->
     </ItemGroup>
 
     <ItemGroup>
