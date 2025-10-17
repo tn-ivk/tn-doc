@@ -29,11 +29,8 @@
 - При последующих запросах десериализовать `RawJson` через `JsonConvert.DeserializeObject<T>(rawJson, settings)`
 
 ### 3. Обновление кэша при записи
-- Для операций, которые вызывают `CfgFileRW.SaveCfg`, после успешной записи сразу обновлять запись в кэше:
-  ```csharp
-  var raw = JsonConvert.SerializeObject(obj, Formatting.Indented);
-  _configCache.Update(filePath, raw);
-  ```
+- Для операций, которые вызывают `CfgFileRW.SaveCfg`, после успешной записи сразу обновлять запись в кэше
+- Метод `Update<T>()` принимает тип как параметр для правильного создания ключа кэша
 - Если синхронное обновление сложно, оставить операцию `ClearCache()`; убедиться, что все места её вызывают после записи
 
 ### 4. Рефактор `LoadCfg<T>`
@@ -50,6 +47,9 @@
 - Добавить юнит/интеграционные тесты: открыть два разных паспорта подряд, убедиться, что второй стартует с дефолтных методов
 - Проверить, что `ClearCache` и `GetStatistics` корректно работают с новым форматом (количество байт, загрузка, счётчики)
 - Протестировать производительность: сравнить время загрузки конфигураций до и после изменений
+- **Тест обновления:** сохранить конфигурацию через `SaveCfg`, загрузить повторно, убедиться, что получены новые данные
+- **Нагрузочный тест:** 10000 запросов `LoadCfg` за 1 минуту, измерить время отклика и hit rate
+- **Тест на утечки памяти:** загрузить 1000+ различных конфигураций, проверить использование памяти
 
 ### 6. Оптимизация/финализация
 - При необходимости внедрить кэш `JsonSerializer` (reuse настроек) для снижения аллокаций
@@ -82,7 +82,7 @@ public T GetOrLoadConfig<T>(string filePath) where T : class
         Interlocked.Increment(ref _cacheHits);
         entry.LastAccessTime = DateTime.UtcNow;
         entry.AccessCount++;
-        
+
         return JsonConvert.DeserializeObject<T>(entry.RawJson, _serializerSettings);
     }
 
@@ -92,7 +92,7 @@ public T GetOrLoadConfig<T>(string filePath) where T : class
 
     var rawJson = File.ReadAllText(normalizedPath, Encoding.UTF8);
     var config = JsonConvert.DeserializeObject<T>(rawJson, _serializerSettings);
-    
+
     if (config == null)
     {
         _logger.Warn($"Не удалось загрузить конфигурацию: {normalizedPath}");
@@ -112,46 +112,57 @@ public T GetOrLoadConfig<T>(string filePath) where T : class
 
     _cache[cacheKey] = newEntry;
     _logger.Debug($"Конфигурация закэширована: {Path.GetFileName(normalizedPath)} (всего в кэше: {_cache.Count})");
-    
+
     return config;
 }
 ```
 
 ### Обновление кэша после сохранения
 ```csharp
-public void Update(string filePath, string newRawJson)
+public void Update<T>(string filePath, string newRawJson) where T : class
 {
     var normalizedPath = Path.GetFullPath(filePath);
-    var key = new ConfigCacheKey(normalizedPath, typeof(object));
-    
+    var key = new ConfigCacheKey(normalizedPath, typeof(T));
+
     _cache[key] = new ConfigCacheEntry
     {
         RawJson = newRawJson,
         FilePath = normalizedPath,
-        ConfigType = typeof(object),
+        ConfigType = typeof(T),
         LoadedAt = DateTime.UtcNow,
         LastAccessTime = DateTime.UtcNow,
         AccessCount = 0
     };
-    
-    _logger.Debug($"Кэш обновлён для файла: {Path.GetFileName(normalizedPath)}");
+
+    _logger.Debug($"Кэш обновлён для файла: {Path.GetFileName(normalizedPath)} (тип: {typeof(T).Name})");
 }
 ```
 
-### Использование в CfgFileRW.SaveCfg
+### Использование Update<T> (когда тип известен на этапе компиляции)
+```csharp
+// Пример в коде, где тип конфигурации известен
+var config = new PassportConfig { /* ... */ };
+var jsonContent = JsonConvert.SerializeObject(config, Formatting.Indented);
+File.WriteAllText(filePath, jsonContent, Encoding.UTF8);
+
+// Обновляем кэш с указанием конкретного типа
+ConfigurationCacheService.Instance?.Update<PassportConfig>(filePath, jsonContent);
+```
+
+### Использование в CfgFileRW.SaveCfg (когда тип неизвестен)
 ```csharp
 public static bool SaveCfg(string filePath, object obj)
 {
     // ... существующая логика сохранения ...
-    
+
     try
     {
         var jsonContent = JsonConvert.SerializeObject(obj, Formatting.Indented);
         File.WriteAllText(filePath, jsonContent, Encoding.UTF8);
-        
-        // Обновляем кэш после успешного сохранения
-        ConfigurationCacheService.Instance?.Update(filePath, jsonContent);
-        
+
+        // Инвалидируем кэш для этого файла (проще чем рефлексия)
+        ConfigurationCacheService.Instance?.ClearCache(filePath);
+
         _logger.Trace($"Выполнено сохранение файла {filePath}");
         return true;
     }
