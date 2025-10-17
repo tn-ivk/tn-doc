@@ -1086,6 +1086,19 @@ function _convertEditRowToStableRow(row, rowMap, isPassportTable) {
         qpMethodsArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Methods'];
         qpParametersArray = qpCfgsDictionaries['QpsInfo'][Number(row.closest('table').dataset.qpId)]['Parameters'];
     }
+    // Для таблицы методов паспорта качества используем специальную карту типов,
+    // чтобы корректно обрабатывать колонку "Применять по умолчанию"
+    if (isPassportTable && row.closest('.qp-method-table')) {
+        rowMap = {
+            0: 'bool',
+            1: 'text',
+            2: 'qp-method-limit',
+            3: 'number',
+            4: 'text',
+            5: 'qp-method-default',
+            6: 'ignore'
+        };
+    }
     for (let i = 0; i < cells.length; i++) {
         _convertEditCellToStableCell(cells[i], rowMap[i], usersGroupArray, licensesArray, qpMethodsArray, qpParametersArray);
     }
@@ -2385,7 +2398,13 @@ function _getCurrentQpMethodState(rowItem) {
         limitValueActivate: cells[2].querySelector('i')?.classList.contains('fa-check-square-o') || false,
         limitValue: cells[3].textContent.trim(),
         limitValueString: cells[4].textContent.trim(),
-        isDefault: cells[5].querySelector('input[type="checkbox"].default-method-checkbox')?.checked || false
+        // В стабильном режиме чекбокса нет — читаем по иконке; в режиме редактирования — по чекбоксу
+        isDefault: (function() {
+            const cb = cells[5].querySelector('input[type="checkbox"].default-method-checkbox');
+            if (cb) return cb.checked;
+            const icon = cells[5].querySelector('i');
+            return icon ? icon.classList.contains('fa-check-square-o') : false;
+        })()
     };
 }
 

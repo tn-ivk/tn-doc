@@ -12,7 +12,7 @@
 
     <div class="field field-horizontal">
       <label for="use-security">Функции безопасности:</label>
-      <InputSwitch
+      <ToggleSwitch
         id="use-security"
         v-model="useSecurityFeatures"
       />
@@ -73,7 +73,7 @@ import type { OpcConnectionSettings } from '../types/config.types';
 
 import Panel from 'primevue/panel';
 import InputText from 'primevue/inputtext';
-import InputSwitch from 'primevue/inputswitch';
+import ToggleSwitch from 'primevue/toggleswitch';
 import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';

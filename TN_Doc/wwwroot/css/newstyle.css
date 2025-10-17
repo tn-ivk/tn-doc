@@ -149,11 +149,7 @@ table.mainTable button:hover {
     background-color: var(--md-primary-hover);
 }
 
-table.mainTable input[type=button]:disabled,
-table.mainTable button:disabled {
-    color: var(--md-text-light);
-    background-color: var(--md-gray-light);
-}
+/* Disabled стили централизованы в material3.css */
 
 
 

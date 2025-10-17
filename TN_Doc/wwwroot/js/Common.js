@@ -340,6 +340,52 @@ $(document).ready
     }
 );
 
+// Перенос фокуса за пределы модалки до установки aria-hidden
+function moveFocusOutsideModal(modalElement, fallbackFocusSelector) {
+    try {
+        const activeElement = document.activeElement;
+        if (activeElement && modalElement.contains(activeElement)) {
+            // Сначала убираем фокус с элемента внутри модалки
+            if (typeof activeElement.blur === 'function') {
+                activeElement.blur();
+            }
+        }
+
+        // Затем переводим фокус на указанный fallback-элемент или на body
+        const fallback = (fallbackFocusSelector && document.querySelector(fallbackFocusSelector)) || document.body;
+        if (fallback && typeof fallback.focus === 'function') {
+            // Делаем это асинхронно, чтобы не мешать текущему циклу обработки событий Bootstrap
+            setTimeout(function () { fallback.focus(); }, 0);
+        }
+    } catch (e) {
+        // В случае любых проблем просто пытаемся сфокусировать body
+        try { document.body && document.body.focus && document.body.focus(); } catch (_) {}
+    }
+}
+
+// Устанавливает guard на событие скрытия модального окна, чтобы избежать предупреждения
+function installModalA11yFocusGuard(modalSelector, fallbackFocusSelector) {
+    try {
+        $(modalSelector).on('hide.bs.modal', function () {
+            moveFocusOutsideModal(this, fallbackFocusSelector);
+        });
+
+        // Дополнительно, если закрываем по кнопке с data-dismiss, переносим фокус по mousedown
+        // чтобы ещё до фазы hide.bs.modal убрать фокус из модалки
+        $(document).on('mousedown', modalSelector + ' .close-modal-wnd-btn,[data-dismiss="modal"]', function () {
+            try {
+                if (typeof this.blur === 'function') {
+                    this.blur();
+                }
+                const fallback = (fallbackFocusSelector && document.querySelector(fallbackFocusSelector)) || document.body;
+                if (fallback && typeof fallback.focus === 'function') {
+                    setTimeout(function () { fallback.focus(); }, 0);
+                }
+            } catch (_) {}
+        });
+    } catch (_) {}
+}
+
 function InitDevices() {
     $.ajax(
         {
@@ -782,6 +828,12 @@ function InitElement() {
     InitPrinterName();
     InitExportFormat();
     InitProtocolNumber();
+
+    // A11y: предотвращаем предупреждение "Blocked aria-hidden ... descendant retained focus"
+    // Возвращаем фокус на кнопку меню после закрытия любых модалок
+    installModalA11yFocusGuard('#modal-window', '#MenuButton');
+    installModalA11yFocusGuard('#configurator-window', '#MenuButton');
+    installModalA11yFocusGuard('#PromiseConfirm', '#MenuButton');
     $('#ComboboxDocGUID').change(async function () {
         if (table != null) $('#DataTable').DataTable().clear().draw();
         $('.FR').attr('src', '');
@@ -1470,11 +1522,11 @@ function FillPassportDataElis() {
                                 logTrace('Заполнение поля Результат-Текст: ' + (currentKey || '[нет ключа]') + ', значение: ' + (root[currentKey].valueString || '-'));
                             }
 
-                            // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe
+    // Синхронно обновляем визуальную колонку «Результат-Текст» в iframe (только если ЕЛИС включен)
                             try {
                                 let parameterKey = item.dataset.key;
                                 let printCell = iframe.contentWindow.document.querySelector('[data-parameter-key="' + parameterKey + '"]');
-                                if (printCell) {
+                        if (printCell && !document.getElementById('Edit')?.classList.contains('no-elis')) {
                                     let printInput = printCell.querySelector('.print-cell-input');
                                     if (printInput) {
                                         printInput.value = root[currentKey].valueString || '-';
@@ -1665,7 +1717,7 @@ function updatePrintColumnFromInput(valueInput) {
         } else {
             // Fallback к старой логике, если функция не найдена
             let printCell = iframe.contentWindow.document.querySelector(`[data-parameter-key="${parameterKey}"]`);
-            if (printCell) {
+                        if (printCell && !document.getElementById('Edit')?.classList.contains('no-elis')) {
                 printCell.setAttribute('data-print-value', valueInput.value || '-');
                 printCell.setAttribute('data-elis-filled', 'false');
                 

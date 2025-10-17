@@ -286,6 +286,22 @@ public class HomeController : Controller
     /// <returns></returns>
     public bool IsUsedElis(int IdDevice) => _appConfig.IsUsedElis(IdDevice);
 
+    [HttpGet]
+    public IActionResult IsElisUsed(int idDevice)
+    {
+        try
+        {
+            var used = _appConfig.IsUsedElis(idDevice);
+            _logger.LogTrace($"Использование ЕЛИС для устройства {_appConfig.GetDeviceName(idDevice)}: {used}");
+            return Json(new { isElisUsed = used });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка проверки использования ЕЛИС для устройства {idDevice}");
+            return Json(new { isElisUsed = false });
+        }
+    }
+
     /// <summary>
     /// Получить данные для регистрации устройства в ЕЛИС.
     /// </summary>
