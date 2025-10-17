@@ -88,9 +88,11 @@ export interface PrintSettings {
 }
 
 export interface Elis {
-  Use?: boolean;
-  LabHubUrl?: string;
-  ClientToken?: string;
+  Use: boolean;
+  OstKey: string;
+  SiknKey: string;
+  ClientName: string;
+  ClientToken: string;
 }
 
 export interface CfgApp {

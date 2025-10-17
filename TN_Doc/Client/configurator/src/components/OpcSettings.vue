@@ -128,6 +128,37 @@ const localSettings = ref<OpcConnectionSettings>(
   }
 );
 
+// Синхронизация с внешними изменениями modelValue
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue && JSON.stringify(newValue) !== JSON.stringify(localSettings.value)) {
+      // Маппинг числовых значений Type в строковые
+      const mappedType = (newValue.Type as any) === 0 ? OpcType.DA :
+                        (newValue.Type as any) === 1 ? OpcType.UA :
+                        newValue.Type;
+
+      localSettings.value = {
+        ...newValue,
+        Type: mappedType,
+        // Гарантируем наличие настроек для обоих типов
+        DaSettings: newValue.DaSettings || {
+          Host: '127.0.0.1',
+          ProgId: 'psregulopcda_01',
+          StartPrefix: 'Root.PLC1.IVK_TN_01',
+          UpdateRate: 500
+        },
+        UaSettings: newValue.UaSettings || {
+          ConfigFilename: 'opcua-config.xml',
+          StartPrefix: 'ns=2;s=Root.PLC1',
+          UpdateRate: 500
+        }
+      };
+    }
+  },
+  { immediate: true, deep: true }
+);
+
 onMounted(() => {
   if (!props.modelValue) {
     emit('update:modelValue', localSettings.value);
@@ -151,7 +182,7 @@ function handleTypeChange() {
 .opc-settings {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .field {
@@ -162,12 +193,38 @@ function handleTypeChange() {
 
 .field-type-selector {
   gap: 0;
+  margin-bottom: 0.5rem;
 }
 
 .field label {
   font-weight: 600;
   color: var(--text-color);
   font-size: 0.9rem;
+}
+
+/* Стили для полей ввода в модальном окне OPC */
+:deep(.p-inputtext),
+:deep(.p-inputnumber-input) {
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.p-inputtext:hover),
+:deep(.p-inputnumber-input:hover) {
+  border-color: #B0BEC5 !important;
+}
+
+:deep(.p-inputtext:focus),
+:deep(.p-inputnumber-input:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
 }
 
 /* Кастомные стили для переключателя OPC */

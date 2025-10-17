@@ -39,6 +39,59 @@
       </div>
     </div>
 
+    <!-- Настройки ЕЛИС -->
+    <div class="field field-horizontal">
+      <label for="use-elis">Использовать ЕЛИС:</label>
+      <ToggleSwitch
+        id="use-elis"
+        v-model="elisEnabled"
+      />
+    </div>
+
+    <!-- Поля настроек ЕЛИС (отображаются только когда ЕЛИС включен) -->
+    <template v-if="elisEnabled">
+      <div class="field field-horizontal">
+        <label for="elis-ost-key">OstKey:</label>
+        <InputText
+          id="elis-ost-key"
+          v-model="elisOstKey"
+          placeholder="Ключ ОСТ"
+          class="field-input-flex"
+        />
+      </div>
+
+      <div class="field field-horizontal">
+        <label for="elis-sikn-key">SiknKey:</label>
+        <InputText
+          id="elis-sikn-key"
+          v-model="elisSiknKey"
+          placeholder="Ключ СИКН"
+          class="field-input-flex"
+        />
+      </div>
+
+      <div class="field field-horizontal">
+        <label for="elis-client-name">ClientName:</label>
+        <InputText
+          id="elis-client-name"
+          v-model="elisClientName"
+          placeholder="Имя клиента"
+          class="field-input-flex"
+        />
+      </div>
+
+      <div class="field field-horizontal">
+        <label for="elis-client-token">ClientToken:</label>
+        <InputText
+          id="elis-client-token"
+          v-model="elisClientToken"
+          placeholder="Токен клиента"
+          class="field-input-flex"
+          disabled
+        />
+      </div>
+    </template>
+
     <!-- Заполнитель для растягивания по высоте -->
     <div class="spacer"></div>
 
@@ -167,6 +220,79 @@ const armOpcSettings = computed({
     });
   }
 });
+
+// ЕЛИС настройки
+const elisEnabled = computed({
+  get: () => currentConfig.value?.Elis?.Use || false,
+  set: (value: boolean) => {
+    const currentElis = currentConfig.value?.Elis;
+    configStore.updateGeneralSettings({
+      Elis: {
+        Use: value,
+        OstKey: currentElis?.OstKey || '',
+        SiknKey: currentElis?.SiknKey || '',
+        ClientName: currentElis?.ClientName || '',
+        ClientToken: currentElis?.ClientToken || ''
+      }
+    });
+  }
+});
+
+const elisOstKey = computed({
+  get: () => currentConfig.value?.Elis?.OstKey || '',
+  set: (value: string) => {
+    const currentElis = currentConfig.value?.Elis;
+    configStore.updateGeneralSettings({
+      Elis: {
+        Use: currentElis?.Use || false,
+        OstKey: value,
+        SiknKey: currentElis?.SiknKey || '',
+        ClientName: currentElis?.ClientName || '',
+        ClientToken: currentElis?.ClientToken || ''
+      }
+    });
+  }
+});
+
+const elisSiknKey = computed({
+  get: () => currentConfig.value?.Elis?.SiknKey || '',
+  set: (value: string) => {
+    const currentElis = currentConfig.value?.Elis;
+    configStore.updateGeneralSettings({
+      Elis: {
+        Use: currentElis?.Use || false,
+        OstKey: currentElis?.OstKey || '',
+        SiknKey: value,
+        ClientName: currentElis?.ClientName || '',
+        ClientToken: currentElis?.ClientToken || ''
+      }
+    });
+  }
+});
+
+const elisClientName = computed({
+  get: () => currentConfig.value?.Elis?.ClientName || '',
+  set: (value: string) => {
+    const currentElis = currentConfig.value?.Elis;
+    configStore.updateGeneralSettings({
+      Elis: {
+        Use: currentElis?.Use || false,
+        OstKey: currentElis?.OstKey || '',
+        SiknKey: currentElis?.SiknKey || '',
+        ClientName: value,
+        ClientToken: currentElis?.ClientToken || ''
+      }
+    });
+  }
+});
+
+const elisClientToken = computed({
+  get: () => currentConfig.value?.Elis?.ClientToken || '',
+  set: (value: string) => {
+    // Это поле только для чтения, setter не должен ничего делать
+    // Но оставляем его для соответствия интерфейсу v-model
+  }
+});
 </script>
 
 <style scoped>
@@ -269,6 +395,43 @@ const armOpcSettings = computed({
 
 :deep(.p-inputtext#export-path:hover) {
   border-color: #B0BEC5 !important;
+}
+
+/* Стили для полей ЕЛИС */
+:deep(.p-inputtext#elis-ost-key),
+:deep(.p-inputtext#elis-sikn-key),
+:deep(.p-inputtext#elis-client-name),
+:deep(.p-inputtext#elis-client-token) {
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.p-inputtext#elis-ost-key:focus),
+:deep(.p-inputtext#elis-sikn-key:focus),
+:deep(.p-inputtext#elis-client-name:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
+}
+
+:deep(.p-inputtext#elis-ost-key:hover),
+:deep(.p-inputtext#elis-sikn-key:hover),
+:deep(.p-inputtext#elis-client-name:hover) {
+  border-color: #B0BEC5 !important;
+}
+
+/* Disabled поле ClientToken */
+:deep(.p-inputtext#elis-client-token:disabled) {
+  background-color: #F5F5F5 !important;
+  color: #9E9E9E !important;
+  cursor: not-allowed !important;
+  border-color: #E0E0E0 !important;
 }
 
 :deep(.p-inputswitch) {
