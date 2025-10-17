@@ -35,7 +35,9 @@
       "Bash(git restore:*)",
       "Bash(npm run build:configurator:*)",
       "Bash(netstat:*)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "Bash(dotnet build)",
+      "Bash(dotnet test:*)"
     ],
     "deny": [],
     "ask": []
