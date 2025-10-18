@@ -54,8 +54,9 @@
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
       dateFormat="dd.mm.yy"
+      updateModelType="replace"
       class="w-full"
-      @date-select="handleChange"
+      @update:modelValue="handleChange"
     />
 
     <!-- DateTime (дата и время) -->
@@ -68,8 +69,9 @@
       dateFormat="dd.mm.yy"
       :showTime="true"
       hourFormat="24"
+      updateModelType="replace"
       class="w-full"
-      @date-select="handleChange"
+      @update:modelValue="handleChange"
     />
 
     <!-- Сообщение об ошибке валидации -->
