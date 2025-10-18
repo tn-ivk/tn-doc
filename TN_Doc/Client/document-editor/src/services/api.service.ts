@@ -19,7 +19,7 @@ class DocumentApiService {
     // Интерсептор для логирования запросов
     this.api.interceptors.request.use(
       (config) => {
-        console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, config.data);
+        console.log(`[API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`, config.data);
         return config;
       },
       (error) => {

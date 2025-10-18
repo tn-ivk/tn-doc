@@ -3,7 +3,7 @@ import DocumentEditor from '@/views/DocumentEditor.vue';
 import ErrorPage from '@/views/ErrorPage.vue';
 
 const router = createRouter({
-  history: createWebHistory('/document-editor/'),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/edit/:deviceId/:docType/:id',

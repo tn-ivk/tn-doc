@@ -3,10 +3,12 @@ import vue from '@vitejs/plugin-vue';
 import { resolve } from 'node:path';
 import { createBaseConfig } from '../vite.config.base';
 
+const baseConfig = createBaseConfig(__dirname);
+
 export default defineConfig({
-  ...createBaseConfig(__dirname),
+  ...baseConfig,
   plugins: [vue()],
-  base: '/document-editor/',
+  base: process.env.NODE_ENV === 'production' ? '/document-editor/' : '/',
   build: {
     outDir: resolve(__dirname, '../../wwwroot/document-editor'),
     emptyOutDir: true,
@@ -16,6 +18,7 @@ export default defineConfig({
     }
   },
   server: {
+    ...baseConfig.server,
     port: 5174,
     strictPort: true
   }
