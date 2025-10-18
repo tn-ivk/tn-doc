@@ -33,11 +33,11 @@ If this is your first time working with the codebase:
    dotnet build
    ```
 
-3. **Build Vue components** (StatusBar and Configurator):
+3. **Build Vue components** (StatusBar и Configurator):
    ```bash
    cd TN_Doc/Client
    npm install
-   npm run build:all
+   npm run build:all  # Соберёт оба приложения
    cd ../..
    ```
 
@@ -128,6 +128,14 @@ dotnet run --verbosity detailed
 ```
 
 ### Building Vue Components (StatusBar & Configurator)
+
+**Структура npm workspace монорепозитория:**
+- `TN_Doc/Client/` - корневой workspace с унифицированными скриптами
+- `statusbar/` - Приложение мониторинга состояния системы
+- `configurator/` - Веб-интерфейс управления конфигурацией
+- `shared/` - Общие TypeScript утилиты и API клиент
+- Общий стек: Vue 3.4.21 + TypeScript + PrimeVue 4.2+ + Vite
+
 ```bash
 # Navigate to Client project root (monorepo workspace)
 cd TN_Doc/Client
@@ -179,6 +187,9 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 # Run tests for specific class
 dotnet test --filter "ClassName=AppConfigServiceTests"
+
+# Run tests for KMH libraries
+dotnet test --filter "ClassName~Kmh"
 
 # Run tests with code coverage
 dotnet test /p:CollectCoverage=true
@@ -463,34 +474,41 @@ The application includes a real-time status bar built with **Vue 3 + PrimeVue** 
   - Tooltip: Contextual help
 
 ### Configurator Architecture
-The application includes a web-based configuration interface built with **Vue 3 + PrimeVue**:
-- **Frontend Stack**:
-  - Vue 3.4.21 with TypeScript
-  - **PrimeVue 4.2+** - Enterprise UI component library
-  - Pinia for state management
-  - Axios HTTP client
-  - Vite as build tool
-  - Source: `/TN_Doc/Client/configurator/`
-- **Features**:
-  - General settings tab: export paths, security features, local OPC client config
-  - Devices tab: device list with search, multi-select for batch editing, mixed-state indicators
-  - Per-device configuration: enabled state, document templates, DB connections, OPC settings
-  - Real-time validation with backend validators (OpcConfigValidator, DbConfigValidator)
-  - Unsaved changes protection (browser beforeunload warning)
-  - Change logging with diff calculation
-- **Backend Components**:
-  - `ConfiguratorController`: REST API at `/api/configurator/`
-  - `ConfigurationService`: Business logic and config file management
-  - `OpcConfigValidator`, `DbConfigValidator`: Server-side validation
-- **PrimeVue Components Used**:
-  - TabView/TabPanel: Main navigation
-  - DataTable: Device list with search/selection
-  - InputSwitch: Toggle controls
-  - MultiSelect: Document template selection
-  - InputText/Password: Form inputs
-  - Button: Actions with loading states
-  - Message: Validation errors and warnings
-  - Tag: Document template badges
+Веб-интерфейс для управления конфигурацией, доступен по адресу `/configurator`:
+
+**Frontend (Vue 3 + PrimeVue):**
+- **Tech Stack**:
+  - Vue 3.4.21 с TypeScript
+  - **PrimeVue 4.2+** - Enterprise UI библиотека компонентов
+  - Pinia для управления состоянием
+  - Axios HTTP клиент
+  - Vite как сборщик
+  - Исходники: `/TN_Doc/Client/configurator/`
+
+- **Функциональность**:
+  - **Вкладка "Общие настройки"**: пути экспорта, функции безопасности, локальный OPC клиент
+  - **Вкладка "Устройства"**: список устройств с поиском, мультивыбор для пакетного редактирования, индикаторы смешанного состояния
+  - **Редактор устройства**: состояние включено/выключено, шаблоны документов, подключения к БД, настройки OPC
+  - Валидация в реальном времени с бэкенд валидаторами
+  - Защита от потери несохранённых изменений (browser beforeunload warning)
+  - Журнал изменений с расчётом diff
+
+**Backend компоненты:**
+- `ConfiguratorController`: REST API `/api/configurator/`
+- `ConfigurationService`: Бизнес-логика и управление файлами конфигурации
+- `OpcConfigValidator`, `DbConfigValidator`: Серверная валидация настроек
+
+**Используемые PrimeVue компоненты:**
+- TabView/TabPanel: Основная навигация
+- DataTable: Список устройств с поиском/выбором
+- InputSwitch: Переключатели
+- MultiSelect: Выбор шаблонов документов
+- InputText/Password: Поля ввода
+- Button: Действия с состояниями загрузки
+- Message: Ошибки валидации и предупреждения
+- Tag: Метки шаблонов документов
+
+**Доступ:** http://localhost:PORT/configurator
 
 ### Document Generation Architecture
 The system uses a factory pattern with dynamic module loading:
@@ -767,18 +785,18 @@ The system contains the following document libraries that require test coverage:
 ### Git Workflow Notes
 
 **Branch Strategy:**
-- **master**: Production branch (stable releases)
-- **develop**: Main development branch (active development)
-- **developWork**: Personal/experimental work branch (temporary)
-- **feature/**: Feature branches for specific tasks
-- **bugs/**: Bug fix branches
-- **projects/**: Project-specific branches (e.g., projects/sikn-531-gazprom)
+- **master**: Production ветка (только стабильные релизы)
+- **develop**: Основная ветка разработки ⭐ (используйте для новых фич)
+- **developWork**: Личная/экспериментальная ветка (временная)
+- **feature/***: Ветки функциональности (создавать от develop)
+- **bugs/***: Исправление ошибок
+- **projects/***: Проектные ветки (например, projects/sikn-531-gazprom)
 
 **Branch Guidelines:**
-- Always branch from `develop` for new features
-- Merge back to `develop` after testing
-- Use descriptive branch names (e.g., `feature/status-bar-improvements`)
-- Delete feature branches after merging
+- Всегда создавайте новые ветки от `develop`
+- Мержите обратно в `develop` после тестирования
+- Используйте описательные имена (например, `feature/status-bar-improvements`)
+- Удаляйте feature ветки после мерджа
 
 **Commit Message Rules:**
 - NEVER mention AI, automated generation, or "Claude" in commit messages
