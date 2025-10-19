@@ -3477,6 +3477,7 @@
     "ClientToken": ""
   },
   "UseSecurityFeatures": false,
+  "UseVueDocumentEditor": true,
   "ArmOpcConnectionSettings": {
     "Type": 1,
     "DaSettings": {

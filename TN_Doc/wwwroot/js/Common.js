@@ -944,39 +944,68 @@ function GetEditDoc() {
             async: false,
             url: 'Home/GetDocEdit',
             type: 'GET',
+            dataType: 'json', // Ожидаем JSON ответ
             data: {
                 IdDevice: $('#ComboboxDevice').val(),
                 IdDoc: $('#ComboboxDocGUID').val(),
                 id: currentId
             },
-            success: function (htmlContent) {
-                // Нормализуем базовый URL для ресурсов внутри blob-документа
-                try {
-                    const baseHref = window.location.origin + '/';
-                    if (typeof htmlContent === 'string' && !/\bbase\s+href=/i.test(htmlContent)) {
-                        htmlContent = htmlContent.replace('<head>', '<head><base href="' + baseHref + '">');
-                    }
-                } catch (e) {
-                    // если по какой-то причине не удалось модифицировать HTML, продолжаем без падения
-                    console && console.warn && console.warn('Не удалось вставить <base href> для blob HTML:', e);
+            success: function (response) {
+                // Проверяем, является ли ответ JSON с флагом useVue
+                if (response && response.useVue === true && response.url) {
+                    // Используем Vue Document Editor
+                    console.log('Загружается Vue Document Editor:', response.url);
+
+                    // Освобождаем предыдущий Blob URL, если он существует
+                    $('.FR').each(function () {
+                        const oldSrc = $(this).attr('src');
+                        if (oldSrc && oldSrc.startsWith('blob:')) {
+                            URL.revokeObjectURL(oldSrc);
+                        }
+                        // Устанавливаем URL на Vue SPA
+                        $(this).attr('src', response.url);
+                    });
+                } else {
+                    // Старый подход - HTML контент (не должен попасть сюда с dataType: 'json')
+                    console.warn('Неожиданный формат ответа от GetDocEdit');
                 }
-
-                // Создаём Blob из HTML-контента
-                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-                const blobUrl = URL.createObjectURL(blob);
-
-                // Освобождаем предыдущий Blob URL, если он существует
-                $('.FR').each(function () {
-                    const oldSrc = $(this).attr('src');
-                    if (oldSrc && oldSrc.startsWith('blob:')) {
-                        URL.revokeObjectURL(oldSrc);
-                    }
-                    $(this).attr('src', blobUrl);
-                });
 
                 $('#viewPanel').prop('hidden', true);
                 $('#editPanel').prop('hidden', false);
+            },
+            error: function(xhr, status, error) {
+                // Если ответ не JSON, пробуем обработать как HTML (старый подход)
+                if (xhr.responseText && typeof xhr.responseText === 'string') {
+                    var htmlContent = xhr.responseText;
 
+                    // Нормализуем базовый URL для ресурсов внутри blob-документа
+                    try {
+                        const baseHref = window.location.origin + '/';
+                        if (!/\bbase\s+href=/i.test(htmlContent)) {
+                            htmlContent = htmlContent.replace('<head>', '<head><base href="' + baseHref + '">');
+                        }
+                    } catch (e) {
+                        console && console.warn && console.warn('Не удалось вставить <base href> для blob HTML:', e);
+                    }
+
+                    // Создаём Blob из HTML-контента
+                    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                    const blobUrl = URL.createObjectURL(blob);
+
+                    // Освобождаем предыдущий Blob URL, если он существует
+                    $('.FR').each(function () {
+                        const oldSrc = $(this).attr('src');
+                        if (oldSrc && oldSrc.startsWith('blob:')) {
+                            URL.revokeObjectURL(oldSrc);
+                        }
+                        $(this).attr('src', blobUrl);
+                    });
+
+                    $('#viewPanel').prop('hidden', true);
+                    $('#editPanel').prop('hidden', false);
+                } else {
+                    console.error('Ошибка загрузки формы редактирования:', error);
+                }
             }
         });
 

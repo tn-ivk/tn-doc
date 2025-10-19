@@ -546,7 +546,8 @@ public class HomeController : Controller
         }
     }
 
-    public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
+    [HttpGet]
+    public IActionResult GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
     {
         try
         {
@@ -554,22 +555,48 @@ public class HomeController : Controller
             if (id == 0)
             {
                 _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
-                return string.Empty;
+                return Content(string.Empty);
             }
-            
+
+            // Проверяем флаг использования Vue Document Editor
+            if (_cfgApp.UseVueDocumentEditor && IsDocumentSupportedInVueEditor(IdDoc))
+            {
+                _logger.LogInformation($"Используется Vue Document Editor для документа {IdDoc}");
+                var vueUrl = $"/document-editor/edit/{IdDevice}/{IdDoc}/{id}";
+                return Json(new { useVue = true, url = vueUrl });
+            }
+
+            // Старый подход - генерация HTML на сервере
             var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
                 _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return string.Empty;
+                return Content(string.Empty);
             }
-            return doc.GetEditDoc(id);
+            var htmlContent = doc.GetEditDoc(id);
+            return Content(htmlContent, "text/html");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Ошибка при получении формы редактирования документа {IdDoc} для устройства {IdDevice}");
-            return string.Empty;
+            return Content(string.Empty);
         }
+    }
+
+    /// <summary>
+    /// Проверяет, поддерживается ли документ в Vue Editor
+    /// </summary>
+    private bool IsDocumentSupportedInVueEditor(IdDoc idDoc)
+    {
+        // На данный момент поддерживается только Report
+        // В будущем добавим другие документы
+        return idDoc switch
+        {
+            IdDoc.Report => true,
+            // IdDoc.Jornal => true,  // TODO: будет добавлено позже
+            // IdDoc.Act => true,     // TODO: будет добавлено позже
+            _ => false
+        };
     }
 
 
