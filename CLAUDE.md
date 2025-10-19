@@ -14,7 +14,8 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 **Important Notes:**
 - NEVER mention AI, code generation, or "Claude" in commit messages
-- Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, and status bar cleanup
+- Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, status bar cleanup, and experimental Document Editor (POC)
+- Current active branch: feature/additional-info-table (работа над функционалом дополнительной информации)
 
 ## Quick Start for New Developers
 
@@ -33,11 +34,11 @@ If this is your first time working with the codebase:
    dotnet build
    ```
 
-3. **Build Vue components** (StatusBar и Configurator):
+3. **Build Vue components** (StatusBar, Configurator, Document Editor):
    ```bash
    cd TN_Doc/Client
    npm install
-   npm run build:all  # Соберёт оба приложения
+   npm run build:all  # Соберёт все приложения (statusbar, configurator, document-editor)
    cd ../..
    ```
 
@@ -127,12 +128,13 @@ dotnet run --verbosity detailed
 # - API endpoints: http://localhost:PORT/api/*
 ```
 
-### Building Vue Components (StatusBar & Configurator)
+### Building Vue Components (StatusBar, Configurator & Document Editor)
 
 **Структура npm workspace монорепозитория:**
 - `TN_Doc/Client/` - корневой workspace с унифицированными скриптами
 - `statusbar/` - Приложение мониторинга состояния системы
 - `configurator/` - Веб-интерфейс управления конфигурацией
+- `document-editor/` - Экспериментальный редактор документов (POC)
 - `shared/` - Общие TypeScript утилиты и API клиент
 - Общий стек: Vue 3.4.21 + TypeScript + PrimeVue 4.2+ + Vite
 
@@ -151,13 +153,19 @@ npm run dev --workspace=statusbar
 # Development mode - Configurator with hot reload
 npm run dev:configurator
 
+# Development mode - Document Editor with hot reload (experimental POC)
+npm run dev:editor
+
 # Build StatusBar for production
 npm run build
 
 # Build Configurator for production
 npm run build:configurator
 
-# Build all Vue apps (StatusBar + Configurator)
+# Build Document Editor for production (experimental POC)
+npm run build:editor
+
+# Build all Vue apps (StatusBar + Configurator + Document Editor)
 npm run build:all
 
 # Type checking across all workspaces
@@ -169,6 +177,7 @@ npm run clean
 # Build outputs:
 # - StatusBar: TN_Doc/wwwroot/statusbar/
 # - Configurator: TN_Doc/wwwroot/configurator/
+# - Document Editor: TN_Doc/wwwroot/document-editor/ (experimental)
 ```
 
 ### Testing
@@ -275,6 +284,7 @@ The following projects must be deployed at the same level (all share TN_Doc conf
 - **TN_Doc/Client/**: Frontend applications (npm workspace monorepo)
   - `statusbar/`: Real-time status monitoring Vue 3 app
   - `configurator/`: Configuration management Vue 3 app
+  - `document-editor/`: Experimental document editing Vue 3 app (POC)
   - `shared/`: Shared TypeScript utilities and API client
   - `package.json`: Workspace root with unified scripts
   - `vite.config.base.ts`: Shared Vite configuration
@@ -510,6 +520,33 @@ The application includes a real-time status bar built with **Vue 3 + PrimeVue** 
 
 **Доступ:** http://localhost:PORT/configurator
 
+### Document Editor Architecture (Experimental POC)
+Экспериментальный Vue-интерфейс для редактирования документов, находится в активной разработке:
+
+**Frontend (Vue 3 + PrimeVue):**
+- **Tech Stack**:
+  - Vue 3.4.21 с TypeScript
+  - **PrimeVue 4.2+** - Enterprise UI библиотека компонентов
+  - Pinia для управления состоянием
+  - Axios HTTP клиент
+  - Vite как сборщик
+  - Исходники: `/TN_Doc/Client/document-editor/`
+
+**Функциональность (в разработке):**
+- Редактирование документов через Vue-интерфейс
+- Интеграция с существующим DocumentEditController
+- Динамическая генерация форм на основе конфигурации
+
+**Статус:**
+- POC (Proof of Concept) - в активной разработке
+- Экспериментальная ветка: feature/additional-info-table
+- Не рекомендуется для production использования
+
+**Backend компоненты:**
+- `DocumentEditController`: REST API `/api/document-edit/` (существующий контроллер)
+
+**Доступ:** http://localhost:PORT/document-editor (в разработке)
+
 ### Document Generation Architecture
 The system uses a factory pattern with dynamic module loading:
 - **IAppConfigService**: Singleton that manages configuration and provides `GetDocumentClass(idDevice, idDoc)` factory method
@@ -600,7 +637,8 @@ The application uses in-memory PDF generation (implemented in v1.4.1):
    ```bash
    cd TN_Doc/Client
    npm run dev              # StatusBar with hot reload
-   npm run dev:configurator  # Configurator with hot reload
+   npm run dev:configurator # Configurator with hot reload
+   npm run dev:editor       # Document Editor with hot reload (experimental)
    ```
 
 4. **Run tests frequently**:
@@ -678,10 +716,11 @@ The application uses in-memory PDF generation (implemented in v1.4.1):
 - **Node.js/npm errors**: Ensure Node.js 18+ and npm 8+ are installed for Vue components
 
 **Vue Component Issues:**
-- **Build fails for StatusBar/Configurator**: Run `npm install` in `TN_Doc/Client/` first
+- **Build fails for StatusBar/Configurator/Document Editor**: Run `npm install` in `TN_Doc/Client/` first
 - **Hot reload not working**: Check Vite dev server is running on correct port
 - **TypeScript errors**: Run `npm run type-check` to see all type issues
 - **Stale build output**: Run `npm run clean` in `TN_Doc/Client/` and rebuild
+- **Document Editor POC issues**: Check feature/additional-info-table branch for latest changes
 
 **Document Generation:**
 - **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
