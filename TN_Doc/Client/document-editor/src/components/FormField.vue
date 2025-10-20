@@ -1,6 +1,10 @@
 <template>
-  <div class="form-field">
-    <label :for="field.key" class="field-label">
+  <div class="form-field" :class="{ compact: hideLabel }">
+    <label
+      v-if="!hideLabel"
+      :for="field.key"
+      class="field-label"
+    >
       {{ field.label }}
       <span v-if="field.required" class="required-mark">*</span>
     </label>
@@ -13,10 +17,10 @@
       :options="field.options"
       optionLabel="label"
       optionValue="value"
-      :placeholder="`Выберите ${field.label.toLowerCase()}`"
+      :placeholder="hideLabel ? '' : `Выберите ${field.label.toLowerCase()}`"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
-      class="w-full"
+      class="field-control"
       @change="handleChange"
     />
 
@@ -25,10 +29,10 @@
       v-else-if="field.type === 'text'"
       :id="field.key"
       v-model="localValue"
-      :placeholder="field.label"
+      :placeholder="hideLabel ? '' : field.label"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
-      class="w-full"
+      class="field-control"
       @input="handleChange"
     />
 
@@ -37,12 +41,12 @@
       v-else-if="field.type === 'number'"
       :id="field.key"
       v-model="localValue"
-      :placeholder="field.label"
+      :placeholder="hideLabel ? '' : field.label"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
       :minFractionDigits="field.roundValue || 0"
       :maxFractionDigits="field.roundValue || 2"
-      class="w-full"
+      class="field-control"
       @input="handleChange"
     />
 
@@ -55,7 +59,7 @@
       :class="{ 'p-invalid': !isValid }"
       dateFormat="dd.mm.yy"
       updateModelType="replace"
-      class="w-full"
+      class="field-control"
       @update:modelValue="handleChange"
     />
 
@@ -70,7 +74,7 @@
       :showTime="true"
       hourFormat="24"
       updateModelType="replace"
-      class="w-full"
+      class="field-control"
       @update:modelValue="handleChange"
     />
 
@@ -92,6 +96,7 @@ import type { FormField } from '@/types/document.types';
 const props = defineProps<{
   field: FormField;
   modelValue: any;
+  hideLabel?: boolean;
 }>();
 
 const emit = defineEmits<{
