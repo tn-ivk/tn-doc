@@ -86,7 +86,6 @@ export const useDocumentStore = defineStore('document', () => {
     }
 
     isSaving.value = true;
-    error.value = null;
 
     try {
       const response = await documentApi.saveDocument(
@@ -103,7 +102,8 @@ export const useDocumentStore = defineStore('document', () => {
         throw new Error(response.error || 'Не удалось сохранить документ');
       }
     } catch (err: any) {
-      error.value = err.response?.data?.error || err.message || 'Ошибка при сохранении документа';
+      // НЕ устанавливаем error.value, чтобы форма продолжала отображаться
+      // Ошибка будет показана через Toast в DocumentEditor.vue
       console.error('[DocumentStore] Ошибка сохранения:', err);
       throw err;
     } finally {

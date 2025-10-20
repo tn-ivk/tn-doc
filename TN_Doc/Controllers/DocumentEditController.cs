@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using TN_DocGeneral.Interfaces;
@@ -123,8 +124,30 @@ public class DocumentEditController : ControllerBase
             }
 
             // Сохраняем документ
-            var jsonString = data.GetRawText();
-            var success = doc.SaveDoc(jsonString);
+            bool success;
+
+            // Проверяем, реализует ли документ IDocumentEditor (новый формат)
+            if (doc is IDocumentEditor editor)
+            {
+                _logger.Trace($"Использование IDocumentEditor.SaveDocument для {docType}");
+
+                // Десериализуем JSON в словарь
+                var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(data.GetRawText());
+                if (values == null)
+                {
+                    _logger.Error("Не удалось десериализовать данные документа");
+                    return BadRequest(new { error = "Invalid document data" });
+                }
+
+                success = editor.SaveDocument(id, values);
+            }
+            else
+            {
+                _logger.Trace($"Использование старого SaveDoc для {docType}");
+                // Используем старый метод для обратной совместимости
+                var jsonString = data.GetRawText();
+                success = doc.SaveDoc(jsonString);
+            }
 
             if (success)
             {
