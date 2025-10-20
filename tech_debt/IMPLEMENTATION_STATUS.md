@@ -4,9 +4,9 @@
 
 **Текущий этап:** Stage 1 - Report Document Editor (Backend + Frontend)
 
-**Статус:** ✅ Backend завершён, ✅ Frontend завершён, ⏳ Тестирование
+**Статус:** ✅ Backend завершён, ✅ Frontend завершён, ✅ Production build готов, ⏳ Тестирование
 
-**Прогресс:** ~75% Stage 1 завершено
+**Прогресс:** ~90% Stage 1 завершено
 
 ## ✅ Что реализовано
 
@@ -114,7 +114,7 @@
    - ⏳ Ручное тестирование через dev сервер
    - ⏳ Проверка API endpoints
    - ⏳ Проверка сохранения в БД
-   - ⏳ Тестирование production build
+   - ✅ Production build выполнен (`TN_Doc/wwwroot/document-editor/`)
 
 ## ✅ Завершено (Stage 1 - Интеграция)
 
@@ -222,11 +222,14 @@
 - [x] Store готов
 - [x] Компоненты готовы
 - [x] Документация создана
-- [ ] Зависимости установлены (`npm install`)
+- [x] Зависимости установлены (`npm install`)
+- [x] Production build выполнен (`npm run build:editor`)
 - [ ] Backend запущен (`dotnet run`)
 - [ ] Frontend dev server запущен (`npm run dev:editor`)
 - [ ] Тесты API выполнены
 - [ ] Тесты в браузере выполнены
 - [ ] Production build протестирован
 
-**Следующий шаг:** Выполнить установку зависимостей и запустить тестирование согласно [TESTING.md](../TN_Doc/Client/document-editor/TESTING.md)
+**Следующий шаг:** Запустить backend и frontend dev server, затем выполнить ручное тестирование согласно [TESTING.md](../TN_Doc/Client/document-editor/TESTING.md)
+
+**Production build готов:** Файлы собраны в `TN_Doc/wwwroot/document-editor/` (index.html + assets)
