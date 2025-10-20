@@ -233,9 +233,15 @@ public class StatusProvider : IStatusProvider
             _logger.LogDebug("Проверка Messaging Service: {Status} за {LatencyMs}мс",
                 status.IsConnected ? "Подключен" : "Отключен", status.LatencyMs);
         }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogWarning(ex, "Не удалось подключиться к Messaging Service: истекло время подключения");
+            status.Error = ex.Message;
+            status.LastChecked = DateTime.Now;
+        }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Не удалось подключиться к Messaging Service: {ErrorMessage}", ex.Message);
+            _logger.LogError(ex, "Не удалось подключиться к Messaging Service: {ErrorMessage}", ex.Message);
             status.Error = ex.Message;
             status.LastChecked = DateTime.Now;
         }
