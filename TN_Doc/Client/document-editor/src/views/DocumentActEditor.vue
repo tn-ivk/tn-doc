@@ -47,6 +47,7 @@ import FormField from '@/components/FormField.vue';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentEditor } from '@/composables/useDocumentEditor';
+import { useActAutoFill } from '@/composables/useActAutoFill';
 
 // Используем общую логику редактирования документов
 const {
@@ -57,9 +58,15 @@ const {
   setupBeforeUnloadHandler
 } = useDocumentEditor();
 
+// Используем логику автозаполнения для Актов
+const { setupAutoFillWatchers } = useActAutoFill();
+
 // Загружаем документ при монтировании
 onMounted(async () => {
   await loadDocument();
+
+  // Настраиваем автозаполнение связанных полей для Актов
+  setupAutoFillWatchers();
 });
 
 // Экспонируем SaveDoc() для главного окна
@@ -75,6 +82,7 @@ setupBeforeUnloadHandler();
 </script>
 
 <style scoped>
+/* Переиспользуем стили из базового DocumentEditor */
 .document-editor {
   background-color: var(--md-surface);
   font-family: 'Segoe UI', 'PT Astra Sans', 'Helvetica Neue', Arial, sans-serif;
@@ -125,7 +133,6 @@ setupBeforeUnloadHandler();
   font-size: 15px;
   color: var(--md-text);
 }
-
 
 .editor-table td {
   border: 1px solid var(--md-outline);
