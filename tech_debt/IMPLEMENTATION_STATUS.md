@@ -126,14 +126,25 @@
    - ✅ Модифицирован JavaScript (Common.js) для поддержки обоих редакторов
    - ✅ Создана документация по интеграции (VUE_EDITOR_INTEGRATION.md)
 
+## ✅ Завершено (Stage 1 - Улучшения UI)
+
+1. **Toast уведомления**
+   - ✅ ToastService добавлен в main.ts
+   - ✅ ConfirmationService добавлен в main.ts
+   - ✅ Toast компонент добавлен в App.vue
+   - ✅ ConfirmDialog компонент добавлен в App.vue
+   - ✅ Кнопки "Сохранить" и "Отмена" в DocumentEditor.vue
+   - ✅ Toast уведомления при успешном сохранении
+   - ✅ Toast уведомления при ошибках
+   - ✅ ConfirmDialog для подтверждения отмены изменений
+   - ✅ Toast уведомление при загрузке документа
+   - Статус: **Завершено**
+
 ## ⬜ Ещё не начато (Stage 1)
 
 1. **Тесты**
    - ⬜ Unit тесты для DocumentEditController
    - ⬜ Unit тесты для Vue компонентов (Vitest)
-
-2. **Улучшения** (можно отложить на Stage 2)
-   - ⬜ Toast уведомления вместо alert/confirm
 
 ## 📝 Следующие этапы
 

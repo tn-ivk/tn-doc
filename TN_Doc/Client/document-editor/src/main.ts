@@ -2,6 +2,8 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
+import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
 import router from './router';
 import App from './App.vue';
 
@@ -76,5 +78,9 @@ app.use(PrimeVue, {
     emptyMessage: 'Нет доступных вариантов'
   }
 });
+
+// Toast и Confirmation сервисы
+app.use(ToastService);
+app.use(ConfirmationService);
 
 app.mount('#app');
