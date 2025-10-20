@@ -15,6 +15,24 @@ export interface DocumentEditConfig {
   initialValues: Record<string, any>;
   /** Идентификатор устройства (целое число) */
   deviceId: number;
+  /** Справочники (лицензии/доверенности и т.д.) */
+  dictionaries?: DocumentDictionaries;
+}
+
+/** Справочники документа */
+export interface DocumentDictionaries {
+  /** Справочник лицензий/доверенностей */
+  licenses?: License[];
+}
+
+/** Лицензия/доверенность */
+export interface License {
+  /** ID лицензии */
+  id: number;
+  /** Номер лицензии */
+  licensesNumber: string;
+  /** Дата лицензии */
+  licensesDate: string;
 }
 
 export interface FormField {
@@ -43,8 +61,18 @@ export interface SelectOption {
   label: string;
   /** Выбрана ли опция по умолчанию */
   selected: boolean;
-  /** Дополнительные данные (для сложных случаев) */
-  data?: Record<string, any>;
+  /** Дополнительные данные пользователя (Factory, FIO, LicId и т.д.) */
+  data?: UserData;
+}
+
+/** Данные пользователя для автозаполнения связанных полей */
+export interface UserData {
+  /** Организация (предприятие) */
+  factory?: string;
+  /** Полное ФИО (Фамилия Имя Отчество) */
+  fio?: string;
+  /** ID доверенности */
+  licId?: number;
 }
 
 export interface SaveDocumentRequest {
