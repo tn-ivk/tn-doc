@@ -2,7 +2,6 @@
   <div
     class="form-field"
     :class="{ compact: hideLabel }"
-    ref="fieldRootRef"
   >
     <label
       v-if="!hideLabel"
@@ -91,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { ref, computed, watch } from 'vue';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
@@ -119,48 +118,9 @@ const isValid = computed(() => {
   return true;
 });
 
-const fieldRootRef = ref<HTMLElement | null>(null);
-
 // Синхронизация с внешним modelValue
 watch(() => props.modelValue, (newValue) => {
   localValue.value = newValue;
-});
-
-onMounted(async () => {
-  await nextTick();
-
-  if (props.field.type === 'select' && fieldRootRef.value) {
-    const dropdownEl = fieldRootRef.value.querySelector(
-      '.p-dropdown, .p-select, [data-pc-name="dropdown"], [data-pc-name="select"]'
-    ) as HTMLElement | null;
-
-    if (dropdownEl) {
-      const styles = getComputedStyle(dropdownEl);
-      // eslint-disable-next-line no-console
-      console.log('[FormField] Dropdown styles', {
-        key: props.field.key,
-        appliedClasses: dropdownEl.className,
-        dataPcName: dropdownEl.getAttribute('data-pc-name'),
-        offsetHeight: dropdownEl.offsetHeight,
-        clientHeight: dropdownEl.clientHeight,
-        height: styles.height,
-        minHeight: styles.minHeight,
-        borderRadius: styles.borderRadius,
-        borderColor: styles.borderColor,
-        padding: styles.padding,
-        boxShadow: styles.boxShadow,
-        fontSize: styles.fontSize,
-        fontFamily: styles.fontFamily
-      });
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('[FormField] Dropdown element not found', {
-        key: props.field.key,
-        fieldRootClasses: fieldRootRef.value.className,
-        innerHTML: fieldRootRef.value.innerHTML
-      });
-    }
-  }
 });
 
 // Обработка изменений
@@ -170,13 +130,6 @@ function handleChange() {
 </script>
 
 <style scoped>
-.form-field {
-  margin-bottom: 1rem;
-}
-
-.form-field.compact {
-  margin-bottom: 0.5rem;
-}
 
 
 .field-control {
@@ -209,7 +162,7 @@ function handleChange() {
   border-radius: var(--md-radius) !important;
   border: 1px solid var(--md-outline) !important;
   background: #ffffff !important;
-  padding: 0;
+  padding: 0 !important;
   display: flex;
   align-items: center;
   box-shadow: none !important;

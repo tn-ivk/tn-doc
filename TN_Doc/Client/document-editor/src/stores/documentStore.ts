@@ -35,8 +35,6 @@ export const useDocumentStore = defineStore('document', () => {
       // Инициализируем formData начальными значениями
       formData.value = { ...loadedConfig.initialValues };
       isDirty.value = false;
-
-      console.log('[DocumentStore] Конфигурация загружена:', loadedConfig);
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Не удалось загрузить конфигурацию документа';
       console.error('[DocumentStore] Ошибка загрузки конфигурации:', err);
@@ -52,7 +50,6 @@ export const useDocumentStore = defineStore('document', () => {
   function updateField(key: string, value: any) {
     formData.value[key] = value;
     isDirty.value = true;
-    console.log(`[DocumentStore] Поле "${key}" обновлено:`, value);
   }
 
   /**
@@ -76,7 +73,6 @@ export const useDocumentStore = defineStore('document', () => {
 
       if (response.success) {
         isDirty.value = false;
-        console.log('[DocumentStore] Документ успешно сохранён');
         return response;
       } else {
         throw new Error(response.error || 'Не удалось сохранить документ');

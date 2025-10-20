@@ -16,28 +16,16 @@ class DocumentApiService {
       }
     });
 
-    // Интерсептор для логирования запросов
+    // Интерсептор для обработки ошибок запросов
     this.api.interceptors.request.use(
-      (config) => {
-        console.log(`[API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`, config.data);
-        return config;
-      },
-      (error) => {
-        console.error('[API Request Error]', error);
-        return Promise.reject(error);
-      }
+      (config) => config,
+      (error) => Promise.reject(error)
     );
 
-    // Интерсептор для логирования ответов
+    // Интерсептор для обработки ошибок ответов
     this.api.interceptors.response.use(
-      (response) => {
-        console.log(`[API Response] ${response.config.url}`, response.data);
-        return response;
-      },
-      (error) => {
-        console.error('[API Response Error]', error.response?.data || error.message);
-        return Promise.reject(error);
-      }
+      (response) => response,
+      (error) => Promise.reject(error)
     );
   }
 

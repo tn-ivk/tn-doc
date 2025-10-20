@@ -61,13 +61,7 @@ const handleSave = async () => {
     // Успешное сохранение - НЕ показываем Toast
     // Главное окно само обработает результат
   } catch (error: any) {
-    // Показываем Toast только при ошибке
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка сохранения',
-      detail: error.message || 'Не удалось сохранить документ',
-      life: 5000
-    });
+  // Ошибка уже сохранена в store, сообщение отображается в UI
   }
 };
 
@@ -86,15 +80,11 @@ onMounted(async () => {
     return;
   }
 
-  try {
-    await store.loadConfig(
-      parseInt(deviceId as string, 10),
-      docType as string,
-      parseInt(id as string, 10)
-    );
-  } catch (error: any) {
-    console.error('Ошибка загрузки документа:', error);
-  }
+  await store.loadConfig(
+    parseInt(deviceId as string, 10),
+    docType as string,
+    parseInt(id as string, 10)
+  );
 });
 
 // Отслеживаем изменения и уведомляем главное окно
@@ -182,7 +172,7 @@ onBeforeUnmount(() => {
 
 .editor-table td {
   border: 1px solid var(--md-outline);
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.5rem;
   vertical-align: middle;
 }
 
@@ -194,11 +184,6 @@ onBeforeUnmount(() => {
   color: var(--md-text);
   white-space: nowrap;
   padding-right: 0.75rem;
-}
-
-.editor-input-cell {
-  background-color: transparent;
-  width: 100%;
 }
 
 .label-text {
