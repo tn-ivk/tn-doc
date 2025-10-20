@@ -558,15 +558,21 @@ public class HomeController : Controller
                 return Content(string.Empty);
             }
 
+            // ДИАГНОСТИКА: Выводим значения флагов для отладки
+            var useVueFlag = _cfgApp.UseVueDocumentEditor;
+            var isSupportedInVue = IsDocumentSupportedInVueEditor(IdDoc);
+            _logger.LogInformation($"[ДИАГНОСТИКА] UseVueDocumentEditor={useVueFlag}, IsDocumentSupportedInVueEditor({IdDoc})={isSupportedInVue}");
+
             // Проверяем флаг использования Vue Document Editor
-            if (_cfgApp.UseVueDocumentEditor && IsDocumentSupportedInVueEditor(IdDoc))
+            if (useVueFlag && isSupportedInVue)
             {
-                _logger.LogInformation($"Используется Vue Document Editor для документа {IdDoc}");
                 var vueUrl = $"/document-editor/edit/{IdDevice}/{IdDoc}/{id}";
+                _logger.LogInformation($"[Vue Editor] Используется Vue Document Editor для документа {IdDoc}, URL: {vueUrl}");
                 return Json(new { useVue = true, url = vueUrl });
             }
 
             // Старый подход - генерация HTML на сервере
+            _logger.LogInformation($"[Legacy Editor] Используется старый HTML-редактор для документа {IdDoc}");
             var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
             if (doc is null)
             {
