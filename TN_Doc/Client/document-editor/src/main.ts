@@ -9,6 +9,7 @@ import App from './App.vue';
 
 // PrimeVue CSS
 import 'primeicons/primeicons.css';
+import '../../../wwwroot/css/material3.css';
 
 const app = createApp(App);
 
