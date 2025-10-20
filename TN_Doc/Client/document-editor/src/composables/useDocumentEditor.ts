@@ -1,5 +1,4 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { useDocumentStore } from '@/stores/documentStore';
 
@@ -8,7 +7,6 @@ import { useDocumentStore } from '@/stores/documentStore';
  * Переиспользуется в DocumentEditor и DocumentActEditor
  */
 export function useDocumentEditor() {
-  const route = useRoute();
   const store = useDocumentStore();
   const toast = useToast();
 
@@ -46,20 +44,12 @@ export function useDocumentEditor() {
 
   /**
    * Загрузка конфигурации документа
+   * @param deviceId ID устройства
+   * @param docType Тип документа
+   * @param id ID документа
    */
-  const loadDocument = async () => {
-    const { deviceId, docType, id } = route.params;
-
-    if (!deviceId || !docType || !id) {
-      store.error = 'Отсутствуют обязательные параметры маршрута';
-      return;
-    }
-
-    await store.loadConfig(
-      parseInt(deviceId as string, 10),
-      docType as string,
-      parseInt(id as string, 10)
-    );
+  const loadDocument = async (deviceId: number, docType: string, id: number) => {
+    await store.loadConfig(deviceId, docType, id);
   };
 
   /**
