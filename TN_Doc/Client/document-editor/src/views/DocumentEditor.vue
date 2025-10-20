@@ -119,30 +119,31 @@ onBeforeUnmount(() => {
   color: var(--md-text);
 }
 
+
 .editor-table tr {
-  height: 56px;
+  height: 44px;
 }
 
 .editor-table td {
   border: 1px solid var(--md-outline);
-  padding: 0.5rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   vertical-align: middle;
 }
 
 .editor-label-cell {
-  width: 50%;
-  background-color: var(--md-surface-variant);
-  font-weight: 600;
+  width: 55%;
+  background-color: transparent;
+  font-weight: var(--md-font-weight-medium);
   color: var(--md-text);
 }
 
 .editor-input-cell {
-  background-color: #ffffff;
+  background-color: transparent;
 }
 
 .label-text {
   display: inline-block;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .required-mark {

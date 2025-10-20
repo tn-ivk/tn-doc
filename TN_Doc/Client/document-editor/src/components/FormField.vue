@@ -130,11 +130,13 @@ function handleChange() {
   margin-bottom: 1rem;
 }
 
+
 .field-control {
   width: 100%;
   font-family: var(--md-font-family);
-  font-size: 14px;
+  font-size: var(--md-font-size-base);
   color: var(--md-text);
+  font-weight: var(--md-font-weight-normal);
 }
 
 :deep(.field-control.p-inputtext),
@@ -187,7 +189,7 @@ function handleChange() {
   height: 30px;
   padding: 0 10px;
   color: var(--md-text);
-  font-size: 14px;
+  font-size: var(--md-font-size-base);
   line-height: 1.2;
 }
 
