@@ -55,7 +55,7 @@ const store = useDocumentStore();
 const toast = useToast();
 
 // Функция сохранения документа (только ошибки в Toast)
-const handleSave = async () => {
+const handleSave = async (): Promise<boolean> => {
   // Проверяем валидацию перед сохранением
   if (store.hasValidationErrors) {
     toast.add({
@@ -64,13 +64,14 @@ const handleSave = async () => {
       detail: 'Заполните все обязательные поля',
       life: 5000
     });
-    return;
+    return false;
   }
 
   try {
     await store.saveDocument();
     // Успешное сохранение - НЕ показываем Toast
     // Главное окно само обработает результат
+    return true;
   } catch (error: any) {
     // Показываем Toast только при ошибке
     toast.add({
@@ -79,13 +80,14 @@ const handleSave = async () => {
       detail: error.message || 'Не удалось сохранить документ',
       life: 5000
     });
+    return false;
   }
 };
 
 // Экспонируем SaveDoc() для главного окна
 onMounted(() => {
   (window as any).SaveDoc = async function() {
-    await handleSave();
+    return await handleSave();
   };
 });
 
