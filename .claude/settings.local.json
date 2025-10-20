@@ -51,7 +51,10 @@
       "Bash(then)",
       "Bash(echo:*)",
       "Bash(find:*)",
-      "Bash(/dev/null)"
+      "Bash(/dev/null)",
+      "Bash(test -d TN_Doc/Client/document-editor/node_modules)",
+      "Bash(npm install)",
+      "Bash(npm run build:editor)"
     ],
     "deny": [],
     "ask": []
