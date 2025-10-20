@@ -165,8 +165,8 @@ function handleChange() {
 
 :deep(.field-control.p-dropdown) {
   width: 100%;
-  min-height: 35px;
-  height: 35px;
+  min-height: var(--md-control-height);
+  height: var(--md-control-height);
   border-radius: var(--md-radius);
   border: 1px solid var(--md-outline);
   background: #ffffff;
@@ -188,7 +188,7 @@ function handleChange() {
 :deep(.field-control.p-dropdown .p-dropdown-label) {
   display: flex;
   align-items: center;
-  height: 35px;
+  height: var(--md-control-height);
   padding: 0 10px;
   color: var(--md-text);
   font-size: var(--md-font-size-base);
