@@ -232,12 +232,13 @@ function handleChange() {
 }
 
 :deep(.field-control .p-dropdown-item.p-highlight) {
-  background: var(--md-primary);
-  color: #ffffff;
+  background: var(--md-primary-light);
+  color: var(--md-text);
 }
 
 :deep(.field-control .p-dropdown-item.p-highlight:not(.p-disabled):hover) {
-  background: var(--md-primary-hover);
+  background: var(--md-primary);
+  color: #ffffff;
 }
 
 :deep(.field-control.p-dropdown.p-disabled) {

@@ -245,12 +245,13 @@ select, textarea, .form-control, .filterDatepicker, select.filterSelect,
 }
 
 .p-dropdown-item.p-highlight {
-  background: var(--md-primary) !important;
-  color: #ffffff !important;
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
 }
 
 .p-dropdown-item.p-highlight:not(.p-disabled):hover {
-  background: var(--md-primary-hover) !important;
+  background: var(--md-primary) !important;
+  color: #ffffff !important;
 }
 
 /* PrimeVue Select (new API) */
@@ -335,8 +336,8 @@ select, textarea, .form-control, .filterDatepicker, select.filterSelect,
 
 .p-focusable-list[role="listbox"] .p-select-option.p-focus,
 .p-focusable-list[role="listbox"] .p-select-option.p-active {
-  background: var(--md-primary) !important;
-  color: #ffffff !important;
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
 }
 
 .p-select-list,
