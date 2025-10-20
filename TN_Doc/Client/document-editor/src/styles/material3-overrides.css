@@ -1,0 +1,113 @@
+.field-control.p-dropdown,
+.p-inputtext,
+.p-inputnumber-input,
+.p-calendar .p-inputtext {
+  min-height: var(--md-control-height);
+  height: var(--md-control-height);
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  background: #ffffff !important;
+  padding: 6px 10px !important;
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+  color: var(--md-text) !important;
+  box-shadow: none !important;
+}
+
+.p-inputtext:focus,
+.p-inputnumber-input:focus,
+.p-calendar .p-inputtext:focus,
+.field-control.p-dropdown:not(.p-disabled).p-focus,
+.field-control.p-dropdown:not(.p-disabled):focus-within {
+  border-color: var(--md-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+  outline: none !important;
+  background: var(--md-primary-light) !important;
+}
+
+.p-inputtext:hover,
+.p-inputnumber-input:hover,
+.p-calendar .p-inputtext:hover,
+.field-control.p-dropdown:not(.p-disabled):hover {
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
+}
+
+.field-control.p-dropdown .p-dropdown-label {
+  display: flex;
+  align-items: center;
+  height: var(--md-control-height);
+  padding: 0 10px !important;
+  color: var(--md-text) !important;
+  line-height: 1.2;
+}
+
+.field-control.p-dropdown .p-dropdown-trigger {
+  width: 32px !important;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--md-text-secondary) !important;
+}
+
+.field-control.p-dropdown .p-dropdown-trigger-icon {
+  font-size: 0.85rem !important;
+}
+
+.field-control.p-dropdown .p-dropdown-label.p-placeholder {
+  color: var(--md-text-secondary) !important;
+}
+
+.field-control.p-dropdown.p-disabled,
+.p-inputtext:disabled,
+.p-inputnumber-input:disabled,
+.p-calendar .p-inputtext:disabled {
+  background: var(--md-disabled-bg) !important;
+  border-color: var(--md-disabled-border) !important;
+  color: var(--md-disabled-text) !important;
+}
+
+.field-control.p-dropdown.p-disabled .p-dropdown-label {
+  color: var(--md-disabled-text) !important;
+}
+
+.field-control .p-dropdown-panel {
+  margin-top: 2px;
+  border: 1px solid var(--md-outline) !important;
+  border-radius: var(--md-radius) !important;
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12) !important;
+  background: #ffffff !important;
+  overflow: hidden;
+}
+
+.field-control .p-dropdown-items {
+  padding: 4px 0 !important;
+  font-size: var(--md-font-size-base) !important;
+}
+
+.field-control .p-dropdown-item {
+  padding: 6px 12px !important;
+  color: var(--md-text) !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.field-control .p-dropdown-item:not(.p-disabled):hover {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.field-control .p-dropdown-item.p-highlight {
+  background: var(--md-primary) !important;
+  color: #ffffff !important;
+}
+
+.field-control .p-dropdown-item.p-highlight:not(.p-disabled):hover {
+  background: var(--md-primary-hover) !important;
+}
+
+.p-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--md-error) !important;
+}

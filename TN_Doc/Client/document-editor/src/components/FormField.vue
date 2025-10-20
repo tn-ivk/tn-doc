@@ -131,6 +131,10 @@ function handleChange() {
   margin-bottom: 1rem;
 }
 
+.form-field.compact {
+  margin-bottom: 0.5rem;
+}
+
 
 .field-control {
   width: 100%;
@@ -140,24 +144,16 @@ function handleChange() {
   font-weight: var(--md-font-weight-normal);
 }
 
-:deep(.field-control.p-inputtext),
-:deep(.field-control .p-inputtext),
-:deep(.field-control.p-inputmask),
-:deep(.field-control .p-inputnumber-input) {
+::deep(.field-control.p-inputtext),
+::deep(.field-control .p-inputtext),
+::deep(.field-control.p-inputmask),
+::deep(.field-control .p-inputnumber-input) {
   width: 100%;
-  height: 35px;
-  padding: 6px 10px;
-  border-radius: var(--md-radius);
-  border: 1px solid var(--md-outline);
-  background: #ffffff;
-  color: var(--md-text);
-  line-height: 1.2;
-  box-shadow: none;
 }
 
-:deep(.field-control .p-inputtext:focus),
-:deep(.field-control.p-inputtext:focus),
-:deep(.field-control .p-inputnumber-input:focus) {
+::deep(.field-control .p-inputtext:focus),
+::deep(.field-control.p-inputtext:focus),
+::deep(.field-control .p-inputnumber-input:focus) {
   border-color: var(--md-primary);
   box-shadow: none;
   outline: none;
@@ -167,37 +163,44 @@ function handleChange() {
   width: 100%;
   min-height: var(--md-control-height);
   height: var(--md-control-height);
-  border-radius: var(--md-radius);
-  border: 1px solid var(--md-outline);
-  background: #ffffff;
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  background: #ffffff !important;
   padding: 0;
-  transition: border-color 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 :deep(.field-control.p-dropdown:not(.p-disabled):hover) {
-  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary));
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
 }
 
 :deep(.field-control.p-dropdown:not(.p-disabled).p-focus),
 :deep(.field-control.p-dropdown:not(.p-disabled):focus-within) {
-  border-color: var(--md-primary);
-  box-shadow: none;
-  background: var(--md-primary-light);
+  border-color: var(--md-primary) !important;
+  background: var(--md-primary-light) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
 }
 
 :deep(.field-control.p-dropdown .p-dropdown-label) {
   display: flex;
   align-items: center;
   height: var(--md-control-height);
-  padding: 0 10px;
-  color: var(--md-text);
-  font-size: var(--md-font-size-base);
+  padding: 0 10px !important;
+  color: var(--md-text) !important;
+  font-size: var(--md-font-size-base) !important;
   line-height: 1.2;
 }
 
 :deep(.field-control.p-dropdown .p-dropdown-trigger) {
-  width: 28px;
-  color: var(--md-text-secondary);
+  width: 32px !important;
+  color: var(--md-text-secondary) !important;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 :deep(.field-control.p-dropdown .p-dropdown-trigger-icon) {
