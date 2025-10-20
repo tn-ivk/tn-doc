@@ -43,11 +43,14 @@
 
 <script setup lang="ts">
 import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import FormField from '@/components/FormField.vue';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentEditor } from '@/composables/useDocumentEditor';
 import { useActAutoFill } from '@/composables/useActAutoFill';
+
+const route = useRoute();
 
 // Используем общую логику редактирования документов
 const {
@@ -63,7 +66,18 @@ const { setupAutoFillWatchers } = useActAutoFill();
 
 // Загружаем документ при монтировании
 onMounted(async () => {
-  await loadDocument();
+  const { deviceId, docType, id } = route.params;
+
+  if (!deviceId || !docType || !id) {
+    store.error = 'Отсутствуют обязательные параметры маршрута';
+    return;
+  }
+
+  await loadDocument(
+    parseInt(deviceId as string, 10),
+    docType as string,
+    parseInt(id as string, 10)
+  );
 
   // Настраиваем автозаполнение связанных полей для Актов
   setupAutoFillWatchers();
