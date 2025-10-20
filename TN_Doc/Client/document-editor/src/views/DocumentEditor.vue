@@ -42,8 +42,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 import { useDocumentStore } from '@/stores/documentStore';
 import FormField from '@/components/FormField.vue';
 import Message from 'primevue/message';
@@ -51,6 +52,31 @@ import ProgressSpinner from 'primevue/progressspinner';
 
 const route = useRoute();
 const store = useDocumentStore();
+const toast = useToast();
+
+// Функция сохранения документа (только ошибки в Toast)
+const handleSave = async () => {
+  try {
+    await store.saveDocument();
+    // Успешное сохранение - НЕ показываем Toast
+    // Главное окно само обработает результат
+  } catch (error: any) {
+    // Показываем Toast только при ошибке
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка сохранения',
+      detail: error.message || 'Не удалось сохранить документ',
+      life: 5000
+    });
+  }
+};
+
+// Экспонируем SaveDoc() для главного окна
+onMounted(() => {
+  (window as any).SaveDoc = async function() {
+    await handleSave();
+  };
+});
 
 onMounted(async () => {
   const { deviceId, docType, id } = route.params;
@@ -71,6 +97,16 @@ onMounted(async () => {
   }
 });
 
+// Отслеживаем изменения и уведомляем главное окно
+watch(() => store.hasUnsavedChanges, (hasChanges) => {
+  if (window.parent) {
+    window.parent.postMessage(
+      hasChanges ? 'ButtonSaveOn' : 'ButtonSaveOff',
+      '*'
+    );
+  }
+}, { immediate: true });
+
 // Предупреждение перед закрытием с несохранёнными изменениями
 const handleBeforeUnload = (e: BeforeUnloadEvent) => {
   if (store.hasUnsavedChanges) {
@@ -85,6 +121,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload);
+  // Очищаем глобальную функцию
+  (window as any).SaveDoc = undefined;
   store.reset();
 });
 </script>
