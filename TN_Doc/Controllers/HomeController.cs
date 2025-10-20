@@ -594,13 +594,12 @@ public class HomeController : Controller
     /// </summary>
     private bool IsDocumentSupportedInVueEditor(IdDoc idDoc)
     {
-        // На данный момент поддерживается только Report
-        // В будущем добавим другие документы
+        // Поддерживаются: Report, Act, Jornal
         return idDoc switch
         {
             IdDoc.Report => true,
-            // IdDoc.Jornal => true,  // TODO: будет добавлено позже
-            // IdDoc.Act => true,     // TODO: будет добавлено позже
+            IdDoc.Jornal => true,
+            IdDoc.Act => true,
             _ => false
         };
     }

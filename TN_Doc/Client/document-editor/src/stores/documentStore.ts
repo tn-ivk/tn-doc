@@ -22,6 +22,31 @@ export const useDocumentStore = defineStore('document', () => {
   const fields = computed(() => config.value?.fields || []);
 
   /**
+   * Проверка валидации: есть ли незаполненные обязательные поля
+   */
+  const hasValidationErrors = computed(() => {
+    if (!config.value) return false;
+
+    const requiredFields = config.value.fields.filter(f => f.required);
+
+    for (const field of requiredFields) {
+      const value = formData.value[field.key];
+
+      // Проверяем, что значение заполнено (не пустая строка, не null, не undefined)
+      if (value === null || value === undefined || value === '') {
+        return true;
+      }
+    }
+
+    return false;
+  });
+
+  /**
+   * Можно ли сохранить документ (нет ошибок валидации)
+   */
+  const canSave = computed(() => !hasValidationErrors.value);
+
+  /**
    * Загрузить конфигурацию документа
    */
   async function loadConfig(deviceId: number, docType: string, id: number) {
@@ -112,6 +137,8 @@ export const useDocumentStore = defineStore('document', () => {
     hasUnsavedChanges,
     documentTitle,
     fields,
+    hasValidationErrors,
+    canSave,
 
     // Actions
     loadConfig,

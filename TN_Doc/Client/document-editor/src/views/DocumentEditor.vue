@@ -56,12 +56,29 @@ const toast = useToast();
 
 // Функция сохранения документа (только ошибки в Toast)
 const handleSave = async () => {
+  // Проверяем валидацию перед сохранением
+  if (store.hasValidationErrors) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Ошибка валидации',
+      detail: 'Заполните все обязательные поля',
+      life: 5000
+    });
+    return;
+  }
+
   try {
     await store.saveDocument();
     // Успешное сохранение - НЕ показываем Toast
     // Главное окно само обработает результат
   } catch (error: any) {
-  // Ошибка уже сохранена в store, сообщение отображается в UI
+    // Показываем Toast только при ошибке
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка сохранения',
+      detail: error.message || 'Не удалось сохранить документ',
+      life: 5000
+    });
   }
 };
 
@@ -87,11 +104,11 @@ onMounted(async () => {
   );
 });
 
-// Отслеживаем изменения и уведомляем главное окно
-watch(() => store.hasUnsavedChanges, (hasChanges) => {
+// Отслеживаем валидацию и уведомляем главное окно о состоянии кнопки
+watch(() => store.canSave, (canSave) => {
   if (window.parent) {
     window.parent.postMessage(
-      hasChanges ? 'ButtonSaveOn' : 'ButtonSaveOff',
+      canSave ? 'ButtonSaveOn' : 'ButtonSaveOff',
       '*'
     );
   }
