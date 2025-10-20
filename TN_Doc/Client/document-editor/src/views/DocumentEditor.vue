@@ -12,28 +12,30 @@
     </Message>
 
     <!-- Редактор документа -->
-    <div v-else-if="store.isReady">
+    <div v-else-if="store.isReady" class="editor-wrapper">
       <div class="editor-container">
-        <table class="editor-table">
-          <tbody>
-            <tr v-for="field in store.fields" :key="field.key">
-              <td class="editor-label-cell">
-                <div class="label-wrapper">
-                  <span class="label-text">{{ field.label }}</span>
-                  <span v-if="field.required" class="required-mark">*</span>
-                </div>
-              </td>
-              <td class="editor-input-cell">
-                <FormField
-                  :field="field"
-                  :modelValue="store.formData[field.key]"
-                  :hide-label="true"
-                  @update:modelValue="(value) => store.updateField(field.key, value)"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="editor-table-wrapper">
+          <table class="editor-table">
+            <tbody>
+              <tr v-for="field in store.fields" :key="field.key">
+                <td class="editor-label-cell">
+                  <div class="label-wrapper">
+                    <span class="label-text">{{ field.label }}</span>
+                    <span v-if="field.required" class="required-mark">*</span>
+                  </div>
+                </td>
+                <td class="editor-input-cell">
+                  <FormField
+                    :field="field"
+                    :modelValue="store.formData[field.key]"
+                    :hide-label="true"
+                    @update:modelValue="(value) => store.updateField(field.key, value)"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -89,9 +91,14 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .document-editor {
-  padding: 0.5rem 1rem 1.5rem;
   background-color: var(--md-surface);
   font-family: 'Segoe UI', 'PT Astra Sans', 'Helvetica Neue', Arial, sans-serif;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
 }
 
 .loading-container {
@@ -103,13 +110,27 @@ onBeforeUnmount(() => {
   gap: 1rem;
 }
 
+.editor-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .editor-container {
   width: 100%;
   background: #ffffff;
   border: 1px solid var(--md-outline);
   border-radius: 8px;
-  overflow: hidden;
   box-shadow: 0 2px 6px rgba(33, 33, 33, 0.04);
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.editor-table-wrapper {
+  overflow: auto;
+  flex: 1;
 }
 
 .editor-table {
@@ -120,10 +141,6 @@ onBeforeUnmount(() => {
   color: var(--md-text);
 }
 
-
-.editor-table tr {
-  height: 44px;
-}
 
 .editor-table td {
   border: 1px solid var(--md-outline);

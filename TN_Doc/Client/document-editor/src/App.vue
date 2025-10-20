@@ -2,7 +2,9 @@
   <div id="app">
     <Toast />
     <ConfirmDialog />
-    <RouterView />
+    <div class="app-content">
+      <RouterView />
+    </div>
   </div>
 </template>
 
@@ -19,6 +21,11 @@ import ConfirmDialog from 'primevue/confirmdialog';
   padding: 0;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--surface-ground);
@@ -27,5 +34,14 @@ body {
 
 #app {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 </style>
