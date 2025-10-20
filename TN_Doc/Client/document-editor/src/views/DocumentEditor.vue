@@ -11,47 +11,28 @@
       {{ store.error }}
     </Message>
 
-    <!-- Форма редактирования -->
+    <!-- Таблица редактирования -->
     <div v-else-if="store.isReady" class="editor-container">
-      <!-- Заголовок -->
-      <div class="editor-header">
-        <h2>{{ store.documentTitle }}</h2>
-        <Badge
-          v-if="store.hasUnsavedChanges"
-          value="Несохранённые изменения"
-          severity="warning"
-        />
-      </div>
-
-      <!-- Поля формы -->
-      <div class="editor-fields">
-        <FormField
-          v-for="field in store.fields"
-          :key="field.key"
-          :field="field"
-          :modelValue="store.formData[field.key]"
-          @update:modelValue="(value) => store.updateField(field.key, value)"
-        />
-      </div>
-
-      <!-- Кнопки действий -->
-      <div class="editor-actions">
-        <Button
-          label="Сохранить"
-          icon="pi pi-save"
-          severity="success"
-          :loading="store.isSaving"
-          :disabled="!store.hasUnsavedChanges"
-          @click="handleSave"
-        />
-        <Button
-          label="Отмена"
-          icon="pi pi-times"
-          severity="secondary"
-          :disabled="store.isSaving"
-          @click="handleCancel"
-        />
-      </div>
+      <table class="editor-table">
+        <tbody>
+          <tr v-for="field in store.fields" :key="field.key">
+            <td class="editor-label-cell">
+              <div class="label-wrapper">
+                <span class="label-text">{{ field.label }}</span>
+                <span v-if="field.required" class="required-mark">*</span>
+              </div>
+            </td>
+            <td class="editor-input-cell">
+              <FormField
+                :field="field"
+                :modelValue="store.formData[field.key]"
+                :hide-label="true"
+                @update:modelValue="(value) => store.updateField(field.key, value)"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -61,9 +42,7 @@ import { onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDocumentStore } from '@/stores/documentStore';
 import FormField from '@/components/FormField.vue';
-import Button from 'primevue/button';
 import Message from 'primevue/message';
-import Badge from 'primevue/badge';
 import ProgressSpinner from 'primevue/progressspinner';
 
 const route = useRoute();
@@ -104,32 +83,14 @@ onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload);
   store.reset();
 });
-
-async function handleSave() {
-  try {
-    await store.saveDocument();
-    alert('Документ успешно сохранён');
-  } catch (error: any) {
-    alert(`Ошибка сохранения: ${error.message}`);
-  }
-}
-
-function handleCancel() {
-  if (store.hasUnsavedChanges) {
-    const confirmed = confirm('У вас есть несохранённые изменения. Вы уверены, что хотите отменить?');
-    if (!confirmed) return;
-  }
-
-  // Закрыть окно или вернуться назад
-  window.history.back();
-}
 </script>
 
 <style scoped>
+
 .document-editor {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 0.5rem 1rem 1.5rem;
+  background-color: var(--md-surface);
+  font-family: 'Segoe UI', 'PT Astra Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .loading-container {
@@ -142,35 +103,67 @@ function handleCancel() {
 }
 
 .editor-container {
-  background: var(--surface-card);
-  border-radius: var(--border-radius);
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--md-outline);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(33, 33, 33, 0.04);
 }
 
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--surface-border);
+.editor-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 15px;
+  color: var(--md-text);
 }
 
-.editor-header h2 {
-  margin: 0;
-  color: var(--text-color);
+.editor-table tr {
+  height: 56px;
 }
 
-.editor-fields {
-  margin-bottom: 2rem;
+.editor-table td {
+  border: 1px solid var(--md-outline);
+  padding: 0.5rem 0.75rem;
+  vertical-align: middle;
 }
 
-.editor-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid var(--surface-border);
+.editor-label-cell {
+  width: 50%;
+  background-color: var(--md-surface-variant);
+  font-weight: 600;
+  color: var(--md-text);
+}
+
+.editor-input-cell {
+  background-color: #ffffff;
+}
+
+.label-text {
+  display: inline-block;
+  line-height: 1.4;
+}
+
+.required-mark {
+  margin-left: 4px;
+  color: var(--md-error);
+  font-weight: 600;
+}
+
+.editor-table tr:first-child td:first-child {
+  border-top-left-radius: 8px;
+}
+
+.editor-table tr:first-child td:last-child {
+  border-top-right-radius: 8px;
+}
+
+.editor-table tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.editor-table tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
 }
 </style>

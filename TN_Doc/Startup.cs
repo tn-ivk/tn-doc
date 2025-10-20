@@ -131,6 +131,7 @@ public class Startup
 		{
 			endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 			endpoints.MapHub<TN_Doc.Hubs.StatusHub>("/statusHub");
+			endpoints.MapFallbackToFile("/document-editor/{*path}", "document-editor/index.html");
 		});
 	}
 }
