@@ -21,6 +21,7 @@
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
       class="field-control"
+      appendTo="self"
       @change="handleChange"
     />
 
@@ -146,7 +147,7 @@ function handleChange() {
   width: 100%;
   height: 30px;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--md-radius);
   border: 1px solid var(--md-outline);
   background: #ffffff;
   color: var(--md-text);
@@ -166,7 +167,7 @@ function handleChange() {
   width: 100%;
   min-height: 30px;
   height: 30px;
-  border-radius: 6px;
+  border-radius: var(--md-radius);
   border: 1px solid var(--md-outline);
   background: #ffffff;
   padding: 0;
@@ -200,6 +201,43 @@ function handleChange() {
 
 :deep(.field-control.p-dropdown .p-dropdown-trigger-icon) {
   font-size: 0.85rem;
+}
+
+:deep(.field-control.p-dropdown .p-dropdown-label.p-placeholder) {
+  color: var(--md-text-secondary);
+}
+
+:deep(.field-control .p-dropdown-panel) {
+  margin-top: 2px;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-radius);
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12);
+  background: #ffffff;
+}
+
+:deep(.field-control .p-dropdown-items) {
+  padding: 4px 0;
+  font-size: var(--md-font-size-base);
+}
+
+:deep(.field-control .p-dropdown-item) {
+  padding: 6px 12px;
+  color: var(--md-text);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+:deep(.field-control .p-dropdown-item:not(.p-disabled):hover) {
+  background: var(--md-surface-variant);
+  color: var(--md-text);
+}
+
+:deep(.field-control .p-dropdown-item.p-highlight) {
+  background: var(--md-primary);
+  color: #ffffff;
+}
+
+:deep(.field-control .p-dropdown-item.p-highlight:not(.p-disabled):hover) {
+  background: var(--md-primary-hover);
 }
 
 :deep(.field-control.p-dropdown.p-disabled) {
