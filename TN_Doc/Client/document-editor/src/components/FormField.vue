@@ -145,8 +145,8 @@ function handleChange() {
 :deep(.field-control.p-inputmask),
 :deep(.field-control .p-inputnumber-input) {
   width: 100%;
-  height: 30px;
-  padding: 4px 10px;
+  height: 35px;
+  padding: 6px 10px;
   border-radius: var(--md-radius);
   border: 1px solid var(--md-outline);
   background: #ffffff;
@@ -165,8 +165,8 @@ function handleChange() {
 
 :deep(.field-control.p-dropdown) {
   width: 100%;
-  min-height: 30px;
-  height: 30px;
+  min-height: 35px;
+  height: 35px;
   border-radius: var(--md-radius);
   border: 1px solid var(--md-outline);
   background: #ffffff;
@@ -182,12 +182,13 @@ function handleChange() {
 :deep(.field-control.p-dropdown:not(.p-disabled):focus-within) {
   border-color: var(--md-primary);
   box-shadow: none;
+  background: var(--md-primary-light);
 }
 
 :deep(.field-control.p-dropdown .p-dropdown-label) {
   display: flex;
   align-items: center;
-  height: 30px;
+  height: 35px;
   padding: 0 10px;
   color: var(--md-text);
   font-size: var(--md-font-size-base);
@@ -227,7 +228,7 @@ function handleChange() {
 }
 
 :deep(.field-control .p-dropdown-item:not(.p-disabled):hover) {
-  background: var(--md-surface-variant);
+  background: var(--md-primary-light);
   color: var(--md-text);
 }
 
