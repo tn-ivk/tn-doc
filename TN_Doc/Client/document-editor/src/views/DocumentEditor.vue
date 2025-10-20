@@ -136,7 +136,7 @@ onBeforeUnmount(() => {
 .editor-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   font-size: 15px;
   color: var(--md-text);
 }
@@ -149,14 +149,18 @@ onBeforeUnmount(() => {
 }
 
 .editor-label-cell {
-  width: 55%;
+  width: 1%;
+  max-width: 50%;
   background-color: transparent;
   font-weight: var(--md-font-weight-medium);
   color: var(--md-text);
+  white-space: nowrap;
+  padding-right: 0.75rem;
 }
 
 .editor-input-cell {
   background-color: transparent;
+  width: 100%;
 }
 
 .label-text {
