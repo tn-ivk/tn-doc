@@ -1,19 +1,19 @@
 <template>
-  <!-- Редактируемая ячейка печати -->
+  <!-- Редактируемая ячейка результата -->
   <InputText
     v-if="isEditable"
-    :modelValue="parameter.values.printValue"
-    :class="{ 'elis-filled': parameter.elisFlags.printValue }"
+    :modelValue="parameter.values.result"
+    :class="{ 'elis-filled': parameter.elisFlags.result }"
     type="text"
-    class="print-cell-input"
+    class="result-cell-input"
     @update:modelValue="handleValueChange"
   />
 
-  <!-- Нередактируемая ячейка печати (просто текст) -->
+  <!-- Нередактируемая ячейка результата (просто текст) -->
   <span
     v-else
-    :class="{ 'elis-filled-text': parameter.elisFlags.printValue }"
-    class="print-cell-readonly"
+    :class="{ 'elis-filled-text': parameter.elisFlags.result }"
+    class="result-cell-readonly"
   >
     {{ displayValue }}
   </span>
@@ -25,38 +25,30 @@ import InputText from 'primevue/inputtext';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
 interface Props {
-  /** Параметр качества */
   parameter: PassportQualityParameter;
-  /** Редактируема ли ячейка */
   isEditable: boolean;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:printValue': [value: string];
+  'update:result': [value: string];
 }>();
 
-/**
- * Отображаемое значение (с форматированием)
- */
 const displayValue = computed(() => {
-  if (!props.parameter.values.printValue) return '-';
-  return props.parameter.values.printValue.replace('.', ',');
+  if (!props.parameter.values.result) return '-';
+  return props.parameter.values.result.replace('.', ',');
 });
 
-/**
- * Обработчик изменения значения
- */
 function handleValueChange(value: string | undefined) {
   const stringValue = value ?? '';
-  emit('update:printValue', stringValue);
-  console.log(`[PassportPrintCell] PrintValue изменено: ${props.parameter.key} -> ${stringValue}`);
+  emit('update:result', stringValue);
+  console.log(`[PassportResultCell] Result изменено: ${props.parameter.key} -> ${stringValue}`);
 }
 </script>
 
 <style scoped>
-.print-cell-input {
+.result-cell-input {
   width: 100%;
   border: none;
   background: transparent;
@@ -69,24 +61,23 @@ function handleValueChange(value: string | undefined) {
   margin: 0;
 }
 
-.print-cell-input:focus {
+.result-cell-input:focus {
   outline: none;
   background: #f8f9fa;
 }
 
-.print-cell-readonly {
+.result-cell-readonly {
   display: block;
   width: 100%;
   text-align: center;
   font-size: 15px;
 }
 
-/* ELIS подсветка для input */
+/* ELIS подсветка */
 .elis-filled {
   background-color: #8fd19e !important;
 }
 
-/* ELIS подсветка для readonly текста */
 .elis-filled-text {
   background-color: #8fd19e;
   display: inline-block;

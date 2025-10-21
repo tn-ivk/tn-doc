@@ -45,9 +45,9 @@
         v-if="hasQualityParameters"
         :parameters="qualityParameters"
         :isElisUsed="isElisUsed"
-        @update:halValue="handleHalValueUpdate"
         @update:method="handleMethodUpdate"
-        @update:printValue="handlePrintValueUpdate"
+        @update:measurement="handleMeasurementUpdate"
+        @update:result="handleResultUpdate"
       />
     </div>
   </div>
@@ -79,9 +79,9 @@ const {
   qualityParameters,
   isElisUsed,
   hasQualityParameters,
-  handleHalValueUpdate,
+  handleMeasurementUpdate,
   handleMethodUpdate,
-  handlePrintValueUpdate
+  handleResultUpdate
 } = usePassportEditor();
 
 // Загружаем документ при монтировании

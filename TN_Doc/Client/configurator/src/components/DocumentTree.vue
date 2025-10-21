@@ -9,7 +9,7 @@
     >
       <template #default="slotProps">
         <div class="tree-node-content">
-          <i v-if="slotProps.node.icon" :class="slotProps.node.icon" class="node-icon"></i>
+          <i v-if="slotProps.node.data?.icon" :class="slotProps.node.data.icon" class="node-icon"></i>
           <span>{{ slotProps.node.label }}</span>
         </div>
       </template>
@@ -27,7 +27,6 @@ import type { DocumentTreeNode } from '../types/document.types';
 interface TreeNodeType {
   key: string;
   label: string;
-  icon?: string;
   children?: TreeNodeType[];
   data?: any;
   type?: string;
@@ -92,10 +91,10 @@ const treeNodes = computed<TreeNodeType[]>(() => {
               children.push({
                 key: `doc-${doc.IdDoc}-template-${template.Id}`,
                 label: template.Name || `Шаблон ${template.Id}`,
-                icon: 'pi pi-file',
                 type: 'template',
                 data: {
                   type: 'template',
+                  icon: 'pi pi-file',
                   configPath: doc.PathToDocConfigFile,
                   editConfigPath: template.PathToDocEditConfigFile
                 }
@@ -107,10 +106,10 @@ const treeNodes = computed<TreeNodeType[]>(() => {
         documentMap.set(doc.IdDoc, {
           key: `doc-${doc.IdDoc}`,
           label: doc.Name || `Документ ${doc.IdDoc}`,
-          icon: 'pi pi-folder',
           type: 'document',
           data: {
             type: 'document',
+            icon: 'pi pi-folder',
             configPath: doc.PathToDocConfigFile,
             editConfigPath: doc.PathToDocEditConfigFile
           },
@@ -132,7 +131,7 @@ function onNodeSelect(node: any) {
   const documentNode: DocumentTreeNode = {
     key: node.key || '',
     label: node.label || '',
-    icon: node.icon,
+    icon: node.data.icon,
     type: node.data.type,
     configPath: node.data.configPath,
     editConfigPath: node.data.editConfigPath

@@ -4,58 +4,48 @@
     :disabled="!parameter.editable"
     :class="[
       validationClass,
-      { 'elis-filled': parameter.elisFlags.hal },
+      { 'elis-filled': parameter.elisFlags.measurement },
       { 'manual-input--disabled': !parameter.editable }
     ]"
     :minFractionDigits="0"
     :maxFractionDigits="parameter.roundValue || 10"
     mode="decimal"
     locale="ru-RU"
-    class="hal-input"
+    class="measurement-input"
     @update:modelValue="handleValueChange"
-    @input="handleInput"
   />
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import InputNumber from 'primevue/inputnumber';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
 interface Props {
-  /** Параметр качества */
   parameter: PassportQualityParameter;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:halValue': [value: string];
+  'update:measurement': [value: string];
 }>();
 
-/**
- * Численное значение для InputNumber
- */
 const numericValue = computed(() => {
-  if (!props.parameter.values.hal) return null;
-  const value = parseFloat(props.parameter.values.hal.replace(',', '.'));
+  if (!props.parameter.values.measurement) return null;
+  const value = parseFloat(props.parameter.values.measurement.replace(',', '.'));
   return isNaN(value) ? null : value;
 });
 
-/**
- * Класс валидации (correct-value / incorrect-value)
- */
 const validationClass = computed(() => {
-  // Проверка обязательного заполнения
   if (props.parameter.requiredFill) {
-    if (!props.parameter.values.hal || props.parameter.values.hal === '') {
+    if (!props.parameter.values.measurement || props.parameter.values.measurement === '') {
       return 'incorrect-value';
     }
   }
 
-  // Проверка округления
-  if (props.parameter.roundValue && props.parameter.values.hal) {
-    const value = props.parameter.values.hal.replace(',', '.');
+  if (props.parameter.roundValue && props.parameter.values.measurement) {
+    const value = props.parameter.values.measurement.replace(',', '.');
     const parts = value.split('.');
     if (parts.length > 1 && parts[1].length > props.parameter.roundValue) {
       return 'incorrect-value';
@@ -65,31 +55,20 @@ const validationClass = computed(() => {
   return 'correct-value';
 });
 
-/**
- * Обработчик изменения значения
- */
 function handleValueChange(value: number | null) {
   const stringValue = value !== null ? value.toString().replace('.', ',') : '';
-  emit('update:halValue', stringValue);
-}
-
-/**
- * Обработчик ввода (для реакции на изменение в реальном времени)
- */
-function handleInput(event: any) {
-  // Обработка ввода с клавиатуры
-  console.log(`[PassportHalInput] Input: ${props.parameter.key}`, event);
+  emit('update:measurement', stringValue);
 }
 </script>
 
 <style scoped>
-.hal-input {
+.measurement-input {
   width: 100%;
   text-align: center;
   font-size: 15px;
 }
 
-.hal-input:deep(input) {
+.measurement-input:deep(input) {
   text-align: center;
   font-size: 15px;
 }

@@ -4,9 +4,9 @@ import type {
   PassportEditConfig,
   PassportQualityParameter,
   MethodOption,
-  HalValueUpdateEvent,
+  MeasurementUpdateEvent,
   MethodUpdateEvent,
-  PrintValueUpdateEvent
+  ResultUpdateEvent
 } from '@/types/passport.types';
 
 /**
@@ -55,24 +55,21 @@ export function usePassportEditor() {
   }
 
   /**
-   * Пересчитать значение для печати (PrintValue) на основе метода и значения ХАЛ
+   * Пересчитать результат на основе метода и значения measurement
    */
-  function recalculatePrintValue(param: PassportQualityParameter): string {
-    // Найти выбранный метод
+  function recalculateResult(param: PassportQualityParameter): string {
     const selectedMethod = param.method.options.find(
       (m: MethodOption) => m.name === param.method.selected
     );
 
-    // Если есть ValueString из ELIS и ХАЛ заполнено из ELIS, используем его
-    if (param.elisFlags.printValue && param.elisFlags.hal) {
-      return param.values.printValue;
+    // Если есть результат из ELIS и measurement заполнено из ELIS, используем его
+    if (param.elisFlags.result && param.elisFlags.measurement) {
+      return param.values.result;
     }
 
-    // Парсим значение ХАЛ
-    const halValue = parseFloat(param.values.hal.replace(',', '.'));
+    const measurementValue = parseFloat(param.values.measurement.replace(',', '.'));
 
-    // Если значение невалидное, возвращаем прочерк
-    if (isNaN(halValue)) {
+    if (isNaN(measurementValue)) {
       return '-';
     }
 
@@ -80,20 +77,18 @@ export function usePassportEditor() {
     if (
       selectedMethod?.limitValueActivate &&
       selectedMethod.limitValue !== undefined &&
-      halValue < selectedMethod.limitValue
+      measurementValue < selectedMethod.limitValue
     ) {
       return selectedMethod.limitValueString || '-';
     }
 
-    // Иначе возвращаем само значение ХАЛ
-    return param.values.hal;
+    return param.values.measurement;
   }
 
   /**
-   * Определить, редактируема ли ячейка печати
-   * Ячейка редактируема, если limitValueActivate === true И halValue < limitValue
+   * Определить, редактируема ли ячейка результата
    */
-  function isPrintCellEditable(param: PassportQualityParameter): boolean {
+  function isResultEditable(param: PassportQualityParameter): boolean {
     const selectedMethod = param.method.options.find(
       (m: MethodOption) => m.name === param.method.selected
     );
@@ -102,34 +97,29 @@ export function usePassportEditor() {
       return false;
     }
 
-    const halValue = parseFloat(param.values.hal.replace(',', '.'));
-    if (isNaN(halValue)) {
+    const measurementValue = parseFloat(param.values.measurement.replace(',', '.'));
+    if (isNaN(measurementValue)) {
       return false;
     }
 
-    return selectedMethod.limitValue !== undefined && halValue < selectedMethod.limitValue;
+    return selectedMethod.limitValue !== undefined && measurementValue < selectedMethod.limitValue;
   }
 
   /**
-   * Обработчик обновления значения ХАЛ
+   * Обработчик обновления measurement
    */
-  function handleHalValueUpdate(event: HalValueUpdateEvent) {
+  function handleMeasurementUpdate(event: MeasurementUpdateEvent) {
     const param = findParameter(event.paramKey);
     if (!param) {
       console.warn(`Параметр с ключом ${event.paramKey} не найден`);
       return;
     }
 
-    // Обновляем значение ХАЛ
-    param.values.hal = event.value;
-
-    // Пересчитываем значение для печати
-    param.values.printValue = recalculatePrintValue(param);
-
-    // Отмечаем, что документ изменён
+    param.values.measurement = event.value;
+    param.values.result = recalculateResult(param);
     store.isDirty = true;
 
-    console.log(`[usePassportEditor] ХАЛ обновлено: ${event.paramKey} = ${event.value}, PrintValue = ${param.values.printValue}`);
+    console.log(`[usePassportEditor] Measurement обновлено: ${event.paramKey} = ${event.value}, Result = ${param.values.result}`);
   }
 
   /**
@@ -142,55 +132,40 @@ export function usePassportEditor() {
       return;
     }
 
-    // Обновляем выбранный метод
     param.method.selected = event.methodName;
-
-    // Пересчитываем значение для печати (может измениться редактируемость)
-    param.values.printValue = recalculatePrintValue(param);
-
-    // Отмечаем, что документ изменён
+    param.values.result = recalculateResult(param);
     store.isDirty = true;
 
-    console.log(`[usePassportEditor] Метод обновлен: ${event.paramKey} = ${event.methodName}, PrintValue = ${param.values.printValue}`);
+    console.log(`[usePassportEditor] Метод обновлен: ${event.paramKey} = ${event.methodName}, Result = ${param.values.result}`);
   }
 
   /**
-   * Обработчик обновления значения для печати (ручное редактирование)
+   * Обработчик обновления результата (ручное редактирование)
    */
-  function handlePrintValueUpdate(event: PrintValueUpdateEvent) {
+  function handleResultUpdate(event: ResultUpdateEvent) {
     const param = findParameter(event.paramKey);
     if (!param) {
       console.warn(`Параметр с ключом ${event.paramKey} не найден`);
       return;
     }
 
-    // Обновляем значение для печати
-    param.values.printValue = event.value;
-
-    // Отмечаем, что документ изменён
+    param.values.result = event.value;
     store.isDirty = true;
+    param.elisFlags.result = false;
 
-    // Сбрасываем флаг ELIS заполнения (пользователь ввел вручную)
-    param.elisFlags.printValue = false;
-
-    console.log(`[usePassportEditor] PrintValue обновлено вручную: ${event.paramKey} = ${event.value}`);
+    console.log(`[usePassportEditor] Result обновлено вручную: ${event.paramKey} = ${event.value}`);
   }
 
   return {
-    // Computed
     passportConfig,
     qualityParameters,
     isElisUsed,
     hasQualityParameters,
-
-    // Methods
     findParameter,
-    recalculatePrintValue,
-    isPrintCellEditable,
-
-    // Event handlers
-    handleHalValueUpdate,
+    recalculateResult,
+    isResultEditable,
+    handleMeasurementUpdate,
     handleMethodUpdate,
-    handlePrintValueUpdate
+    handleResultUpdate
   };
 }

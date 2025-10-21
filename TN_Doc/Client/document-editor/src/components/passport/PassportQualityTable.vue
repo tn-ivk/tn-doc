@@ -7,36 +7,23 @@
     >
       <!-- Определение ширины колонок -->
       <colgroup>
-        <col class="col-num">
-        <col class="col-name">
-        <col class="col-method">
-        <col class="col-documents" v-if="isElisUsed">
-        <col class="col-ivk">
-        <col class="col-hal">
-        <col class="col-result-value">
-        <col class="col-result-text">
+        <col class="col-num">          <!-- № -->
+        <col class="col-name">         <!-- Наименование -->
+        <col class="col-method">       <!-- Метод -->
+        <col class="col-documents" v-if="isElisUsed">  <!-- Документы (условная) -->
+        <col class="col-measurement">  <!-- Измерение -->
+        <col class="col-result">       <!-- Результат -->
       </colgroup>
 
-      <!-- Заголовок таблицы (двухстрочный) -->
+      <!-- Заголовок таблицы (ОДНА строка вместо двух) -->
       <thead>
-        <!-- Первая строка заголовков -->
         <tr>
-          <th rowspan="2">№</th>
-          <th rowspan="2">Наименование показателя</th>
-          <th rowspan="2">Метод испытаний</th>
-          <th v-if="isElisUsed" rowspan="2" class="th-documents">Документы</th>
-          <th rowspan="2">Измерение ИВК</th>
-          <th rowspan="2">Измерение ХАЛ</th>
-          <th colspan="2">Результат</th>
-        </tr>
-
-        <!-- Вторая строка заголовков (подзаголовки для Результата) -->
-        <tr>
-          <!-- Пустые ячейки для объединенных заголовков -->
-          <th class="th-spacer" v-for="n in spacerColumnsCount" :key="`spacer-${n}`"></th>
-          <!-- Подзаголовки для "Результат" -->
-          <th>Значение</th>
-          <th>Текст</th>
+          <th>№</th>
+          <th>Наименование показателя</th>
+          <th>Метод испытаний</th>
+          <th v-if="isElisUsed" class="th-documents">Документы</th>
+          <th>Измерение</th>
+          <th>Результат</th>
         </tr>
       </thead>
 
@@ -48,9 +35,9 @@
           :parameter="param"
           :index="index + 1"
           :isElisUsed="isElisUsed"
-          @update:halValue="$emit('update:halValue', $event)"
           @update:method="$emit('update:method', $event)"
-          @update:printValue="$emit('update:printValue', $event)"
+          @update:measurement="$emit('update:measurement', $event)"
+          @update:result="$emit('update:result', $event)"
         />
       </tbody>
     </table>
@@ -58,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import PassportParameterRow from './PassportParameterRow.vue';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
@@ -69,22 +55,13 @@ interface Props {
   isElisUsed: boolean;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 defineEmits<{
-  'update:halValue': [event: { paramKey: string; value: string }];
   'update:method': [event: { paramKey: string; methodName: string }];
-  'update:printValue': [event: { paramKey: string; value: string }];
+  'update:measurement': [event: { paramKey: string; value: string }];
+  'update:result': [event: { paramKey: string; value: string }];
 }>();
-
-/**
- * Количество пустых ячеек во второй строке заголовка
- * (для выравнивания с объединенными ячейками в первой строке)
- */
-const spacerColumnsCount = computed(() => {
-  // №, Наименование, Метод, Документы (если ELIS), ИВК, ХАЛ
-  return props.isElisUsed ? 6 : 5;
-});
 </script>
 
 <style scoped>
@@ -127,11 +104,6 @@ const spacerColumnsCount = computed(() => {
   vertical-align: middle;
 }
 
-/* Пустые ячейки во второй строке заголовка (для выравнивания) */
-.th-spacer {
-  display: none;
-}
-
 /* Колонка "Документы" */
 .th-documents {
   min-width: 150px;
@@ -156,23 +128,13 @@ const spacerColumnsCount = computed(() => {
   min-width: 150px;
 }
 
-.col-ivk {
-  width: 100px;
-  text-align: center;
-}
-
-.col-hal {
-  width: 100px;
-  text-align: center;
-}
-
-.col-result-value {
-  width: 100px;
-  text-align: center;
-}
-
-.col-result-text {
+.col-measurement {
   width: 120px;
+  text-align: center;
+}
+
+.col-result {
+  width: 150px;
   text-align: center;
 }
 

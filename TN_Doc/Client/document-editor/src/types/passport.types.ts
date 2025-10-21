@@ -48,17 +48,13 @@ export interface PassportQualityParameter {
 }
 
 /**
- * Значения параметра (ИВК, ХАЛ, Результат, Печать)
+ * Значения параметра (новая структура с объединенным измерением)
  */
 export interface ParameterValues {
-  /** Значение ИВК (только чтение) */
-  ivk: string;
-  /** Значение ХАЛ (редактируемое) */
-  hal: string;
-  /** Результат (только чтение) */
+  /** Измерение (объединенное значение: ELIS → HAL → IVK → пусто) */
+  measurement: string;
+  /** Результат (ранее printValue) */
   result: string;
-  /** Значение для печати (может быть редактируемым) */
-  printValue: string;
 }
 
 /**
@@ -98,15 +94,15 @@ export interface ParameterDocument {
 }
 
 /**
- * Флаги заполнения из ELIS для параметра
+ * Флаги заполнения из ELIS для параметра (новая структура)
  */
 export interface ParameterElisFlags {
-  /** Значение ХАЛ заполнено из ELIS */
-  hal: boolean;
+  /** Измерение заполнено из ELIS (вместо hal) */
+  measurement: boolean;
   /** Метод испытаний заполнен из ELIS */
   method: boolean;
-  /** Значение для печати заполнено из ELIS */
-  printValue: boolean;
+  /** Результат заполнен из ELIS (вместо printValue) */
+  result: boolean;
   /** Документ заполнен из ELIS */
   document: boolean;
 }
@@ -122,9 +118,9 @@ export interface ElisData {
 }
 
 /**
- * Событие обновления значения ХАЛ
+ * Событие обновления значения measurement
  */
-export interface HalValueUpdateEvent {
+export interface MeasurementUpdateEvent {
   /** Ключ параметра */
   paramKey: string;
   /** Новое значение */
@@ -142,9 +138,9 @@ export interface MethodUpdateEvent {
 }
 
 /**
- * Событие обновления значения для печати
+ * Событие обновления значения result
  */
-export interface PrintValueUpdateEvent {
+export interface ResultUpdateEvent {
   /** Ключ параметра */
   paramKey: string;
   /** Новое значение */

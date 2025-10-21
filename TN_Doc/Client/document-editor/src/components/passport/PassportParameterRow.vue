@@ -16,38 +16,26 @@
 
     <!-- Документы (только если ELIS используется) -->
     <td v-if="isElisUsed" class="cell-documents td-documents">
-      <PassportDocumentField
+      <PassportDocumentField :parameter="parameter" />
+    </td>
+
+    <!-- Измерение (объединенная колонка) -->
+    <td class="cell-measurement">
+      <PassportMeasurementInput
         :parameter="parameter"
+        @update:measurement="handleMeasurementUpdate"
       />
     </td>
 
-    <!-- Измерение ИВК (только чтение) -->
-    <td class="cell-ivk manual-input--disabled">
-      {{ formatValue(parameter.values.ivk) }}
-    </td>
-
-    <!-- Измерение ХАЛ (редактируемое) -->
-    <td class="cell-hal">
-      <PassportHalInput
-        :parameter="parameter"
-        @update:halValue="handleHalValueUpdate"
-      />
-    </td>
-
-    <!-- Результат - Значение (только чтение) -->
-    <td class="cell-result-value manual-input--disabled">
-      {{ formatValue(parameter.values.result) }}
-    </td>
-
-    <!-- Результат - Текст (может быть редактируемым) -->
+    <!-- Результат (может быть редактируемым) -->
     <td
-      class="cell-result-text"
-      :class="{ 'manual-input--disabled': !isPrintCellEditable }"
+      class="cell-result"
+      :class="{ 'manual-input--disabled': !isResultEditable }"
     >
-      <PassportPrintCell
+      <PassportResultCell
         :parameter="parameter"
-        :isEditable="isPrintCellEditable"
-        @update:printValue="handlePrintValueUpdate"
+        :isEditable="isResultEditable"
+        @update:result="handleResultUpdate"
       />
     </td>
   </tr>
@@ -57,8 +45,8 @@
 import { computed } from 'vue';
 import PassportMethodSelect from './PassportMethodSelect.vue';
 import PassportDocumentField from './PassportDocumentField.vue';
-import PassportHalInput from './PassportHalInput.vue';
-import PassportPrintCell from './PassportPrintCell.vue';
+import PassportMeasurementInput from './PassportMeasurementInput.vue';
+import PassportResultCell from './PassportResultCell.vue';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {
@@ -73,15 +61,15 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:halValue': [event: { paramKey: string; value: string }];
   'update:method': [event: { paramKey: string; methodName: string }];
-  'update:printValue': [event: { paramKey: string; value: string }];
+  'update:measurement': [event: { paramKey: string; value: string }];
+  'update:result': [event: { paramKey: string; value: string }];
 }>();
 
 /**
- * Определить, редактируема ли ячейка печати
+ * Определить, редактируема ли ячейка результата
  */
-const isPrintCellEditable = computed(() => {
+const isResultEditable = computed(() => {
   const selectedMethod = props.parameter.method.options.find(
     (m: MethodOption) => m.name === props.parameter.method.selected
   );
@@ -90,50 +78,24 @@ const isPrintCellEditable = computed(() => {
     return false;
   }
 
-  const halValue = parseFloat(props.parameter.values.hal.replace(',', '.'));
-  if (isNaN(halValue)) {
+  const measurementValue = parseFloat(props.parameter.values.measurement.replace(',', '.'));
+  if (isNaN(measurementValue)) {
     return false;
   }
 
-  return selectedMethod.limitValue !== undefined && halValue < selectedMethod.limitValue;
+  return selectedMethod.limitValue !== undefined && measurementValue < selectedMethod.limitValue;
 });
 
-/**
- * Форматирование значения (замена точки на запятую)
- */
-function formatValue(value: string): string {
-  if (!value) return '-';
-  return value.replace('.', ',');
-}
-
-/**
- * Обработчик обновления значения ХАЛ
- */
-function handleHalValueUpdate(value: string) {
-  emit('update:halValue', {
-    paramKey: props.parameter.key,
-    value
-  });
-}
-
-/**
- * Обработчик обновления метода испытаний
- */
 function handleMethodUpdate(methodName: string) {
-  emit('update:method', {
-    paramKey: props.parameter.key,
-    methodName
-  });
+  emit('update:method', { paramKey: props.parameter.key, methodName });
 }
 
-/**
- * Обработчик обновления значения для печати
- */
-function handlePrintValueUpdate(value: string) {
-  emit('update:printValue', {
-    paramKey: props.parameter.key,
-    value
-  });
+function handleMeasurementUpdate(value: string) {
+  emit('update:measurement', { paramKey: props.parameter.key, value });
+}
+
+function handleResultUpdate(value: string) {
+  emit('update:result', { paramKey: props.parameter.key, value });
 }
 </script>
 
@@ -153,13 +115,11 @@ function handlePrintValueUpdate(value: string) {
 }
 
 .cell-method,
-.cell-hal {
+.cell-measurement {
   padding: 4px;
 }
 
-.cell-ivk,
-.cell-result-value,
-.cell-result-text {
+.cell-result {
   text-align: center;
 }
 
@@ -167,10 +127,5 @@ function handlePrintValueUpdate(value: string) {
   background-color: var(--md-surface-variant, #F1F3F4);
   color: var(--md-text-secondary, #5F6368);
   cursor: not-allowed;
-}
-
-/* Стили для ELIS подсветки */
-.elis-filled-cell {
-  background-color: #8fd19e !important;
 }
 </style>
