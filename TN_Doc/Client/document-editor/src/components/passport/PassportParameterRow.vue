@@ -102,6 +102,12 @@ function handleResultUpdate(value: string) {
 <style scoped>
 .parameter-row td {
   vertical-align: middle;
+  border: 1px solid var(--md-outline-light, #E0E0E0);
+}
+
+/* Более специфичные селекторы для переопределения глобальных стилей */
+.quality-table .parameter-row td {
+  border: 1px solid var(--md-outline-light, #E0E0E0);
 }
 
 .cell-number {
