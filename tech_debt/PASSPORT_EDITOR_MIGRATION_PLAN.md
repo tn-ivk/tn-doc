@@ -1,868 +1,1188 @@
-# План миграции формы редактирования паспорта на Vue.js
+# План реализации Vue-редактора для документов Passport (Quality Certificates)
+
+**Обновлено:** 2025-10-21
+**Версия:** 2.0 (с учетом изменения структуры таблицы Edit)
+**Статус:** Frontend реализован (требует обновления под новую структуру), Backend не реализован
+
+---
 
 ## 📋 Оглавление
 
-1. [Архитектура и технологический стек](#1-архитектура-и-технологический-стек)
-2. [Изменения на серверной стороне](#2-изменения-на-серверной-стороне)
-3. [Компонентная структура Vue](#3-компонентная-структура-vue)
-4. [Composables (переиспользуемая логика)](#4-composables-переиспользуемая-логика)
-5. [Pinia Store](#5-pinia-store)
-6. [Интеграция с существующей системой](#6-интеграция-с-существующей-системой)
-7. [Этапы реализации](#7-этапы-реализации)
-8. [Преимущества миграции](#8-преимущества-миграции)
-9. [Риски и митигация](#9-риски-и-митигация)
+1. [Текущее состояние](#текущее-состояние)
+2. [Изменение структуры таблицы Edit](#изменение-структуры-таблицы-edit)
+3. [Обновления Frontend](#обновления-frontend)
+4. [Backend реализация](#backend-реализация)
+5. [Timeline и оценка](#timeline-и-оценка)
+6. [Приоритеты](#приоритеты)
+7. [Следующие шаги](#следующие-шаги)
 
 ---
 
-## 1. АРХИТЕКТУРА И ТЕХНОЛОГИЧЕСКИЙ СТЕК
+## Текущее состояние
 
-### Использовать существующий стек из statusbar:
-- Vue 3.4+ с Composition API
-- TypeScript
-- PrimeVue 4.2+ (готовые компоненты)
-- Pinia для управления состоянием
-- Vite как сборщик
+### ✅ Frontend - Реализовано (требует обновления)
 
-### Структура проекта:
-```
-TN_Doc/Client/passport-editor/
-├── src/
-│   ├── components/
-│   │   ├── AdditionalInfoTable.vue     # Таблица дополнительной информации
-│   │   ├── ParametersTable.vue          # Основная таблица параметров
-│   │   ├── ValidationTooltip.vue        # Компонент для подсказок валидации
-│   │   └── PrintCell.vue                # Редактируемая ячейка печати
-│   ├── composables/
-│   │   ├── useValidation.ts             # Логика валидации
-│   │   ├── useParentCommunication.ts    # Связь с родительским окном
-│   │   └── useLogger.ts                 # Клиентское логирование
-│   ├── stores/
-│   │   └── passportStore.ts             # Pinia store для данных паспорта
-│   ├── types/
-│   │   ├── passport.types.ts            # TypeScript типы
-│   │   └── validation.types.ts
-│   ├── services/
-│   │   ├── api.service.ts               # API запросы
-│   │   └── validation.service.ts        # Сервис валидации
-│   ├── App.vue                           # Главный компонент
-│   └── main.ts
-├── public/
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
-```
+**Основной компонент редактора:**
+- ✅ `DocumentPassportEditor.vue` - главный компонент редактора
+- ✅ Таблица AdditionalInfo (16 полей дополнительной информации)
+- ⚠️ `PassportQualityTable.vue` - **ТРЕБУЕТ ОБНОВЛЕНИЯ** (8 колонок → 6 колонок)
 
----
+**TypeScript типы:**
+- ✅ `passport.types.ts` с интерфейсами
+- ⚠️ **ТРЕБУЕТ ОБНОВЛЕНИЯ**: `ParameterValues` - убрать отдельные `ivk`/`hal`, добавить единое поле `measurement`
 
-## 2. ИЗМЕНЕНИЯ НА СЕРВЕРНОЙ СТОРОНЕ
+**Композабл логика:**
+- ✅ `usePassportEditor.ts` - основная бизнес-логика
+- ⚠️ **ТРЕБУЕТ ОБНОВЛЕНИЯ**: адаптировать под новую структуру данных
 
-### 2.1 Модификация DocPassport.cs
+**Компоненты таблицы качественных параметров:**
+- ⚠️ `PassportParameterRow.vue` - **ТРЕБУЕТ ОБНОВЛЕНИЯ** (8 ячеек → 6 ячеек)
+- ✅ `PassportMethodSelect.vue` - выбор метода испытаний
+- ✅ `PassportHalInput.vue` - ввод значения ХАЛ (переименовать в `PassportMeasurementInput.vue`)
+- ⚠️ `PassportPrintCell.vue` - **ТРЕБУЕТСЯ АДАПТАЦИЯ** под колонку "Результат"
+- ✅ `PassportDocumentField.vue` - отображение ELIS документов
 
-**Текущее состояние:**
-- `GetEditDoc(id)` генерирует HTML с помощью HtmlAgilityPack
-- Сохраняет в `/wwwroot/HTML/html.html`
+**Роутинг:**
+- ✅ Маршрут `/edit/:deviceId/Passport/:id` добавлен в `router/index.ts`
 
-**Новый подход:**
-```csharp
-// Новый метод для возврата JSON данных вместо HTML
-public object GetEditDocData(int id)
-{
-    _logger.Trace($"Получение JSON данных для редактирования документа {IdDoc} с ID {id}");
-    GetViewDoc(id);
+**Расположение:**
+- Все компоненты в `/TN_Doc/Client/document-editor/`
+- Использует существующий document-editor монорепозиторий (не отдельное приложение)
 
-    var isElisUsed = _appConfig.IsUsedElis(_deviceId);
-    var editDoc = LoadCfg<CfgEditPassport>(PathToDocEditConfigFile);
-    var dataArm = ((DataIVKDoc)Doc.Doc.DataIVK).TablePassport.DataARM;
+### ❌ Backend - Не реализовано (0%)
 
-    var result = new
-    {
-        DocId = id,
-        IsElisUsed = isElisUsed,
-        AdditionalInfo = BuildAdditionalInfoData(editDoc, dataArm),
-        Parameters = BuildParametersData(editDoc, dataArm),
-        Dictionaries = new
-        {
-            Users = Doc.Doc?.Settings?.Dictionarys?.Users,
-            InvalidChars = GetInvalidChars()
-        }
-    };
-
-    return result;
-}
-
-private List<object> BuildAdditionalInfoData(CfgEditPassport editDoc, DataARM dataArm)
-{
-    var items = new List<object>();
-    foreach (var item in editDoc.AdditionalInfo.Where(x => x.Use))
-    {
-        var fieldData = new
-        {
-            Key = item.Key,
-            Name = item.Name,
-            Type = item.Type,
-            Edit = item.Edit,
-            RequiredFill = item.RequiredFill,
-            Value = GetAdditionalInfoValue(item),
-            KeyELIS = item.KeyELIS,
-            ElisAlias = item.ElisAlias,
-            ElisFilled = false,
-            Options = item.Type == "list" ? GetUserOptions(item.Key) : null
-        };
-        items.Add(fieldData);
-    }
-    return items;
-}
-
-private List<object> BuildParametersData(CfgEditPassport editDoc, DataARM dataArm)
-{
-    var parameters = new List<object>();
-    foreach (var param in editDoc.Parameters.Where(x => x.Use))
-    {
-        var metodName = GetJsonTokenSafety($"Doc.DataIVK.TablePassport.TableActAndPassport.Passport.{param.Key.Replace("Correction", "Result")}.Desc");
-        var valueResult = GetJsonTokenSafety($"Doc.DataIVK.TablePassport.PassportResult.{param.Key.Replace("Correction", "Result")}");
-        var valueRaw = GetJsonTokenSafety($"Doc.DataIVK.TablePassport.TableActAndPassport.Passport.{param.Key.Replace("Correction", "Raw")}.Value", NotEditLabel);
-        // ... остальные данные
-
-        var labInfo = dataArm?.LabInfo?.FirstOrDefault(x => x.ParameterKey == param.Key);
-        var methods = GetMetods(param, editDoc, labInfo);
-
-        var paramData = new
-        {
-            Key = param.Key,
-            Name = param.Name,
-            Id = param.Id,
-            Edit = param.Edit,
-            RequiredFill = param.RequiredFill,
-            RoundValue = param.RoundValue,
-            KeyELIS = param.KeyELIS,
-            ElisAlias = param.ElisAlias,
-            ValueIVK = valueRaw,
-            ValueHAL = valueCorrection,
-            ValueResult = valueResult,
-            PrintValue = GetPrintValue(param.Key, valueResult, dataArm),
-            Metods = methods,
-            SelectedMetod = metodName,
-            Document = labInfo?.Document,
-            ElisFilled = false
-        };
-        parameters.Add(paramData);
-    }
-    return parameters;
-}
-```
-
-### 2.2 Новый контроллер endpoint
-
-```csharp
-// В HomeController или новом PassportController
-[HttpGet]
-public IActionResult GetPassportEditData(Guid idDevice, int idDoc)
-{
-    try
-    {
-        var doc = _appConfig.GetDocumentClass(idDevice, IdDoc.Passport);
-        var data = ((DocPassport)doc).GetEditDocData(idDoc);
-        return Ok(data);
-    }
-    catch (Exception ex)
-    {
-        _logger.Error(ex, "Ошибка получения данных для редактирования паспорта");
-        return StatusCode(500, new { error = ex.Message });
-    }
-}
-```
+**Требуется реализация:**
+- ❌ Интерфейс `IDocumentEditor` в `DocPassport.cs`
+- ❌ Метод `GetEditConfig(int id)` для возврата конфигурации
+- ❌ Классы моделей (QualityParameter, ParameterValues, etc.)
+- ❌ Метод `BuildQualityParameters()` с логикой "Измерение"
+- ❌ Метод `UpdateQualityParameters()`
+- ❌ Метод `SaveEditConfig(object config)`
 
 ---
 
-## 3. КОМПОНЕНТНАЯ СТРУКТУРА VUE
+## Изменение структуры таблицы Edit
 
-### 3.1 Главный компонент App.vue
+### Старая структура (8 колонок):
+| № | Наименование | Метод | Документы* | Измерение ИВК | Измерение ХАЛ | Результат-Значение | Результат-Текст |
+
+### Новая структура (6 колонок):
+| № | Наименование | Метод | Документы* | Измерение | Результат |
+
+_* Колонка "Документы" показывается только при использовании ELIS_
+
+### Ключевые изменения:
+
+1. **Колонки "Измерение ИВК" и "Измерение ХАЛ" объединены в "Измерение"**
+   - Логика заполнения должна быть реализована в `DocPassport.cs`
+   - Приоритет: ELIS → HAL → IVK → пусто
+
+2. **Колонка "Результат-Значение" удалена**
+   - Значение теперь только одно - в колонке "Результат"
+
+3. **Колонка "Результат-Текст" переименована в "Результат"**
+   - Всегда показывается, независимо от использования ELIS
+   - Может быть редактируемой при определенных условиях (limitValueActivate)
+
+4. **Структура данных изменена:**
+   ```typescript
+   // БЫЛО:
+   interface ParameterValues {
+     ivk: string;
+     hal: string;
+     result: string;
+     printValue: string;
+   }
+
+   // СТАЛО:
+   interface ParameterValues {
+     measurement: string;  // Объединенное значение
+     result: string;       // Результат (ранее printValue)
+   }
+   ```
+
+---
+
+## Обновления Frontend
+
+### 1. Обновить `passport.types.ts` ⚠️
+
+**Файл:** `/TN_Doc/Client/document-editor/src/types/passport.types.ts`
+
+```typescript
+/**
+ * Значения параметра
+ */
+export interface ParameterValues {
+  /** Измерение (объединенное значение) */
+  measurement: string;
+  /** Результат (ранее printValue) */
+  result: string;
+}
+
+/**
+ * Флаги заполнения из ELIS для параметра
+ */
+export interface ParameterElisFlags {
+  measurement: boolean; // Измерение заполнено из ELIS (вместо hal)
+  method: boolean;      // Метод испытаний заполнен из ELIS
+  result: boolean;      // Результат заполнен из ELIS (вместо printValue)
+  document: boolean;    // Документ заполнен из ELIS
+}
+
+/**
+ * Событие обновления measurement
+ */
+export interface MeasurementUpdateEvent {
+  paramKey: string;
+  value: string;
+}
+
+/**
+ * Событие обновления result
+ */
+export interface ResultUpdateEvent {
+  paramKey: string;
+  value: string;
+}
+```
+
+### 2. Обновить `PassportQualityTable.vue` ⚠️
+
+**Файл:** `/TN_Doc/Client/document-editor/src/components/passport/PassportQualityTable.vue`
+
+**Изменить заголовок таблицы:**
 
 ```vue
 <template>
-  <div class="passport-editor">
-    <AdditionalInfoTable
-      :fields="additionalInfo"
-      :dictionaries="dictionaries"
-      @field-change="handleFieldChange"
-    />
+  <div class="quality-table-container">
+    <table id="Edit" class="quality-table">
+      <!-- Определение ширины колонок -->
+      <colgroup>
+        <col class="col-num">          <!-- № -->
+        <col class="col-name">         <!-- Наименование -->
+        <col class="col-method">       <!-- Метод -->
+        <col class="col-documents" v-if="isElisUsed">  <!-- Документы (условная) -->
+        <col class="col-measurement">  <!-- Измерение -->
+        <col class="col-result">       <!-- Результат -->
+      </colgroup>
 
-    <ParametersTable
-      :parameters="parameters"
-      :is-elis-used="isElisUsed"
-      @parameter-change="handleParameterChange"
-      @metod-change="handleMetodChange"
-    />
+      <!-- Заголовок таблицы (ОДНА строка вместо двух) -->
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Наименование показателя</th>
+          <th>Метод испытаний</th>
+          <th v-if="isElisUsed" class="th-documents">Документы</th>
+          <th>Измерение</th>
+          <th>Результат</th>
+        </tr>
+      </thead>
+
+      <!-- Тело таблицы -->
+      <tbody>
+        <PassportParameterRow
+          v-for="(param, index) in parameters"
+          :key="param.key"
+          :parameter="param"
+          :index="index + 1"
+          :isElisUsed="isElisUsed"
+          @update:method="$emit('update:method', $event)"
+          @update:measurement="$emit('update:measurement', $event)"
+          @update:result="$emit('update:result', $event)"
+        />
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
-import { usePassportStore } from '@/stores/passportStore';
-import { useParentCommunication } from '@/composables/useParentCommunication';
-import AdditionalInfoTable from '@/components/AdditionalInfoTable.vue';
-import ParametersTable from '@/components/ParametersTable.vue';
+import { computed } from 'vue';
+import PassportParameterRow from './PassportParameterRow.vue';
+import type { PassportQualityParameter } from '@/types/passport.types';
 
-const store = usePassportStore();
-const { notifyValidationState } = useParentCommunication();
-
-const additionalInfo = computed(() => store.additionalInfo);
-const parameters = computed(() => store.parameters);
-const isElisUsed = computed(() => store.isElisUsed);
-const dictionaries = computed(() => store.dictionaries);
-
-onMounted(async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const docId = parseInt(urlParams.get('id') || '0');
-  const deviceId = urlParams.get('deviceId') || '';
-
-  await store.loadPassportData(deviceId, docId);
-});
-
-const handleFieldChange = (key: string, value: any) => {
-  store.updateAdditionalInfo(key, value);
-  notifyValidationState(store.isValid);
-};
-
-const handleParameterChange = (key: string, tag: string, value: any) => {
-  store.updateParameter(key, tag, value);
-  notifyValidationState(store.isValid);
-};
-
-const handleMetodChange = (key: string, metod: any) => {
-  store.updateMetod(key, metod);
-};
-</script>
-```
-
-### 3.2 AdditionalInfoTable.vue
-
-```vue
-<template>
-  <table id="AdditionalInfo">
-    <tbody>
-      <tr v-for="field in fields" :key="field.Key">
-        <td>{{ field.Name }}</td>
-        <td>
-          <!-- Dropdown для списков пользователей -->
-          <Dropdown
-            v-if="field.Type === 'list'"
-            v-model="field.Value"
-            :options="field.Options"
-            optionLabel="IOF"
-            optionValue="Id"
-            :class="getValidationClass(field)"
-            :disabled="!field.Edit"
-            @change="handleChange(field)"
-          />
-
-          <!-- Calendar для дат -->
-          <Calendar
-            v-else-if="field.Type === 'datetime-local'"
-            v-model="field.Value"
-            showTime
-            :class="getValidationClass(field)"
-            :required="field.RequiredFill"
-            @update:modelValue="handleChange(field)"
-          />
-
-          <!-- InputText для текста -->
-          <InputText
-            v-else
-            v-model="field.Value"
-            :class="getValidationClass(field)"
-            :disabled="!field.Edit"
-            :required="field.RequiredFill"
-            @input="handleChange(field)"
-          />
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</template>
-
-<script setup lang="ts">
-import { useValidation } from '@/composables/useValidation';
-import Dropdown from 'primevue/dropdown';
-import Calendar from 'primevue/calendar';
-import InputText from 'primevue/inputtext';
-
-const props = defineProps<{
-  fields: any[];
-  dictionaries: any;
-}>();
-
-const emit = defineEmits<{
-  fieldChange: [key: string, value: any];
-}>();
-
-const { validateField, getValidationClass } = useValidation();
-
-const handleChange = (field: any) => {
-  validateField(field);
-  emit('fieldChange', field.Key, field.Value);
-
-  // Автозаполнение должности и предприятия при выборе пользователя
-  if (field.Key.includes('_IOF')) {
-    autoFillUserData(field);
-  }
-};
-
-const autoFillUserData = (field: any) => {
-  // Логика из UserChangeEvent()
-  // ...
-};
-</script>
-```
-
-### 3.3 ParametersTable.vue
-
-```vue
-<template>
-  <table id="Edit" :class="{ 'no-elis': !isElisUsed }">
-    <colgroup>
-      <col class="col-num">
-      <col class="col-name">
-      <col class="col-method">
-      <col class="col-ivk">
-      <col v-if="isElisUsed" class="col-elis">
-      <col class="col-hal">
-      <col class="col-result-value">
-      <col class="col-result-text">
-    </colgroup>
-
-    <thead>
-      <tr>
-        <th rowspan="2">№</th>
-        <th rowspan="2">Наименование показателя</th>
-        <th rowspan="2">Метод испытаний</th>
-        <th rowspan="2">Измерение ИВК</th>
-        <th v-if="isElisUsed" rowspan="2">Документы</th>
-        <th rowspan="2">Измерение ХАЛ</th>
-        <th colspan="2">Результат</th>
-      </tr>
-      <tr>
-        <th>Значение</th>
-        <th>Текст</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr v-for="(param, index) in parameters" :key="param.Key">
-        <td style="text-align: center">{{ index + 1 }}</td>
-        <td>{{ param.Name }}</td>
-
-        <!-- Метод испытаний -->
-        <td>
-          <Dropdown
-            v-model="param.SelectedMetod"
-            :options="param.Metods"
-            optionLabel="Name"
-            optionValue="Name"
-            :class="getValidationClass(param, 'Metod')"
-            @change="handleMetodChange(param)"
-          />
-        </td>
-
-        <!-- Измерение ИВК -->
-        <td class="manual-input--disabled" style="text-align: center">
-          {{ param.ValueIVK }}
-        </td>
-
-        <!-- Документы (если ELIS) -->
-        <td v-if="isElisUsed">
-          <InputText
-            :value="param.Document?.Number"
-            disabled
-            class="manual-input--disabled"
-            style="text-align: center"
-          />
-        </td>
-
-        <!-- Измерение ХАЛ -->
-        <td>
-          <InputNumber
-            v-model="param.ValueHAL"
-            :class="getValidationClass(param, 'Value')"
-            :disabled="!param.Edit"
-            :maxFractionDigits="param.RoundValue ? parseInt(param.RoundValue) : 10"
-            :useGrouping="false"
-            @input="handleHALChange(param)"
-          />
-        </td>
-
-        <!-- Результат - Значение -->
-        <td class="manual-input--disabled" style="text-align: center">
-          {{ param.ValueResult }}
-        </td>
-
-        <!-- Результат - Текст -->
-        <PrintCell
-          :parameter="param"
-          @value-change="handlePrintValueChange"
-        />
-      </tr>
-    </tbody>
-  </table>
-</template>
-
-<script setup lang="ts">
-import { useValidation } from '@/composables/useValidation';
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
-import PrintCell from './PrintCell.vue';
-
-const props = defineProps<{
-  parameters: any[];
+interface Props {
+  parameters: PassportQualityParameter[];
   isElisUsed: boolean;
+}
+
+const props = defineProps<Props>();
+
+defineEmits<{
+  'update:method': [event: { paramKey: string; methodName: string }];
+  'update:measurement': [event: { paramKey: string; value: string }];
+  'update:result': [event: { paramKey: string; value: string }];
 }>();
-
-const emit = defineEmits<{
-  parameterChange: [key: string, tag: string, value: any];
-  metodChange: [key: string, metod: any];
-}>();
-
-const { validateField, getValidationClass } = useValidation();
-
-const handleMetodChange = (param: any) => {
-  emit('metodChange', param.Key, param.SelectedMetod);
-  // Логика из TogglePrintCellEditable()
-};
-
-const handleHALChange = (param: any) => {
-  validateField(param, 'Value');
-  emit('parameterChange', param.Key, 'Value', param.ValueHAL);
-  // Логика из updatePrintValueOnHalChange()
-};
 </script>
 ```
 
-### 3.4 PrintCell.vue
+### 3. Обновить `PassportParameterRow.vue` ⚠️
+
+**Файл:** `/TN_Doc/Client/document-editor/src/components/passport/PassportParameterRow.vue`
+
+**Изменить структуру ячеек (6 ячеек вместо 8):**
 
 ```vue
 <template>
-  <td
-    :class="cellClasses"
-    style="text-align: center"
-    :data-parameter-key="parameter.Key"
-  >
-    <InputText
-      v-if="isEditable"
-      v-model="printValue"
-      class="print-cell-input"
-      :class="getValidationClass(parameter, 'PrintValue')"
-      @input="handleInput"
-    />
-    <span v-else>{{ printValue }}</span>
-  </td>
+  <tr class="parameter-row">
+    <!-- №: Номер строки -->
+    <td class="cell-number">{{ index }}</td>
+
+    <!-- Наименование показателя -->
+    <td class="cell-name">{{ parameter.name }}</td>
+
+    <!-- Метод испытаний -->
+    <td class="cell-method">
+      <PassportMethodSelect
+        :parameter="parameter"
+        @update:method="handleMethodUpdate"
+      />
+    </td>
+
+    <!-- Документы (только если ELIS используется) -->
+    <td v-if="isElisUsed" class="cell-documents td-documents">
+      <PassportDocumentField :parameter="parameter" />
+    </td>
+
+    <!-- Измерение (объединенная колонка) -->
+    <td class="cell-measurement">
+      <PassportMeasurementInput
+        :parameter="parameter"
+        @update:measurement="handleMeasurementUpdate"
+      />
+    </td>
+
+    <!-- Результат (может быть редактируемым) -->
+    <td
+      class="cell-result"
+      :class="{ 'manual-input--disabled': !isResultEditable }"
+    >
+      <PassportResultCell
+        :parameter="parameter"
+        :isEditable="isResultEditable"
+        @update:result="handleResultUpdate"
+      />
+    </td>
+  </tr>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import InputText from 'primevue/inputtext';
+import { computed } from 'vue';
+import PassportMethodSelect from './PassportMethodSelect.vue';
+import PassportDocumentField from './PassportDocumentField.vue';
+import PassportMeasurementInput from './PassportMeasurementInput.vue';
+import PassportResultCell from './PassportResultCell.vue';
+import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
-const props = defineProps<{
-  parameter: any;
-}>();
+interface Props {
+  parameter: PassportQualityParameter;
+  index: number;
+  isElisUsed: boolean;
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  valueChange: [key: string, value: string];
+  'update:method': [event: { paramKey: string; methodName: string }];
+  'update:measurement': [event: { paramKey: string; value: string }];
+  'update:result': [event: { paramKey: string; value: string }];
 }>();
 
-const printValue = ref(props.parameter.PrintValue);
+/**
+ * Определить, редактируема ли ячейка результата
+ */
+const isResultEditable = computed(() => {
+  const selectedMethod = props.parameter.method.options.find(
+    (m: MethodOption) => m.name === props.parameter.method.selected
+  );
 
-const isEditable = computed(() => {
-  // Логика из TogglePrintCellEditable()
-  const metod = props.parameter.Metods.find(m => m.Name === props.parameter.SelectedMetod);
-  const halValue = parseFloat(props.parameter.ValueHAL);
+  if (!selectedMethod || !selectedMethod.limitValueActivate) {
+    return false;
+  }
 
-  return metod?.LimitValueActivate && !isNaN(halValue) && halValue < metod.LimitValue;
+  const measurementValue = parseFloat(props.parameter.values.measurement.replace(',', '.'));
+  if (isNaN(measurementValue)) {
+    return false;
+  }
+
+  return selectedMethod.limitValue !== undefined && measurementValue < selectedMethod.limitValue;
 });
 
-const cellClasses = computed(() => ({
-  'print-cell-editable': isEditable.value,
-  'manual-input--disabled': !isEditable.value,
-  'elis-filled-cell': props.parameter.ElisFilled
-}));
+function handleMethodUpdate(methodName: string) {
+  emit('update:method', { paramKey: props.parameter.key, methodName });
+}
 
-watch(() => props.parameter, (newParam) => {
-  printValue.value = calculatePrintValue(newParam);
-}, { deep: true });
+function handleMeasurementUpdate(value: string) {
+  emit('update:measurement', { paramKey: props.parameter.key, value });
+}
 
-const calculatePrintValue = (param: any) => {
-  // Логика из calculatePrintValue()
-  // ...
-};
-
-const handleInput = () => {
-  emit('valueChange', props.parameter.Key, printValue.value);
-};
+function handleResultUpdate(value: string) {
+  emit('update:result', { paramKey: props.parameter.key, value });
+}
 </script>
 ```
 
----
+### 4. Переименовать `PassportHalInput.vue` → `PassportMeasurementInput.vue` ⚠️
 
-## 4. COMPOSABLES (ПЕРЕИСПОЛЬЗУЕМАЯ ЛОГИКА)
+**Создать:** `/TN_Doc/Client/document-editor/src/components/passport/PassportMeasurementInput.vue`
 
-### 4.1 useValidation.ts
+```vue
+<template>
+  <InputNumber
+    :modelValue="numericValue"
+    :disabled="!parameter.editable"
+    :class="[
+      validationClass,
+      { 'elis-filled': parameter.elisFlags.measurement },
+      { 'manual-input--disabled': !parameter.editable }
+    ]"
+    :minFractionDigits="0"
+    :maxFractionDigits="parameter.roundValue || 10"
+    mode="decimal"
+    locale="ru-RU"
+    class="measurement-input"
+    @update:modelValue="handleValueChange"
+  />
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import InputNumber from 'primevue/inputnumber';
+import type { PassportQualityParameter } from '@/types/passport.types';
+
+interface Props {
+  parameter: PassportQualityParameter;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:measurement': [value: string];
+}>();
+
+const numericValue = computed(() => {
+  if (!props.parameter.values.measurement) return null;
+  const value = parseFloat(props.parameter.values.measurement.replace(',', '.'));
+  return isNaN(value) ? null : value;
+});
+
+const validationClass = computed(() => {
+  if (props.parameter.requiredFill) {
+    if (!props.parameter.values.measurement || props.parameter.values.measurement === '') {
+      return 'incorrect-value';
+    }
+  }
+
+  if (props.parameter.roundValue && props.parameter.values.measurement) {
+    const value = props.parameter.values.measurement.replace(',', '.');
+    const parts = value.split('.');
+    if (parts.length > 1 && parts[1].length > props.parameter.roundValue) {
+      return 'incorrect-value';
+    }
+  }
+
+  return 'correct-value';
+});
+
+function handleValueChange(value: number | null) {
+  const stringValue = value !== null ? value.toString().replace('.', ',') : '';
+  emit('update:measurement', stringValue);
+}
+</script>
+
+<style scoped>
+.measurement-input {
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+}
+
+.measurement-input:deep(input) {
+  text-align: center;
+  font-size: 15px;
+}
+
+/* Валидация */
+.correct-value {
+  border-color: var(--md-outline, #CFD8DC);
+}
+
+.correct-value:deep(input) {
+  border-color: var(--md-outline, #CFD8DC);
+}
+
+.incorrect-value {
+  border-color: var(--md-error, #dc3545);
+  background-color: #f8d7da;
+}
+
+.incorrect-value:deep(input) {
+  border-color: var(--md-error, #dc3545);
+  background-color: #f8d7da;
+}
+
+/* ELIS подсветка */
+.elis-filled {
+  background-color: #8fd19e !important;
+}
+
+.elis-filled:deep(input) {
+  background-color: #8fd19e !important;
+}
+
+/* Disabled стиль */
+.manual-input--disabled {
+  background-color: var(--md-surface-variant, #F1F3F4);
+  color: var(--md-text-secondary, #5F6368);
+  cursor: not-allowed;
+}
+
+.manual-input--disabled:deep(input) {
+  background-color: var(--md-surface-variant, #F1F3F4);
+  color: var(--md-text-secondary, #5F6368);
+  cursor: not-allowed;
+}
+</style>
+```
+
+### 5. Переименовать `PassportPrintCell.vue` → `PassportResultCell.vue` ⚠️
+
+**Создать:** `/TN_Doc/Client/document-editor/src/components/passport/PassportResultCell.vue`
+
+```vue
+<template>
+  <!-- Редактируемая ячейка результата -->
+  <InputText
+    v-if="isEditable"
+    :modelValue="parameter.values.result"
+    :class="{ 'elis-filled': parameter.elisFlags.result }"
+    type="text"
+    class="result-cell-input"
+    @update:modelValue="handleValueChange"
+  />
+
+  <!-- Нередактируемая ячейка результата (просто текст) -->
+  <span
+    v-else
+    :class="{ 'elis-filled-text': parameter.elisFlags.result }"
+    class="result-cell-readonly"
+  >
+    {{ displayValue }}
+  </span>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import InputText from 'primevue/inputtext';
+import type { PassportQualityParameter } from '@/types/passport.types';
+
+interface Props {
+  parameter: PassportQualityParameter;
+  isEditable: boolean;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:result': [value: string];
+}>();
+
+const displayValue = computed(() => {
+  if (!props.parameter.values.result) return '-';
+  return props.parameter.values.result.replace('.', ',');
+});
+
+function handleValueChange(value: string) {
+  emit('update:result', value);
+  console.log(`[PassportResultCell] Result изменено: ${props.parameter.key} -> ${value}`);
+}
+</script>
+
+<style scoped>
+.result-cell-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 2px;
+  outline: none;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.result-cell-input:focus {
+  outline: none;
+  background: #f8f9fa;
+}
+
+.result-cell-readonly {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+}
+
+/* ELIS подсветка */
+.elis-filled {
+  background-color: #8fd19e !important;
+}
+
+.elis-filled-text {
+  background-color: #8fd19e;
+  display: inline-block;
+  width: 100%;
+  padding: 2px;
+}
+</style>
+```
+
+### 6. Обновить `usePassportEditor.ts` ⚠️
+
+**Файл:** `/TN_Doc/Client/document-editor/src/composables/usePassportEditor.ts`
+
+**Изменить типы событий и обработчики:**
 
 ```typescript
-import { ref } from 'vue';
-import type { ValidationRule } from '@/types/validation.types';
+import { computed } from 'vue';
+import { useDocumentStore } from '@/stores/documentStore';
+import type {
+  PassportEditConfig,
+  PassportQualityParameter,
+  MethodOption,
+  MeasurementUpdateEvent,
+  MethodUpdateEvent,
+  ResultUpdateEvent
+} from '@/types/passport.types';
 
-export function useValidation() {
-  const invalidChars = ref<string[]>([]);
+export function usePassportEditor() {
+  const store = useDocumentStore();
 
-  const checkEmpty = (field: any): boolean => {
-    if (!field.RequiredFill) return true;
+  const passportConfig = computed<PassportEditConfig | null>(() => {
+    if (!store.config || store.config.docType !== 'Passport') {
+      return null;
+    }
+    return store.config as PassportEditConfig;
+  });
 
-    if (!field.Value || field.Value === '') {
-      field.ValidationError = 'Поле должно быть заполнено!';
+  const qualityParameters = computed<PassportQualityParameter[]>(() => {
+    return passportConfig.value?.qualityParameters || [];
+  });
+
+  const isElisUsed = computed<boolean>(() => {
+    return passportConfig.value?.isElisUsed || false;
+  });
+
+  const hasQualityParameters = computed<boolean>(() => {
+    return qualityParameters.value.length > 0;
+  });
+
+  function findParameter(paramKey: string): PassportQualityParameter | undefined {
+    return qualityParameters.value.find(p => p.key === paramKey);
+  }
+
+  /**
+   * Пересчитать результат на основе метода и значения measurement
+   */
+  function recalculateResult(param: PassportQualityParameter): string {
+    const selectedMethod = param.method.options.find(
+      (m: MethodOption) => m.name === param.method.selected
+    );
+
+    // Если есть результат из ELIS и measurement заполнено из ELIS, используем его
+    if (param.elisFlags.result && param.elisFlags.measurement) {
+      return param.values.result;
+    }
+
+    const measurementValue = parseFloat(param.values.measurement.replace(',', '.'));
+
+    if (isNaN(measurementValue)) {
+      return '-';
+    }
+
+    // Если у метода активирован лимит и значение ниже порога
+    if (
+      selectedMethod?.limitValueActivate &&
+      selectedMethod.limitValue !== undefined &&
+      measurementValue < selectedMethod.limitValue
+    ) {
+      return selectedMethod.limitValueString || '-';
+    }
+
+    return param.values.measurement;
+  }
+
+  /**
+   * Определить, редактируема ли ячейка результата
+   */
+  function isResultEditable(param: PassportQualityParameter): boolean {
+    const selectedMethod = param.method.options.find(
+      (m: MethodOption) => m.name === param.method.selected
+    );
+
+    if (!selectedMethod || !selectedMethod.limitValueActivate) {
       return false;
     }
 
-    field.ValidationError = null;
-    return true;
-  };
-
-  const checkInvalidChars = (field: any): boolean => {
-    if (!invalidChars.value || invalidChars.value.length === 0) return true;
-
-    const value = String(field.Value);
-    for (const char of invalidChars.value) {
-      if (value.includes(char)) {
-        field.ValidationError = `Некорректный символ: ${char}`;
-        return false;
-      }
+    const measurementValue = parseFloat(param.values.measurement.replace(',', '.'));
+    if (isNaN(measurementValue)) {
+      return false;
     }
 
-    field.ValidationError = null;
-    return true;
-  };
+    return selectedMethod.limitValue !== undefined && measurementValue < selectedMethod.limitValue;
+  }
 
-  const checkRounding = (field: any): boolean => {
-    if (!field.RoundValue) return true;
-
-    const round = Number(field.RoundValue);
-    if (isNaN(round) || round < 1) return true;
-
-    const pattern = `^-?[0-9]+(?:\\.[0-9]{1,${round}})?$`;
-    const regex = new RegExp(pattern);
-
-    if (regex.test(String(field.Value))) {
-      field.ValidationError = null;
-      return true;
+  /**
+   * Обработчик обновления measurement
+   */
+  function handleMeasurementUpdate(event: MeasurementUpdateEvent) {
+    const param = findParameter(event.paramKey);
+    if (!param) {
+      console.warn(`Параметр с ключом ${event.paramKey} не найден`);
+      return;
     }
 
-    field.ValidationError = 'Кол-во знаков после запятой не соответствует заданным правилам!';
-    return false;
-  };
+    param.values.measurement = event.value;
+    param.values.result = recalculateResult(param);
+    store.isDirty = true;
 
-  const validateField = (field: any, tag?: string): boolean => {
-    let isValid = true;
+    console.log(`[usePassportEditor] Measurement обновлено: ${event.paramKey} = ${event.value}, Result = ${param.values.result}`);
+  }
 
-    if (tag === 'Value') {
-      isValid = checkEmpty(field) && checkRounding(field);
-    } else {
-      isValid = checkEmpty(field) && checkInvalidChars(field);
+  /**
+   * Обработчик обновления метода испытаний
+   */
+  function handleMethodUpdate(event: MethodUpdateEvent) {
+    const param = findParameter(event.paramKey);
+    if (!param) {
+      console.warn(`Параметр с ключом ${event.paramKey} не найден`);
+      return;
     }
 
-    return isValid;
-  };
+    param.method.selected = event.methodName;
+    param.values.result = recalculateResult(param);
+    store.isDirty = true;
 
-  const getValidationClass = (field: any, tag?: string) => {
-    return {
-      'correct-value': !field.ValidationError,
-      'incorrect-value': !!field.ValidationError
-    };
-  };
+    console.log(`[usePassportEditor] Метод обновлен: ${event.paramKey} = ${event.methodName}, Result = ${param.values.result}`);
+  }
+
+  /**
+   * Обработчик обновления результата (ручное редактирование)
+   */
+  function handleResultUpdate(event: ResultUpdateEvent) {
+    const param = findParameter(event.paramKey);
+    if (!param) {
+      console.warn(`Параметр с ключом ${event.paramKey} не найден`);
+      return;
+    }
+
+    param.values.result = event.value;
+    store.isDirty = true;
+    param.elisFlags.result = false;
+
+    console.log(`[usePassportEditor] Result обновлено вручную: ${event.paramKey} = ${event.value}`);
+  }
 
   return {
-    invalidChars,
-    validateField,
-    getValidationClass,
-    checkEmpty,
-    checkInvalidChars,
-    checkRounding
-  };
-}
-```
-
-### 4.2 useParentCommunication.ts
-
-```typescript
-export function useParentCommunication() {
-  const notifyValidationState = (isValid: boolean) => {
-    const message = isValid ? 'ButtonSaveOn' : 'ButtonSaveOff';
-    window.top?.postMessage(message, '*');
-  };
-
-  const saveDocument = async (data: any) => {
-    // Вызов SaveDoc через window.parent
-    return new Promise((resolve, reject) => {
-      // Логика из SaveDoc()
-    });
-  };
-
-  return {
-    notifyValidationState,
-    saveDocument
-  };
-}
-```
-
-### 4.3 useLogger.ts
-
-```typescript
-export function useLogger() {
-  const logToServer = async (level: string, message: string) => {
-    try {
-      await fetch('/api/ClientLog/logging', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level, message })
-      });
-    } catch (error) {
-      console.warn('Не удалось отправить лог на сервер:', message);
-    }
-  };
-
-  return {
-    logTrace: (msg: string) => logToServer('Trace', msg),
-    logDebug: (msg: string) => logToServer('Debug', msg),
-    logInfo: (msg: string) => logToServer('Info', msg),
-    logWarn: (msg: string) => logToServer('Warn', msg),
-    logError: (msg: string) => logToServer('Error', msg)
-  };
-}
-```
-
----
-
-## 5. PINIA STORE
-
-```typescript
-// stores/passportStore.ts
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { PassportData } from '@/types/passport.types';
-import { apiService } from '@/services/api.service';
-
-export const usePassportStore = defineStore('passport', () => {
-  const docId = ref<number>(0);
-  const deviceId = ref<string>('');
-  const additionalInfo = ref<any[]>([]);
-  const parameters = ref<any[]>([]);
-  const dictionaries = ref<any>(null);
-  const isElisUsed = ref<boolean>(false);
-
-  const isValid = computed(() => {
-    const additionalValid = additionalInfo.value.every(f => !f.ValidationError);
-    const parametersValid = parameters.value.every(p => !p.ValidationError);
-    return additionalValid && parametersValid;
-  });
-
-  const loadPassportData = async (devId: string, docNumber: number) => {
-    deviceId.value = devId;
-    docId.value = docNumber;
-
-    const data = await apiService.getPassportEditData(devId, docNumber);
-
-    additionalInfo.value = data.AdditionalInfo;
-    parameters.value = data.Parameters;
-    dictionaries.value = data.Dictionaries;
-    isElisUsed.value = data.IsElisUsed;
-  };
-
-  const updateAdditionalInfo = (key: string, value: any) => {
-    const field = additionalInfo.value.find(f => f.Key === key);
-    if (field) {
-      field.Value = value;
-    }
-  };
-
-  const updateParameter = (key: string, tag: string, value: any) => {
-    const param = parameters.value.find(p => p.Key === key);
-    if (param) {
-      if (tag === 'Value') param.ValueHAL = value;
-      else if (tag === 'PrintValue') param.PrintValue = value;
-    }
-  };
-
-  const updateMetod = (key: string, metodName: string) => {
-    const param = parameters.value.find(p => p.Key === key);
-    if (param) {
-      param.SelectedMetod = metodName;
-    }
-  };
-
-  return {
-    docId,
-    deviceId,
-    additionalInfo,
-    parameters,
-    dictionaries,
+    passportConfig,
+    qualityParameters,
     isElisUsed,
-    isValid,
-    loadPassportData,
-    updateAdditionalInfo,
-    updateParameter,
-    updateMetod
+    hasQualityParameters,
+    findParameter,
+    recalculateResult,
+    isResultEditable,
+    handleMeasurementUpdate,
+    handleMethodUpdate,
+    handleResultUpdate
   };
-});
+}
 ```
 
 ---
 
-## 6. ИНТЕГРАЦИЯ С СУЩЕСТВУЮЩЕЙ СИСТЕМОЙ
+## Backend реализация
 
-### 6.1 Модификация родительской страницы
+### 1. Реализовать интерфейс `IDocumentEditor` в классе `DocPassport`
 
-```javascript
-// В родительском окне (Index.cshtml или другая страница)
-function openPassportEditor(deviceId, docId) {
-  const iframe = document.getElementById('editFrame');
-  iframe.src = `/passport-editor/?deviceId=${deviceId}&id=${docId}`;
-
-  // Слушатель сообщений от Vue приложения
-  window.addEventListener('message', (event) => {
-    if (event.data === 'ButtonSaveOn') {
-      enableSaveButton();
-    } else if (event.data === 'ButtonSaveOff') {
-      disableSaveButton();
-    }
-  });
-}
-```
-
-### 6.2 Endpoint для сохранения
+**Файл:** `tn.docgeneral/Passport/DocPassport.cs`
 
 ```csharp
-[HttpPost]
-public async Task<IActionResult> SavePassport([FromBody] SavePassportRequest request)
-{
-    try
-    {
-        var doc = _appConfig.GetDocumentClass(request.DeviceId, IdDoc.Passport);
-        var success = doc.SaveDoc(JsonConvert.SerializeObject(request.Data));
+using TN_Doc.Models.Interfaces;
 
-        return Ok(new { success });
-    }
-    catch (Exception ex)
+namespace TN.DocGeneral.Passport
+{
+    public class DocPassport : IDocumentEditor
     {
-        _logger.Error(ex, "Ошибка сохранения паспорта");
-        return StatusCode(500, new { error = ex.Message });
+        // Существующие методы и поля...
+
+        /// <summary>
+        /// Получить конфигурацию для редактирования паспорта качества
+        /// </summary>
+        public object GetEditConfig(int id)
+        {
+            // Загрузить документ из базы данных
+            var doc = LoadDocumentById(id);
+
+            // Построить конфигурацию
+            return new PassportEditConfig
+            {
+                DocType = "Passport",
+                DeviceId = IdDevice,
+                DocumentId = id,
+                IsElisUsed = IsElisUsed(),
+                AdditionalInfo = BuildAdditionalInfoFields(doc),
+                QualityParameters = BuildQualityParameters(doc)
+            };
+        }
+
+        /// <summary>
+        /// Сохранить изменения документа из JSON
+        /// </summary>
+        public void SaveEditConfig(object config)
+        {
+            var passportConfig = config as PassportEditConfig;
+            if (passportConfig == null)
+            {
+                throw new ArgumentException("Неверный тип конфигурации");
+            }
+
+            // Обновить AdditionalInfo поля
+            UpdateAdditionalInfoFields(passportConfig.AdditionalInfo);
+
+            // Обновить качественные параметры
+            UpdateQualityParameters(passportConfig.QualityParameters);
+
+            // Сохранить изменения в базу данных
+            SaveToDatabase();
+        }
     }
+}
+```
+
+### 2. Создать классы моделей для Backend
+
+```csharp
+/// <summary>
+/// Конфигурация для редактирования паспорта качества
+/// </summary>
+public class PassportEditConfig
+{
+    public string DocType { get; set; } = "Passport";
+    public int DeviceId { get; set; }
+    public int DocumentId { get; set; }
+    public bool IsElisUsed { get; set; }
+    public Dictionary<string, AdditionalInfoField> AdditionalInfo { get; set; } = new();
+    public List<QualityParameter> QualityParameters { get; set; } = new();
+}
+
+/// <summary>
+/// Параметр качества нефти
+/// </summary>
+public class QualityParameter
+{
+    public int Id { get; set; }
+    public string Key { get; set; }
+    public string Name { get; set; }
+    public bool Editable { get; set; }
+    public bool RequiredFill { get; set; }
+    public int? RoundValue { get; set; }
+    public ElisData? ElisData { get; set; }
+    public ParameterValues Values { get; set; }
+    public ParameterMethod Method { get; set; }
+    public ParameterDocument? Document { get; set; }
+    public ParameterElisFlags ElisFlags { get; set; }
+}
+
+/// <summary>
+/// Значения параметра (НОВАЯ СТРУКТУРА)
+/// </summary>
+public class ParameterValues
+{
+    /// <summary>
+    /// Измерение (объединенное значение)
+    /// Логика заполнения: ELIS → HAL → IVK → пусто
+    /// </summary>
+    public string Measurement { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Результат (ранее PrintValue)
+    /// Всегда показывается, независимо от ELIS
+    /// </summary>
+    public string Result { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Метод испытаний
+/// </summary>
+public class ParameterMethod
+{
+    public string Selected { get; set; }
+    public List<MethodOption> Options { get; set; } = new();
+}
+
+/// <summary>
+/// Опция метода испытаний
+/// </summary>
+public class MethodOption
+{
+    public string Name { get; set; }
+    public bool IsDefault { get; set; }
+    public bool LimitValueActivate { get; set; }
+    public double? LimitValue { get; set; }
+    public string? LimitValueString { get; set; }
+}
+
+/// <summary>
+/// Документ ELIS
+/// </summary>
+public class ParameterDocument
+{
+    public string Number { get; set; }
+    public bool ElisFilled { get; set; }
+}
+
+/// <summary>
+/// Флаги заполнения из ELIS (НОВАЯ СТРУКТУРА)
+/// </summary>
+public class ParameterElisFlags
+{
+    public bool Measurement { get; set; }  // вместо hal
+    public bool Method { get; set; }
+    public bool Result { get; set; }       // вместо printValue
+    public bool Document { get; set; }
+}
+
+/// <summary>
+/// ELIS метаданные
+/// </summary>
+public class ElisData
+{
+    public string KeyELIS { get; set; }
+    public List<string>? ElisAlias { get; set; }
+}
+```
+
+### 3. Реализовать метод `BuildQualityParameters()`
+
+**ВАЖНО: Логика заполнения колонки "Измерение"**
+
+```csharp
+/// <summary>
+/// Построить список качественных параметров
+/// </summary>
+private List<QualityParameter> BuildQualityParameters(PassportDocument doc)
+{
+    var parameters = new List<QualityParameter>();
+
+    // Пример для одного параметра (нужно повторить для всех параметров)
+    parameters.Add(new QualityParameter
+    {
+        Id = 1,
+        Key = "TempCorrection",
+        Name = "Температура приведения, °С",
+        Editable = true,
+        RequiredFill = false,
+        RoundValue = 1,
+        ElisData = new ElisData
+        {
+            KeyELIS = "TempCorrection",
+            ElisAlias = new List<string> { "Температура приведения" }
+        },
+        Values = new ParameterValues
+        {
+            // ЛОГИКА ЗАПОЛНЕНИЯ MEASUREMENT:
+            // 1. Если есть значение из ELIS - используем его
+            // 2. Иначе если есть значение HAL из БД - используем его
+            // 3. Иначе если есть значение IVK из БД - используем его
+            // 4. Иначе пустая строка
+            Measurement = GetMeasurementValue(doc, "TempCorrection"),
+
+            // ЛОГИКА ЗАПОЛНЕНИЯ RESULT:
+            // 1. Если есть ValueString из ELIS - используем его
+            // 2. Иначе если есть PrintValue из БД - используем его
+            // 3. Иначе пересчитываем на основе measurement и метода
+            Result = GetResultValue(doc, "TempCorrection")
+        },
+        Method = new ParameterMethod
+        {
+            Selected = doc.TempCorrectionMethod,
+            Options = GetMethodOptions("TempCorrection")
+        },
+        Document = IsElisUsed() ? new ParameterDocument
+        {
+            Number = doc.TempCorrectionDocNumber ?? string.Empty,
+            ElisFilled = doc.TempCorrectionElisDocFilled
+        } : null,
+        ElisFlags = new ParameterElisFlags
+        {
+            Measurement = doc.TempCorrectionElisMeasurementFilled,
+            Method = doc.TempCorrectionElisMethodFilled,
+            Result = doc.TempCorrectionElisResultFilled,
+            Document = doc.TempCorrectionElisDocFilled
+        }
+    });
+
+    // Повторить для всех остальных параметров качества...
+
+    return parameters;
+}
+
+/// <summary>
+/// Получить значение measurement для параметра
+/// ЛОГИКА: ELIS → HAL → IVK → пусто
+/// </summary>
+private string GetMeasurementValue(PassportDocument doc, string paramKey)
+{
+    // TODO: Реализовать логику на основе конкретных требований
+    switch (paramKey)
+    {
+        case "TempCorrection":
+            if (!string.IsNullOrEmpty(doc.TempCorrectionElisValue))
+                return doc.TempCorrectionElisValue;
+            if (!string.IsNullOrEmpty(doc.TempCorrectionHalValue))
+                return doc.TempCorrectionHalValue;
+            if (!string.IsNullOrEmpty(doc.TempCorrectionIvkValue))
+                return doc.TempCorrectionIvkValue;
+            return string.Empty;
+        // ... остальные параметры
+        default:
+            return string.Empty;
+    }
+}
+
+/// <summary>
+/// Получить значение result для параметра
+/// ЛОГИКА: ValueString из ELIS → PrintValue из БД → пересчёт
+/// </summary>
+private string GetResultValue(PassportDocument doc, string paramKey)
+{
+    switch (paramKey)
+    {
+        case "TempCorrection":
+            if (!string.IsNullOrEmpty(doc.TempCorrectionElisValueString))
+                return doc.TempCorrectionElisValueString;
+            if (!string.IsNullOrEmpty(doc.TempCorrectionPrintValue))
+                return doc.TempCorrectionPrintValue;
+            return RecalculateResult(doc, paramKey);
+        // ... остальные параметры
+        default:
+            return string.Empty;
+    }
+}
+
+/// <summary>
+/// Пересчитать результат на основе measurement и метода
+/// </summary>
+private string RecalculateResult(PassportDocument doc, string paramKey)
+{
+    var measurementValue = GetMeasurementValue(doc, paramKey);
+    if (string.IsNullOrEmpty(measurementValue))
+        return "-";
+
+    var method = GetSelectedMethod(doc, paramKey);
+    if (method == null || !method.LimitValueActivate)
+        return measurementValue;
+
+    if (double.TryParse(measurementValue.Replace(',', '.'), out var value))
+    {
+        if (method.LimitValue.HasValue && value < method.LimitValue.Value)
+        {
+            return method.LimitValueString ?? "-";
+        }
+    }
+
+    return measurementValue;
+}
+```
+
+### 4. Реализовать метод `UpdateQualityParameters()`
+
+```csharp
+/// <summary>
+/// Обновить качественные параметры в документе
+/// </summary>
+private void UpdateQualityParameters(List<QualityParameter> parameters)
+{
+    foreach (var param in parameters)
+    {
+        switch (param.Key)
+        {
+            case "TempCorrection":
+                UpdateMeasurementValue("TempCorrection", param.Values.Measurement);
+                UpdateResultValue("TempCorrection", param.Values.Result);
+                UpdateMethodValue("TempCorrection", param.Method.Selected);
+                break;
+            // Повторить для всех остальных параметров...
+        }
+    }
+}
+
+private void UpdateMeasurementValue(string paramKey, string value)
+{
+    // TODO: Сохранить в соответствующее поле БД
+}
+
+private void UpdateResultValue(string paramKey, string value)
+{
+    // TODO: Сохранить в соответствующее поле БД
+}
+
+private void UpdateMethodValue(string paramKey, string methodName)
+{
+    // TODO: Сохранить в соответствующее поле БД
+}
+```
+
+### 5. Реализовать метод `BuildAdditionalInfoFields()`
+
+```csharp
+/// <summary>
+/// Построить поля дополнительной информации (AdditionalInfo таблица)
+/// </summary>
+private Dictionary<string, AdditionalInfoField> BuildAdditionalInfoFields(PassportDocument doc)
+{
+    return new Dictionary<string, AdditionalInfoField>
+    {
+        ["Field1"] = new AdditionalInfoField
+        {
+            Label = "Месторождение",
+            Value = doc.Field1Value ?? string.Empty,
+            Editable = true,
+            Type = "text"
+        },
+        ["Field2"] = new AdditionalInfoField
+        {
+            Label = "Пункт приёма",
+            Value = doc.Field2Value ?? string.Empty,
+            Editable = true,
+            Type = "text"
+        },
+        // ... остальные 14 полей
+    };
 }
 ```
 
 ---
 
-## 7. ЭТАПЫ РЕАЛИЗАЦИИ
+## Timeline и оценка
 
-### Этап 1: Подготовка инфраструктуры (1-2 дня)
-- [ ] Создать Vue проект в `/TN_Doc/Client/passport-editor/`
-- [ ] Настроить TypeScript, Vite, PrimeVue
-- [ ] Создать базовую структуру папок
-- [ ] Настроить интеграцию сборки в ASP.NET Core
+### Frontend обновления (1-2 дня)
+- [ ] Обновить `passport.types.ts` - изменить ParameterValues (1 час)
+- [ ] Обновить `PassportQualityTable.vue` - изменить заголовок (1 час)
+- [ ] Обновить `PassportParameterRow.vue` - 6 ячеек вместо 8 (2 часа)
+- [ ] Переименовать `PassportHalInput.vue` → `PassportMeasurementInput.vue` (30 мин)
+- [ ] Переименовать `PassportPrintCell.vue` → `PassportResultCell.vue` (30 мин)
+- [ ] Обновить `usePassportEditor.ts` - новые обработчики (2 часа)
+- [ ] Обновить `DocumentPassportEditor.vue` (1 час)
+- [ ] Тестирование frontend (2 часа)
 
-### Этап 2: Серверная часть (2-3 дня)
-- [ ] Создать `GetEditDocData()` в `DocPassport.cs`
-- [ ] Добавить endpoint в контроллер
-- [ ] Протестировать возврат JSON данных
-- [ ] Добавить endpoint для сохранения
+### Backend реализация (5-7 дней)
+- [ ] Реализовать интерфейс `IDocumentEditor` (1 день)
+- [ ] Создать классы моделей (1 день)
+- [ ] Реализовать `BuildQualityParameters()` с логикой "Измерение" (2-3 дня)
+- [ ] Реализовать `UpdateQualityParameters()` (1-2 дня)
+- [ ] Реализовать `BuildAdditionalInfoFields()` (1 день)
+- [ ] Тестирование backend (1 день)
 
-### Этап 3: Базовые компоненты (3-4 дня)
-- [ ] Реализовать `AdditionalInfoTable.vue`
-- [ ] Реализовать `ParametersTable.vue`
-- [ ] Создать `PrintCell.vue`
-- [ ] Базовая валидация
+### Интеграционное тестирование (2 дня)
+- [ ] Проверить загрузку данных из БД
+- [ ] Проверить ELIS интеграцию
+- [ ] Проверить сохранение изменений
+- [ ] Проверить валидацию полей
+- [ ] Проверить редактируемость ячейки "Результат"
 
-### Этап 4: Логика валидации (2-3 дня)
-- [ ] Composable `useValidation`
-- [ ] Проверка обязательных полей
-- [ ] Проверка недопустимых символов
-- [ ] Проверка округления
-- [ ] Tooltips для ошибок
-
-### Этап 5: Pinia Store и API (2 дня)
-- [ ] Создать store
-- [ ] Сервис API запросов
-- [ ] Загрузка данных
-- [ ] Сохранение данных
-
-### Этап 6: Специфичная логика (3-4 дня)
-- [ ] Автозаполнение пользовательских данных
-- [ ] Логика `TogglePrintCellEditable`
-- [ ] Расчет `PrintValue`
-- [ ] Обработка ELIS данных
-
-### Этап 7: Интеграция с родительским окном (1-2 дня)
-- [ ] `useParentCommunication` composable
-- [ ] Уведомления о валидности
-- [ ] Интеграция кнопки сохранения
-
-### Этап 8: Стили и UX (2-3 дня)
-- [ ] Портировать CSS стили
-- [ ] ELIS подсветка
-- [ ] Адаптация под PrimeVue
-- [ ] Тестирование UI
-
-### Этап 9: Тестирование (3-5 дней)
-- [ ] Unit тесты composables
-- [ ] Component тесты
-- [ ] E2E тесты
-- [ ] Тестирование интеграции
-
-### Этап 10: Документация и развертывание (1-2 дня)
-- [ ] Документация компонентов
-- [ ] README для разработчиков
-- [ ] Настройка CI/CD
-- [ ] Развертывание
-
-**Общая оценка: 20-30 рабочих дней**
+**Итого: 8-11 дней (1.5-2 недели)**
 
 ---
 
-## 8. ПРЕИМУЩЕСТВА МИГРАЦИИ
+## Приоритеты
 
-✅ **Реактивность**: Автоматическое обновление UI при изменении данных
-✅ **Типобезопасность**: TypeScript предотвращает ошибки на этапе разработки
-✅ **Компонентность**: Переиспользуемые изолированные компоненты
-✅ **Тестируемость**: Легче писать unit и integration тесты
-✅ **Поддержка**: Современный код проще поддерживать
-✅ **PrimeVue**: Готовые компоненты с accessibility и валидацией
-✅ **Производительность**: Virtual DOM и оптимизации Vue 3
+### 🔴 Критично (обязательно)
+1. Обновить структуру таблицы с 8 на 6 колонок (Frontend)
+2. Реализовать логику колонки "Измерение" в DocPassport.cs (Backend)
+3. Реализовать GetEditConfig() в DocPassport.cs (Backend)
+4. Обновить типы TypeScript под новую структуру
 
----
+### 🟡 Важно (желательно)
+1. ELIS интеграция с подсветкой #8fd19e
+2. Валидация полей с визуализацией ошибок
+3. Динамическая редактируемость ячейки "Результат"
+4. Проверка округления значений
 
-## 9. РИСКИ И МИТИГАЦИЯ
-
-⚠️ **Риск**: Сложность логики `TogglePrintCellEditable`
-   - **Митигация**: Детальный анализ и unit тесты
-
-⚠️ **Риск**: Интеграция с OPC тегами через `EditDoc.js`
-   - **Митигация**: Создать отдельный сервис для OPC
-
-⚠️ **Риск**: Обратная совместимость с существующими формами
-   - **Митигация**: Поэтапная миграция, feature flag
-
-⚠️ **Риск**: ELIS интеграция
-   - **Митигация**: Сохранить существующую логику, обернуть в API
+### 🟢 Опционально (можно отложить)
+1. Анимации переходов
+2. Расширенное логирование событий
+3. Unit тесты для композаблов
+4. E2E тесты
 
 ---
 
-## Файлы для анализа
+## Следующие шаги
 
-### Зависимые файлы проекта:
-- `/TN_Doc/wwwroot/HTML/DocEditPassport.html` - HTML форма редактирования
-- `/tn.docgeneral/Passport/DocPassport.cs` - Серверная логика
-- `/TN_Doc/wwwroot/css/commonEditForm.css` - Общие стили
-- `/TN_Doc/wwwroot/css/elisEditForm.css` - Стили ELIS
-- `/TN_Doc/wwwroot/js/EditDoc.js` - JavaScript логика
-- `/TN_Doc/wwwroot/js/Logger.js` - Клиентское логирование
-- `/TN_Doc/wwwroot/js/loading-spinner.js` - Спиннер загрузки
+1. **Обновить Frontend компоненты** под новую 6-колоночную структуру (1-2 дня)
+2. **Уточнить с пользователем логику колонки "Измерение"** - как именно формировать значение
+3. **Реализовать Backend GetEditConfig()** в DocPassport.cs (5-7 дней)
+4. **Интеграционное тестирование** (2 дня)
+5. **Деплой и production тестирование** (1 день)
 
-### Конфигурационные файлы:
-- `/TN_Doc/Cfg/CfgEditPassport.json` - Конфигурация формы редактирования
+---
+
+## Архитектурные решения
+
+### Интеграция с существующей системой
+
+**Используемый подход:**
+- ✅ Использование существующего `document-editor` монорепозитория
+- ✅ Интеграция с `DocumentEditController` (без создания нового контроллера)
+- ✅ Использование интерфейса `IDocumentEditor` для единообразия
+- ✅ Следование паттерну из `DocumentActEditor.vue`
+- ✅ Роутинг через Vue Router (`/edit/:deviceId/Passport/:id`)
+
+**НЕ используемый подход (из старого плана):**
+- ❌ Создание отдельного приложения `/TN_Doc/Client/passport-editor/`
+- ❌ Создание нового `PassportController`
+- ❌ Отдельные endpoint'ы для паспортов
+
+### Технологический стек
+
+**Frontend:**
+- Vue 3.4.21 с Composition API
+- TypeScript для типобезопасности
+- PrimeVue 4.2+ для UI компонентов
+- Pinia для управления состоянием
+- Vite как сборщик
+
+**Backend:**
+- ASP.NET Core 8.0
+- Интерфейс `IDocumentEditor`
+- Существующий `DocumentEditController`
+- NLog для логирования
+
+### ELIS интеграция
+
+**Подсветка данных из ELIS:**
+- Цвет: `#8fd19e` (светло-зеленый)
+- Применяется к полям с флагом `elisFlags.<field> === true`
+- Условное отображение колонки "Документы" при `isElisUsed === true`
+
+**Флаги ELIS:**
+- `measurement` - измерение заполнено из ELIS
+- `method` - метод испытаний заполнен из ELIS
+- `result` - результат заполнен из ELIS
+- `document` - документ заполнен из ELIS
+
+---
+
+## Связанные документы
+
+- `/tech_debt/DOCUMENT_EDITOR_POC.md` - Архитектура Document Editor POC
+- `/tech_debt/IMPLEMENTATION_STATUS.md` - Статус реализации Stage 1 и Stage 2
+- `/tech_debt/MIGRATION_PATTERN.md` - Общий паттерн миграции документов
+- `/tech_debt/VUE_EDITOR_INTEGRATION.md` - Интеграция Vue редактора
+
+---
+
+**Последнее обновление:** 2025-10-21
+**Автор:** TN_Doc Development Team
+**Статус:** В разработке (Frontend готов, Backend требует реализации)

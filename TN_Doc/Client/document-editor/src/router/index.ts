@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import DocumentEditor from '@/views/DocumentEditor.vue';
 import DocumentActEditor from '@/views/DocumentActEditor.vue';
+import DocumentPassportEditor from '@/views/DocumentPassportEditor.vue';
 import ErrorPage from '@/views/ErrorPage.vue';
 
 const router = createRouter({
@@ -11,6 +12,13 @@ const router = createRouter({
       path: '/edit/:deviceId/Act/:id',
       name: 'act-editor',
       component: DocumentActEditor,
+      props: true
+    },
+    {
+      // Специальный маршрут для редактирования Паспортов качества
+      path: '/edit/:deviceId/Passport/:id',
+      name: 'passport-editor',
+      component: DocumentPassportEditor,
       props: true
     },
     {
