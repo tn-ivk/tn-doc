@@ -235,7 +235,7 @@ public class StatusProvider : IStatusProvider
         }
         catch (TaskCanceledException ex)
         {
-            _logger.LogWarning(ex, "Не удалось подключиться к Messaging Service: истекло время подключения");
+            _logger.LogWarning("Не удалось подключиться к Messaging Service: истекло время подключения");
             status.Error = ex.Message;
             status.LastChecked = DateTime.Now;
         }
