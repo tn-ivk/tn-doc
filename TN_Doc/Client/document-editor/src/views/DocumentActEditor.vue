@@ -67,34 +67,13 @@ const { setupAutoFillWatchers } = useActAutoFill();
 
 // Загружаем документ при монтировании
 onMounted(async () => {
-  console.log('[DocumentActEditor] Монтирование компонента');
-  console.log('[DocumentActEditor] route.params:', route.params);
-  console.log('[DocumentActEditor] route.path:', route.path);
-  console.log('[DocumentActEditor] route.fullPath:', route.fullPath);
-
   const { deviceId, id } = route.params;
   const docType = 'Act'; // Для этого компонента тип документа всегда Act
 
-  console.log('[DocumentActEditor] Извлечённые параметры:', {
-    deviceId,
-    docType,
-    id,
-    deviceIdType: typeof deviceId,
-    docTypeType: typeof docType,
-    idType: typeof id
-  });
-
   if (!deviceId || !id) {
-    console.error('[DocumentActEditor] Отсутствуют параметры маршрута!');
     store.error = 'Отсутствуют обязательные параметры маршрута';
     return;
   }
-
-  console.log('[DocumentActEditor] Загружаем документ с параметрами:', {
-    deviceId: parseInt(deviceId as string, 10),
-    docType: docType,
-    id: parseInt(id as string, 10)
-  });
 
   await loadDocument(
     parseInt(deviceId as string, 10),
