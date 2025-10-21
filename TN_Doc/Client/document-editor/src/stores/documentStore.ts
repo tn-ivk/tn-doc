@@ -22,19 +22,30 @@ export const useDocumentStore = defineStore('document', () => {
   const fields = computed(() => config.value?.fields || []);
 
   /**
-   * Проверка валидации: есть ли незаполненные обязательные поля
+   * Проверка валидации: есть ли незаполненные обязательные поля или некорректные символы
    */
   const hasValidationErrors = computed(() => {
     if (!config.value) return false;
 
-    const requiredFields = config.value.fields.filter(f => f.required);
+    const invalidChars = config.value.invalidChars || [];
 
-    for (const field of requiredFields) {
+    for (const field of config.value.fields) {
       const value = formData.value[field.key];
 
-      // Проверяем, что значение заполнено (не пустая строка, не null, не undefined)
-      if (value === null || value === undefined || value === '') {
-        return true;
+      // Проверка обязательных полей
+      if (field.required) {
+        if (value === null || value === undefined || value === '') {
+          return true;
+        }
+      }
+
+      // Проверка некорректных символов для текстовых полей
+      if (field.type === 'text' && value && typeof value === 'string' && invalidChars.length > 0) {
+        for (const char of invalidChars) {
+          if (value.includes(char)) {
+            return true;
+          }
+        }
       }
     }
 
@@ -55,6 +66,11 @@ export const useDocumentStore = defineStore('document', () => {
 
     try {
       const loadedConfig = await documentApi.getEditConfig(deviceId, docType, id);
+
+      // Загружаем список некорректных символов для данного устройства
+      const invalidChars = await documentApi.getInvalidChars(deviceId);
+      loadedConfig.invalidChars = invalidChars;
+
       config.value = loadedConfig;
 
       // Инициализируем formData начальными значениями

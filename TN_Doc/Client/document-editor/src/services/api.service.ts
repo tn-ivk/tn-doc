@@ -78,6 +78,27 @@ class DocumentApiService {
     );
     return response.data;
   }
+
+  /**
+   * Получить список некорректных символов для устройства
+   * @param deviceId ID устройства (целое число)
+   */
+  async getInvalidChars(deviceId: number): Promise<string[]> {
+    try {
+      const response = await axios.get<string>('/Home/GetInvalideChars', {
+        params: { IdDevice: deviceId }
+      });
+
+      // Парсим JSON строку в массив
+      if (response.data) {
+        return JSON.parse(response.data);
+      }
+      return [];
+    } catch (error) {
+      console.error('Ошибка при получении списка некорректных символов:', error);
+      return [];
+    }
+  }
 }
 
 // Экспортируем синглтон

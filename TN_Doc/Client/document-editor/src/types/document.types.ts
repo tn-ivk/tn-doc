@@ -17,6 +17,8 @@ export interface DocumentEditConfig {
   deviceId: number;
   /** Справочники (лицензии/доверенности и т.д.) */
   dictionaries?: DocumentDictionaries;
+  /** Список некорректных символов для данного устройства */
+  invalidChars?: string[];
 }
 
 /** Справочники документа */

@@ -29,6 +29,7 @@
                     :field="field"
                     :modelValue="store.formData[field.key]"
                     :hide-label="true"
+                    :invalidChars="store.config?.invalidChars || []"
                     @update:modelValue="(value) => store.updateField(field.key, value)"
                   />
                 </td>

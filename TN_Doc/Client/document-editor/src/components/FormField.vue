@@ -84,7 +84,7 @@
 
     <!-- Сообщение об ошибке валидации -->
     <small v-if="!isValid" class="p-error">
-      Поле "{{ field.label }}" обязательно для заполнения
+      {{ validationMessage }}
     </small>
   </div>
 </template>
@@ -101,6 +101,7 @@ const props = defineProps<{
   field: FormField;
   modelValue: any;
   hideLabel?: boolean;
+  invalidChars?: string[];
 }>();
 
 const emit = defineEmits<{
@@ -110,12 +111,40 @@ const emit = defineEmits<{
 // Локальное значение для v-model
 const localValue = ref(props.modelValue);
 
+// Найти некорректный символ в значении
+const invalidCharFound = computed(() => {
+  // Проверяем только текстовые поля
+  if (props.field.type !== 'text') return null;
+  if (!localValue.value || typeof localValue.value !== 'string') return null;
+  if (!props.invalidChars || props.invalidChars.length === 0) return null;
+
+  // Проверяем каждый некорректный символ
+  for (const char of props.invalidChars) {
+    if (localValue.value.includes(char)) {
+      return char;
+    }
+  }
+  return null;
+});
+
 // Валидация
 const isValid = computed(() => {
+  // Проверка на некорректные символы
+  if (invalidCharFound.value !== null) return false;
+
+  // Проверка обязательных полей
   if (!props.field.required) return true;
   if (localValue.value === null || localValue.value === undefined) return false;
   if (typeof localValue.value === 'string' && localValue.value.trim() === '') return false;
   return true;
+});
+
+// Сообщение об ошибке
+const validationMessage = computed(() => {
+  if (invalidCharFound.value !== null) {
+    return `Некорректный символ: ${invalidCharFound.value}`;
+  }
+  return `Поле "${props.field.label}" обязательно для заполнения`;
 });
 
 // Синхронизация с внешним modelValue
