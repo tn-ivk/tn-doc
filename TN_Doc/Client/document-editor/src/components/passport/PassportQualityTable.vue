@@ -91,7 +91,7 @@ defineEmits<{
   font-weight: 600;
   text-align: center;
   padding: 6px 10px;
-  border: 1px solid var(--md-outline, #CFD8DC);
+  border: 1px solid var(--md-outline-light, #E0E0E0);
   color: var(--md-text, #212121);
   font-size: 15px;
 }
@@ -99,7 +99,7 @@ defineEmits<{
 /* Ячейки тела таблицы */
 .quality-table td {
   padding: 6px 10px;
-  border: 1px solid var(--md-outline, #CFD8DC);
+  border: 1px solid var(--md-outline-light, #E0E0E0);
   background-color: white;
   vertical-align: middle;
 }
