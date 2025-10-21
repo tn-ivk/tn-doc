@@ -40,7 +40,6 @@ var table = null;
 var currentId = null;
 var docTemplates = {};
 let isViewing = false;
-let isEditingDoc = false;
 let isShowEditAndSave = true;
 let isAllowEditAndSave = true;
 
@@ -758,7 +757,7 @@ function InitElement() {
     //InitPrinterName();
     //InitExportFormat();
     InitProtocolNumber();
-    $('#ComboboxDocGUID').change(function () {
+    $('#ComboboxDocGUID').change(async function () {
         if (table != null) $('#DataTable').DataTable().clear().draw();
         $('.FR').attr('src', '');
 
@@ -813,18 +812,7 @@ function GetData() {
                 hasError = true;
                 ret = [];
             },
-            complete: function (data) {
-                if ($('#ComboboxDocGUID').val() == 0 ||
-                    $('#ComboboxDocGUID').val() == 3 ||
-                    $('#ComboboxDocGUID').val() == 32) {
-                    $('#ButtonSave').prop('disabled', true);
-                    isEditingDoc = false;
-                    $('#viewModeButton').prop('hidden', true);
-                } else {
-                    $('#ButtonSave').prop('disabled', false);
-                    isEditingDoc = true;
-                }
-
+            complete: async function (data) {
                 if ($('#ComboboxDocGUID').val() == 1) {
                     $('#ButtonElis').prop('hidden', !IsUsedElis);
                 } else
@@ -838,7 +826,7 @@ function GetData() {
     return {'data': ret};
 }
 
-function GetDoc() {
+async function GetDoc() {
     $('.FR').attr('src', '');
     
     $.ajax(
@@ -852,7 +840,7 @@ function GetDoc() {
                 id: currentId,
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
-            success: function (data) {
+            success: async function (data) {
                 if (data)
                     $('.FR').attr('src', '/PDF/PDF.pdf#view=FitH');
                     //$('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
@@ -860,11 +848,13 @@ function GetDoc() {
                 $('#viewPanel').prop('hidden', false);
                 $('#editPanel').prop('hidden', true);
                 isViewing = true;
-                if(isEditingDoc)
-                    $('#viewModeButton')
-                        .prop('value', 'Редактирование')
-                        .prop('hidden', false)
-                        .prop('disabled', !isAllowEditAndSave);
+                
+                const canEdit = await checkCanEditDocument();
+                $('#viewModeButton')
+                    .prop('value', 'Редактирование')
+                    .prop('hidden', !canEdit)
+                    .prop('disabled', !isAllowEditAndSave);
+                $('#ButtonSave').prop('disabled', !canEdit);
             },
         });
 }
@@ -895,8 +885,7 @@ function GetEditDoc() {
         });
     
     isViewing = false;
-    $('#viewModeButton').prop('hidden', false)
-        .prop('value', '     Просмотр     ');
+    $('#viewModeButton').prop('value', '     Просмотр     ');
 }
 
 async function SaveDoc() {
@@ -1839,6 +1828,24 @@ function updateSaveBtnText() {
             button.val('Сохранить');
         }
     });
+}
+
+async function checkCanEditDocument() {
+    try {
+        const response = await $.ajax({
+            url: 'Home/CanEditDocument',
+            type: 'GET',
+            data: {
+                idDevice: $('#ComboboxDevice').val(),
+                idDoc: $('#ComboboxDocGUID').val()
+            }
+        });
+        
+        return response.canEdit;
+    } catch (error) {
+        console.error('Ошибка проверки возможности редактирования:', error);
+        return false;
+    }
 }
 
 function showError(message) {

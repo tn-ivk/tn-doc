@@ -2,28 +2,29 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using TN_Doc.Models.Services;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc.Models.Printer;
 
 /// <summary>
 /// Класс принтера для взаимодействия с печатью под Linux
 /// </summary>
-public sealed class LinuxPrinter : AbsPrinter
+public sealed class LinuxPrinter(IReportBuffer buffer) : AbsPrinter(buffer)
 {
-    private readonly IReportBuffer _buffer;
-
-    public LinuxPrinter(IReportBuffer buffer)
-    {
-        _buffer = buffer;
-    }
     /// <summary>
     /// Получение списка доступных принтеров в системе
     /// </summary>
     /// <returns>Список доступных принтеров</returns>
+    [SupportedOSPlatform("linux")]
     public override IEnumerable<string> GetAvailablePrinters()
     {
+        if (!OperatingSystem.IsLinux())
+        {
+            throw new PlatformNotSupportedException("Получение списка принтеров поддерживается только в Linux");
+        }
+
         using var process = new Process();
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
@@ -32,40 +33,73 @@ public sealed class LinuxPrinter : AbsPrinter
         process.StartInfo.Arguments = "-e";
         process.StartInfo.FileName = "lpstat";
         process.StartInfo.CreateNoWindow = true;
-        process.Start();
+        
+        if (!process.Start())
+        {
+            throw new InvalidOperationException("Не удалось запустить процесс lpstat для получения списка принтеров");
+        }
+        
         process.WaitForExit();
-        foreach (var item in process.StandardOutput.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries))
-            yield return item;
+        
+        if (process.ExitCode != 0)
+        {
+            var error = process.StandardError.ReadToEnd();
+            throw new InvalidOperationException($"Ошибка выполнения lpstat: {error}");
+        }
+        
+        var output = process.StandardOutput.ReadToEnd();
+        return output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
     }
 
     /// <summary>
     /// Печать сформированного отчёта на заданном принтере
     /// </summary>
     /// <param name="printerName">Название принтера</param>
+    [SupportedOSPlatform("linux")]
     public override Task PrintDocAsync(string printerName)
     {
+        if (!OperatingSystem.IsLinux())
+        {
+            throw new PlatformNotSupportedException("Печать поддерживается только в Linux");
+        }
+
         return Task.Run(() =>
         {
             var printersName = GetAvailablePrinters();
             if (!printersName.Contains(printerName))
-                return;
+                throw new InvalidOperationException($"Принтер '{printerName}' не доступен");
+                
             var pdfBytes = _buffer.GetPdfBytes();
             if (pdfBytes is null || pdfBytes.Length == 0)
-                return;
+                throw new InvalidOperationException("Отсутствуют подготовленные данные для печати");
+                
             using var process = new Process();
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardInput = true;
+            process.StartInfo.RedirectStandardError = true;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.Arguments = $"-d {printerName} -t \"TN_Doc\"";
             process.StartInfo.FileName = "lp";
             process.StartInfo.CreateNoWindow = true;
-            process.Start();
+            
+            if (!process.Start())
+            {
+                throw new InvalidOperationException("Не удалось запустить процесс lp для печати");
+            }
+            
             using (var stdin = process.StandardInput.BaseStream)
             {
                 stdin.Write(pdfBytes, 0, pdfBytes.Length);
                 stdin.Flush();
             }
+            
             process.WaitForExit();
+            
+            if (process.ExitCode != 0)
+            {
+                var error = process.StandardError.ReadToEnd();
+                throw new InvalidOperationException($"Ошибка печати через lp: {error}");
+            }
         });
     }
 }

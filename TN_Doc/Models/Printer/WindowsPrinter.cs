@@ -4,43 +4,32 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using TN_DocGeneral.Services;
 using PrinterSettings = SystemDrawing::System.Drawing.Printing.PrinterSettings;
-using TN_Doc.Models.Services;
 
 namespace TN_Doc.Models.Printer;
 
 /// <summary>
 /// Вспомогательный класс для работы с принтером в ОС Windows
 /// </summary>
-public sealed class WindowsPrinter : AbsPrinter
+public sealed class WindowsPrinter(IReportBuffer buffer) : AbsPrinter(buffer)
 {
-    private readonly ILogger<WindowsPrinter> _logger;
-    private readonly IReportBuffer _buffer;
-    
-    public WindowsPrinter(ILogger<WindowsPrinter> logger, IReportBuffer buffer)
-    {
-        _logger = logger;
-        _buffer = buffer;
-    }
-    
     /// <summary>
     /// Получение списка доступных принтеров в системе
     /// </summary>
     /// <returns>Список доступных принтеров в системе</returns>
+    [SupportedOSPlatform("windows")]
     public override IEnumerable<string> GetAvailablePrinters()
     {
-        try
+        if (!OperatingSystem.IsWindows())
         {
-            var printers = PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
-            return printers;
+            throw new PlatformNotSupportedException("Получение списка принтеров поддерживается только в Windows");
         }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Ошибка получения списка доступных принтеров в системе: {ex.Message}");
-            return [];
-        }
+
+        var printers = PrinterSettings.InstalledPrinters.Cast<object>().Cast<string>();
+        return printers;
     }
     
     /// <summary>
@@ -48,8 +37,14 @@ public sealed class WindowsPrinter : AbsPrinter
     /// </summary>
     /// <param name="printerName">Наименование принтера</param>
     /// <returns>Задача на печать документа pdf</returns>
+    [SupportedOSPlatform("windows")]
     public override Task PrintDocAsync(string printerName)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            throw new PlatformNotSupportedException("Печать поддерживается только в Windows");
+        }
+
         return Task.Run(async() =>
         {
                 var printersName = GetAvailablePrinters();

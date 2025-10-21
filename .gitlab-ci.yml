@@ -1,4 +1,3 @@
-
 variables:
     VERSION: $CI_COMMIT_TAG
     GIT_SUBMODULE_STRATEGY: recursive
@@ -10,7 +9,8 @@ variables:
 
 stages:          
   - build
-  - package 
+  - package
+  - notify 
 
 build-job:
   stage: build
@@ -22,20 +22,20 @@ build-job:
   before_script:
     # Создание директории для публикации
     - mkdir -p ./publish
-    - mkdir -p $PROJECT_NAME/Dll
+    - mkdir -p TN_Doc/Dll
   script:
     - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
-    - 'dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
+    - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - echo "Rebuilding solution ..."
     - dotnet build
-    - echo "Moving to $PROJECT_NAME..."
-    - cd $PROJECT_NAME
+    - echo "Moving to TN_Doc..."
+    - cd TN_Doc
     - echo "Current directory after cd:$(pwd)"
     - echo "Building the application..."
-    - dotnet publish ${PROJECT_NAME}.csproj -c Release -r linux-x64 --self-contained false -o ../publish
+    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
   artifacts:
-    name: "build-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./publish/
 
@@ -47,8 +47,10 @@ extract-version-job:
   tags:
     - orpovy
   script:
+    # Установка curl для работы с GitLab API
+    - apt-get update && apt-get install -y curl
     # Определение пути к .csproj файлу
-    - CSPROJ_FILE="$PROJECT_NAME/${PROJECT_NAME}.csproj"
+    - CSPROJ_FILE="TN_Doc/TN_Doc.csproj"
     # Проверка существования файла
     - if [ ! -f "$CSPROJ_FILE" ]; then echo "Error:$CSPROJ_FILE not found"; exit 1; fi
     # Извлечение версии из .csproj
@@ -56,8 +58,33 @@ extract-version-job:
     - echo "Extracted version:$VERSION"
     # Проверка версии
     - if [ -z "$VERSION" ]; then echo "Error:Version not found in $CSPROJ_FILE"; exit 1; fi
+    # Формирование имени переменной для build number
+    - BUILD_VAR_NAME="BUILD_NUMBER_$(echo $VERSION | tr '.' '_')"
+    - echo "Build variable name:$BUILD_VAR_NAME"
+    # Получение текущего build number из переменных проекта
+    - |
+      CURRENT_BUILD=$(curl -s --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME" | \
+        grep -o '"value":"[^"]*"' | cut -d'"' -f4 || echo "0")
+    - if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" = "null" ]; then CURRENT_BUILD=0; fi
+    - BUILD_NUMBER=$((CURRENT_BUILD + 1))
+    - echo "Current build number:$CURRENT_BUILD, New build number:$BUILD_NUMBER"
+    # Обновление build number в переменных проекта
+    - |
+      RESPONSE=$(curl -s --request PUT --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+        --header "Content-Type: application/json" \
+        --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/$BUILD_VAR_NAME")
+      if echo "$RESPONSE" | grep -q "404\|message"; then
+        echo "Variable does not exist, creating new one..."
+        curl -s --request POST --header "PRIVATE-TOKEN: $PROJECT_API_TOKEN" \
+          --header "Content-Type: application/json" \
+          --data "{\"key\":\"$BUILD_VAR_NAME\",\"value\":\"$BUILD_NUMBER\"}" \
+          "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables"
+      fi
+      echo "Build number updated successfully"
     # Формирование ревизии из CI_COMMIT_SHORT_SHA
-    - REVISION="r${CI_COMMIT_SHORT_SHA}"
+    - REVISION="b${BUILD_NUMBER}-${CI_COMMIT_SHORT_SHA}"
     # Формирование полной версии
     - FULL_VERSION="${VERSION}-${REVISION}"
     - echo "Full version:$FULL_VERSION"
@@ -65,7 +92,8 @@ extract-version-job:
     - echo "FULL_VERSION=$FULL_VERSION" > version.env
     - echo "VERSION=$VERSION" >> version.env
     - echo "REVISION=$REVISION" >> version.env
-    - echo "PACKAGE_NAME=$PROJECT_NAME" >> version.env
+    - echo "BUILD_NUMBER=$BUILD_NUMBER" >> version.env
+    - echo "PACKAGE_NAME=TN_Doc" >> version.env
   artifacts:
     reports:
       dotenv: version.env
@@ -84,138 +112,367 @@ package-job:      # This job runs in the deploy stage.
     - apt-get update && apt-get install -y dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
-    - DEB_NAME="$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
+    - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-full-${FULL_VERSION}"
     - echo "DEB_NAME=$DEB_NAME"
     # Создание структуры пакета
     - mkdir -p deb/DEBIAN
-    - mkdir -p deb/opt/$PROJECT_NAME
-    - mkdir -p deb/var/log/$PROJECT_NAME
+    - mkdir -p deb/opt/TN_Doc
+    - mkdir -p deb/var/log/TN_Doc
     - mkdir -p deb/etc/systemd/system
+    - mkdir -p deb/usr/share/fonts
+    - mkdir -p deb/usr/local/bin
+    # Создание уникальной временной директории для зависимостей
+    - mkdir -p deb/tmp/TN_Doc
     # Копирование файлов приложения
-    - cp -r ./publish/* deb/opt/$PROJECT_NAME/
+    - cp -r ./publish/* deb/opt/TN_Doc/
+    # Копирование .NET Runtime если есть в distrib
+    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tmp/TN_Doc/; fi
+    # Копирование шрифтов в пакет (если присутствуют в репозитории)
+    - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
     # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
-      Package: ${PROJECT_NAME}
+      Package: tn.doc-full
       Version: ${VERSION}
       Section: utils
       Priority: optional
       Architecture: amd64
-      Depends: libgdiplus
+      Depends: systemd
       Maintainer: DadonovAD <dadonovad@transneft.ru>
-      Description: ${PROJECT_NAME} это приложение для работы с документами СОИ СИКН/ОСИКН.
+      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН (полная версия).
+       Включает .NET Runtime 8.0.13 и системные шрифты для автономной работы.
       Homepage:
 
       EOF
-    # Генерация preinst
+    # Генерация preinst с хардкод значениями (оптимизированный вывод)
     - |
       cat << EOF > deb/DEBIAN/preinst
       #!/bin/bash
       set -e
 
-      # Проверка наличия .NET Runtime
-      if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
-          echo "Error: .NET Runtime 8 is not installed. Please install dotnet-runtime-8.0."
-          exit 1
-      fi
+      echo "============================================"
+      echo "Starting pre-installation script for TN_Doc (full version)"
+      echo "============================================"
 
-      # Проверка версии .NET Runtime
-      REQUIRED_VERSION="$DOTNET_RT_VERSION"
-      INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App | grep -E '8\.0\.[0-9]+' | sort -V | tail -n 1)
+      # Проверка .NET Runtime перед установкой
+      check_dotnet_runtime() {
+          # Проверка наличия .NET Runtime
+          if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              echo "Warning: .NET Runtime 8 is not installed. Will install from local archive."
+              return 1
+          fi
 
-      if [ -z "\$INSTALLED_VERSION" ]; then
-          echo "Error: No compatible .NET Runtime 8 version found."
-          exit 1
-      fi
+          # Проверка версии .NET Runtime
+          REQUIRED_VERSION="8.0.13"
+          INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+          
+          if [ -z "\$INSTALLED_VERSION" ]; then
+              echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
+              return 1
+          fi
 
-      if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
-          echo "Error: .NET Runtime version \$INSTALLED_VERSION is installed, but version >= \$REQUIRED_VERSION is required."
-          exit 1
-      fi
+          if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
+              echo "Warning: .NET Runtime version \$INSTALLED_VERSION < \$REQUIRED_VERSION. Will install from local archive."
+              return 1
+          fi
+
+          echo "✓ .NET Runtime version \$INSTALLED_VERSION is compatible (>= \$REQUIRED_VERSION)"
+          return 0
+      }
+
+      # Проверка .NET Runtime (установка будет в postinst если нужно)
+      check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
+
+      # Очистка временной директории TN_Doc
+      echo "Cleaning /tmp/TN_Doc directory..."
+      rm -rf /tmp/TN_Doc
+      echo "✓ Temporary directory cleaned"
 
       # Остановка службы TN_Doc, если она запущена
-      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
-          echo "Stopping ${PROJECT_NAME}.service..."
-          systemctl stop ${PROJECT_NAME}.service
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
       fi
 
       # Удаление старых директорий
-      echo "Removing old ${PROJECT_NAME} directories..."
-      for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+      echo "Removing old TN_Doc directories..."
+      OPT_DIR="/opt/TN_Doc"
+      LOG_DIR="/var/log/TN_Doc"
+      for dir in "\$OPT_DIR" "\$LOG_DIR"; do
           if [ -d "\$dir" ]; then
+              echo "Removing directory: \$dir"
               rm -rf "\$dir"
-              echo "Removed \$dir"
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Successfully removed \$dir"
+              else
+                  echo "! WARNING: Failed to remove \$dir"
+              fi
           fi
       done
+      echo "=== Old directories cleanup completed ==="
 
       exit 0
       EOF
+    - chmod +x deb/DEBIAN/preinst
+    # Генерация prerm с хардкод значениями (убрана отладочная информация)
     - |
       cat << EOF > deb/DEBIAN/prerm
       #!/bin/bash
       set -e
 
-      # Остановка службы ${PROJECT_NAME}, если она запущена
-      if systemctl is-active --quiet ${PROJECT_NAME}.service; then
-          echo "Stopping ${PROJECT_NAME}.service..."
-          systemctl stop ${PROJECT_NAME}.service
+      echo "============================================"
+      echo "Starting pre-removal script for TN_Doc (full version)"
+      echo "============================================"
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+          if [ \$? -eq 0 ]; then
+              echo "✓ Service stopped successfully"
+          else
+              echo "! WARNING: Failed to stop service"
+          fi
       fi
 
       exit 0
       EOF
-    # Генерация postinst
+    - chmod +x deb/DEBIAN/prerm
+    # Генерация postinst с хардкод значениями (оптимизированный вывод)
     - |
       cat << EOF > deb/DEBIAN/postinst
       #!/bin/bash
       set -e
 
+      echo "============================================"
+      echo "Starting post-installation script for TN_Doc (full version)"
+      echo "============================================"
+      echo "Installing dependencies for TN_Doc..."
+
+      # Установка .NET Runtime
+      install_dotnet_runtime() {
+          echo "=== Starting .NET Runtime installation check ==="
+          
+          # Проверяем, нужна ли установка
+          REQUIRED_VERSION="8.0.13"
+
+          if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+              
+              if [ -n "\$INSTALLED_VERSION" ] && [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" = "\$REQUIRED_VERSION" ]; then
+                  echo "✓ .NET Runtime version \$INSTALLED_VERSION is already installed and compatible"
+                  echo "=== Skipping .NET Runtime installation ==="
+                  return 0
+              else
+                  echo "! Installed version \$INSTALLED_VERSION is not compatible with required \$REQUIRED_VERSION"
+              fi
+          else
+              echo "! .NET Runtime directory not found, installation required"
+          fi
+          
+          echo "=== Starting .NET Runtime installation ==="
+          
+          # Проверяем наличие локального архива
+          if [ -f "/tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              echo "✓ Found .NET Runtime archive"
+
+              # Создаем директорию для .NET
+              echo "Creating .NET directory: /usr/bin/dotnet"
+              mkdir -p /usr/bin/dotnet
+
+              # Распаковываем архив напрямую в /usr/bin/dotnet
+              echo "Extracting .NET Runtime archive..."
+              tar -xzf /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Archive extracted successfully"
+              else
+                  echo "✗ ERROR: Failed to extract archive"
+                  exit 1
+              fi
+
+              # Удаляем архив
+              rm -f /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+              echo "✓ .NET Runtime 8.0.13 installed successfully"
+          else
+              echo "✗ ERROR: .NET Runtime archive not found at /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+              echo "Please ensure the archive is available before installing this package."
+              exit 1
+          fi
+
+          echo "=== .NET Runtime installation completed ==="
+      }
+
+      # Установка переменных окружения для пользователей
+      setup_dotnet_environment() {
+          echo "=== Setting up .NET environment variables ==="
+
+          # Создание переменных окружения для пользователя administrator
+          if [ -f "/home/administrator/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added DOTNET_ROOT to administrator's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in administrator's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя operators
+          if [ -f "/home/operators/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added DOTNET_ROOT to operators's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in operators's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя engineer
+          if [ -f "/home/engineer/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added DOTNET_ROOT to engineer's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in engineer's .profile"
+              fi
+          fi
+
+          echo "=== Environment setup completed ==="
+      }
+
+      echo "=== Starting application dependencies installation ==="
+
+      # Установка .NET Runtime
+      echo "Step 1: Installing .NET Runtime..."
+      install_dotnet_runtime
+      echo "✓ .NET Runtime setup completed"
+
+      # Установка переменных окружения для пользователей
+      echo "Step 2: Setting up environment variables..."
+      setup_dotnet_environment
+      echo "✓ Environment variables setup completed"
+
+      # Обновление кэша шрифтов (без verbose вывода)
+      echo "Step 3: Updating font cache..."
+      fc-cache -f || true
+      echo "✓ Font cache updated"
+
       # Установка прав и владельцев
-      chmod 755 /opt/$PROJECT_NAME/$PROJECT_NAME
-      chmod 644 /opt/$PROJECT_NAME/*.dll
-      chown -R alphadaemon:alphadaemon /opt/$PROJECT_NAME
-      chmod u=rwx,g=rx,o=rx /opt/$PROJECT_NAME
-      chown alphadaemon:alphadaemon /var/log/$PROJECT_NAME
-      chmod u=rwx,g=rx,o=rx /var/log/$PROJECT_NAME
+      echo "Step 4: Setting up application permissions..."
+      chmod 755 /opt/TN_Doc/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Executable permissions set"
+      else
+          echo "! WARNING: Failed to set executable permissions"
+      fi
+      
+      chmod 644 /opt/TN_Doc/*.dll
+      chown -R alphadaemon:alphadaemon /opt/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Ownership set successfully"
+      else
+          echo "! WARNING: Failed to set ownership"
+      fi
+      
+      chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+      chown alphadaemon:alphadaemon /var/log/TN_Doc
+      chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+      echo "✓ Application permissions setup completed"
 
       # Перезагрузка systemd
+      echo "Step 5: Reloading systemd daemon..."
       systemctl daemon-reload
+      echo "✓ Systemd daemon reloaded"
 
       # Включение и запуск сервиса
-      systemctl enable ${PROJECT_NAME}.service
-      systemctl start ${PROJECT_NAME}.service
+      echo "Step 6: Enabling and starting application service..."
+      
+      # Проверка наличия необходимых файлов
+      if [ -f "/usr/bin/dotnet/dotnet" ] && [ -f "/opt/TN_Doc/TN_Doc" ]; then
+          echo "✓ All required binaries found"
+      else
+          echo "! WARNING: Some binaries missing"
+          [ ! -f "/usr/bin/dotnet/dotnet" ] && echo "  - dotnet binary not found"
+          [ ! -f "/opt/TN_Doc/TN_Doc" ] && echo "  - application binary not found"
+      fi
 
+      systemctl enable TN_Doc.service
+      systemctl start TN_Doc.service
+
+      # Проверка статуса сервиса
+      sleep 2
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "✓ Application service started successfully"
+      else
+          echo "! WARNING: Service failed to start. Checking logs..."
+          journalctl -u TN_Doc.service -n 10 --no-pager || echo "Cannot read journal logs"
+      fi
+
+      # Финальная очистка временной директории
+      echo "Final cleanup: Removing /tmp/TN_Doc directory..."
+      rm -rf /tmp/TN_Doc
+      echo "✓ Temporary directory cleaned"
+
+      echo "=== TN_Doc installation completed successfully ==="
+      echo "============================================"
       exit 0
       EOF
+    - chmod +x deb/DEBIAN/postinst
+    # Генерация postrm с хардкод значениями
     - |
       cat << EOF > deb/DEBIAN/postrm
       #!/bin/bash
       set -e
 
+      echo "============================================"
+      echo "Starting post-removal script for TN_Doc (full version)"
+      echo "============================================"
+
       # Удаление директорий при полной очистке (purge)
       if [ "\$1" = "purge" ]; then
-          echo "Purging ${PROJECT_NAME} directories..."
-          for dir in /opt/$PROJECT_NAME /var/log/$PROJECT_NAME; do
+          echo "Purging TN_Doc directories..."
+          OPT_DIR="/opt/TN_Doc"
+          LOG_DIR="/var/log/TN_Doc"
+          for dir in "\$OPT_DIR" "\$LOG_DIR"; do
               if [ -d "\$dir" ]; then
+                  echo "Removing directory: \$dir"
                   rm -rf "\$dir"
-                  echo "Removed \$dir"
+                  if [ \$? -eq 0 ]; then
+                      echo "✓ Successfully removed \$dir"
+                  else
+                      echo "! WARNING: Failed to remove \$dir"
+                  fi
               fi
           done
+          
+          # Удаление systemd service
+          echo "Removing systemd service..."
+          systemctl disable TN_Doc.service 2>/dev/null || true
+          rm -f /etc/systemd/system/TN_Doc.service
+          systemctl daemon-reload
+          echo "✓ Systemd service removed"
       fi
 
       exit 0
       EOF
-    # Генерация TN_Doc.service
+    - chmod +x deb/DEBIAN/postrm
+    # Генерация systemd unit с хардкод значениями
     - |
-      cat << EOF > deb/etc/systemd/system/${PROJECT_NAME}.service
+      cat << EOF > deb/etc/systemd/system/TN_Doc.service
       [Unit]
-      Description=Service ${PROJECT_NAME}
+      Description=Service TN_Doc (full version)
 
       [Service]
-      WorkingDirectory=/opt/$PROJECT_NAME/
-      ExecStart=/usr/bin/dotnet/dotnet /opt/$PROJECT_NAME/$PROJECT_NAME.dll
+      WorkingDirectory=/opt/TN_Doc/
+      ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
       Restart=always
       RestartSec=10
-      SyslogIdentifier=dotnet-${PROJECT_NAME}
+      SyslogIdentifier=dotnet-TN_Doc
       User=alphadaemon
       Environment=ASPNETCORE_ENVIRONMENT=Production
 
@@ -223,10 +480,10 @@ package-job:      # This job runs in the deploy stage.
       WantedBy=multi-user.target
       EOF
     # Установка прав
-    - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst
+    - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst deb/DEBIAN/prerm deb/DEBIAN/postrm
     - chmod 644 deb/DEBIAN/control
-    - chmod 755 deb/opt/$PROJECT_NAME/$PROJECT_NAME
-    - chmod 644 deb/opt/$PROJECT_NAME/*.dll
+    - chmod 755 deb/opt/TN_Doc/TN_Doc
+    - chmod 644 deb/opt/TN_Doc/*.dll 2>/dev/null || true
     - echo "Creating control.tar.xz..."
     - tar -cJf control.tar.xz -C deb/DEBIAN .
     - echo "Creating data.tar.xz..."
@@ -240,6 +497,822 @@ package-job:      # This job runs in the deploy stage.
     - ls -l ./packages/${DEB_NAME}_amd64.deb
     - echo "Current directory:$(pwd)"
   artifacts:
-    name: "package-${PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+    name: "package-full-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
+
+package-minimal-job:      # Minimal package without dependencies
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - build-job
+    - extract-version-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev
+  script:
+    - echo "Packaging the application into a minimal .deb file..."
+    - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
+    - echo "DEB_NAME=$DEB_NAME"
+    # Создание структуры минимального пакета
+    - mkdir -p deb-minimal/DEBIAN
+    - mkdir -p deb-minimal/opt/TN_Doc
+    - mkdir -p deb-minimal/var/log/TN_Doc
+    - mkdir -p deb-minimal/etc/systemd/system
+    # Копирование только файлов приложения
+    - cp -r ./publish/* deb-minimal/opt/TN_Doc/
+    # Генерация minimal control
+    - |
+      cat << EOF > deb-minimal/DEBIAN/control
+      Package: tn.doc
+      Version: ${VERSION}
+      Section: utils
+      Priority: optional
+      Architecture: amd64
+      Depends: systemd, dotnet-runtime-8.0 (>= 8.0.13)
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
+       Требует предустановленный .NET Runtime 8.0.13+ и системные шрифты.
+      Homepage:
+
+      EOF
+    # Генерация minimal preinst
+    - |
+      cat << EOF > deb-minimal/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-installation script for TN_Doc"
+      echo "============================================"
+
+      # Проверка наличия .NET Runtime
+      check_dotnet_runtime() {
+          # Проверка наличия .NET Runtime
+          if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              echo "ERROR: .NET Runtime 8 is not installed."
+              echo "Please install .NET Runtime 8.0.13 or later before installing this package"
+              exit 1
+          fi
+
+          # Проверка версии .NET Runtime
+          REQUIRED_VERSION="8.0.13"
+          INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
+          
+          if [ -z "\$INSTALLED_VERSION" ]; then
+              echo "ERROR: No compatible .NET Runtime 8 version found in /usr/bin/dotnet/shared/Microsoft.NETCore.App"
+              echo "Please install .NET Runtime 8.0.13 or later"
+              exit 1
+          fi
+
+          if [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" != "\$REQUIRED_VERSION" ]; then
+              echo "ERROR: .NET Runtime version \$INSTALLED_VERSION < \$REQUIRED_VERSION"
+              echo "Please install .NET Runtime 8.0.13 or later"
+              exit 1
+          fi
+
+          echo "✓ .NET Runtime version \$INSTALLED_VERSION is compatible (>= \$REQUIRED_VERSION)"
+      }
+
+      # Проверка .NET Runtime
+      echo "Checking .NET Runtime availability..."
+      check_dotnet_runtime
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+      fi
+
+      # Удаление старых директорий
+      echo "Removing old TN_Doc directories..."
+      OPT_DIR="/opt/TN_Doc"
+      LOG_DIR="/var/log/TN_Doc"
+      for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+          if [ -d "\$dir" ]; then
+              echo "Removing directory: \$dir"
+              rm -rf "\$dir"
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Successfully removed \$dir"
+              else
+                  echo "! WARNING: Failed to remove \$dir"
+              fi
+          fi
+      done
+
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/preinst
+    # Генерация minimal prerm
+    - |
+      cat << EOF > deb-minimal/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for TN_Doc"
+      echo "============================================"
+
+      # Остановка службы TN_Doc, если она запущена
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "Stopping TN_Doc.service..."
+          systemctl stop TN_Doc.service
+          if [ \$? -eq 0 ]; then
+              echo "✓ Service stopped successfully"
+          else
+              echo "! WARNING: Failed to stop service"
+          fi
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/prerm
+    # Генерация minimal postinst
+    - |
+      cat << EOF > deb-minimal/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-installation script for TN_Doc"
+      echo "============================================"
+
+      # Установка прав и владельцев
+      echo "Setting up application permissions..."
+      chmod 755 /opt/TN_Doc/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Executable permissions set"
+      else
+          echo "! WARNING: Failed to set executable permissions"
+      fi
+      
+      chmod 644 /opt/TN_Doc/*.dll
+      chown -R alphadaemon:alphadaemon /opt/TN_Doc
+      if [ \$? -eq 0 ]; then
+          echo "✓ Ownership set successfully"
+      else
+          echo "! WARNING: Failed to set ownership"
+      fi
+      
+      chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+      chown alphadaemon:alphadaemon /var/log/TN_Doc
+      chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+      echo "✓ Application permissions setup completed"
+
+      # Перезагрузка systemd
+      echo "Reloading systemd daemon..."
+      systemctl daemon-reload
+      echo "✓ Systemd daemon reloaded"
+
+      # Включение и запуск сервиса
+      echo "Enabling and starting application service..."
+      
+      # Проверка наличия необходимых файлов
+      if [ -f "/opt/TN_Doc/TN_Doc" ]; then
+          echo "✓ Application binary found"
+      else
+          echo "! WARNING: Application binary not found"
+      fi
+
+      systemctl enable TN_Doc.service
+      systemctl start TN_Doc.service
+
+      # Проверка статуса сервиса
+      sleep 2
+      if systemctl is-active --quiet TN_Doc.service; then
+          echo "✓ Application service started successfully"
+      else
+          echo "! WARNING: Service failed to start. Checking logs..."
+          journalctl -u TN_Doc.service -n 10 --no-pager || echo "Cannot read journal logs"
+      fi
+
+      echo "=== TN_Doc installation completed successfully ==="
+      echo "============================================"
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/postinst
+    # Генерация minimal postrm
+    - |
+      cat << EOF > deb-minimal/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-removal script for TN_Doc"
+      echo "============================================"
+
+      # Удаление директорий при полной очистке (purge)
+      if [ "\$1" = "purge" ]; then
+          echo "Purging TN_Doc directories..."
+          OPT_DIR="/opt/TN_Doc"
+          LOG_DIR="/var/log/TN_Doc"
+          for dir in "\$OPT_DIR" "\$LOG_DIR"; do
+              if [ -d "\$dir" ]; then
+                  echo "Removing directory: \$dir"
+                  rm -rf "\$dir"
+                  if [ \$? -eq 0 ]; then
+                      echo "✓ Successfully removed \$dir"
+                  else
+                      echo "! WARNING: Failed to remove \$dir"
+                  fi
+              fi
+          done
+          
+          # Удаление systemd service
+          echo "Removing systemd service..."
+          systemctl disable TN_Doc.service 2>/dev/null || true
+          rm -f /etc/systemd/system/TN_Doc.service
+          systemctl daemon-reload
+          echo "✓ Systemd service removed"
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-minimal/DEBIAN/postrm
+    # Генерация systemd unit (использует системный dotnet)
+    - |
+      cat << EOF > deb-minimal/etc/systemd/system/TN_Doc.service
+      [Unit]
+      Description=Service TN_Doc
+
+      [Service]
+      WorkingDirectory=/opt/TN_Doc/
+      ExecStart=dotnet /opt/TN_Doc/TN_Doc.dll
+      Restart=always
+      RestartSec=10
+      SyslogIdentifier=dotnet-TN_Doc
+      User=alphadaemon
+      Environment=ASPNETCORE_ENVIRONMENT=Production
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+    # Установка прав
+    - chmod 755 deb-minimal/DEBIAN/preinst deb-minimal/DEBIAN/postinst deb-minimal/DEBIAN/prerm deb-minimal/DEBIAN/postrm
+    - chmod 644 deb-minimal/DEBIAN/control
+    - chmod 755 deb-minimal/opt/TN_Doc/TN_Doc
+    - chmod 644 deb-minimal/opt/TN_Doc/*.dll 2>/dev/null || true
+    - echo "Creating minimal control.tar.xz..."
+    - tar -cJf control-minimal.tar.xz -C deb-minimal/DEBIAN .
+    - echo "Creating minimal data.tar.xz..."
+    - tar -cJf data-minimal.tar.xz -C deb-minimal --exclude=DEBIAN .
+    - echo "Creating minimal debian-binary..."
+    - echo "2.0" > debian-binary-minimal
+    - echo "Building minimal .deb package..."
+    - mkdir -p packages
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary-minimal control-minimal.tar.xz data-minimal.tar.xz
+    - rm -f debian-binary-minimal control-minimal.tar.xz data-minimal.tar.xz
+    - ls -l ./packages/${DEB_NAME}_amd64.deb
+    - echo "Current directory:$(pwd)"
+  artifacts:
+    name: "package-minimal-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
+
+package-net-runtime-job:      # .NET Runtime standalone package
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - extract-version-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev
+  script:
+    - echo "Creating .NET Runtime standalone package..."
+    - DEB_NAME="tn.dotnet-runtime-8.0.13"
+    - echo "DEB_NAME=$DEB_NAME"
+    # Создание структуры пакета
+    - mkdir -p deb-runtime/DEBIAN
+    - mkdir -p deb-runtime/usr/bin/dotnet
+    - mkdir -p deb-runtime/tmp/dotnet-runtime
+    # Копирование .NET Runtime архива
+    - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb-runtime/tmp/dotnet-runtime/; else echo "ERROR .NET Runtime archive not found"; exit 1; fi
+    # Генерация control
+    - |
+      cat << EOF > deb-runtime/DEBIAN/control
+      Package: tn.dotnet-runtime
+      Version: 8.0.13-${VERSION}
+      Section: libs
+      Priority: optional
+      Architecture: amd64
+      Depends: libc6, libgcc-s1, libstdc++6
+      Provides: dotnet-runtime-8.0
+      Conflicts: dotnet-runtime-8.0
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: Microsoft .NET Runtime 8.0.13 для TN приложений.
+       Автономная установка .NET Runtime 8.0.13 в /usr/bin/dotnet.
+       Предоставляет среду выполнения для TN_Doc и других .NET приложений.
+      Homepage:
+
+      EOF
+    # Генерация preinst
+    - |
+      cat << EOF > deb-runtime/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-installation script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      # Проверка конфликтующих установок
+      check_existing_dotnet() {
+          if [ -d "/usr/bin/dotnet" ]; then
+              echo "Warning: Existing .NET installation found in /usr/bin/dotnet"
+              echo "Backing up existing installation..."
+              mv /usr/bin/dotnet "/usr/bin/dotnet.backup.\$(date +%Y%m%d_%H%M%S)"
+          fi
+      }
+
+      check_existing_dotnet
+
+      # Очистка временной директории
+      rm -rf /tmp/dotnet-runtime
+      echo "✓ Pre-installation checks completed"
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/preinst
+    # Генерация postinst (с логикой из package-job)
+    - |
+      cat << EOF > deb-runtime/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-installation script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      # Установка .NET Runtime
+      install_dotnet_runtime() {
+          echo "=== Starting .NET Runtime installation ==="
+          
+          # Проверяем наличие локального архива
+          if [ -f "/tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              echo "✓ Found .NET Runtime archive"
+
+              # Создаем директорию для .NET
+              echo "Creating .NET directory: /usr/bin/dotnet"
+              mkdir -p /usr/bin/dotnet
+
+              # Распаковываем архив напрямую в /usr/bin/dotnet
+              echo "Extracting .NET Runtime archive..."
+              tar -xzf /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+              if [ \$? -eq 0 ]; then
+                  echo "✓ Archive extracted successfully"
+              else
+                  echo "✗ ERROR: Failed to extract archive"
+                  exit 1
+              fi
+
+              # Удаляем архив
+              rm -f /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+              echo "✓ .NET Runtime 8.0.13 installed successfully"
+          else
+              echo "✗ ERROR: .NET Runtime archive not found at /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+              exit 1
+          fi
+
+          echo "=== .NET Runtime installation completed ==="
+      }
+
+      # Установка переменных окружения для пользователей
+      setup_dotnet_environment() {
+          echo "=== Setting up .NET environment variables ==="
+
+          # Создание переменных окружения для пользователя administrator
+          if [ -f "/home/administrator/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added DOTNET_ROOT to administrator's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/administrator/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/administrator/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in administrator's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя operators
+          if [ -f "/home/operators/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added DOTNET_ROOT to operators's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/operators/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/operators/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in operators's .profile"
+              fi
+          fi
+
+          # Создание переменных окружения для пользователя engineer
+          if [ -f "/home/engineer/.profile" ]; then
+              if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'DOTNET_ROOT=/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added DOTNET_ROOT to engineer's .profile"
+              fi
+              if ! grep -q "PATH.*:/usr/bin/dotnet" /home/engineer/.profile; then
+                  echo 'PATH=\$PATH:/usr/bin/dotnet' >> /home/engineer/.profile
+                  echo "✓ Added /usr/bin/dotnet to PATH in engineer's .profile"
+              fi
+          fi
+
+          echo "=== Environment setup completed ==="
+      }
+
+      # Выполнение установки
+      install_dotnet_runtime
+      setup_dotnet_environment
+
+      # Финальная очистка
+      rm -rf /tmp/dotnet-runtime
+      echo "✓ .NET Runtime 8.0.13 installation completed successfully"
+      echo "============================================"
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/postinst
+    # Генерация prerm
+    - |
+      cat << EOF > deb-runtime/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      # Проверка использования другими пакетами
+      if dpkg -l | grep -q "tn\.doc"; then
+          echo "WARNING: TN_Doc packages are installed and may depend on this runtime"
+          echo "Consider removing dependent packages first"
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/prerm
+    # Генерация postrm
+    - |
+      cat << EOF > deb-runtime/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-removal script for .NET Runtime 8.0.13"
+      echo "============================================"
+
+      if [ "\$1" = "purge" ]; then
+          echo "Purging .NET Runtime installation..."
+          
+          # Удаление .NET Runtime
+          if [ -d "/usr/bin/dotnet" ]; then
+              rm -rf /usr/bin/dotnet
+              echo "✓ .NET Runtime directory removed"
+          fi
+          
+          # Очистка переменных окружения
+          for user_home in /home/administrator /home/operators /home/engineer; do
+              if [ -f "\${user_home}/.profile" ]; then
+                  sed -i '/DOTNET_ROOT=\/usr\/bin\/dotnet/d' "\${user_home}/.profile"
+                  sed -i '/PATH=.*:\/usr\/bin\/dotnet/d' "\${user_home}/.profile"
+                  echo "✓ Cleaned environment variables from \${user_home}/.profile"
+              fi
+          done
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-runtime/DEBIAN/postrm
+    # Установка прав
+    - chmod 644 deb-runtime/DEBIAN/control
+    - echo "Creating runtime control.tar.xz..."
+    - tar -cJf control-runtime.tar.xz -C deb-runtime/DEBIAN .
+    - echo "Creating runtime data.tar.xz..."
+    - tar -cJf data-runtime.tar.xz -C deb-runtime --exclude=DEBIAN .
+    - echo "Creating runtime debian-binary..."
+    - echo "2.0" > debian-binary-runtime
+    - echo "Building .NET Runtime .deb package..."
+    - mkdir -p packages
+    - ar r ./packages/${DEB_NAME}_amd64.deb debian-binary-runtime control-runtime.tar.xz data-runtime.tar.xz
+    - rm -f debian-binary-runtime control-runtime.tar.xz data-runtime.tar.xz
+    - ls -l ./packages/${DEB_NAME}_amd64.deb
+    - echo "Current directory:$(pwd)"
+  artifacts:
+    name: "package-net-runtime-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
+
+package-fonts-job:      # System fonts standalone package
+  stage: package
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - extract-version-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev
+  script:
+    - echo "Creating system fonts standalone package..."
+    - DEB_NAME="tn.fonts-${VERSION}"
+    - echo "DEB_NAME=$DEB_NAME"
+    # Проверка наличия шрифтов
+    - if [ ! -d "fonts" ]; then echo "ERROR fonts directory not found"; exit 1; fi
+    # Создание структуры пакета
+    - mkdir -p deb-fonts/DEBIAN
+    - mkdir -p deb-fonts/usr/share/fonts
+    # Копирование шрифтов
+    - cp -r fonts/* deb-fonts/usr/share/fonts/
+    # Генерация control
+    - |
+      cat << EOF > deb-fonts/DEBIAN/control
+      Package: tn.fonts
+      Version: ${VERSION}
+      Section: fonts
+      Priority: optional
+      Architecture: all
+      Depends: fontconfig
+      Maintainer: DadonovAD <dadonovad@transneft.ru>
+      Description: Системные шрифты для TN приложений.
+       Набор шрифтов Arial, Segoe UI, Tahoma для корректного отображения
+       документов в TN_Doc и других TN приложениях.
+      Homepage:
+
+      EOF
+    # Генерация preinst
+    - |
+      cat << EOF > deb-fonts/DEBIAN/preinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-installation script for TN Fonts"
+      echo "============================================"
+
+      # Проверка доступности fontconfig
+      if ! command -v fc-cache >/dev/null 2>&1; then
+          echo "WARNING: fontconfig (fc-cache) not found. Font cache may not be updated."
+      fi
+
+      # Очистка старых шрифтов TN (если есть)
+      if [ -d "/usr/share/fonts/tn-fonts" ]; then
+          echo "Removing old TN fonts directory..."
+          rm -rf /usr/share/fonts/tn-fonts
+      fi
+
+      echo "✓ Pre-installation checks completed"
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/preinst
+    # Генерация postinst
+    - |
+      cat << EOF > deb-fonts/DEBIAN/postinst
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-installation script for TN Fonts"
+      echo "============================================"
+
+      # Установка прав на шрифты
+      echo "Setting fonts permissions..."
+      find /usr/share/fonts -name "*.ttf" -exec chmod 644 {} \;
+      find /usr/share/fonts -name "*.TTF" -exec chmod 644 {} \;
+      echo "✓ Font permissions set"
+
+      # Обновление кэша шрифтов
+      echo "Updating font cache..."
+      if command -v fc-cache >/dev/null 2>&1; then
+          fc-cache -f -v
+          if [ \$? -eq 0 ]; then
+              echo "✓ Font cache updated successfully"
+          else
+              echo "! WARNING: Font cache update failed"
+          fi
+      else
+          echo "! WARNING: fc-cache not available, font cache not updated"
+      fi
+
+      # Проверка установленных шрифтов
+      echo "Verifying installed fonts..."
+      FONT_COUNT=\$(find /usr/share/fonts -name "*.ttf" -o -name "*.TTF" | wc -l)
+      echo "Found \$FONT_COUNT font files installed"
+
+      if command -v fc-list >/dev/null 2>&1; then
+          ARIAL_COUNT=\$(fc-list | grep -i arial | wc -l)
+          SEGOE_COUNT=\$(fc-list | grep -i "segoe ui" | wc -l)
+          TAHOMA_COUNT=\$(fc-list | grep -i tahoma | wc -l)
+          echo "Available fonts: Arial (\$ARIAL_COUNT), Segoe UI (\$SEGOE_COUNT), Tahoma (\$TAHOMA_COUNT)"
+      fi
+
+      echo "=== TN Fonts installation completed successfully ==="
+      echo "============================================"
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/postinst
+    # Генерация prerm
+    - |
+      cat << EOF > deb-fonts/DEBIAN/prerm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting pre-removal script for TN Fonts"
+      echo "============================================"
+
+      # Проверка использования другими пакетами
+      if dpkg -l | grep -q "tn\.doc"; then
+          echo "WARNING: TN_Doc packages are installed and may use these fonts"
+          echo "Documents may not render correctly after font removal"
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/prerm
+    # Генерация postrm
+    - |
+      cat << EOF > deb-fonts/DEBIAN/postrm
+      #!/bin/bash
+      set -e
+
+      echo "============================================"
+      echo "Starting post-removal script for TN Fonts"
+      echo "============================================"
+
+      if [ "\$1" = "purge" ]; then
+          echo "Purging TN fonts installation..."
+          
+          # Удаление остатков шрифтов (если остались)
+          for font_dir in "/usr/share/fonts/arial" "/usr/share/fonts/segoe ui" "/usr/share/fonts/tahoma"; do
+              if [ -d "\$font_dir" ]; then
+                  echo "Removing font directory: \$font_dir"
+                  rm -rf "\$font_dir"
+                  if [ \$? -eq 0 ]; then
+                      echo "✓ Successfully removed \$font_dir"
+                  else
+                      echo "! WARNING: Failed to remove \$font_dir"
+                  fi
+              fi
+          done
+          
+          # Обновление кэша шрифтов после удаления
+          echo "Updating font cache after removal..."
+          if command -v fc-cache >/dev/null 2>&1; then
+              fc-cache -f
+              echo "✓ Font cache updated"
+          fi
+      fi
+
+      exit 0
+      EOF
+    - chmod +x deb-fonts/DEBIAN/postrm
+    # Установка прав
+    - chmod 644 deb-fonts/DEBIAN/control
+    - find deb-fonts/usr/share/fonts -name "*.ttf" -exec chmod 644 {} \;
+    - find deb-fonts/usr/share/fonts -name "*.TTF" -exec chmod 644 {} \;
+    - echo "Creating fonts control.tar.xz..."
+    - tar -cJf control-fonts.tar.xz -C deb-fonts/DEBIAN .
+    - echo "Creating fonts data.tar.xz..."
+    - tar -cJf data-fonts.tar.xz -C deb-fonts --exclude=DEBIAN .
+    - echo "Creating fonts debian-binary..."
+    - echo "2.0" > debian-binary-fonts
+    - echo "Building fonts .deb package..."
+    - mkdir -p packages
+    - ar r ./packages/${DEB_NAME}.deb debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
+    - rm -f debian-binary-fonts control-fonts.tar.xz data-fonts.tar.xz
+    - ls -l ./packages/${DEB_NAME}.deb
+    - echo "Current directory:$(pwd)"
+  artifacts:
+    name: "package-fonts-TN_Doc-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/
+
+notify-telegram-job:      # Telegram notifications with file uploads
+  stage: notify
+  image: ubuntu:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?$/
+  needs:
+    - package-job
+    - package-minimal-job
+    - package-net-runtime-job
+    - package-fonts-job
+  tags:
+    - orpovy
+  before_script:
+    - apt-get update && apt-get install -y curl
+  script:
+    - echo "Sending Telegram notifications with packages for all built packages..."
+    
+    # Получение информации о пакетах приложения
+    - FULL_PACKAGE=$(ls ./packages/tn.doc-full-*.deb | head -n1)
+    - FULL_SIZE=$(du -h "$FULL_PACKAGE" | cut -f1)
+    - FULL_SIZE_BYTES=$(stat -c%s "$FULL_PACKAGE")
+    - FULL_NAME=$(basename "$FULL_PACKAGE")
+    
+    - MINIMAL_PACKAGE=$(ls ./packages/tn.doc-[0-9]*.deb | head -n1)
+    - MINIMAL_SIZE=$(du -h "$MINIMAL_PACKAGE" | cut -f1)
+    - MINIMAL_SIZE_BYTES=$(stat -c%s "$MINIMAL_PACKAGE")
+    - MINIMAL_NAME=$(basename "$MINIMAL_PACKAGE")
+    
+    # Получение информации о пакетах зависимостей
+    - RUNTIME_PACKAGE=$(ls ./packages/tn.dotnet-runtime-*.deb | head -n1)
+    - RUNTIME_SIZE=$(du -h "$RUNTIME_PACKAGE" | cut -f1)
+    - RUNTIME_SIZE_BYTES=$(stat -c%s "$RUNTIME_PACKAGE")
+    - RUNTIME_NAME=$(basename "$RUNTIME_PACKAGE")
+    
+    - FONTS_PACKAGE=$(ls ./packages/tn.fonts-*.deb | head -n1)
+    - FONTS_SIZE=$(du -h "$FONTS_PACKAGE" | cut -f1)
+    - FONTS_SIZE_BYTES=$(stat -c%s "$FONTS_PACKAGE")
+    - FONTS_NAME=$(basename "$FONTS_PACKAGE")
+    
+    # Функция отправки сообщения
+    - |
+      send_message() {
+          local message="$1"
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d chat_id="${TELEGRAM_CHAT_ID}" \
+              -d text="${message}"
+      }
+    
+    # Функция отправки файла с проверкой размера (75MB лимит)
+    - |
+      send_file() {
+          local file_path="$1"
+          local caption="$2"
+          local file_size="$3"
+          
+          # Максимальный размер файла: 75MB = 78643200 байт
+          if [ "$file_size" -lt 78643200 ]; then
+              echo "✅ Отправляем файл: $(basename "$file_path") ($(du -h "$file_path" | cut -f1))"
+              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+                  -F chat_id="${TELEGRAM_CHAT_ID}" \
+                  -F document="@${file_path}" \
+                  -F caption="${caption}"
+              if [ $? -eq 0 ]; then
+                  echo "✅ Файл отправлен успешно"
+              else
+                  echo "❌ Ошибка отправки файла"
+              fi
+          else
+              echo "⚠️ Файл $(basename "$file_path") слишком большой: $(du -h "$file_path" | cut -f1) > 75MB"
+              send_message "⚠️ Файл $(basename "$file_path") слишком большой для отправки ($(du -h "$file_path" | cut -f1)). Максимум: 75MB"
+          fi
+      }
+    
+    # Отправка первого сообщения - пакеты приложения
+    - |
+      APP_MESSAGE="🚀 Собраны пакеты приложения TN_Doc:
+
+      📦 Полный пакет: $FULL_NAME
+      📏 Размер: $FULL_SIZE
+
+      📦 Минимальный пакет: $MINIMAL_NAME  
+      📏 Размер: $MINIMAL_SIZE
+
+      🏷️ Версия: ${VERSION}
+      🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
+      📋 Pipeline: ${CI_PIPELINE_URL}"
+      
+      send_message "$APP_MESSAGE"
+    
+    # Отправка пакетов приложения
+    - echo "Отправляем пакеты приложения..."
+    - send_file "$FULL_PACKAGE" "📦 Полный пакет TN_Doc v${VERSION}" "$FULL_SIZE_BYTES"
+    - send_file "$MINIMAL_PACKAGE" "📦 Минимальный пакет TN_Doc v${VERSION}" "$MINIMAL_SIZE_BYTES"
+    
+    # Пауза между группами сообщений
+    - sleep 2
+    
+    # Отправка второго сообщения - пакеты зависимостей
+    - |
+      DEPS_MESSAGE="⚙️ Собраны пакеты зависимостей TN_Doc:
+
+      📦 .NET Runtime: $RUNTIME_NAME
+      📏 Размер: $RUNTIME_SIZE
+
+      📦 Системные шрифты: $FONTS_NAME
+      📏 Размер: $FONTS_SIZE
+
+      🏷️ Версия: ${VERSION}
+      🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
+      📋 Pipeline: ${CI_PIPELINE_URL}"
+      
+      send_message "$DEPS_MESSAGE"
+    
+    # Отправка пакетов зависимостей
+    - echo "Отправляем пакеты зависимостей..."
+    - send_file "$RUNTIME_PACKAGE" "⚙️ .NET Runtime 8.0.13 для TN приложений" "$RUNTIME_SIZE_BYTES"
+    - send_file "$FONTS_PACKAGE" "⚙️ Системные шрифты для TN приложений v${VERSION}" "$FONTS_SIZE_BYTES"
+    
+    - echo "Telegram notifications and files sent successfully"
+  artifacts:
+    name: "notifications-sent-${CI_COMMIT_SHORT_SHA}"
+    when: always
+    expire_in: 1 day
     paths:
       - ./packages/

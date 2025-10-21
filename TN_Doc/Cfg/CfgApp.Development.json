@@ -237,7 +237,7 @@
           "Description": "",
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
-          "PathToDocEditConfigFile": "",
+          "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
@@ -246,7 +246,7 @@
               "Name": "Журнал регистрации СИ (Нефть)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3532-2015 (Приложение 12)",
               "PathToDocTemplateFile": "/Doc/25_DocMeasurementJornal.frx",
-              "PathToDocEditConfigFile": ""
+              "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             },
             {
               "Use": true,
@@ -254,7 +254,7 @@
               "Name": "Журнал регистрации СИ (Нефтепродукт)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3275-2016 (Приложение Д)",
               "PathToDocTemplateFile": "/Doc/25_DocMeasurementJornal_NP.frx",
-              "PathToDocEditConfigFile": ""
+              "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             }
           ]
         },
@@ -960,7 +960,7 @@
           "Name": "КМХ МИ 3272-2010",
           "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
           "PathToDocDll": "/Dll/KMH_MPR_TPR.dll",
-          "PathToDocConfigFile": "",
+          "PathToDocConfigFile": "/Cfg/CfgKMH3272_MPR_TPR.json",
           "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
@@ -969,8 +969,8 @@
               "Id": 0,
               "Name": "КМХ МИ 3272-2010",
               "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
-              "PathToDocTemplateFile": "",
-              "PathToDocEditConfigFile": null
+              "PathToDocTemplateFile": "/Doc/33_TableKMH3272_MPR_TPR_Release_version.frx",
+              "PathToDocEditConfigFile": "/Cfg/CfgEditKMH3272_MPR_TPR.json"
             }
           ]
         },
@@ -1399,7 +1399,7 @@
           "Description": "",
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
-          "PathToDocEditConfigFile": "",
+          "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
           "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
@@ -1408,7 +1408,7 @@
               "Name": "Журнал регистрации СИ (Нефть)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3532-2015 (Приложение 12)",
               "PathToDocTemplateFile": "/Doc/25_DocMeasurementJornal.frx",
-              "PathToDocEditConfigFile": ""
+              "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             },
             {
               "Use": true,
@@ -1416,7 +1416,7 @@
               "Name": "Журнал регистрации СИ (Нефтепродукт)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3275-2016 (Приложение Д)",
               "PathToDocTemplateFile": "/Doc/25_DocMeasurementJornal_NP.frx",
-              "PathToDocEditConfigFile": ""
+              "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             }
           ]
         },
@@ -2561,7 +2561,7 @@
           "Description": "",
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
-          "PathToDocEditConfigFile": "",
+          "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
@@ -2570,7 +2570,7 @@
               "Name": "Журнал регистрации СИ (Нефть)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3532-2015 (Приложение 12)",
               "PathToDocTemplateFile": "/Doc/25_DocMeasurementJornal.frx",
-              "PathToDocEditConfigFile": ""
+              "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             },
             {
               "Use": true,
@@ -2578,7 +2578,7 @@
               "Name": "Журнал регистрации СИ (Нефтепродукт)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3275-2016 (Приложение Д)",
               "PathToDocTemplateFile": "/Doc/25_DocMeasurementJornal_NP.frx",
-              "PathToDocEditConfigFile": ""
+              "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             }
           ]
         },

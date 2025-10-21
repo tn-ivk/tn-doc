@@ -284,94 +284,97 @@
         "Signers": [
           {
             "Id": 1,
-            "Name": "Оператор товарный сдающей стороны:",
+            "Name": "Представитель сдающей стороны:",
+            "Key": "DeliveryIOF",
             "ShowSigner": [
               {
                 "Id": 1,
                 "Name": "Отчет за два часа",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 2,
                 "Name": "Отчет за смену",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 3,
                 "Name": "Отчет за сутки",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 4,
                 "Name": "Отчет за месяц",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 5,
                 "Name": "Отчет за время ведения ТКО",
-                "Visible": false
+                "Visible": true
               }
             ]
           },
           {
             "Id": 2,
-            "Name": "Оператор товарный принимающей стороны:",
+            "Name": "Представитель принимающей стороны:",
+            "Key": "ReceiveIOF",
             "ShowSigner": [
               {
                 "Id": 1,
                 "Name": "Отчет за два часа",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 2,
                 "Name": "Отчет за смену",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 3,
                 "Name": "Отчет за сутки",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 4,
                 "Name": "Отчет за месяц",
-                "Visible": false
+                "Visible": true
               },
               {
                 "Id": 5,
                 "Name": "Отчет за время ведения ТКО",
-                "Visible": false
+                "Visible": true
               }
             ]
           },
           {
             "Id": 3,
             "Name": "Оператор товарный:",
+            "Key": "OperatorIOF",
             "ShowSigner": [
               {
                 "Id": 1,
                 "Name": "Отчет за два часа",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 2,
                 "Name": "Отчет за смену",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 3,
                 "Name": "Отчет за сутки",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 4,
                 "Name": "Отчет за месяц",
-                "Visible": true
+                "Visible": false
               },
               {
                 "Id": 5,
                 "Name": "Отчет за время ведения ТКО",
-                "Visible": true
+                "Visible": false
               }
             ]
           }

@@ -1,0 +1,36 @@
+{
+  "AdditionalInfo": [
+    {
+      "Id": 1,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryIOF1",
+      "Type": "list",
+      "Name": "Операторы предприятия, сдающего нефть - Смену сдал"
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Edit": true,
+      "Key": "DeliveryIOF2",
+      "Type": "list",
+      "Name": "Операторы предприятия, сдающего нефть - Смену принял"
+    },
+    {
+      "Id": 3,
+      "Use": true,
+      "Edit": true,
+      "Key": "ReceiveIOF1",
+      "Type": "list",
+      "Name": "Операторы предприятия, принимающего нефть - Смену сдал"
+    },
+    {
+      "Id": 4,
+      "Use": true,
+      "Edit": true,
+      "Key": "ReceiveIOF2",
+      "Type": "list",
+      "Name": "Операторы предприятия, принимающего нефть - Смену принял"
+    }
+  ]
+}

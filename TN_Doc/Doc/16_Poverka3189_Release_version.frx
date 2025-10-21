@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3189.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="07/02/2025 14:35:02" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Collections.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Poverka3189.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/12/2025 17:50:16" ReportInfo.CreatorVersion="2025.2.8.0">
   <ScriptText>//1 mm on the screen = 3.78 pixels
 using System;
 using System.Reflection;
@@ -43,12 +43,6 @@ namespace FastReport
 
     private void Page_StartPage(object sender, EventArgs e)
     {
-      //using (var sr = new StreamReader(&quot;D:/!_Work/!_Транснефть/SVN/Work/Sources/Reports/FRX/Входящие данные от Алексея (классы и json)/16_TablePoverka3189/DocPoverka3189.json&quot;))
-      //{
-      // Read the stream as a string
-      //   Report.SetParameterValue(&quot;JsonDoc&quot;, sr.ReadToEnd());
-      //}
-         
       //// Десериализация данных (формат json) из входного параметра - Json                         
       string json = (string)Report.GetParameterValue(&quot;JsonDoc&quot;);
       Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
@@ -178,7 +172,7 @@ namespace FastReport
         m_D.Text = tools.GetNormalizedValue(DataIVK.TablePoverka3189.Protokol.Table1.m_D);
         m_S.Text = tools.GetNormalizedValue(DataIVK.TablePoverka3189.Protokol.Table1.m_S);
         m_E.Text = tools.GetNormalizedValue(DataIVK.TablePoverka3189.Protokol.Table1.m_E);
-        Alpha_t1.Text = tools.GetNormalizedValue(DataIVK.TablePoverka3189.Protokol.Table1.Alpha_t1);
+        Alpha_t_PU.Text = tools.GetNormalizedValue(DataIVK.TablePoverka3189.Protokol.Table1.Alpha_t_PU);
         Teta_Sum_0.Text = tools.GetNormalizedValue(DataIVK.TablePoverka3189.Protokol.Table1.Teta_Sum_0);
         Teta_V_0.Text = tools.GetNormalizedValue(DataIVK.TablePoverka3189.Protokol.Table1.Teta_V_0);
                                                                                                
@@ -597,7 +591,7 @@ namespace FastReport
           <TableCell Name="m_D" Border.Lines="All" Text="m_D" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="m_S" Border.Lines="All" Text="m_S" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="m_E" Border.Lines="All" Text="m_E" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="0" Format.DecimalSeparator="." Format.GroupSeparator="" Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
-          <TableCell Name="Alpha_t1" Border.Lines="All" Text="Alpha_t1" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="6" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
+          <TableCell Name="Alpha_t_PU" Border.Lines="All" Text="Alpha_t_PU" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="false" Format.DecimalDigits="6" Format.DecimalSeparator="." Format.GroupSeparator=" " Format.NegativePattern="1" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Teta_Sum_0" Border.Lines="All" Text="Teta_Sum_0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="4" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
           <TableCell Name="Teta_V_0" Border.Lines="All" Text="Teta_V_0" Padding="0, 0, 0, 0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.9" TextRenderType="HtmlTags"/>
         </TableRow>
