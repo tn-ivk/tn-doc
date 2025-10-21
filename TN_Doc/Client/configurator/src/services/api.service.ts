@@ -94,7 +94,8 @@ class ApiService {
    */
   async loadDocumentConfig(configPath: string): Promise<string> {
     const response = await this.api.get('/configurator/document-config', {
-      params: { path: configPath }
+      params: { path: configPath },
+      responseType: 'text' // Получаем сырой JSON-текст, без автопарсинга Axios
     });
     return response.data;
   }
