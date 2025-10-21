@@ -13,7 +13,7 @@
     </label>
 
     <!-- Select (выпадающий список) -->
-    <Dropdown
+    <Select
       v-if="field.type === 'select'"
       :id="field.key"
       v-model="localValue"
@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import DatePicker from 'primevue/datepicker';
@@ -190,7 +190,7 @@ function handleChange() {
   outline: none;
 }
 
-:deep(.field-control.p-dropdown) {
+:deep(.field-control.p-select) {
   width: 100%;
   min-height: var(--md-control-height);
   height: var(--md-control-height);
@@ -204,18 +204,18 @@ function handleChange() {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-:deep(.field-control.p-dropdown:not(.p-disabled):hover) {
+:deep(.field-control.p-select:not(.p-disabled):hover) {
   border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
 }
 
-:deep(.field-control.p-dropdown:not(.p-disabled).p-focus),
-:deep(.field-control.p-dropdown:not(.p-disabled):focus-within) {
+:deep(.field-control.p-select:not(.p-disabled).p-focus),
+:deep(.field-control.p-select:not(.p-disabled):focus-within) {
   border-color: var(--md-primary) !important;
   background: var(--md-primary-light) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
 }
 
-:deep(.field-control.p-dropdown .p-dropdown-label) {
+:deep(.field-control.p-select .p-select-label) {
   display: flex;
   align-items: center;
   height: var(--md-control-height);
@@ -225,7 +225,7 @@ function handleChange() {
   line-height: 1.2;
 }
 
-:deep(.field-control.p-dropdown .p-dropdown-trigger) {
+:deep(.field-control.p-select .p-select-dropdown) {
   width: 32px !important;
   color: var(--md-text-secondary) !important;
   height: 100%;
@@ -234,15 +234,15 @@ function handleChange() {
   justify-content: center;
 }
 
-:deep(.field-control.p-dropdown .p-dropdown-trigger-icon) {
+:deep(.field-control.p-select .p-select-dropdown .p-icon) {
   font-size: 0.85rem;
 }
 
-:deep(.field-control.p-dropdown .p-dropdown-label.p-placeholder) {
+:deep(.field-control.p-select .p-select-label.p-placeholder) {
   color: var(--md-text-secondary);
 }
 
-:deep(.field-control .p-dropdown-panel) {
+:deep(.field-control .p-select-overlay) {
   margin-top: 2px;
   border: 1px solid var(--md-outline);
   border-radius: var(--md-radius);
@@ -250,46 +250,46 @@ function handleChange() {
   background: #ffffff;
 }
 
-:deep(.field-control .p-dropdown-items) {
+:deep(.field-control .p-select-list) {
   padding: 4px 0;
   font-size: var(--md-font-size-base);
 }
 
-:deep(.field-control .p-dropdown-item) {
+:deep(.field-control .p-select-option) {
   padding: 6px 12px;
   color: var(--md-text);
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
-:deep(.field-control .p-dropdown-item:not(.p-disabled):hover) {
+:deep(.field-control .p-select-option:not(.p-disabled):hover) {
   background: var(--md-primary-light);
   color: var(--md-text);
 }
 
-:deep(.field-control .p-dropdown-item.p-highlight) {
+:deep(.field-control .p-select-option.p-focus) {
   background: var(--md-primary-light);
   color: var(--md-text);
 }
 
-:deep(.field-control .p-dropdown-item.p-highlight:not(.p-disabled):hover) {
+:deep(.field-control .p-select-option.p-focus:not(.p-disabled):hover) {
   background: var(--md-primary);
   color: #ffffff;
 }
 
-:deep(.field-control.p-dropdown.p-disabled) {
+:deep(.field-control.p-select.p-disabled) {
   background: var(--md-disabled-bg);
   border-color: var(--md-disabled-border);
   color: var(--md-disabled-text);
 }
 
-:deep(.field-control.p-dropdown.p-disabled .p-dropdown-label) {
+:deep(.field-control.p-select.p-disabled .p-select-label) {
   color: var(--md-disabled-text);
 }
 
 .field-control.p-invalid,
 :deep(.field-control .p-inputtext.p-invalid),
 :deep(.field-control .p-inputnumber-input.p-invalid),
-:deep(.field-control.p-dropdown.p-invalid) {
+:deep(.field-control.p-select.p-invalid) {
   border-color: var(--md-error) !important;
   box-shadow: none !important;
 }
@@ -298,7 +298,7 @@ function handleChange() {
 .field-control.p-invalid:disabled,
 :deep(.field-control .p-inputtext.p-invalid:disabled),
 :deep(.field-control .p-inputnumber-input.p-invalid:disabled),
-:deep(.field-control.p-dropdown.p-invalid.p-disabled) {
+:deep(.field-control.p-select.p-invalid.p-disabled) {
   border-color: var(--md-error) !important;
   box-shadow: none !important;
   background: color-mix(in srgb, var(--md-error) 5%, var(--md-disabled-bg)) !important;
