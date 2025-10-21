@@ -86,19 +86,25 @@ class DocumentApiService {
   async getInvalidChars(deviceId: number): Promise<string[]> {
     try {
       console.log('[API] Запрос некорректных символов для устройства:', deviceId);
-      const response = await axios.get<string>('/Home/GetInvalideChars', {
+      const response = await axios.get<any>('/Home/GetInvalideChars', {
         params: { IdDevice: deviceId }
       });
 
       console.log('[API] Ответ сервера (сырой):', response.data);
+      console.log('[API] Тип ответа:', typeof response.data, Array.isArray(response.data) ? '(массив)' : '');
 
-      // Парсим JSON строку в массив
-      if (response.data) {
+      // Axios автоматически парсит JSON, проверяем тип
+      if (Array.isArray(response.data)) {
+        console.log('[API] Возвращаем массив напрямую:', response.data);
+        return response.data;
+      } else if (typeof response.data === 'string' && response.data) {
+        // Если вернулась строка, парсим её
         const parsed = JSON.parse(response.data);
-        console.log('[API] Распарсенный массив:', parsed);
+        console.log('[API] Распарсенный массив из строки:', parsed);
         return parsed;
       }
-      console.log('[API] Пустой ответ от сервера');
+
+      console.log('[API] Пустой или некорректный ответ от сервера');
       return [];
     } catch (error) {
       console.error('[API] Ошибка при получении списка некорректных символов:', error);
