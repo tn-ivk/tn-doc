@@ -437,8 +437,29 @@ select, textarea, .form-control, .filterDatepicker, select.filterSelect,
   color: var(--md-text) !important;
 }
 
+/* Selected item in PrimeVue Dropdown within the document editor */
+.document-editor .p-dropdown-item.p-highlight {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
 .document-editor .p-dropdown-item.p-highlight:not(.p-disabled):hover {
   background: var(--md-primary-hover) !important;
+}
+
+/* PrimeVue Select (new API) selected states in the document editor */
+.document-editor .p-select-option.p-selected,
+.document-editor .p-select-option.p-highlight,
+.document-editor .p-select-option[aria-selected="true"] {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.document-editor .p-select-option.p-selected:not(.p-disabled):hover,
+.document-editor .p-select-option.p-highlight:not(.p-disabled):hover,
+.document-editor .p-select-option[aria-selected="true"]:not(.p-disabled):hover {
+  background: var(--md-primary) !important;
+  color: #ffffff !important;
 }
 
 input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicker:focus, select.filterSelect:focus,
