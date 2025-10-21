@@ -294,6 +294,16 @@ function handleChange() {
   box-shadow: none !important;
 }
 
+/* Стили для disabled полей с ошибками валидации */
+.field-control.p-invalid:disabled,
+:deep(.field-control .p-inputtext.p-invalid:disabled),
+:deep(.field-control .p-inputnumber-input.p-invalid:disabled),
+:deep(.field-control.p-dropdown.p-invalid.p-disabled) {
+  border-color: var(--md-error) !important;
+  box-shadow: none !important;
+  background: color-mix(in srgb, var(--md-error) 5%, var(--md-disabled-bg)) !important;
+}
+
 .field-label {
   display: block;
   margin-bottom: 0.5rem;
