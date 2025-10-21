@@ -48,9 +48,10 @@ const displayValue = computed(() => {
 /**
  * Обработчик изменения значения
  */
-function handleValueChange(value: string) {
-  emit('update:printValue', value);
-  console.log(`[PassportPrintCell] PrintValue изменено: ${props.parameter.key} -> ${value}`);
+function handleValueChange(value: string | undefined) {
+  const stringValue = value ?? '';
+  emit('update:printValue', stringValue);
+  console.log(`[PassportPrintCell] PrintValue изменено: ${props.parameter.key} -> ${stringValue}`);
 }
 </script>
 
