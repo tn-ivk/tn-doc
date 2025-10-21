@@ -1405,7 +1405,7 @@ function FillPassportDataElis() {
                             item.setAttribute("data-document", JSON.stringify(new LabDocumentInfo(root[currentKey].documentType, root[currentKey].documentNumber, root[currentKey].documentDate)));
                         break;
                     case 'Value':
-                        item.value = root[currentKey].value;
+                        item.value = (root[currentKey].value === '' ? '0' : root[currentKey].value);
                         FixedElisData(item);
                         if (root[currentKey].valueString && root[currentKey].valueString !== root[currentKey].value) {
                             // Ищем уже существующий скрытый PrintValue для этого параметра
