@@ -62,6 +62,7 @@ import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentEditor } from '@/composables/useDocumentEditor';
 import { usePassportEditor } from '@/composables/usePassportEditor';
+import { usePassportAutoFill } from '@/composables/usePassportAutoFill';
 
 const route = useRoute();
 
@@ -84,6 +85,9 @@ const {
   handleResultUpdate
 } = usePassportEditor();
 
+// Используем логику автозаполнения для Паспортов
+const { setupAutoFillWatchers } = usePassportAutoFill();
+
 // Загружаем документ при монтировании
 onMounted(async () => {
   const { deviceId, id } = route.params;
@@ -99,6 +103,9 @@ onMounted(async () => {
     docType,
     parseInt(id as string, 10)
   );
+
+  // Настраиваем автозаполнение связанных полей для Паспортов
+  setupAutoFillWatchers();
 });
 
 // Экспонируем SaveDoc() для главного окна

@@ -71,6 +71,8 @@ export interface SelectOption {
 export interface UserData {
   /** Организация (предприятие) */
   factory?: string;
+  /** Должность */
+  post?: string;
   /** Полное ФИО (Фамилия Имя Отчество) */
   fio?: string;
   /** ID доверенности */
