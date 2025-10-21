@@ -14,10 +14,17 @@ export const useConfigStore = defineStore('config', () => {
   const error = ref<string | null>(null);
   const validationErrors = ref<Map<string, string>>(new Map());
 
+  // Хранилище для измененных конфигураций документов
+  const dirtyDocumentConfigs = ref<Map<string, string>>(new Map());
+
   // Computed
   const isDirty = computed(() => {
     if (!originalConfig.value || !currentConfig.value) return false;
-    return !_.isEqual(originalConfig.value, currentConfig.value);
+    // Проверяем изменения в основной конфигурации
+    const configDirty = !_.isEqual(originalConfig.value, currentConfig.value);
+    // Проверяем изменения в конфигурациях документов
+    const docConfigsDirty = dirtyDocumentConfigs.value.size > 0;
+    return configDirty || docConfigsDirty;
   });
 
   const selectedDevices = computed<Device[]>(() => {
@@ -65,11 +72,17 @@ export const useConfigStore = defineStore('config', () => {
         throw new Error(errorMessage);
       }
 
-      // Сохранение
+      // Сохранение основной конфигурации
       await apiService.saveConfig(currentConfig.value);
 
-      // Обновляем оригинальную конфигурацию
+      // Сохранение измененных конфигураций документов
+      for (const [path, content] of dirtyDocumentConfigs.value.entries()) {
+        await apiService.saveDocumentConfig(path, content);
+      }
+
+      // Обновляем оригинальную конфигурацию и очищаем dirty state
       originalConfig.value = _.cloneDeep(currentConfig.value);
+      dirtyDocumentConfigs.value.clear();
     } catch (e: any) {
       error.value = e.message || 'Не удалось сохранить конфигурацию';
       throw e;
@@ -164,6 +177,37 @@ export const useConfigStore = defineStore('config', () => {
     if (originalConfig.value) {
       currentConfig.value = _.cloneDeep(originalConfig.value);
     }
+    // Сбрасываем изменения в конфигурациях документов
+    dirtyDocumentConfigs.value.clear();
+  }
+
+  async function loadDocumentConfig(configPath: string): Promise<string> {
+    try {
+      const content = await apiService.loadDocumentConfig(configPath);
+      // Форматируем JSON для удобного чтения
+      const parsed = JSON.parse(content);
+      return JSON.stringify(parsed, null, 2);
+    } catch (e: any) {
+      throw new Error(`Не удалось загрузить конфигурацию: ${e.message}`);
+    }
+  }
+
+  async function saveDocumentConfig(configPath: string, content: string): Promise<void> {
+    try {
+      await apiService.saveDocumentConfig(configPath, content);
+      // Удаляем из dirty state после успешного сохранения
+      dirtyDocumentConfigs.value.delete(configPath);
+    } catch (e: any) {
+      throw new Error(`Не удалось сохранить конфигурацию: ${e.message}`);
+    }
+  }
+
+  function markDocumentConfigDirty(configPath: string, content: string) {
+    dirtyDocumentConfigs.value.set(configPath, content);
+  }
+
+  function clearDocumentConfigDirty(configPath: string) {
+    dirtyDocumentConfigs.value.delete(configPath);
   }
 
   return {
@@ -190,6 +234,10 @@ export const useConfigStore = defineStore('config', () => {
     updateDocumentTemplate,
     selectDevices,
     validateConfig,
-    resetConfig
+    resetConfig,
+    loadDocumentConfig,
+    saveDocumentConfig,
+    markDocumentConfigDirty,
+    clearDocumentConfigDirty
   };
 });

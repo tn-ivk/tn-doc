@@ -23,7 +23,15 @@ import { storeToRefs } from 'pinia';
 import Tree from 'primevue/tree';
 import { useConfigStore } from '../stores/configStore';
 import type { DocumentTreeNode } from '../types/document.types';
-import type { TreeNode } from 'primevue/tree';
+
+interface TreeNodeType {
+  key: string;
+  label: string;
+  icon?: string;
+  children?: TreeNodeType[];
+  data?: any;
+  type?: string;
+}
 
 const emit = defineEmits<{
   nodeSelect: [node: DocumentTreeNode | null]
@@ -34,12 +42,12 @@ const { currentConfig } = storeToRefs(configStore);
 const selectedKeys = ref<Record<string, boolean>>({});
 
 // Построение дерева из конфигурации
-const treeNodes = computed<TreeNode[]>(() => {
+const treeNodes = computed<TreeNodeType[]>(() => {
   if (!currentConfig.value?.Devices) {
     return [];
   }
 
-  const nodes: TreeNode[] = [];
+  const nodes: TreeNodeType[] = [];
   const usedDocuments = new Map<number, Set<string>>();
 
   // Собираем все используемые документы и шаблоны
@@ -74,7 +82,7 @@ const treeNodes = computed<TreeNode[]>(() => {
       if (!usedDocuments.has(doc.IdDoc)) continue;
 
       if (!documentMap.has(doc.IdDoc)) {
-        const children: TreeNode[] = [];
+        const children: TreeNodeType[] = [];
 
         // Добавляем только используемые шаблоны
         if (doc.TemplateDocs) {
@@ -115,15 +123,15 @@ const treeNodes = computed<TreeNode[]>(() => {
   return Array.from(documentMap.values());
 });
 
-function onNodeSelect(node: TreeNode) {
-  if (!node.data) {
+function onNodeSelect(node: any) {
+  if (!node?.data) {
     emit('nodeSelect', null);
     return;
   }
 
   const documentNode: DocumentTreeNode = {
-    key: node.key as string,
-    label: node.label as string,
+    key: node.key || '',
+    label: node.label || '',
     icon: node.icon,
     type: node.data.type,
     configPath: node.data.configPath,
