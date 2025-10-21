@@ -116,11 +116,17 @@ const invalidCharFound = computed(() => {
   // Проверяем только текстовые поля
   if (props.field.type !== 'text') return null;
   if (!localValue.value || typeof localValue.value !== 'string') return null;
-  if (!props.invalidChars || props.invalidChars.length === 0) return null;
+  if (!props.invalidChars || props.invalidChars.length === 0) {
+    console.log('[FormField]', props.field.key, '- список некорректных символов пуст');
+    return null;
+  }
+
+  console.log('[FormField]', props.field.key, '- проверка значения:', localValue.value, 'на символы:', props.invalidChars);
 
   // Проверяем каждый некорректный символ
   for (const char of props.invalidChars) {
     if (localValue.value.includes(char)) {
+      console.log('[FormField]', props.field.key, '- найден некорректный символ:', char);
       return char;
     }
   }

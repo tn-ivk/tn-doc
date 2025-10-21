@@ -69,6 +69,7 @@ export const useDocumentStore = defineStore('document', () => {
 
       // Загружаем список некорректных символов для данного устройства
       const invalidChars = await documentApi.getInvalidChars(deviceId);
+      console.log('[DocumentStore] Загружены некорректные символы для устройства', deviceId, ':', invalidChars);
       loadedConfig.invalidChars = invalidChars;
 
       config.value = loadedConfig;
