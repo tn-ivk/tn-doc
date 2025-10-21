@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents and reports from measurement system data (ИВК - Измерительно-вычислительный комплекс). The system generates quality certificates, verification protocols, acceptance acts, and various measurement reports using FastReport templates.
 
-**Version**: 1.4.2
+**Version**: 1.4.3
 **Target Framework**: .NET 8.0
 **SDK Compatibility**: Works with .NET SDK 8.0+ and 9.0+
 **Runtime Requirement**: .NET Runtime 8.0.13 or higher
@@ -14,8 +14,29 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 **Important Notes:**
 - NEVER mention AI, code generation, or "Claude" in commit messages
+- Use Russian language for all commit messages
 - Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, status bar cleanup, and experimental Document Editor (POC)
 - Current active branch: feature/additional-info-table (работа над функционалом дополнительной информации)
+
+## Essential Commands (Quick Reference)
+
+```bash
+# Build and run
+dotnet build                                    # Build entire solution
+cd TN_Doc && dotnet run                         # Run application (http://localhost:38509)
+
+# Vue components
+cd TN_Doc/Client && npm run build:all          # Build all Vue apps
+npm run dev                                     # StatusBar dev server
+npm run dev:configurator                        # Configurator dev server
+
+# Testing
+dotnet test                                     # Run all tests
+dotnet test --filter "ClassName=YourTestClass" # Run specific test class
+
+# Code quality
+dotnet format                                   # Format code
+```
 
 ## Quick Start for New Developers
 
@@ -819,7 +840,7 @@ The system contains the following document libraries that require test coverage:
 ### Version Management
 - Version is centrally managed in `TN_Doc.csproj`
 - Changes are documented in `/TN_Doc/changes.md`
-- Current version: 1.4.2 (.NET 8.0)
+- Current version: 1.4.3 (.NET 8.0)
 
 ### Git Workflow Notes
 
@@ -888,38 +909,15 @@ Configuration follows a layered approach:
 - **Exception Boundaries**: Controllers catch exceptions and return appropriate HTTP status codes
 - **Resource Cleanup**: Explicit disposal of FastReport objects and streams in finally blocks
 
-### Recent Changes (v1.4.2)
+### Recent Changes (v1.4.3)
+See `/TN_Doc/changes.md` for detailed version history. Key improvements:
 - Removed TN.Tools project (obsolete functionality)
-- Simplified file path determination logic
 - Updated KMH_MI2816 for IVK version 7.12.14.3000 protocol changes
 - Updated docgeneral to version 1.2.2
-- ⚠️ **UI Theme Improvements** (feature/ui-theme-2 branch):
-  - **Centralized color management**: All colors moved to CSS variables in `material3.css`
-  - Replaced hardcoded HEX colors with CSS variables across all stylesheets:
-    * `elisRequestWindow.css` - 10 replacements
-    * `errorDialogWindow.css` - 6 replacements
-    * `LeftPanel.css` - 4 replacements
-    * `menu-dropdown.css` - 6 replacements
-    * `site.css` - 6 replacements including tab selector styling
-    * `newstyle.css` - 9 replacements
-    * `elisEditForm.css` - 2 replacements
-    * `commonEditForm.css` - 1 replacement
-  - **Centralized control sizes**: Heights defined via CSS variables (standard height: 35px)
-  - **Configurator UI enhancements**:
-    * Apply/Cancel buttons with improved styling
-    * Device editor optimization and vertical alignment
-    * Template tag styling improvements
-  - **Top panel improvements**: Precise vertical alignment of controls and comboboxes
-  - **Dictionary buttons**: Enhanced styling and icon sizing
-  - **Document template selector**: Optimized combobox width
-- ⚠️ Status bar improvements: Removed time display and project version info from status bar
-- Cleaned up status bar JavaScript to remove unused time update functionality
-- **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/LoggingPathService.cs` for reusability across projects (TN_Doc, TN_KMH, etc.). Now accepts `applicationName` parameter for dynamic log paths
-- **ReportBuffer cleanup**: Removed unused `_preparedReport` field and FastReport dependency. Class now only stores PDF bytes without external dependencies
-- **GetEditDoc logging enhancement**: Added logging to HTML form save operations in all 37 document libraries
-  - Replaced string concatenation with `Path.Combine()` for cross-platform compatibility
-  - Added trace logging with full file path on successful save: `_logger.Trace($"HTML форма документа {IdDoc} (id={id}) сохранена: {htmlPath}")`
-  - Affects: Act, all Poverka libraries (18), all KMH libraries (18)
+- **UI Theme Improvements**: Centralized color management via CSS variables in `material3.css`
+- **Status bar improvements**: 4 indicator states (online, offline, ndv, warning), improved layout
+- **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/` for cross-project reusability
+- **GetEditDoc logging enhancement**: Enhanced logging in all 42 document libraries with `Path.Combine()` usage
 
 ### Previous Changes (v1.4.1)
 - 🐞 Fixed incorrect population of Act shifts when filling "reverse" passports
