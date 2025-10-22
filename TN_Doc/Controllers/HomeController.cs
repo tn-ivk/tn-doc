@@ -558,51 +558,17 @@ public class HomeController : Controller
                 return Content(string.Empty);
             }
 
-            // ДИАГНОСТИКА: Выводим значения флагов для отладки
-            var useVueFlag = _cfgApp.UseVueDocumentEditor;
-            var isSupportedInVue = IsDocumentSupportedInVueEditor(IdDoc);
-            _logger.LogInformation($"[ДИАГНОСТИКА] UseVueDocumentEditor={useVueFlag}, IsDocumentSupportedInVueEditor({IdDoc})={isSupportedInVue}");
-
-            // Проверяем флаг использования Vue Document Editor
-            if (useVueFlag && isSupportedInVue)
-            {
-                var vueUrl = $"/document-editor/edit/{IdDevice}/{IdDoc}/{id}";
-                _logger.LogInformation($"[Vue Editor] Используется Vue Document Editor для документа {IdDoc}, URL: {vueUrl}");
-                return Json(new { useVue = true, url = vueUrl });
-            }
-
-            // Старый подход - генерация HTML на сервере
-            _logger.LogInformation($"[Legacy Editor] Используется старый HTML-редактор для документа {IdDoc}");
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return Content(string.Empty);
-            }
-            var htmlContent = doc.GetEditDoc(id);
-            return Content(htmlContent, "text/html");
+            // Используем Vue Document Editor для всех документов
+            // Все 41 библиотека реализуют IDocumentEditor
+            var vueUrl = $"/document-editor/edit/{IdDevice}/{IdDoc}/{id}";
+            _logger.LogDebug($"Используется Vue Document Editor для документа {IdDoc}, URL: {vueUrl}");
+            return Json(new { useVue = true, url = vueUrl });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Ошибка при получении формы редактирования документа {IdDoc} для устройства {IdDevice}");
             return Content(string.Empty);
         }
-    }
-
-    /// <summary>
-    /// Проверяет, поддерживается ли документ в Vue Editor
-    /// </summary>
-    private bool IsDocumentSupportedInVueEditor(IdDoc idDoc)
-    {
-        // Поддерживаются: Report, Act, Jornal, Passport
-        return idDoc switch
-        {
-            IdDoc.Report => true,
-            IdDoc.Jornal => true,
-            IdDoc.Act => true,
-            IdDoc.Passport => true,
-            _ => false
-        };
     }
 
 
