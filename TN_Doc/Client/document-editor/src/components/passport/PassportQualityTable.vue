@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, watch } from 'vue';
 import PassportParameterRow from './PassportParameterRow.vue';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
@@ -55,13 +56,24 @@ interface Props {
   isElisUsed: boolean;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-defineEmits<{
+const emit = defineEmits<{
   'update:method': [event: { paramKey: string; methodName: string }];
   'update:measurement': [event: { paramKey: string; value: string }];
   'update:result': [event: { paramKey: string; value: string }];
 }>();
+
+onMounted(() => {
+  console.log('[PassportQualityTable] Монтирование таблицы качественных параметров');
+  console.log('[PassportQualityTable] Количество параметров:', props.parameters.length);
+  console.log('[PassportQualityTable] ELIS используется:', props.isElisUsed);
+  console.log('[PassportQualityTable] Параметры:', props.parameters);
+});
+
+watch(() => props.parameters, (newParams) => {
+  console.log('[PassportQualityTable] Параметры изменились, новое количество:', newParams.length);
+}, { deep: true });
 </script>
 
 <style scoped>

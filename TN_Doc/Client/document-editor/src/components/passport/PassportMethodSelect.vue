@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import Select from 'primevue/select';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
@@ -27,15 +27,33 @@ const emit = defineEmits<{
   'update:method': [methodName: string];
 }>();
 
+onMounted(() => {
+  console.log('[PassportMethodSelect] Монтирование select метода для параметра:', props.parameter.key);
+  console.log('[PassportMethodSelect] Выбранный метод:', props.parameter.method.selected);
+  console.log('[PassportMethodSelect] Доступные методы:', props.parameter.method.options);
+  console.log('[PassportMethodSelect] methodOptions:', methodOptions.value);
+});
+
 /**
  * Опции для Select компонента
  */
 const methodOptions = computed(() => {
-  return props.parameter.method.options.map(option => ({
+  const options = props.parameter.method.options.map(option => ({
     label: option.name,
     value: option.name,
     ...option
   }));
+
+  console.log('[PassportMethodSelect] Computed methodOptions для', props.parameter.key + ':', options);
+
+  // Проверка валидности опций
+  options.forEach((opt, idx) => {
+    if (!opt.label || opt.value === undefined) {
+      console.error('[PassportMethodSelect] ОШИБКА: некорректная опция метода #' + idx + ':', opt);
+    }
+  });
+
+  return options;
 });
 
 /**

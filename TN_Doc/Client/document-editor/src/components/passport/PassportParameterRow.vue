@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import PassportMethodSelect from './PassportMethodSelect.vue';
 import PassportDocumentField from './PassportDocumentField.vue';
 import PassportMeasurementInput from './PassportMeasurementInput.vue';
@@ -65,6 +65,16 @@ const emit = defineEmits<{
   'update:measurement': [event: { paramKey: string; value: string }];
   'update:result': [event: { paramKey: string; value: string }];
 }>();
+
+onMounted(() => {
+  console.log('[PassportParameterRow] Монтирование строки параметра:', {
+    index: props.index,
+    key: props.parameter.key,
+    name: props.parameter.name,
+    isElisUsed: props.isElisUsed,
+    parameter: props.parameter
+  });
+});
 
 /**
  * Определить, редактируема ли ячейка результата

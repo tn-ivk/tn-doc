@@ -20,9 +20,12 @@ export function usePassportEditor() {
    * Приведение конфигурации к типу PassportEditConfig
    */
   const passportConfig = computed<PassportEditConfig | null>(() => {
+    console.log('[usePassportEditor] Вычисление passportConfig, store.config:', store.config);
     if (!store.config || store.config.docType !== 'Passport') {
+      console.log('[usePassportEditor] Конфигурация не является Passport, docType:', store.config?.docType);
       return null;
     }
+    console.log('[usePassportEditor] Конфигурация успешно приведена к PassportEditConfig');
     return store.config as PassportEditConfig;
   });
 
@@ -30,7 +33,9 @@ export function usePassportEditor() {
    * Качественные параметры из конфигурации
    */
   const qualityParameters = computed<PassportQualityParameter[]>(() => {
-    return passportConfig.value?.qualityParameters || [];
+    const params = passportConfig.value?.qualityParameters || [];
+    console.log('[usePassportEditor] Качественные параметры:', params.length, 'шт.');
+    return params;
   });
 
   /**

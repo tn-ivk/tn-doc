@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
@@ -107,6 +107,28 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: any): void;
 }>();
+
+onMounted(() => {
+  console.log('[FormField] Монтирование поля:', {
+    key: props.field.key,
+    type: props.field.type,
+    label: props.field.label,
+    value: props.modelValue,
+    invalidChars: props.invalidChars,
+    hasOptions: !!props.field.options,
+    optionsCount: props.field.options?.length || 0
+  });
+
+  // Проверка на корректность опций для select
+  if (props.field.type === 'select' && props.field.options) {
+    console.log('[FormField] Select опции для', props.field.key + ':', props.field.options);
+    props.field.options.forEach((opt, idx) => {
+      if (!opt.label || opt.value === undefined) {
+        console.error('[FormField] ОШИБКА: некорректная опция #' + idx + ' для поля', props.field.key + ':', opt);
+      }
+    });
+  }
+});
 
 // Локальное значение для v-model
 const localValue = ref(props.modelValue);

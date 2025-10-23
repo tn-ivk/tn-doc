@@ -90,22 +90,34 @@ const { setupAutoFillWatchers } = usePassportAutoFill();
 
 // Загружаем документ при монтировании
 onMounted(async () => {
+  console.log('[DocumentPassportEditor] onMounted - начало');
   const { deviceId, id } = route.params;
   const docType = 'Passport'; // Для этого компонента тип документа всегда Passport
 
+  console.log('[DocumentPassportEditor] Параметры маршрута:', { deviceId, id, docType });
+
   if (!deviceId || !id) {
     store.error = 'Отсутствуют обязательные параметры маршрута';
+    console.error('[DocumentPassportEditor] Отсутствуют параметры маршрута');
     return;
   }
 
+  console.log('[DocumentPassportEditor] Начало загрузки документа...');
   await loadDocument(
     parseInt(deviceId as string, 10),
     docType,
     parseInt(id as string, 10)
   );
+  console.log('[DocumentPassportEditor] Документ загружен');
+  console.log('[DocumentPassportEditor] Загруженная конфигурация:', store.config);
+  console.log('[DocumentPassportEditor] Поля формы:', store.fields);
+  console.log('[DocumentPassportEditor] Данные формы:', store.formData);
+  console.log('[DocumentPassportEditor] Качественные параметры:', qualityParameters.value);
 
   // Настраиваем автозаполнение связанных полей для Паспортов
+  console.log('[DocumentPassportEditor] Настройка автозаполнения...');
   setupAutoFillWatchers();
+  console.log('[DocumentPassportEditor] onMounted - завершено');
 });
 
 // Экспонируем SaveDoc() для главного окна
