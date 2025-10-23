@@ -108,6 +108,57 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: any): void;
 }>();
 
+/**
+ * Конвертирует значение для datetime-local/date полей в объект Date
+ */
+function convertToDate(value: any, fieldType: string): any {
+  if (!value) return value;
+
+  // Для datetime-local и date полей конвертируем строку в Date
+  if ((fieldType === 'datetime-local' || fieldType === 'date') && typeof value === 'string') {
+    try {
+      const dateObj = new Date(value);
+      console.log('[FormField] Конвертация строки в Date:', {
+        original: value,
+        converted: dateObj,
+        isValid: !isNaN(dateObj.getTime())
+      });
+      return dateObj;
+    } catch (e) {
+      console.error('[FormField] Ошибка конвертации даты:', e);
+      return value;
+    }
+  }
+
+  return value;
+}
+
+/**
+ * Конвертирует объект Date обратно в строку ISO для сохранения
+ */
+function convertFromDate(value: any, fieldType: string): any {
+  if (!value) return value;
+
+  // Для datetime-local и date полей конвертируем Date в ISO строку
+  if ((fieldType === 'datetime-local' || fieldType === 'date') && value instanceof Date) {
+    // Проверяем что дата валидна
+    if (isNaN(value.getTime())) {
+      console.error('[FormField] Невалидная дата:', value);
+      return null;
+    }
+
+    // Конвертируем в ISO строку с локальным временем (без Z)
+    const isoString = value.toISOString().slice(0, 19); // "2025-10-22T02:07:33"
+    console.log('[FormField] Конвертация Date в строку:', {
+      original: value,
+      converted: isoString
+    });
+    return isoString;
+  }
+
+  return value;
+}
+
 onMounted(() => {
   console.log('[FormField] Монтирование поля:', {
     key: props.field.key,
@@ -153,7 +204,8 @@ onMounted(() => {
 });
 
 // Локальное значение для v-model
-const localValue = ref(props.modelValue);
+// Для datetime-local и date конвертируем строку в объект Date
+const localValue = ref(convertToDate(props.modelValue, props.field.type));
 
 // Валидные опции для select (фильтруем пустые)
 const validSelectOptions = computed(() => {
@@ -227,12 +279,16 @@ const validationMessage = computed(() => {
 
 // Синхронизация с внешним modelValue
 watch(() => props.modelValue, (newValue) => {
-  localValue.value = newValue;
+  // Конвертируем новое значение для datetime-local/date полей
+  localValue.value = convertToDate(newValue, props.field.type);
 });
 
 // Обработка изменений
 function handleChange() {
-  emit('update:modelValue', localValue.value);
+  // Конвертируем Date обратно в строку для datetime-local/date полей перед отправкой
+  const valueToEmit = convertFromDate(localValue.value, props.field.type);
+  console.log('[FormField]', props.field.key, '- handleChange, отправка значения:', valueToEmit);
+  emit('update:modelValue', valueToEmit);
 }
 </script>
 
