@@ -121,10 +121,32 @@ onMounted(() => {
 
   // Проверка на корректность опций для select
   if (props.field.type === 'select' && props.field.options) {
-    console.log('[FormField] Select опции для', props.field.key + ':', props.field.options);
+    console.log('[FormField] Select ВСЕ опции для', props.field.key + ':', props.field.options);
+    console.log('[FormField] Select ВАЛИДНЫЕ опции для', props.field.key + ':', validSelectOptions.value);
+
+    // Проверяем исходные опции
     props.field.options.forEach((opt, idx) => {
+      console.log(`[FormField] Исходная опция #${idx}:`, {
+        label: opt.label,
+        value: opt.value,
+        hasLabel: !!(opt.label && opt.label.trim()),
+        hasValue: opt.value !== undefined && opt.value !== null && opt.value !== ''
+      });
       if (!opt.label || opt.value === undefined) {
-        console.error('[FormField] ОШИБКА: некорректная опция #' + idx + ' для поля', props.field.key + ':', opt);
+        console.error('[FormField] ОШИБКА: некорректная ИСХОДНАЯ опция #' + idx + ' для поля', props.field.key + ':', opt);
+      }
+    });
+
+    // Проверяем отфильтрованные опции
+    validSelectOptions.value.forEach((opt, idx) => {
+      console.log(`[FormField] Валидная опция #${idx}:`, {
+        label: opt.label,
+        value: opt.value,
+        hasLabel: !!(opt.label && opt.label.trim()),
+        hasValue: opt.value !== undefined && opt.value !== null && opt.value !== ''
+      });
+      if (!opt.label || opt.value === undefined || opt.label.trim() === '' || opt.value === '') {
+        console.error('[FormField] ОШИБКА: некорректная ВАЛИДНАЯ опция #' + idx + ' для поля', props.field.key + ':', opt);
       }
     });
   }
@@ -139,17 +161,24 @@ const validSelectOptions = computed(() => {
     return [];
   }
 
+  console.log('[FormField] validSelectOptions computed для', props.field.key);
+  console.log('[FormField] Исходные опции (длина):', props.field.options.length);
+
   // Фильтруем опции с пустыми label или value
-  const filtered = props.field.options.filter(opt => {
+  const filtered = props.field.options.filter((opt, idx) => {
     const hasLabel = opt.label && opt.label.trim() !== '';
     const hasValue = opt.value !== undefined && opt.value !== null && opt.value !== '';
-    return hasLabel && hasValue;
+    const isValid = hasLabel && hasValue;
+
+    console.log(`[FormField] Проверка опции #${idx}: label="${opt.label}", value="${opt.value}", hasLabel=${hasLabel}, hasValue=${hasValue}, isValid=${isValid}`);
+
+    return isValid;
   });
 
   const removedCount = props.field.options.length - filtered.length;
-  if (removedCount > 0) {
-    console.log('[FormField] Отфильтровано пустых опций для', props.field.key + ':', removedCount);
-  }
+  console.log('[FormField] Отфильтровано пустых опций для', props.field.key + ':', removedCount);
+  console.log('[FormField] Осталось валидных опций:', filtered.length);
+  console.log('[FormField] Результат фильтрации:', filtered);
 
   return filtered;
 });
