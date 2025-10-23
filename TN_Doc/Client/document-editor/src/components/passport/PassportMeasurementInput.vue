@@ -1,17 +1,24 @@
 <template>
-  <InputNumber
-    :modelValue="numericValue"
-    :disabled="!parameter.editable"
-    :class="[
-      validationClass,
-      { 'elis-filled': parameter.elisFlags.measurement },
-      { 'manual-input--disabled': !parameter.editable }
-    ]"
-    :minFractionDigits="0"
-    :maxFractionDigits="parameter.roundValue || 10"
-    class="measurement-input"
-    @update:modelValue="handleValueChange"
-  />
+  <div class="measurement-field">
+    <InputNumber
+      :modelValue="numericValue"
+      :disabled="!parameter.editable"
+      :class="[
+        { 'p-invalid': !isValid },
+        { 'elis-filled': parameter.elisFlags.measurement },
+        { 'manual-input--disabled': !parameter.editable }
+      ]"
+      :minFractionDigits="0"
+      :maxFractionDigits="parameter.roundValue || 10"
+      class="measurement-input"
+      @update:modelValue="handleValueChange"
+    />
+
+    <!-- Сообщение об ошибке валидации -->
+    <small v-if="!isValid" class="p-error">
+      {{ validationMessage }}
+    </small>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -35,22 +42,46 @@ const numericValue = computed(() => {
   return isNaN(value) ? null : value;
 });
 
-const validationClass = computed(() => {
+// Валидация поля
+const isValid = computed(() => {
+  // Проверка обязательных полей
   if (props.parameter.requiredFill) {
     if (!props.parameter.values.measurement || props.parameter.values.measurement === '') {
-      return 'incorrect-value';
+      return false;
     }
   }
 
+  // Проверка количества знаков после запятой
   if (props.parameter.roundValue && props.parameter.values.measurement) {
     const value = props.parameter.values.measurement.replace(',', '.');
     const parts = value.split('.');
     if (parts.length > 1 && parts[1].length > props.parameter.roundValue) {
-      return 'incorrect-value';
+      return false;
     }
   }
 
-  return 'correct-value';
+  return true;
+});
+
+// Сообщение об ошибке валидации
+const validationMessage = computed(() => {
+  // Проверка обязательных полей
+  if (props.parameter.requiredFill) {
+    if (!props.parameter.values.measurement || props.parameter.values.measurement === '') {
+      return `Поле "${props.parameter.name}" обязательно для заполнения`;
+    }
+  }
+
+  // Проверка количества знаков после запятой
+  if (props.parameter.roundValue && props.parameter.values.measurement) {
+    const value = props.parameter.values.measurement.replace(',', '.');
+    const parts = value.split('.');
+    if (parts.length > 1 && parts[1].length > props.parameter.roundValue) {
+      return `Максимум ${props.parameter.roundValue} знаков после запятой`;
+    }
+  }
+
+  return '';
 });
 
 function handleValueChange(value: number | null) {
@@ -60,6 +91,10 @@ function handleValueChange(value: number | null) {
 </script>
 
 <style scoped>
+.measurement-field {
+  width: 100%;
+}
+
 .measurement-input {
   width: 100%;
   text-align: center;
@@ -71,26 +106,15 @@ function handleValueChange(value: number | null) {
   font-size: 15px;
 }
 
-/* Валидация */
-.correct-value {
-  border-color: var(--md-outline, #CFD8DC);
+/* Валидация - красная рамка при ошибке */
+.measurement-input.p-invalid,
+.measurement-input.p-invalid:deep(input),
+.measurement-input.p-invalid:deep(.p-inputnumber-input) {
+  border-color: var(--md-error, #dc3545) !important;
+  box-shadow: none !important;
 }
 
-.correct-value:deep(input) {
-  border-color: var(--md-outline, #CFD8DC);
-}
-
-.incorrect-value {
-  border-color: var(--md-error, #dc3545);
-  background-color: #f8d7da;
-}
-
-.incorrect-value:deep(input) {
-  border-color: var(--md-error, #dc3545);
-  background-color: #f8d7da;
-}
-
-/* ELIS подсветка */
+/* ELIS подсветка - зеленый фон для данных из ELIS */
 .elis-filled {
   background-color: #8fd19e !important;
 }
@@ -110,5 +134,22 @@ function handleValueChange(value: number | null) {
   background-color: var(--md-surface-variant, #F1F3F4);
   color: var(--md-text-secondary, #5F6368);
   cursor: not-allowed;
+}
+
+/* Disabled поле с ошибкой валидации */
+.manual-input--disabled.p-invalid,
+.manual-input--disabled.p-invalid:deep(input),
+.manual-input--disabled.p-invalid:deep(.p-inputnumber-input) {
+  border-color: var(--md-error, #dc3545) !important;
+  background: color-mix(in srgb, var(--md-error) 5%, var(--md-disabled-bg)) !important;
+}
+
+/* Сообщение об ошибке */
+.p-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--md-error, #dc3545);
+  line-height: 1.2;
 }
 </style>
