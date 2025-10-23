@@ -9,8 +9,6 @@
     ]"
     :minFractionDigits="0"
     :maxFractionDigits="parameter.roundValue || 10"
-    mode="decimal"
-    locale="ru-RU"
     class="measurement-input"
     @update:modelValue="handleValueChange"
   />
