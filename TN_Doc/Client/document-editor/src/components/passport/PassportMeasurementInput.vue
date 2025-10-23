@@ -98,7 +98,6 @@ const tooltipOptions = computed(() => {
       showOnHover: true,
       class: 'p-error-tooltip',
       style: {
-        padding: '0.5rem 0.75rem',
         backgroundColor: '#dc3545',
         color: 'white',
         fontSize: '0.875rem',
