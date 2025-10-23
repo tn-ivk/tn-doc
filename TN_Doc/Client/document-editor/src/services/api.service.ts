@@ -53,9 +53,40 @@ class DocumentApiService {
     docType: string,
     id: number
   ): Promise<DocumentEditConfig> {
-    const response = await this.api.get<DocumentEditConfig>(
-      `/${deviceId}/${docType}/edit/${id}`
-    );
+    const url = `/${deviceId}/${docType}/edit/${id}`;
+    console.log('[API] getEditConfig - запрос:', { deviceId, docType, id, url });
+
+    const response = await this.api.get<DocumentEditConfig>(url);
+
+    console.log('[API] getEditConfig - ответ получен');
+    console.log('[API] getEditConfig - статус:', response.status);
+    console.log('[API] getEditConfig - данные (сырой JSON):', JSON.stringify(response.data, null, 2));
+
+    // Детальная проверка fields и initialValues
+    if (response.data) {
+      console.log('[API] getEditConfig - количество полей:', response.data.fields?.length);
+      console.log('[API] getEditConfig - количество initialValues:', Object.keys(response.data.initialValues || {}).length);
+
+      // Ищем поля, связанные с датой/временем
+      const dateFields = response.data.fields?.filter(f =>
+        f.label?.toLowerCase().includes('дата') ||
+        f.label?.toLowerCase().includes('время') ||
+        f.key?.toLowerCase().includes('date') ||
+        f.key?.toLowerCase().includes('time')
+      );
+
+      if (dateFields && dateFields.length > 0) {
+        console.log('[API] getEditConfig - 🔍 Найдены поля даты/времени:', dateFields.map(f => ({
+          key: f.key,
+          label: f.label,
+          type: f.type,
+          initialValue: response.data.initialValues?.[f.key]
+        })));
+      } else {
+        console.warn('[API] getEditConfig - ⚠️ Не найдены поля даты/времени');
+      }
+    }
+
     return response.data;
   }
 

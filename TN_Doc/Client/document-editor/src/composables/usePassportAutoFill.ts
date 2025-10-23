@@ -103,20 +103,32 @@ export function usePassportAutoFill() {
    * Установка watchers для автозаполнения
    */
   const setupAutoFillWatchers = () => {
+    console.log('[PassportAutoFill] setupAutoFillWatchers - начало установки watchers');
+    console.log('[PassportAutoFill] Текущие значения formData:', {
+      Laboratory_IOF: store.formData['Laboratory_IOF'],
+      Delive_IOF: store.formData['Delive_IOF'],
+      Receive_IOF: store.formData['Receive_IOF']
+    });
+
     // Отслеживаем изменения поля Laboratory_IOF (представитель лаборатории)
-    watch(() => store.formData['Laboratory_IOF'], (newValue) => {
+    watch(() => store.formData['Laboratory_IOF'], (newValue, oldValue) => {
+      console.log('[PassportAutoFill] Laboratory_IOF изменился:', { oldValue, newValue });
       handleLaboratoryIOFChange(newValue);
     });
 
     // Отслеживаем изменения поля Delive_IOF (сдающая сторона)
-    watch(() => store.formData['Delive_IOF'], (newValue) => {
+    watch(() => store.formData['Delive_IOF'], (newValue, oldValue) => {
+      console.log('[PassportAutoFill] Delive_IOF изменился:', { oldValue, newValue });
       handleDeliveIOFChange(newValue);
     });
 
     // Отслеживаем изменения поля Receive_IOF (принимающая сторона)
-    watch(() => store.formData['Receive_IOF'], (newValue) => {
+    watch(() => store.formData['Receive_IOF'], (newValue, oldValue) => {
+      console.log('[PassportAutoFill] Receive_IOF изменился:', { oldValue, newValue });
       handleReceiveIOFChange(newValue);
     });
+
+    console.log('[PassportAutoFill] setupAutoFillWatchers - watchers установлены');
   };
 
   return {

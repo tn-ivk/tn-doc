@@ -83,8 +83,24 @@ export const useDocumentStore = defineStore('document', () => {
 
       // Инициализируем formData начальными значениями
       console.log('[DocumentStore] Инициализация formData...');
+      console.log('[DocumentStore] initialValues полный дамп:', JSON.stringify(loadedConfig.initialValues, null, 2));
       formData.value = { ...loadedConfig.initialValues };
       console.log('[DocumentStore] formData инициализирован:', Object.keys(formData.value).length, 'полей');
+      console.log('[DocumentStore] formData полный дамп:', JSON.stringify(formData.value, null, 2));
+
+      // Проверка поля даты и времени отбора
+      const dateKeys = Object.keys(formData.value).filter(key =>
+        key.toLowerCase().includes('date') || key.toLowerCase().includes('дата') || key.toLowerCase().includes('время')
+      );
+      if (dateKeys.length > 0) {
+        console.log('[DocumentStore] 🔍 Найдены ключи, связанные с датой/временем:', dateKeys);
+        dateKeys.forEach(key => {
+          console.log(`[DocumentStore] 🔍 ${key} = ${formData.value[key]} (тип: ${typeof formData.value[key]})`);
+        });
+      } else {
+        console.warn('[DocumentStore] ⚠️ Не найдены ключи, связанные с датой/временем в formData');
+      }
+
       isDirty.value = false;
       console.log('[DocumentStore] loadConfig - успешно завершено');
     } catch (err: any) {

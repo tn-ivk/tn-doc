@@ -38,22 +38,26 @@ onMounted(() => {
  * Опции для Select компонента
  */
 const methodOptions = computed(() => {
-  const options = props.parameter.method.options.map(option => ({
-    label: option.name,
-    value: option.name,
-    ...option
-  }));
+  // Фильтруем опции с пустыми name (технические записи "не выбрано")
+  const validOptions = props.parameter.method.options
+    .filter(option => option.name && option.name.trim() !== '')
+    .map(option => ({
+      label: option.name,
+      value: option.name,
+      ...option
+    }));
 
-  console.log('[PassportMethodSelect] Computed methodOptions для', props.parameter.key + ':', options);
+  console.log('[PassportMethodSelect] Computed methodOptions для', props.parameter.key + ':', validOptions);
+  console.log('[PassportMethodSelect] Отфильтровано опций:', props.parameter.method.options.length - validOptions.length);
 
   // Проверка валидности опций
-  options.forEach((opt, idx) => {
-    if (!opt.label || opt.value === undefined) {
+  validOptions.forEach((opt, idx) => {
+    if (!opt.label || opt.value === undefined || opt.label.trim() === '') {
       console.error('[PassportMethodSelect] ОШИБКА: некорректная опция метода #' + idx + ':', opt);
     }
   });
 
-  return options;
+  return validOptions;
 });
 
 /**
