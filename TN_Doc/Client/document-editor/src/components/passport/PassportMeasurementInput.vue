@@ -1,28 +1,26 @@
 <template>
   <div class="measurement-field">
     <InputNumber
+      v-tooltip.left="tooltipOptions"
       :modelValue="numericValue"
       :disabled="!parameter.editable"
       :class="[
         { 'p-invalid': !isValid },
         { 'elis-filled': parameter.elisFlags.measurement },
-        { 'manual-input--disabled': !parameter.editable }
+        { 'manual-input--disabled': !parameter.editable },
+        { 'has-tooltip-error': !isValid && tooltipOptions.value }
       ]"
       :minFractionDigits="0"
       :maxFractionDigits="parameter.roundValue || 10"
       class="measurement-input"
       @update:modelValue="handleValueChange"
     />
-
-    <!-- Сообщение об ошибке валидации -->
-    <small v-if="!isValid" class="p-error">
-      {{ validationMessage }}
-    </small>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import Tooltip from 'primevue/tooltip';
 import InputNumber from 'primevue/inputnumber';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
@@ -35,6 +33,13 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   'update:measurement': [value: string];
 }>();
+
+// Регистрируем директиву tooltip
+defineOptions({
+  directives: {
+    tooltip: Tooltip
+  }
+});
 
 const numericValue = computed(() => {
   if (!props.parameter.values.measurement) return null;
@@ -84,6 +89,28 @@ const validationMessage = computed(() => {
   return '';
 });
 
+// Настройки для tooltip
+const tooltipOptions = computed(() => {
+  if (!isValid.value && validationMessage.value) {
+    return {
+      value: validationMessage.value,
+      showOnFocus: true,
+      showOnHover: true,
+      class: 'p-error-tooltip',
+      style: {
+        padding: '0.5rem 0.75rem',
+        backgroundColor: '#dc3545',
+        color: 'white',
+        fontSize: '0.875rem',
+        borderRadius: '4px',
+        maxWidth: '300px',
+        lineHeight: '1.3'
+      }
+    };
+  }
+  return { value: '' };
+});
+
 function handleValueChange(value: number | null) {
   const stringValue = value !== null ? value.toString().replace('.', ',') : '';
   emit('update:measurement', stringValue);
@@ -112,6 +139,11 @@ function handleValueChange(value: number | null) {
 .measurement-input.p-invalid:deep(.p-inputnumber-input) {
   border-color: var(--md-error, #dc3545) !important;
   box-shadow: none !important;
+}
+
+/* Стиль для поля с ошибкой и tooltip */
+.has-tooltip-error:deep(.p-inputnumber-input) {
+  border-color: var(--md-error, #dc3545) !important;
 }
 
 /* ELIS подсветка - зеленый фон для данных из ELIS */
@@ -144,12 +176,18 @@ function handleValueChange(value: number | null) {
   background: color-mix(in srgb, var(--md-error) 5%, var(--md-disabled-bg)) !important;
 }
 
-/* Сообщение об ошибке */
-.p-error {
-  display: block;
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: var(--md-error, #dc3545);
-  line-height: 1.2;
+/* Стили для tooltip с ошибкой */
+:deep(.p-error-tooltip),
+:deep(.p-tooltip.p-error-tooltip),
+:deep(.p-tooltip.p-error-tooltip .p-tooltip-text) {
+  background-color: var(--md-error, #dc3545) !important;
+  color: white !important;
+  font-size: 0.875rem !important;
+  padding: 0.75rem 1rem 0.75rem 1.25rem !important;
+  border-radius: 6px !important;
+  max-width: 300px !important;
+  word-wrap: break-word !important;
+  line-height: 1.4 !important;
+  margin: 0.5rem !important;
 }
 </style>

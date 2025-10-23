@@ -1,0 +1,33 @@
+/* Глобальные стили для tooltip с ошибками */
+.p-error-tooltip {
+  background-color: #dc3545 !important;
+  color: white !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 4px !important;
+  max-width: 300px !important;
+  word-wrap: break-word !important;
+  line-height: 1.3 !important;
+}
+
+.p-tooltip.p-error-tooltip {
+  background-color: #dc3545 !important;
+  color: white !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 4px !important;
+  max-width: 300px !important;
+  word-wrap: break-word !important;
+  line-height: 1.3 !important;
+}
+
+.p-tooltip.p-error-tooltip .p-tooltip-text {
+  background-color: #dc3545 !important;
+  color: white !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 4px !important;
+  max-width: 300px !important;
+  word-wrap: break-word !important;
+  line-height: 1.3 !important;
+}
