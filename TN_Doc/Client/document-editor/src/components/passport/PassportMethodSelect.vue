@@ -6,6 +6,7 @@
     optionValue="value"
     :class="{ 'elis-filled': parameter.elisFlags.method }"
     placeholder="Выберите метод"
+    showClear
     class="method-select"
     @update:modelValue="handleMethodChange"
   />
@@ -28,12 +29,9 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-  // Validate method options on mount
-  methodOptions.value.forEach((opt, idx) => {
-    if (!opt.label || opt.value === undefined || opt.label.trim() === '') {
-      console.error('[PassportMethodSelect] ОШИБКА: некорректная опция метода #' + idx + ':', opt);
-    }
-  });
+  console.log('[PassportMethodSelect] Монтирование select метода для параметра:', props.parameter.key);
+  console.log('[PassportMethodSelect] Выбранный метод:', props.parameter.method.selected);
+  console.log('[PassportMethodSelect] Количество опций (включая "Не выбрано"):', methodOptions.value.length);
 });
 
 /**
@@ -41,20 +39,32 @@ onMounted(() => {
  */
 const methodOptions = computed(() => {
   // Фильтруем опции с пустыми name (технические записи "не выбрано")
-  return props.parameter.method.options
+  const validOptions = props.parameter.method.options
     .filter(option => option.name && option.name.trim() !== '')
     .map(option => ({
       label: option.name,
       value: option.name,
       ...option
     }));
+
+  // Добавляем явную пустую опцию в начало списка
+  return [
+    {
+      label: '(Не выбрано)',
+      value: '',
+      isDefault: false,
+      limitValueActivate: false
+    },
+    ...validOptions
+  ];
 });
 
 /**
  * Обработчик изменения метода
  */
-function handleMethodChange(methodName: string) {
-  emit('update:method', methodName);
+function handleMethodChange(methodName: string | null) {
+  // Если пользователь очистил значение (showClear) или выбрал "(Не выбрано)"
+  emit('update:method', methodName || '');
 }
 </script>
 
