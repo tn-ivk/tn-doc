@@ -126,6 +126,10 @@ function handleResultUpdate(value: string) {
   padding: 4px;
 }
 
+.cell-documents {
+  padding: 4px;
+}
+
 .cell-result {
   text-align: center;
 }

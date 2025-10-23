@@ -47,13 +47,18 @@ const isElisFilled = computed(() => {
   color: var(--md-text-secondary, #5F6368);
   cursor: not-allowed;
   border: none;
+  padding: 6px 12px;
+  box-sizing: border-box;
 }
 
 .document-field:deep(input) {
+  padding: 6px 12px;
   text-align: center;
   background-color: var(--md-surface-variant, #F1F3F4);
   color: var(--md-text-secondary, #5F6368);
   cursor: not-allowed;
+  border: none;
+  box-sizing: border-box;
 }
 
 /* ELIS подсветка */
