@@ -1,11 +1,11 @@
 <template>
   <Select
-    :modelValue="parameter.method.selected"
+    :modelValue="parameter.method.selected || null"
     :options="methodOptions"
     optionLabel="label"
     optionValue="value"
     :class="{ 'elis-filled': parameter.elisFlags.method }"
-    placeholder="Выберите метод"
+    placeholder="Метод не выбран"
     showClear
     class="method-select"
     @update:modelValue="handleMethodChange"
@@ -31,39 +31,29 @@ const emit = defineEmits<{
 onMounted(() => {
   console.log('[PassportMethodSelect] Монтирование select метода для параметра:', props.parameter.key);
   console.log('[PassportMethodSelect] Выбранный метод:', props.parameter.method.selected);
-  console.log('[PassportMethodSelect] Количество опций (включая "Не выбрано"):', methodOptions.value.length);
+  console.log('[PassportMethodSelect] Количество опций:', methodOptions.value.length);
 });
 
 /**
  * Опции для Select компонента
+ * Только стандартная фильтрация пустых опций от бэкенда
  */
 const methodOptions = computed(() => {
   // Фильтруем опции с пустыми name (технические записи "не выбрано")
-  const validOptions = props.parameter.method.options
+  return props.parameter.method.options
     .filter(option => option.name && option.name.trim() !== '')
     .map(option => ({
       label: option.name,
       value: option.name,
       ...option
     }));
-
-  // Добавляем явную пустую опцию в начало списка
-  return [
-    {
-      label: '(Не выбрано)',
-      value: '',
-      isDefault: false,
-      limitValueActivate: false
-    },
-    ...validOptions
-  ];
 });
 
 /**
  * Обработчик изменения метода
  */
 function handleMethodChange(methodName: string | null) {
-  // Если пользователь очистил значение (showClear) или выбрал "(Не выбрано)"
+  // Если пользователь очистил значение (showClear), передаём пустую строку
   emit('update:method', methodName || '');
 }
 </script>
