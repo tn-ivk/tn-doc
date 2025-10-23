@@ -17,7 +17,7 @@
       v-if="field.type === 'select'"
       :id="field.key"
       v-model="localValue"
-      :options="field.options"
+      :options="validSelectOptions"
       optionLabel="label"
       optionValue="value"
       :placeholder="hideLabel ? '' : `Выберите ${field.label.toLowerCase()}`"
@@ -132,6 +132,27 @@ onMounted(() => {
 
 // Локальное значение для v-model
 const localValue = ref(props.modelValue);
+
+// Валидные опции для select (фильтруем пустые)
+const validSelectOptions = computed(() => {
+  if (props.field.type !== 'select' || !props.field.options) {
+    return [];
+  }
+
+  // Фильтруем опции с пустыми label или value
+  const filtered = props.field.options.filter(opt => {
+    const hasLabel = opt.label && opt.label.trim() !== '';
+    const hasValue = opt.value !== undefined && opt.value !== null && opt.value !== '';
+    return hasLabel && hasValue;
+  });
+
+  const removedCount = props.field.options.length - filtered.length;
+  if (removedCount > 0) {
+    console.log('[FormField] Отфильтровано пустых опций для', props.field.key + ':', removedCount);
+  }
+
+  return filtered;
+});
 
 // Найти некорректный символ в значении
 const invalidCharFound = computed(() => {
