@@ -118,6 +118,7 @@ function handleResultUpdate(value: string) {
 .cell-name {
   white-space: pre-wrap;
   word-wrap: break-word;
+  padding-left: 5px;
 }
 
 .cell-method,
