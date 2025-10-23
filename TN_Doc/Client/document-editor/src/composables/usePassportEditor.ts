@@ -20,12 +20,9 @@ export function usePassportEditor() {
    * Приведение конфигурации к типу PassportEditConfig
    */
   const passportConfig = computed<PassportEditConfig | null>(() => {
-    console.log('[usePassportEditor] Вычисление passportConfig, store.config:', store.config);
     if (!store.config || store.config.docType !== 'Passport') {
-      console.log('[usePassportEditor] Конфигурация не является Passport, docType:', store.config?.docType);
       return null;
     }
-    console.log('[usePassportEditor] Конфигурация успешно приведена к PassportEditConfig');
     return store.config as PassportEditConfig;
   });
 
@@ -33,9 +30,7 @@ export function usePassportEditor() {
    * Качественные параметры из конфигурации
    */
   const qualityParameters = computed<PassportQualityParameter[]>(() => {
-    const params = passportConfig.value?.qualityParameters || [];
-    console.log('[usePassportEditor] Качественные параметры:', params.length, 'шт.');
-    return params;
+    return passportConfig.value?.qualityParameters || [];
   });
 
   /**
@@ -123,8 +118,6 @@ export function usePassportEditor() {
     param.values.measurement = event.value;
     param.values.result = recalculateResult(param);
     store.isDirty = true;
-
-    console.log(`[usePassportEditor] Measurement обновлено: ${event.paramKey} = ${event.value}, Result = ${param.values.result}`);
   }
 
   /**
@@ -140,8 +133,6 @@ export function usePassportEditor() {
     param.method.selected = event.methodName;
     param.values.result = recalculateResult(param);
     store.isDirty = true;
-
-    console.log(`[usePassportEditor] Метод обновлен: ${event.paramKey} = ${event.methodName}, Result = ${param.values.result}`);
   }
 
   /**
@@ -157,8 +148,6 @@ export function usePassportEditor() {
     param.values.result = event.value;
     store.isDirty = true;
     param.elisFlags.result = false;
-
-    console.log(`[usePassportEditor] Result обновлено вручную: ${event.paramKey} = ${event.value}`);
   }
 
   return {

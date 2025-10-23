@@ -28,10 +28,12 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-  console.log('[PassportMethodSelect] Монтирование select метода для параметра:', props.parameter.key);
-  console.log('[PassportMethodSelect] Выбранный метод:', props.parameter.method.selected);
-  console.log('[PassportMethodSelect] Доступные методы:', props.parameter.method.options);
-  console.log('[PassportMethodSelect] methodOptions:', methodOptions.value);
+  // Validate method options on mount
+  methodOptions.value.forEach((opt, idx) => {
+    if (!opt.label || opt.value === undefined || opt.label.trim() === '') {
+      console.error('[PassportMethodSelect] ОШИБКА: некорректная опция метода #' + idx + ':', opt);
+    }
+  });
 });
 
 /**
@@ -39,25 +41,13 @@ onMounted(() => {
  */
 const methodOptions = computed(() => {
   // Фильтруем опции с пустыми name (технические записи "не выбрано")
-  const validOptions = props.parameter.method.options
+  return props.parameter.method.options
     .filter(option => option.name && option.name.trim() !== '')
     .map(option => ({
       label: option.name,
       value: option.name,
       ...option
     }));
-
-  console.log('[PassportMethodSelect] Computed methodOptions для', props.parameter.key + ':', validOptions);
-  console.log('[PassportMethodSelect] Отфильтровано опций:', props.parameter.method.options.length - validOptions.length);
-
-  // Проверка валидности опций
-  validOptions.forEach((opt, idx) => {
-    if (!opt.label || opt.value === undefined || opt.label.trim() === '') {
-      console.error('[PassportMethodSelect] ОШИБКА: некорректная опция метода #' + idx + ':', opt);
-    }
-  });
-
-  return validOptions;
 });
 
 /**
@@ -65,7 +55,6 @@ const methodOptions = computed(() => {
  */
 function handleMethodChange(methodName: string) {
   emit('update:method', methodName);
-  console.log(`[PassportMethodSelect] Метод изменён: ${props.parameter.key} -> ${methodName}`);
 }
 </script>
 

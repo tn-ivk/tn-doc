@@ -90,11 +90,8 @@ const { setupAutoFillWatchers } = usePassportAutoFill();
 
 // Загружаем документ при монтировании
 onMounted(async () => {
-  console.log('[DocumentPassportEditor] onMounted - начало');
   const { deviceId, id } = route.params;
   const docType = 'Passport'; // Для этого компонента тип документа всегда Passport
-
-  console.log('[DocumentPassportEditor] Параметры маршрута:', { deviceId, id, docType });
 
   if (!deviceId || !id) {
     store.error = 'Отсутствуют обязательные параметры маршрута';
@@ -102,39 +99,14 @@ onMounted(async () => {
     return;
   }
 
-  console.log('[DocumentPassportEditor] Начало загрузки документа...');
   await loadDocument(
     parseInt(deviceId as string, 10),
     docType,
     parseInt(id as string, 10)
   );
-  console.log('[DocumentPassportEditor] Документ загружен');
-  console.log('[DocumentPassportEditor] Загруженная конфигурация:', JSON.stringify(store.config, null, 2));
-  console.log('[DocumentPassportEditor] Поля формы (fields):', JSON.stringify(store.fields, null, 2));
-  console.log('[DocumentPassportEditor] Данные формы (formData):', JSON.stringify(store.formData, null, 2));
-  console.log('[DocumentPassportEditor] Качественные параметры:', JSON.stringify(qualityParameters.value, null, 2));
-
-  // Детальная проверка поля "Дата и время отбора пробы"
-  const dateField = store.fields.find(f =>
-    f.label?.includes('Дата') && f.label?.includes('время') && f.label?.includes('отбора')
-  );
-  if (dateField) {
-    console.log('[DocumentPassportEditor] 🔍 Найдено поле даты и времени отбора:', {
-      key: dateField.key,
-      label: dateField.label,
-      type: dateField.type,
-      value: store.formData[dateField.key],
-      valueType: typeof store.formData[dateField.key]
-    });
-  } else {
-    console.warn('[DocumentPassportEditor] ⚠️ Поле "Дата и время отбора пробы" не найдено среди полей!');
-    console.log('[DocumentPassportEditor] Доступные поля:', store.fields.map(f => ({ key: f.key, label: f.label })));
-  }
 
   // Настраиваем автозаполнение связанных полей для Паспортов
-  console.log('[DocumentPassportEditor] Настройка автозаполнения...');
   setupAutoFillWatchers();
-  console.log('[DocumentPassportEditor] onMounted - завершено');
 });
 
 // Экспонируем SaveDoc() для главного окна

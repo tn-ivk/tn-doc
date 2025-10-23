@@ -45,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
 import PassportParameterRow from './PassportParameterRow.vue';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
@@ -64,16 +63,7 @@ const emit = defineEmits<{
   'update:result': [event: { paramKey: string; value: string }];
 }>();
 
-onMounted(() => {
-  console.log('[PassportQualityTable] Монтирование таблицы качественных параметров');
-  console.log('[PassportQualityTable] Количество параметров:', props.parameters.length);
-  console.log('[PassportQualityTable] ELIS используется:', props.isElisUsed);
-  console.log('[PassportQualityTable] Параметры:', props.parameters);
-});
-
-watch(() => props.parameters, (newParams) => {
-  console.log('[PassportQualityTable] Параметры изменились, новое количество:', newParams.length);
-}, { deep: true });
+// Component mounted without debug logging
 </script>
 
 <style scoped>

@@ -117,13 +117,7 @@ function convertToDate(value: any, fieldType: string): any {
   // Для datetime-local и date полей конвертируем строку в Date
   if ((fieldType === 'datetime-local' || fieldType === 'date') && typeof value === 'string') {
     try {
-      const dateObj = new Date(value);
-      console.log('[FormField] Конвертация строки в Date:', {
-        original: value,
-        converted: dateObj,
-        isValid: !isNaN(dateObj.getTime())
-      });
-      return dateObj;
+      return new Date(value);
     } catch (e) {
       console.error('[FormField] Ошибка конвертации даты:', e);
       return value;
@@ -148,56 +142,18 @@ function convertFromDate(value: any, fieldType: string): any {
     }
 
     // Конвертируем в ISO строку с локальным временем (без Z)
-    const isoString = value.toISOString().slice(0, 19); // "2025-10-22T02:07:33"
-    console.log('[FormField] Конвертация Date в строку:', {
-      original: value,
-      converted: isoString
-    });
-    return isoString;
+    return value.toISOString().slice(0, 19); // "2025-10-22T02:07:33"
   }
 
   return value;
 }
 
 onMounted(() => {
-  console.log('[FormField] Монтирование поля:', {
-    key: props.field.key,
-    type: props.field.type,
-    label: props.field.label,
-    value: props.modelValue,
-    invalidChars: props.invalidChars,
-    hasOptions: !!props.field.options,
-    optionsCount: props.field.options?.length || 0
-  });
-
-  // Проверка на корректность опций для select
+  // Validate select options on mount
   if (props.field.type === 'select' && props.field.options) {
-    console.log('[FormField] Select ВСЕ опции для', props.field.key + ':', props.field.options);
-    console.log('[FormField] Select ВАЛИДНЫЕ опции для', props.field.key + ':', validSelectOptions.value);
-
-    // Проверяем исходные опции
-    props.field.options.forEach((opt, idx) => {
-      console.log(`[FormField] Исходная опция #${idx}:`, {
-        label: opt.label,
-        value: opt.value,
-        hasLabel: !!(opt.label && opt.label.trim()),
-        hasValue: opt.value !== undefined && opt.value !== null && opt.value !== ''
-      });
-      if (!opt.label || opt.value === undefined) {
-        console.error('[FormField] ОШИБКА: некорректная ИСХОДНАЯ опция #' + idx + ' для поля', props.field.key + ':', opt);
-      }
-    });
-
-    // Проверяем отфильтрованные опции
     validSelectOptions.value.forEach((opt, idx) => {
-      console.log(`[FormField] Валидная опция #${idx}:`, {
-        label: opt.label,
-        value: opt.value,
-        hasLabel: !!(opt.label && opt.label.trim()),
-        hasValue: opt.value !== undefined && opt.value !== null && opt.value !== ''
-      });
       if (!opt.label || opt.value === undefined || opt.label.trim() === '' || opt.value === '') {
-        console.error('[FormField] ОШИБКА: некорректная ВАЛИДНАЯ опция #' + idx + ' для поля', props.field.key + ':', opt);
+        console.error('[FormField] ОШИБКА: некорректная опция #' + idx + ' для поля', props.field.key + ':', opt);
       }
     });
   }
@@ -213,26 +169,12 @@ const validSelectOptions = computed(() => {
     return [];
   }
 
-  console.log('[FormField] validSelectOptions computed для', props.field.key);
-  console.log('[FormField] Исходные опции (длина):', props.field.options.length);
-
   // Фильтруем опции с пустыми label или value
-  const filtered = props.field.options.filter((opt, idx) => {
+  return props.field.options.filter(opt => {
     const hasLabel = opt.label && opt.label.trim() !== '';
     const hasValue = opt.value !== undefined && opt.value !== null && opt.value !== '';
-    const isValid = hasLabel && hasValue;
-
-    console.log(`[FormField] Проверка опции #${idx}: label="${opt.label}", value="${opt.value}", hasLabel=${hasLabel}, hasValue=${hasValue}, isValid=${isValid}`);
-
-    return isValid;
+    return hasLabel && hasValue;
   });
-
-  const removedCount = props.field.options.length - filtered.length;
-  console.log('[FormField] Отфильтровано пустых опций для', props.field.key + ':', removedCount);
-  console.log('[FormField] Осталось валидных опций:', filtered.length);
-  console.log('[FormField] Результат фильтрации:', filtered);
-
-  return filtered;
 });
 
 // Найти некорректный символ в значении
@@ -240,17 +182,11 @@ const invalidCharFound = computed(() => {
   // Проверяем только текстовые поля
   if (props.field.type !== 'text') return null;
   if (!localValue.value || typeof localValue.value !== 'string') return null;
-  if (!props.invalidChars || props.invalidChars.length === 0) {
-    console.log('[FormField]', props.field.key, '- список некорректных символов пуст');
-    return null;
-  }
-
-  console.log('[FormField]', props.field.key, '- проверка значения:', localValue.value, 'на символы:', props.invalidChars);
+  if (!props.invalidChars || props.invalidChars.length === 0) return null;
 
   // Проверяем каждый некорректный символ
   for (const char of props.invalidChars) {
     if (localValue.value.includes(char)) {
-      console.log('[FormField]', props.field.key, '- найден некорректный символ:', char);
       return char;
     }
   }

@@ -61,48 +61,22 @@ export const useDocumentStore = defineStore('document', () => {
    * Загрузить конфигурацию документа
    */
   async function loadConfig(deviceId: number, docType: string, id: number) {
-    console.log('[DocumentStore] loadConfig - начало', { deviceId, docType, id });
     isLoading.value = true;
     error.value = null;
 
     try {
-      console.log('[DocumentStore] Запрос конфигурации редактирования...');
       const loadedConfig = await documentApi.getEditConfig(deviceId, docType, id);
-      console.log('[DocumentStore] Конфигурация получена:', loadedConfig);
-      console.log('[DocumentStore] Количество полей:', loadedConfig.fields?.length);
-      console.log('[DocumentStore] Начальные значения:', loadedConfig.initialValues);
 
       // Загружаем список некорректных символов для данного устройства
-      console.log('[DocumentStore] Запрос некорректных символов...');
       const invalidChars = await documentApi.getInvalidChars(deviceId);
-      console.log('[DocumentStore] Загружены некорректные символы для устройства', deviceId, ':', invalidChars);
       loadedConfig.invalidChars = invalidChars;
 
-      console.log('[DocumentStore] Установка конфигурации в state...');
       config.value = loadedConfig;
 
       // Инициализируем formData начальными значениями
-      console.log('[DocumentStore] Инициализация formData...');
-      console.log('[DocumentStore] initialValues полный дамп:', JSON.stringify(loadedConfig.initialValues, null, 2));
       formData.value = { ...loadedConfig.initialValues };
-      console.log('[DocumentStore] formData инициализирован:', Object.keys(formData.value).length, 'полей');
-      console.log('[DocumentStore] formData полный дамп:', JSON.stringify(formData.value, null, 2));
-
-      // Проверка поля даты и времени отбора
-      const dateKeys = Object.keys(formData.value).filter(key =>
-        key.toLowerCase().includes('date') || key.toLowerCase().includes('дата') || key.toLowerCase().includes('время')
-      );
-      if (dateKeys.length > 0) {
-        console.log('[DocumentStore] 🔍 Найдены ключи, связанные с датой/временем:', dateKeys);
-        dateKeys.forEach(key => {
-          console.log(`[DocumentStore] 🔍 ${key} = ${formData.value[key]} (тип: ${typeof formData.value[key]})`);
-        });
-      } else {
-        console.warn('[DocumentStore] ⚠️ Не найдены ключи, связанные с датой/временем в formData');
-      }
 
       isDirty.value = false;
-      console.log('[DocumentStore] loadConfig - успешно завершено');
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Не удалось загрузить конфигурацию документа';
       console.error('[DocumentStore] Ошибка загрузки конфигурации:', err);
