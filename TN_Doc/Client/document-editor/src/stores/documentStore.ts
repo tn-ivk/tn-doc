@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { documentApi } from '@/services/api.service';
 import type { DocumentEditConfig, FormField } from '@/types/document.types';
+import type { PassportEditConfig } from '@/types/passport.types';
 
 /**
  * Store для управления состоянием документа
@@ -43,6 +44,32 @@ export const useDocumentStore = defineStore('document', () => {
       if (field.type === 'text' && value && typeof value === 'string' && invalidChars.length > 0) {
         for (const char of invalidChars) {
           if (value.includes(char)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Дополнительная валидация для паспорта качества (таблица Edit)
+    if (config.value.docType === 'Passport') {
+      const passportConfig = config.value as PassportEditConfig;
+      const parameters = passportConfig.qualityParameters || [];
+
+      for (const param of parameters) {
+        const measurement = (param.values?.measurement ?? '').toString();
+
+        // Проверка обязательных полей измерения
+        if (param.requiredFill) {
+          if (!measurement || measurement === '') {
+            return true;
+          }
+        }
+
+        // Проверка количества знаков после запятой
+        if (param.roundValue && measurement) {
+          const normalized = measurement.replace(',', '.');
+          const parts = normalized.split('.');
+          if (parts.length > 1 && parts[1].length > param.roundValue) {
             return true;
           }
         }
