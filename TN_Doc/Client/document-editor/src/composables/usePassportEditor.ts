@@ -117,7 +117,12 @@ export function usePassportEditor() {
 
     param.values.measurement = event.value;
     param.values.result = recalculateResult(param);
-    store.isDirty = true;
+    store.bulkUpdateFields({
+      [`value.${event.paramKey}`]: event.value,
+      [`value.${event.paramKey}__elisFilled`]: false,
+      [`result.${event.paramKey}`]: param.values.result,
+      [`result.${event.paramKey}__elisFilled`]: false
+    });
   }
 
   /**
@@ -132,7 +137,12 @@ export function usePassportEditor() {
 
     param.method.selected = event.methodName;
     param.values.result = recalculateResult(param);
-    store.isDirty = true;
+    store.bulkUpdateFields({
+      [`method.${event.paramKey}`]: event.methodName,
+      [`method.${event.paramKey}__elisFilled`]: false,
+      [`result.${event.paramKey}`]: param.values.result,
+      [`result.${event.paramKey}__elisFilled`]: false
+    });
   }
 
   /**
@@ -146,8 +156,11 @@ export function usePassportEditor() {
     }
 
     param.values.result = event.value;
-    store.isDirty = true;
     param.elisFlags.result = false;
+    store.bulkUpdateFields({
+      [`result.${event.paramKey}`]: event.value,
+      [`result.${event.paramKey}__elisFilled`]: false
+    });
   }
 
   return {

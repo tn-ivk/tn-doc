@@ -121,6 +121,20 @@ export const useDocumentStore = defineStore('document', () => {
     isDirty.value = true;
   }
 
+  function bulkUpdateFields(payload: Record<string, any>) {
+    if (!payload) return;
+    let changed = false;
+    for (const [key, value] of Object.entries(payload)) {
+      if (formData.value[key] !== value) {
+        formData.value[key] = value;
+        changed = true;
+      }
+    }
+    if (changed) {
+      isDirty.value = true;
+    }
+  }
+
   /**
    * Сохранить документ
    */
