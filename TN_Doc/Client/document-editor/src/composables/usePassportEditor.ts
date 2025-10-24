@@ -135,10 +135,17 @@ export function usePassportEditor() {
       return;
     }
 
-    param.method.selected = event.methodName;
+    const methodOption = event.method;
+    param.method.selected = methodOption?.name || '';
+    if (methodOption) {
+      const existing = param.method.options.find(opt => opt.name === methodOption.name);
+      if (!existing) {
+        param.method.options.push(methodOption);
+      }
+    }
     param.values.result = recalculateResult(param);
     store.bulkUpdateFields({
-      [`method.${event.paramKey}`]: event.methodName,
+      [`method.${event.paramKey}`]: methodOption ? JSON.stringify(methodOption) : '',
       [`method.${event.paramKey}__elisFilled`]: false,
       [`result.${event.paramKey}`]: param.values.result,
       [`result.${event.paramKey}__elisFilled`]: false

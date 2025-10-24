@@ -133,8 +133,8 @@ export interface MeasurementUpdateEvent {
 export interface MethodUpdateEvent {
   /** Ключ параметра */
   paramKey: string;
-  /** Название выбранного метода */
-  methodName: string;
+  /** Выбранный метод */
+  method: MethodOption | null;
 }
 
 /**

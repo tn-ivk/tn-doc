@@ -1,10 +1,9 @@
-<template>
+              <template>
   <div class="method-field">
     <Select
-      :modelValue="parameter.method.selected || null"
+      :modelValue="selectedMethodOption"
       :options="methodOptions"
-      optionLabel="label"
-      optionValue="value"
+      optionLabel="name"
       :class="[
         { 'p-invalid': !isValid },
         { 'elis-filled': parameter.elisFlags.method }
@@ -25,7 +24,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import Select from 'primevue/select';
-import type { PassportQualityParameter } from '@/types/passport.types';
+import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {
   /** Параметр качества */
@@ -35,7 +34,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:method': [methodName: string];
+  'update:method': [method: MethodOption | null];
 }>();
 
 onMounted(() => {
@@ -49,14 +48,12 @@ onMounted(() => {
  * Только стандартная фильтрация пустых опций от бэкенда
  */
 const methodOptions = computed(() => {
-  // Фильтруем опции с пустыми name (технические записи "не выбрано")
-  return props.parameter.method.options
-    .filter(option => option.name && option.name.trim() !== '')
-    .map(option => ({
-      label: option.name,
-      value: option.name,
-      ...option
-    }));
+  return props.parameter.method.options.filter(option => option.name && option.name.trim() !== '');
+});
+
+const selectedMethodOption = computed(() => {
+  if (!props.parameter.method.selected) return null;
+  return methodOptions.value.find(option => option.name === props.parameter.method.selected) || null;
 });
 
 // Валидация поля метода
@@ -79,9 +76,8 @@ const validationMessage = computed(() => {
 /**
  * Обработчик изменения метода
  */
-function handleMethodChange(methodName: string | null) {
-  // Если пользователь очистил значение (showClear), передаём пустую строку
-  emit('update:method', methodName || '');
+function handleMethodChange(method: MethodOption | null) {
+  emit('update:method', method);
 }
 </script>
 

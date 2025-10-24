@@ -61,7 +61,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:method': [event: { paramKey: string; methodName: string }];
+  'update:method': [event: { paramKey: string; method: MethodOption | null }];
   'update:measurement': [event: { paramKey: string; value: string }];
   'update:result': [event: { paramKey: string; value: string }];
 }>();
@@ -88,8 +88,8 @@ const isResultEditable = computed(() => {
   return selectedMethod.limitValue !== undefined && measurementValue < selectedMethod.limitValue;
 });
 
-function handleMethodUpdate(methodName: string) {
-  emit('update:method', { paramKey: props.parameter.key, methodName });
+function handleMethodUpdate(method: MethodOption | null) {
+  emit('update:method', { paramKey: props.parameter.key, method });
 }
 
 function handleMeasurementUpdate(value: string) {
