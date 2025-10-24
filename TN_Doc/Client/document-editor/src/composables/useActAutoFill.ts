@@ -122,14 +122,22 @@ export function useActAutoFill() {
    */
   const setupAutoFillWatchers = () => {
     // Отслеживаем изменения поля Delive_IOF (сдающая сторона)
-    watch(() => store.formData['Delive_IOF'], (newValue) => {
-      handleDeliveIOFChange(newValue);
-    });
+    watch(
+      () => store.formData['Delive_IOF'],
+      (newValue) => {
+        handleDeliveIOFChange(newValue);
+      },
+      { immediate: true }
+    );
 
     // Отслеживаем изменения поля Receive_IOF (принимающая сторона)
-    watch(() => store.formData['Receive_IOF'], (newValue) => {
-      handleReceiveIOFChange(newValue);
-    });
+    watch(
+      () => store.formData['Receive_IOF'],
+      (newValue) => {
+        handleReceiveIOFChange(newValue);
+      },
+      { immediate: true }
+    );
   };
 
   return {
