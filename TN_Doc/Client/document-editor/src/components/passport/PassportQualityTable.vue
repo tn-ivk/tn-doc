@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import PassportParameterRow from './PassportParameterRow.vue';
-import type { PassportQualityParameter } from '@/types/passport.types';
+import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {
   /** Список качественных параметров */
@@ -58,7 +58,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:method': [event: { paramKey: string; methodName: string }];
+  'update:method': [event: { paramKey: string; method: MethodOption | null }];
   'update:measurement': [event: { paramKey: string; value: string }];
   'update:result': [event: { paramKey: string; value: string }];
 }>();
