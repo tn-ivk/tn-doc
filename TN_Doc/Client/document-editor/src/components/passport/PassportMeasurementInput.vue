@@ -11,7 +11,7 @@
         { 'has-tooltip-error': !isValid && tooltipOptions.value }
       ]"
       :minFractionDigits="0"
-      :maxFractionDigits="parameter.roundValue || 10"
+      :maxFractionDigits="8"
       class="measurement-input"
       @update:modelValue="handleValueChange"
     />
