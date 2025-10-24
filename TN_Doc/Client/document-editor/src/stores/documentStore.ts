@@ -201,6 +201,7 @@ export const useDocumentStore = defineStore('document', () => {
     // Actions
     loadConfig,
     updateField,
+    bulkUpdateFields,
     saveDocument,
     reset
   };
