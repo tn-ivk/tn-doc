@@ -4,6 +4,8 @@
 
 Данный документ описывает интеграцию функциональности записи OPC тегов в новый Vue-редактор документов, реализуя логику, аналогичную старой версии (`EditDoc.js`).
 
+**Архитектурное решение:** OPC параметры передаются из главного окна через URL query params при открытии iframe с редактором, а НЕ получаются на бэкенде. Это сохраняет разделение ответственности и соответствует оригинальной архитектуре.
+
 ## Изменения в архитектуре
 
 ### 1. Новый OPC API клиент (`opc.service.ts`)
@@ -105,23 +107,31 @@ updateDocument(deviceId, docType, id, data): Promise<SaveDocumentResponse>
 
 ---
 
-### 4. Обновление типов
+### 4. Композабл для получения OPC параметров из URL
 
-**Файл:** `TN_Doc/Client/document-editor/src/types/document.types.ts`
+**Файл:** `TN_Doc/Client/document-editor/src/composables/useOpcParams.ts`
 
-**Добавлены новые поля в `DocumentEditConfig`:**
+**Функциональность:**
+- Получает OPC параметры из URL query params
+- Валидирует наличие всех обязательных параметров
+- Возвращает интерфейс `OpcDeviceParams` или `null`
+
+**Интерфейс OPC параметров:**
 ```typescript
-export interface DocumentEditConfig {
-  // ... существующие поля ...
+export interface OpcDeviceParams {
+  deviceGuid: string;  // IdDevice в виде строки
+  deviceName: string;  // Имя устройства
+  tagPrefix: string;   // Префикс для OPC тегов
+}
+```
 
-  /** GUID устройства для OPC тегов */
-  deviceGuid?: string;
+**Пример использования:**
+```typescript
+const { opcParams, hasOpcParams } = useOpcParams();
 
-  /** Имя устройства */
-  deviceName?: string;
-
-  /** Префикс тега для OPC (например: "IVK", "IVK_2") */
-  tagPrefix?: string;
+// opcParams.value будет содержать параметры из URL или null
+if (opcParams.value) {
+  await saveDocumentWithOpc(opcParams.value);
 }
 ```
 
@@ -159,19 +169,58 @@ const handleSave = async (): Promise<boolean> => {
 
 ---
 
+## Требования к фронтенду (главное окно)
+
+### Передача OPC параметров через URL
+
+**Главное окно должно передавать OPC параметры при открытии iframe с редактором:**
+
+```javascript
+// Пример из старого Common.js
+const deviceId = $('#ComboboxDevice').val();           // Например: 1
+const deviceName = $('#ComboboxDevice :selected').text(); // Например: "ИВК-1"
+const tagPrefix = 'IVK';  // Из конфигурации устройства
+
+// Формируем URL с параметрами
+const editorUrl = `/document-editor/${deviceId}/Passport/${id}?deviceGuid=${deviceId}&deviceName=${encodeURIComponent(deviceName)}&tagPrefix=${tagPrefix}`;
+
+// Открываем iframe
+document.getElementsByClassName('FR')[0].src = editorUrl;
+```
+
+**Обязательные query параметры:**
+- `deviceGuid` - IdDevice в виде строки (используется для OPC запросов)
+- `deviceName` - имя устройства
+- `tagPrefix` - префикс тега из OPC настроек устройства
+
+**Откуда брать `tagPrefix`:**
+```javascript
+// Нужно получить из конфигурации устройства
+// Например, через новый API endpoint или при загрузке списка устройств
+$.ajax({
+    url: '/Home/GetDeviceOpcPrefix',
+    data: { IdDevice: deviceId },
+    success: function(tagPrefix) {
+        // Используем полученный префикс
+    }
+});
+```
+
+---
+
 ## Требования к бэкенду
 
 ### 1. Обновление API контроллера
 
-**Необходимо реализовать новый endpoint:**
+**Необходимо реализовать endpoint UpdateDocument** (уже реализован):
 
 ```csharp
 [HttpPost("{deviceId}/{docType}/update/{id}")]
-public async Task<IActionResult> UpdateDocument(
+public IActionResult UpdateDocument(
     int deviceId,
     string docType,
     int id,
-    [FromBody] Dictionary<string, object> data)
+    [FromBody] JsonElement data)
 {
     // Логика обновления документа после успешной записи в OPC тег
     // Аналогично методу SaveDoc, но для обновления существующего документа
@@ -184,32 +233,25 @@ public async Task<IActionResult> UpdateDocument(
 
 ---
 
-### 2. Добавление OPC параметров в конфигурацию
+### 2. (Опционально) Endpoint для получения OPC префикса устройства
 
-**В методе `GetEditConfig` необходимо добавить поля:**
+**Для удобства главного окна можно добавить:**
 
 ```csharp
-public class DocumentEditConfigDto
+[HttpGet("device/{deviceId}/opc-prefix")]
+public IActionResult GetDeviceOpcPrefix(int deviceId)
 {
-    // ... существующие поля ...
+    var device = _appConfig.GetDeviceCfg(deviceId);
+    if (device?.OpcConnectionSettings == null)
+    {
+        return Ok(new { tagPrefix = "" });
+    }
 
-    public string DeviceGuid { get; set; }      // GUID устройства для OPC
-    public string DeviceName { get; set; }      // Имя устройства
-    public string TagPrefix { get; set; }       // Префикс тега (IVK, IVK_2 и т.д.)
-}
-```
+    var prefix = device.OpcConnectionSettings.Type == OpcType.DA
+        ? device.OpcConnectionSettings.DaSettings?.StartPrefix
+        : device.OpcConnectionSettings.UaSettings?.StartPrefix;
 
-**Пример ответа:**
-```json
-{
-  "docId": 123,
-  "docType": "Passport",
-  "deviceId": 1,
-  "deviceGuid": "550e8400-e29b-41d4-a716-446655440000",
-  "deviceName": "IVK-1",
-  "tagPrefix": "IVK",
-  "fields": [...],
-  "initialValues": {...}
+    return Ok(new { tagPrefix = prefix ?? "" });
 }
 ```
 

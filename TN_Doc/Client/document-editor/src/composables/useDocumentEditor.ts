@@ -2,6 +2,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useDocumentStore } from '@/stores/documentStore';
 import { usePassportSave } from './usePassportSave';
+import { useOpcParams } from './useOpcParams';
 
 /**
  * Композабл с общей логикой редактирования документов
@@ -11,12 +12,15 @@ export function useDocumentEditor() {
   const store = useDocumentStore();
   const toast = useToast();
   const { saveDocumentWithOpc } = usePassportSave();
+  const { opcParams } = useOpcParams();
 
   /**
    * Функция сохранения документа с поддержкой OPC тегов
    * Для паспортов: выполняется polling OPC тегов
    * Для актов: выполняется запись в OPC тег без polling
    * Для остальных документов: обычное сохранение
+   *
+   * OPC параметры получаются из URL query params, которые передает главное окно
    */
   const handleSave = async (): Promise<boolean> => {
     // Проверяем валидацию перед сохранением
@@ -32,7 +36,8 @@ export function useDocumentEditor() {
 
     try {
       // Используем новую логику сохранения с поддержкой OPC
-      const success = await saveDocumentWithOpc();
+      // Передаем OPC параметры из URL
+      const success = await saveDocumentWithOpc(opcParams.value);
 
       if (!success) {
         // Polling завершился по таймауту

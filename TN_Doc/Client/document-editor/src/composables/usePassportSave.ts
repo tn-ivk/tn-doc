@@ -2,6 +2,7 @@ import { useDocumentStore } from '@/stores/documentStore';
 import { documentApi } from '@/services/api.service';
 import { opcApi } from '@/services/opc.service';
 import type { PassportEditConfig } from '@/types/passport.types';
+import type { OpcDeviceParams } from './useOpcParams';
 
 /**
  * Композабл для сохранения паспортов качества с поддержкой OPC тегов
@@ -12,15 +13,19 @@ import type { PassportEditConfig } from '@/types/passport.types';
  * 3. Polling тега ARM.ARM_FillActAndPassportResult (ждем увеличения значения)
  * 4. Объединить данные из localStorage ('dataPassport')
  * 5. Обновить документ через UpdateDoc
+ *
+ * OPC параметры теперь передаются из главного окна через URL query params,
+ * а не получаются из конфигурации на бэкенде.
  */
 export function usePassportSave() {
   const store = useDocumentStore();
 
   /**
    * Основная функция сохранения паспорта качества
+   * @param opcParams OPC параметры устройства (из URL query params)
    * @returns true при успехе, false при ошибке
    */
-  async function savePassportWithOpc(): Promise<boolean> {
+  async function savePassportWithOpc(opcParams: OpcDeviceParams | null): Promise<boolean> {
     if (!store.config) {
       throw new Error('Конфигурация документа не загружена');
     }
@@ -51,18 +56,18 @@ export function usePassportSave() {
     );
     console.log('[usePassportSave] Шаг 1: Паспорт успешно сохранен');
 
-    // Проверяем наличие необходимых данных для OPC
-    if (!config.deviceGuid || !config.tagPrefix) {
-      console.warn('[usePassportSave] Отсутствуют deviceGuid или tagPrefix, пропускаем OPC логику');
+    // Проверяем наличие OPC параметров
+    if (!opcParams) {
+      console.warn('[usePassportSave] Отсутствуют OPC параметры, пропускаем OPC логику');
       return true;
     }
 
     try {
       // Шаг 2: Записать в OPC тег ARM.ARM_FillActAndPassport = true
       console.log('[usePassportSave] Шаг 2: Запись в OPC тег ARM.ARM_FillActAndPassport...');
-      const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', config.tagPrefix);
+      const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
       await opcApi.writeTag(
-        config.deviceGuid,
+        opcParams.deviceGuid,
         triggerTagName,
         true,
         2, // namespaceIndex
@@ -72,10 +77,10 @@ export function usePassportSave() {
 
       // Шаг 3: Polling тега ARM.ARM_FillActAndPassportResult
       console.log('[usePassportSave] Шаг 3: Ожидание подтверждения от ИВК (polling)...');
-      const resultTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassportResult', config.tagPrefix);
+      const resultTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassportResult', opcParams.tagPrefix);
 
       const pollingSuccess = await opcApi.pollTag(
-        config.deviceGuid,
+        opcParams.deviceGuid,
         resultTagName,
         (currentValue: number, initialValue: number) => currentValue > initialValue,
         5000, // maxDuration (5 секунд)
@@ -134,8 +139,9 @@ export function usePassportSave() {
   /**
    * Упрощенная функция сохранения для актов (без OPC polling)
    * Для актов тоже нужна запись в тег, но без ожидания (без polling)
+   * @param opcParams OPC параметры устройства (из URL query params)
    */
-  async function saveActWithOpc(): Promise<boolean> {
+  async function saveActWithOpc(opcParams: OpcDeviceParams | null): Promise<boolean> {
     if (!store.config) {
       throw new Error('Конфигурация документа не загружена');
     }
@@ -152,18 +158,18 @@ export function usePassportSave() {
     );
     console.log('[usePassportSave] Акт успешно сохранен');
 
-    // Проверяем наличие необходимых данных для OPC
-    if (!config.deviceGuid || !config.tagPrefix) {
-      console.warn('[usePassportSave] Отсутствуют deviceGuid или tagPrefix, пропускаем запись в тег');
+    // Проверяем наличие OPC параметров
+    if (!opcParams) {
+      console.warn('[usePassportSave] Отсутствуют OPC параметры, пропускаем запись в тег');
       return true;
     }
 
     try {
       // Шаг 2: Записать в OPC тег ARM.ARM_FillActAndPassport = true (без polling)
       console.log('[usePassportSave] Запись в OPC тег ARM.ARM_FillActAndPassport...');
-      const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', config.tagPrefix);
+      const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
       await opcApi.writeTag(
-        config.deviceGuid,
+        opcParams.deviceGuid,
         triggerTagName,
         true,
         2, // namespaceIndex
@@ -181,8 +187,9 @@ export function usePassportSave() {
   /**
    * Универсальная функция сохранения документа с поддержкой OPC
    * Автоматически выбирает нужную стратегию в зависимости от типа документа
+   * @param opcParams OPC параметры устройства (из URL query params)
    */
-  async function saveDocumentWithOpc(): Promise<boolean> {
+  async function saveDocumentWithOpc(opcParams: OpcDeviceParams | null): Promise<boolean> {
     if (!store.config) {
       throw new Error('Конфигурация документа не загружена');
     }
@@ -191,12 +198,12 @@ export function usePassportSave() {
 
     // Для паспортов используем полную логику с polling
     if (docType === 'Passport') {
-      return await savePassportWithOpc();
+      return await savePassportWithOpc(opcParams);
     }
 
     // Для актов используем упрощенную логику (запись в тег без polling)
     if (docType === 'Act') {
-      return await saveActWithOpc();
+      return await saveActWithOpc(opcParams);
     }
 
     // Для остальных документов (Report, Jornal и т.д.) просто сохраняем

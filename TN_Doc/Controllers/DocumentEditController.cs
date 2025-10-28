@@ -84,29 +84,6 @@ public class DocumentEditController : ControllerBase
             // Получаем конфигурацию
             var config = editor.GetEditConfig(id);
 
-            // Заполняем OPC параметры для работы с тегами
-            var device = _appConfig.GetDeviceCfg(deviceId);
-            if (device != null)
-            {
-                config.DeviceGuid = deviceId.ToString(); // IdDevice используется как GUID для OPC
-                config.DeviceName = device.Name;
-
-                // Получаем префикс тега из OPC настроек
-                if (device.OpcConnectionSettings != null)
-                {
-                    // Префикс может быть в DA или UA настройках
-                    config.TagPrefix = device.OpcConnectionSettings.Type == TN.DocData.OpcType.DA
-                        ? device.OpcConnectionSettings.DaSettings?.StartPrefix
-                        : device.OpcConnectionSettings.UaSettings?.StartPrefix;
-                }
-
-                _logger.Trace($"OPC параметры заполнены: DeviceGuid={config.DeviceGuid}, DeviceName={config.DeviceName}, TagPrefix={config.TagPrefix}");
-            }
-            else
-            {
-                _logger.Warn($"Не удалось получить конфигурацию устройства с ID={deviceId}");
-            }
-
             _logger.Info($"Конфигурация редактирования успешно получена: {docType} (id={id}, deviceId={deviceId})");
             return Ok(config);
         }
