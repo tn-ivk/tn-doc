@@ -5,11 +5,11 @@ import { useRoute } from 'vue-router';
  * Интерфейс OPC параметров устройства
  */
 export interface OpcDeviceParams {
-  /** GUID устройства (на самом деле IdDevice в виде строки) */
+  /** ID устройства (используется для SaveDoc/UpdateDoc на бэкенде) */
   deviceGuid: string;
-  /** Имя устройства */
+  /** Имя устройства (используется для WriteTag/ReadTag в TN_MessagingService, например: "ИВК-1", "ИВК-2") */
   deviceName: string;
-  /** Префикс тега для OPC (например: "IVK", "IVK_2") */
+  /** Префикс тега для OPC (например: "IVK_TN_01", "IVK_TN_02") */
   tagPrefix: string;
 }
 

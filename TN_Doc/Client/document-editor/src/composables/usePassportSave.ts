@@ -67,7 +67,7 @@ export function usePassportSave() {
       console.log('[usePassportSave] Шаг 2: Запись в OPC тег ARM.ARM_FillActAndPassport...');
       const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
       await opcApi.writeTag(
-        opcParams.deviceGuid,
+        opcParams.deviceName, // Имя устройства ("ИВК-1"), а не ID!
         triggerTagName,
         true,
         2, // namespaceIndex
@@ -80,7 +80,7 @@ export function usePassportSave() {
       const resultTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassportResult', opcParams.tagPrefix);
 
       const pollingSuccess = await opcApi.pollTag(
-        opcParams.deviceGuid,
+        opcParams.deviceName, // Имя устройства ("ИВК-1"), а не ID!
         resultTagName,
         (currentValue: number, initialValue: number) => currentValue > initialValue,
         5000, // maxDuration (5 секунд)
@@ -169,7 +169,7 @@ export function usePassportSave() {
       console.log('[usePassportSave] Запись в OPC тег ARM.ARM_FillActAndPassport...');
       const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
       await opcApi.writeTag(
-        opcParams.deviceGuid,
+        opcParams.deviceName, // Имя устройства ("ИВК-1"), а не ID!
         triggerTagName,
         true,
         2, // namespaceIndex
