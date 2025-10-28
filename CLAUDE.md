@@ -15,32 +15,30 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **Important Notes:**
 - NEVER mention AI, code generation, or "Claude" in commit messages
 - Use Russian language for all commit messages
-- Recent work includes UI theme improvements with centralized CSS variables, Configurator Vue application, status bar cleanup, and experimental Document Editor (POC)
 - Current active branch: feature/additional-info-table (работа над функционалом дополнительной информации)
 
-## Essential Commands (Quick Reference)
+## Essential Commands
 
 ```bash
 # Build and run
 dotnet build                                    # Build entire solution
-cd TN_Doc && dotnet run                         # Run application (http://localhost:38509)
+cd TN_Doc && dotnet run                         # Run app (http://localhost:38509)
 
-# Vue components
-cd TN_Doc/Client && npm run build:all          # Build all Vue apps
+# Vue components (from TN_Doc/Client/)
+npm run build:all                               # Build all Vue apps
 npm run dev                                     # StatusBar dev server
 npm run dev:configurator                        # Configurator dev server
+npm run dev:editor                              # Document Editor dev server (experimental POC)
 
 # Testing
 dotnet test                                     # Run all tests
-dotnet test --filter "ClassName=YourTestClass" # Run specific test class
+dotnet test --filter "ClassName=YourTestClass"  # Run specific test class
 
 # Code quality
 dotnet format                                   # Format code
 ```
 
 ## Quick Start for New Developers
-
-If this is your first time working with the codebase:
 
 1. **Setup NuGet sources** (required for FastReport and internal packages):
    ```bash
@@ -55,11 +53,11 @@ If this is your first time working with the codebase:
    dotnet build
    ```
 
-3. **Build Vue components** (StatusBar, Configurator, Document Editor):
+3. **Build Vue components**:
    ```bash
    cd TN_Doc/Client
    npm install
-   npm run build:all  # Соберёт все приложения (statusbar, configurator, document-editor)
+   npm run build:all
    cd ../..
    ```
 
@@ -70,269 +68,34 @@ If this is your first time working with the codebase:
    # Visit http://localhost:38509
    ```
 
-5. **Run tests to verify everything works**:
+5. **Verify everything works**:
    ```bash
    dotnet test
    ```
-
-## Build and Development Commands
-
-### Prerequisites
-
-**Required Software:**
-- .NET SDK 8.0 or higher
-- .NET Runtime 8.0.13 or higher
-- Node.js 18+ and npm 8+ (for Vue applications)
-- MySQL/MariaDB server (for production)
-
-**Linux-specific:**
-- libgdiplus package (required for FastReport rendering)
-- CUPS printing system (for physical printing)
-
-**NuGet Source Configuration:**
-```bash
-# Add required NuGet sources
-dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
-dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget --username "<USERNAME>" --password "<PASSWORD>" --store-password-in-clear-text
-
-# Restore NuGet packages
-dotnet restore
-```
-
-### Building the Solution
-```bash
-# Build entire solution
-dotnet build
-
-# Build specific project
-dotnet build TN_Doc/TN_Doc.csproj
-
-# Build in Release mode
-dotnet build -c Release
-
-# Publish for production (Linux)
-dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
-
-# Publish for production (Windows)
-dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish
-
-# Clean build
-dotnet clean && dotnet build
-
-# Rebuild solution
-dotnet clean && dotnet restore && dotnet build
-```
-
-### Running the Application
-```bash
-# Run in development mode (from solution root)
-cd TN_Doc
-dotnet run
-
-# Run from solution root
-dotnet run --project TN_Doc/TN_Doc.csproj
-
-# Run with specific environment
-ASPNETCORE_ENVIRONMENT=Development dotnet run
-
-# Run with specific URLs (default ports)
-dotnet run --urls="http://localhost:38509;https://localhost:44357"
-
-# Run with verbose output for debugging
-dotnet run --verbosity detailed
-
-# Application will be available at:
-# - Default ports: http://localhost:38509 and https://localhost:44357
-# - Custom port: http://localhost:5000 (when using --urls="http://localhost:5000")
-# - StatusBar: Available on main page as embedded component
-# - Configurator UI: http://localhost:PORT/configurator
-# - API endpoints: http://localhost:PORT/api/*
-```
-
-### Building Vue Components (StatusBar, Configurator & Document Editor)
-
-**Структура npm workspace монорепозитория:**
-- `TN_Doc/Client/` - корневой workspace с унифицированными скриптами
-- `statusbar/` - Приложение мониторинга состояния системы
-- `configurator/` - Веб-интерфейс управления конфигурацией
-- `document-editor/` - Экспериментальный редактор документов (POC)
-- `shared/` - Общие TypeScript утилиты и API клиент
-- Общий стек: Vue 3.4.21 + TypeScript + PrimeVue 4.2+ + Vite
-
-```bash
-# Navigate to Client project root (monorepo workspace)
-cd TN_Doc/Client
-
-# Install all dependencies (first time only)
-npm install
-
-# Development mode - StatusBar with hot reload
-npm run dev
-# or explicitly
-npm run dev --workspace=statusbar
-
-# Development mode - Configurator with hot reload
-npm run dev:configurator
-
-# Development mode - Document Editor with hot reload (experimental POC)
-npm run dev:editor
-
-# Build StatusBar for production
-npm run build
-
-# Build Configurator for production
-npm run build:configurator
-
-# Build Document Editor for production (experimental POC)
-npm run build:editor
-
-# Build all Vue apps (StatusBar + Configurator + Document Editor)
-npm run build:all
-
-# Type checking across all workspaces
-npm run type-check
-
-# Clean all node_modules (useful for troubleshooting)
-npm run clean
-
-# Build outputs:
-# - StatusBar: TN_Doc/wwwroot/statusbar/
-# - Configurator: TN_Doc/wwwroot/configurator/
-# - Document Editor: TN_Doc/wwwroot/document-editor/ (experimental)
-```
-
-### Testing
-```bash
-# Run all tests
-dotnet test
-
-# Run tests in specific project
-dotnet test Tests/Tests.csproj
-
-# Run tests with detailed output
-dotnet test --logger:"console;verbosity=detailed"
-
-# Run a specific test method
-dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
-
-# Run tests for specific class
-dotnet test --filter "ClassName=AppConfigServiceTests"
-
-# Run tests for KMH libraries
-dotnet test --filter "ClassName~Kmh"
-
-# Run tests with code coverage
-dotnet test /p:CollectCoverage=true
-```
-
-#### Test Structure and Conventions
-- **Test Project**: `Tests/Tests.csproj` using NUnit framework with Moq for mocking
-- **Test Categories**:
-  - Controllers: `Tests/controllers/`
-  - Services: `Tests/Services/`
-- **Naming Convention**: `MethodName_WhenCondition_ThenExpectedResult`
-- **Test Rules**:
-  - Write independent tests without hidden environment dependencies
-  - Use mocks/fakes for external services and databases
-  - Cover negative scenarios and validation errors
-  - Follow AAA pattern: Arrange-Act-Assert
-
-### Code Quality and Linting
-```bash
-# Format code
-dotnet format
-
-# Check code style violations
-dotnet format --verify-no-changes
-
-# Analyze code with built-in analyzers
-dotnet build /p:TreatWarningsAsErrors=true
-
-# Run code analysis (if analyzers are configured)
-dotnet build /p:RunAnalyzersDuringBuild=true
-```
-
-### Debugging and Diagnostics
-```bash
-# Check .NET runtime and SDK versions
-dotnet --info
-
-# List installed .NET runtimes
-dotnet --list-runtimes
-
-# List installed .NET SDKs
-dotnet --list-sdks
-
-# Check project dependencies
-dotnet list package
-
-# Check for outdated packages
-dotnet list package --outdated
-
-# Check for vulnerable packages
-dotnet list package --vulnerable
-
-# View detailed build logs
-dotnet build -v detailed > build.log 2>&1
-
-# Debug application with verbose logging
-ASPNETCORE_ENVIRONMENT=Development dotnet run --verbosity detailed
-
-# Check application logs (platform-specific)
-# Linux: tail -f /opt/TN_Doc/logs/*.log
-# Windows: Get-Content TN_Doc\logs\*.log -Tail 50 -Wait
-```
-
-### Related Projects Setup
-The following projects must be deployed at the same level (all share TN_Doc configuration):
-- TN_KMH: `git clone http://192.168.100.100/orpovy/ivk/tn_kmh.git`
-- TN_MessagingService: `git clone http://192.168.100.100/orpovy/ivk/tn_messagingservice.git`
-  - Use "samara_build" branch for OPC DA support (older IVK systems)
-  - Master branch for standard OPC UA communication
-- TN.ElisConnector (for ELIS integration): `git clone http://192.168.100.100/orpovy/ivk/tn.elisconnector.git`
-  - Includes TSPD.Mock.Hub for testing ELIS integration
 
 ## Architecture Overview
 
 ### Solution Structure
 - **TN_Doc**: Main ASP.NET Core web application
-  - Entry point: `TN_Doc/Program.cs` and `TN_Doc/Startup.cs`
+  - Entry point: `Program.cs` and `Startup.cs`
   - Controllers: `TN_Doc/Controllers/`
-  - Models/Services: `TN_Doc/Models/`
-  - Views: `TN_Doc/Views/`
-  - Static files: `TN_Doc/wwwroot/`
-  - Configuration: `TN_Doc/appsettings.json`, `TN_Doc/nlog.config`
+  - Services: `TN_Doc/Models/` and `TN_Doc/Services/`
+  - Configuration: `appsettings.json`, `nlog.config`
+
 - **TN_Doc/Client/**: Frontend applications (npm workspace monorepo)
   - `statusbar/`: Real-time status monitoring Vue 3 app
-  - `configurator/`: Configuration management Vue 3 app
+  - `configurator/`: Configuration management Vue 3 app (базовая версия с v1.4.2)
   - `document-editor/`: Experimental document editing Vue 3 app (POC)
   - `shared/`: Shared TypeScript utilities and API client
-  - `package.json`: Workspace root with unified scripts
-  - `vite.config.base.ts`: Shared Vite configuration
+  - Stack: Vue 3.4.21 + TypeScript + PrimeVue 4.2+ + Vite
+
 - **TN.DocGeneral**: Core business logic and shared utilities
 - **Ivk.DataBase**: Database library for IVK measurement system data access
-- **tn.docgeneral/** (Document modules organized by type):
-  - Individual document implementations (Passport, Poverka*, KMH*, Act, Report, Jornal)
-  - Sikn425 modules in separate subfolder
-  - Common modules for shared document logic
-- **Tests**: Unit tests using NUnit framework with Moq for mocking
-  - Controller tests: `Tests/controllers/`
-  - Service tests: `Tests/Services/`
-- **tn_toolsfastreport/TN_Tools**: FastReport utilities
-- **winprutil**: Go-based Windows printing utility
-- **Dll/**: Pre-compiled document module assemblies
-- **prutils/**: Contains winprutil.exe for Windows PDF printing
-- **Template/Config packages**: `TN_Doc/Doc/`, `TN_Doc/Cfg/`, `TN_Doc/DLL/`
-- **docs/**: Comprehensive documentation structure
-  - `architecture/`: System architecture decisions and design
-  - `development/`: Development guides and setup instructions
-  - `deployment/`: Deployment procedures for Linux and Windows
-  - `integration/`: External system integration guides (ELIS, OPC)
-  - `api/`: API documentation and endpoints
-  - `ui-design.md`: Material Design 3 UI design system details
+- **tn.docgeneral/**: Document modules (Passport, Poverka*, KMH*, Act, Report, Jornal)
+- **Tests**: Unit tests using NUnit framework with Moq
 
 ### Document Module Pattern
-Each document type module implements a consistent pattern:
+Each document type implements a consistent pattern:
 - **Class Library**: Contains document-specific business logic
 - **Configuration Files**:
   - Document config: `TN_Doc/Cfg/Cfg{DocumentType}.json`
@@ -341,342 +104,123 @@ Each document type module implements a consistent pattern:
 - **Standard Interface Methods**:
   - `GetViewDoc(id)`: Returns JSON data for report generation
   - `GetPathTemplateFile()`: Returns path to .frx template
-  - `GetEditDoc(id)`: Returns HTML for editing forms
+  - `GetEditDoc(id)`: Returns HTML for editing forms (⚠️ v1.4.2: теперь строится в памяти, без дисковых операций)
   - `SetDocFromJson(json)`: Updates document data from JSON
 
-### FastReport Integration
-- Templates are .frx files with embedded C# scripting
-- Data passed via JSON parameter "JsonDoc"
-- Templates can reference project DLLs for complex processing
-- Export formats: PDF, Excel, ODS, XML, HTML
-- Script security disabled for template flexibility
-- Platform-specific rendering libraries (SkiaSharp, HarfBuzz)
+### Key Services and Patterns
 
-### Configuration System
-- **CfgApp.json**: Main application settings
-  - Device definitions with database connections
-  - ELIS integration settings
-  - OPC communication parameters
-  - Security features toggle
-  - PVL and PVS usage enabled by default
-- **Document Configs** (`Cfg*.json`):
-  - Template paths and report settings
-  - Edit form configurations
-  - Field mappings and validation rules
-- **Environment-Specific**:
-  - Development configs: `*.Development.json`
-  - Only copied to output in Debug builds
-  - Removed before deployment to avoid conflicts
-- **Configuration Management**:
-  - Web-based configurator UI at `/configurator` endpoint (Vue 3 SPA)
-  - ConfigurationService provides thread-safe config updates
-  - Validators ensure OPC and DB settings correctness before save
-  - Change logging with diff calculation for audit trails
-  - REST API at `/api/configurator/` for programmatic access
+**Dependency Injection** (registered in `Startup.cs`):
+- **IAppConfigService**: Singleton - configuration management and document class factory
+- **IReportBuffer**: Singleton - in-memory PDF storage (no disk I/O since v1.4.1)
+- **IConfigurationCacheService**: Singleton - кэширование конфигурационных файлов с LRU eviction (max 50 entries) ⚠️ v1.4.2
+- **IDocModuleLoader**: Singleton - кэширование загрузки документов (оптимизация загрузки DLL-библиотек) ⚠️ v1.4.2
+- **IDbSchemaCache**: Scoped - caching database schema information
+- **IStatusProvider**: Scoped - system health monitoring
+- **StatusMonitoringService**: Background hosted service (checks every 60s)
+- **LoggingPathService**: Static utility for platform-specific log paths (TN.DocGeneral/Services/)
 
-## Key Dependencies and External Systems
+**Multi-platform Support**:
+- Platform detection in `Program.cs` configures Windows Service or systemd
+- Windows: Runs as `NT AUTHORITY\NETWORK SERVICE`, uses `prutils/winprutil.exe` for printing
+- Linux: Runs as `alphadaemon` user, uses CUPS printing, requires `libgdiplus`
+- Log directories are platform-specific (Windows: `TN_Doc/logs/`, Linux: `/opt/TN_Doc/logs/`)
 
-### ELIS Integration
-ELIS (Единая Лабораторная Информационная Система) for quality passport data:
-- Requires TN.ElisConnector module from separate repository
-- Communicates with LabHub for laboratory data
-- Configuration in CfgApp.json under "Elis" section
-- Supports global or per-device ELIS configuration
-- SSL certificate support for secure communication
-- **SSL Certificate Setup**:
-  - Place certificate files in `Cert/` folder
-  - Install certificates on server
-  - Configure certificate path in ELIS settings
-
-### OPC Communication
-Real-time data acquisition from measurement systems:
-- **OPC DA**: Legacy protocol (requires "samara_build" branch of TN_MessagingService)
-  - Tags must be pre-defined in `opc.da.tags.json`
-  - All tags must be registered before first use
-- **OPC UA**: Modern protocol with better security
-  - Configuration in `opc.ua.tags.json`
-- Settings in CfgApp.json under "OpcConnectionSettings"
-
-### Database Connectivity
-- **MySQL/MariaDB** via Pomelo.EntityFrameworkCore.MySql (v7.0.0)
-- Per-device connection strings in CfgApp.json
-- Password encryption supported via EncryptionLibrary
-- Entity Framework Core for data access
-
-### Key Package Dependencies
-- **FastReport.Web.Skia** (2025.2.8): Report generation engine
-- **NLog** (5.4.0): Structured logging
-- **Newtonsoft.Json** (13.0.3): JSON processing
-- **Platform Libraries**:
-  - SkiaSharp.NativeAssets.Linux
-  - HarfBuzzSharp.NativeAssets.Linux
-  - System.Drawing.Common
-  - libgdiplus (Linux system dependency)
-- **Hosting Extensions**:
-  - Microsoft.Extensions.Hosting.Systemd (Linux)
-  - Microsoft.Extensions.Hosting.WindowsServices (Windows)
-
-## Important File Locations
-
-### Configuration
-- `/TN_Doc/Cfg/CfgApp.json` - Main application configuration
-- `/TN_Doc/Cfg/Cfg{DocumentType}.json` - Document template configurations
-- `/TN_Doc/Cfg/CfgEdit{DocumentType}.json` - Edit form configurations
-- `/TN_Doc/appsettings.json` - ASP.NET Core settings
-- `/TN_Doc/nlog.config` - Logging configuration
-- `/TN_Doc/opc.da.tags.json` - OPC DA tag definitions
-- `/TN_Doc/opc.ua.tags.json` - OPC UA tag definitions
-
-### Templates and Documents
-- `/TN_Doc/Doc/**/*.frx` - FastReport templates
-- `/TN_Doc/Doc/GOSTR8.1011-2022/` - GOST standard templates
-- `/TN_Doc/Doc/Act/` - Acceptance act templates
-- `/TN_Doc/Doc/Passport/` - Quality passport templates
-- `/TN_Doc/wwwroot/HTML/` - HTML editing forms
-
-### Output Directories
-- `/TN_Doc/wwwroot/PDF/` - Generated PDF documents
-- **Log Directories** (Platform-specific as of v1.4.1):
-  - Windows: `TN_Doc/logs/`
-  - Linux: `/opt/TN_Doc/logs/`
-- `/TN_Doc/UserPreference/` - User preferences (last used templates)
-
-### Design and Documentation
-- `/DESIGN_DOCUMENTATION.md` - Material Design 3 UI/UX design system documentation
-- `/CHANGELOG.md` - Version history and detailed change log
-- `/docs/` - Additional documentation (architecture, API, deployment, integration guides)
-- `/README.md` - Project overview and quick start guide
-
-## Development Notes
-
-### Service Architecture
-The application uses dependency injection with the following key services:
-
-**TN_Doc Services:**
-- **IAppConfigService**: Singleton configuration management and document class factory
-- **PrinterService**: Platform-specific printing (Windows/Linux)
-- **DirectoryService**: File system operations
-- **DbContext**: Entity Framework database context
-- **AppInfoProvider**: Application version information
-- **IDbSchemaCache**: Scoped service for caching database schema information
-- **IDocModuleLoader**: Singleton for dynamic loading of document modules
-- **IStatusProvider**: Scoped service for system health monitoring
-- **StatusMonitoringService**: Background hosted service for continuous status monitoring
-- **ConnectionTracker**: Tracks active SignalR connections to optimize background checks
-
-**TN.DocGeneral Shared Services:**
-- **IReportBuffer**: Singleton for in-memory PDF storage (no external dependencies)
-- **LoggingPathService**: Static utility for platform-specific log paths (accepts `applicationName` parameter)
-- **IConfigurationCacheService**: Singleton for caching configuration files with JSON-based storage and LRU eviction (max 50 entries)
-
-Services are registered in `Startup.cs` and `Extensions/IServiceCollectionExtensions.cs`.
-
-### Status Bar Architecture
-The application includes a real-time status bar built with **Vue 3 + PrimeVue** that monitors system health:
-- **Frontend Stack**:
-  - Vue 3.4.21 with TypeScript
-  - **PrimeVue 4.2+** - Enterprise UI component library
-  - Pinia for state management
-  - SignalR client for real-time updates
-  - Vite as build tool
-  - Source: `/TN_Doc/Client/statusbar/`
-- **Device Indicators**: Database connectivity for each configured ИВК device
-- **OPC Indicators**: OPC DA/UA server connection status
-- **Service Indicators**: SignalR Hub and ELIS laboratory system status
-- **Real-time Updates**: SignalR-based push notifications for status changes via `/statusHub` endpoint
-- **Manual Refresh**: Click individual indicators or global refresh button
-- **Configuration-Driven**: Dynamically creates indicators based on `CfgApp.json` device/OPC settings
-- **Backend Components**:
-  - `StatusHub`: SignalR hub at `/statusHub` for broadcasting status updates
-  - `StatusMonitoringService`: Background service that periodically checks system health (every 60s)
-  - `StatusProvider`: Service that queries database, OPC, MessagingService, and ELIS endpoints
-  - `StatusController`: REST API endpoint `/api/status` with 5-second caching
-  - HTTP clients configured with timeouts (2s for MessagingService, 5s for ELIS)
-- **ELIS Indicator Logic**:
-  - Shown only when `CfgApp.json → Elis.Use = true`
-  - Current implementation: checks if ELIS configuration is enabled (not real connection test)
-  - TODO: Implement real health check via TN.ElisConnector endpoint
-  - Status determined by `CheckElisServiceAsync()` in StatusProvider
-- **PrimeVue Components Used**:
-  - Badge: Status indicators with color coding
-  - Button: Refresh action with loading state
-  - Tag: SignalR connection indicator
-  - Message: Error notifications
-  - Tooltip: Contextual help
-
-### Configurator Architecture
-Веб-интерфейс для управления конфигурацией, доступен по адресу `/configurator`:
-
-**Frontend (Vue 3 + PrimeVue):**
-- **Tech Stack**:
-  - Vue 3.4.21 с TypeScript
-  - **PrimeVue 4.2+** - Enterprise UI библиотека компонентов
-  - Pinia для управления состоянием
-  - Axios HTTP клиент
-  - Vite как сборщик
-  - Исходники: `/TN_Doc/Client/configurator/`
-
-- **Функциональность**:
-  - **Вкладка "Общие настройки"**: пути экспорта, функции безопасности, локальный OPC клиент
-  - **Вкладка "Устройства"**: список устройств с поиском, мультивыбор для пакетного редактирования, индикаторы смешанного состояния
-  - **Редактор устройства**: состояние включено/выключено, шаблоны документов, подключения к БД, настройки OPC
-  - Валидация в реальном времени с бэкенд валидаторами
-  - Защита от потери несохранённых изменений (browser beforeunload warning)
-  - Журнал изменений с расчётом diff
-
-**Backend компоненты:**
-- `ConfiguratorController`: REST API `/api/configurator/`
-- `ConfigurationService`: Бизнес-логика и управление файлами конфигурации
-- `OpcConfigValidator`, `DbConfigValidator`: Серверная валидация настроек
-
-**Используемые PrimeVue компоненты:**
-- TabView/TabPanel: Основная навигация
-- DataTable: Список устройств с поиском/выбором
-- InputSwitch: Переключатели
-- MultiSelect: Выбор шаблонов документов
-- InputText/Password: Поля ввода
-- Button: Действия с состояниями загрузки
-- Message: Ошибки валидации и предупреждения
-- Tag: Метки шаблонов документов
-
-**Доступ:** http://localhost:PORT/configurator
-
-### Document Editor Architecture (Experimental POC)
-Экспериментальный Vue-интерфейс для редактирования документов, находится в активной разработке:
-
-**Frontend (Vue 3 + PrimeVue):**
-- **Tech Stack**:
-  - Vue 3.4.21 с TypeScript
-  - **PrimeVue 4.2+** - Enterprise UI библиотека компонентов
-  - Pinia для управления состоянием
-  - Axios HTTP клиент
-  - Vite как сборщик
-  - Исходники: `/TN_Doc/Client/document-editor/`
-
-**Функциональность (в разработке):**
-- Редактирование документов через Vue-интерфейс
-- Интеграция с существующим DocumentEditController
-- Динамическая генерация форм на основе конфигурации
-
-**Статус:**
-- POC (Proof of Concept) - в активной разработке
-- Экспериментальная ветка: feature/additional-info-table
-- Не рекомендуется для production использования
-
-**Backend компоненты:**
-- `DocumentEditController`: REST API `/api/document-edit/` (существующий контроллер)
-
-**Доступ:** http://localhost:PORT/document-editor (в разработке)
-
-### Document Generation Architecture
-The system uses a factory pattern with dynamic module loading:
-- **IAppConfigService**: Singleton that manages configuration and provides `GetDocumentClass(idDevice, idDoc)` factory method
-- **Document Classes**: Each document type implements standard interface with methods:
-  - `GetViewDoc(id)`: Returns JSON data for report generation
-  - `GetPathTemplateFile()`: Returns path to .frx template file
-  - `GetEditDoc(id)`: Returns HTML for editing forms
-  - `SetDocFromJson(json)`: Updates document data from JSON
-- **Dynamic Loading**: Document modules are loaded at runtime from `Dll/` directory or compiled assemblies
-- **Template Resolution**: FastReport templates (.frx files) paths resolved through document configuration files
-
-### Memory Management and PDF Generation
-The application uses in-memory PDF generation (implemented in v1.4.1):
-- **IReportBuffer**: Singleton service that stores generated PDF bytes in memory
-- **Middleware Interceptor**: Custom middleware in `Startup.cs` intercepts `/PDF/PDF.pdf` requests and serves from memory buffer
-- **Cache Control**: Responses include `no-store, no-cache, must-revalidate` headers to prevent browser caching
-- **FastReport Integration**: Reports exported to `MemoryStream`, then stored in `IReportBuffer`
-- **Printer Support**: Temporary files still needed for physical printing (winprutil.exe/CUPS)
+**Memory Management (v1.4.1+)**:
+- **IReportBuffer**: Stores generated PDF bytes in memory
+- **Middleware Interceptor**: Custom middleware intercepts `/PDF/PDF.pdf` requests and serves from buffer
 - **Benefits**: Eliminates "file in use" errors and concurrent access issues
 
-### Multi-platform Support
-- **Windows**:
-  - Deploy as Windows Service using `sc create`
-  - Run as `NT AUTHORITY\NETWORK SERVICE` (must have appropriate permissions)
-  - Uses `prutils/winprutil.exe` for PDF printing
-- **Linux**:
-  - Deploy with systemd service
-  - Run as user `alphadaemon` (created during package installation)
-  - Native CUPS printing support
-  - Requires `libgdiplus` package
-- Platform detection in `Program.cs` configures appropriate hosting
+## Key Development Patterns
 
-### Document Generation Workflow
-1. User selects document type and record ID from web interface
-2. Controller instantiates appropriate document module
-3. Module retrieves data from database using ID
-4. Configuration loaded from `Cfg{DocumentType}.json`
-5. FastReport template (`.frx`) loaded with path from config
-6. JSON data injected into template via "JsonDoc" parameter
-7. Report rendered to requested format (PDF/Excel/etc.)
-8. Result streamed to browser or saved to `/wwwroot/PDF/`
+### Coding Conventions (C#)
+From `.cursor/rules/coding-conventions-csharp.mdc`:
+- **Naming**: `PascalCase` for types/methods, `camelCase` for private fields, `_camelCase` for private readonly fields
+- **API Design**: Explicitly annotate public APIs, avoid `dynamic`/`object` without justification
+- **Control Flow**: Prefer early returns, avoid deep nesting
+- **Error Handling**: Never suppress exceptions, log and return meaningful errors
+- **Dependencies**: Register in `Startup.cs`/`IServiceCollectionExtensions.cs`, bind settings via `IOptions<T>`
 
-### Security Considerations
-- **UseSecurityFeatures** flag in CfgApp.json enables:
-  - Database password encryption
-  - Enhanced input validation
-  - Restricted file access
-- FastReport script security disabled for flexibility
-- Sensitive configs excluded from release builds
-- CORS configured with permissive policy (review for production)
+### ASP.NET Core Patterns
+From `.cursor/rules/aspnet-tn_doc.mdc`:
+- **New Endpoints**: Create actions in appropriate controllers, inject services via DI, place logic in `Models/Services`
+- **Validation**: Validate input data, return `IActionResult`/`ActionResult<T>`
+- **Logging**: Use NLog (`ILogger<T>`), detailed logs in Development, minimal in Production
+- **Configuration**: All parameters in `appsettings.*.json`, bind sections through `IOptions<T>`
 
-### Deployment Process
+### Configuration System
+Layered configuration approach:
+1. **appsettings.json**: ASP.NET Core application settings
+2. **CfgApp.json**: Main application configuration (devices, ELIS, OPC)
+3. **Cfg{DocumentType}.json**: Document-specific template and report settings
+4. **CfgEdit{DocumentType}.json**: Edit form configurations
+5. **Development overlays**: `*.Development.json` files auto-loaded in Debug builds
 
-#### Linux Deployment (via GitLab CI/CD)
-1. Tag push triggers pipeline (e.g., `v1.3.5`)
-2. Docker builds with .NET SDK 8.0
-3. Creates `.deb` package with:
-   - Application files in `/opt/TN_Doc/`
-   - Systemd service as `tn-doc.service` (runs with `ASPNETCORE_ENVIRONMENT=Production`)
-   - Log directory at `/var/log/TN_Doc/`
-4. Package validates .NET Runtime 8.0.13+
-5. Pre/post-install scripts create `alphadaemon` user and set permissions
+⚠️ **v1.4.2**: Configuration files are now cached via `IConfigurationCacheService` - minimize disk I/O
 
-#### Windows Deployment
-1. Publish as self-contained or framework-dependent
-2. Create service: `sc create TN_Doc binPath="path\to\TN_Doc.exe"`
-3. Configure service identity as `NT AUTHORITY\NETWORK SERVICE`
-4. Ensure `prutils/winprutil.exe` is accessible
-5. Grant necessary permissions to service account
+## Working with Document Modules
 
-### Development Workflow
+### Standard Document Module Interface
+All document modules must implement these methods:
 
-#### Daily Development Cycle
-1. **Start with fresh environment**:
-   ```bash
-   git pull origin develop
-   dotnet restore
-   dotnet build
-   ```
+1. **GetViewDoc(id)**: Returns JSON data for report generation
+   - Fetches document data from database
+   - Transforms to format expected by FastReport template
+   - Returns JSON string with "JsonDoc" parameter
 
-2. **Run application locally** (from solution root):
-   ```bash
-   cd TN_Doc
-   ASPNETCORE_ENVIRONMENT=Development dotnet run
-   ```
+2. **GetPathTemplateFile()**: Returns path to .frx template
+   - Resolves path from document configuration
+   - Returns absolute path to FastReport template file
 
-3. **Work on Vue components** (parallel terminal):
-   ```bash
-   cd TN_Doc/Client
-   npm run dev              # StatusBar with hot reload
-   npm run dev:configurator # Configurator with hot reload
-   npm run dev:editor       # Document Editor with hot reload (experimental)
-   ```
+3. **GetEditDoc(id)**: Returns HTML for editing forms
+   - ⚠️ **v1.4.2**: Generates HTML in memory only (no file operations)
+   - **IMPORTANT**: Always use `Path.Combine()` for cross-platform compatibility
+   - **IMPORTANT**: Add trace logging on generation:
+     ```csharp
+     _logger.Trace($"HTML форма документа {IdDoc} (id={id}) сгенерирована, размер: {html.Length} символов");
+     ```
+   - Returns HTML as string
 
-4. **Run tests frequently**:
-   ```bash
-   dotnet test
-   dotnet test --filter "ClassName=YourTestClass"
-   ```
+4. **SetDocFromJson(json)**: Updates document data from JSON
+   - Parses JSON from client
+   - Validates input data
+   - Updates database records
 
-5. **Before committing**:
-   ```bash
-   dotnet format                        # Format code
-   dotnet build                          # Ensure it builds
-   dotnet test                           # Run all tests
-   cd TN_Doc/Client && npm run build:all # Build Vue components
-   ```
+### Complete Document Libraries List (42 libraries)
 
-#### Common Development Tasks
+**Core Documents (4)**: Act, Passport, Jornal, Report
+
+**Verification Documents - Poverka (21)**: Poverka1974, Poverka1974_04, Poverka1974_89, Poverka1974_95, Poverka2816, Poverka3151, Poverka3189, Poverka3265_PR_PU, Poverka3265_UPR_PR, Poverka3265_UPR_PU, Poverka3266, Poverka3267, Poverka3272, Poverka3287, Poverka3288, Poverka3312_PR_PU, Poverka3312_UPR_PR, Poverka3380, PoverkaSikn425_PR_PR, PoverkaSikn425_PR_PU
+
+**Quality Control - KMH (14)**: KMH3265_PR_PU, KMH3265_UPR_PR, KMH3288_MPR_TPR, KMH3312_PR_PU, KMH3312_UPR_PR, KMH_MI2816, KMH_MPR_MPR, KMH_MPR_PU, KMH_MPR_TPR, KMH_PP, KMH_PP_Areom, KMH_PR_PR, KMH_PR_PU, KMH_PV, KMH_PW, KMX_Sikn425_PR_PR, KMX_Sikn425_PR_PU
+
+**Common Libraries (3)**: CommonPoverka1974, CommonSikn425
+
+## Development Workflow
+
+### Daily Development Cycle
+```bash
+# 1. Start with fresh environment
+git pull origin develop
+dotnet restore && dotnet build
+
+# 2. Run application (from solution root)
+cd TN_Doc && ASPNETCORE_ENVIRONMENT=Development dotnet run
+
+# 3. Work on Vue components (parallel terminal)
+cd TN_Doc/Client
+npm run dev              # StatusBar with hot reload
+npm run dev:configurator # Configurator with hot reload
+
+# 4. Run tests frequently
+dotnet test --filter "ClassName=YourTestClass"
+
+# 5. Before committing
+dotnet format                        # Format code
+dotnet build && dotnet test          # Ensure it builds and tests pass
+cd TN_Doc/Client && npm run build:all # Build Vue components
+```
+
+### Common Development Tasks
 
 **Adding a new document type:**
 1. Create new library in `tn.docgeneral/{DocumentType}/`
@@ -695,168 +239,34 @@ The application uses in-memory PDF generation (implemented in v1.4.1):
 5. Check logs for any rendering errors
 
 **Working with configurations:**
-- `CfgApp.json`: Main app settings (devices, ELIS, OPC)
-- `Cfg{DocumentType}.json`: Template paths, report settings
-- `CfgEdit{DocumentType}.json`: Edit form field mappings
-- Use Configurator UI (`/configurator`) for runtime changes
+- Use Configurator UI (`/configurator`) for runtime changes (базовая версия доступна с v1.4.2)
 - Changes to CfgApp.json require app restart
+- ⚠️ Configuration caching is enabled - changes may require cache invalidation
 
-**Debugging tips:**
-- Use `ASPNETCORE_ENVIRONMENT=Development` for local debugging
-- Development configs auto-loaded in Debug builds
-- Check logs for detailed error information:
-  - Linux: `/opt/TN_Doc/logs/`
-  - Windows: `TN_Doc/logs/`
-- Enable verbose logging in `nlog.config` for troubleshooting
-- Test document generation with various IDs before deployment
-- Validate FastReport templates with test data
+### Test Guidelines
+From `.cursor/rules/tests-guide.mdc`:
+- **Naming Convention**: `MethodName_WhenCondition_ThenExpectedResult`
+- **AAA Pattern**: Arrange-Act-Assert
+- **Test Rules**:
+  - Write independent tests without hidden environment dependencies
+  - Use mocks/fakes for external services and databases
+  - Cover negative scenarios and validation errors
+- Run specific tests: `dotnet test --filter "ClassName=AppConfigServiceTests"`
 
-**Pre-deployment checklist:**
-- Remove `appsettings.Development.json` before production deployment
-- Build Vue components: `cd TN_Doc/Client && npm run build:all`
-- Run full test suite: `dotnet test`
-- Check for hardcoded development URLs or paths
-- Verify database connection strings are correct
-- When working with OPC DA, ensure all tags are pre-registered
-
-**Windows Service Deployment:**
-- Use `NT AUTHORITY\NETWORK SERVICE` account (no password)
-- Grant appropriate file system permissions
-
-**Multi-project Deployment:**
-- All three projects (TN_Doc, TN_KMH, TN_MessagingService) should be deployed from develop branch
-- They share the same `CfgApp.json` configuration file
-- Deploy at the same directory level
-
-### Common Issues and Solutions
-
-**Build and Dependencies:**
-- **Build errors**: Ensure NuGet sources are configured (ortpr and FastReport)
-- **FastReport license errors**: Ensure FastReport NuGet source is configured with valid credentials
-- **Runtime version mismatch**: Verify .NET Runtime 8.0.13+ is installed (`dotnet --info`)
-- **Node.js/npm errors**: Ensure Node.js 18+ and npm 8+ are installed for Vue components
-
-**Vue Component Issues:**
-- **Build fails for StatusBar/Configurator/Document Editor**: Run `npm install` in `TN_Doc/Client/` first
-- **Hot reload not working**: Check Vite dev server is running on correct port
-- **TypeScript errors**: Run `npm run type-check` to see all type issues
-- **Stale build output**: Run `npm run clean` in `TN_Doc/Client/` and rebuild
-- **Document Editor POC issues**: Check feature/additional-info-table branch for latest changes
-
-**Document Generation:**
-- **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
-- **Document generation failures**: Check logs and validate JSON data structure
-- **"File in use" errors**: Should not occur in v1.4.1+ due to in-memory PDF generation
-
-**Database and Integration:**
-- **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
-- **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
-- **ELIS integration issues**: Check SSL certificates in `Cert/` folder and verify LabHub connectivity
-
-**Platform-specific:**
-- **Platform-specific printing issues**: Ensure winprutil.exe (Windows) or CUPS (Linux) are available
-- **Permission issues on Linux**: Ensure `alphadaemon` user has access to `/opt/TN_Doc/` and `/var/log/TN_Doc/`
-- **libgdiplus errors on Linux**: Install via `sudo apt install libgdiplus` (Debian/Ubuntu)
-
-### Working with Document Modules
-When working on specific document types:
-- Document-specific templates are in `/TN_Doc/Doc/{DocumentType}/`
-- Configuration files follow pattern `Cfg{DocumentType}.json` and `CfgEdit{DocumentType}.json`
-- Each document module implements standard interface methods in corresponding class library
-- Test document generation thoroughly before modifying templates
-- FastReport templates (.frx files) are binary - use FastReport Designer for editing
-- Pre-compiled modules available in `Dll/` directory
-
-#### Standard Document Module Interface
-All document modules must implement these methods:
-
-1. **GetViewDoc(id)**: Returns JSON data for report generation
-   - Fetches document data from database
-   - Transforms to format expected by FastReport template
-   - Returns JSON string with "JsonDoc" parameter
-
-2. **GetPathTemplateFile()**: Returns path to .frx template
-   - Resolves path from document configuration
-   - Returns absolute path to FastReport template file
-
-3. **GetEditDoc(id)**: Returns HTML for editing forms
-   - Generates HTML editing form
-   - **IMPORTANT**: Always use `Path.Combine()` for cross-platform compatibility
-   - **IMPORTANT**: Add trace logging on successful save:
-     ```csharp
-     string htmlPath = Path.Combine(wwwrootPath, "HTML", "html.html");
-     _logger.Trace($"HTML форма документа {IdDoc} (id={id}) сохранена: {htmlPath}");
-     ```
-   - Saves to `wwwroot/HTML/` directory
-   - Returns HTML as string or returns direct file path
-
-4. **SetDocFromJson(json)**: Updates document data from JSON
-   - Parses JSON from client
-   - Validates input data
-   - Updates database records
-
-#### Recent GetEditDoc Improvements (v1.4.2)
-As of version 1.4.2, all 42 document libraries now include enhanced logging in GetEditDoc:
-- Replaced string concatenation with `Path.Combine()` for cross-platform compatibility
-- Added trace logging with full file path on successful save
-- Consistent logging pattern across all libraries
-
-#### Complete Document Libraries List (42 libraries)
-The system contains the following document libraries that require test coverage:
-
-**Core Documents (4)**:
-- Act - Acceptance acts
-- Passport - Quality passports
-- Jornal - Journals
-- Report - Reports
-
-**Verification Documents - Poverka (21)**:
-- Poverka1974, Poverka1974_04, Poverka1974_89, Poverka1974_95 - GOST R 8.1011-2022 standard
-- Poverka2816 - MI 2816 verification
-- Poverka3151 - GOST 3151 verification
-- Poverka3189 - GOST 3189 verification
-- Poverka3265_PR_PU, Poverka3265_UPR_PR, Poverka3265_UPR_PU - GOST 3265 verification
-- Poverka3266, Poverka3267, Poverka3272 - GOST 3266/3267/3272 verification
-- Poverka3287, Poverka3288 - GOST 3287/3288 verification
-- Poverka3312_PR_PU, Poverka3312_UPR_PR - GOST 3312 verification
-- Poverka3380 - GOST 3380 verification
-- PoverkaSikn425_PR_PR, PoverkaSikn425_PR_PU - SIKN-425 verification
-
-**Quality Control - KMH (14)**:
-- KMH3265_PR_PU, KMH3265_UPR_PR - GOST 3265 quality control
-- KMH3288_MPR_TPR - GOST 3288 mass/temperature quality control
-- KMH3312_PR_PU, KMH3312_UPR_PR - GOST 3312 quality control
-- KMH_MI2816 - MI 2816 quality control
-- KMH_MPR_MPR, KMH_MPR_PU, KMH_MPR_TPR - Mass/pressure/temperature control
-- KMH_PP, KMH_PP_Areom - Density control
-- KMH_PR_PR, KMH_PR_PU - Pressure control
-- KMH_PV - Volume control, KMH_PW - Mass control
-- KMX_Sikn425_PR_PR, KMX_Sikn425_PR_PU - SIKN-425 quality control
-
-**Common Libraries (3)**:
-- CommonPoverka1974 - Shared functionality for GOST R 8.1011-2022 documents
-- CommonSikn425 - Common SIKN-425 functionality
-
-### Version Management
-- Version is centrally managed in `TN_Doc.csproj`
-- Changes are documented in `/TN_Doc/changes.md`
-- Current version: 1.4.3 (.NET 8.0)
-
-### Git Workflow Notes
+## Git Workflow and Commit Conventions
 
 **Branch Strategy:**
-- **master**: Production ветка (только стабильные релизы)
-- **develop**: Основная ветка разработки ⭐ (используйте для новых фич)
-- **developWork**: Личная/экспериментальная ветка (временная)
-- **feature/***: Ветки функциональности (создавать от develop)
-- **bugs/***: Исправление ошибок
-- **projects/***: Проектные ветки (например, projects/sikn-531-gazprom)
+- **master**: Production branch (only stable releases)
+- **develop**: Main development branch ⭐ (use this for new features)
+- **feature/***: Feature branches (create from develop)
+- **bugs/***: Bug fix branches
+- **projects/***: Project-specific branches (e.g., projects/sikn-531-gazprom)
 
 **Branch Guidelines:**
-- Всегда создавайте новые ветки от `develop`
-- Мержите обратно в `develop` после тестирования
-- Используйте описательные имена (например, `feature/status-bar-improvements`)
-- Удаляйте feature ветки после мерджа
+- Always create new branches from `develop`
+- Merge back to `develop` after testing
+- Use descriptive names (e.g., `feature/status-bar-improvements`)
+- Delete feature branches after merge
 
 **Commit Message Rules:**
 - NEVER mention AI, automated generation, or "Claude" in commit messages
@@ -871,68 +281,106 @@ The system contains the following document libraries that require test coverage:
 - Do NOT commit Development config files to production branches
 - Always test document generation before committing template changes
 
-### Key Development Patterns
+## Key Dependencies and External Systems
 
-#### Coding Conventions (C#)
-- **Naming**: `PascalCase` for types/methods, `camelCase` for private fields, `_camelCase` for private readonly fields
-- **API Design**: Explicitly annotate public APIs, avoid `dynamic`/`object` without justification
-- **Control Flow**: Prefer early returns, avoid deep nesting
-- **Error Handling**: Never suppress exceptions, log and return meaningful errors
-- **Dependencies**: Register in `Startup.cs`/`IServiceCollectionExtensions.cs`, bind settings via `IOptions<T>`
-- **Project Files**: Fix target frameworks and exact package versions in `*.csproj`
+### ELIS Integration
+ELIS (Единая Лабораторная Информационная Система) for quality passport data:
+- Requires TN.ElisConnector module from separate repository
+- Configuration in CfgApp.json under "Elis" section
+- SSL certificate support (place certificates in `Cert/` folder)
 
-#### ASP.NET Core Patterns
-- **New Endpoints**: Create actions in appropriate controllers, inject services via DI, place logic in `Models/Services`
-- **Validation**: Validate input data, return `IActionResult`/`ActionResult<T>`
-- **Logging**: Use NLog (`ILogger<T>`), detailed logs in Development, minimal in Production
-- **Configuration**: All parameters in `appsettings.*.json`, bind sections through `IOptions<T>`
-- **Static Files**: Place resources in `wwwroot/`, consider browser caching
+### OPC Communication
+Real-time data acquisition from measurement systems:
+- **OPC DA**: Legacy protocol - tags must be pre-defined in `opc.da.tags.json`
+- **OPC UA**: Modern protocol - configuration in `opc.ua.tags.json`
+- Settings in CfgApp.json under "OpcConnectionSettings"
 
-#### Dependency Injection Setup
-- **Singleton Services**: AppConfigService (thread-safe singleton pattern)
-- **Platform-Specific Services**: Printers registered based on OS detection in `IServiceCollectionExtensions.cs`
-- **Release-Only Services**: Directory configuration only applied in Release builds (`#if RELEASE`)
+### Database Connectivity
+- **MySQL/MariaDB** via Pomelo.EntityFrameworkCore.MySql (v7.0.0)
+- Per-device connection strings in CfgApp.json
+- Password encryption supported via EncryptionLibrary
 
-#### Configuration Loading Pattern
-Configuration follows a layered approach:
-1. **appsettings.json**: ASP.NET Core application settings
-2. **CfgApp.json**: Main application configuration (devices, ELIS, OPC)
-3. **Cfg{DocumentType}.json**: Document-specific template and report settings
-4. **CfgEdit{DocumentType}.json**: Edit form configurations
-5. **Development overlays**: `*.Development.json` files auto-loaded in Debug builds
+### Key Package Dependencies
+- **FastReport.Web.Skia** (2025.2.8): Report generation engine
+- **NLog** (5.4.0): Structured logging
+- **Newtonsoft.Json** (13.0.3): JSON processing
+- **Platform Libraries**: SkiaSharp, HarfBuzzSharp, System.Drawing.Common, libgdiplus (Linux)
 
-#### Error Handling and Logging
-- **NLog**: Structured logging with platform-specific log directories
-  - Configuration: `/TN_Doc/nlog.config`
-  - Client-side logging via `ClientLogController` (v1.4.1+)
-  - Document operation logging with library events
-- **Exception Boundaries**: Controllers catch exceptions and return appropriate HTTP status codes
-- **Resource Cleanup**: Explicit disposal of FastReport objects and streams in finally blocks
+## Important File Locations
 
-### Recent Changes (v1.4.3)
-See `/TN_Doc/changes.md` for detailed version history. Key improvements:
+### Configuration
+- `/TN_Doc/Cfg/CfgApp.json` - Main application configuration
+- `/TN_Doc/Cfg/Cfg{DocumentType}.json` - Document template configurations
+- `/TN_Doc/Cfg/CfgEdit{DocumentType}.json` - Edit form configurations
+- `/TN_Doc/appsettings.json` - ASP.NET Core settings
+- `/TN_Doc/nlog.config` - Logging configuration
+
+### Templates and Output
+- `/TN_Doc/Doc/**/*.frx` - FastReport templates
+- `/TN_Doc/wwwroot/PDF/` - Generated PDF documents (deprecated - now in-memory)
+- `/TN_Doc/wwwroot/HTML/` - HTML editing forms (deprecated since v1.4.2 - now generated in-memory)
+- **Logs**: Windows: `TN_Doc/logs/`, Linux: `/opt/TN_Doc/logs/`
+
+### Documentation
+- `/CHANGELOG.md` - Version history and detailed change log
+- `/docs/` - Additional documentation (architecture, API, deployment, integration guides)
+- `/README.md` - Project overview and quick start guide
+
+## Common Issues and Solutions
+
+**Build and Dependencies:**
+- **Build errors**: Ensure NuGet sources are configured (ortpr and FastReport)
+- **Runtime version mismatch**: Verify .NET Runtime 8.0.13+ is installed (`dotnet --info`)
+
+**Vue Component Issues:**
+- **Build fails**: Run `npm install` in `TN_Doc/Client/` first
+- **Hot reload not working**: Check Vite dev server is running on correct port
+- **Stale build output**: Run `npm run clean` in `TN_Doc/Client/` and rebuild
+
+**Document Generation:**
+- **Missing templates**: Check that .frx files exist and paths in Cfg*.json are correct
+- **"File in use" errors**: Should not occur in v1.4.1+ due to in-memory PDF generation
+
+**Database and Integration:**
+- **Database connection**: Verify MySQL/MariaDB connectivity and credentials in CfgApp.json
+- **OPC DA tag errors**: All tags must be pre-registered in `opc.da.tags.json` before use (unlike OPC UA)
+- **ELIS integration issues**: Check SSL certificates in `Cert/` folder
+
+**Platform-specific:**
+- **Permission issues on Linux**: Ensure `alphadaemon` user has access to `/opt/TN_Doc/` and `/opt/TN_Doc/logs/`
+- **libgdiplus errors on Linux**: Install via `sudo apt install libgdiplus` (Debian/Ubuntu)
+
+## Recent Changes (v1.4.3)
+
+Key improvements (see `/TN_Doc/changes.md` for full history):
 - Removed TN.Tools project (obsolete functionality)
 - Updated KMH_MI2816 for IVK version 7.12.14.3000 protocol changes
 - Updated docgeneral to version 1.2.2
 - **UI Theme Improvements**: Centralized color management via CSS variables in `material3.css`
 - **Status bar improvements**: 4 indicator states (online, offline, ndv, warning), improved layout
 - **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/` for cross-project reusability
-- **GetEditDoc logging enhancement**: Enhanced logging in all 42 document libraries with `Path.Combine()` usage
 
-### Previous Changes (v1.4.1)
-- 🐞 Fixed incorrect population of Act shifts when filling "reverse" passports
-- Sorting of Acts by date and documents in KMH and verifications by date
-- Display of values in locked cells for quality passport editing forms
-- Corrected log messages to properly display device names
-- Updated docgeneral to version 1.2.1
-- Manual viscosity correction for Poverka 1974 variants (2004, 1995, 1989)
-- Client-side logging moved to separate controller (`ClientLogController`)
-- Enhanced document operation logging (library events)
-- Corrected ELIS form population logging
+## Previous Major Changes (v1.4.2)
 
-### Previous Major Changes
-- **v1.4.0**: Modal dictionary window closing after saving, validation improvements
-- **v1.3.7**: Manual viscosity correction for Poverka 3380, export fixes
-- **v1.3.6**: Template corrections and passport improvements
-- **v1.3.5**: Fixed document loading for IVK-2/IVK-3 devices
-- **v1.3.4**: Platform-specific log paths, PVL/PVS enabled by default
+- ⚠️ **Базовая версия конфигуратора**: веб-интерфейс для управления конфигурацией (`/configurator`)
+- ⚠️ **Базовая версия строки состояния**: диагностические индикаторы связи с устройствами и сервисами
+- ⚠️ **Кэширование конфигурационных файлов**: `IConfigurationCacheService` с LRU eviction
+- ⚠️ **Кэширование загрузки документов**: `IDocModuleLoader` оптимизация загрузки DLL
+- ⚠️ **Исключено построение HTML из файла**: GetEditDoc теперь работает в памяти
+- Рефакторинг UI приложения
+- Упрощение определения путей до файлов
+
+## Related Projects
+
+The following projects must be deployed at the same level (all share TN_Doc configuration):
+- **TN_KMH**: Контроль метрологических характеристик - `git clone http://192.168.100.100/orpovy/ivk/tn_kmh.git`
+- **TN_MessagingService**: OPC клиент - `git clone http://192.168.100.100/orpovy/ivk/tn_messagingservice.git`
+  - Use "samara_build" branch for OPC DA support
+  - Master branch for OPC UA communication
+- **TN.ElisConnector**: ELIS integration - `git clone http://192.168.100.100/orpovy/ivk/tn.elisconnector.git`
+
+## Version Management
+
+- Version is centrally managed in `TN_Doc.csproj`
+- Changes are documented in `/TN_Doc/changes.md`
+- Current version: 1.4.3 (.NET 8.0)
