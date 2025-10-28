@@ -956,14 +956,28 @@ function GetEditDoc() {
                     // Используем Vue Document Editor
                     console.log('Загружается Vue Document Editor:', response.url);
 
+                    // Добавляем OPC параметры к URL
+                    const deviceGuid = $('#ComboboxDevice').val();
+                    const deviceName = $('#ComboboxDevice :selected').text();
+                    const tagPrefix = PrefixTag;
+
+                    // Создаем URL с OPC параметрами
+                    let urlWithParams = response.url;
+                    const separator = urlWithParams.includes('?') ? '&' : '?';
+                    urlWithParams += separator + 'deviceGuid=' + encodeURIComponent(deviceGuid);
+                    urlWithParams += '&deviceName=' + encodeURIComponent(deviceName);
+                    urlWithParams += '&tagPrefix=' + encodeURIComponent(tagPrefix);
+
+                    console.log('URL с OPC параметрами:', urlWithParams);
+
                     // Освобождаем предыдущий Blob URL, если он существует
                     $('.FR').each(function () {
                         const oldSrc = $(this).attr('src');
                         if (oldSrc && oldSrc.startsWith('blob:')) {
                             URL.revokeObjectURL(oldSrc);
                         }
-                        // Устанавливаем URL на Vue SPA
-                        $(this).attr('src', response.url);
+                        // Устанавливаем URL на Vue SPA с OPC параметрами
+                        $(this).attr('src', urlWithParams);
                     });
                 } else {
                     // Старый подход - HTML контент (не должен попасть сюда с dataType: 'json')
