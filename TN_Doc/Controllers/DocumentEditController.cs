@@ -84,6 +84,29 @@ public class DocumentEditController : ControllerBase
             // Получаем конфигурацию
             var config = editor.GetEditConfig(id);
 
+            // Заполняем OPC параметры для работы с тегами
+            var device = _appConfig.GetDeviceCfg(deviceId);
+            if (device != null)
+            {
+                config.DeviceGuid = deviceId.ToString(); // IdDevice используется как GUID для OPC
+                config.DeviceName = device.Name;
+
+                // Получаем префикс тега из OPC настроек
+                if (device.OpcConnectionSettings != null)
+                {
+                    // Префикс может быть в DA или UA настройках
+                    config.TagPrefix = device.OpcConnectionSettings.Type == TN.DocData.OpcType.DA
+                        ? device.OpcConnectionSettings.DaSettings?.StartPrefix
+                        : device.OpcConnectionSettings.UaSettings?.StartPrefix;
+                }
+
+                _logger.Trace($"OPC параметры заполнены: DeviceGuid={config.DeviceGuid}, DeviceName={config.DeviceName}, TagPrefix={config.TagPrefix}");
+            }
+            else
+            {
+                _logger.Warn($"Не удалось получить конфигурацию устройства с ID={deviceId}");
+            }
+
             _logger.Info($"Конфигурация редактирования успешно получена: {docType} (id={id}, deviceId={deviceId})");
             return Ok(config);
         }
@@ -163,6 +186,80 @@ public class DocumentEditController : ControllerBase
         catch (Exception ex)
         {
             _logger.Error(ex, $"Ошибка при сохранении документа: deviceId={deviceId}, docType={docType}, id={id}");
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Обновить документ после успешной записи в OPC тег
+    /// (используется для паспортов после подтверждения от ИВК)
+    /// </summary>
+    /// <param name="deviceId">ID устройства (целое число)</param>
+    /// <param name="docType">Тип документа</param>
+    /// <param name="id">ID документа</param>
+    /// <param name="data">JSON данные документа (с объединенными данными из localStorage)</param>
+    [HttpPost("{deviceId}/{docType}/update/{id}")]
+    public IActionResult UpdateDocument(int deviceId, string docType, int id, [FromBody] JsonElement data)
+    {
+        _logger.Trace($"API запрос обновления документа: deviceId={deviceId}, docType={docType}, id={id}");
+
+        try
+        {
+            // Получаем IdDoc
+            if (!Enum.TryParse<IdDoc>(docType, ignoreCase: true, out var idDoc))
+            {
+                _logger.Warn($"Неизвестный тип документа: {docType}");
+                return BadRequest(new { error = $"Unknown document type: {docType}" });
+            }
+
+            // Загружаем модуль документа
+            var doc = _docModuleLoader.LoadDocsModule(_options, deviceId, idDoc, AppContext.BaseDirectory);
+            if (doc == null)
+            {
+                _logger.Error($"Не удалось загрузить DLL для документа {idDoc}");
+                return StatusCode(500, new { error = "Failed to load document module" });
+            }
+
+            // Обновляем документ
+            bool success;
+
+            // Проверяем, реализует ли документ IDocumentEditor (новый формат)
+            if (doc is IDocumentEditor editor)
+            {
+                _logger.Trace($"Использование IDocumentEditor.SaveDocument для обновления {docType}");
+
+                // Десериализуем JSON в словарь
+                var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(data.GetRawText());
+                if (values == null)
+                {
+                    _logger.Error("Не удалось десериализовать данные документа");
+                    return BadRequest(new { error = "Invalid document data" });
+                }
+
+                success = editor.SaveDocument(id, values);
+            }
+            else
+            {
+                _logger.Trace($"Использование старого SaveDoc для обновления {docType}");
+                // Используем старый метод для обратной совместимости
+                var jsonString = data.GetRawText();
+                success = doc.SaveDoc(jsonString);
+            }
+
+            if (success)
+            {
+                _logger.Info($"Документ успешно обновлен: {docType} (id={id}, deviceId={deviceId})");
+                return Ok(new { success = true, message = "Document updated successfully" });
+            }
+            else
+            {
+                _logger.Warn($"Не удалось обновить документ: {docType} (id={id}, deviceId={deviceId})");
+                return StatusCode(500, new { error = "Failed to update document" });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, $"Ошибка при обновлении документа: deviceId={deviceId}, docType={docType}, id={id}");
             return StatusCode(500, new { error = "Internal server error", message = ex.Message });
         }
     }
