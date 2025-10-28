@@ -1,6 +1,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useDocumentStore } from '@/stores/documentStore';
+import { usePassportSave } from './usePassportSave';
 
 /**
  * Композабл с общей логикой редактирования документов
@@ -9,9 +10,13 @@ import { useDocumentStore } from '@/stores/documentStore';
 export function useDocumentEditor() {
   const store = useDocumentStore();
   const toast = useToast();
+  const { saveDocumentWithOpc } = usePassportSave();
 
   /**
-   * Функция сохранения документа (только ошибки в Toast)
+   * Функция сохранения документа с поддержкой OPC тегов
+   * Для паспортов: выполняется polling OPC тегов
+   * Для актов: выполняется запись в OPC тег без polling
+   * Для остальных документов: обычное сохранение
    */
   const handleSave = async (): Promise<boolean> => {
     // Проверяем валидацию перед сохранением
@@ -26,10 +31,22 @@ export function useDocumentEditor() {
     }
 
     try {
-      await store.saveDocument();
+      // Используем новую логику сохранения с поддержкой OPC
+      const success = await saveDocumentWithOpc();
+
+      if (!success) {
+        // Polling завершился по таймауту
+        toast.add({
+          severity: 'warn',
+          summary: 'Предупреждение',
+          detail: 'Документ сохранен, но ИВК не подтвердил запись в течение 5 секунд',
+          life: 7000
+        });
+      }
+
       // Успешное сохранение - НЕ показываем Toast
       // Главное окно само обработает результат
-      return true;
+      return success;
     } catch (error: any) {
       // Показываем Toast только при ошибке
       toast.add({

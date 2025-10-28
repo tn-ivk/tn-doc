@@ -111,6 +111,28 @@ class DocumentApiService {
   }
 
   /**
+   * Обновить документ (используется после успешной записи в OPC тег)
+   * @param deviceId ID устройства (целое число)
+   * @param docType Тип документа
+   * @param id ID документа
+   * @param data JSON данные документа
+   */
+  async updateDocument(
+    deviceId: number,
+    docType: string,
+    id: number,
+    data: SaveDocumentRequest
+  ): Promise<SaveDocumentResponse> {
+    console.log('[API] updateDocument - запрос:', { deviceId, docType, id });
+    const response = await this.api.post<SaveDocumentResponse>(
+      `/${deviceId}/${docType}/update/${id}`,
+      data
+    );
+    console.log('[API] updateDocument - документ успешно обновлен');
+    return response.data;
+  }
+
+  /**
    * Получить список некорректных символов для устройства
    * @param deviceId ID устройства (целое число)
    */

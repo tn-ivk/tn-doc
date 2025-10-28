@@ -15,6 +15,12 @@ export interface DocumentEditConfig {
   initialValues: Record<string, any>;
   /** Идентификатор устройства (целое число) */
   deviceId: number;
+  /** GUID устройства для OPC тегов */
+  deviceGuid?: string;
+  /** Имя устройства */
+  deviceName?: string;
+  /** Префикс тега для OPC (например: "IVK", "IVK_2") */
+  tagPrefix?: string;
   /** Справочники (лицензии/доверенности и т.д.) */
   dictionaries?: DocumentDictionaries;
   /** Список некорректных символов для данного устройства */
