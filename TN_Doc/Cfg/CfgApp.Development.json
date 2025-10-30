@@ -237,7 +237,7 @@
           "Description": "",
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
-          "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
+          "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
@@ -1399,7 +1399,7 @@
           "Description": "",
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
-          "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
+          "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
