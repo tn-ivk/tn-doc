@@ -247,7 +247,7 @@
               "Name": "Журнал регистрации СИ (Нефть)",
               "Description": "Журнал регистрации показаний средств измерений СИКН. МИ 3532-2015 (Приложение 12)",
               "PathToDocTemplateFile": "/Doc/25_DocMeasurementJornal.frx",
-              "PathToDocEditConfigFile": ""
+              "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json"
             },
             {
               "Use": false,
@@ -544,7 +544,7 @@
           "Description": "",
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
-          "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
+          "PathToDocEditConfigFile": "",
           "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
