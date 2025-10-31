@@ -136,54 +136,7 @@ export function usePassportSave() {
     }
   }
 
-  /**
-   * Упрощенная функция сохранения для актов (без OPC polling)
-   * Для актов тоже нужна запись в тег, но без ожидания (без polling)
-   * @param opcParams OPC параметры устройства (из URL query params)
-   */
-  async function saveActWithOpc(opcParams: OpcDeviceParams | null): Promise<boolean> {
-    if (!store.config) {
-      throw new Error('Конфигурация документа не загружена');
-    }
-
-    const config = store.config;
-
-    // Шаг 1: Сохранить документ
-    console.log('[usePassportSave] Сохранение акта...');
-    await documentApi.saveDocument(
-      config.deviceId,
-      config.docType,
-      config.docId,
-      store.formData
-    );
-    console.log('[usePassportSave] Акт успешно сохранен');
-
-    // Проверяем наличие OPC параметров
-    if (!opcParams) {
-      console.warn('[usePassportSave] Отсутствуют OPC параметры, пропускаем запись в тег');
-      return true;
-    }
-
-    try {
-      // Шаг 2: Записать в OPC тег ARM.ARM_FillActAndPassport = true (без polling)
-      console.log('[usePassportSave] Запись в OPC тег ARM.ARM_FillActAndPassport...');
-      const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
-      await opcApi.writeTag(
-        opcParams.deviceName, // Имя устройства ("ИВК-1"), а не ID!
-        triggerTagName,
-        true,
-        2, // namespaceIndex
-        0  // indexArray
-      );
-      console.log('[usePassportSave] Тег успешно записан');
-
-      return true;
-    } catch (opcError: any) {
-      console.error('[usePassportSave] Ошибка при записи в OPC тег:', opcError);
-      throw new Error(`Документ сохранен, но не удалось записать в ИВК: ${opcError.message}`);
-    }
-  }
-
+  
   /**
    * Универсальная функция сохранения документа с поддержкой OPC
    * Автоматически выбирает нужную стратегию в зависимости от типа документа
@@ -201,11 +154,7 @@ export function usePassportSave() {
       return await savePassportWithOpc(opcParams);
     }
 
-    // Для актов используем упрощенную логику (запись в тег без polling)
-    if (docType === 'Act') {
-      return await saveActWithOpc(opcParams);
-    }
-
+    
     // Для остальных документов (Report, Jornal и т.д.) просто сохраняем
     console.log(`[usePassportSave] Сохранение документа типа ${docType} без OPC логики`);
     await documentApi.saveDocument(
@@ -219,7 +168,6 @@ export function usePassportSave() {
 
   return {
     savePassportWithOpc,
-    saveActWithOpc,
     saveDocumentWithOpc
   };
 }
