@@ -196,16 +196,6 @@ public class DocumentEditController : ControllerBase
                 return BadRequest(new { error = $"Update operation is only supported for Passport documents" });
             }
 
-            // Проверяем данные
-            var jsonString = data.GetRawText();
-            _logger.Trace($"Полученные JSON данные (первые 500 символов): {(jsonString?.Length > 500 ? jsonString.Substring(0, 500) + "..." : jsonString ?? "null")}");
-
-            if (string.IsNullOrEmpty(jsonString))
-            {
-                _logger.Error("Данные для обновления пустые или отсутствуют");
-                return BadRequest(new { error = "Invalid document data" });
-            }
-
             // Загружаем модуль документа
             var doc = _docModuleLoader.LoadDocsModule(_options, deviceId, idDoc, AppContext.BaseDirectory);
             if (doc == null)
@@ -214,18 +204,36 @@ public class DocumentEditController : ControllerBase
                 return StatusCode(500, new { error = "Failed to load document module" });
             }
 
-            // Проверяем, реализует ли документ IDocUpdater
-            if (doc is not IDocUpdater docUpdater)
+            // Проверяем, реализует ли документ IDocumentEditor
+            if (doc is not IDocumentEditor editor)
             {
-                _logger.Error($"Документ типа {docType} не поддерживает обновление через IDocUpdater");
-                return StatusCode(500, new { error = "Document type does not support update operation" });
+                _logger.Error($"Документ типа {docType} не поддерживает редактирование через API");
+                return BadRequest(new { error = $"Document type '{docType}' does not support Vue editor" });
             }
 
-            _logger.Trace($"Использование IDocUpdater.DocUpdate для обновления {docType}");
-            docUpdater.DocUpdate(jsonString);
+            // Десериализуем JSON в словарь
+            var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(data.GetRawText());
+            if (values == null)
+            {
+                _logger.Error("Не удалось десериализовать данные документа");
+                return BadRequest(new { error = "Invalid document data" });
+            }
 
-            _logger.Info($"Документ успешно обновлен: {docType} (id={id}, deviceId={deviceId})");
-            return Ok(new { success = true, message = "Document updated successfully" });
+            _logger.Trace($"Обновление паспорта через SaveDocument (после подтверждения от ИВК), количество полей: {values.Count}");
+
+            // Используем SaveDocument для обновления - он правильно обрабатывает плоский формат данных
+            var success = editor.SaveDocument(id, values);
+
+            if (success)
+            {
+                _logger.Info($"Документ успешно обновлен: {docType} (id={id}, deviceId={deviceId})");
+                return Ok(new { success = true, message = "Document updated successfully" });
+            }
+            else
+            {
+                _logger.Warn($"Не удалось обновить документ: {docType} (id={id}, deviceId={deviceId})");
+                return StatusCode(500, new { error = "Failed to update document" });
+            }
         }
         catch (Exception ex)
         {
