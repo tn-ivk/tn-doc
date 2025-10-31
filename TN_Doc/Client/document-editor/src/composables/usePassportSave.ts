@@ -30,39 +30,42 @@ export function usePassportSave() {
       throw new Error('Конфигурация документа не загружена');
     }
 
-    const config = store.config as PassportEditConfig;
+    store.isSaving = true;
 
-    // Проверяем, что это паспорт (DocGUID == 1)
-    const isPassport = config.docType === 'Passport';
-    if (!isPassport) {
-      console.warn('[usePassportSave] Документ не является паспортом, пропускаем OPC логику');
-      // Для не-паспортов просто сохраняем
+    try {
+      const config = store.config as PassportEditConfig;
+
+      // Проверяем, что это паспорт (DocGUID == 1)
+      const isPassport = config.docType === 'Passport';
+      if (!isPassport) {
+        console.warn('[usePassportSave] Документ не является паспортом, пропускаем OPC логику');
+        // Для не-паспортов просто сохраняем
+        await documentApi.saveDocument(
+          config.deviceId,
+          config.docType,
+          config.docId,
+          store.formData
+        );
+        store.isDirty = false;
+        return true;
+      }
+
+      // Шаг 1: Сохранить документ
+      console.log('[usePassportSave] Шаг 1: Сохранение паспорта...');
       await documentApi.saveDocument(
         config.deviceId,
         config.docType,
         config.docId,
         store.formData
       );
-      return true;
-    }
+      console.log('[usePassportSave] Шаг 1: Паспорт успешно сохранен');
 
-    // Шаг 1: Сохранить документ
-    console.log('[usePassportSave] Шаг 1: Сохранение паспорта...');
-    await documentApi.saveDocument(
-      config.deviceId,
-      config.docType,
-      config.docId,
-      store.formData
-    );
-    console.log('[usePassportSave] Шаг 1: Паспорт успешно сохранен');
-
-    // Проверяем наличие OPC параметров
-    if (!opcParams) {
-      console.warn('[usePassportSave] Отсутствуют OPC параметры, пропускаем OPC логику');
-      return true;
-    }
-
-    try {
+      // Проверяем наличие OPC параметров
+      if (!opcParams) {
+        console.warn('[usePassportSave] Отсутствуют OPC параметры, пропускаем OPC логику');
+        store.isDirty = false;
+        return true;
+      }
       // Шаг 2: Записать в OPC тег ARM.ARM_FillActAndPassport = true
       console.log('[usePassportSave] Шаг 2: Запись в OPC тег ARM.ARM_FillActAndPassport...');
       const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
@@ -128,11 +131,13 @@ export function usePassportSave() {
       );
       console.log('[usePassportSave] Шаг 5: Документ успешно обновлен');
 
+      store.isDirty = false;
       return true;
-    } catch (opcError: any) {
-      console.error('[usePassportSave] Ошибка при работе с OPC:', opcError);
-      // Документ сохранен, но OPC операция не удалась
-      throw new Error(`Документ сохранен, но не удалось записать в ИВК: ${opcError.message}`);
+    } catch (error: any) {
+      console.error('[usePassportSave] Ошибка при сохранении:', error);
+      throw error;
+    } finally {
+      store.isSaving = false;
     }
   }
 
@@ -156,14 +161,24 @@ export function usePassportSave() {
 
     
     // Для остальных документов (Report, Jornal и т.д.) просто сохраняем
-    console.log(`[usePassportSave] Сохранение документа типа ${docType} без OPC логики`);
-    await documentApi.saveDocument(
-      store.config.deviceId,
-      store.config.docType,
-      store.config.docId,
-      store.formData
-    );
-    return true;
+    store.isSaving = true;
+
+    try {
+      console.log(`[usePassportSave] Сохранение документа типа ${docType} без OPC логики`);
+      await documentApi.saveDocument(
+        store.config.deviceId,
+        store.config.docType,
+        store.config.docId,
+        store.formData
+      );
+      store.isDirty = false;
+      return true;
+    } catch (error: any) {
+      console.error('[usePassportSave] Ошибка при сохранении документа:', error);
+      throw error;
+    } finally {
+      store.isSaving = false;
+    }
   }
 
   return {
