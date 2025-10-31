@@ -189,6 +189,21 @@ public class DocumentEditController : ControllerBase
                 return BadRequest(new { error = $"Unknown document type: {docType}" });
             }
 
+            // Проверяем, что обновление применяется только для паспортов
+            if (idDoc != IdDoc.Passport)
+            {
+                _logger.Warn($"Обновление данных не применяется для документов типа {idDoc}");
+                return BadRequest(new { error = $"Update operation is only supported for Passport documents" });
+            }
+
+            // Проверяем данные
+            var jsonString = data.GetRawText();
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                _logger.Error("Данные для обновления пустые или отсутствуют");
+                return BadRequest(new { error = "Invalid document data" });
+            }
+
             // Загружаем модуль документа
             var doc = _docModuleLoader.LoadDocsModule(_options, deviceId, idDoc, AppContext.BaseDirectory);
             if (doc == null)
@@ -197,42 +212,18 @@ public class DocumentEditController : ControllerBase
                 return StatusCode(500, new { error = "Failed to load document module" });
             }
 
-            // Обновляем документ
-            bool success;
-
-            // Проверяем, реализует ли документ IDocumentEditor (новый формат)
-            if (doc is IDocumentEditor editor)
+            // Проверяем, реализует ли документ IDocUpdater
+            if (doc is not IDocUpdater docUpdater)
             {
-                _logger.Trace($"Использование IDocumentEditor.SaveDocument для обновления {docType}");
-
-                // Десериализуем JSON в словарь
-                var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(data.GetRawText());
-                if (values == null)
-                {
-                    _logger.Error("Не удалось десериализовать данные документа");
-                    return BadRequest(new { error = "Invalid document data" });
-                }
-
-                success = editor.SaveDocument(id, values);
-            }
-            else
-            {
-                _logger.Trace($"Использование старого SaveDoc для обновления {docType}");
-                // Используем старый метод для обратной совместимости
-                var jsonString = data.GetRawText();
-                success = doc.SaveDoc(jsonString);
+                _logger.Error($"Документ типа {docType} не поддерживает обновление через IDocUpdater");
+                return StatusCode(500, new { error = "Document type does not support update operation" });
             }
 
-            if (success)
-            {
-                _logger.Info($"Документ успешно обновлен: {docType} (id={id}, deviceId={deviceId})");
-                return Ok(new { success = true, message = "Document updated successfully" });
-            }
-            else
-            {
-                _logger.Warn($"Не удалось обновить документ: {docType} (id={id}, deviceId={deviceId})");
-                return StatusCode(500, new { error = "Failed to update document" });
-            }
+            _logger.Trace($"Использование IDocUpdater.DocUpdate для обновления {docType}");
+            docUpdater.DocUpdate(jsonString);
+
+            _logger.Info($"Документ успешно обновлен: {docType} (id={id}, deviceId={deviceId})");
+            return Ok(new { success = true, message = "Document updated successfully" });
         }
         catch (Exception ex)
         {
