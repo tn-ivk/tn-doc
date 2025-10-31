@@ -204,11 +204,11 @@ public class DocumentEditController : ControllerBase
                 return StatusCode(500, new { error = "Failed to load document module" });
             }
 
-            // Проверяем, реализует ли документ IDocumentEditor
-            if (doc is not IDocumentEditor editor)
+            // Проверяем, реализует ли документ IDocUpdater
+            if (doc is not IDocUpdater docUpdater)
             {
-                _logger.Error($"Документ типа {docType} не поддерживает редактирование через API");
-                return BadRequest(new { error = $"Document type '{docType}' does not support Vue editor" });
+                _logger.Error($"Документ типа {docType} не поддерживает обновление через IDocUpdater");
+                return StatusCode(500, new { error = "Document type does not support update operation" });
             }
 
             // Десериализуем JSON в словарь
@@ -219,21 +219,13 @@ public class DocumentEditController : ControllerBase
                 return BadRequest(new { error = "Invalid document data" });
             }
 
-            _logger.Trace($"Обновление паспорта через SaveDocument (после подтверждения от ИВК), количество полей: {values.Count}");
+            _logger.Trace($"Обновление паспорта через DocUpdate (после подтверждения от ИВК), количество полей: {values.Count}");
 
-            // Используем SaveDocument для обновления - он правильно обрабатывает плоский формат данных
-            var success = editor.SaveDocument(id, values);
+            // Используем DocUpdate с плоским объектом - метод сам преобразует в CorrectionData
+            docUpdater.DocUpdate(id, values);
 
-            if (success)
-            {
-                _logger.Info($"Документ успешно обновлен: {docType} (id={id}, deviceId={deviceId})");
-                return Ok(new { success = true, message = "Document updated successfully" });
-            }
-            else
-            {
-                _logger.Warn($"Не удалось обновить документ: {docType} (id={id}, deviceId={deviceId})");
-                return StatusCode(500, new { error = "Failed to update document" });
-            }
+            _logger.Info($"Документ успешно обновлен: {docType} (id={id}, deviceId={deviceId})");
+            return Ok(new { success = true, message = "Document updated successfully" });
         }
         catch (Exception ex)
         {
