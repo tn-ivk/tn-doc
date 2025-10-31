@@ -198,6 +198,8 @@ public class DocumentEditController : ControllerBase
 
             // Проверяем данные
             var jsonString = data.GetRawText();
+            _logger.Trace($"Полученные JSON данные (первые 500 символов): {(jsonString?.Length > 500 ? jsonString.Substring(0, 500) + "..." : jsonString ?? "null")}");
+
             if (string.IsNullOrEmpty(jsonString))
             {
                 _logger.Error("Данные для обновления пустые или отсутствуют");
