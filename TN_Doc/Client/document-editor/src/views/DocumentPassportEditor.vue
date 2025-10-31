@@ -13,6 +13,16 @@
 
     <!-- Редактор паспорта -->
     <div v-else-if="store.isReady" class="editor-wrapper">
+      <!-- Оверлей при сохранении -->
+      <Transition name="fade">
+        <div v-if="store.isSaving" class="saving-overlay-wrapper">
+          <div class="saving-spinner">
+            <ProgressSpinner style="width: 50px; height: 50px" />
+            <p class="saving-text">Сохранение...</p>
+          </div>
+        </div>
+      </Transition>
+
       <!-- Таблица AdditionalInfo (дополнительная информация) -->
       <div class="editor-container additional-info-section">
         <div class="editor-table-wrapper">
@@ -148,6 +158,7 @@ setupBeforeUnloadHandler();
   flex-direction: column;
   gap: 1rem;
   min-height: 0;
+  position: relative;
 }
 
 /* Секция дополнительной информации */
@@ -219,5 +230,48 @@ setupBeforeUnloadHandler();
 
 .editor-table tr:last-child td:last-child {
   border-bottom-right-radius: 8px;
+}
+
+/* Оверлей при сохранении */
+.saving-overlay-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  border-radius: 8px;
+}
+
+.saving-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.saving-text {
+  margin: 0;
+  color: var(--md-text);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Анимация появления/исчезновения */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>
