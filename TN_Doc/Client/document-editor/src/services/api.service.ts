@@ -137,38 +137,6 @@ class DocumentApiService {
     return response.data;
   }
 
-  /**
-   * Получить список некорректных символов для устройства
-   * @param deviceId ID устройства (целое число)
-   */
-  async getInvalidChars(deviceId: number): Promise<string[]> {
-    try {
-      logger.debug('API: запрос некорректных символов', { deviceId });
-      const response = await axios.get<any>('/Home/GetInvalideChars', {
-        params: { IdDevice: deviceId }
-      });
-
-      logger.trace('API: ответ сервера', { data: response.data });
-      logger.trace('API: тип ответа', { type: typeof response.data, isArray: Array.isArray(response.data) });
-
-      // Axios автоматически парсит JSON, проверяем тип
-      if (Array.isArray(response.data)) {
-        logger.debug('API: возвращаем массив напрямую', { data: response.data });
-        return response.data;
-      } else if (typeof response.data === 'string' && response.data) {
-        // Если вернулась строка, парсим её
-        const parsed = JSON.parse(response.data);
-        logger.debug('API: распарсен массив из строки', { parsed });
-        return parsed;
-      }
-
-      logger.warn('API: пустой или некорректный ответ от сервера');
-      return [];
-    } catch (error) {
-      logger.error('API: ошибка получения некорректных символов', { error: error instanceof Error ? error.message : String(error) });
-      return [];
-    }
-  }
 }
 
 // Экспортируем синглтон
