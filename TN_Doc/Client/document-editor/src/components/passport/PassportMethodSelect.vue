@@ -70,7 +70,7 @@ const isValid = computed(() => {
 // Сообщение об ошибке валидации
 const validationMessage = computed(() => {
   if (!isValid.value) {
-    return `Необходимо выбрать метод испытаний для "${props.parameter.name}"`;
+    return `Необходимо выбрать метод испытаний`;
   }
   return '';
 });
