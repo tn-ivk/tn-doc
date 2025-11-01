@@ -10,14 +10,14 @@ import type { DocumentEditConfig } from './document.types';
 export interface PassportEditConfig extends DocumentEditConfig {
   /** Используется ли ELIS для данного устройства */
   isElisUsed: boolean;
-  /** Качественные параметры нефти */
-  qualityParameters?: PassportQualityParameter[];
+  /** Схема параметров качества (только метаданные, без данных) */
+  qualityParametersSchema?: PassportQualityParameterSchema[];
 }
 
 /**
- * Параметр качества нефти (строка таблицы Edit)
+ * Схема параметра качества нефти (только метаданные, без данных)
  */
-export interface PassportQualityParameter {
+export interface PassportQualityParameterSchema {
   /** ID параметра */
   id: number;
   /** Ключ параметра (например, "TempCorrection") */
@@ -30,20 +30,24 @@ export interface PassportQualityParameter {
   requiredFill?: boolean;
   /** Количество знаков после запятой для округления */
   roundValue?: number;
-
   /** ELIS метаданные */
   elisData?: ElisData;
+  /** Доступные методы испытаний (из конфигурации) */
+  methodOptions: MethodOption[];
+}
 
-  /** Значения параметра */
+/**
+ * Полный параметр качества нефти (схема + данные)
+ * Создается динамически из PassportQualityParameterSchema + formData
+ */
+export interface PassportQualityParameter extends PassportQualityParameterSchema {
+  /** Значения параметра (вычисляются из formData) */
   values: ParameterValues;
-
-  /** Метод испытаний */
+  /** Метод испытаний (вычисляется из formData) */
   method: ParameterMethod;
-
-  /** Документ (только если ELIS используется) */
+  /** Документ (только если ELIS используется, вычисляется из formData) */
   document?: ParameterDocument;
-
-  /** Флаги заполнения из ELIS */
+  /** Флаги заполнения из ELIS (вычисляются из formData) */
   elisFlags: ParameterElisFlags;
 }
 
