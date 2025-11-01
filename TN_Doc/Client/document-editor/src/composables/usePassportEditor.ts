@@ -79,7 +79,8 @@ export function usePassportEditor() {
         },
         method: {
           selected: selectedMethodName,
-          options: methodOptions
+          options: methodOptions,
+          requiredFill: paramSchema.methodRequiredFill
         },
         document: documentNumber ? {
           number: documentNumber,

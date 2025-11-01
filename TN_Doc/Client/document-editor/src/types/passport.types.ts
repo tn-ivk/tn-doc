@@ -28,6 +28,8 @@ export interface PassportQualityParameterSchema {
   editable: boolean;
   /** Обязательно ли заполнение */
   requiredFill?: boolean;
+  /** Обязательно ли заполнение метода испытаний */
+  methodRequiredFill?: boolean;
   /** Количество знаков после запятой для округления */
   roundValue?: number;
   /** ELIS метаданные */
@@ -69,6 +71,8 @@ export interface ParameterMethod {
   selected: string;
   /** Доступные методы */
   options: MethodOption[];
+  /** Обязательно ли заполнение метода */
+  requiredFill?: boolean;
 }
 
 /**

@@ -60,8 +60,8 @@ const selectedMethodOption = computed(() => {
 
 // Валидация поля метода
 const isValid = computed(() => {
-  // Если параметр обязателен для заполнения, метод тоже должен быть выбран
-  if (props.parameter.requiredFill) {
+  // Если метод испытаний обязателен для заполнения, проверяем что он выбран
+  if (props.parameter.method.requiredFill) {
     return !!props.parameter.method.selected && props.parameter.method.selected.trim() !== '';
   }
   return true;
