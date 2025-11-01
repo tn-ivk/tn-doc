@@ -4,3 +4,4 @@
 
 export { ApiClient, apiClient } from './api/ApiClient';
 export { logger, Logger, type LogLevel, type LogEntry, type LoggerConfig } from './logger';
+export { useInvalidChars } from './composables/useInvalidChars';

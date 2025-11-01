@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { logger } from '@tn-doc/shared';
+import { logger, useInvalidChars } from '@tn-doc/shared';
 import { documentApi } from '@/services/api.service';
 import type { DocumentEditConfig, FormField } from '@/types/document.types';
 import type { PassportEditConfig } from '@/types/passport.types';
@@ -95,8 +95,9 @@ export const useDocumentStore = defineStore('document', () => {
     try {
       const loadedConfig = await documentApi.getEditConfig(deviceId, docType, id);
 
-      // Загружаем список некорректных символов для данного устройства
-      const invalidChars = await documentApi.getInvalidChars(deviceId);
+      // Загружаем список некорректных символов для данного устройства с кэшированием
+      const { getInvalidChars } = useInvalidChars();
+      const invalidChars = await getInvalidChars(deviceId);
       loadedConfig.invalidChars = invalidChars;
 
       config.value = loadedConfig;
