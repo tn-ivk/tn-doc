@@ -13,5 +13,5 @@ public class DeviceStatus
     public bool IsConnected { get; set; }
     public int? LatencyMs { get; set; }
     public DateTime? LastChecked { get; set; }
-    public string Error { get; set; }
+    public string? Error { get; set; }
 }
