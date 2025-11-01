@@ -9,6 +9,7 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **Version**: 1.4.3 (.NET 8.0)
 **Main Development Branch**: develop
 **Runtime Requirement**: .NET Runtime 8.0.13+
+**Node.js Requirement**: Node.js 18.0+ и npm 8.0+ (для Vue компонентов)
 
 **Critical Rules:**
 - NEVER mention AI, code generation, or "Claude" in commit messages
@@ -51,11 +52,11 @@ dotnet format                                   # Format code
    dotnet build
    ```
 
-3. **Build Vue components**:
+3. **Build Vue components** (npm workspaces):
    ```bash
    cd TN_Doc/Client
-   npm install
-   npm run build:all
+   npm install                # Устанавливает зависимости для всех workspaces
+   npm run build:all          # Собирает statusbar, configurator, document-editor
    cd ../..
    ```
 
@@ -83,10 +84,10 @@ tn_doc/
 │   ├── Cfg/                   # Document and app configuration files
 │   ├── Doc/                   # FastReport templates (*.frx)
 │   └── Client/                # Frontend Vue 3 applications (npm workspaces)
-│       ├── statusbar/         # Real-time status monitoring
-│       ├── configurator/      # Configuration management (v1.4.2+)
-│       ├── document-editor/   # Experimental document editing (POC)
-│       └── shared/            # Shared TypeScript utilities
+│       ├── statusbar/         # Real-time status monitoring (Vue 3 + PrimeVue)
+│       ├── configurator/      # Configuration management UI (v1.4.2+)
+│       ├── document-editor/   # Experimental document editing (POC, not production)
+│       └── shared/            # Shared TypeScript utilities and types
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
 ├── tn.docgeneral/             # Document module libraries (42 libraries)
@@ -242,6 +243,19 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
 - Changes to CfgApp.json require app restart
 - Configuration caching is enabled - changes may require cache invalidation
 
+### Modifying UI theme and colors (v1.4.3+)
+
+1. **All colors are centralized** in `/TN_Doc/wwwroot/css/material3.css`
+2. Edit CSS variables in `:root` selector to change theme colors
+3. DO NOT add hardcoded HEX colors in other stylesheets - use CSS variables instead
+4. Common CSS variables:
+   - `--md-primary`, `--md-primary-active`, `--md-primary-light` - primary colors
+   - `--md-gray-*` - grayscale palette (600, 700, 800)
+   - `--md-elis-highlight` - ELIS data highlighting
+   - `--md-error-*` - error states
+   - `--md-border-*` - border colors
+5. After changes, rebuild Vue components: `npm run build:all`
+
 ## Git Workflow and Commit Conventions
 
 ### Branch Strategy
@@ -346,12 +360,18 @@ Real-time data acquisition from measurement systems:
 ## Recent Changes (v1.4.3)
 
 See `/TN_Doc/changes.md` for full history:
-- Removed TN.Tools project (obsolete functionality)
-- Updated KMH_MI2816 for IVK version 7.12.14.3000 protocol changes
-- Updated docgeneral to version 1.2.2
-- UI Theme Improvements: Centralized color management via CSS variables in `material3.css`
-- Status bar improvements: 4 indicator states (online, offline, ndv, warning)
-- LoggingPathService refactoring: Moved to `TN.DocGeneral/Services/` for reusability
+- ⚠️ **Removed TN.Tools project** - obsolete functionality
+- **Updated KMH_MI2816** for IVK version 7.12.14.3000 protocol changes
+- **Updated docgeneral to version 1.2.2**
+- **UI Theme Improvements**: Centralized color management via CSS variables
+  - All colors now defined in `TN_Doc/wwwroot/css/material3.css`
+  - Replaced hardcoded HEX colors with CSS variables across all stylesheets
+  - New CSS variables: `--md-primary-active`, `--md-gray-*`, `--md-elis-highlight`, `--md-error-*`, etc.
+  - Simplifies theme customization - change colors in one place
+- **Status bar improvements**: 4 indicator states (online, offline, ndv, warning)
+  - Improved alignment and sizing of device/service indicators
+  - Removed redundant refresh button and SignalR indicator
+- **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/` for reusability
 
 ## Previous Major Changes (v1.4.2)
 
