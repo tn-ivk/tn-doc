@@ -17,7 +17,7 @@
       <Transition name="fade">
         <div v-if="store.isSaving" class="saving-overlay-wrapper">
           <div class="saving-spinner">
-            <ProgressSpinner style="width: 50px; height: 50px" />
+            <ProgressSpinner style="width: 60px; height: 60px" />
             <p class="saving-text">Сохранение...</p>
           </div>
         </div>
@@ -251,8 +251,8 @@ setupBeforeUnloadHandler();
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 2rem;
+  gap: 1.25rem;
+  padding: 2.5rem;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -261,7 +261,7 @@ setupBeforeUnloadHandler();
 .saving-text {
   margin: 0;
   color: var(--md-text);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
 }
 
