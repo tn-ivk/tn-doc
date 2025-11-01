@@ -56,7 +56,12 @@ public class Startup
 		services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
 		services.AddScoped<IConfigurationService, ConfigurationService>();
 		services.AddSingleton<AppClientTracker>();
-		services.AddControllersWithViews();
+		services.AddControllersWithViews()
+			.AddJsonOptions(options =>
+			{
+				// Сериализуем enum'ы как строки вместо чисел (для совместимости с фронтендом)
+				options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+			});
 		services.AddDbContext<DocGeneral>();
 		services.AddSingleton<IDocModuleLoader, CachedDocModuleLoader>();
 
