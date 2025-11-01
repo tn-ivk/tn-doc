@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { logger } from '@tn-doc/shared';
 import { documentApi } from '@/services/api.service';
 import type { DocumentEditConfig, FormField } from '@/types/document.types';
 import type { PassportEditConfig } from '@/types/passport.types';
@@ -106,7 +107,10 @@ export const useDocumentStore = defineStore('document', () => {
       isDirty.value = false;
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Не удалось загрузить конфигурацию документа';
-      console.error('[DocumentStore] Ошибка загрузки конфигурации:', err);
+      logger.error('DocumentStore: ошибка загрузки конфигурации', {
+        error: err.message,
+        response: err.response?.data
+      });
       throw err;
     } finally {
       isLoading.value = false;
@@ -162,7 +166,13 @@ export const useDocumentStore = defineStore('document', () => {
     } catch (err: any) {
       // НЕ устанавливаем error.value, чтобы форма продолжала отображаться
       // Ошибка будет показана через Toast в DocumentEditor.vue
-      console.error('[DocumentStore] Ошибка сохранения:', err);
+      logger.error('DocumentStore: ошибка сохранения документа', {
+        deviceId: config.value.deviceId,
+        docType: config.value.docType,
+        docId: config.value.docId,
+        error: err.message,
+        response: err.response?.data
+      });
       throw err;
     } finally {
       isSaving.value = false;

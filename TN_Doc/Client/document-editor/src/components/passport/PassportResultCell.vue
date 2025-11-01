@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 <template>
   <!-- Редактируемая ячейка результата -->
   <InputText
@@ -20,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { logger } from '@tn-doc/shared';
 import { computed } from 'vue';
 import InputText from 'primevue/inputtext';
 import type { PassportQualityParameter } from '@/types/passport.types';
@@ -43,7 +45,7 @@ const displayValue = computed(() => {
 function handleValueChange(value: string | undefined) {
   const stringValue = value ?? '';
   emit('update:result', stringValue);
-  console.log(`[PassportResultCell] Result изменено: ${props.parameter.key} -> ${stringValue}`);
+  logger.debug(`[PassportResultCell] Result изменено: ${props.parameter.key} -> ${stringValue}`);
 }
 </script>
 

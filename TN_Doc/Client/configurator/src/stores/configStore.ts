@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { logger } from '@tn-doc/shared';
 import type { CfgApp, Device, ValidationResult } from '../types/config.types';
 import apiService from '../services/api.service';
 import _ from 'lodash';
@@ -43,12 +44,22 @@ export const useConfigStore = defineStore('config', () => {
     isLoading.value = true;
     error.value = null;
 
+    logger.debug('ConfigStore: загрузка конфигурации');
+
     try {
       const config = await apiService.getConfig();
       originalConfig.value = _.cloneDeep(config);
       currentConfig.value = _.cloneDeep(config);
+
+      logger.info('ConfigStore: конфигурация успешно загружена', {
+        deviceCount: config.Devices.length,
+        hasElisConfig: !!config.Elis
+      });
     } catch (e: any) {
       error.value = e.message || 'Не удалось загрузить конфигурацию';
+      logger.error('ConfigStore: ошибка загрузки конфигурации', {
+        error: e.message
+      });
       throw e;
     } finally {
       isLoading.value = false;
@@ -63,28 +74,43 @@ export const useConfigStore = defineStore('config', () => {
     isSaving.value = true;
     error.value = null;
 
+    logger.info('ConfigStore: сохранение конфигурации', {
+      deviceCount: currentConfig.value.Devices.length,
+      dirtyDocConfigsCount: dirtyDocumentConfigs.value.size
+    });
+
     try {
       // Валидация перед сохранением
       const validationResult = await apiService.validateConfig(currentConfig.value);
       if (!validationResult.IsValid) {
         const errorMessage = validationResult.Errors.join('\n');
         error.value = errorMessage;
+        logger.warn('ConfigStore: ошибка валидации конфигурации', {
+          errors: validationResult.Errors
+        });
         throw new Error(errorMessage);
       }
 
       // Сохранение основной конфигурации
       await apiService.saveConfig(currentConfig.value);
+      logger.debug('ConfigStore: основная конфигурация сохранена');
 
       // Сохранение измененных конфигураций документов
       for (const [path, content] of dirtyDocumentConfigs.value.entries()) {
         await apiService.saveDocumentConfig(path, content);
+        logger.debug('ConfigStore: сохранена конфигурация документа', { path });
       }
 
       // Обновляем оригинальную конфигурацию и очищаем dirty state
       originalConfig.value = _.cloneDeep(currentConfig.value);
       dirtyDocumentConfigs.value.clear();
+
+      logger.info('ConfigStore: конфигурация успешно сохранена');
     } catch (e: any) {
       error.value = e.message || 'Не удалось сохранить конфигурацию';
+      logger.error('ConfigStore: ошибка сохранения конфигурации', {
+        error: e.message
+      });
       throw e;
     } finally {
       isSaving.value = false;

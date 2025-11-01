@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 import { watch } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
 import type { UserData } from '@/types/document.types';
@@ -40,7 +41,7 @@ export function usePassportAutoFill() {
       store.updateField('Laboratory_Factory', userData.factory || '');
       store.updateField('Laboratory_Post', userData.post || '');
 
-      console.log('[PassportAutoFill] Автозаполнение полей представителя лаборатории:', {
+      logger.debug('[PassportAutoFill] Автозаполнение полей представителя лаборатории:', {
         factory: userData.factory,
         post: userData.post
       });
@@ -66,7 +67,7 @@ export function usePassportAutoFill() {
       store.updateField('Delive_Factory', userData.factory || '');
       store.updateField('Delive_Post', userData.post || '');
 
-      console.log('[PassportAutoFill] Автозаполнение полей представителя сдающей стороны:', {
+      logger.debug('[PassportAutoFill] Автозаполнение полей представителя сдающей стороны:', {
         factory: userData.factory,
         post: userData.post
       });
@@ -92,7 +93,7 @@ export function usePassportAutoFill() {
       store.updateField('Receive_Factory', userData.factory || '');
       store.updateField('Receive_Post', userData.post || '');
 
-      console.log('[PassportAutoFill] Автозаполнение полей представителя принимающей стороны:', {
+      logger.debug('[PassportAutoFill] Автозаполнение полей представителя принимающей стороны:', {
         factory: userData.factory,
         post: userData.post
       });
@@ -103,8 +104,8 @@ export function usePassportAutoFill() {
    * Установка watchers для автозаполнения
    */
   const setupAutoFillWatchers = () => {
-    console.log('[PassportAutoFill] setupAutoFillWatchers - начало установки watchers');
-    console.log('[PassportAutoFill] Текущие значения formData:', {
+    logger.debug('[PassportAutoFill] setupAutoFillWatchers - начало установки watchers');
+    logger.debug('[PassportAutoFill] Текущие значения formData:', {
       Laboratory_IOF: store.formData['Laboratory_IOF'],
       Delive_IOF: store.formData['Delive_IOF'],
       Receive_IOF: store.formData['Receive_IOF']
@@ -112,23 +113,23 @@ export function usePassportAutoFill() {
 
     // Отслеживаем изменения поля Laboratory_IOF (представитель лаборатории)
     watch(() => store.formData['Laboratory_IOF'], (newValue, oldValue) => {
-      console.log('[PassportAutoFill] Laboratory_IOF изменился:', { oldValue, newValue });
+      logger.debug('[PassportAutoFill] Laboratory_IOF изменился:', { oldValue, newValue });
       handleLaboratoryIOFChange(newValue);
     });
 
     // Отслеживаем изменения поля Delive_IOF (сдающая сторона)
     watch(() => store.formData['Delive_IOF'], (newValue, oldValue) => {
-      console.log('[PassportAutoFill] Delive_IOF изменился:', { oldValue, newValue });
+      logger.debug('[PassportAutoFill] Delive_IOF изменился:', { oldValue, newValue });
       handleDeliveIOFChange(newValue);
     });
 
     // Отслеживаем изменения поля Receive_IOF (принимающая сторона)
     watch(() => store.formData['Receive_IOF'], (newValue, oldValue) => {
-      console.log('[PassportAutoFill] Receive_IOF изменился:', { oldValue, newValue });
+      logger.debug('[PassportAutoFill] Receive_IOF изменился:', { oldValue, newValue });
       handleReceiveIOFChange(newValue);
     });
 
-    console.log('[PassportAutoFill] setupAutoFillWatchers - watchers установлены');
+    logger.debug('[PassportAutoFill] setupAutoFillWatchers - watchers установлены');
   };
 
   return {

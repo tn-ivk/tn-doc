@@ -4,6 +4,7 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
+import { logger } from '@tn-doc/shared';
 import router from './router';
 import App from './App.vue';
 
@@ -11,6 +12,14 @@ import App from './App.vue';
 import 'primeicons/primeicons.css';
 import '../../../wwwroot/css/material3.css';
 import './assets/css/tooltip-styles.css';
+
+// Инициализация логгера с глобальным контекстом
+logger.setGlobalContext({
+  component: 'DocumentEditor',
+  version: '1.4.3'
+});
+
+logger.info('DocumentEditor: инициализация приложения');
 
 const app = createApp(App);
 

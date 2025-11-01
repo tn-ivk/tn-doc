@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -35,7 +36,7 @@ export function useOpcParams() {
 
     // Проверяем наличие всех обязательных параметров
     if (!deviceName || !deviceGuid || !tagPrefix) {
-      console.warn('[useOpcParams] Отсутствуют OPC параметры в URL:', {
+      logger.warn('[useOpcParams] Отсутствуют OPC параметры в URL:', {
         deviceName,
         deviceGuid,
         tagPrefix
@@ -60,9 +61,9 @@ export function useOpcParams() {
    */
   function logOpcParams() {
     if (opcParams.value) {
-      console.log('[useOpcParams] OPC параметры получены:', opcParams.value);
+      logger.debug('[useOpcParams] OPC параметры получены:', opcParams.value);
     } else {
-      console.warn('[useOpcParams] OPC параметры отсутствуют в URL');
+      logger.warn('[useOpcParams] OPC параметры отсутствуют в URL');
     }
   }
 

@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 import { computed, watch } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
 import type {
@@ -83,7 +84,10 @@ const tryParseSerializedMethod = (value: unknown): MethodOption | null => {
       limitValueString: payload.LimitValueString
     };
   } catch (error) {
-    console.warn('[usePassportEditor] parse method failed', value, error);
+    logger.warn('usePassportEditor: parse method failed', {
+      value,
+      error: error instanceof Error ? error.message : String(error)
+    });
     return null;
   }
 };
@@ -229,7 +233,7 @@ watch(
   function handleMeasurementUpdate(event: MeasurementUpdateEvent) {
     const param = findParameter(event.paramKey);
     if (!param) {
-      console.warn(`Параметр с ключом ${event.paramKey} не найден`);
+      logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
       return;
     }
 
@@ -249,7 +253,7 @@ watch(
   function handleMethodUpdate(event: MethodUpdateEvent) {
     const param = findParameter(event.paramKey);
     if (!param) {
-      console.warn(`Параметр с ключом ${event.paramKey} не найден`);
+      logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
       return;
     }
 
@@ -276,7 +280,7 @@ watch(
   function handleResultUpdate(event: ResultUpdateEvent) {
     const param = findParameter(event.paramKey);
     if (!param) {
-      console.warn(`Параметр с ключом ${event.paramKey} не найден`);
+      logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
       return;
     }
 

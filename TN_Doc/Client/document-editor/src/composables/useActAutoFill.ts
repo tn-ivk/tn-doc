@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 import { watch } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
 import type { UserData, License } from '@/types/document.types';
@@ -65,7 +66,7 @@ export function useActAutoFill() {
         store.updateField('Delive_Lic_Number', '');
       }
 
-      console.log('[ActAutoFill] Автозаполнение полей сдающей стороны:', {
+      logger.debug('[ActAutoFill] Автозаполнение полей сдающей стороны:', {
         factory: userData.factory,
         fio: userData.fio,
         licId: userData.licId
@@ -109,7 +110,7 @@ export function useActAutoFill() {
         store.updateField('Receive_Lic_Number', '');
       }
 
-      console.log('[ActAutoFill] Автозаполнение полей принимающей стороны:', {
+      logger.debug('[ActAutoFill] Автозаполнение полей принимающей стороны:', {
         factory: userData.factory,
         fio: userData.fio,
         licId: userData.licId

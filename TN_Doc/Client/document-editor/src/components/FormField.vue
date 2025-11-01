@@ -90,6 +90,7 @@
 </template>
 
 <script setup lang="ts">
+import { logger } from '@tn-doc/shared';
 import { ref, computed, watch, onMounted } from 'vue';
 import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
@@ -119,7 +120,7 @@ function convertToDate(value: any, fieldType: string): any {
     try {
       return new Date(value);
     } catch (e) {
-      console.error('[FormField] Ошибка конвертации даты:', e);
+      logger.error('FormField: ошибка конвертации даты', { error: e instanceof Error ? e.message : String(e) });
       return value;
     }
   }
@@ -137,7 +138,7 @@ function convertFromDate(value: any, fieldType: string): any {
   if ((fieldType === 'datetime-local' || fieldType === 'date') && value instanceof Date) {
     // Проверяем что дата валидна
     if (isNaN(value.getTime())) {
-      console.error('[FormField] Невалидная дата:', value);
+      logger.error('FormField: невалидная дата', { value });
       return null;
     }
 
@@ -153,7 +154,7 @@ onMounted(() => {
   if (props.field.type === 'select' && props.field.options) {
     validSelectOptions.value.forEach((opt, idx) => {
       if (!opt.label || opt.value === undefined || opt.label.trim() === '' || opt.value === '') {
-        console.error('[FormField] ОШИБКА: некорректная опция #' + idx + ' для поля', props.field.key + ':', opt);
+        logger.error('FormField: некорректная опция', { fieldKey: props.field.key, optionIndex: idx, option: opt });
       }
     });
   }
@@ -223,7 +224,7 @@ watch(() => props.modelValue, (newValue) => {
 function handleChange() {
   // Конвертируем Date обратно в строку для datetime-local/date полей перед отправкой
   const valueToEmit = convertFromDate(localValue.value, props.field.type);
-  console.log('[FormField]', props.field.key, '- handleChange, отправка значения:', valueToEmit);
+  logger.debug('FormField: handleChange', { fieldKey: props.field.key, value: valueToEmit });
   emit('update:modelValue', valueToEmit);
 }
 </script>

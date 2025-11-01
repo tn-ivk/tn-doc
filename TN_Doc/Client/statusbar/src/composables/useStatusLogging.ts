@@ -1,6 +1,11 @@
 /**
- * Composable для логирования событий статус-бара
- * Интегрируется с существующим ClientLogController TN_Doc
+ * @deprecated Используйте logger из @tn-doc/shared
+ *
+ * Этот composable устарел и оставлен для обратной совместимости.
+ * Вместо него используйте:
+ *
+ * import { logger } from '@tn-doc/shared';
+ * logger.info('сообщение', { context });
  */
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';

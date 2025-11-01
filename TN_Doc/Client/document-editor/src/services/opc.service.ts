@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 import axios, { type AxiosInstance } from 'axios';
 
 /**
@@ -30,11 +31,17 @@ class OpcApiService {
     // Интерсептор для логирования запросов
     this.api.interceptors.request.use(
       (config) => {
-        console.log('[OPC API] Запрос:', config.method?.toUpperCase(), config.url, config.data);
+        logger.debug('OPC API: запрос', {
+          method: config.method?.toUpperCase(),
+          url: config.url,
+          data: config.data
+        });
         return config;
       },
       (error) => {
-        console.error('[OPC API] Ошибка запроса:', error);
+        logger.error('OPC API: ошибка запроса', {
+          error: error instanceof Error ? error.message : String(error)
+        });
         return Promise.reject(error);
       }
     );
@@ -42,11 +49,17 @@ class OpcApiService {
     // Интерсептор для логирования ответов
     this.api.interceptors.response.use(
       (response) => {
-        console.log('[OPC API] Ответ:', response.status, response.data);
+        logger.debug('OPC API: ответ', {
+          status: response.status,
+          data: response.data
+        });
         return response;
       },
       (error) => {
-        console.error('[OPC API] Ошибка ответа:', error.response?.status, error.response?.data);
+        logger.error('OPC API: ошибка ответа', {
+          status: error.response?.status,
+          data: error.response?.data
+        });
         return Promise.reject(error);
       }
     );
@@ -70,7 +83,7 @@ class OpcApiService {
       const response = await this.api.get(url);
       return response.data;
     } catch (error: any) {
-      console.error('[OPC API] Ошибка чтения тега:', { deviceName, tagName, error: error.message });
+      logger.error('[OPC API] Ошибка чтения тега:', { deviceName, tagName, error: error.message });
       throw new Error(`Не удалось прочитать тег ${tagName}: ${error.message}`);
     }
   }
@@ -100,9 +113,9 @@ class OpcApiService {
       };
 
       await this.api.put('/', payload);
-      console.log('[OPC API] Тег успешно записан:', { deviceName, tagName, value });
+      logger.debug('[OPC API] Тег успешно записан:', { deviceName, tagName, value });
     } catch (error: any) {
-      console.error('[OPC API] Ошибка записи тега:', { deviceName, tagName, value, error: error.message });
+      logger.error('[OPC API] Ошибка записи тега:', { deviceName, tagName, value, error: error.message });
       throw new Error(`Не удалось записать тег ${tagName}: ${error.message}`);
     }
   }
@@ -141,7 +154,7 @@ class OpcApiService {
     try {
       // Читаем начальное значение тега
       const initialValue = await this.readTag(deviceName, tagName, namespaceIndex, indexArray);
-      console.log('[OPC API] Polling начат. Начальное значение тега:', initialValue);
+      logger.debug('[OPC API] Polling начат. Начальное значение тега:', initialValue);
 
       return new Promise<boolean>((resolve) => {
         const intervalId = setInterval(async () => {
@@ -154,7 +167,7 @@ class OpcApiService {
 
             // Проверяем условие
             if (expectedChange(currentValue, initialValue)) {
-              console.log('[OPC API] Polling завершен успешно. Текущее значение:', currentValue);
+              logger.debug('OPC API: polling завершен успешно', { currentValue });
               clearInterval(intervalId);
               resolve(true);
               return;
@@ -162,19 +175,23 @@ class OpcApiService {
 
             // Проверяем таймаут
             if (elapsed >= maxDuration) {
-              console.warn('[OPC API] Polling завершен по таймауту. Текущее значение:', currentValue);
+              logger.warn('OPC API: polling завершен по таймауту', { currentValue });
               clearInterval(intervalId);
               resolve(false);
               return;
             }
           } catch (error) {
-            console.error('[OPC API] Ошибка при чтении тега в polling:', error);
+            logger.error('OPC API: ошибка при чтении тега в polling', {
+              error: error instanceof Error ? error.message : String(error)
+            });
             // Продолжаем polling даже при ошибке чтения
           }
         }, pollInterval);
       });
     } catch (error) {
-      console.error('[OPC API] Ошибка при инициализации polling:', error);
+      logger.error('OPC API: ошибка при инициализации polling', {
+        error: error instanceof Error ? error.message : String(error)
+      });
       return false;
     }
   }

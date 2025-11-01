@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 import { useDocumentStore } from '@/stores/documentStore';
 import { documentApi } from '@/services/api.service';
 import { opcApi } from '@/services/opc.service';
@@ -38,7 +39,7 @@ export function usePassportSave() {
       // Проверяем, что это паспорт (DocGUID == 1)
       const isPassport = config.docType === 'Passport';
       if (!isPassport) {
-        console.warn('[usePassportSave] Документ не является паспортом, пропускаем OPC логику');
+        logger.warn('[usePassportSave] Документ не является паспортом, пропускаем OPC логику');
         // Для не-паспортов просто сохраняем
         await documentApi.saveDocument(
           config.deviceId,
@@ -51,23 +52,23 @@ export function usePassportSave() {
       }
 
       // Шаг 1: Сохранить документ
-      console.log('[usePassportSave] Шаг 1: Сохранение паспорта...');
+      logger.debug('[usePassportSave] Шаг 1: Сохранение паспорта...');
       await documentApi.saveDocument(
         config.deviceId,
         config.docType,
         config.docId,
         store.formData
       );
-      console.log('[usePassportSave] Шаг 1: Паспорт успешно сохранен');
+      logger.debug('[usePassportSave] Шаг 1: Паспорт успешно сохранен');
 
       // Проверяем наличие OPC параметров
       if (!opcParams) {
-        console.warn('[usePassportSave] Отсутствуют OPC параметры, пропускаем OPC логику');
+        logger.warn('[usePassportSave] Отсутствуют OPC параметры, пропускаем OPC логику');
         store.isDirty = false;
         return true;
       }
       // Шаг 2: Записать в OPC тег ARM.ARM_FillActAndPassport = true
-      console.log('[usePassportSave] Шаг 2: Запись в OPC тег ARM.ARM_FillActAndPassport...');
+      logger.debug('[usePassportSave] Шаг 2: Запись в OPC тег ARM.ARM_FillActAndPassport...');
       const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
       await opcApi.writeTag(
         opcParams.deviceName, // Имя устройства ("ИВК-1"), а не ID!
@@ -76,10 +77,10 @@ export function usePassportSave() {
         2, // namespaceIndex
         0  // indexArray для записи
       );
-      console.log('[usePassportSave] Шаг 2: Тег успешно записан');
+      logger.debug('[usePassportSave] Шаг 2: Тег успешно записан');
 
       // Шаг 3: Polling тега ARM.ARM_FillActAndPassportResult
-      console.log('[usePassportSave] Шаг 3: Ожидание подтверждения от ИВК (polling)...');
+      logger.debug('[usePassportSave] Шаг 3: Ожидание подтверждения от ИВК (polling)...');
       const resultTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassportResult', opcParams.tagPrefix);
 
       const pollingSuccess = await opcApi.pollTag(
@@ -93,15 +94,15 @@ export function usePassportSave() {
       );
 
       if (!pollingSuccess) {
-        console.warn('[usePassportSave] Polling завершился по таймауту, документ сохранен, но ИВК не подтвердил запись');
+        logger.warn('[usePassportSave] Polling завершился по таймауту, документ сохранен, но ИВК не подтвердил запись');
         // Возвращаем false, чтобы показать пользователю предупреждение
         return false;
       }
 
-      console.log('[usePassportSave] Шаг 3: ИВК подтвердил запись');
+      logger.debug('[usePassportSave] Шаг 3: ИВК подтвердил запись');
 
       // Шаг 4: Объединить данные из localStorage
-      console.log('[usePassportSave] Шаг 4: Объединение данных из localStorage...');
+      logger.debug('[usePassportSave] Шаг 4: Объединение данных из localStorage...');
       let mergedData = { ...store.formData };
 
       try {
@@ -112,29 +113,31 @@ export function usePassportSave() {
             ...mergedData,
             ...passportData
           };
-          console.log('[usePassportSave] Данные из localStorage успешно объединены');
+          logger.debug('[usePassportSave] Данные из localStorage успешно объединены');
         } else {
-          console.log('[usePassportSave] Данные в localStorage отсутствуют');
+          logger.debug('[usePassportSave] Данные в localStorage отсутствуют');
         }
       } catch (error) {
-        console.error('[usePassportSave] Ошибка при чтении/парсинге данных из localStorage:', error);
+        logger.error('usePassportSave: ошибка при чтении/парсинге данных из localStorage', {
+          error: error instanceof Error ? error.message : String(error)
+        });
         // Продолжаем без объединения данных
       }
 
       // Шаг 5: Обновить документ через UpdateDoc
-      console.log('[usePassportSave] Шаг 5: Обновление документа с объединенными данными...');
+      logger.debug('[usePassportSave] Шаг 5: Обновление документа с объединенными данными...');
       await documentApi.updateDocument(
         config.deviceId,
         config.docType,
         config.docId,
         mergedData
       );
-      console.log('[usePassportSave] Шаг 5: Документ успешно обновлен');
+      logger.debug('[usePassportSave] Шаг 5: Документ успешно обновлен');
 
       store.isDirty = false;
       return true;
     } catch (error: any) {
-      console.error('[usePassportSave] Ошибка при сохранении:', error);
+      logger.error('[usePassportSave] Ошибка при сохранении:', error);
       throw error;
     } finally {
       store.isSaving = false;
@@ -164,7 +167,7 @@ export function usePassportSave() {
     store.isSaving = true;
 
     try {
-      console.log(`[usePassportSave] Сохранение документа типа ${docType} без OPC логики`);
+      logger.debug(`[usePassportSave] Сохранение документа типа ${docType} без OPC логики`);
       await documentApi.saveDocument(
         store.config.deviceId,
         store.config.docType,
@@ -174,7 +177,7 @@ export function usePassportSave() {
       store.isDirty = false;
       return true;
     } catch (error: any) {
-      console.error('[usePassportSave] Ошибка при сохранении документа:', error);
+      logger.error('[usePassportSave] Ошибка при сохранении документа:', error);
       throw error;
     } finally {
       store.isSaving = false;

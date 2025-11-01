@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { logger } from '@tn-doc/shared';
 import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
@@ -53,15 +54,23 @@ const { pause, resume } = useIntervalFn(() => {
 // SignalR real-time обновления
 on('statusUpdated', (data: StatusResponse) => {
   store.updateFromSignalR(data);
+  logger.trace('StatusBar: получено обновление через SignalR', {
+    deviceCount: data.devices?.length || 0
+  });
 });
 
 // Начальная загрузка
 onMounted(() => {
+  logger.debug('StatusBar: компонент монтирован, загрузка статусов');
   store.fetchStatus();
 });
 
 function handleDeviceClick(device: DeviceStatus) {
-  console.log('Device clicked:', device);
+  logger.debug('StatusBar: клик по устройству', {
+    deviceId: device.id,
+    deviceName: device.name,
+    isConnected: device.isConnected
+  });
   // Будущее: показать модальное окно с деталями устройства
 }
 

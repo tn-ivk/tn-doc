@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 <template>
   <div class="passport-editor">
     <!-- Индикатор загрузки -->
@@ -64,6 +65,7 @@
 </template>
 
 <script setup lang="ts">
+import { logger } from '@tn-doc/shared';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FormField from '@/components/FormField.vue';
@@ -105,7 +107,7 @@ onMounted(async () => {
 
   if (!deviceId || !id) {
     store.error = 'Отсутствуют обязательные параметры маршрута';
-    console.error('[DocumentPassportEditor] Отсутствуют параметры маршрута');
+    logger.error('[DocumentPassportEditor] Отсутствуют параметры маршрута');
     return;
   }
 

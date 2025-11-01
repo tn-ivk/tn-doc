@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
               <template>
   <div class="method-field">
     <Select
@@ -22,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+import { logger } from '@tn-doc/shared';
 import { computed, onMounted } from 'vue';
 import Select from 'primevue/select';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
@@ -38,9 +40,9 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-  console.log('[PassportMethodSelect] Монтирование select метода для параметра:', props.parameter.key);
-  console.log('[PassportMethodSelect] Выбранный метод:', props.parameter.method.selected);
-  console.log('[PassportMethodSelect] Количество опций:', methodOptions.value.length);
+  logger.debug('PassportMethodSelect: монтирование', { paramKey: props.parameter.key });
+  logger.debug('PassportMethodSelect: выбранный метод', { selected: props.parameter.method.selected });
+  logger.debug('PassportMethodSelect: количество опций', { count: methodOptions.value.length });
 });
 
 /**

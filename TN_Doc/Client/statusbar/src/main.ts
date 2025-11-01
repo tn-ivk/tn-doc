@@ -4,6 +4,7 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import Tooltip from 'primevue/tooltip';
 import 'primeicons/primeicons.css';
+import { logger } from '@tn-doc/shared';
 import App from './App.vue';
 
 /**
@@ -14,11 +15,19 @@ function initStatusBar() {
   const container = document.getElementById('status-bar');
 
   if (!container) {
-    console.warn('[StatusBar] Container element not found. Status bar will not be initialized.');
+    logger.warn('StatusBar: контейнер #status-bar не найден, инициализация пропущена');
     return;
   }
 
   try {
+    // Инициализация логгера с глобальным контекстом
+    logger.setGlobalContext({
+      component: 'StatusBar',
+      version: '1.4.3'
+    });
+
+    logger.info('StatusBar: инициализация приложения');
+
     const app = createApp(App);
     const pinia = createPinia();
 
@@ -140,9 +149,9 @@ function initStatusBar() {
 
     app.mount(container);
 
-    console.info('[StatusBar] Application initialized successfully');
+    logger.info('StatusBar: приложение успешно инициализировано');
   } catch (error) {
-    console.error('[StatusBar] Failed to initialize:', error);
+    logger.exception(error as Error, 'StatusBar: ошибка инициализации');
   }
 }
 

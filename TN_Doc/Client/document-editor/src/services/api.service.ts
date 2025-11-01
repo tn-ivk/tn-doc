@@ -1,3 +1,4 @@
+import { logger } from '@tn-doc/shared';
 import axios, { type AxiosInstance } from 'axios';
 import type { DocumentEditConfig, SaveDocumentRequest, SaveDocumentResponse } from '@/types/document.types';
 
@@ -37,7 +38,9 @@ class DocumentApiService {
       const response = await this.api.get('/health');
       return response.data.status === 'healthy';
     } catch (error) {
-      console.error('Health check failed:', error);
+      logger.error('API: health check failed', {
+        error: error instanceof Error ? error.message : String(error)
+      });
       return false;
     }
   }
@@ -54,18 +57,18 @@ class DocumentApiService {
     id: number
   ): Promise<DocumentEditConfig> {
     const url = `/${deviceId}/${docType}/edit/${id}`;
-    console.log('[API] getEditConfig - запрос:', { deviceId, docType, id, url });
+    logger.debug('API: getEditConfig запрос', { deviceId, docType, id, url });
 
     const response = await this.api.get<DocumentEditConfig>(url);
 
-    console.log('[API] getEditConfig - ответ получен');
-    console.log('[API] getEditConfig - статус:', response.status);
-    console.log('[API] getEditConfig - данные (сырой JSON):', JSON.stringify(response.data, null, 2));
+    logger.debug('API: getEditConfig ответ получен');
+    logger.debug('API: getEditConfig статус', { status: response.status });
+    logger.trace('API: getEditConfig данные', { data: response.data });
 
     // Детальная проверка fields и initialValues
     if (response.data) {
-      console.log('[API] getEditConfig - количество полей:', response.data.fields?.length);
-      console.log('[API] getEditConfig - количество initialValues:', Object.keys(response.data.initialValues || {}).length);
+      logger.debug('API: getEditConfig количество полей', { count: response.data.fields?.length });
+      logger.debug('API: getEditConfig количество initialValues', { count: Object.keys(response.data.initialValues || {}).length });
 
       // Ищем поля, связанные с датой/временем
       const dateFields = response.data.fields?.filter(f =>
@@ -76,14 +79,16 @@ class DocumentApiService {
       );
 
       if (dateFields && dateFields.length > 0) {
-        console.log('[API] getEditConfig - 🔍 Найдены поля даты/времени:', dateFields.map(f => ({
-          key: f.key,
-          label: f.label,
-          type: f.type,
-          initialValue: response.data.initialValues?.[f.key]
-        })));
+        logger.debug('API: getEditConfig найдены поля даты/времени', {
+          fields: dateFields.map(f => ({
+            key: f.key,
+            label: f.label,
+            type: f.type,
+            initialValue: response.data.initialValues?.[f.key]
+          }))
+        });
       } else {
-        console.warn('[API] getEditConfig - ⚠️ Не найдены поля даты/времени');
+        logger.warn('API: getEditConfig не найдены поля даты/времени');
       }
     }
 
@@ -123,12 +128,12 @@ class DocumentApiService {
     id: number,
     data: SaveDocumentRequest
   ): Promise<SaveDocumentResponse> {
-    console.log('[API] updateDocument - запрос:', { deviceId, docType, id });
+    logger.debug('API: updateDocument запрос', { deviceId, docType, id });
     const response = await this.api.post<SaveDocumentResponse>(
       `/${deviceId}/${docType}/update/${id}`,
       data
     );
-    console.log('[API] updateDocument - документ успешно обновлен');
+    logger.info('API: updateDocument успешно', { deviceId, docType, id });
     return response.data;
   }
 
@@ -138,29 +143,29 @@ class DocumentApiService {
    */
   async getInvalidChars(deviceId: number): Promise<string[]> {
     try {
-      console.log('[API] Запрос некорректных символов для устройства:', deviceId);
+      logger.debug('API: запрос некорректных символов', { deviceId });
       const response = await axios.get<any>('/Home/GetInvalideChars', {
         params: { IdDevice: deviceId }
       });
 
-      console.log('[API] Ответ сервера (сырой):', response.data);
-      console.log('[API] Тип ответа:', typeof response.data, Array.isArray(response.data) ? '(массив)' : '');
+      logger.trace('API: ответ сервера', { data: response.data });
+      logger.trace('API: тип ответа', { type: typeof response.data, isArray: Array.isArray(response.data) });
 
       // Axios автоматически парсит JSON, проверяем тип
       if (Array.isArray(response.data)) {
-        console.log('[API] Возвращаем массив напрямую:', response.data);
+        logger.debug('API: возвращаем массив напрямую', { data: response.data });
         return response.data;
       } else if (typeof response.data === 'string' && response.data) {
         // Если вернулась строка, парсим её
         const parsed = JSON.parse(response.data);
-        console.log('[API] Распарсенный массив из строки:', parsed);
+        logger.debug('API: распарсен массив из строки', { parsed });
         return parsed;
       }
 
-      console.log('[API] Пустой или некорректный ответ от сервера');
+      logger.warn('API: пустой или некорректный ответ от сервера');
       return [];
     } catch (error) {
-      console.error('[API] Ошибка при получении списка некорректных символов:', error);
+      logger.error('API: ошибка получения некорректных символов', { error: error instanceof Error ? error.message : String(error) });
       return [];
     }
   }
