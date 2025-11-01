@@ -54,23 +54,24 @@ export const useDocumentStore = defineStore('document', () => {
     // Дополнительная валидация для паспорта качества (таблица Edit)
     if (config.value.docType === 'Passport') {
       const passportConfig = config.value as PassportEditConfig;
-      const parameters = passportConfig.qualityParameters || [];
+      const parametersSchema = passportConfig.qualityParametersSchema || [];
 
-      for (const param of parameters) {
-        const measurement = (param.values?.measurement ?? '').toString();
+      for (const paramSchema of parametersSchema) {
+        // Берем значения из formData вместо param.values
+        const measurement = (formData.value[`value.${paramSchema.key}`] ?? '').toString();
 
         // Проверка обязательных полей измерения
-        if (param.requiredFill) {
+        if (paramSchema.requiredFill) {
           if (!measurement || measurement === '') {
             return true;
           }
         }
 
         // Проверка количества знаков после запятой
-        if (param.roundValue && measurement) {
+        if (paramSchema.roundValue && measurement) {
           const normalized = measurement.replace(',', '.');
           const parts = normalized.split('.');
-          if (parts.length > 1 && parts[1].length > param.roundValue) {
+          if (parts.length > 1 && parts[1].length > paramSchema.roundValue) {
             return true;
           }
         }

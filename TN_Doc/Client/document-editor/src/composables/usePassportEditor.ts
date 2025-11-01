@@ -1,96 +1,15 @@
 import { logger } from '@tn-doc/shared';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
 import type {
   PassportEditConfig,
   PassportQualityParameter,
+  PassportQualityParameterSchema,
   MethodOption,
   MeasurementUpdateEvent,
   MethodUpdateEvent,
   ResultUpdateEvent
 } from '@/types/passport.types';
-
-interface SerializedMethodPayload {
-  Id: number;
-  Use: boolean;
-  IdParameter: number;
-  Name: string;
-  LimitValueActivate: boolean;
-  LimitValue: number;
-  LimitValueString: string;
-  IsDefault: boolean;
-}
-
-interface SerializedMethodPayload {
-  Id: number;
-  Use: boolean;
-  IdParameter: number;
-  Name: string;
-  LimitValueActivate: boolean;
-  LimitValue: number;
-  LimitValueString: string;
-  IsDefault: boolean;
-}
-
-const serializeMethodOption = (option: MethodOption | null): string => {
-  if (!option || !option.name || option.name.trim() === '') {
-    return '';
-  }
-
-  const payload: SerializedMethodPayload = {
-    Id: option.id,
-    Use: option.use,
-    IdParameter: option.idParameter,
-    Name: option.name,
-    LimitValueActivate: option.limitValueActivate,
-    LimitValue: option.limitValue ?? 0,
-    LimitValueString: option.limitValueString ?? '',
-    IsDefault: option.isDefault
-  };
-
-  return JSON.stringify(payload);
-};
-
-const tryParseSerializedMethod = (value: unknown): MethodOption | null => {
-  if (typeof value !== 'string' || value.trim() == '') {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(value) as Partial<SerializedMethodPayload>;
-    if (!parsed || typeof parsed !== 'object' || typeof parsed.Name !== 'string') {
-      return null;
-    }
-
-    const payload: SerializedMethodPayload = {
-      Id: typeof parsed.Id === 'number' ? parsed.Id : 0,
-      Use: Boolean(parsed.Use),
-      IdParameter: typeof parsed.IdParameter === 'number' ? parsed.IdParameter : 0,
-      Name: parsed.Name,
-      LimitValueActivate: Boolean(parsed.LimitValueActivate),
-      LimitValue: typeof parsed.LimitValue === 'number' ? parsed.LimitValue : 0,
-      LimitValueString: typeof parsed.LimitValueString === 'string' ? parsed.LimitValueString : '',
-      IsDefault: Boolean(parsed.IsDefault)
-    };
-
-    return {
-      id: payload.Id,
-      use: payload.Use,
-      idParameter: payload.IdParameter,
-      name: payload.Name,
-      isDefault: payload.IsDefault,
-      limitValueActivate: payload.LimitValueActivate,
-      limitValue: payload.LimitValue,
-      limitValueString: payload.LimitValueString
-    };
-  } catch (error) {
-    logger.warn('usePassportEditor: parse method failed', {
-      value,
-      error: error instanceof Error ? error.message : String(error)
-    });
-    return null;
-  }
-};
 
 /**
  * Композабл для работы с редактором паспорта качества
@@ -110,50 +29,66 @@ export function usePassportEditor() {
   });
 
   /**
-   * Качественные параметры из конфигурации
+   * Схема параметров качества из конфигурации (только метаданные)
    */
-  const qualityParameters = computed<PassportQualityParameter[]>(() => {
-    return passportConfig.value?.qualityParameters || [];
+  const qualityParametersSchema = computed<PassportQualityParameterSchema[]>(() => {
+    return passportConfig.value?.qualityParametersSchema || [];
   });
 
-let methodsHydrated = false;
-
-watch(
-  () => qualityParameters.value,
-  (params) => {
-    if (methodsHydrated || !params || params.length === 0) {
-      return;
+  /**
+   * Вычисляемое свойство для объединения схемы + данных из formData
+   * Создает полные объекты PassportQualityParameter динамически
+   */
+  const qualityParameters = computed<PassportQualityParameter[]>(() => {
+    const schema = qualityParametersSchema.value;
+    if (schema.length === 0) {
+      return [];
     }
 
-    params.forEach((param) => {
-      const storedValue = store.formData[`method.${param.key}`];
-      const parsedOption = tryParseSerializedMethod(storedValue);
-      if (!parsedOption) {
-        return;
+    return schema.map(paramSchema => {
+      // Извлекаем данные из formData
+      const measurementValue = store.formData[`value.${paramSchema.key}`] || '';
+      const resultValue = store.formData[`result.${paramSchema.key}`] || '';
+      const methodJson = store.formData[`method.${paramSchema.key}`] || '';
+      const documentNumber = store.formData[`document.${paramSchema.key}`] || '';
+
+      // Парсим выбранный метод
+      const selectedMethod = tryParseMethod(methodJson);
+      const selectedMethodName = selectedMethod?.name || '';
+
+      // Определяем флаги ELIS
+      const elisFlags = {
+        measurement: store.formData[`value.${paramSchema.key}__elisFilled`] === true,
+        method: store.formData[`method.${paramSchema.key}__elisFilled`] === true,
+        result: store.formData[`result.${paramSchema.key}__elisFilled`] === true,
+        document: store.formData[`document.${paramSchema.key}__elisFilled`] === true
+      };
+
+      // Объединяем методы из схемы + выбранный метод (если есть и его нет в списке)
+      const methodOptions = [...paramSchema.methodOptions];
+      if (selectedMethod && !methodOptions.find(m => m.name === selectedMethod.name)) {
+        methodOptions.push(selectedMethod);
       }
 
-      const existingIndex = param.method.options.findIndex(
-        (option) => option.name === parsedOption.name
-      );
-
-      if (existingIndex >= 0) {
-        param.method.options[existingIndex] = {
-          ...param.method.options[existingIndex],
-          ...parsedOption
-        };
-      } else {
-        param.method.options.push(parsedOption);
-      }
-
-      if (!param.method.selected || param.method.selected.trim() === '') {
-        param.method.selected = parsedOption.name;
-      }
+      // Создаем полный объект параметра
+      return {
+        ...paramSchema,
+        values: {
+          measurement: measurementValue,
+          result: resultValue
+        },
+        method: {
+          selected: selectedMethodName,
+          options: methodOptions
+        },
+        document: documentNumber ? {
+          number: documentNumber,
+          elisFilled: elisFlags.document
+        } : undefined,
+        elisFlags
+      };
     });
-
-    methodsHydrated = true;
-  },
-  { immediate: true }
-);
+  });
 
   /**
    * Используется ли ELIS для данного устройства
@@ -237,12 +172,18 @@ watch(
       return;
     }
 
-    param.values.measurement = event.value;
-    param.values.result = recalculateResult(param);
+    // Пересчитываем результат с новым measurement
+    const tempParam = {
+      ...param,
+      values: { ...param.values, measurement: event.value }
+    };
+    const newResult = recalculateResult(tempParam);
+
+    // Обновляем formData
     store.bulkUpdateFields({
       [`value.${event.paramKey}`]: event.value,
       [`value.${event.paramKey}__elisFilled`]: false,
-      [`result.${event.paramKey}`]: param.values.result,
+      [`result.${event.paramKey}`]: newResult,
       [`result.${event.paramKey}__elisFilled`]: false
     });
   }
@@ -258,18 +199,22 @@ watch(
     }
 
     const methodOption = event.method;
-    param.method.selected = methodOption?.name || '';
-    if (methodOption) {
-      const existing = param.method.options.find(opt => opt.name === methodOption.name);
-      if (!existing) {
-        param.method.options.push(methodOption);
+    const methodJson = methodOption ? serializeMethodOption(methodOption) : '';
+
+    // Пересчитываем результат с новым методом
+    const tempParam = {
+      ...param,
+      method: {
+        selected: methodOption?.name || '',
+        options: param.method.options
       }
-    }
-    param.values.result = recalculateResult(param);
+    };
+    const newResult = recalculateResult(tempParam);
+
     store.bulkUpdateFields({
-      [`method.${event.paramKey}`]: serializeMethodOption(methodOption),
+      [`method.${event.paramKey}`]: methodJson,
       [`method.${event.paramKey}__elisFilled`]: false,
-      [`result.${event.paramKey}`]: param.values.result,
+      [`result.${event.paramKey}`]: newResult,
       [`result.${event.paramKey}__elisFilled`]: false
     });
   }
@@ -284,17 +229,70 @@ watch(
       return;
     }
 
-    param.values.result = event.value;
-    param.elisFlags.result = false;
     store.bulkUpdateFields({
       [`result.${event.paramKey}`]: event.value,
       [`result.${event.paramKey}__elisFilled`]: false
     });
   }
 
+  /**
+   * Вспомогательная функция сериализации метода в JSON строку
+   */
+  function serializeMethodOption(option: MethodOption | null): string {
+    if (!option || !option.name || option.name.trim() === '') {
+      return '';
+    }
+
+    const payload = {
+      Id: option.id,
+      Use: option.use,
+      IdParameter: option.idParameter,
+      Name: option.name,
+      LimitValueActivate: option.limitValueActivate,
+      LimitValue: option.limitValue ?? 0,
+      LimitValueString: option.limitValueString ?? '',
+      IsDefault: option.isDefault
+    };
+
+    return JSON.stringify(payload);
+  }
+
+  /**
+   * Вспомогательная функция парсинга метода из JSON строки
+   */
+  function tryParseMethod(methodJson: string): MethodOption | null {
+    if (!methodJson || methodJson.trim() === '') {
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(methodJson);
+      if (!parsed || typeof parsed !== 'object' || typeof parsed.Name !== 'string') {
+        return null;
+      }
+
+      return {
+        id: parsed.Id || 0,
+        use: Boolean(parsed.Use),
+        idParameter: parsed.IdParameter || 0,
+        name: parsed.Name,
+        isDefault: Boolean(parsed.IsDefault),
+        limitValueActivate: Boolean(parsed.LimitValueActivate),
+        limitValue: parsed.LimitValue || 0,
+        limitValueString: parsed.LimitValueString || ''
+      };
+    } catch (error) {
+      logger.warn('usePassportEditor: parse method failed', {
+        methodJson,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return null;
+    }
+  }
+
   return {
     passportConfig,
-    qualityParameters,
+    qualityParameters, // Теперь вычисляется динамически из схемы + formData!
     isElisUsed,
     hasQualityParameters,
     findParameter,
