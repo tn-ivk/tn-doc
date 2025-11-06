@@ -12,8 +12,7 @@
   font-size: 14px;
   font-family: Arial, sans-serif !important;
   max-height: 90vh; /* Максимальная высота - 90% высоты экрана */
-  display: flex;
-  flex-direction: column;
+  min-width: 600px; /* Минимальная ширина окна */
 }
 
 #elis .modal-header {
@@ -40,7 +39,8 @@
   margin: 0 !important;
   border-bottom: 1px solid var(--md-outline-light);
   overflow-y: auto; /* Вертикальный скроллинг при переполнении */
-  max-height: calc(90vh - 150px); /* Максимальная высота с учётом header и footer */
+  flex: 1; /* Занимает всё доступное пространство */
+  min-height: 0; /* Важно для корректной работы overflow в flex контейнере */
 }
 
 #elis .modal-info {
@@ -102,6 +102,9 @@
   border: none !important;
   padding: 0 !important;
   margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Максимальная высота содержимого */
 }
 
 #elis div.modal-footer {
@@ -111,12 +114,10 @@
 }
 
 #elis .list-group {
-  width: calc(100% - 20px); /* Ширина кнопки с учетом отступов */
+  width: calc(100% - 20px); /* Ширина с учетом отступов */
   margin: 10px;
   font-size: 14px;
   font-family: Arial, sans-serif;
-  overflow-y: auto; /* Вертикальный скроллинг для списка */
-  flex: 1; /* Занимает доступное пространство */
 }
 
 #elis .list-group-item {
