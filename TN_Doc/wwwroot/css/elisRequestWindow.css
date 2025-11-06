@@ -33,14 +33,13 @@
   background-color: transparent !important; /* Убираем фон */
   display: flex;
   flex-direction: column;
-  justify-content: left;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   padding: 0 !important;
   margin: 0 !important;
   border-bottom: 1px solid var(--md-outline-light);
   overflow-y: auto; /* Вертикальный скроллинг при переполнении */
-  flex: 1; /* Занимает всё доступное пространство */
-  min-height: 0; /* Важно для корректной работы overflow в flex контейнере */
+  max-height: calc(90vh - 180px); /* Ограничение по высоте для скроллинга */
 }
 
 #elis .modal-info {
@@ -105,6 +104,7 @@
   display: flex;
   flex-direction: column;
   max-height: 90vh; /* Максимальная высота содержимого */
+  min-height: 200px; /* Минимальная высота окна */
 }
 
 #elis div.modal-footer {
@@ -121,6 +121,10 @@
 }
 
 #elis .list-group-item {
-  
   display: block; /* Блоковый элемент для полной ширины */
+  padding: 12px 15px; /* Отступы внутри элемента */
+  min-height: 70px; /* Минимальная высота элемента протокола */
+  line-height: 1.5; /* Межстрочный интервал */
+  white-space: normal; /* Разрешить перенос текста */
+  word-wrap: break-word; /* Перенос длинных слов */
 }
