@@ -128,3 +128,7 @@
   white-space: normal; /* Разрешить перенос текста */
   word-wrap: break-word; /* Перенос длинных слов */
 }
+
+#elis .list-group-item b {
+  font-weight: normal; /* Убрать жирное начертание с меток */
+}
