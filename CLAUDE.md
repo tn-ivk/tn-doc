@@ -14,7 +14,7 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **Critical Rules:**
 - NEVER mention AI, code generation, or "Claude" in commit messages
 - Use Russian language for all commit messages
-- Current active branch: feature/additional-info-table
+- Current active branch: feature/passport-edit-config-refactoring
 
 ## Essential Commands
 
@@ -25,9 +25,10 @@ cd TN_Doc && dotnet run                         # Run app (http://localhost:3850
 
 # Vue components (from TN_Doc/Client/)
 npm run build:all                               # Build all Vue apps
-npm run dev                                     # StatusBar dev server
-npm run dev:configurator                        # Configurator dev server
-npm run dev:editor                              # Document Editor dev server (experimental POC)
+npm run dev                                     # StatusBar dev server (port 5173)
+npm run dev:configurator                        # Configurator dev server (port 5174)
+npm run dev:editor                              # Document Editor dev server (⚠️ POC only, port 5175)
+npm run clean                                   # Clean all build artifacts
 
 # Testing
 dotnet test                                     # Run all tests
@@ -84,9 +85,9 @@ tn_doc/
 │   ├── Cfg/                   # Document and app configuration files
 │   ├── Doc/                   # FastReport templates (*.frx)
 │   └── Client/                # Frontend Vue 3 applications (npm workspaces)
-│       ├── statusbar/         # Real-time status monitoring (Vue 3 + PrimeVue)
-│       ├── configurator/      # Configuration management UI (v1.4.2+)
-│       ├── document-editor/   # Experimental document editing (POC, not production)
+│       ├── statusbar/         # Real-time status monitoring (Vue 3 + PrimeVue) - PRODUCTION
+│       ├── configurator/      # Configuration management UI (v1.4.2+) - PRODUCTION
+│       ├── document-editor/   # ⚠️ EXPERIMENTAL POC - NOT FOR PRODUCTION USE
 │       └── shared/            # Shared TypeScript utilities and types
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
@@ -256,6 +257,31 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
    - `--md-border-*` - border colors
 5. After changes, rebuild Vue components: `npm run build:all`
 
+### Working with Vue components
+
+**Production components:**
+- **StatusBar** (`TN_Doc/Client/statusbar/`): Real-time monitoring interface with SignalR
+  - Framework: Vue 3 + TypeScript + PrimeVue
+  - Dev server: `npm run dev` (port 5173)
+  - Build output: `TN_Doc/wwwroot/dist/statusbar/`
+
+- **Configurator** (`TN_Doc/Client/configurator/`): Web UI for app configuration (v1.4.2+)
+  - Framework: Vue 3 + TypeScript + PrimeVue
+  - Dev server: `npm run dev:configurator` (port 5174)
+  - Build output: `TN_Doc/wwwroot/dist/configurator/`
+
+**⚠️ Experimental component (DO NOT USE IN PRODUCTION):**
+- **Document Editor** (`TN_Doc/Client/document-editor/`): POC for in-browser document editing
+  - Status: Proof of concept, not production-ready
+  - May contain incomplete features and bugs
+  - Do not rely on this for production deployments
+
+**Development workflow:**
+1. Start ASP.NET Core app: `cd TN_Doc && dotnet run`
+2. In parallel terminal, start Vue dev server: `cd TN_Doc/Client && npm run dev`
+3. Changes to Vue components hot-reload automatically
+4. Before committing, build all components: `npm run build:all`
+
 ## Git Workflow and Commit Conventions
 
 ### Branch Strategy
@@ -360,9 +386,17 @@ Real-time data acquisition from measurement systems:
 ## Recent Changes (v1.4.3)
 
 See `/TN_Doc/changes.md` for full history:
+- **Configurator Enhancements**: Added settings for measurement instruments (СИ), ELIS connections, and OPC connections
+- **Journal Report Fix**: Fixed printing form for measurement instrument registration journal (DataARM compatibility)
+- **Updated docgeneral to version 1.2.3**
+
+## Previous Major Changes (v1.4.2 - October 2024)
+
 - ⚠️ **Removed TN.Tools project** - obsolete functionality
 - **Updated KMH_MI2816** for IVK version 7.12.14.3000 protocol changes
 - **Updated docgeneral to version 1.2.2**
+- ⚠️ **Removed duplicate Act template**: Removed `Act_GOSTR50.2.040(G)_ShiftTime.frx` (duplicated functionality)
+- **UI Refactoring**: Major application interface improvements
 - **UI Theme Improvements**: Centralized color management via CSS variables
   - All colors now defined in `TN_Doc/wwwroot/css/material3.css`
   - Replaced hardcoded HEX colors with CSS variables across all stylesheets
@@ -373,13 +407,15 @@ See `/TN_Doc/changes.md` for full history:
   - Removed redundant refresh button and SignalR indicator
 - **LoggingPathService refactoring**: Moved to `TN.DocGeneral/Services/` for reusability
 
-## Previous Major Changes (v1.4.2)
+## Previous Major Changes (v1.4.1)
 
 - ⚠️ **Базовая версия конфигуратора**: веб-интерфейс для управления конфигурацией (`/configurator`)
 - ⚠️ **Базовая версия строки состояния**: диагностические индикаторы связи
 - ⚠️ **Кэширование конфигурационных файлов**: `IConfigurationCacheService` с LRU eviction
 - ⚠️ **Кэширование загрузки документов**: `IDocModuleLoader` оптимизация загрузки DLL
 - ⚠️ **Исключено построение HTML из файла**: GetEditDoc теперь работает в памяти
+- ⚠️ **In-memory document generation**: `IReportBuffer` eliminates disk I/O for PDF generation
+- **Local user directories for signatories**: Reports and journals now use local user references
 
 ## Related Projects
 
