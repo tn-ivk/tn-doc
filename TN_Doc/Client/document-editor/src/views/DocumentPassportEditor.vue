@@ -121,6 +121,18 @@ const handleElisData = (elisData: ElisPassportData) => {
   // Подготовить объект для bulk update
   const updates: Record<string, any> = {};
 
+  // Отладка: вывести информацию о полях с ELIS интеграцией
+  const fieldsWithElis = store.fields.filter(f => f.elisAlias && f.elisAlias.length > 0);
+  logger.info(`[ELIS] Найдено ${fieldsWithElis.length} полей с ELIS интеграцией из ${store.fields.length}`);
+  fieldsWithElis.slice(0, 3).forEach(f => {
+    logger.info(`[ELIS] Пример поля: key="${f.key}", elisAlias=[${f.elisAlias?.join(', ')}]`);
+  });
+
+  // Отладка: вывести доступные ключи в ELIS данных
+  logger.info(`[ELIS] Доступные ключи в elisData: ${Object.keys(elisData).join(', ')}`);
+  logger.info(`[ELIS] Доступные ключи в elisData.labInfo: ${elisData.labInfo ? Object.keys(elisData.labInfo).join(', ') : 'отсутствует'}`);
+  logger.info(`[ELIS] Доступные ключи в elisData.parameters: ${elisData.parameters ? Object.keys(elisData.parameters).slice(0, 5).join(', ') + '...' : 'отсутствует'}`);
+
   // 1. Заполнить поля AdditionalInfo
   store.fields.forEach((field) => {
     if (!field.elisAlias || field.elisAlias.length === 0) {
