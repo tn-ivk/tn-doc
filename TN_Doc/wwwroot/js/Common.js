@@ -1440,8 +1440,34 @@ function FillPassportDataElis() {
         else{
             logTrace('Информация о лаборатории:\n' + JSON.stringify(labInfo, null, 2));
         }
-        
+
         let iframe = document.querySelector('.FR');
+
+        // Проверить, используется ли Vue редактор
+        const isVueEditor = iframe && iframe.contentWindow &&
+                           iframe.contentWindow.document.querySelector('#app');
+
+        if (isVueEditor) {
+            // Vue редактор обнаружен - отправить данные через postMessage
+            logTrace('Обнаружен Vue редактор, отправка данных ЕЛИС через postMessage');
+
+            // Объединить данные labInfo и dataPassport
+            const elisPayload = {
+                ...dataPassport,
+                labInfo: labInfo || {}
+            };
+
+            // Отправить postMessage в iframe
+            iframe.contentWindow.postMessage({
+                type: 'ELIS_DATA',
+                payload: elisPayload
+            }, '*');
+
+            logTrace('Данные ЕЛИС отправлены в Vue редактор');
+            return;
+        }
+
+        // Legacy HTML редактор - использовать старый механизм
         let elisNodes = iframe.contentWindow.document.querySelectorAll('.elis-data');
         
         if (!elisNodes || elisNodes.length === 0) {

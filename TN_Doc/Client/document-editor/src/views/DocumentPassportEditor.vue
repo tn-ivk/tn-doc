@@ -42,6 +42,7 @@ import { logger } from '@tn-doc/shared';
                     :modelValue="store.formData[field.key]"
                     :hide-label="true"
                     :invalidChars="store.config?.invalidChars || []"
+                    :highlightColor="store.formData[`${field.key}__elisFilled`] ? 'var(--md-elis-highlight)' : undefined"
                     @update:modelValue="(value) => store.updateField(field.key, value)"
                   />
                 </td>
@@ -75,6 +76,9 @@ import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentEditor } from '@/composables/useDocumentEditor';
 import { usePassportEditor } from '@/composables/usePassportEditor';
 import { usePassportAutoFill } from '@/composables/usePassportAutoFill';
+import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/composables/useElisIntegration';
+import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
+import type { PassportEditConfig } from '@/types/passport.types';
 
 const route = useRoute();
 
@@ -99,6 +103,111 @@ const {
 
 // Используем логику автозаполнения для Паспортов
 const { setupAutoFillWatchers } = usePassportAutoFill();
+
+// Функция обработки данных ELIS
+const handleElisData = (elisData: ElisPassportData) => {
+  logger.info('[DocumentPassportEditor] Получены данные ELIS, начинаем заполнение формы');
+
+  // Подготовить объект для bulk update
+  const updates: Record<string, any> = {};
+
+  // 1. Заполнить поля AdditionalInfo
+  store.fields.forEach((field) => {
+    if (!field.elisAlias || field.elisAlias.length === 0) {
+      return; // Пропустить поля без ELIS интеграции
+    }
+
+    // Искать значение в данных ELIS (fallback по массиву алиасов)
+    let value: any;
+
+    // Сначала искать в labInfo
+    value = findElisValue(elisData, field.elisAlias, 'labInfo');
+
+    // Если не найдено, искать в корне
+    if (value === undefined) {
+      value = findElisValue(elisData, field.elisAlias);
+    }
+
+    // Если не найдено, искать в signers.laboratory
+    if (value === undefined) {
+      value = findElisValue(elisData, field.elisAlias, 'signers.laboratory');
+    }
+
+    if (value !== undefined && value !== null) {
+      updates[field.key] = value;
+      updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
+      logger.info(`[ELIS] Поле "${field.key}" заполнено значением: ${JSON.stringify(value)}`);
+    }
+  });
+
+  // 2. Заполнить параметры качества (Parameters)
+  if (store.config && store.config.docType === 'Passport') {
+    const passportConfig = store.config as PassportEditConfig;
+    const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+    parametersSchema.forEach((param) => {
+      if (!param.elisAlias || param.elisAlias.length === 0) {
+        return; // Пропустить параметры без ELIS интеграции
+      }
+
+      // Искать параметр в elisData.parameters (русские полные названия)
+      const elisParam = findElisValue(elisData, param.elisAlias, 'parameters') as ElisParameter | undefined;
+
+      if (elisParam) {
+        // Заполнить measurement (value)
+        if (elisParam.value !== undefined && elisParam.value !== null) {
+          const valueKey = `value.${param.key}`;
+          updates[valueKey] = elisParam.value.toString();
+          updates[`${valueKey}__elisFilled`] = true;
+          logger.info(`[ELIS] Параметр "${param.key}" measurement заполнен: ${elisParam.value}`);
+        }
+
+        // Заполнить result (valueString)
+        if (elisParam.valueString) {
+          const resultKey = `result.${param.key}`;
+          updates[resultKey] = elisParam.valueString.toString();
+          updates[`${resultKey}__elisFilled`] = true;
+          logger.info(`[ELIS] Параметр "${param.key}" result заполнен: ${elisParam.valueString}`);
+        }
+
+        // Создать метод испытаний из ELIS данных
+        if (elisParam.testMethodName) {
+          const elisMethod = createMethodFromElisData(elisParam);
+          if (elisMethod) {
+            // Найти метод в списке доступных методов параметра
+            const matchingMethod = param.methodOptions.find(
+              (method) => method.name === elisMethod.name
+            );
+
+            if (matchingMethod) {
+              // Использовать существующий метод
+              const methodKey = `method.${param.key}`;
+              updates[methodKey] = matchingMethod;
+              updates[`${methodKey}__elisFilled`] = true;
+              logger.info(`[ELIS] Параметр "${param.key}" method найден: ${matchingMethod.name}`);
+            } else {
+              // Метод не найден в списке - логировать предупреждение
+              logger.warn(
+                `[ELIS] Метод "${elisMethod.name}" для параметра "${param.key}" не найден в списке доступных методов`
+              );
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // 3. Применить все обновления bulk операцией
+  if (Object.keys(updates).length > 0) {
+    store.bulkUpdateFields(updates);
+    logger.info(`[ELIS] Применено ${Object.keys(updates).length} обновлений полей из данных ELIS`);
+  } else {
+    logger.warn('[ELIS] Не найдено ни одного поля для заполнения из данных ELIS');
+  }
+};
+
+// Регистрируем обработчик ELIS данных
+useElisIntegration(handleElisData);
 
 // Загружаем документ при монтировании
 onMounted(async () => {

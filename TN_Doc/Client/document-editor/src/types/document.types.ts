@@ -54,6 +54,18 @@ export interface FormField {
   roundValue?: number;
   /** Тег группы (для группировки полей при сохранении) */
   tag?: string;
+  /**
+   * Массив алиасов для маппинга с данными ELIS
+   * Используется механизм fallback: перебираются все алиасы по порядку,
+   * используется первое найденное значение
+   * @example
+   * // AdditionalInfo (camelCase):
+   * elisAlias: ["labName", "laboratoryName"]
+   *
+   * // Parameters (русские названия):
+   * elisAlias: ["Массовая доля воды(%)", "Массовая концентрация воды(%)"]
+   */
+  elisAlias?: string[];
 }
 
 export interface SelectOption {
