@@ -6,6 +6,7 @@
  */
 
 import { onMounted, onUnmounted } from 'vue';
+import { logger } from '@tn-doc/shared';
 import type { ElisPassportData, ElisParameter, ElisMethodData } from '@/types/elis.types';
 
 /**
@@ -46,7 +47,9 @@ export function findElisValue(
     for (const part of pathParts) {
       searchRoot = searchRoot?.[part];
       if (!searchRoot) {
-        console.warn(`[ELIS] Путь поиска "${searchPath}" не найден в данных ELIS`);
+        logger.warn('[ELIS] Путь поиска не найден в данных ELIS', {
+          searchPath
+        });
         return undefined;
       }
     }
@@ -56,14 +59,19 @@ export function findElisValue(
   for (const alias of elisAlias) {
     const value = searchRoot[alias];
     if (value !== undefined && value !== null) {
-      console.log(`[ELIS] Найдено значение по алиасу "${alias}" в "${searchPath || 'root'}":`, value);
+      logger.info('[ELIS] Найдено значение по алиасу в данных ELIS', {
+        alias,
+        searchPath: searchPath || 'root',
+        value
+      });
       return value;
     }
   }
 
-  console.warn(
-    `[ELIS] Не найдено значение для алиасов: [${elisAlias.join(', ')}] в "${searchPath || 'root'}"`
-  );
+  logger.warn('[ELIS] Не найдено значение для алиасов в данных ELIS', {
+    elisAlias,
+    searchPath: searchPath || 'root'
+  });
   return undefined;
 }
 
@@ -136,7 +144,11 @@ export function parseElisValueString(valueString: string): {
       const limitValue = parseFloat(numberStr);
 
       if (!isNaN(limitValue)) {
-        console.log(`[ELIS] Распознано пороговое значение: "${trimmed}" → ${limitValue} (${operator})`);
+        logger.info('[ELIS] Распознано пороговое значение из текстового представления', {
+          originalString: trimmed,
+          limitValue,
+          operator
+        });
         return {
           limitValue,
           operator,
@@ -146,7 +158,9 @@ export function parseElisValueString(valueString: string): {
     }
   }
 
-  console.warn(`[ELIS] Не удалось распознать формат: "${trimmed}"`);
+  logger.warn('[ELIS] Не удалось распознать формат текстового представления', {
+    valueString: trimmed
+  });
   return null;
 }
 
@@ -213,10 +227,10 @@ export function enrichElisData(elisData: ElisPassportData): ElisPassportData {
       enriched.labInfo.chiefLabOrganization = lab.company;
     }
 
-    console.log('[ELIS] Данные обогащены автоматически сформированными полями:', {
+    logger.info('[ELIS] Данные обогащены автоматически сформированными полями', {
       chiefLabShortSign: shortSign,
       chiefLabPosition: lab.post,
-      chiefLabOrganization: lab.company,
+      chiefLabOrganization: lab.company
     });
   }
 
@@ -240,7 +254,9 @@ export function useElisIntegration(onElisDataReceived: (data: ElisPassportData) 
     // if (event.origin !== window.location.origin) return;
 
     if (event.data && event.data.type === 'ELIS_DATA') {
-      console.log('[useElisIntegration] Получены данные ELIS из главного окна:', event.data.payload);
+      logger.info('[useElisIntegration] Получены данные ELIS из главного окна', {
+        payloadKeys: Object.keys(event.data.payload || {})
+      });
 
       // Обогатить данные автоматически сформированными полями
       const enrichedData = enrichElisData(event.data.payload);
@@ -252,11 +268,11 @@ export function useElisIntegration(onElisDataReceived: (data: ElisPassportData) 
 
   onMounted(() => {
     window.addEventListener('message', handleMessage);
-    console.log('[useElisIntegration] Слушатель postMessage зарегистрирован');
+    logger.info('[useElisIntegration] Слушатель postMessage зарегистрирован');
   });
 
   onUnmounted(() => {
     window.removeEventListener('message', handleMessage);
-    console.log('[useElisIntegration] Слушатель postMessage удалён');
+    logger.info('[useElisIntegration] Слушатель postMessage удалён');
   });
 }

@@ -113,7 +113,10 @@ const handleElisData = (elisData: ElisPassportData) => {
 
   // Проверить, что конфигурация загружена
   if (!store.config || store.fields.length === 0) {
-    logger.warn(`[ELIS] Конфигурация документа ещё не загружена (config: ${!!store.config}, fields: ${store.fields.length}), сохраняем данные для отложенной обработки`);
+    logger.warn('[ELIS] Конфигурация документа ещё не загружена, сохраняем данные для отложенной обработки', {
+      hasConfig: !!store.config,
+      fieldsCount: store.fields.length
+    });
     pendingElisData = elisData; // Сохранить для обработки после загрузки
     return;
   }
@@ -123,15 +126,22 @@ const handleElisData = (elisData: ElisPassportData) => {
 
   // Отладка: вывести информацию о полях с ELIS интеграцией
   const fieldsWithElis = store.fields.filter(f => f.elisAlias && f.elisAlias.length > 0);
-  logger.info(`[ELIS] Найдено ${fieldsWithElis.length} полей с ELIS интеграцией из ${store.fields.length}`);
-  fieldsWithElis.slice(0, 3).forEach(f => {
-    logger.info(`[ELIS] Пример поля: key="${f.key}", elisAlias=[${f.elisAlias?.join(', ')}]`);
+  logger.info('[ELIS] Найдено полей с ELIS интеграцией', {
+    fieldsWithElisCount: fieldsWithElis.length,
+    totalFieldsCount: store.fields.length,
+    exampleFields: fieldsWithElis.slice(0, 3).map(f => ({
+      key: f.key,
+      elisAlias: f.elisAlias
+    }))
   });
 
   // Отладка: вывести доступные ключи в ELIS данных
-  logger.info(`[ELIS] Доступные ключи в elisData: ${Object.keys(elisData).join(', ')}`);
-  logger.info(`[ELIS] Доступные ключи в elisData.labInfo: ${elisData.labInfo ? Object.keys(elisData.labInfo).join(', ') : 'отсутствует'}`);
-  logger.info(`[ELIS] Доступные ключи в elisData.parameters: ${elisData.parameters ? Object.keys(elisData.parameters).slice(0, 5).join(', ') + '...' : 'отсутствует'}`);
+  logger.info('[ELIS] Доступные ключи в elisData', {
+    rootKeys: Object.keys(elisData),
+    labInfoKeys: elisData.labInfo ? Object.keys(elisData.labInfo) : null,
+    parametersKeysPreview: elisData.parameters ? Object.keys(elisData.parameters).slice(0, 5) : null,
+    parametersTotal: elisData.parameters ? Object.keys(elisData.parameters).length : 0
+  });
 
   // 1. Заполнить поля AdditionalInfo
   store.fields.forEach((field) => {
@@ -158,7 +168,10 @@ const handleElisData = (elisData: ElisPassportData) => {
     if (value !== undefined && value !== null) {
       updates[field.key] = value;
       updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
-      logger.info(`[ELIS] Поле "${field.key}" заполнено значением: ${JSON.stringify(value)}`);
+      logger.info('[ELIS] Поле заполнено из данных ELIS', {
+        fieldKey: field.key,
+        value: value
+      });
     }
   });
 
@@ -181,7 +194,10 @@ const handleElisData = (elisData: ElisPassportData) => {
           const valueKey = `value.${param.key}`;
           updates[valueKey] = elisParam.value.toString();
           updates[`${valueKey}__elisFilled`] = true;
-          logger.info(`[ELIS] Параметр "${param.key}" measurement заполнен: ${elisParam.value}`);
+          logger.info('[ELIS] Параметр measurement заполнен из данных ELIS', {
+            paramKey: param.key,
+            value: elisParam.value
+          });
         }
 
         // Заполнить result (valueString)
@@ -189,7 +205,10 @@ const handleElisData = (elisData: ElisPassportData) => {
           const resultKey = `result.${param.key}`;
           updates[resultKey] = elisParam.valueString.toString();
           updates[`${resultKey}__elisFilled`] = true;
-          logger.info(`[ELIS] Параметр "${param.key}" result заполнен: ${elisParam.valueString}`);
+          logger.info('[ELIS] Параметр result заполнен из данных ELIS', {
+            paramKey: param.key,
+            valueString: elisParam.valueString
+          });
         }
 
         // Создать метод испытаний из ELIS данных
@@ -206,12 +225,16 @@ const handleElisData = (elisData: ElisPassportData) => {
               const methodKey = `method.${param.key}`;
               updates[methodKey] = matchingMethod;
               updates[`${methodKey}__elisFilled`] = true;
-              logger.info(`[ELIS] Параметр "${param.key}" method найден: ${matchingMethod.name}`);
+              logger.info('[ELIS] Метод испытаний найден для параметра', {
+                paramKey: param.key,
+                methodName: matchingMethod.name
+              });
             } else {
               // Метод не найден в списке - логировать предупреждение
-              logger.warn(
-                `[ELIS] Метод "${elisMethod.name}" для параметра "${param.key}" не найден в списке доступных методов`
-              );
+              logger.warn('[ELIS] Метод испытаний не найден в списке доступных методов', {
+                paramKey: param.key,
+                elisMethodName: elisMethod.name
+              });
             }
           }
         }
@@ -222,7 +245,9 @@ const handleElisData = (elisData: ElisPassportData) => {
   // 3. Применить все обновления bulk операцией
   if (Object.keys(updates).length > 0) {
     store.bulkUpdateFields(updates);
-    logger.info(`[ELIS] Применено ${Object.keys(updates).length} обновлений полей из данных ELIS`);
+    logger.info('[ELIS] Применены обновления полей из данных ELIS', {
+      updatesCount: Object.keys(updates).length
+    });
   } else {
     logger.warn('[ELIS] Не найдено ни одного поля для заполнения из данных ELIS');
   }
