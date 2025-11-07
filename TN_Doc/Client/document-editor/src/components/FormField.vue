@@ -23,6 +23,7 @@
       :placeholder="hideLabel ? '' : `Выберите ${field.label.toLowerCase()}`"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
+      :style="fieldBackgroundStyle"
       class="field-control"
       appendTo="self"
       @change="handleChange"
@@ -36,6 +37,7 @@
       :placeholder="hideLabel ? '' : field.label"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
+      :style="fieldBackgroundStyle"
       class="field-control"
       @input="handleChange"
     />
@@ -48,6 +50,7 @@
       :placeholder="hideLabel ? '' : field.label"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
+      :style="fieldBackgroundStyle"
       :minFractionDigits="field.roundValue || 0"
       :maxFractionDigits="field.roundValue || 2"
       class="field-control"
@@ -61,6 +64,7 @@
       v-model="localValue"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
+      :style="fieldBackgroundStyle"
       dateFormat="dd.mm.yy"
       updateModelType="replace"
       class="field-control"
@@ -74,6 +78,7 @@
       v-model="localValue"
       :disabled="!field.editable"
       :class="{ 'p-invalid': !isValid }"
+      :style="fieldBackgroundStyle"
       dateFormat="dd.mm.yy"
       :showTime="true"
       hourFormat="24"
@@ -90,6 +95,37 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Универсальный компонент для отображения полей формы
+ *
+ * @component FormField
+ *
+ * @prop {FormField} field - Конфигурация поля
+ * @prop {any} modelValue - Значение поля
+ * @prop {boolean} [hideLabel] - Скрыть label
+ * @prop {string[]} [invalidChars] - Список недопустимых символов
+ * @prop {string} [highlightColor] - Цвет подсветки фона элемента (опциональный)
+ *
+ * @example
+ * // Стандартное использование (белый фон)
+ * <FormField :field="field" :modelValue="value" />
+ *
+ * @example
+ * // С подсветкой зелёным (ELIS данные)
+ * <FormField
+ *   :field="field"
+ *   :modelValue="value"
+ *   highlightColor="var(--md-elis-highlight)"
+ * />
+ *
+ * @example
+ * // С подсветкой жёлтым (предупреждение)
+ * <FormField
+ *   :field="field"
+ *   :modelValue="value"
+ *   highlightColor="#fff3cd"
+ * />
+ */
 import { logger } from '@tn-doc/shared';
 import { ref, computed, watch, onMounted } from 'vue';
 import Select from 'primevue/select';
@@ -103,11 +139,25 @@ const props = defineProps<{
   modelValue: any;
   hideLabel?: boolean;
   invalidChars?: string[];
+  highlightColor?: string;
 }>();
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: any): void;
 }>();
+
+/**
+ * Computed свойство для стилей фона элемента
+ * Применяет цвет подсветки, если передан highlightColor
+ */
+const fieldBackgroundStyle = computed(() => {
+  if (!props.highlightColor) return {};
+
+  return {
+    backgroundColor: props.highlightColor,
+    transition: 'background-color 0.2s ease-in-out'
+  };
+});
 
 /**
  * Конвертирует значение для datetime-local/date полей в объект Date
