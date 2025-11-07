@@ -104,9 +104,19 @@ const {
 // Используем логику автозаполнения для Паспортов
 const { setupAutoFillWatchers } = usePassportAutoFill();
 
+// Хранилище для отложенной обработки ELIS данных
+let pendingElisData: ElisPassportData | null = null;
+
 // Функция обработки данных ELIS
 const handleElisData = (elisData: ElisPassportData) => {
   logger.info('[DocumentPassportEditor] Получены данные ELIS, начинаем заполнение формы');
+
+  // Проверить, что конфигурация загружена
+  if (!store.config || store.fields.length === 0) {
+    logger.warn(`[ELIS] Конфигурация документа ещё не загружена (config: ${!!store.config}, fields: ${store.fields.length}), сохраняем данные для отложенной обработки`);
+    pendingElisData = elisData; // Сохранить для обработки после загрузки
+    return;
+  }
 
   // Подготовить объект для bulk update
   const updates: Record<string, any> = {};
@@ -228,6 +238,13 @@ onMounted(async () => {
 
   // Настраиваем автозаполнение связанных полей для Паспортов
   setupAutoFillWatchers();
+
+  // Обработать отложенные ELIS данные, если они были получены до загрузки конфигурации
+  if (pendingElisData) {
+    logger.info('[ELIS] Обрабатываем отложенные ELIS данные после загрузки конфигурации');
+    handleElisData(pendingElisData);
+    pendingElisData = null; // Сбросить после обработки
+  }
 });
 
 // Экспонируем SaveDoc() для главного окна
