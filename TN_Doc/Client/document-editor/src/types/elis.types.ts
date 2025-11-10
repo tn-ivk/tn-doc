@@ -4,33 +4,55 @@
 
 /**
  * Полные данные протокола ELIS для паспорта качества
+ *
+ * Структура данных ELIS включает:
+ * 1. Корневой уровень: основные поля (labName, protocolNumber, pointDeliveryName, даты)
+ * 2. labInfo: дополнительная информация о лаборатории (accreditationNumber, ownerName)
+ * 3. parameters: качественные показатели (русские полные названия)
+ * 4. signers: подписанты (представители лаборатории)
  */
 export interface ElisPassportData {
-  /** Информация о лаборатории */
+  /** Название лаборатории (на корневом уровне!) */
+  labName?: string;
+  /** Номер протокола испытаний */
+  protocolNumber?: string;
+  /** Точка поставки */
+  pointDeliveryName?: string;
+  /** Место отбора пробы */
+  samplingLocation?: string;
+  /** Дата протокола */
+  protocolDate?: string;
+  /** Период отбора пробы */
+  startPeriodTime?: string;
+  endPeriodTime?: string;
+
+  /** Дополнительная информация о лаборатории (accreditationNumber, ownerName) */
   labInfo?: ElisLabInfo;
   /** Параметры качества */
   parameters?: Record<string, ElisParameter>;
   /** Подписанты (представители) */
   signers?: ElisSigners;
-  /** Период отбора пробы */
-  startPeriodTime?: string;
-  endPeriodTime?: string;
-  /** Номер протокола испытаний */
-  protocolNumber?: string;
-  /** Точка поставки */
-  pointDeliveryName?: string;
+
+  /** Автоматически добавленные поля (через enrichElisData) */
+  chiefLabShortSign?: string;
+  chiefLabPosition?: string;
+  chiefLabOrganization?: string;
 }
 
 /**
- * Информация о лаборатории
+ * Информация о лаборатории (отдельный объект, передаваемый из localStorage.labInfo)
  */
 export interface ElisLabInfo {
-  /** Название лаборатории */
-  labName?: string;
-  /** Адрес лаборатории */
-  labAddress?: string;
+  /** Владелец (организация) */
+  ownerName?: string;
   /** Номер аттестата аккредитации */
   accreditationNumber?: string;
+  /** Адрес лаборатории */
+  labAddress?: string;
+  /** Автоматически добавленные поля (через enrichElisData) */
+  chiefLabShortSign?: string;
+  chiefLabPosition?: string;
+  chiefLabOrganization?: string;
   /** Альтернативные названия полей */
   [key: string]: any;
 }
@@ -60,6 +82,8 @@ export interface ElisSigners {
  * Представитель лаборатории
  */
 export interface ElisLaboratoryRepresentative {
+  /** ФИО в формате "Фамилия И. О." (legacy поле) */
+  iof?: string;
   /** Имя */
   givenName?: string;
   /** Отчество */

@@ -59,18 +59,22 @@ export function findElisValue(
   for (const alias of elisAlias) {
     const value = searchRoot[alias];
     if (value !== undefined && value !== null) {
-      logger.info('[ELIS] Найдено значение по алиасу в данных ELIS', {
+      logger.info(`[ELIS DEBUG] ✅ findElisValue: Найден "${alias}" в "${searchPath || 'root'}"`, {
         alias,
         searchPath: searchPath || 'root',
-        value
+        valueType: typeof value,
+        valuePreview: typeof value === 'string' && value.length > 50 ? `${value.substring(0, 50)}...` : value
       });
       return value;
+    } else {
+      logger.info(`[ELIS DEBUG] ⚠️ findElisValue: Алиас "${alias}" не найден в "${searchPath || 'root'}"`);
     }
   }
 
-  logger.warn('[ELIS] Не найдено значение для алиасов в данных ELIS', {
+  logger.warn(`[ELIS DEBUG] ❌ findElisValue: Ни один алиас не найден`, {
     elisAlias,
-    searchPath: searchPath || 'root'
+    searchPath: searchPath || 'root',
+    searchedAliases: elisAlias
   });
   return undefined;
 }
@@ -196,42 +200,61 @@ export function createMethodFromElisData(elisParam: ElisParameter): ElisMethodDa
  * Обогащает данные ELIS автоматически сформированными полями
  * (например, chiefLabShortSign из givenName, middleName, familyName)
  *
+ * Функция выполняет:
+ * 1. Форматирование ФИО представителя лаборатории (givenName, middleName, familyName → "И. О. Фамилия")
+ * 2. Копирование полей из signers.laboratory в корень и labInfo
+ * 3. Копирование labName в labInfo (если отсутствует)
+ *
  * @param elisData - исходные данные ELIS
  * @returns обогащенные данные ELIS
  */
 export function enrichElisData(elisData: ElisPassportData): ElisPassportData {
   const enriched = { ...elisData };
 
+  // Инициализировать labInfo, если отсутствует
+  if (!enriched.labInfo) {
+    enriched.labInfo = {};
+  }
+
+  // Копировать labName в labInfo для единообразия (если отсутствует в labInfo)
+  if (elisData.labName && !enriched.labInfo.labName) {
+    enriched.labInfo.labName = elisData.labName;
+  }
+
   // Форматировать ФИО представителя лаборатории
   if (elisData.signers?.laboratory) {
     const lab = elisData.signers.laboratory;
     const shortSign = formatShortName(lab.givenName, lab.middleName, lab.familyName);
 
-    // Добавить сформированные поля в корень для удобства поиска
-    if (!enriched.labInfo) {
-      enriched.labInfo = {};
-    }
-
     if (shortSign) {
-      (enriched as any).chiefLabShortSign = shortSign;
+      enriched.chiefLabShortSign = shortSign;
       enriched.labInfo.chiefLabShortSign = shortSign;
+      logger.info(`[ELIS DEBUG] enrichElisData: Добавлено chiefLabShortSign = "${shortSign}"`);
     }
 
     if (lab.post) {
-      (enriched as any).chiefLabPosition = lab.post;
+      enriched.chiefLabPosition = lab.post;
       enriched.labInfo.chiefLabPosition = lab.post;
+      logger.info(`[ELIS DEBUG] enrichElisData: Добавлено chiefLabPosition = "${lab.post}"`);
     }
 
     if (lab.company) {
-      (enriched as any).chiefLabOrganization = lab.company;
+      enriched.chiefLabOrganization = lab.company;
       enriched.labInfo.chiefLabOrganization = lab.company;
+      logger.info(`[ELIS DEBUG] enrichElisData: Добавлено chiefLabOrganization = "${lab.company}"`);
     }
 
-    logger.info('[ELIS] Данные обогащены автоматически сформированными полями', {
+    logger.info('[ELIS DEBUG] enrichElisData: Данные обогащены автоматически сформированными полями', {
       chiefLabShortSign: shortSign,
       chiefLabPosition: lab.post,
       chiefLabOrganization: lab.company
     });
+  } else {
+    logger.warn('[ELIS DEBUG] enrichElisData: signers.laboratory отсутствует, автоматические поля не добавлены');
+  }
+
+  if (elisData.labName && !enriched.labInfo.labName) {
+    logger.info(`[ELIS DEBUG] enrichElisData: Скопирован labName в labInfo = "${elisData.labName}"`);
   }
 
   return enriched;
