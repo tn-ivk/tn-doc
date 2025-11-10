@@ -196,11 +196,24 @@ const handleElisData = (elisData: ElisPassportData) => {
   let successCount = 0;
   let failedFields: any[] = [];
 
-  store.fields.forEach((field) => {
+  console.error(`🔥🔥🔥 [ELIS DEBUG] Начинаем обработку ${store.fields.length} полей`);
+
+  store.fields.forEach((field, index) => {
+    console.error(`🔥 [ELIS DEBUG] Поле #${index}: "${field.key}"`, {
+      key: field.key,
+      label: field.label,
+      hasElisAlias: !!field.elisAlias,
+      elisAlias: field.elisAlias,
+      elisAliasType: typeof field.elisAlias,
+      elisAliasLength: field.elisAlias?.length
+    });
+
     if (!field.elisAlias || field.elisAlias.length === 0) {
+      console.error(`🔥⚠️ [ELIS DEBUG] Поле "${field.key}" ПРОПУЩЕНО (нет elisAlias или длина = 0)`);
       return; // Пропустить поля без ELIS интеграции
     }
 
+    console.error(`🔥✅ [ELIS DEBUG] Поле "${field.key}" ИМЕЕТ elisAlias, продолжаем обработку`);
     logger.info(`[ELIS DEBUG] Обработка поля "${field.key}" (${field.label})`, {
       elisAlias: field.elisAlias,
       type: field.type
