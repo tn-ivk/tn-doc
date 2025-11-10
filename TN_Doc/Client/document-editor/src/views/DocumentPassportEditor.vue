@@ -254,6 +254,13 @@ const handleElisData = (elisData: ElisPassportData) => {
 
     if (value !== undefined && value !== null) {
       // Для полей типа "list" (combobox) нужно найти соответствующий элемент в field.options
+      logger.info(`[ELIS DEBUG] 🔍 Проверка типа поля "${field.key}"`, {
+        fieldType: field.type,
+        hasOptions: !!field.options,
+        optionsLength: field.options?.length ?? 0,
+        elisValue: value
+      });
+
       if (field.type === 'list' && field.options && field.options.length > 0) {
         // value - это строка ФИО (например, "А. А. Богданов")
         // Ищем пользователя с совпадающим label
