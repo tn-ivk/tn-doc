@@ -32,15 +32,7 @@ export interface PassportQualityParameterSchema {
   methodRequiredFill?: boolean;
   /** Количество знаков после запятой для округления */
   roundValue?: number;
-  /**
-   * Массив алиасов для маппинга с данными ELIS (русские полные названия)
-   * Используется механизм fallback: перебираются все алиасы по порядку,
-   * используется первое найденное значение
-   * @example
-   * elisAlias: ["Массовая доля воды(%)", "Массовая концентрация воды(%)"]
-   */
-  elisAlias?: string[];
-  /** ELIS метаданные (устаревшее, используйте elisAlias) */
+  /** ELIS метаданные (содержит KeyELIS и ElisAlias) */
   elisData?: ElisData;
   /** Доступные методы испытаний (из конфигурации) */
   methodOptions: MethodOption[];

@@ -357,32 +357,33 @@ const handleElisData = (elisData: ElisPassportData) => {
 
     logger.info('[ELIS DEBUG] Схема параметров качества:', {
       totalParameters: parametersSchema.length,
-      parametersWithElis: parametersSchema.filter(p => p.elisAlias && p.elisAlias.length > 0).length
+      parametersWithElis: parametersSchema.filter(p => p.elisData?.elisAlias && p.elisData.elisAlias.length > 0).length
     });
 
     // Логировать каждый параметр отдельно для детального анализа
     logger.info('[ELIS DEBUG] 📋 Детальный список параметров схемы:');
     parametersSchema.forEach((param, idx) => {
-      logger.info(`[ELIS DEBUG]   Параметр #${idx}: key="${param.key}", name="${param.name}", elisAlias=${JSON.stringify(param.elisAlias)}, methodOptionsCount=${param.methodOptions?.length || 0}`);
+      logger.info(`[ELIS DEBUG]   Параметр #${idx}: key="${param.key}", name="${param.name}", elisData.elisAlias=${JSON.stringify(param.elisData?.elisAlias)}, methodOptionsCount=${param.methodOptions?.length || 0}`);
     });
 
     let paramsSuccessCount = 0;
     let paramsFailedFields: any[] = [];
 
     parametersSchema.forEach((param, paramIndex) => {
-      if (!param.elisAlias || param.elisAlias.length === 0) {
+      const elisAlias = param.elisData?.elisAlias;
+      if (!elisAlias || elisAlias.length === 0) {
         logger.info(`[ELIS DEBUG] 🔸 Параметр #${paramIndex}: "${param.key}" ПРОПУЩЕН (нет elisAlias)`);
         return; // Пропустить параметры без ELIS интеграции
       }
 
       logger.info(`[ELIS DEBUG] 🔸 Параметр #${paramIndex}: "${param.key}" (${param.name})`, {
-        elisAlias: param.elisAlias,
+        elisAlias: elisAlias,
         methodOptionsCount: param.methodOptions?.length || 0
       });
 
       // Искать параметр в elisData.parameters (русские полные названия)
-      logger.info(`[ELIS DEBUG]   → Вызов findElisValue(elisData, [${param.elisAlias}], 'parameters')`);
-      const elisParam = findElisValue(elisData, param.elisAlias, 'parameters') as ElisParameter | undefined;
+      logger.info(`[ELIS DEBUG]   → Вызов findElisValue(elisData, [${elisAlias}], 'parameters')`);
+      const elisParam = findElisValue(elisData, elisAlias, 'parameters') as ElisParameter | undefined;
 
       if (!elisParam) {
         logger.warn(`[ELIS DEBUG]   ❌ findElisValue вернул undefined для "${param.key}"`);
@@ -448,10 +449,10 @@ const handleElisData = (elisData: ElisPassportData) => {
         paramsFailedFields.push({
           key: param.key,
           name: param.name,
-          elisAlias: param.elisAlias
+          elisAlias: elisAlias
         });
         logger.warn(`[ELIS DEBUG] ❌ Параметр "${param.key}" не найден в elisData.parameters`, {
-          elisAlias: param.elisAlias,
+          elisAlias: elisAlias,
           availableKeys: elisData.parameters ? Object.keys(elisData.parameters) : []
         });
       }
