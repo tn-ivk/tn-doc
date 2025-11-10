@@ -124,82 +124,186 @@ const handleElisData = (elisData: ElisPassportData) => {
   // Подготовить объект для bulk update
   const updates: Record<string, any> = {};
 
-  // Отладка: вывести информацию о полях с ELIS интеграцией
+  // ========================================
+  // ОТЛАДОЧНЫЕ ЛОГИ - Структура данных ELIS
+  // ========================================
+
+  logger.info('[ELIS DEBUG] ========== НАЧАЛО АНАЛИЗА ДАННЫХ ==========');
+
+  // 1. Вывести все ключи верхнего уровня ELIS данных
+  logger.info('[ELIS DEBUG] Ключи на корневом уровне elisData:', {
+    keys: Object.keys(elisData),
+    values: Object.keys(elisData).reduce((acc, key) => {
+      const value = elisData[key as keyof typeof elisData];
+      acc[key] = typeof value === 'object' && value !== null ? `[object: ${Object.keys(value).length} keys]` : value;
+      return acc;
+    }, {} as Record<string, any>)
+  });
+
+  // 2. Детально вывести labInfo
+  if (elisData.labInfo) {
+    logger.info('[ELIS DEBUG] Содержимое labInfo:', {
+      keys: Object.keys(elisData.labInfo),
+      data: elisData.labInfo
+    });
+  } else {
+    logger.warn('[ELIS DEBUG] labInfo отсутствует в данных');
+  }
+
+  // 3. Вывести превью parameters
+  if (elisData.parameters) {
+    const paramKeys = Object.keys(elisData.parameters);
+    logger.info('[ELIS DEBUG] Параметры качества:', {
+      total: paramKeys.length,
+      keys: paramKeys,
+      firstParameter: paramKeys[0] ? {
+        key: paramKeys[0],
+        value: elisData.parameters[paramKeys[0]]
+      } : null
+    });
+  } else {
+    logger.warn('[ELIS DEBUG] parameters отсутствуют в данных');
+  }
+
+  // 4. Вывести signers
+  if (elisData.signers?.laboratory) {
+    logger.info('[ELIS DEBUG] Подписанты (signers.laboratory):', elisData.signers.laboratory);
+  } else {
+    logger.warn('[ELIS DEBUG] signers.laboratory отсутствует в данных');
+  }
+
+  // 5. Найти все поля с ELIS интеграцией
   const fieldsWithElis = store.fields.filter(f => f.elisAlias && f.elisAlias.length > 0);
-  logger.info('[ELIS] Найдено полей с ELIS интеграцией', {
-    fieldsWithElisCount: fieldsWithElis.length,
+  logger.info('[ELIS DEBUG] Поля с ElisAlias в конфигурации:', {
     totalFieldsCount: store.fields.length,
-    exampleFields: fieldsWithElis.slice(0, 3).map(f => ({
+    fieldsWithElisCount: fieldsWithElis.length,
+    fields: fieldsWithElis.map(f => ({
       key: f.key,
-      elisAlias: f.elisAlias
+      label: f.label,
+      elisAlias: f.elisAlias,
+      type: f.type
     }))
   });
 
-  // Отладка: вывести доступные ключи в ELIS данных
-  logger.info('[ELIS] Доступные ключи в elisData', {
-    rootKeys: Object.keys(elisData),
-    labInfoKeys: elisData.labInfo ? Object.keys(elisData.labInfo) : null,
-    parametersKeysPreview: elisData.parameters ? Object.keys(elisData.parameters).slice(0, 5) : null,
-    parametersTotal: elisData.parameters ? Object.keys(elisData.parameters).length : 0
-  });
+  logger.info('[ELIS DEBUG] ========== КОНЕЦ АНАЛИЗА ДАННЫХ ==========');
 
   // 1. Заполнить поля AdditionalInfo
+  logger.info('[ELIS DEBUG] ========== НАЧАЛО ЗАПОЛНЕНИЯ ADDITIONALINFO ==========');
+
+  let successCount = 0;
+  let failedFields: any[] = [];
+
   store.fields.forEach((field) => {
     if (!field.elisAlias || field.elisAlias.length === 0) {
       return; // Пропустить поля без ELIS интеграции
     }
 
+    logger.info(`[ELIS DEBUG] Обработка поля "${field.key}" (${field.label})`, {
+      elisAlias: field.elisAlias,
+      type: field.type
+    });
+
     // Искать значение в данных ELIS (fallback по массиву алиасов)
     // Порядок поиска: корень → labInfo → signers.laboratory
     let value: any;
+    let foundIn: string | null = null;
 
     // Сначала искать в корне (здесь находятся labName, protocolNumber, pointDeliveryName и т.д.)
     value = findElisValue(elisData, field.elisAlias);
+    if (value !== undefined) {
+      foundIn = 'root';
+    }
 
     // Если не найдено, искать в labInfo (здесь находятся accreditationNumber, ownerName)
     if (value === undefined) {
       value = findElisValue(elisData, field.elisAlias, 'labInfo');
+      if (value !== undefined) {
+        foundIn = 'labInfo';
+      }
     }
 
     // Если не найдено, искать в signers.laboratory (здесь находятся post, company)
     if (value === undefined) {
       value = findElisValue(elisData, field.elisAlias, 'signers.laboratory');
+      if (value !== undefined) {
+        foundIn = 'signers.laboratory';
+      }
     }
 
     if (value !== undefined && value !== null) {
       updates[field.key] = value;
       updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
-      logger.info('[ELIS] Поле заполнено из данных ELIS', {
-        fieldKey: field.key,
+      successCount++;
+      logger.info(`[ELIS DEBUG] ✅ Поле "${field.key}" успешно заполнено`, {
+        foundIn: foundIn,
         elisAlias: field.elisAlias,
-        value: value
+        value: typeof value === 'string' && value.length > 100 ? `${value.substring(0, 100)}...` : value
+      });
+    } else {
+      failedFields.push({
+        key: field.key,
+        label: field.label,
+        elisAlias: field.elisAlias,
+        searchedIn: ['root', 'labInfo', 'signers.laboratory']
+      });
+      logger.warn(`[ELIS DEBUG] ❌ Поле "${field.key}" не найдено в данных ELIS`, {
+        elisAlias: field.elisAlias,
+        searchedIn: ['root', 'labInfo', 'signers.laboratory']
       });
     }
   });
 
+  logger.info('[ELIS DEBUG] Результат заполнения AdditionalInfo:', {
+    successCount: successCount,
+    failedCount: failedFields.length,
+    failedFields: failedFields
+  });
+
+  logger.info('[ELIS DEBUG] ========== КОНЕЦ ЗАПОЛНЕНИЯ ADDITIONALINFO ==========');
+
   // 2. Заполнить параметры качества (Parameters)
   if (store.config && store.config.docType === 'Passport') {
+    logger.info('[ELIS DEBUG] ========== НАЧАЛО ЗАПОЛНЕНИЯ PARAMETERS ==========');
+
     const passportConfig = store.config as PassportEditConfig;
     const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+    logger.info('[ELIS DEBUG] Схема параметров качества:', {
+      totalParameters: parametersSchema.length,
+      parametersWithElis: parametersSchema.filter(p => p.elisAlias && p.elisAlias.length > 0).length,
+      parameters: parametersSchema.map(p => ({
+        key: p.key,
+        name: p.name,
+        elisAlias: p.elisAlias,
+        hasElisAlias: !!p.elisAlias
+      }))
+    });
+
+    let paramsSuccessCount = 0;
+    let paramsFailedFields: any[] = [];
 
     parametersSchema.forEach((param) => {
       if (!param.elisAlias || param.elisAlias.length === 0) {
         return; // Пропустить параметры без ELIS интеграции
       }
 
+      logger.info(`[ELIS DEBUG] Обработка параметра "${param.key}" (${param.name})`, {
+        elisAlias: param.elisAlias
+      });
+
       // Искать параметр в elisData.parameters (русские полные названия)
       const elisParam = findElisValue(elisData, param.elisAlias, 'parameters') as ElisParameter | undefined;
 
       if (elisParam) {
+        logger.info(`[ELIS DEBUG] ✅ Параметр "${param.key}" найден в ELIS данных:`, elisParam);
+
         // Заполнить measurement (value)
         if (elisParam.value !== undefined && elisParam.value !== null) {
           const valueKey = `value.${param.key}`;
           updates[valueKey] = elisParam.value.toString();
           updates[`${valueKey}__elisFilled`] = true;
-          logger.info('[ELIS] Параметр measurement заполнен из данных ELIS', {
-            paramKey: param.key,
-            value: elisParam.value
-          });
+          paramsSuccessCount++;
+          logger.info(`[ELIS DEBUG] ✅ Measurement заполнен: ${param.key} = ${elisParam.value}`);
         }
 
         // Заполнить result (valueString)
@@ -207,15 +311,18 @@ const handleElisData = (elisData: ElisPassportData) => {
           const resultKey = `result.${param.key}`;
           updates[resultKey] = elisParam.valueString.toString();
           updates[`${resultKey}__elisFilled`] = true;
-          logger.info('[ELIS] Параметр result заполнен из данных ELIS', {
-            paramKey: param.key,
-            valueString: elisParam.valueString
-          });
+          logger.info(`[ELIS DEBUG] ✅ Result заполнен: ${param.key} = ${elisParam.valueString}`);
         }
 
         // Создать метод испытаний из ELIS данных
         if (elisParam.testMethodName) {
           const elisMethod = createMethodFromElisData(elisParam);
+          if (elisMethod) {
+            logger.info(`[ELIS DEBUG] Создан метод из ELIS данных:`, elisMethod);
+          } else {
+            logger.warn(`[ELIS DEBUG] Не удалось создать метод из ELIS данных для "${param.key}"`);
+          }
+
           if (elisMethod) {
             // Найти метод в списке доступных методов параметра
             const matchingMethod = param.methodOptions.find(
@@ -227,32 +334,62 @@ const handleElisData = (elisData: ElisPassportData) => {
               const methodKey = `method.${param.key}`;
               updates[methodKey] = matchingMethod;
               updates[`${methodKey}__elisFilled`] = true;
-              logger.info('[ELIS] Метод испытаний найден для параметра', {
-                paramKey: param.key,
-                methodName: matchingMethod.name
-              });
+              logger.info(`[ELIS DEBUG] ✅ Метод найден в списке: ${matchingMethod.name}`);
             } else {
               // Метод не найден в списке - логировать предупреждение
-              logger.warn('[ELIS] Метод испытаний не найден в списке доступных методов', {
+              logger.warn(`[ELIS DEBUG] ⚠️ Метод "${elisMethod.name}" не найден в списке доступных методов`, {
                 paramKey: param.key,
-                elisMethodName: elisMethod.name
+                availableMethods: param.methodOptions.map(m => m.name)
               });
             }
           }
         }
+      } else {
+        paramsFailedFields.push({
+          key: param.key,
+          name: param.name,
+          elisAlias: param.elisAlias
+        });
+        logger.warn(`[ELIS DEBUG] ❌ Параметр "${param.key}" не найден в elisData.parameters`, {
+          elisAlias: param.elisAlias,
+          availableKeys: elisData.parameters ? Object.keys(elisData.parameters) : []
+        });
       }
     });
+
+    logger.info('[ELIS DEBUG] Результат заполнения Parameters:', {
+      successCount: paramsSuccessCount,
+      failedCount: paramsFailedFields.length,
+      failedFields: paramsFailedFields
+    });
+
+    logger.info('[ELIS DEBUG] ========== КОНЕЦ ЗАПОЛНЕНИЯ PARAMETERS ==========');
   }
 
   // 3. Применить все обновления bulk операцией
-  if (Object.keys(updates).length > 0) {
+  logger.info('[ELIS DEBUG] ========== ИТОГОВЫЕ РЕЗУЛЬТАТЫ ==========');
+
+  const totalUpdates = Object.keys(updates).length;
+  const elisFilledCount = Object.keys(updates).filter(k => k.includes('__elisFilled')).length;
+  const actualFieldsUpdated = totalUpdates - elisFilledCount;
+
+  logger.info('[ELIS DEBUG] Подготовленные обновления:', {
+    totalUpdates: totalUpdates,
+    actualFieldsUpdated: actualFieldsUpdated,
+    elisFilledFlagsCount: elisFilledCount,
+    updateKeys: Object.keys(updates)
+  });
+
+  if (totalUpdates > 0) {
     store.bulkUpdateFields(updates);
-    logger.info('[ELIS] Применены обновления полей из данных ELIS', {
-      updatesCount: Object.keys(updates).length
+    logger.info('[ELIS DEBUG] ✅ УСПЕШНО: Обновления применены к store', {
+      updatesCount: actualFieldsUpdated
     });
   } else {
-    logger.warn('[ELIS] Не найдено ни одного поля для заполнения из данных ELIS');
+    logger.error('[ELIS DEBUG] ❌ ОШИБКА: Не найдено ни одного поля для заполнения из данных ELIS!');
   }
+
+  logger.info('[ELIS DEBUG] ========== КОНЕЦ ОБРАБОТКИ ELIS ДАННЫХ ==========');
 };
 
 // Регистрируем обработчик ELIS данных
