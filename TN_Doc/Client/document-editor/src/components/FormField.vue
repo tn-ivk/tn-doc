@@ -66,6 +66,8 @@
       :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor }"
       dateFormat="dd.mm.yy"
       updateModelType="replace"
+      :style="{ width: '100%' }"
+      :inputStyle="{ width: '100%' }"
       class="field-control"
       @update:modelValue="handleChange"
     />
@@ -81,6 +83,8 @@
       :showTime="true"
       hourFormat="24"
       updateModelType="replace"
+      :style="{ width: '100%' }"
+      :inputStyle="{ width: '100%' }"
       class="field-control"
       @update:modelValue="handleChange"
     />
@@ -301,6 +305,16 @@ function handleChange() {
   border-color: var(--md-primary);
   box-shadow: none;
   outline: none;
+}
+
+::deep(.field-control.p-datepicker) {
+  width: 100%;
+  display: flex;
+}
+
+::deep(.field-control.p-datepicker .p-inputtext) {
+  flex: 1;
+  width: 100%;
 }
 
 :deep(.field-control.p-select) {
