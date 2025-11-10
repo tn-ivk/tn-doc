@@ -174,7 +174,6 @@ const handleElisData = (elisData: ElisPassportData) => {
 
   // 5. Найти все поля с ELIS интеграцией
   const fieldsWithElis = store.fields.filter(f => f.elisAlias && f.elisAlias.length > 0);
-  console.error(`🔥🔥🔥 [ELIS DEBUG] Найдено ${fieldsWithElis.length} полей с ElisAlias`, fieldsWithElis);
   logger.info('[ELIS DEBUG] Поля с ElisAlias в конфигурации:', {
     totalFieldsCount: store.fields.length,
     fieldsWithElisCount: fieldsWithElis.length,
@@ -186,31 +185,18 @@ const handleElisData = (elisData: ElisPassportData) => {
     }))
   });
 
-  console.error('🔥 [ELIS DEBUG] ========== КОНЕЦ АНАЛИЗА ДАННЫХ ==========');
   logger.info('[ELIS DEBUG] ========== КОНЕЦ АНАЛИЗА ДАННЫХ ==========');
 
   // 1. Заполнить поля AdditionalInfo
-  console.error('🔥🔥🔥 [ELIS DEBUG] ========== НАЧАЛО ЗАПОЛНЕНИЯ ADDITIONALINFO ==========');
   logger.info('[ELIS DEBUG] ========== НАЧАЛО ЗАПОЛНЕНИЯ ADDITIONALINFO ==========');
 
   let successCount = 0;
   let failedFields: any[] = [];
 
-  // 🔥 КРИТИЧНЫЙ ЛОГ: Начало forEach
-  console.error(`🔥🔥🔥 [ELIS DEBUG] Начинаем обработку ${store.fields.length} полей`);
-  logger.error(`[ELIS DEBUG] 🔥 Начинаем обработку ${store.fields.length} полей из store.fields`);
+  logger.info(`[ELIS DEBUG] Начинаем обработку ${store.fields.length} полей из store.fields`);
 
   store.fields.forEach((field, index) => {
-    // 🔥 ЛОГ КАЖДОГО ПОЛЯ
-    console.error(`🔥 [ELIS DEBUG] Поле #${index}: "${field.key}"`, {
-      key: field.key,
-      label: field.label,
-      hasElisAlias: !!field.elisAlias,
-      elisAlias: field.elisAlias,
-      elisAliasType: typeof field.elisAlias,
-      elisAliasLength: field.elisAlias?.length
-    });
-    logger.error(`[ELIS DEBUG] 🔥 Поле #${index}: "${field.key}"`, {
+    logger.info(`[ELIS DEBUG] Поле #${index}: "${field.key}"`, {
       key: field.key,
       label: field.label,
       hasElisAlias: !!field.elisAlias,
@@ -220,13 +206,11 @@ const handleElisData = (elisData: ElisPassportData) => {
     });
 
     if (!field.elisAlias || field.elisAlias.length === 0) {
-      console.error(`🔥⚠️ [ELIS DEBUG] Поле "${field.key}" ПРОПУЩЕНО (нет elisAlias или длина = 0)`);
-      logger.error(`[ELIS DEBUG] 🔥⚠️ Поле "${field.key}" ПРОПУЩЕНО (elisAlias пустой или отсутствует)`);
+      logger.info(`[ELIS DEBUG] Поле "${field.key}" ПРОПУЩЕНО (elisAlias пустой или отсутствует)`);
       return; // Пропустить поля без ELIS интеграции
     }
 
-    console.error(`🔥✅ [ELIS DEBUG] Поле "${field.key}" ИМЕЕТ elisAlias, продолжаем обработку`);
-    logger.error(`[ELIS DEBUG] 🔥✅ Поле "${field.key}" ИМЕЕТ elisAlias [${field.elisAlias}], продолжаем обработку`);
+    logger.info(`[ELIS DEBUG] Поле "${field.key}" ИМЕЕТ elisAlias [${field.elisAlias}], продолжаем обработку`);
     logger.info(`[ELIS DEBUG] Обработка поля "${field.key}" (${field.label})`, {
       elisAlias: field.elisAlias,
       type: field.type
@@ -237,8 +221,7 @@ const handleElisData = (elisData: ElisPassportData) => {
     let value: any;
     let foundIn: string | null = null;
 
-    // 🔥 КРИТИЧНЫЙ ЛОГ: Перед вызовом findElisValue
-    console.error(`🔥🔥🔥 [ELIS DEBUG] ПЕРЕД ВЫЗОВОМ findElisValue для поля "${field.key}"`, {
+    logger.info(`[ELIS DEBUG] ПЕРЕД ВЫЗОВОМ findElisValue для поля "${field.key}"`, {
       fieldKey: field.key,
       fieldLabel: field.label,
       elisAlias: field.elisAlias,
@@ -247,7 +230,7 @@ const handleElisData = (elisData: ElisPassportData) => {
     });
 
     // Сначала искать в корне (здесь находятся labName, protocolNumber, pointDeliveryName и т.д.)
-    console.error(`🔥 [ELIS DEBUG] Вызываем findElisValue(elisData, [${field.elisAlias}], undefined)`);
+    logger.info(`[ELIS DEBUG] Вызываем findElisValue(elisData, [${field.elisAlias}], undefined)`);
     value = findElisValue(elisData, field.elisAlias);
     if (value !== undefined) {
       foundIn = 'root';
