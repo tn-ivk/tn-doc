@@ -150,17 +150,18 @@ const handleElisData = (elisData: ElisPassportData) => {
     }
 
     // Искать значение в данных ELIS (fallback по массиву алиасов)
+    // Порядок поиска: корень → labInfo → signers.laboratory
     let value: any;
 
-    // Сначала искать в labInfo
-    value = findElisValue(elisData, field.elisAlias, 'labInfo');
+    // Сначала искать в корне (здесь находятся labName, protocolNumber, pointDeliveryName и т.д.)
+    value = findElisValue(elisData, field.elisAlias);
 
-    // Если не найдено, искать в корне
+    // Если не найдено, искать в labInfo (здесь находятся accreditationNumber, ownerName)
     if (value === undefined) {
-      value = findElisValue(elisData, field.elisAlias);
+      value = findElisValue(elisData, field.elisAlias, 'labInfo');
     }
 
-    // Если не найдено, искать в signers.laboratory
+    // Если не найдено, искать в signers.laboratory (здесь находятся post, company)
     if (value === undefined) {
       value = findElisValue(elisData, field.elisAlias, 'signers.laboratory');
     }
@@ -170,6 +171,7 @@ const handleElisData = (elisData: ElisPassportData) => {
       updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
       logger.info('[ELIS] Поле заполнено из данных ELIS', {
         fieldKey: field.key,
+        elisAlias: field.elisAlias,
         value: value
       });
     }

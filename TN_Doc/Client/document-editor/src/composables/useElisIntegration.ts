@@ -196,34 +196,44 @@ export function createMethodFromElisData(elisParam: ElisParameter): ElisMethodDa
  * Обогащает данные ELIS автоматически сформированными полями
  * (например, chiefLabShortSign из givenName, middleName, familyName)
  *
+ * Функция выполняет:
+ * 1. Форматирование ФИО представителя лаборатории (givenName, middleName, familyName → "И. О. Фамилия")
+ * 2. Копирование полей из signers.laboratory в корень и labInfo
+ * 3. Копирование labName в labInfo (если отсутствует)
+ *
  * @param elisData - исходные данные ELIS
  * @returns обогащенные данные ELIS
  */
 export function enrichElisData(elisData: ElisPassportData): ElisPassportData {
   const enriched = { ...elisData };
 
+  // Инициализировать labInfo, если отсутствует
+  if (!enriched.labInfo) {
+    enriched.labInfo = {};
+  }
+
+  // Копировать labName в labInfo для единообразия (если отсутствует в labInfo)
+  if (elisData.labName && !enriched.labInfo.labName) {
+    enriched.labInfo.labName = elisData.labName;
+  }
+
   // Форматировать ФИО представителя лаборатории
   if (elisData.signers?.laboratory) {
     const lab = elisData.signers.laboratory;
     const shortSign = formatShortName(lab.givenName, lab.middleName, lab.familyName);
 
-    // Добавить сформированные поля в корень для удобства поиска
-    if (!enriched.labInfo) {
-      enriched.labInfo = {};
-    }
-
     if (shortSign) {
-      (enriched as any).chiefLabShortSign = shortSign;
+      enriched.chiefLabShortSign = shortSign;
       enriched.labInfo.chiefLabShortSign = shortSign;
     }
 
     if (lab.post) {
-      (enriched as any).chiefLabPosition = lab.post;
+      enriched.chiefLabPosition = lab.post;
       enriched.labInfo.chiefLabPosition = lab.post;
     }
 
     if (lab.company) {
-      (enriched as any).chiefLabOrganization = lab.company;
+      enriched.chiefLabOrganization = lab.company;
       enriched.labInfo.chiefLabOrganization = lab.company;
     }
 
