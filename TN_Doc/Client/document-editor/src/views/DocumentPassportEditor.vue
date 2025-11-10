@@ -357,14 +357,13 @@ const handleElisData = (elisData: ElisPassportData) => {
 
     logger.info('[ELIS DEBUG] Схема параметров качества:', {
       totalParameters: parametersSchema.length,
-      parametersWithElis: parametersSchema.filter(p => p.elisAlias && p.elisAlias.length > 0).length,
-      parameters: parametersSchema.map(p => ({
-        key: p.key,
-        name: p.name,
-        elisAlias: p.elisAlias,
-        hasElisAlias: !!p.elisAlias,
-        methodOptionsCount: p.methodOptions?.length || 0
-      }))
+      parametersWithElis: parametersSchema.filter(p => p.elisAlias && p.elisAlias.length > 0).length
+    });
+
+    // Логировать каждый параметр отдельно для детального анализа
+    logger.info('[ELIS DEBUG] 📋 Детальный список параметров схемы:');
+    parametersSchema.forEach((param, idx) => {
+      logger.info(`[ELIS DEBUG]   Параметр #${idx}: key="${param.key}", name="${param.name}", elisAlias=${JSON.stringify(param.elisAlias)}, methodOptionsCount=${param.methodOptions?.length || 0}`);
     });
 
     let paramsSuccessCount = 0;
