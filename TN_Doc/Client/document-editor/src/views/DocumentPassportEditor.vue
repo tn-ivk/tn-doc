@@ -78,7 +78,7 @@ import { usePassportEditor } from '@/composables/usePassportEditor';
 import { usePassportAutoFill } from '@/composables/usePassportAutoFill';
 import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/composables/useElisIntegration';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
-import type { PassportEditConfig } from '@/types/passport.types';
+import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
 
 const route = useRoute();
 
@@ -423,24 +423,39 @@ const handleElisData = (elisData: ElisPassportData) => {
 
             // Найти метод в списке доступных методов параметра
             // param.methodOptions содержит MethodOption[] с названиями методов
-            const matchingMethod = param.methodOptions.find(
+            let matchingMethod = param.methodOptions.find(
               (method) => method.name === elisMethod.name
             );
 
-            if (matchingMethod) {
-              // Сохранить метод как JSON string (как требует формат formData)
-              const methodKey = `method.${param.key}`;
-              updates[methodKey] = JSON.stringify(matchingMethod);
-              updates[`${methodKey}__elisFilled`] = true;
-              logger.info(`[ELIS DEBUG] ✅ Метод найден в списке: ${matchingMethod.name}`);
-            } else {
-              // Метод не найден в списке - логировать предупреждение
-              logger.warn(`[ELIS DEBUG] ⚠️ Метод "${elisMethod.name}" не найден в списке доступных методов`, {
+            if (!matchingMethod) {
+              // Метод не найден - создаём новый MethodOption из ElisMethodData
+              const maxId = Math.max(0, ...param.methodOptions.map(m => m.id));
+              const newMethod: MethodOption = {
+                id: maxId + 1,
+                use: true,
+                idParameter: param.id,
+                name: elisMethod.name,
+                isDefault: false,
+                limitValueActivate: !!elisMethod.limitValue,
+                limitValue: elisMethod.limitValue,
+                limitValueString: elisMethod.limitValueString
+              };
+
+              matchingMethod = newMethod;
+              param.methodOptions.push(newMethod);
+              logger.info(`[ELIS DEBUG] ➕ Метод "${elisMethod.name}" не найден в списке, добавлен как новая опция`, {
                 paramKey: param.key,
                 elisMethodName: elisMethod.name,
-                availableMethods: param.methodOptions.map(m => m.name)
+                totalMethodsAfter: param.methodOptions.length
               });
+            } else {
+              logger.info(`[ELIS DEBUG] ✅ Метод найден в списке: ${matchingMethod.name}`);
             }
+
+            // Сохранить метод как JSON string (теперь ВСЕГДА заполняем)
+            const methodKey = `method.${param.key}`;
+            updates[methodKey] = JSON.stringify(matchingMethod);
+            updates[`${methodKey}__elisFilled`] = true;
           } else {
             logger.warn(`[ELIS DEBUG] Не удалось создать метод из ELIS данных для "${param.key}"`);
           }
