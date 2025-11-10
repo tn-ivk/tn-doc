@@ -261,28 +261,47 @@ const handleElisData = (elisData: ElisPassportData) => {
         elisValue: value
       });
 
-      if (field.type === 'list' && field.options && field.options.length > 0) {
+      if ((field.type === 'list' || field.type === 'select') && field.options && field.options.length > 0) {
         // value - это строка ФИО (например, "А. А. Богданов")
         // Ищем пользователя с совпадающим label
-        const matchingOption = field.options.find(opt => opt.label === value);
+        let matchingOption = field.options.find(opt => opt.label === value);
 
-        if (matchingOption) {
-          updates[field.key] = matchingOption.value; // Используем ID пользователя
-          updates[`${field.key}__elisFilled`] = true;
-          successCount++;
-          logger.info(`[ELIS DEBUG] ✅ Поле "${field.key}" (combobox) успешно заполнено`, {
-            foundIn: foundIn,
-            elisAlias: field.elisAlias,
+        if (!matchingOption) {
+          // Если значение из ELIS не найдено в списке, создаем новую опцию
+          const maxId = Math.max(0, ...field.options.map(opt => {
+            const id = parseInt(opt.value, 10);
+            return isNaN(id) ? 0 : id;
+          }));
+          const newId = (maxId + 1).toString();
+
+          matchingOption = {
+            value: newId,
+            label: value,
+            selected: false
+          };
+
+          // Добавляем новую опцию в список
+          field.options.push(matchingOption);
+
+          logger.info(`[ELIS DEBUG] ➕ Значение "${value}" не найдено в combobox "${field.key}", добавлена новая опция`, {
             elisValue: value,
-            selectedOptionValue: matchingOption.value,
-            selectedOptionLabel: matchingOption.label
-          });
-        } else {
-          logger.warn(`[ELIS DEBUG] ⚠️ Поле "${field.key}" (combobox): значение "${value}" не найдено в списке options`, {
-            elisValue: value,
+            newOptionValue: newId,
+            previousOptionsCount: field.options.length - 1,
             availableOptions: field.options.map(o => o.label)
           });
         }
+
+        // Устанавливаем выбранное значение (либо найденное, либо только что созданное)
+        updates[field.key] = matchingOption.value; // Используем ID пользователя
+        updates[`${field.key}__elisFilled`] = true;
+        successCount++;
+        logger.info(`[ELIS DEBUG] ✅ Поле "${field.key}" (combobox) успешно заполнено`, {
+          foundIn: foundIn,
+          elisAlias: field.elisAlias,
+          elisValue: value,
+          selectedOptionValue: matchingOption.value,
+          selectedOptionLabel: matchingOption.label
+        });
       } else {
         // Для обычных полей (text, number, date, datetime-local) просто сохраняем значение
         updates[field.key] = value;
