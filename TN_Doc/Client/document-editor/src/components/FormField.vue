@@ -63,8 +63,7 @@
       :id="field.key"
       v-model="localValue"
       :disabled="!field.editable"
-      :class="{ 'p-invalid': !isValid }"
-      :style="fieldBackgroundStyle"
+      :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor }"
       dateFormat="dd.mm.yy"
       updateModelType="replace"
       class="field-control"
@@ -77,8 +76,7 @@
       :id="field.key"
       v-model="localValue"
       :disabled="!field.editable"
-      :class="{ 'p-invalid': !isValid }"
-      :style="fieldBackgroundStyle"
+      :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor }"
       dateFormat="dd.mm.yy"
       :showTime="true"
       hourFormat="24"
@@ -452,6 +450,21 @@ function handleChange() {
 
 :deep(.field-control.p-select.elis-highlighted:not(.p-disabled).p-focus),
 :deep(.field-control.p-select.elis-highlighted:not(.p-disabled):focus-within) {
+  background: var(--md-primary-light) !important;
+}
+
+/* ELIS подсветка для DatePicker (date, datetime-local) */
+:deep(.field-control.p-datepicker.elis-highlighted .p-inputtext) {
+  background: var(--md-elis-highlight, #e8f5e9) !important;
+  transition: background-color 0.2s ease-in-out;
+}
+
+:deep(.field-control.p-datepicker.elis-highlighted .p-inputtext:hover) {
+  background: color-mix(in srgb, var(--md-elis-highlight, #e8f5e9) 85%, var(--md-primary)) !important;
+}
+
+:deep(.field-control.p-datepicker.elis-highlighted .p-inputtext:focus),
+:deep(.field-control.p-datepicker.elis-highlighted .p-inputtext:focus-visible) {
   background: var(--md-primary-light) !important;
 }
 </style>
