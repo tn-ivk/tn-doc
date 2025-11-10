@@ -34,20 +34,14 @@ export function findElisValue(
   elisAlias?: string[],
   searchPath?: string
 ): any {
-  // 🔥 КРИТИЧНЫЙ ЛОГ: Функция вызвана
-  console.error('🔥🔥🔥 [ELIS DEBUG] findElisValue() ВЫЗВАНА!', {
-    elisAlias,
-    searchPath,
-    elisDataKeys: elisData ? Object.keys(elisData) : 'elisData is null/undefined'
-  });
-  logger.error('[ELIS DEBUG] 🔥 findElisValue() ВЫЗВАНА', {
+  // КРИТИЧНЫЙ ЛОГ: Функция вызвана
+  logger.error('[ELIS DEBUG] findElisValue() ВЫЗВАНА', {
     elisAlias,
     searchPath,
     elisDataKeys: elisData ? Object.keys(elisData) : 'elisData is null/undefined'
   });
 
   if (!elisAlias || elisAlias.length === 0) {
-    console.error('🔥 [ELIS DEBUG] findElisValue: elisAlias пустой или undefined');
     logger.warn('[ELIS DEBUG] findElisValue: elisAlias пустой или undefined');
     return undefined;
   }
@@ -92,10 +86,10 @@ export function findElisValue(
   }
 
   // Перебрать все алиасы и найти первое существующее значение
-  console.error(`🔥 [ELIS DEBUG] Начинаем перебор ${elisAlias.length} алиасов`, elisAlias);
+  logger.info(`[ELIS DEBUG] Начинаем перебор ${elisAlias.length} алиасов`, { elisAlias });
 
   for (const alias of elisAlias) {
-    console.error(`🔥 [ELIS DEBUG] Проверяем алиас "${alias}" в searchRoot`, {
+    logger.info(`[ELIS DEBUG] Проверяем алиас "${alias}" в searchRoot`, {
       alias,
       searchRootType: typeof searchRoot,
       hasProperty: searchRoot && typeof searchRoot === 'object' ? alias in searchRoot : false
@@ -103,7 +97,6 @@ export function findElisValue(
 
     const value = searchRoot[alias];
     if (value !== undefined && value !== null) {
-      console.error(`🔥✅ [ELIS DEBUG] НАЙДЕН "${alias}" в "${searchPath || 'root'}"!`, value);
       logger.info(`[ELIS DEBUG] ✅ findElisValue: Найден "${alias}" в "${searchPath || 'root'}"`, {
         alias,
         searchPath: searchPath || 'root',
@@ -112,7 +105,6 @@ export function findElisValue(
       });
       return value;
     } else {
-      console.error(`🔥⚠️ [ELIS DEBUG] Алиас "${alias}" НЕ НАЙДЕН (value = ${value})`);
       logger.info(`[ELIS DEBUG] ⚠️ findElisValue: Алиас "${alias}" не найден в "${searchPath || 'root'}"`);
     }
   }
@@ -329,7 +321,7 @@ export function enrichElisData(elisData: ElisPassportData): ElisPassportData {
  *
  * @example
  * useElisIntegration((elisData) => {
- *   console.log('Получены данные ELIS:', elisData);
+ *   logger.info('Получены данные ELIS:', elisData);
  *   // Применить данные к форме
  * });
  */
