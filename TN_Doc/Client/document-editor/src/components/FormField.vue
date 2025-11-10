@@ -22,7 +22,7 @@
       optionValue="value"
       :placeholder="hideLabel ? '' : `Выберите ${field.label.toLowerCase()}`"
       :disabled="!field.editable"
-      :class="{ 'p-invalid': !isValid }"
+      :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor }"
       :style="fieldBackgroundStyle"
       class="field-control"
       appendTo="self"
@@ -435,5 +435,23 @@ function handleChange() {
   display: block;
   margin-top: 0.25rem;
   font-size: 0.875rem;
+}
+
+/* ELIS подсветка для Select (combobox) */
+:deep(.field-control.p-select.elis-highlighted) {
+  background: var(--md-elis-highlight, #e8f5e9) !important;
+}
+
+:deep(.field-control.p-select.elis-highlighted .p-select-label) {
+  background: transparent !important;
+}
+
+:deep(.field-control.p-select.elis-highlighted:not(.p-disabled):hover) {
+  background: color-mix(in srgb, var(--md-elis-highlight, #e8f5e9) 85%, var(--md-primary)) !important;
+}
+
+:deep(.field-control.p-select.elis-highlighted:not(.p-disabled).p-focus),
+:deep(.field-control.p-select.elis-highlighted:not(.p-disabled):focus-within) {
+  background: var(--md-primary-light) !important;
 }
 </style>
