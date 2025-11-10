@@ -253,14 +253,40 @@ const handleElisData = (elisData: ElisPassportData) => {
     }
 
     if (value !== undefined && value !== null) {
-      updates[field.key] = value;
-      updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
-      successCount++;
-      logger.info(`[ELIS DEBUG] ✅ Поле "${field.key}" успешно заполнено`, {
-        foundIn: foundIn,
-        elisAlias: field.elisAlias,
-        value: typeof value === 'string' && value.length > 100 ? `${value.substring(0, 100)}...` : value
-      });
+      // Для полей типа "list" (combobox) нужно найти соответствующий элемент в field.options
+      if (field.type === 'list' && field.options && field.options.length > 0) {
+        // value - это строка ФИО (например, "А. А. Богданов")
+        // Ищем пользователя с совпадающим label
+        const matchingOption = field.options.find(opt => opt.label === value);
+
+        if (matchingOption) {
+          updates[field.key] = matchingOption.value; // Используем ID пользователя
+          updates[`${field.key}__elisFilled`] = true;
+          successCount++;
+          logger.info(`[ELIS DEBUG] ✅ Поле "${field.key}" (combobox) успешно заполнено`, {
+            foundIn: foundIn,
+            elisAlias: field.elisAlias,
+            elisValue: value,
+            selectedOptionValue: matchingOption.value,
+            selectedOptionLabel: matchingOption.label
+          });
+        } else {
+          logger.warn(`[ELIS DEBUG] ⚠️ Поле "${field.key}" (combobox): значение "${value}" не найдено в списке options`, {
+            elisValue: value,
+            availableOptions: field.options.map(o => o.label)
+          });
+        }
+      } else {
+        // Для обычных полей (text, number, date, datetime-local) просто сохраняем значение
+        updates[field.key] = value;
+        updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
+        successCount++;
+        logger.info(`[ELIS DEBUG] ✅ Поле "${field.key}" успешно заполнено`, {
+          foundIn: foundIn,
+          elisAlias: field.elisAlias,
+          value: typeof value === 'string' && value.length > 100 ? `${value.substring(0, 100)}...` : value
+        });
+      }
     } else {
       failedFields.push({
         key: field.key,
@@ -341,29 +367,29 @@ const handleElisData = (elisData: ElisPassportData) => {
           const elisMethod = createMethodFromElisData(elisParam);
           if (elisMethod) {
             logger.info(`[ELIS DEBUG] Создан метод из ELIS данных:`, elisMethod);
-          } else {
-            logger.warn(`[ELIS DEBUG] Не удалось создать метод из ELIS данных для "${param.key}"`);
-          }
 
-          if (elisMethod) {
             // Найти метод в списке доступных методов параметра
+            // param.methodOptions содержит MethodOption[] с названиями методов
             const matchingMethod = param.methodOptions.find(
               (method) => method.name === elisMethod.name
             );
 
             if (matchingMethod) {
-              // Использовать существующий метод
+              // Сохранить метод как JSON string (как требует формат formData)
               const methodKey = `method.${param.key}`;
-              updates[methodKey] = matchingMethod;
+              updates[methodKey] = JSON.stringify(matchingMethod);
               updates[`${methodKey}__elisFilled`] = true;
               logger.info(`[ELIS DEBUG] ✅ Метод найден в списке: ${matchingMethod.name}`);
             } else {
               // Метод не найден в списке - логировать предупреждение
               logger.warn(`[ELIS DEBUG] ⚠️ Метод "${elisMethod.name}" не найден в списке доступных методов`, {
                 paramKey: param.key,
+                elisMethodName: elisMethod.name,
                 availableMethods: param.methodOptions.map(m => m.name)
               });
             }
+          } else {
+            logger.warn(`[ELIS DEBUG] Не удалось создать метод из ELIS данных для "${param.key}"`);
           }
         }
       } else {

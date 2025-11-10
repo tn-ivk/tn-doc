@@ -42,8 +42,8 @@ export interface FormField {
   key: string;
   /** Отображаемое название поля */
   label: string;
-  /** Тип поля: "select", "text", "number", "date", "datetime-local" */
-  type: 'select' | 'text' | 'number' | 'date' | 'datetime-local';
+  /** Тип поля: "select", "text", "number", "date", "datetime-local", "list" (combobox с локальными пользователями) */
+  type: 'select' | 'text' | 'number' | 'date' | 'datetime-local' | 'list';
   /** Обязательно ли поле для заполнения */
   required: boolean;
   /** Редактируемо ли поле */
