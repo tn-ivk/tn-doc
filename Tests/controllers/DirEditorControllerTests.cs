@@ -308,7 +308,7 @@ public class DirEditorControllerTests
     /// Не должен падать при некорректном JSON словарей (поведение сервиса — логирует ошибку).
     /// </summary>
     [Test]
-    public async Task SetDirAsync_WithInvalidJson_HandlesGracefully()
+    public void SetDirAsync_WithInvalidJson_HandlesGracefully()
     {
         // Arrange
         var invalidJson = "{ invalid json }";
@@ -324,7 +324,7 @@ public class DirEditorControllerTests
     /// Должен выбросить JsonReaderException при некорректном JSON конфигурации паспортов качества.
     /// </summary>
     [Test]
-    public async Task SetQpConfigsAsync_WithInvalidJson_ThrowsJsonReaderException()
+    public void SetQpConfigsAsync_WithInvalidJson_ThrowsJsonReaderException()
     {
         // Arrange
         var invalidJson = "{ invalid json }";

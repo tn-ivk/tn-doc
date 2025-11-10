@@ -536,8 +536,6 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
             return;
         }
 
-        const int testId = 1;
-
         // Act & Assert
         // v1.4.2 требование: GetEditDoc использует Path.Combine() для пути к шаблону
         // DocReport.cs line 216: var templatePath = Path.Combine(PathToRootDirectory, "wwwroot/HTML/DocEdit.html");

@@ -218,8 +218,6 @@ public class KmhMi2816Tests : BaseDocumentTest<KMH_MI2816>
             return;
         }
 
-        const int testId = 1;
-
         // Act & Assert
         // v1.4.2 requirement: all GetEditDoc should use Path.Combine()
         Assert.Pass("GetEditDoc should use Path.Combine() instead of string concatenation (v1.4.2)");
@@ -234,8 +232,6 @@ public class KmhMi2816Tests : BaseDocumentTest<KMH_MI2816>
             Assert.Inconclusive("KMH_MI2816 not initialized");
             return;
         }
-
-        const int testId = 1;
 
         // Act & Assert
         // v1.4.2 requirement: all GetEditDoc should add trace logging
