@@ -161,3 +161,8 @@
 #elis .list-group-item b {
   font-weight: normal; /* Убрать жирное начертание с меток */
 }
+
+#elis .list-group-item small {
+  font-size: inherit;
+  font-family: inherit;
+}
