@@ -20,15 +20,15 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 ```bash
 # Build and run
-dotnet build                                    # Build entire solution
+dotnet build                                    # Build entire solution (or open TN_Doc.sln in Visual Studio/Rider)
 cd TN_Doc && dotnet run                         # Run app (http://localhost:38509)
 
-# Vue components (from TN_Doc/Client/)
-npm run build:all                               # Build all Vue apps
+# Vue components (from TN_Doc/Client/ - uses npm workspaces)
+npm run build:all                               # Build all Vue apps (statusbar, configurator, document-editor)
 npm run dev                                     # StatusBar dev server (port 5173)
 npm run dev:configurator                        # Configurator dev server (port 5174)
 npm run dev:editor                              # Document Editor dev server (⚠️ POC only, port 5175)
-npm run clean                                   # Clean all build artifacts
+npm run clean                                   # Clean all build artifacts (requires Git Bash/PowerShell on Windows)
 
 # Testing
 dotnet test                                     # Run all tests
@@ -37,6 +37,8 @@ dotnet test --filter "ClassName=YourTestClass"  # Run specific test class
 # Code quality
 dotnet format                                   # Format code
 ```
+
+**Note**: Commands use forward slashes for cross-platform compatibility. On Windows, these work in PowerShell and Git Bash. For Command Prompt, use backslashes (`cd TN_Doc` works, but `cd TN_Doc\Client` for nested paths).
 
 ## Quick Start for New Developers
 
@@ -202,6 +204,13 @@ git pull origin develop
 dotnet restore && dotnet build
 
 # 2. Run application (from solution root)
+# Windows PowerShell/Git Bash:
+cd TN_Doc
+$env:ASPNETCORE_ENVIRONMENT="Development"  # PowerShell
+# or: set ASPNETCORE_ENVIRONMENT=Development  # CMD
+dotnet run
+
+# Linux/macOS:
 cd TN_Doc && ASPNETCORE_ENVIRONMENT=Development dotnet run
 
 # 3. Work on Vue components (parallel terminal)
