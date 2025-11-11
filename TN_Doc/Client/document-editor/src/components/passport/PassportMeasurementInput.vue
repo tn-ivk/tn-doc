@@ -145,13 +145,10 @@ function handleValueChange(value: number | null) {
   border-color: var(--md-error, #dc3545) !important;
 }
 
-/* ELIS подсветка - зеленый фон для данных из ELIS */
-.elis-filled {
-  background-color: #8fd19e !important;
-}
-
-.elis-filled:deep(input) {
-  background-color: #8fd19e !important;
+/* ELIS подсветка - применяем ТОЛЬКО к самому input внутри PrimeVue InputNumber */
+.measurement-input.elis-filled:deep(.p-inputnumber-input) {
+  background-color: var(--md-elis-highlight, #e8f5e9) !important;
+  color: var(--md-text, #212121) !important;
 }
 
 /* Disabled стиль */
