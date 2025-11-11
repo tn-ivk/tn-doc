@@ -1110,8 +1110,86 @@ updates[`${methodKey}__elisFilled`] = true;
 
 ---
 
+## 🔧 Критическое исправление №7: Методы испытаний не отображались в combobox (11.11.2025)
+
+### Проблема: Combobox подсвечивался зелёным, но показывал "Метод не выбран"
+
+**Описание**:
+- Методы успешно создавались из ELIS данных
+- Методы сохранялись в `store.formData` в формате camelCase JSON
+- **НО**: `tryParseMethod()` ожидал только PascalCase формат (из бэкенда)
+- Метод не парсился → `selectedMethod = null` → combobox показывал "Метод не выбран"
+
+**Диагностика из логов**:
+```
+INFO [ELIS DEBUG] ➕ Метод "ГОСТ Р 52247-2021, метод Г" не найден в списке, добавлен как новая опция
+INFO [ELIS DEBUG] ✅ Measurement заполнен: Mass_fraction_of_organic_chlorides = 6.1
+```
+
+**Корневая причина**:
+
+Метод сохранялся в `formData` в формате camelCase:
+```json
+{
+  "id": 4,
+  "use": true,
+  "idParameter": 15,
+  "name": "ГОСТ Р 52247-2021, метод Г",
+  "isDefault": false,
+  "limitValueActivate": false,
+  "limitValue": 0,
+  "limitValueString": ""
+}
+```
+
+Но `tryParseMethod()` пытался прочитать `parsed.Name` (PascalCase):
+```typescript
+if (typeof parsed.Name !== 'string') {
+  return null; // ❌ Метод не распознан!
+}
+```
+
+**Решение**:
+
+Обновлена функция `tryParseMethod()` для поддержки обоих форматов:
+
+```typescript
+// usePassportEditor.ts (строки 275-290)
+
+// Поддерживаем как PascalCase (из бэкенда), так и camelCase (из ELIS интеграции)
+const name = parsed.Name || parsed.name;
+if (typeof name !== 'string') {
+  return null;
+}
+
+return {
+  id: parsed.Id || parsed.id || 0,
+  use: Boolean(parsed.Use ?? parsed.use),
+  idParameter: parsed.IdParameter || parsed.idParameter || 0,
+  name: name,
+  isDefault: Boolean(parsed.IsDefault ?? parsed.isDefault),
+  limitValueActivate: Boolean(parsed.LimitValueActivate ?? parsed.limitValueActivate),
+  limitValue: parsed.LimitValue || parsed.limitValue || 0,
+  limitValueString: parsed.LimitValueString || parsed.limitValueString || ''
+};
+```
+
+**Дополнительно**: Упрощена логика добавления методов - убрана строка `param.methodOptions.push(newMethod)`, т.к. это не имело эффекта. Вместо этого `usePassportEditor` автоматически добавляет выбранный метод в список опций (строки 68-71).
+
+**Изменённые файлы**:
+1. `usePassportEditor.ts` - tryParseMethod() с поддержкой camelCase и PascalCase
+2. `DocumentPassportEditor.vue` - упрощена логика создания методов
+
+**Коммит**: `3486418` - "Исправлено заполнение методов испытаний из ELIS: поддержка camelCase"
+
+**Пересборка**: ✅ `npm run build:editor` выполнена успешно
+
+**Результат**: Теперь методы из ELIS корректно парсятся, отображаются в combobox и подсвечиваются зелёным!
+
+---
+
 **Автор**: Разработчик + Ассистент
 **Дата начала**: 2025-11-10 16:00
-**Дата последнего обновления**: 2025-11-10 21:00
+**Дата последнего обновления**: 2025-11-11 09:30
 **Статус**: ✅ **ВСЕ КРИТИЧЕСКИЕ ФУНКЦИИ РАБОТАЮТ** - AdditionalInfo (100%), Parameters Measurement (100%), Parameters Methods (100%). Требуется финальное тестирование.
 
