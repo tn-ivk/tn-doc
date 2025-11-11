@@ -34,15 +34,7 @@ export function findElisValue(
   elisAlias?: string[],
   searchPath?: string
 ): any {
-  // КРИТИЧНЫЙ ЛОГ: Функция вызвана
-  logger.error('[ELIS DEBUG] findElisValue() ВЫЗВАНА', {
-    elisAlias,
-    searchPath,
-    elisDataKeys: elisData ? Object.keys(elisData) : 'elisData is null/undefined'
-  });
-
   if (!elisAlias || elisAlias.length === 0) {
-    logger.warn('[ELIS DEBUG] findElisValue: elisAlias пустой или undefined');
     return undefined;
   }
 
@@ -52,69 +44,23 @@ export function findElisValue(
   if (searchPath) {
     // Поддержка вложенных путей через точку (например, "signers.laboratory")
     const pathParts = searchPath.split('.');
-    logger.info(`[ELIS DEBUG] findElisValue: Поиск по пути "${searchPath}"`, {
-      pathParts,
-      elisAlias
-    });
 
     for (const part of pathParts) {
       searchRoot = searchRoot?.[part];
       if (!searchRoot) {
-        logger.warn('[ELIS DEBUG] findElisValue: Путь поиска не найден в данных ELIS', {
-          searchPath,
-          failedAt: part,
-          availableKeys: searchRoot ? Object.keys(searchRoot) : 'searchRoot is undefined'
-        });
         return undefined;
       }
     }
-
-    // Логировать доступные ключи в найденном объекте
-    if (searchRoot && typeof searchRoot === 'object') {
-      logger.info(`[ELIS DEBUG] findElisValue: Объект поиска найден по пути "${searchPath}"`, {
-        availableKeys: Object.keys(searchRoot),
-        keysCount: Object.keys(searchRoot).length
-      });
-    }
-  } else {
-    // Поиск в корне
-    logger.info(`[ELIS DEBUG] findElisValue: Поиск в корневом объекте`, {
-      elisAlias,
-      availableRootKeys: Object.keys(elisData),
-      rootKeysCount: Object.keys(elisData).length
-    });
   }
 
   // Перебрать все алиасы и найти первое существующее значение
-  logger.info(`[ELIS DEBUG] Начинаем перебор ${elisAlias.length} алиасов`, { elisAlias });
-
   for (const alias of elisAlias) {
-    logger.info(`[ELIS DEBUG] Проверяем алиас "${alias}" в searchRoot`, {
-      alias,
-      searchRootType: typeof searchRoot,
-      hasProperty: searchRoot && typeof searchRoot === 'object' ? alias in searchRoot : false
-    });
-
     const value = searchRoot[alias];
     if (value !== undefined && value !== null) {
-      logger.info(`[ELIS DEBUG] ✅ findElisValue: Найден "${alias}" в "${searchPath || 'root'}"`, {
-        alias,
-        searchPath: searchPath || 'root',
-        valueType: typeof value,
-        valuePreview: typeof value === 'string' && value.length > 50 ? `${value.substring(0, 50)}...` : value
-      });
       return value;
-    } else {
-      logger.info(`[ELIS DEBUG] ⚠️ findElisValue: Алиас "${alias}" не найден в "${searchPath || 'root'}"`);
     }
   }
 
-  logger.warn(`[ELIS DEBUG] ❌ findElisValue: Ни один алиас не найден`, {
-    elisAlias,
-    searchPath: searchPath || 'root',
-    searchedAliases: elisAlias,
-    availableKeysInSearchRoot: searchRoot && typeof searchRoot === 'object' ? Object.keys(searchRoot) : 'not an object'
-  });
   return undefined;
 }
 
@@ -248,31 +194,16 @@ export function createMethodFromElisData(elisParam: ElisParameter): ElisMethodDa
  * @returns обогащенные данные ELIS
  */
 export function enrichElisData(elisData: ElisPassportData): ElisPassportData {
-  logger.info('[ELIS DEBUG] enrichElisData: Начало обогащения данных ELIS', {
-    rootKeys: Object.keys(elisData),
-    hasLabInfo: !!elisData.labInfo,
-    hasSigners: !!elisData.signers,
-    hasSignersLaboratory: !!elisData.signers?.laboratory,
-    hasParameters: !!elisData.parameters,
-    parametersCount: elisData.parameters ? Object.keys(elisData.parameters).length : 0
-  });
-
   const enriched = { ...elisData };
 
   // Инициализировать labInfo, если отсутствует
   if (!enriched.labInfo) {
-    logger.warn('[ELIS DEBUG] enrichElisData: labInfo отсутствует, создаем пустой объект');
     enriched.labInfo = {};
-  } else {
-    logger.info('[ELIS DEBUG] enrichElisData: labInfo присутствует', {
-      labInfoKeys: Object.keys(enriched.labInfo)
-    });
   }
 
   // Копировать labName в labInfo для единообразия (если отсутствует в labInfo)
   if (elisData.labName && !enriched.labInfo.labName) {
     enriched.labInfo.labName = elisData.labName;
-    logger.info(`[ELIS DEBUG] enrichElisData: Скопировано labName в labInfo = "${elisData.labName}"`);
   }
 
   // Форматировать ФИО представителя лаборатории
@@ -283,32 +214,17 @@ export function enrichElisData(elisData: ElisPassportData): ElisPassportData {
     if (shortSign) {
       enriched.chiefLabShortSign = shortSign;
       enriched.labInfo.chiefLabShortSign = shortSign;
-      logger.info(`[ELIS DEBUG] enrichElisData: Добавлено chiefLabShortSign = "${shortSign}"`);
     }
 
     if (lab.post) {
       enriched.chiefLabPosition = lab.post;
       enriched.labInfo.chiefLabPosition = lab.post;
-      logger.info(`[ELIS DEBUG] enrichElisData: Добавлено chiefLabPosition = "${lab.post}"`);
     }
 
     if (lab.company) {
       enriched.chiefLabOrganization = lab.company;
       enriched.labInfo.chiefLabOrganization = lab.company;
-      logger.info(`[ELIS DEBUG] enrichElisData: Добавлено chiefLabOrganization = "${lab.company}"`);
     }
-
-    logger.info('[ELIS DEBUG] enrichElisData: Данные обогащены автоматически сформированными полями', {
-      chiefLabShortSign: shortSign,
-      chiefLabPosition: lab.post,
-      chiefLabOrganization: lab.company
-    });
-  } else {
-    logger.warn('[ELIS DEBUG] enrichElisData: signers.laboratory отсутствует, автоматические поля не добавлены');
-  }
-
-  if (elisData.labName && !enriched.labInfo.labName) {
-    logger.info(`[ELIS DEBUG] enrichElisData: Скопирован labName в labInfo = "${elisData.labName}"`);
   }
 
   return enriched;
