@@ -63,12 +63,12 @@ const isElisFilled = computed(() => {
 
 /* ELIS подсветка */
 .elis-filled {
-  background-color: #8fd19e !important;
+  background-color: var(--md-elis-highlight, #e8f5e9) !important;
   color: var(--md-text, #212121) !important;
 }
 
 .elis-filled:deep(input) {
-  background-color: #8fd19e !important;
+  background-color: var(--md-elis-highlight, #e8f5e9) !important;
   color: var(--md-text, #212121) !important;
 }
 
