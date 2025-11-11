@@ -106,29 +106,14 @@ function handleMethodChange(method: MethodOption | null) {
 }
 
 /* ELIS подсветка */
-.elis-filled {
-  background-color: #8fd19e !important;
-  /*  border-color: #8fd19e !important; */
-  }
-  
 :deep(.p-select.elis-filled) {
   background-color: #8fd19e !important;
 }
 
-  .elis-filled:deep(.p-select-label),
-  .elis-filled:deep(.p-select-dropdown),
-  .elis-filled:deep(.p-select-clear-icon) {
-    background-color: #8fd19e !important;
-  }
-  
-  .elis-filled:deep(.p-select-dropdown) {
-    border-left: 1px solid #8fd19e !important;
-  }
-  
-  .elis-filled:deep(.p-select-dropdown-icon),
-  .elis-filled:deep(.p-select-clear-icon) {
-    color: var(--md-text, #212121) !important;
-  }
+:deep(.p-select.elis-filled .p-select-dropdown-icon),
+:deep(.p-select.elis-filled .p-select-clear-icon) {
+  color: var(--md-text, #212121) !important;
+}
   
   /* Сообщение об ошибке */
 .p-error {
