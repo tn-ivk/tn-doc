@@ -268,19 +268,25 @@ export function usePassportEditor() {
 
     try {
       const parsed = JSON.parse(methodJson);
-      if (!parsed || typeof parsed !== 'object' || typeof parsed.Name !== 'string') {
+      if (!parsed || typeof parsed !== 'object') {
+        return null;
+      }
+
+      // Поддерживаем как PascalCase (из бэкенда), так и camelCase (из ELIS интеграции)
+      const name = parsed.Name || parsed.name;
+      if (typeof name !== 'string') {
         return null;
       }
 
       return {
-        id: parsed.Id || 0,
-        use: Boolean(parsed.Use),
-        idParameter: parsed.IdParameter || 0,
-        name: parsed.Name,
-        isDefault: Boolean(parsed.IsDefault),
-        limitValueActivate: Boolean(parsed.LimitValueActivate),
-        limitValue: parsed.LimitValue || 0,
-        limitValueString: parsed.LimitValueString || ''
+        id: parsed.Id || parsed.id || 0,
+        use: Boolean(parsed.Use ?? parsed.use),
+        idParameter: parsed.IdParameter || parsed.idParameter || 0,
+        name: name,
+        isDefault: Boolean(parsed.IsDefault ?? parsed.isDefault),
+        limitValueActivate: Boolean(parsed.LimitValueActivate ?? parsed.limitValueActivate),
+        limitValue: parsed.LimitValue || parsed.limitValue || 0,
+        limitValueString: parsed.LimitValueString || parsed.limitValueString || ''
       };
     } catch (error) {
       logger.warn('usePassportEditor: parse method failed', {

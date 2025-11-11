@@ -429,8 +429,10 @@ const handleElisData = (elisData: ElisPassportData) => {
 
             if (!matchingMethod) {
               // Метод не найден - создаём новый MethodOption из ElisMethodData
+              // ВАЖНО: не добавляем в param.methodOptions, т.к. это бесполезно
+              // usePassportEditor автоматически добавит выбранный метод в список опций (строки 68-71)
               const maxId = Math.max(0, ...param.methodOptions.map(m => m.id));
-              const newMethod: MethodOption = {
+              matchingMethod = {
                 id: maxId + 1,
                 use: true,
                 idParameter: param.id,
@@ -441,12 +443,9 @@ const handleElisData = (elisData: ElisPassportData) => {
                 limitValueString: elisMethod.limitValueString
               };
 
-              matchingMethod = newMethod;
-              param.methodOptions.push(newMethod);
-              logger.info(`[ELIS DEBUG] ➕ Метод "${elisMethod.name}" не найден в списке, добавлен как новая опция`, {
+              logger.info(`[ELIS DEBUG] ➕ Метод "${elisMethod.name}" не найден в списке, будет добавлен динамически`, {
                 paramKey: param.key,
-                elisMethodName: elisMethod.name,
-                totalMethodsAfter: param.methodOptions.length
+                elisMethodName: elisMethod.name
               });
             } else {
               logger.info(`[ELIS DEBUG] ✅ Метод найден в списке: ${matchingMethod.name}`);
