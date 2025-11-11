@@ -118,7 +118,7 @@ const buildDocumentPayload = (elisParam?: ElisParameter): string => {
     return '';
   }
 
-  const number = elisParam.documentNumber || elisParam.testMethodName || '';
+  const number = elisParam.documentNumber || '';
   if (!number) {
     return '';
   }
