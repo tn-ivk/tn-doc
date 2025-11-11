@@ -68,6 +68,14 @@ export interface ElisParameter {
   valueString?: string;
   /** Название метода испытаний (ГОСТ, ТУ и т.д.) */
   testMethodName?: string;
+  /** Погрешность измерения */
+  measurementError?: string;
+  /** Тип документа (например, "ПротоколИспытаний") */
+  documentType?: string;
+  /** Номер документа */
+  documentNumber?: string;
+  /** Дата документа */
+  documentDate?: string;
 }
 
 /**

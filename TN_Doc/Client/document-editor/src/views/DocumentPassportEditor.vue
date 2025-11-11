@@ -456,11 +456,19 @@ const handleElisData = (elisData: ElisPassportData) => {
             updates[methodKey] = JSON.stringify(matchingMethod);
             updates[`${methodKey}__elisFilled`] = true;
 
-            // Заполнить документ (номер нормативного документа, например "ГОСТ 2477-2014")
+            // Заполнить документ (номер документа из ELIS)
+            // Приоритет: documentNumber → testMethodName (fallback)
             const documentKey = `document.${param.key}`;
-            updates[documentKey] = elisParam.testMethodName;
-            updates[`${documentKey}__elisFilled`] = true;
-            logger.info(`[ELIS DEBUG] ✅ Документ заполнен: ${param.key} = ${elisParam.testMethodName}`);
+            const documentValue = elisParam.documentNumber || elisParam.testMethodName || '';
+
+            if (documentValue) {
+              updates[documentKey] = documentValue;
+              updates[`${documentKey}__elisFilled`] = true;
+              logger.info(`[ELIS DEBUG] ✅ Документ заполнен: ${param.key} = ${documentValue}` +
+                (elisParam.documentNumber ? ' (из documentNumber)' : ' (fallback из testMethodName)'));
+            } else {
+              logger.warn(`[ELIS DEBUG] ⚠️ Документ для "${param.key}" не заполнен: documentNumber и testMethodName пусты`);
+            }
           } else {
             logger.warn(`[ELIS DEBUG] Не удалось создать метод из ELIS данных для "${param.key}"`);
           }

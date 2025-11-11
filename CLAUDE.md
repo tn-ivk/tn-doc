@@ -14,7 +14,7 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **Critical Rules:**
 - NEVER mention AI, code generation, or "Claude" in commit messages
 - Use Russian language for all commit messages
-- Current active branch: feature/passport-edit-config-refactoring
+- Current active branch: feature/elis-fill-2
 
 ## Essential Commands
 
@@ -275,6 +275,7 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
   - Status: Proof of concept, not production-ready
   - May contain incomplete features and bugs
   - Do not rely on this for production deployments
+  - Dev server: `npm run dev:editor` (port 5175)
 
 **Development workflow:**
 1. Start ASP.NET Core app: `cd TN_Doc && dotnet run`
@@ -388,6 +389,10 @@ Real-time data acquisition from measurement systems:
 See `/TN_Doc/changes.md` for full history:
 - **Configurator Enhancements**: Added settings for measurement instruments (СИ), ELIS connections, and OPC connections
 - **Journal Report Fix**: Fixed printing form for measurement instrument registration journal (DataARM compatibility)
+- **UI Theme Improvements**: Centralized color management via CSS variables (see "Modifying UI theme and colors" section)
+  - All colors now defined in `TN_Doc/wwwroot/css/material3.css`
+  - Replaced hardcoded HEX colors with CSS variables across all stylesheets
+  - New CSS variables: `--md-primary-active`, `--md-gray-*`, `--md-elis-highlight`, `--md-error-*`, etc.
 - **Updated docgeneral to version 1.2.3**
 
 ## Previous Major Changes (v1.4.2 - October 2024)
@@ -397,11 +402,6 @@ See `/TN_Doc/changes.md` for full history:
 - **Updated docgeneral to version 1.2.2**
 - ⚠️ **Removed duplicate Act template**: Removed `Act_GOSTR50.2.040(G)_ShiftTime.frx` (duplicated functionality)
 - **UI Refactoring**: Major application interface improvements
-- **UI Theme Improvements**: Centralized color management via CSS variables
-  - All colors now defined in `TN_Doc/wwwroot/css/material3.css`
-  - Replaced hardcoded HEX colors with CSS variables across all stylesheets
-  - New CSS variables: `--md-primary-active`, `--md-gray-*`, `--md-elis-highlight`, `--md-error-*`, etc.
-  - Simplifies theme customization - change colors in one place
 - **Status bar improvements**: 4 indicator states (online, offline, ndv, warning)
   - Improved alignment and sizing of device/service indicators
   - Removed redundant refresh button and SignalR indicator
