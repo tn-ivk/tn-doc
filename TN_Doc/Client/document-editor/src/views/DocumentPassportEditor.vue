@@ -455,6 +455,12 @@ const handleElisData = (elisData: ElisPassportData) => {
             const methodKey = `method.${param.key}`;
             updates[methodKey] = JSON.stringify(matchingMethod);
             updates[`${methodKey}__elisFilled`] = true;
+
+            // Заполнить документ (номер нормативного документа, например "ГОСТ 2477-2014")
+            const documentKey = `document.${param.key}`;
+            updates[documentKey] = elisParam.testMethodName;
+            updates[`${documentKey}__elisFilled`] = true;
+            logger.info(`[ELIS DEBUG] ✅ Документ заполнен: ${param.key} = ${elisParam.testMethodName}`);
           } else {
             logger.warn(`[ELIS DEBUG] Не удалось создать метод из ELIS данных для "${param.key}"`);
           }
