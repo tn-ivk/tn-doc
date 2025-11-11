@@ -8,6 +8,7 @@ import type {
   MethodOption,
   MeasurementUpdateEvent,
   MethodUpdateEvent,
+  ParameterDocument,
   ResultUpdateEvent
 } from '@/types/passport.types';
 
@@ -50,7 +51,9 @@ export function usePassportEditor() {
       const measurementValue = store.formData[`value.${paramSchema.key}`] || '';
       const resultValue = store.formData[`result.${paramSchema.key}`] || '';
       const methodJson = store.formData[`method.${paramSchema.key}`] || '';
-      const documentNumber = store.formData[`document.${paramSchema.key}`] || '';
+      const documentRaw = store.formData[`document.${paramSchema.key}`];
+      const documentElisFilled = store.formData[`document.${paramSchema.key}__elisFilled`] === true;
+      const documentInfo = tryParseDocument(documentRaw, documentElisFilled);
 
       // Парсим выбранный метод
       const selectedMethod = tryParseMethod(methodJson);
@@ -61,7 +64,7 @@ export function usePassportEditor() {
         measurement: store.formData[`value.${paramSchema.key}__elisFilled`] === true,
         method: store.formData[`method.${paramSchema.key}__elisFilled`] === true,
         result: store.formData[`result.${paramSchema.key}__elisFilled`] === true,
-        document: store.formData[`document.${paramSchema.key}__elisFilled`] === true
+        document: documentElisFilled
       };
 
       // Объединяем методы из схемы + выбранный метод (если есть и его нет в списке)
@@ -82,10 +85,7 @@ export function usePassportEditor() {
           options: methodOptions,
           requiredFill: paramSchema.methodRequiredFill
         },
-        document: documentNumber ? {
-          number: documentNumber,
-          elisFilled: elisFlags.document
-        } : undefined,
+        document: documentInfo,
         elisFlags
       };
     });
@@ -295,6 +295,53 @@ export function usePassportEditor() {
       });
       return null;
     }
+  }
+
+  function tryParseDocument(value: unknown, elisFilled: boolean): ParameterDocument | undefined {
+    if (value === null || value === undefined) {
+      return undefined;
+    }
+
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      const payload = value as Record<string, any>;
+      const numberValue = payload.Number ?? payload.number;
+      const typeValue = payload.Type ?? payload.type;
+      const dateValue = payload.Date ?? payload.date;
+
+      if (!numberValue && !typeValue && !dateValue) {
+        return undefined;
+      }
+
+      return {
+        number: numberValue?.toString() ?? '',
+        type: typeValue ? typeValue.toString() : undefined,
+        date: dateValue ? dateValue.toString() : undefined,
+        elisFilled
+      };
+    }
+
+    const raw = value.toString().trim();
+    if (!raw) {
+      return undefined;
+    }
+
+    if (raw.startsWith('{') && raw.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(raw);
+        return tryParseDocument(parsed, elisFilled);
+      } catch (error) {
+        logger.warn('usePassportEditor: parse document failed', {
+          raw,
+          error: error instanceof Error ? error.message : String(error)
+        });
+        return undefined;
+      }
+    }
+
+    return {
+      number: raw.replace(/^"|"$/g, ''),
+      elisFilled
+    };
   }
 
   return {

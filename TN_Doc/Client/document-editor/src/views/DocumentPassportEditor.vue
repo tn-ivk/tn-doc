@@ -104,8 +104,39 @@ const {
 // Используем логику автозаполнения для Паспортов
 const { setupAutoFillWatchers } = usePassportAutoFill();
 
+type LabDocumentInfoPayload = {
+  Number: string;
+  Type?: string;
+  Date?: string;
+};
+
 // Хранилище для отложенной обработки ELIS данных
 let pendingElisData: ElisPassportData | null = null;
+
+const buildDocumentPayload = (elisParam?: ElisParameter): string => {
+  if (!elisParam) {
+    return '';
+  }
+
+  const number = elisParam.documentNumber || elisParam.testMethodName || '';
+  if (!number) {
+    return '';
+  }
+
+  const payload: LabDocumentInfoPayload = {
+    Number: number
+  };
+
+  if (elisParam.documentType) {
+    payload.Type = elisParam.documentType;
+  }
+
+  if (elisParam.documentDate) {
+    payload.Date = elisParam.documentDate;
+  }
+
+  return JSON.stringify(payload);
+};
 
 // Функция обработки данных ELIS
 const handleElisData = (elisData: ElisPassportData) => {
@@ -455,23 +486,23 @@ const handleElisData = (elisData: ElisPassportData) => {
             const methodKey = `method.${param.key}`;
             updates[methodKey] = JSON.stringify(matchingMethod);
             updates[`${methodKey}__elisFilled`] = true;
-
-            // Заполнить документ (номер документа из ELIS)
-            // Приоритет: documentNumber → testMethodName (fallback)
-            const documentKey = `document.${param.key}`;
-            const documentValue = elisParam.documentNumber || elisParam.testMethodName || '';
-
-            if (documentValue) {
-              updates[documentKey] = documentValue;
-              updates[`${documentKey}__elisFilled`] = true;
-              logger.info(`[ELIS DEBUG] ✅ Документ заполнен: ${param.key} = ${documentValue}` +
-                (elisParam.documentNumber ? ' (из documentNumber)' : ' (fallback из testMethodName)'));
-            } else {
-              logger.warn(`[ELIS DEBUG] ⚠️ Документ для "${param.key}" не заполнен: documentNumber и testMethodName пусты`);
-            }
           } else {
             logger.warn(`[ELIS DEBUG] Не удалось создать метод из ELIS данных для "${param.key}"`);
           }
+        }
+
+        // Заполнить документ (LabDocumentInfo)
+        const documentKey = `document.${param.key}`;
+        const documentPayload = buildDocumentPayload(elisParam);
+
+        if (documentPayload) {
+          updates[documentKey] = documentPayload;
+          updates[`${documentKey}__elisFilled`] = true;
+          logger.info(`[ELIS DEBUG] ✅ Документ заполнен: ${param.key}`, {
+            payload: documentPayload
+          });
+        } else {
+          logger.warn(`[ELIS DEBUG] ⚠️ Документ для "${param.key}" не заполнен: отсутствуют documentNumber и testMethodName`);
         }
       } else {
         paramsFailedFields.push({

@@ -5,6 +5,7 @@
     type="text"
     disabled
     class="document-field manual-input--disabled"
+    :title="documentTooltip"
   />
 </template>
 
@@ -35,6 +36,24 @@ const documentNumber = computed(() => {
  */
 const isElisFilled = computed(() => {
   return props.parameter.document?.elisFilled || false;
+});
+
+/**
+ * Подсказка с дополнительной информацией о документе
+ */
+const documentTooltip = computed(() => {
+  if (!props.parameter.document) {
+    return '';
+  }
+
+  const parts: string[] = [];
+  if (props.parameter.document.type) {
+    parts.push(props.parameter.document.type);
+  }
+  if (props.parameter.document.date) {
+    parts.push(props.parameter.document.date);
+  }
+  return parts.join(' • ');
 });
 </script>
 

@@ -103,6 +103,10 @@ export interface MethodOption {
 export interface ParameterDocument {
   /** Номер документа */
   number: string;
+  /** Тип документа */
+  type?: string;
+  /** Дата документа */
+  date?: string;
   /** Заполнено ли из ELIS */
   elisFilled: boolean;
 }
