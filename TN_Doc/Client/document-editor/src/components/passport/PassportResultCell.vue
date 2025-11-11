@@ -1,23 +1,17 @@
 import { logger } from '@tn-doc/shared';
 <template>
-  <!-- Редактируемая ячейка результата -->
+  <!-- Всегда отображаем InputText, чтобы визуально совпадать со столбцами Документы/Измерение -->
   <InputText
-    v-if="isEditable"
-    :modelValue="parameter.values.result"
-    :class="{ 'elis-filled': parameter.elisFlags.result }"
+    :modelValue="isEditable ? parameter.values.result : displayValue"
+    :disabled="!isEditable"
+    :class="[
+      'result-input',
+      { 'elis-filled': parameter.elisFlags.result },
+      { 'manual-input--disabled': !isEditable }
+    ]"
     type="text"
-    class="result-cell-input"
     @update:modelValue="handleValueChange"
   />
-
-  <!-- Нередактируемая ячейка результата (просто текст) -->
-  <span
-    v-else
-    :class="{ 'elis-filled-text': parameter.elisFlags.result }"
-    class="result-cell-readonly"
-  >
-    {{ displayValue }}
-  </span>
 </template>
 
 <script setup lang="ts">
@@ -50,40 +44,38 @@ function handleValueChange(value: string | undefined) {
 </script>
 
 <style scoped>
-.result-cell-input {
+.result-input {
   width: 100%;
-  border: none;
-  background: transparent;
-  text-align: center;
-  font-family: inherit;
   font-size: 15px;
-  padding: 2px;
-  outline: none;
-  box-sizing: border-box;
-  margin: 0;
+  text-align: center;
 }
 
-.result-cell-input:focus {
-  outline: none;
-  background: #f8f9fa;
-}
-
-.result-cell-readonly {
-  display: block;
-  width: 100%;
+.result-input:deep(input) {
   text-align: center;
   font-size: 15px;
 }
 
-/* ELIS подсветка */
-.elis-filled {
-  background-color: #8fd19e !important;
+/* ELIS подсветка для InputText */
+.result-input.elis-filled {
+  background-color: var(--md-elis-highlight, #e8f5e9) !important;
+  color: var(--md-text, #212121) !important;
 }
 
-.elis-filled-text {
-  background-color: #8fd19e;
-  display: inline-block;
-  width: 100%;
-  padding: 2px;
+.result-input.elis-filled:deep(input) {
+  background-color: var(--md-elis-highlight, #e8f5e9) !important;
+  color: var(--md-text, #212121) !important;
+}
+
+/* Disabled стиль как у колонки Документы */
+.manual-input--disabled {
+  background-color: var(--md-surface-variant, #F1F3F4);
+  color: var(--md-text-secondary, #5F6368);
+  cursor: not-allowed;
+}
+
+.manual-input--disabled:deep(input) {
+  background-color: var(--md-surface-variant, #F1F3F4);
+  color: var(--md-text-secondary, #5F6368);
+  cursor: not-allowed;
 }
 </style>
