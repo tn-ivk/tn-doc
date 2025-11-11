@@ -28,10 +28,7 @@
     </td>
 
     <!-- Результат (может быть редактируемым) -->
-    <td
-      class="cell-result"
-      :class="{ 'manual-input--disabled': !isResultEditable }"
-    >
+    <td class="cell-result">
       <PassportResultCell
         :parameter="parameter"
         :isEditable="isResultEditable"
@@ -134,6 +131,7 @@ function handleResultUpdate(value: string) {
 
 .cell-result {
   text-align: center;
+  padding: 4px;
 }
 
 .manual-input--disabled {
