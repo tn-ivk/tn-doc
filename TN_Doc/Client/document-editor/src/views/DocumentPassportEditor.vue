@@ -155,6 +155,11 @@ const handleElisData = (elisData: ElisPassportData) => {
   // Подготовить объект для bulk update
   const updates: Record<string, any> = {};
 
+  // ВАЖНО: Сохранить полную структуру ELIS протокола для передачи на бэкенд
+  // Используем ключ с __ (двойное подчеркивание), который пропускается при создании CorrectionData,
+  // но извлекается напрямую в методе DocUpdate на бэкенде
+  updates['__elisProtocol'] = JSON.stringify(elisData);
+
   // 1. Заполнить поля AdditionalInfo
 
   let successCount = 0;
