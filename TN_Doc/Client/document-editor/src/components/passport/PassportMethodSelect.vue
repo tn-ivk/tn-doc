@@ -22,8 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { logger } from '@tn-doc/shared';
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import Select from 'primevue/select';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
@@ -37,10 +36,6 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   'update:method': [method: MethodOption | null];
 }>();
-
-onMounted(() => {
-  logger.trace(`PassportMethodSelect [${props.parameter.key}]: метод="${props.parameter.method.selected || '(не выбран)'}", опций=${methodOptions.value.length}`);
-});
 
 /**
  * Опции для Select компонента

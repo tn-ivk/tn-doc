@@ -274,11 +274,11 @@ export function useElisIntegration(onElisDataReceived: (data: ElisPassportData) 
 
   onMounted(() => {
     window.addEventListener('message', handleMessage);
-    logger.info('[useElisIntegration] Слушатель postMessage зарегистрирован');
+    logger.trace('[useElisIntegration] Слушатель postMessage зарегистрирован');
   });
 
   onUnmounted(() => {
     window.removeEventListener('message', handleMessage);
-    logger.info('[useElisIntegration] Слушатель postMessage удалён');
+    logger.trace('[useElisIntegration] Слушатель postMessage удалён');
   });
 }
