@@ -69,7 +69,7 @@ public class StatusProvider : IStatusProvider
 
                 healthyDevices = devices.Count(d => d.IsConnected);
 
-                _logger.LogInformation(
+                _logger.LogDebug(
                     "Проверка устройств завершена: {HealthyCount}/{TotalCount} устройств доступны",
                     healthyDevices, devices.Count);
             }
