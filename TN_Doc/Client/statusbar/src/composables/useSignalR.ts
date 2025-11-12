@@ -14,7 +14,7 @@ export function useSignalR(hubUrl: string) {
   async function connect() {
     try {
       connectionState.value = 'connecting';
-      logger.info(`SignalR: попытка подключения к хабу`, { hubUrl });
+      logger.debug(`SignalR: попытка подключения к хабу`, { hubUrl });
 
       connection.value = new signalR.HubConnectionBuilder()
         .withUrl(hubUrl, {
@@ -40,7 +40,7 @@ export function useSignalR(hubUrl: string) {
 
       connection.value.onreconnected((connectionId) => {
         connectionState.value = 'connected';
-        logger.info('SignalR: успешно переподключен', { connectionId });
+        logger.debug('SignalR: успешно переподключен', { connectionId });
       });
 
       connection.value.onclose((err) => {
@@ -50,14 +50,14 @@ export function useSignalR(hubUrl: string) {
             error: err.message
           });
         } else {
-          logger.info('SignalR: соединение закрыто штатно');
+          logger.debug('SignalR: соединение закрыто штатно');
         }
       });
 
       await connection.value.start();
       connectionState.value = 'connected';
       error.value = null;
-      logger.info('SignalR: успешно подключен', {
+      logger.debug('SignalR: успешно подключен', {
         hubUrl,
         connectionId: connection.value.connectionId
       });
@@ -114,7 +114,7 @@ export function useSignalR(hubUrl: string) {
       await connection.value.stop();
       connection.value = null;
       connectionState.value = 'disconnected';
-      logger.info('SignalR: соединение вручную закрыто');
+      logger.debug('SignalR: соединение вручную закрыто');
     }
   }
 

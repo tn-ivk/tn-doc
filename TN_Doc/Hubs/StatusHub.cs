@@ -21,7 +21,7 @@ namespace TN_Doc.Hubs
         public override async Task OnConnectedAsync()
         {
             var clientIp = Context.GetHttpContext()?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "StatusHub: Client connected - ConnectionId: {ConnectionId}, IP: {ClientIP}",
                 Context.ConnectionId, clientIp);
 
@@ -40,7 +40,7 @@ namespace TN_Doc.Hubs
             }
             else
             {
-                _logger.LogInformation(
+                _logger.LogDebug(
                     "StatusHub: Client disconnected - ConnectionId: {ConnectionId}, IP: {ClientIP}",
                     Context.ConnectionId, clientIp);
             }
