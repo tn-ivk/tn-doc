@@ -84,10 +84,6 @@ public class StatusMonitoringService : BackgroundService
                         currentStatus,
                         stoppingToken);
                 }
-                else
-                {
-                    _logger.LogTrace("Изменений статуса не обнаружено в цикле мониторинга");
-                }
 
                 // Сброс счетчика ошибок при успешном выполнении
                 _consecutiveErrors = 0;

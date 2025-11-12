@@ -41,7 +41,6 @@ public class StatusProvider : IStatusProvider
     public async Task<StatusResponse> GetStatusAsync(CancellationToken ct = default)
     {
         var stopwatch = Stopwatch.StartNew();
-        _logger.LogDebug("Начинается проверка статуса всех устройств и сервисов");
 
         try
         {
@@ -52,10 +51,7 @@ public class StatusProvider : IStatusProvider
                 return new StatusResponse();
             }
 
-            _logger.LogDebug("Получена конфигурация с {DeviceCount} устройствами", appConfig.Devices?.Count ?? 0);
-
             var devices = new List<DeviceStatus>();
-            var healthyDevices = 0;
 
             // Проверка устройств (БД)
             if (appConfig.Devices?.Any() == true)
@@ -66,12 +62,6 @@ public class StatusProvider : IStatusProvider
 
                 var deviceResults = await Task.WhenAll(deviceTasks);
                 devices.AddRange(deviceResults);
-
-                healthyDevices = devices.Count(d => d.IsConnected);
-
-                _logger.LogDebug(
-                    "Проверка устройств завершена: {HealthyCount}/{TotalCount} устройств доступны",
-                    healthyDevices, devices.Count);
             }
 
             // Проверка сервисов
@@ -84,12 +74,15 @@ public class StatusProvider : IStatusProvider
                 Timestamp = DateTime.UtcNow.ToString("o")
             };
 
+            // Один сводный лог вместо нескольких
+            var healthyDevices = devices.Count(d => d.IsConnected);
             _logger.LogDebug(
-                "Проверка статуса завершена за {ElapsedMs}мс - Устройства: {HealthyDevices}/{TotalDevices}, MS: {MsStatus}",
+                "Проверка статуса: {ElapsedMs}мс | Устройства: {HealthyDevices}/{TotalDevices} | MS: {MsStatus} | ELIS: {ElisStatus}",
                 stopwatch.ElapsedMilliseconds,
                 healthyDevices,
                 devices.Count,
-                services.MessagingService?.IsConnected ?? false);
+                services.MessagingService?.IsConnected ?? false,
+                services.Elis?.IsConnected ?? false);
 
             return response;
         }
@@ -117,8 +110,6 @@ public class StatusProvider : IStatusProvider
             Type = "database",
             IsConnected = false
         };
-
-        _logger.LogDebug("Проверка устройства {DeviceName} (ID: {DeviceId})", device.Name, device.IdDevice);
 
         try
         {
@@ -151,9 +142,6 @@ public class StatusProvider : IStatusProvider
 
             status.IsConnected = true;
             status.LatencyMs = (int)deviceStopwatch.ElapsedMilliseconds;
-
-            _logger.LogDebug("Устройство {DeviceName} успешно подключено за {LatencyMs}мс",
-                device.Name, status.LatencyMs);
         }
         catch (OperationCanceledException)
         {
@@ -186,8 +174,6 @@ public class StatusProvider : IStatusProvider
         // Проверяем сервисы только если есть активные клиенты
         if (!_clientTracker.HasActiveClients)
         {
-            _logger.LogTrace("Пропуск проверки сервисов: нет активных клиентов");
-
             // Возвращаем статусы по умолчанию (отключено)
             services.MessagingService = new ConnectionStatus { IsConnected = false, LastChecked = DateTime.Now };
 
@@ -229,9 +215,6 @@ public class StatusProvider : IStatusProvider
             status.IsConnected = response.IsSuccessStatusCode;
             status.LatencyMs = (int)stopwatch.ElapsedMilliseconds;
             status.LastChecked = DateTime.Now;
-
-            _logger.LogDebug("Проверка Messaging Service: {Status} за {LatencyMs}мс",
-                status.IsConnected ? "Подключен" : "Отключен", status.LatencyMs);
         }
         catch (TaskCanceledException ex)
         {
@@ -268,12 +251,10 @@ public class StatusProvider : IStatusProvider
             {
                 // Считаем ELIS настроенным, если есть ключевые параметры
                 status.IsConnected = true;
-                _logger.LogDebug("Конфигурация ELIS используется");
             }
             else
             {
                 status.Error = "Конфигурация ELIS не используется";
-                _logger.LogDebug("Конфигурация ELIS не используется");
             }
 
             // TODO: Реализовать реальную проверку через TN.ElisConnector
