@@ -57,41 +57,7 @@ class DocumentApiService {
     id: number
   ): Promise<DocumentEditConfig> {
     const url = `/${deviceId}/${docType}/edit/${id}`;
-    logger.debug('API: getEditConfig запрос', { deviceId, docType, id, url });
-
     const response = await this.api.get<DocumentEditConfig>(url);
-
-    logger.debug('API: getEditConfig ответ получен');
-    logger.debug('API: getEditConfig статус', { status: response.status });
-    logger.trace('API: getEditConfig данные', { data: response.data });
-
-    // Детальная проверка fields и initialValues
-    if (response.data) {
-      logger.debug('API: getEditConfig количество полей', { count: response.data.fields?.length });
-      logger.debug('API: getEditConfig количество initialValues', { count: Object.keys(response.data.initialValues || {}).length });
-
-      // Ищем поля, связанные с датой/временем
-      const dateFields = response.data.fields?.filter(f =>
-        f.label?.toLowerCase().includes('дата') ||
-        f.label?.toLowerCase().includes('время') ||
-        f.key?.toLowerCase().includes('date') ||
-        f.key?.toLowerCase().includes('time')
-      );
-
-      if (dateFields && dateFields.length > 0) {
-        logger.debug('API: getEditConfig найдены поля даты/времени', {
-          fields: dateFields.map(f => ({
-            key: f.key,
-            label: f.label,
-            type: f.type,
-            initialValue: response.data.initialValues?.[f.key]
-          }))
-        });
-      } else {
-        logger.warn('API: getEditConfig не найдены поля даты/времени');
-      }
-    }
-
     return response.data;
   }
 

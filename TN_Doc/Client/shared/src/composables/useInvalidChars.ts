@@ -27,14 +27,11 @@ export function useInvalidChars() {
   async function getInvalidChars(deviceId: number): Promise<string[]> {
     // Проверяем кэш
     if (cache.has(deviceId)) {
-      logger.debug('[useInvalidChars] Используем кэш', { deviceId });
       return cache.get(deviceId)!;
     }
 
     // Загружаем с сервера
     try {
-      logger.debug('[useInvalidChars] Загружаем с сервера', { deviceId });
-
       const response = await fetch(`/Home/GetInvalideChars?IdDevice=${deviceId}`, {
         credentials: 'same-origin',
         headers: {
@@ -61,11 +58,6 @@ export function useInvalidChars() {
 
       // Кэшируем результат
       cache.set(deviceId, chars);
-      logger.debug('[useInvalidChars] Загружены и закэшированы', {
-        deviceId,
-        count: chars.length,
-        chars
-      });
 
       return chars;
     } catch (error) {
@@ -97,11 +89,8 @@ export function useInvalidChars() {
   function clearCache(deviceId?: number): void {
     if (deviceId !== undefined) {
       cache.delete(deviceId);
-      logger.debug('[useInvalidChars] Очищен кэш устройства', { deviceId });
     } else {
-      const cacheSize = cache.size;
       cache.clear();
-      logger.debug('[useInvalidChars] Очищен весь кэш', { entriesCleared: cacheSize });
     }
   }
 
