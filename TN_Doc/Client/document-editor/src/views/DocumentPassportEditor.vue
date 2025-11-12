@@ -225,6 +225,7 @@ const handleElisData = (elisData: ElisPassportData) => {
         // Устанавливаем выбранное значение (либо найденное, либо только что созданное)
         updates[field.key] = matchingOption.value; // Используем ID пользователя
         updates[`${field.key}__elisFilled`] = true;
+
         successCount++;
       } else {
         // Для обычных полей (text, number, date, datetime-local) просто сохраняем значение
@@ -336,6 +337,7 @@ const handleElisData = (elisData: ElisPassportData) => {
 
   // 3. Применить все обновления bulk операцией
   if (Object.keys(updates).length > 0) {
+    logger.info(`[ELIS Fill] Применяем bulk update с ${Object.keys(updates).length} обновлениями`);
     store.bulkUpdateFields(updates);
   }
 };
