@@ -1,5 +1,4 @@
-import { logger } from '@tn-doc/shared';
-              <template>
+<template>
   <div class="method-field">
     <Select
       :modelValue="selectedMethodOption"
@@ -40,9 +39,7 @@ const emit = defineEmits<{
 }>();
 
 onMounted(() => {
-  logger.debug('PassportMethodSelect: монтирование', { paramKey: props.parameter.key });
-  logger.debug('PassportMethodSelect: выбранный метод', { selected: props.parameter.method.selected });
-  logger.debug('PassportMethodSelect: количество опций', { count: methodOptions.value.length });
+  logger.trace(`PassportMethodSelect [${props.parameter.key}]: метод="${props.parameter.method.selected || '(не выбран)'}", опций=${methodOptions.value.length}`);
 });
 
 /**
