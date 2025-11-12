@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents and reports from measurement system data (ИВК - Измерительно-вычислительный комплекс). The system generates quality certificates, verification protocols, acceptance acts, and various measurement reports using FastReport templates.
 
-**Version**: 1.4.3 (.NET 8.0)
+**Version**: 1.4.4 (.NET 8.0)
 **Main Development Branch**: develop
 **Runtime Requirement**: .NET Runtime 8.0.13+
 **Node.js Requirement**: Node.js 18.0+ и npm 8.0+ (для Vue компонентов)
@@ -27,7 +27,7 @@ cd TN_Doc && dotnet run                         # Run app (http://localhost:3850
 npm run build:all                               # Build all Vue apps (statusbar, configurator, document-editor)
 npm run dev                                     # StatusBar dev server (port 5173)
 npm run dev:configurator                        # Configurator dev server (port 5174)
-npm run dev:editor                              # Document Editor dev server (⚠️ POC only, port 5175)
+npm run dev:editor                              # Document Editor dev server (port 5175)
 npm run clean                                   # Clean all build artifacts (requires Git Bash/PowerShell on Windows)
 
 # Testing
@@ -89,7 +89,7 @@ tn_doc/
 │   └── Client/                # Frontend Vue 3 applications (npm workspaces)
 │       ├── statusbar/         # Real-time status monitoring (Vue 3 + PrimeVue) - PRODUCTION
 │       ├── configurator/      # Configuration management UI (v1.4.2+) - PRODUCTION
-│       ├── document-editor/   # ⚠️ EXPERIMENTAL POC - NOT FOR PRODUCTION USE
+│       ├── document-editor/   # In-browser document editing interface (v1.4.4+) - PRODUCTION
 │       └── shared/            # Shared TypeScript utilities and types
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
@@ -279,12 +279,11 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
   - Dev server: `npm run dev:configurator` (port 5174)
   - Build output: `TN_Doc/wwwroot/dist/configurator/`
 
-**⚠️ Experimental component (DO NOT USE IN PRODUCTION):**
-- **Document Editor** (`TN_Doc/Client/document-editor/`): POC for in-browser document editing
-  - Status: Proof of concept, not production-ready
-  - May contain incomplete features and bugs
-  - Do not rely on this for production deployments
+- **Document Editor** (`TN_Doc/Client/document-editor/`): In-browser document editing interface (v1.4.4+)
+  - Framework: Vue 3 + TypeScript + PrimeVue
+  - Features: Edit Passport quality parameters, ELIS integration, OPC communication
   - Dev server: `npm run dev:editor` (port 5175)
+  - Build output: `TN_Doc/wwwroot/dist/document-editor/`
 
 **Development workflow:**
 1. Start ASP.NET Core app: `cd TN_Doc && dotnet run`
@@ -393,12 +392,20 @@ Real-time data acquisition from measurement systems:
 - **Permission issues on Linux**: Ensure `alphadaemon` user has access to `/opt/TN_Doc/`
 - **libgdiplus errors on Linux**: Install via `sudo apt install libgdiplus` (Debian/Ubuntu)
 
-## Recent Changes (v1.4.3)
+## Recent Changes (v1.4.4)
 
 See `/TN_Doc/changes.md` for full history:
+- **Document Editor Production Release**: Document Editor promoted from POC to production-ready status
+  - Supports editing Passport quality parameters with real-time validation
+  - Integrated with ELIS (lab data) and OPC (device communication)
+  - Advanced auto-fill functionality for dependent parameters
+  - Full support for method selection and measurement input
+
+## Previous Changes (v1.4.3)
+
 - **Configurator Enhancements**: Added settings for measurement instruments (СИ), ELIS connections, and OPC connections
 - **Journal Report Fix**: Fixed printing form for measurement instrument registration journal (DataARM compatibility)
-- **UI Theme Improvements**: Centralized color management via CSS variables (see "Modifying UI theme and colors" section)
+- **UI Theme Improvements**: Centralized color management via CSS variables
   - All colors now defined in `TN_Doc/wwwroot/css/material3.css`
   - Replaced hardcoded HEX colors with CSS variables across all stylesheets
   - New CSS variables: `--md-primary-active`, `--md-gray-*`, `--md-elis-highlight`, `--md-error-*`, etc.
