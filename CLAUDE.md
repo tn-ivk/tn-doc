@@ -443,3 +443,4 @@ The following projects must be deployed at the same level (all share TN_Doc conf
   ```bash
   git clone http://192.168.100.100/orpovy/ivk/tn.elisconnector.git
   ```
+- логи приложения находятся в папке ./TN_Doc/bin/Debug/net8.0/logs

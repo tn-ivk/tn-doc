@@ -140,14 +140,8 @@ const buildDocumentPayload = (elisParam?: ElisParameter): string => {
 
 // Функция обработки данных ELIS
 const handleElisData = (elisData: ElisPassportData) => {
-  logger.info('[DocumentPassportEditor] Получены данные ELIS, начинаем заполнение формы');
-
   // Проверить, что конфигурация загружена
   if (!store.config || store.fields.length === 0) {
-    logger.warn('[ELIS] Конфигурация документа ещё не загружена, сохраняем данные для отложенной обработки', {
-      hasConfig: !!store.config,
-      fieldsCount: store.fields.length
-    });
     pendingElisData = elisData; // Сохранить для обработки после загрузки
     return;
   }
@@ -161,9 +155,6 @@ const handleElisData = (elisData: ElisPassportData) => {
   updates['__elisProtocol'] = JSON.stringify(elisData);
 
   // 1. Заполнить поля AdditionalInfo
-
-  let successCount = 0;
-  let failedFields: any[] = [];
 
   store.fields.forEach((field, index) => {
     if (!field.elisAlias || field.elisAlias.length === 0) {
@@ -224,22 +215,13 @@ const handleElisData = (elisData: ElisPassportData) => {
 
         // Устанавливаем выбранное значение (либо найденное, либо только что созданное)
         updates[field.key] = matchingOption.value; // Используем ID пользователя
+        updates[`${field.key}__label`] = matchingOption.label; // ИСПРАВЛЕНИЕ: Обновляем label
         updates[`${field.key}__elisFilled`] = true;
-
-        successCount++;
       } else {
         // Для обычных полей (text, number, date, datetime-local) просто сохраняем значение
         updates[field.key] = value;
         updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
-        successCount++;
       }
-    } else {
-      failedFields.push({
-        key: field.key,
-        label: field.label,
-        elisAlias: field.elisAlias,
-        searchedIn: ['root', 'labInfo', 'signers.laboratory']
-      });
     }
   });
 
@@ -251,9 +233,6 @@ const handleElisData = (elisData: ElisPassportData) => {
     if (parametersSchema.length === 0) {
       return;
     }
-
-    let paramsSuccessCount = 0;
-    let paramsFailedFields: any[] = [];
 
     parametersSchema.forEach((param, paramIndex) => {
       const elisAlias = param.elisData?.elisAlias;
@@ -271,7 +250,6 @@ const handleElisData = (elisData: ElisPassportData) => {
           const valueKey = `value.${param.key}`;
           updates[valueKey] = elisParam.value.toString();
           updates[`${valueKey}__elisFilled`] = true;
-          paramsSuccessCount++;
         }
 
         // Заполнить result (valueString)
@@ -325,19 +303,12 @@ const handleElisData = (elisData: ElisPassportData) => {
           updates[documentKey] = documentPayload;
           updates[`${documentKey}__elisFilled`] = true;
         }
-      } else {
-        paramsFailedFields.push({
-          key: param.key,
-          name: param.name,
-          elisAlias: elisAlias
-        });
       }
     });
   }
 
   // 3. Применить все обновления bulk операцией
   if (Object.keys(updates).length > 0) {
-    logger.info(`[ELIS Fill] Применяем bulk update с ${Object.keys(updates).length} обновлениями`);
     store.bulkUpdateFields(updates);
   }
 };
@@ -352,7 +323,6 @@ onMounted(async () => {
 
   if (!deviceId || !id) {
     store.error = 'Отсутствуют обязательные параметры маршрута';
-    logger.error('[DocumentPassportEditor] Отсутствуют параметры маршрута');
     return;
   }
 
@@ -367,7 +337,6 @@ onMounted(async () => {
 
   // Обработать отложенные ELIS данные, если они были получены до загрузки конфигурации
   if (pendingElisData) {
-    logger.info('[ELIS] Обрабатываем отложенные ELIS данные после загрузки конфигурации');
     handleElisData(pendingElisData);
     pendingElisData = null; // Сбросить после обработки
   }
