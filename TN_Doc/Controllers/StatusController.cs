@@ -70,7 +70,7 @@ public class StatusController : ControllerBase
             _cache.Set(CacheKey, response, cacheOptions);
 
             var totalDuration = DateTime.UtcNow - requestStart;
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "Status request completed in {Duration}ms for {ClientIP}. " +
                 "Devices: {HealthyDevices}/{TotalDevices}",
                 totalDuration.TotalMilliseconds,
@@ -110,7 +110,7 @@ public class StatusController : ControllerBase
     public async Task<IActionResult> RefreshStatus()
     {
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-        _logger.LogInformation("Status refresh requested by {ClientIP}", clientIp);
+        _logger.LogDebug("Status refresh requested by {ClientIP}", clientIp);
 
         try
         {
@@ -124,7 +124,7 @@ public class StatusController : ControllerBase
             };
             _cache.Set(CacheKey, response, cacheOptions);
 
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "Status refreshed by {ClientIP}. New status: Devices {HealthyDevices}/{TotalDevices}",
                 clientIp,
                 response.Devices.Count(d => d.IsConnected),
