@@ -59,10 +59,14 @@ on('statusUpdated', (data: StatusResponse) => {
   });
 });
 
-// Начальная загрузка
+// Начальная загрузка с задержкой для гарантии готовности сервера
 onMounted(() => {
-  logger.debug('StatusBar: компонент монтирован, загрузка статусов');
-  store.fetchStatus();
+  logger.debug('StatusBar: компонент монтирован, загрузка статусов через 2 секунды');
+
+  // Задержка 2 секунды перед первым запросом, чтобы сервер успел инициализироваться
+  setTimeout(() => {
+    store.fetchStatus();
+  }, 2000);
 });
 
 function handleDeviceClick(device: DeviceStatus) {

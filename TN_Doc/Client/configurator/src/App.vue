@@ -90,6 +90,9 @@ const configStore = useConfigStore();
 const { currentConfig, isLoading, isSaving, isDirty, error } = storeToRefs(configStore);
 
 onMounted(async () => {
+  // Задержка 2 секунды перед первым запросом, чтобы сервер успел инициализироваться
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
   try {
     await configStore.loadConfig();
   } catch (e: any) {
