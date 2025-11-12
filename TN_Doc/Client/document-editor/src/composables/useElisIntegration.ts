@@ -101,6 +101,9 @@ export function formatShortName(
  * - "До 8" → limitValue: 8.0, operator: 'less'
  * - "От 2" → limitValue: 2.0, operator: 'more_equal'
  *
+ * Простые числовые значения ("5,32", "9.9") молча возвращают null - это нормальное поведение.
+ * Предупреждение логируется только для нераспознанных текстовых представлений.
+ *
  * @param valueString - текстовое представление из ELIS
  * @returns объект с limitValue, operator и limitValueString или null
  */
@@ -114,6 +117,14 @@ export function parseElisValueString(valueString: string): {
   }
 
   const trimmed = valueString.trim();
+
+  // Проверить, является ли строка просто числом (с запятой или точкой)
+  // Примеры: "5,32", "9.9", "0,28"
+  const isPlainNumber = /^[0-9]+[,\.]?[0-9]*$/.test(trimmed);
+  if (isPlainNumber) {
+    // Молча вернуть null - это нормальный случай (числовое значение без оператора)
+    return null;
+  }
 
   // Паттерны для парсинга (порядок важен!)
   const patterns = [
@@ -133,7 +144,7 @@ export function parseElisValueString(valueString: string): {
       const limitValue = parseFloat(numberStr);
 
       if (!isNaN(limitValue)) {
-        logger.info('[ELIS] Распознано пороговое значение из текстового представления', {
+        logger.trace('[ELIS] Распознано пороговое значение из текстового представления', {
           originalString: trimmed,
           limitValue,
           operator
@@ -147,6 +158,8 @@ export function parseElisValueString(valueString: string): {
     }
   }
 
+  // Предупреждение только для строк, которые НЕ являются простыми числами
+  // и НЕ распознаны паттернами (возможно, новый формат ELIS)
   logger.warn('[ELIS] Не удалось распознать формат текстового представления', {
     valueString: trimmed
   });
