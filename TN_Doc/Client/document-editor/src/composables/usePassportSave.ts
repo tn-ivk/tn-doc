@@ -87,10 +87,10 @@ export function usePassportSave() {
         opcParams.deviceName, // Имя устройства ("ИВК-1"), а не ID!
         resultTagName,
         (currentValue: number, initialValue: number) => currentValue > initialValue,
-        5000, // maxDuration (5 секунд)
-        500,  // pollInterval (500 мс)
-        2,    // namespaceIndex
-        0     // indexArray для чтения
+        10000, // maxDuration (10 секунд)
+        500,   // pollInterval (500 мс)
+        2,     // namespaceIndex
+        0      // indexArray для чтения
       );
 
       if (!pollingSuccess) {
