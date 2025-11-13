@@ -63,8 +63,7 @@ function _loadAppDictionaries() {
                 try {
                     appDictionaries = JSON.parse(data['dirJsonRaw']);
                     hashCodeLoadedCodeDict = GetObjectHashCode(appDictionaries);
-                    logInfo('Словари приложения успешно загружены');
-                    logDebug(`Загружено словарей: ${Object.keys(appDictionaries).length}, HashCode: ${hashCodeLoadedCodeDict}`);
+                    logDebug(`Словари приложения загружены: ${Object.keys(appDictionaries).length}, HashCode: ${hashCodeLoadedCodeDict}`);
                 } catch (parseError) {
                     logError('Ошибка парсинга JSON данных словарей: ' + parseError.message);
                     appDictionaries = {};
@@ -1603,8 +1602,7 @@ function _loadQPConfigsDictionaries() {
                 try {
                     qpCfgsDictionaries = JSON.parse(data['qpCfgJsonRaw']);
                     hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
-                    logInfo('Конфигурации паспортов качества успешно загружены');
-                    logDebug(`Загружено конфигураций QP: ${qpCfgsDictionaries?.QpsInfo?.length || 0}, HashCode: ${hashCodeLoadedQpConfigs}`);
+                    logDebug(`Конфигурации паспортов качества успешно загружены. Загружено: ${qpCfgsDictionaries?.QpsInfo?.length || 0}, HashCode: ${hashCodeLoadedQpConfigs}`);
                 } catch (parseError) {
                     logError('Ошибка парсинга JSON данных конфигураций QP: ' + parseError.message);
                     qpCfgsDictionaries = {};

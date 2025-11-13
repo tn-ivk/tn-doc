@@ -448,8 +448,6 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
             return;
         }
 
-        const int testId = 1;
-
         // Act & Assert
         // v1.4.2 требование: GetEditDoc использует Path.Combine() для пути к шаблону
         // DocJornal.cs line 133: var templatePath = Path.Combine(PathToRootDirectory, "wwwroot/HTML/DocEdit.html");

@@ -546,7 +546,8 @@ public class HomeController : Controller
         }
     }
 
-    public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
+    [HttpGet]
+    public IActionResult GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
     {
         try
         {
@@ -554,21 +555,19 @@ public class HomeController : Controller
             if (id == 0)
             {
                 _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
-                return string.Empty;
+                return Content(string.Empty);
             }
-            
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return string.Empty;
-            }
-            return doc.GetEditDoc(id);
+
+            // Используем Vue Document Editor для всех документов
+            // Все 41 библиотека реализуют IDocumentEditor
+            var vueUrl = $"/document-editor/edit/{IdDevice}/{IdDoc}/{id}";
+            _logger.LogDebug($"Используется Vue Document Editor для документа {IdDoc}, URL: {vueUrl}");
+            return Json(new { useVue = true, url = vueUrl });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Ошибка при получении формы редактирования документа {IdDoc} для устройства {IdDevice}");
-            return string.Empty;
+            return Content(string.Empty);
         }
     }
 

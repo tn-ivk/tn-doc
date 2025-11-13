@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { logger } from '@tn-doc/shared';
 import type {
   StatusResponse,
   DeviceStatus,
@@ -44,11 +45,18 @@ export const useStatusStore = defineStore('status', () => {
       isLoading.value = true;
       error.value = null;
 
+      logger.debug('StatusStore: запрос статусов устройств');
+
       const response = await apiClient.get<StatusResponse>('/api/status');
 
       devices.value = response.devices;
       services.value = response.services;
       lastUpdate.value = new Date();
+
+      logger.info('StatusStore: статусы успешно загружены', {
+        deviceCount: response.devices.length,
+        connectedDevices: response.devices.filter(d => d.isConnected).length
+      });
 
       // Keep last 10 updates in history
       updateHistory.value.unshift(response);
@@ -57,7 +65,9 @@ export const useStatusStore = defineStore('status', () => {
       }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Ошибка загрузки статуса';
-      console.error('Failed to fetch status:', err);
+      logger.error('StatusStore: ошибка загрузки статусов', {
+        error: err instanceof Error ? err.message : String(err)
+      });
 
       // При ошибке соединения с сервером устанавливаем все индикаторы в offline с ошибкой
       devices.value = devices.value.map(d => ({

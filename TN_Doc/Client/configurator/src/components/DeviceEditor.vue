@@ -399,6 +399,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useToast } from 'primevue/usetoast';
+import { logger } from '@tn-doc/shared';
 import { useConfigStore } from '../stores/configStore';
 import type { Device, OpcConnectionSettings, UsedSI } from '../types/config.types';
 import { OpcType } from '../types/config.types';
@@ -444,12 +445,24 @@ function onToggleDocUse(docId: number, use: boolean) {
   const device = selectedDevices.value[0];
   const doc = device.Docs.find(d => d.IdDoc === docId);
 
+  logger.debug('DeviceEditor: переключение использования документа', {
+    deviceId: device.IdDevice,
+    deviceName: device.Name,
+    docId,
+    docName: doc?.Name,
+    enabled: use
+  });
+
   // Проверка при включении документа
   if (use && doc) {
     const templates = doc.TemplateDocs || [];
 
     // Проверка 1: есть ли шаблоны вообще
     if (templates.length === 0) {
+      logger.warn('DeviceEditor: попытка включить документ без шаблонов', {
+        docId,
+        docName: doc.Name
+      });
       toast.add({
         severity: 'warn',
         summary: 'Предупреждение',
@@ -462,6 +475,11 @@ function onToggleDocUse(docId: number, use: boolean) {
     // Проверка 2: есть ли хотя бы один включенный шаблон
     const enabledTemplatesCount = templates.filter(t => t.Use).length;
     if (enabledTemplatesCount === 0) {
+      logger.warn('DeviceEditor: попытка включить документ без активных шаблонов', {
+        docId,
+        docName: doc.Name,
+        totalTemplates: templates.length
+      });
       toast.add({
         severity: 'warn',
         summary: 'Предупреждение',
@@ -474,6 +492,12 @@ function onToggleDocUse(docId: number, use: boolean) {
 
   const updatedDocs = device.Docs.map(d => d.IdDoc === docId ? { ...d, Use: use } : d);
   configStore.updateDeviceSettings(device.IdDevice, 'Docs', updatedDocs);
+
+  logger.info('DeviceEditor: настройка документа обновлена', {
+    deviceId: device.IdDevice,
+    docId,
+    enabled: use
+  });
 }
 
 function getSelectedTemplates(doc: Device['Docs'][number]) {

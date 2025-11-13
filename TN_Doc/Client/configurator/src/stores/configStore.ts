@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { logger } from '@tn-doc/shared';
 import type { CfgApp, Device, ValidationResult } from '../types/config.types';
 import apiService from '../services/api.service';
 import _ from 'lodash';
@@ -14,10 +15,17 @@ export const useConfigStore = defineStore('config', () => {
   const error = ref<string | null>(null);
   const validationErrors = ref<Map<string, string>>(new Map());
 
+  // Хранилище для измененных конфигураций документов
+  const dirtyDocumentConfigs = ref<Map<string, string>>(new Map());
+
   // Computed
   const isDirty = computed(() => {
     if (!originalConfig.value || !currentConfig.value) return false;
-    return !_.isEqual(originalConfig.value, currentConfig.value);
+    // Проверяем изменения в основной конфигурации
+    const configDirty = !_.isEqual(originalConfig.value, currentConfig.value);
+    // Проверяем изменения в конфигурациях документов
+    const docConfigsDirty = dirtyDocumentConfigs.value.size > 0;
+    return configDirty || docConfigsDirty;
   });
 
   const selectedDevices = computed<Device[]>(() => {
@@ -36,12 +44,22 @@ export const useConfigStore = defineStore('config', () => {
     isLoading.value = true;
     error.value = null;
 
+    logger.debug('ConfigStore: загрузка конфигурации');
+
     try {
       const config = await apiService.getConfig();
       originalConfig.value = _.cloneDeep(config);
       currentConfig.value = _.cloneDeep(config);
+
+      logger.info('ConfigStore: конфигурация успешно загружена', {
+        deviceCount: config.Devices.length,
+        hasElisConfig: !!config.Elis
+      });
     } catch (e: any) {
       error.value = e.message || 'Не удалось загрузить конфигурацию';
+      logger.error('ConfigStore: ошибка загрузки конфигурации', {
+        error: e.message
+      });
       throw e;
     } finally {
       isLoading.value = false;
@@ -56,22 +74,43 @@ export const useConfigStore = defineStore('config', () => {
     isSaving.value = true;
     error.value = null;
 
+    logger.info('ConfigStore: сохранение конфигурации', {
+      deviceCount: currentConfig.value.Devices.length,
+      dirtyDocConfigsCount: dirtyDocumentConfigs.value.size
+    });
+
     try {
       // Валидация перед сохранением
       const validationResult = await apiService.validateConfig(currentConfig.value);
       if (!validationResult.IsValid) {
         const errorMessage = validationResult.Errors.join('\n');
         error.value = errorMessage;
+        logger.warn('ConfigStore: ошибка валидации конфигурации', {
+          errors: validationResult.Errors
+        });
         throw new Error(errorMessage);
       }
 
-      // Сохранение
+      // Сохранение основной конфигурации
       await apiService.saveConfig(currentConfig.value);
+      logger.debug('ConfigStore: основная конфигурация сохранена');
 
-      // Обновляем оригинальную конфигурацию
+      // Сохранение измененных конфигураций документов
+      for (const [path, content] of dirtyDocumentConfigs.value.entries()) {
+        await apiService.saveDocumentConfig(path, content);
+        logger.debug('ConfigStore: сохранена конфигурация документа', { path });
+      }
+
+      // Обновляем оригинальную конфигурацию и очищаем dirty state
       originalConfig.value = _.cloneDeep(currentConfig.value);
+      dirtyDocumentConfigs.value.clear();
+
+      logger.info('ConfigStore: конфигурация успешно сохранена');
     } catch (e: any) {
       error.value = e.message || 'Не удалось сохранить конфигурацию';
+      logger.error('ConfigStore: ошибка сохранения конфигурации', {
+        error: e.message
+      });
       throw e;
     } finally {
       isSaving.value = false;
@@ -164,6 +203,37 @@ export const useConfigStore = defineStore('config', () => {
     if (originalConfig.value) {
       currentConfig.value = _.cloneDeep(originalConfig.value);
     }
+    // Сбрасываем изменения в конфигурациях документов
+    dirtyDocumentConfigs.value.clear();
+  }
+
+  async function loadDocumentConfig(configPath: string): Promise<string> {
+    try {
+      const content = await apiService.loadDocumentConfig(configPath);
+      // Форматируем JSON для удобного чтения
+      const parsed = JSON.parse(content);
+      return JSON.stringify(parsed, null, 2);
+    } catch (e: any) {
+      throw new Error(`Не удалось загрузить конфигурацию: ${e.message}`);
+    }
+  }
+
+  async function saveDocumentConfig(configPath: string, content: string): Promise<void> {
+    try {
+      await apiService.saveDocumentConfig(configPath, content);
+      // Удаляем из dirty state после успешного сохранения
+      dirtyDocumentConfigs.value.delete(configPath);
+    } catch (e: any) {
+      throw new Error(`Не удалось сохранить конфигурацию: ${e.message}`);
+    }
+  }
+
+  function markDocumentConfigDirty(configPath: string, content: string) {
+    dirtyDocumentConfigs.value.set(configPath, content);
+  }
+
+  function clearDocumentConfigDirty(configPath: string) {
+    dirtyDocumentConfigs.value.delete(configPath);
   }
 
   return {
@@ -190,6 +260,10 @@ export const useConfigStore = defineStore('config', () => {
     updateDocumentTemplate,
     selectDevices,
     validateConfig,
-    resetConfig
+    resetConfig,
+    loadDocumentConfig,
+    saveDocumentConfig,
+    markDocumentConfigDirty,
+    clearDocumentConfigDirty
   };
 });

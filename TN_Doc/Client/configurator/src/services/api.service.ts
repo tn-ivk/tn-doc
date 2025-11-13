@@ -88,6 +88,27 @@ class ApiService {
     // Преобразуем camelCase от API в PascalCase для TypeScript типов
     return toPascalCase(response.data) as ValidationResult;
   }
+
+  /**
+   * Загрузить конфигурационный файл документа
+   */
+  async loadDocumentConfig(configPath: string): Promise<string> {
+    const response = await this.api.get('/configurator/document-config', {
+      params: { path: configPath },
+      responseType: 'text' // Получаем сырой JSON-текст, без автопарсинга Axios
+    });
+    return response.data;
+  }
+
+  /**
+   * Сохранить конфигурационный файл документа
+   */
+  async saveDocumentConfig(configPath: string, content: string): Promise<void> {
+    await this.api.post('/configurator/document-config', {
+      path: configPath,
+      content: content
+    });
+  }
 }
 
 export default new ApiService();

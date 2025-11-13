@@ -244,7 +244,6 @@ public class KmhMeasurementTests
     {
         // Arrange
         var document = CreateDocumentInstance(idDoc);
-        const int testId = 1;
 
         // Act & Assert
         // v1.4.2 requirement: all GetEditDoc should use Path.Combine()
@@ -259,7 +258,6 @@ public class KmhMeasurementTests
     {
         // Arrange
         var document = CreateDocumentInstance(idDoc);
-        const int testId = 1;
 
         // Act & Assert
         // v1.4.2 requirement: all GetEditDoc should add trace logging

@@ -21,7 +21,7 @@ public class ConfiguratorViewController : Controller
     [Route("configurator")]
     public IActionResult Index()
     {
-        _logger.LogInformation("Открыта страница конфигуратора");
+        _logger.LogDebug("Открыта страница конфигуратора");
         return View();
     }
 }

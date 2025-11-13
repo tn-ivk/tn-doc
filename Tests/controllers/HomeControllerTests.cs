@@ -525,7 +525,7 @@ public class HomeControllerTests
         // Проверяем структуру результата - в базовой конфигурации есть один шаблон для Report
         if (result.Any())
         {
-            Assert.That(result.All(template => template.Id is int), Is.True);
+            Assert.That(result.All(template => template.Id > 0), Is.True);
             Assert.That(result.All(template => !string.IsNullOrEmpty(template.Name)), Is.True);
             
             // Проверяем что есть хотя бы один шаблон

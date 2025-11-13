@@ -22,6 +22,7 @@
               <TabList>
                 <Tab value="0">Общие</Tab>
                 <Tab value="1">Устройства</Tab>
+                <Tab value="2">Документы</Tab>
               </TabList>
               <!-- Кнопки на одном уровне с TabList -->
               <div class="header-buttons">
@@ -55,6 +56,9 @@
               <TabPanel value="1">
                 <DevicesTab />
               </TabPanel>
+              <TabPanel value="2">
+                <DocumentsTab />
+              </TabPanel>
             </TabPanels>
           </Tabs>
         </div>
@@ -79,12 +83,16 @@ import Toast from 'primevue/toast';
 
 import GeneralTab from './components/GeneralTab.vue';
 import DevicesTab from './components/DevicesTab.vue';
+import DocumentsTab from './components/DocumentsTab.vue';
 
 const toast = useToast();
 const configStore = useConfigStore();
 const { currentConfig, isLoading, isSaving, isDirty, error } = storeToRefs(configStore);
 
 onMounted(async () => {
+  // Задержка 2 секунды перед первым запросом, чтобы сервер успел инициализироваться
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
   try {
     await configStore.loadConfig();
   } catch (e: any) {

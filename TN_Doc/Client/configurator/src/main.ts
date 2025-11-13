@@ -4,9 +4,18 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import { definePreset } from '@primevue/themes';
 import ToastService from 'primevue/toastservice';
+import { logger } from '@tn-doc/shared';
 import App from './App.vue';
 
 import 'primeicons/primeicons.css';
+
+// Инициализация логгера с глобальным контекстом
+logger.setGlobalContext({
+  component: 'Configurator',
+  version: '1.4.3'
+});
+
+logger.info('Configurator: инициализация приложения');
 
 const app = createApp(App);
 

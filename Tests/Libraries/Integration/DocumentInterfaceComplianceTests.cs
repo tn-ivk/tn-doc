@@ -91,8 +91,6 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
     public void GetDocumentClass_ForAllLibraries_ReturnsValidInstance(IdDoc idDoc, string documentName)
     {
         // Arrange
-        const int testIdDevice = 1;
-
         // Настройка мока для возврата экземпляра документа
         // В реальном приложении IAppConfigService.GetDocumentClass создает экземпляр через рефлексию
         // Здесь мы тестируем, что метод не выбрасывает исключений
@@ -134,8 +132,6 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
     public void GetViewDoc_ForAllLibraries_ReturnsValidJsonOrNull(IdDoc idDoc, string documentName)
     {
         // Arrange
-        const int testId = 1;
-
         // Act & Assert
         Assert.DoesNotThrow(() =>
         {
@@ -158,8 +154,6 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
     public void GetEditDoc_ForAllLibraries_UsesPathCombine(IdDoc idDoc, string documentName)
     {
         // Arrange
-        const int testId = 1;
-
         // Act
         // В реальном тесте проверяется, что путь сформирован через Path.Combine
         // и не содержит хардкод конкатенацию
@@ -182,8 +176,6 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
     public void GetEditDoc_ForAllLibraries_AddsTraceLogging(IdDoc idDoc, string documentName)
     {
         // Arrange
-        const int testId = 1;
-
         // Act & Assert
         Assert.Pass($"GetEditDoc for {documentName} should add trace logging on successful save (v1.4.2)");
         // В реальном тесте проверяется, что logger.Trace был вызван
