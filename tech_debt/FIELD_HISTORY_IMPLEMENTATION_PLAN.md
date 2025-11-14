@@ -5,27 +5,27 @@
 
 ## Этапы работ
 
-- [ ] **Этап 1 · Бэкенд: модели и хранилище**
-  - [ ] Добавить `DataSource` в `tn.docgeneral/Passport/Models`
-  - [ ] Добавить `FieldHistoryEntry` с константой `MaxHistoryEntries = 10`
-  - [ ] Расширить `DataARM` словарём `FieldHistoryMap` + методы `AddFieldHistoryEntry`, `GetLastSourceForControl`
-  - [ ] Обеспечить удаление самых старых записей при превышении лимита
+- [x] **Этап 1 · Бэкенд: модели и хранилище** ✅
+  - [x] Добавить `DataSource` в `tn.docgeneral/Passport/Models`
+  - [x] Добавить `FieldHistoryEntry` с константой `MaxHistoryEntries = 10`
+  - [x] Расширить `DataARM` словарём `FieldHistoryMap` + методы `AddFieldHistoryEntry`, `GetLastSourceForControl`
+  - [x] Обеспечить удаление самых старых записей при превышении лимита
 
-- [ ] **Этап 2 · Бэкенд: обработка правок**
-  - [ ] Обновить `EditData` (поле `History`, пометка `[Obsolete]` для `ElisFilled`)
-  - [ ] Переписать `DocPassport.DocUpdate()`:
-    - [ ] Для `Value`: сохранять новое значение, добавлять историю в `value.{ParameterKey}`, логировать
-    - [ ] Для `Method`: обновлять `LabInfo.Metod`, фиксировать историю в `method.{ParameterKey}`
-      - [ ] **ВАЖНО:** `method.*` и `value.*` - это РАЗНЫЕ ключи в FieldHistoryMap
-      - [ ] Логировать: "История метода {ParameterKey}: {Source} от {ModifiedBy}"
-    - [ ] Для AdditionalInfo: сохранять поле и историю (ключи без префиксов: ExportPermit, Sample и т.д.)
-    - [ ] Проставлять `ModifiedBy = "Пользователь"` для Manual при отсутствии автора
-    - [ ] Пересчитывать `ElisFilled` на основе последнего источника для `value.*` ключа
-  - [ ] Обновить `GetEditConfig()`:
-    - [ ] Возвращать историю для `value.*`, `result.*`, `method.*` из FieldHistoryMap
-    - [ ] **Миграция:** если `labInfo.ElisFilled == true` && нет записи в `value.{ParameterKey}`:
-      - [ ] Создать запись: Source=ELIS, ModifiedAt=DateTime.MinValue, Comment="Миграция из ElisFilled"
-      - [ ] Аналогично для AdditionalInfo полей с флагом ELIS
+- [x] **Этап 2 · Бэкенд: обработка правок** ✅
+  - [x] Обновить `EditData` (поле `History`, пометка `[Obsolete]` для `ElisFilled`)
+  - [x] Переписать `DocPassport.DocUpdate()`:
+    - [x] Для `Value`: сохранять новое значение, добавлять историю в `value.{ParameterKey}`, логировать
+    - [x] Для `Method`: обновлять `LabInfo.Metod`, фиксировать историю в `method.{ParameterKey}`
+      - [x] **ВАЖНО:** `method.*` и `value.*` - это РАЗНЫЕ ключи в FieldHistoryMap
+      - [x] Логировать: "История метода {ParameterKey}: {Source} от {ModifiedBy}"
+    - [x] Для AdditionalInfo: сохранять поле и историю (ключи без префиксов: ExportPermit, Sample и т.д.)
+    - [x] Проставлять `ModifiedBy = "Пользователь"` для Manual при отсутствии автора
+    - [x] Пересчитывать `ElisFilled` на основе последнего источника для `value.*` ключа
+  - [x] Обновить `GetEditConfig()`:
+    - [x] Возвращать историю для `value.*`, `result.*`, `method.*` из FieldHistoryMap
+    - [x] **Миграция:** если `labInfo.ElisFilled == true` && нет записи в `value.{ParameterKey}`:
+      - [x] Создать запись: Source=ELIS, ModifiedAt=DateTime.MinValue, Comment="Миграция из ElisFilled"
+      - [x] Аналогично для AdditionalInfo полей с флагом ELIS
 
 - [ ] **Этап 3 · Бэкенд: тесты**
   - [ ] Написать unit-тесты `DataARM.AddFieldHistoryEntry`:
@@ -105,6 +105,32 @@
 
 **Решение:** Реализуем с нормальными именами полей (Source, ModifiedAt, ModifiedBy, Value).
 Компактную сериализацию (`s/t/a/v`) добавим в этапе 8 только если замеры покажут критичный размер DataARM.
+
+---
+
+## История выполнения
+
+### 2025-01-14 - Этапы 1 и 2 завершены ✅
+
+**Коммиты:**
+- `d81c74d` - Этап 2: Обработка истории изменений полей в бэкенде (субмодуль tn.docgeneral)
+- `2206a84` - Обновлен submodule tn.docgeneral: добавлена инфраструктура истории изменений
+- `62450a3` - Обновление субмодуля: Этап 2 истории изменений полей
+- `2206d63` - Исправлена кодировка комментариев в DocPassport.cs (субмодуль)
+- `0cd9b40` - Обновлен субмодуль: исправлена кодировка комментариев в DocPassport
+
+**Реализовано:**
+- Добавлены модели `DataSource`, `FieldHistoryEntry` с лимитом 10 записей
+- Расширен `DataARM` словарём `FieldHistoryMap` и методами управления историей
+- Реализован FIFO для удаления старых записей при превышении лимита
+- Обновлён контракт `EditData` с полем `History` (ElisFilled помечен как Obsolete)
+- Переписан `DocPassport.DocUpdate()` для обработки истории Value/Method/AdditionalInfo
+- Реализовано автоматическое проставление автора "Пользователь" для Manual правок
+- Добавлен пересчёт `ElisFilled` на основе последнего источника
+- Реализована миграция из старого формата (ElisFilled) в новый (FieldHistoryMap)
+- Исправлена кодировка русских комментариев в UTF-8
+
+**Следующий этап:** Этап 3 - Написание unit-тестов для бэкенда
 
 ---
 
