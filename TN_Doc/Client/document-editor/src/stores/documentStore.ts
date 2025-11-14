@@ -4,6 +4,7 @@ import { logger, useInvalidChars } from '@tn-doc/shared';
 import { documentApi } from '@/services/api.service';
 import type { DocumentEditConfig, FormField } from '@/types/document.types';
 import type { PassportEditConfig } from '@/types/passport.types';
+import type { FieldHistoryEntry } from '@/types/history.types';
 
 /**
  * Store для управления состоянием документа
@@ -16,6 +17,12 @@ export const useDocumentStore = defineStore('document', () => {
   const isLoading = ref(false);
   const isSaving = ref(false);
   const error = ref<string | null>(null);
+
+  /**
+   * История изменений полей
+   * Ключ - название поля (controlId), значение - массив записей истории
+   */
+  const formHistory = ref<Record<string, FieldHistoryEntry[]>>({});
 
   // Getters
   const isReady = computed(() => config.value !== null && !isLoading.value);
@@ -106,6 +113,34 @@ export const useDocumentStore = defineStore('document', () => {
       // Инициализируем formData начальными значениями
       formData.value = { ...loadedConfig.initialValues };
 
+      // Загружаем историю изменений полей
+      formHistory.value = {};
+
+      // Загрузить историю из конфигурации (если есть)
+      if ((loadedConfig as any).fieldHistory) {
+        formHistory.value = { ...(loadedConfig as any).fieldHistory };
+      }
+
+      // Загрузить историю параметров качества
+      if (loadedConfig.docType === 'Passport') {
+        const passportConfig = loadedConfig as PassportEditConfig;
+        const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+        for (const paramSchema of parametersSchema) {
+          if ((paramSchema as any).history && Array.isArray((paramSchema as any).history)) {
+            // Для параметров качества используем составные ключи
+            const historyEntries = (paramSchema as any).history as FieldHistoryEntry[];
+            formHistory.value[`value.${paramSchema.key}`] = [...historyEntries];
+            formHistory.value[`result.${paramSchema.key}`] = [...historyEntries];
+            formHistory.value[`method.${paramSchema.key}`] = [...historyEntries];
+          }
+        }
+      }
+
+      logger.info('[documentStore] История изменений загружена', {
+        fieldsWithHistory: Object.keys(formHistory.value).length
+      });
+
       isDirty.value = false;
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Не удалось загрузить конфигурацию документа';
@@ -152,15 +187,24 @@ export const useDocumentStore = defineStore('document', () => {
     isSaving.value = true;
 
     try {
+      // Подготовить данные для сохранения (включая историю)
+      const payload = {
+        ...formData.value,
+        __history: formHistory.value // Передаем историю
+      };
+
       const response = await documentApi.saveDocument(
         config.value.deviceId,
         config.value.docType,
         config.value.docId,
-        formData.value
+        payload
       );
 
       if (response.success) {
         isDirty.value = false;
+        logger.info('[documentStore] Документ сохранен с историей', {
+          fieldsWithHistory: Object.keys(formHistory.value).length
+        });
         return response;
       } else {
         throw new Error(response.error || 'Не удалось сохранить документ');
@@ -187,6 +231,7 @@ export const useDocumentStore = defineStore('document', () => {
   function reset() {
     config.value = null;
     formData.value = {};
+    formHistory.value = {};
     isDirty.value = false;
     isLoading.value = false;
     isSaving.value = false;
@@ -197,6 +242,7 @@ export const useDocumentStore = defineStore('document', () => {
     // State
     config,
     formData,
+    formHistory,
     isDirty,
     isLoading,
     isSaving,
