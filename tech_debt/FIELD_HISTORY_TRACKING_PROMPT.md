@@ -121,7 +121,6 @@
         "ModifiedAt": "2025-01-14T09:00:00",
         "ModifiedBy": "Пользователь",
         "Value": "АБВ123",
-        "NewValue": "АБВ123",
         "Comment": null
       }
     ],
@@ -131,7 +130,6 @@
         "ModifiedAt": "2025-01-14T09:00:00",
         "ModifiedBy": "ELIS",
         "Value": "Образец №1",
-        "NewValue": "Образец №1",
         "Comment": "Загружено из протокола ПР-2024-12345"
       }
     ],
@@ -141,7 +139,6 @@
         "ModifiedAt": "2025-01-14T10:32:00",
         "ModifiedBy": "Пользователь",
         "Value": "850.567",
-        "NewValue": "850.567",
         "PreviousValue": "850.5",
         "Comment": "Скорректировано вручную"
       }
@@ -268,11 +265,6 @@ public class FieldHistoryEntry
     /// Значение после изменения
     /// </summary>
     public string Value { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Новое значение (дублирует Value для интеграций фронтенда)
-    /// </summary>
-    public string? NewValue { get; set; }
 
     /// <summary>
     /// Предыдущее значение (для отката)
@@ -1519,18 +1511,19 @@ if (labInfo.ElisFilled && dataArm.FieldHistoryMap.ContainsKey(controlId) == fals
         ModifiedAt = DateTime.MinValue, // Неизвестная дата
         ModifiedBy = "ELIS",
         Value = labInfo.Value,
-        NewValue = labInfo.Value,
         Comment = "Миграция из старого формата (ElisFilled)"
     });
 }
 ```
 
-### Оптимизация размера истории
+### Оптимизация размера истории (опционально)
 
-Для минимизации размера DataARM JSON:
+⚠️ **Статус:** Отложено до этапа 8 (после замеров реального размера DataARM)
+
+Возможные оптимизации для минимизации размера DataARM JSON:
 
 1. **Не хранить timestamp в миллисекундах** - использовать формат `2025-01-14T10:30:00` (без миллисекунд и часового пояса)
-2. **Сокращать имена полей** в JSON при сериализации:
+2. **Сокращать имена полей** в JSON при сериализации (только если размер критичен):
    - `Source` → `s`
    - `ModifiedAt` → `t`
    - `ModifiedBy` → `a`
@@ -1547,4 +1540,8 @@ if (labInfo.ElisFilled && dataArm.FieldHistoryMap.ContainsKey(controlId) == fals
 ---
 
 **Дата последнего обновления:** 2025-01-14
-**Версия промпта:** 1.0
+**Версия промпта:** 1.1
+**Изменения v1.1:**
+- Удалено избыточное поле `NewValue` из `FieldHistoryEntry`
+- Компактная сериализация JSON отложена до этапа 8
+- Popup открывается по hover (уточнение триггера)
