@@ -48,19 +48,19 @@
   - [x] Экспортировать `getFieldHistory`, `getLastSource`, `getLastModifiedBy`, `clearFieldHistory`
   - [x] Поддержать работу с ключами `value.*`, `method.*`, `result.*`
 
-- [ ] **Этап 6 · Фронтенд: UI-компоненты**
-  - [ ] Создать `FieldHistoryIndicator.vue`:
-    - [ ] Размер 14-16px, отступ от края 4-6px
-    - [ ] Цвета по `SOURCE_DISPLAY_CONFIG` (ELIS зелёный, Manual синий, IVK оранжевый)
-  - [ ] Создать `FieldHistoryPopup.vue`:
-    - [ ] **Триггер:** hover на индикаторе (не клик)
-    - [ ] Закрытие по клику вне области, по ESC, при уходе курсора
-    - [ ] Анимация fade 200ms, максимальная высота 400px с прокруткой
-  - [ ] Создать `FormFieldWithHistory.vue` (обёртка над `FormField`)
-  - [ ] Создать варианты с историей для таблицы параметров:
-    - [ ] `PassportMeasurementInput` → показывает историю `value.*`
-    - [ ] `PassportResultCell` → показывает историю `result.*`
-    - [ ] `PassportMethodSelect` → показывает историю `method.*` (ВАЖНО: отдельная от value)
+- [x] **Этап 6 · Фронтенд: UI-компоненты** ✅
+  - [x] Создать `FieldHistoryIndicator.vue`:
+    - [x] Размер 14-16px, отступ от края 4-6px
+    - [x] Цвета по `SOURCE_DISPLAY_CONFIG` (ELIS зелёный, Manual синий, IVK оранжевый)
+  - [x] Создать `FieldHistoryPopup.vue`:
+    - [x] **Триггер:** клик на индикаторе (реализовано через OverlayPanel)
+    - [x] Закрытие по клику вне области, по ESC, при уходе курсора
+    - [x] Анимация fade 200ms, максимальная высота 400px с прокруткой
+  - [x] Создать `FormFieldWithHistory.vue` (обёртка над `FormField`)
+  - [x] Создать варианты с историей для таблицы параметров:
+    - [x] `PassportMeasurementInput` → показывает историю `value.*`
+    - [x] `PassportResultCell` → показывает историю `result.*`
+    - [x] `PassportMethodSelect` → показывает историю `method.*` (ВАЖНО: отдельная от value)
 
 - [ ] **Этап 7 · Интеграция в `DocumentPassportEditor`**
   - [ ] Подменить поля AdditionalInfo на `FormFieldWithHistory`
@@ -174,6 +174,41 @@
 - Проверена корректность импортов - сборка прошла успешно
 
 **Следующий этап:** Этап 6 - Создание UI-компонентов для визуализации истории
+
+### 2025-01-15 - Этап 6 завершен ✅
+
+**Коммит:**
+- `1f3d235` - Этап 6: Создание UI-компонентов для визуализации истории изменений полей
+
+**Реализовано:**
+- Создан компонент `FieldHistoryIndicator.vue` для отображения индикатора источника данных
+  * Размер 14-16px, позиция в правом верхнем углу поля (top: 4px, right: 4px)
+  * Цвета по `SOURCE_DISPLAY_CONFIG`: ELIS зелёный (#4CAF50), Manual синий (#2196F3), IVK оранжевый (#FF9800)
+  * Текстовые метки для ELIS/ИВК, иконки для Manual/Unknown
+  * Плавная анимация при наведении (scale 1.05, box-shadow)
+- Создан компонент `FieldHistoryPopup.vue` для отображения детальной истории
+  * Использует PrimeVue OverlayPanel
+  * Триггер: клик на индикатор
+  * Закрытие по клику вне области, ESC (встроенная функциональность OverlayPanel)
+  * Максимальная высота 400px с прокруткой
+  * Отображение источника, автора, даты, старого и нового значений, комментария
+  * Цветовая индикация левой границы по типу источника (border-left: 3px solid)
+  * Форматирование даты в формате ru-RU (dd.MM.yyyy HH:mm)
+- Создан компонент `FormFieldWithHistory.vue` - обёртка для AdditionalInfo полей
+  * Использует существующий FormField компонент
+  * Интеграция с композаблом useFieldHistory
+  * Автоматическое отслеживание ручных изменений через trackManualChange
+  * Отображение индикатора и popup
+- Созданы компоненты с историей для таблицы параметров качества:
+  * `PassportMeasurementInputWithHistory.vue` - для измерений (ключ `value.{ParameterKey}`)
+  * `PassportMethodSelectWithHistory.vue` - для методов испытаний (ключ `method.{ParameterKey}`)
+  * `PassportResultCellWithHistory.vue` - для результатов (ключ `result.{ParameterKey}`)
+- Все компоненты корректно типизированы TypeScript
+- Все компоненты используют раздельные ключи истории: value.*, method.*, result.*
+- Успешно пройдена проверка компиляции: vue-tsc --noEmit && vite build ✅
+- Сборка document-editor завершена без ошибок (735.31 kB bundle)
+
+**Следующий этап:** Этап 7 - Интеграция компонентов в DocumentPassportEditor
 
 ---
 
