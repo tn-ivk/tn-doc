@@ -37,7 +37,7 @@ import { logger } from '@tn-doc/shared';
                   </div>
                 </td>
                 <td class="editor-input-cell">
-                  <FormField
+                  <FormFieldWithHistory
                     :field="field"
                     :modelValue="store.formData[field.key]"
                     :hide-label="true"
@@ -69,7 +69,7 @@ import { logger } from '@tn-doc/shared';
 import { logger } from '@tn-doc/shared';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import FormField from '@/components/FormField.vue';
+import FormFieldWithHistory from '@/components/FormFieldWithHistory.vue';
 import PassportQualityTable from '@/components/passport/PassportQualityTable.vue';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
