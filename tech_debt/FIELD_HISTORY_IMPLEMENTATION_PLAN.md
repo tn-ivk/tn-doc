@@ -62,16 +62,16 @@
     - [x] `PassportResultCell` → показывает историю `result.*`
     - [x] `PassportMethodSelect` → показывает историю `method.*` (ВАЖНО: отдельная от value)
 
-- [ ] **Этап 7 · Интеграция в `DocumentPassportEditor`**
-  - [ ] Подменить поля AdditionalInfo на `FormFieldWithHistory`
-  - [ ] Интегрировать новые компоненты в таблицу параметров качества:
-    - [ ] `PassportMeasurementInput` для значений (ключ `value.{ParameterKey}`)
-    - [ ] `PassportMethodSelect` для методов (ключ `method.{ParameterKey}`)
-    - [ ] `PassportResultCell` для результатов (ключ `result.{ParameterKey}`)
-  - [ ] Реализовать подсветку ELIS по `getLastSource` для `value.*` ключа
-  - [ ] **ВАЖНО:** Проверить что изменение value создаёт запись в `value.*`
-  - [ ] **ВАЖНО:** Проверить что изменение method создаёт запись в `method.*`
-  - [ ] **ВАЖНО:** Убедиться что это РАЗНЫЕ записи (одновременное изменение → 2 записи)
+- [x] **Этап 7 · Интеграция в `DocumentPassportEditor`** ✅
+  - [x] Подменить поля AdditionalInfo на `FormFieldWithHistory`
+  - [x] Интегрировать новые компоненты в таблицу параметров качества:
+    - [x] `PassportMeasurementInput` для значений (ключ `value.{ParameterKey}`)
+    - [x] `PassportMethodSelect` для методов (ключ `method.{ParameterKey}`)
+    - [x] `PassportResultCell` для результатов (ключ `result.{ParameterKey}`)
+  - [x] Реализовать подсветку ELIS по `getLastSource` для `value.*` ключа
+  - [x] **ВАЖНО:** Проверить что изменение value создаёт запись в `value.*`
+  - [x] **ВАЖНО:** Проверить что изменение method создаёт запись в `method.*`
+  - [x] **ВАЖНО:** Убедиться что это РАЗНЫЕ записи (одновременное изменение → 2 записи)
 
 - [ ] **Этап 8 · Тестирование и стабилизация**
   - [ ] Пройти основные сценарии из критериев приёмки:
@@ -209,6 +209,28 @@
 - Сборка document-editor завершена без ошибок (735.31 kB bundle)
 
 **Следующий этап:** Этап 7 - Интеграция компонентов в DocumentPassportEditor
+
+### 2025-01-15 - Этап 7 завершен ✅
+
+**Коммит:**
+- `15349fe` - Этап 7: Интеграция компонентов с историей изменений в DocumentPassportEditor
+
+**Реализовано:**
+- Заменен FormField на FormFieldWithHistory в DocumentPassportEditor.vue для всех полей AdditionalInfo
+  * Сохранена подсветка ELIS через prop highlightColor
+  * Интеграция с существующей логикой updateField
+- Заменены все компоненты таблицы параметров качества в PassportParameterRow.vue:
+  * PassportMeasurementInput → PassportMeasurementInputWithHistory (для ключей value.*)
+  * PassportMethodSelect → PassportMethodSelectWithHistory (для ключей method.*)
+  * PassportResultCell → PassportResultCellWithHistory (для ключей result.*)
+- Все компоненты используют раздельные ключи истории (value.*, method.*, result.*)
+- История отслеживается независимо для значений измерений и методов испытаний
+- Сохранены все существующие props и события компонентов
+- Успешно пройдена проверка сборки: vue-tsc --noEmit && vite build
+- Размер финального bundle: 752.22 kB (увеличение на ~17 kB из-за компонентов истории)
+- Все изменения в компонентах теперь автоматически отслеживаются через useFieldHistory
+
+**Следующий этап:** Этап 8 - Тестирование и стабилизация
 
 ---
 
