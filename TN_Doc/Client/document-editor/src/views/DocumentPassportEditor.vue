@@ -77,10 +77,14 @@ import { useDocumentEditor } from '@/composables/useDocumentEditor';
 import { usePassportEditor } from '@/composables/usePassportEditor';
 import { usePassportAutoFill } from '@/composables/usePassportAutoFill';
 import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/composables/useElisIntegration';
+import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
 import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
 
 const route = useRoute();
+
+// Получаем функцию для отслеживания загрузки из ELIS
+const { trackElisLoad } = useFieldHistory();
 
 // Используем общую логику редактирования документов
 const {
@@ -217,10 +221,16 @@ const handleElisData = (elisData: ElisPassportData) => {
         updates[field.key] = matchingOption.value; // Используем ID пользователя
         updates[`${field.key}__label`] = matchingOption.label; // ИСПРАВЛЕНИЕ: Обновляем label
         updates[`${field.key}__elisFilled`] = true;
+
+        // Создать запись истории для ELIS
+        trackElisLoad(field.key, matchingOption.value, elisData.protocolNumber);
       } else {
         // Для обычных полей (text, number, date, datetime-local) просто сохраняем значение
         updates[field.key] = value;
         updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
+
+        // Создать запись истории для ELIS
+        trackElisLoad(field.key, value, elisData.protocolNumber);
       }
     }
   });
@@ -248,8 +258,12 @@ const handleElisData = (elisData: ElisPassportData) => {
         // Заполнить measurement (value)
         if (elisParam.value !== undefined && elisParam.value !== null) {
           const valueKey = `value.${param.key}`;
-          updates[valueKey] = elisParam.value.toString();
+          const valueStr = elisParam.value.toString();
+          updates[valueKey] = valueStr;
           updates[`${valueKey}__elisFilled`] = true;
+
+          // Создать запись истории для ELIS
+          trackElisLoad(valueKey, valueStr, elisData.protocolNumber);
         }
 
         // Заполнить result (valueString)
@@ -257,6 +271,9 @@ const handleElisData = (elisData: ElisPassportData) => {
           const resultKey = `result.${param.key}`;
           updates[resultKey] = elisParam.valueString.toString();
           updates[`${resultKey}__elisFilled`] = true;
+
+          // Создать запись истории для ELIS
+          trackElisLoad(resultKey, elisParam.valueString.toString(), elisData.protocolNumber);
         }
 
         // Создать метод испытаний из ELIS данных
@@ -290,8 +307,12 @@ const handleElisData = (elisData: ElisPassportData) => {
 
             // Сохранить метод как JSON string (теперь ВСЕГДА заполняем)
             const methodKey = `method.${param.key}`;
-            updates[methodKey] = JSON.stringify(matchingMethod);
+            const methodJson = JSON.stringify(matchingMethod);
+            updates[methodKey] = methodJson;
             updates[`${methodKey}__elisFilled`] = true;
+
+            // Создать запись истории для ELIS
+            trackElisLoad(methodKey, methodJson, elisData.protocolNumber);
           }
         }
 
@@ -302,6 +323,9 @@ const handleElisData = (elisData: ElisPassportData) => {
         if (documentPayload) {
           updates[documentKey] = documentPayload;
           updates[`${documentKey}__elisFilled`] = true;
+
+          // Создать запись истории для ELIS
+          trackElisLoad(documentKey, documentPayload, elisData.protocolNumber);
         }
       }
     });
