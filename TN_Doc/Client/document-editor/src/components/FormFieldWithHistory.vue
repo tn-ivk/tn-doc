@@ -34,6 +34,7 @@ import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
+import { logger } from '@tn-doc/shared';
 
 const props = defineProps<{
   field: FormFieldType;
@@ -60,14 +61,18 @@ let hideTimeout: ReturnType<typeof setTimeout> | null = null;
  * История поля
  */
 const fieldHistory = computed(() => {
-  return getFieldHistory(props.field.key);
+  const history = getFieldHistory(props.field.key);
+  logger.debug(`[FormFieldWithHistory] История для поля "${props.field.key}": ${JSON.stringify(history)}`);
+  return history;
 });
 
 /**
  * Последний источник изменений
  */
 const lastSource = computed(() => {
-  return getLastSource(props.field.key);
+  const source = getLastSource(props.field.key);
+  logger.debug(`[FormFieldWithHistory] Последний источник для поля "${props.field.key}": ${source}`);
+  return source;
 });
 
 /**
@@ -85,13 +90,19 @@ const handleChange = (newValue: any) => {
  * Обработчик наведения на индикатор
  */
 const onIndicatorHover = () => {
+  logger.debug(`[FormFieldWithHistory] onIndicatorHover - поле "${props.field.key}"`);
+  logger.debug(`[FormFieldWithHistory] История: ${JSON.stringify(fieldHistory.value)}`);
+  logger.debug(`[FormFieldWithHistory] historyPopup.value: ${historyPopup.value ? 'определен' : 'undefined'}`);
+
   // Отменяем таймер скрытия, если он был запущен
   if (hideTimeout) {
+    logger.debug('[FormFieldWithHistory] Отменён таймер скрытия');
     clearTimeout(hideTimeout);
     hideTimeout = null;
   }
 
   // Показываем popup (без параметра event, OverlayPanel определит позицию автоматически)
+  logger.debug('[FormFieldWithHistory] Вызов historyPopup.show()');
   historyPopup.value?.show(undefined as any);
 };
 
@@ -99,8 +110,11 @@ const onIndicatorHover = () => {
  * Обработчик ухода курсора с индикатора
  */
 const onIndicatorLeave = () => {
+  logger.debug(`[FormFieldWithHistory] onIndicatorLeave - поле "${props.field.key}"`);
+
   // Запускаем таймер скрытия с задержкой 300ms
   hideTimeout = setTimeout(() => {
+    logger.debug('[FormFieldWithHistory] Таймер скрытия истёк, скрываем popup');
     historyPopup.value?.hide();
     hideTimeout = null;
   }, 300);

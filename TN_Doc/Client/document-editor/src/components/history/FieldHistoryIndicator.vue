@@ -2,8 +2,8 @@
   <div
     v-if="source !== DataSource.Unknown"
     class="field-history-indicator"
-    @mouseenter="$emit('mouseenter')"
-    @mouseleave="$emit('mouseleave')"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <!-- Текстовая метка (для ELIS и ИВК) -->
     <span
@@ -26,13 +26,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { DataSource, SOURCE_DISPLAY_CONFIG } from '@/types/history.types';
+import { logger } from '@tn-doc/shared';
 
 const props = defineProps<{
   /** Источник данных */
   source: DataSource;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'mouseenter'): void;
   (e: 'mouseleave'): void;
 }>();
@@ -40,6 +41,22 @@ defineEmits<{
 const displayConfig = computed(() => {
   return SOURCE_DISPLAY_CONFIG[props.source];
 });
+
+/**
+ * Обработчик наведения курсора
+ */
+const handleMouseEnter = () => {
+  logger.debug(`[FieldHistoryIndicator] mouseenter - источник: ${props.source}`);
+  emit('mouseenter');
+};
+
+/**
+ * Обработчик ухода курсора
+ */
+const handleMouseLeave = () => {
+  logger.debug(`[FieldHistoryIndicator] mouseleave - источник: ${props.source}`);
+  emit('mouseleave');
+};
 </script>
 
 <style scoped>
@@ -65,9 +82,9 @@ const displayConfig = computed(() => {
 }
 
 .indicator-text {
-  font-size: 10px;
+  font-size: 7px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
   line-height: 1;
 }
 
