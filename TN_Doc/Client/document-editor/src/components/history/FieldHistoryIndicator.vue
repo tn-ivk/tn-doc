@@ -2,7 +2,8 @@
   <div
     v-if="source !== DataSource.Unknown"
     class="field-history-indicator"
-    @click="$emit('click')"
+    @mouseenter="$emit('mouseenter')"
+    @mouseleave="$emit('mouseleave')"
   >
     <!-- Текстовая метка (для ELIS и ИВК) -->
     <span
@@ -32,7 +33,8 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'click'): void;
+  (e: 'mouseenter'): void;
+  (e: 'mouseleave'): void;
 }>();
 
 const displayConfig = computed(() => {

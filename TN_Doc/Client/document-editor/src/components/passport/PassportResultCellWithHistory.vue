@@ -10,7 +10,8 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
-      @click="onIndicatorClick"
+      @mouseenter="onIndicatorHover"
+      @mouseleave="onIndicatorLeave"
     />
 
     <!-- Popup с историей -->
@@ -47,6 +48,7 @@ const {
 } = useFieldHistory();
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
+let hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * Ключ для истории: result.{parameterKey}
@@ -79,11 +81,28 @@ const handleChange = (newValue: string) => {
 };
 
 /**
- * Обработчик клика на индикатор
+ * Обработчик наведения на индикатор
  */
-const onIndicatorClick = () => {
-  // OverlayPanel.show() может быть вызвана без параметра
+const onIndicatorHover = () => {
+  // Отменяем таймер скрытия, если он был запущен
+  if (hideTimeout) {
+    clearTimeout(hideTimeout);
+    hideTimeout = null;
+  }
+
+  // Показываем popup (без параметра event, OverlayPanel определит позицию автоматически)
   historyPopup.value?.show(undefined as any);
+};
+
+/**
+ * Обработчик ухода курсора с индикатора
+ */
+const onIndicatorLeave = () => {
+  // Запускаем таймер скрытия с задержкой 300ms
+  hideTimeout = setTimeout(() => {
+    historyPopup.value?.hide();
+    hideTimeout = null;
+  }, 300);
 };
 </script>
 
