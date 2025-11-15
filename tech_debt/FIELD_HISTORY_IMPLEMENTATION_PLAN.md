@@ -294,5 +294,33 @@
 
 **Следующий этап:** Этап 8 - Тестирование и стабилизация
 
+### 2025-01-15 - Исправлено позиционирование popup истории изменений ✅
+
+**Коммит:**
+- `4493b21` - Исправлено отображение popup истории изменений: передача события для позиционирования
+
+**Проблема:**
+- Popup с историей изменений не отображался при наведении курсора на индикатор
+- Причина: PrimeVue OverlayPanel получал `event = undefined` и не мог определить позицию для показа
+- Логи показывали, что вся цепочка событий работала корректно (mouseenter → onIndicatorHover → historyPopup.show()), но popup не появлялся
+
+**Реализовано:**
+- FieldHistoryIndicator.vue: обновлен emit для передачи MouseEvent
+  * `emit('mouseenter', event: MouseEvent)` вместо `emit('mouseenter')`
+  * Добавлено логирование передачи события
+- FormFieldWithHistory.vue: обновлен обработчик для получения и передачи события
+  * `@mouseenter="(event) => onIndicatorHover(event)"` вместо `@mouseenter="onIndicatorHover"`
+  * `onIndicatorHover(event: MouseEvent)` принимает событие и передаёт в `historyPopup.show(event)`
+- PassportMeasurementInputWithHistory.vue: аналогичные изменения
+- PassportMethodSelectWithHistory.vue: аналогичные изменения
+- PassportResultCellWithHistory.vue: аналогичные изменения
+- Popup теперь корректно позиционируется относительно индикатора при hover
+- Успешно пройдена проверка сборки: vue-tsc --noEmit && vite build
+- Размер финального bundle: 754.83 kB
+
+**Результат:** Popup истории изменений теперь корректно отображается при наведении курсора на индикатор ✅
+
+**Следующий этап:** Этап 8 - Тестирование и стабилизация
+
 ---
 
