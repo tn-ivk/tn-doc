@@ -3,6 +3,31 @@ import { DataSource, type FieldHistoryEntry, MAX_HISTORY_ENTRIES } from '@/types
 import { logger } from '@tn-doc/shared';
 
 /**
+ * Нормализовать значение для сравнения
+ * Приводит числа к единому формату (точка вместо запятой, удаляет лишние пробелы)
+ */
+const normalizeValue = (value: any): string => {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+
+  const strValue = String(value).trim();
+
+  // Заменяем запятую на точку для чисел
+  const normalized = strValue.replace(',', '.');
+
+  // Если это число, проверяем что преобразование корректно
+  const numValue = parseFloat(normalized);
+  if (!isNaN(numValue)) {
+    // Возвращаем нормализованную строку с точкой
+    return normalized;
+  }
+
+  // Для нечисловых значений возвращаем оригинальную строку (без замены запятой)
+  return strValue;
+};
+
+/**
  * Композабл для работы с историей изменений полей
  */
 export function useFieldHistory() {
@@ -61,21 +86,22 @@ export function useFieldHistory() {
    * Отследить ручное изменение поля
    */
   const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any) => {
-    // Если значение не изменилось, не создаем запись в истории
-    const newValueStr = String(newValue);
-    const previousValueStr = previousValue !== undefined ? String(previousValue) : '';
+    // Нормализуем значения для корректного сравнения (точка/запятая в числах)
+    const newValueNormalized = normalizeValue(newValue);
+    const previousValueNormalized = normalizeValue(previousValue);
 
-    if (newValueStr === previousValueStr) {
-      logger.debug(`[useFieldHistory] Значение не изменилось, запись в историю не создана: поле="${fieldKey}", значение="${newValueStr}"`);
+    // Если нормализованные значения совпадают, не создаем запись в истории
+    if (newValueNormalized === previousValueNormalized) {
+      logger.debug(`[useFieldHistory] Значение не изменилось, запись в историю не создана: поле="${fieldKey}", значение="${newValueNormalized}"`);
       return;
     }
 
-    logger.debug(`[useFieldHistory] Создана запись о ручном изменении: поле="${fieldKey}", старое="${previousValueStr}", новое="${newValueStr}"`);
+    logger.debug(`[useFieldHistory] Создана запись о ручном изменении: поле="${fieldKey}", старое="${previousValueNormalized}", новое="${newValueNormalized}"`);
 
     const entry = createHistoryEntry(
       DataSource.Manual,
-      newValueStr,
-      previousValueStr || undefined,
+      newValueNormalized,
+      previousValueNormalized || undefined,
       'Отредактировано вручную'
     );
 

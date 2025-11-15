@@ -13,6 +13,31 @@ import type {
 } from '@/types/passport.types';
 
 /**
+ * Нормализовать значение для сравнения
+ * Приводит числа к единому формату (точка вместо запятой, удаляет лишние пробелы)
+ */
+const normalizeValue = (value: any): string => {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+
+  const strValue = String(value).trim();
+
+  // Заменяем запятую на точку для чисел
+  const normalized = strValue.replace(',', '.');
+
+  // Если это число, проверяем что преобразование корректно
+  const numValue = parseFloat(normalized);
+  if (!isNaN(numValue)) {
+    // Возвращаем нормализованную строку с точкой
+    return normalized;
+  }
+
+  // Для нечисловых значений возвращаем оригинальную строку (без замены запятой)
+  return strValue;
+};
+
+/**
  * Композабл для работы с редактором паспорта качества
  * Содержит логику для работы с качественными параметрами, методами испытаний и ELIS
  */
@@ -173,6 +198,19 @@ export function usePassportEditor() {
       return;
     }
 
+    // Нормализуем значения для корректного сравнения (точка/запятая в числах)
+    const oldValueNormalized = normalizeValue(param.values.measurement);
+    const newValueNormalized = normalizeValue(event.value);
+
+    // Определяем, действительно ли значение изменилось
+    const valueActuallyChanged = oldValueNormalized !== newValueNormalized;
+
+    logger.debug(
+      `[handleMeasurementUpdate] поле="${event.paramKey}", ` +
+      `старое="${oldValueNormalized}", новое="${newValueNormalized}", ` +
+      `изменилось=${valueActuallyChanged}`
+    );
+
     // Пересчитываем результат с новым measurement
     const tempParam = {
       ...param,
@@ -180,12 +218,15 @@ export function usePassportEditor() {
     };
     const newResult = recalculateResult(tempParam);
 
+    // Если значение реально не изменилось, сохраняем флаг ELIS
+    const shouldResetElisFlag = valueActuallyChanged;
+
     // Обновляем formData
     store.bulkUpdateFields({
       [`value.${event.paramKey}`]: event.value,
-      [`value.${event.paramKey}__elisFilled`]: false,
+      [`value.${event.paramKey}__elisFilled`]: shouldResetElisFlag ? false : param.elisFlags.measurement,
       [`result.${event.paramKey}`]: newResult,
-      [`result.${event.paramKey}__elisFilled`]: false
+      [`result.${event.paramKey}__elisFilled`]: shouldResetElisFlag ? false : param.elisFlags.result
     });
   }
 

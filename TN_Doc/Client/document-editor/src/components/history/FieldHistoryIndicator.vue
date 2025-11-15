@@ -82,9 +82,9 @@ const handleMouseLeave = () => {
 }
 
 .indicator-text {
-  font-size: 6px;
-  font-weight: 700;
-  letter-spacing: 0;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
   line-height: 1;
 }
 
