@@ -42,7 +42,6 @@ import { logger } from '@tn-doc/shared';
                     :modelValue="store.formData[field.key]"
                     :hide-label="true"
                     :invalidChars="store.config?.invalidChars || []"
-                    :highlightColor="store.formData[`${field.key}__elisFilled`] ? 'var(--md-elis-highlight)' : undefined"
                     @update:modelValue="(value) => store.updateField(field.key, value)"
                   />
                 </td>
@@ -227,7 +226,7 @@ const handleElisData = (elisData: ElisPassportData) => {
       } else {
         // Для обычных полей (text, number, date, datetime-local) просто сохраняем значение
         updates[field.key] = value;
-        updates[`${field.key}__elisFilled`] = true; // Флаг для подсветки
+        updates[`${field.key}__elisFilled`] = true;
 
         // Создать запись истории для ELIS
         trackElisLoad(field.key, value, elisData.protocolNumber);
