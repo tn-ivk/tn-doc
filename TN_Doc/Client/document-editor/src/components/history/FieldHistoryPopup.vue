@@ -6,7 +6,7 @@
   >
     <div class="history-header">
       <h3 class="history-title">История изменений</h3>
-      <p class="history-field-name">{{ fieldLabel }}</p>
+      <div class="history-field-name">{{ fieldLabel }}</div>
     </div>
 
     <div v-if="history.length === 0" class="history-empty">
@@ -21,34 +21,30 @@
         class="history-entry"
         :class="`source-${entry.source.toLowerCase()}`"
       >
-        <!-- Иконка источника -->
-        <div class="entry-icon">
-          <span
-            v-if="SOURCE_DISPLAY_CONFIG[entry.source].text"
-            class="entry-icon-text"
-            :style="{ color: SOURCE_DISPLAY_CONFIG[entry.source].color }"
-          >
-            {{ SOURCE_DISPLAY_CONFIG[entry.source].text }}
+        <!-- Строка 1: иконка + описание + дата/время -->
+        <div class="entry-line1">
+          <div class="entry-icon">
+            <span
+              v-if="SOURCE_DISPLAY_CONFIG[entry.source].text"
+              class="entry-icon-text"
+              :style="{ color: SOURCE_DISPLAY_CONFIG[entry.source].color }"
+            >
+              {{ SOURCE_DISPLAY_CONFIG[entry.source].text }}
+            </span>
+            <i
+              v-else
+              :class="['pi', SOURCE_DISPLAY_CONFIG[entry.source].icon]"
+              :style="{ color: SOURCE_DISPLAY_CONFIG[entry.source].color }"
+            />
+          </div>
+          <span class="entry-description">
+            {{ SOURCE_DISPLAY_CONFIG[entry.source].description }}
           </span>
-          <i
-            v-else
-            :class="['pi', SOURCE_DISPLAY_CONFIG[entry.source].icon]"
-            :style="{ color: SOURCE_DISPLAY_CONFIG[entry.source].color }"
-          />
+          <span class="entry-date">{{ formatDate(entry.modifiedAt) }}</span>
         </div>
 
-        <!-- Информация -->
-        <div class="entry-content">
-          <div class="entry-description">
-            {{ SOURCE_DISPLAY_CONFIG[entry.source].description }}
-          </div>
-
-          <div class="entry-meta">
-            <span class="entry-date">{{ formatDate(entry.modifiedAt) }}</span>
-            <span class="entry-separator">•</span>
-            <span class="entry-author">{{ entry.modifiedBy }}</span>
-          </div>
-
+        <!-- Строка 2: старое → новое значение -->
+        <div class="entry-line2">
           <div v-if="entry.previousValue" class="entry-change">
             <span class="change-old">{{ entry.previousValue }}</span>
             <i class="pi pi-arrow-right change-arrow" />
@@ -56,10 +52,6 @@
           </div>
           <div v-else class="entry-value">
             Значение: <strong>{{ entry.value }}</strong>
-          </div>
-
-          <div v-if="entry.comment" class="entry-comment">
-            {{ entry.comment }}
           </div>
         </div>
       </div>
@@ -91,7 +83,7 @@ const reversedHistory = computed(() => {
 });
 
 /**
- * Форматирование даты
+ * Форматирование даты (с секундами)
  */
 const formatDate = (isoDate: string): string => {
   const date = new Date(isoDate);
@@ -100,7 +92,8 @@ const formatDate = (isoDate: string): string => {
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    second: '2-digit'
   });
 };
 
@@ -150,12 +143,16 @@ defineExpose({ show, hide });
   font-size: 16px;
   font-weight: 600;
   color: var(--md-text);
+  display: flex;
+  align-items: center;
 }
 
 .history-field-name {
   margin: 4px 0 0 0;
   font-size: 13px;
   color: var(--md-text-secondary);
+  display: flex;
+  align-items: center;
 }
 
 .history-empty {
@@ -183,17 +180,25 @@ defineExpose({ show, hide });
 
 .history-entry {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
   padding: 12px;
   border-radius: var(--md-radius);
   background: var(--md-surface);
   border: 1px solid var(--md-border-light);
 }
 
+/* Строка 1: иконка + описание + дата/время */
+.entry-line1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .entry-icon {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -202,38 +207,31 @@ defineExpose({ show, hide });
 }
 
 .entry-icon-text {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
 }
 
 .entry-icon .pi {
-  font-size: 16px;
-}
-
-.entry-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  font-size: 14px;
 }
 
 .entry-description {
+  flex: 1;
   font-size: 14px;
   font-weight: 500;
   color: var(--md-text);
 }
 
-.entry-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.entry-date {
   font-size: 12px;
   color: var(--md-text-secondary);
+  white-space: nowrap;
 }
 
-.entry-separator {
-  opacity: 0.5;
+/* Строка 2: старое → новое значение */
+.entry-line2 {
+  padding-left: 32px;
 }
 
 .entry-change {
@@ -264,20 +262,13 @@ defineExpose({ show, hide });
 .entry-value {
   font-size: 13px;
   color: var(--md-text-secondary);
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
 }
 
 .entry-value strong {
   color: var(--md-text);
-}
-
-.entry-comment {
-  font-size: 12px;
-  font-style: italic;
-  color: var(--md-text-muted);
-  padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 4px;
-  border-left: 2px solid var(--md-border);
 }
 
 /* Цветовая индикация для разных источников */

@@ -69,7 +69,7 @@ const handleMouseLeave = () => {
   justify-content: center;
   cursor: pointer;
   z-index: 10;
-  padding: 2px 4px;
+  padding: 2px 2px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
