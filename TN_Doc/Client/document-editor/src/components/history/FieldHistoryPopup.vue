@@ -143,16 +143,14 @@ defineExpose({ show, hide });
   font-size: 16px;
   font-weight: 600;
   color: var(--md-text);
-  display: flex;
-  align-items: center;
+  text-align: center;
 }
 
 .history-field-name {
   margin: 4px 0 0 0;
   font-size: 13px;
   color: var(--md-text-secondary);
-  display: flex;
-  align-items: center;
+  text-align: center;
 }
 
 .history-empty {
