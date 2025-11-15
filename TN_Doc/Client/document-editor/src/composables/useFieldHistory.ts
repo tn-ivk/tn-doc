@@ -54,21 +54,28 @@ export function useFieldHistory() {
       store.formHistory[fieldKey].shift(); // Удаляем самую старую запись
     }
 
-    logger.debug('[useFieldHistory] Добавлена запись в историю', {
-      fieldKey,
-      source: entry.source,
-      modifiedBy: entry.modifiedBy
-    });
+    logger.debug(`[useFieldHistory] Добавлена запись в историю: поле="${fieldKey}", источник=${entry.source}, автор=${entry.modifiedBy}`);
   };
 
   /**
    * Отследить ручное изменение поля
    */
   const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any) => {
+    // Если значение не изменилось, не создаем запись в истории
+    const newValueStr = String(newValue);
+    const previousValueStr = previousValue !== undefined ? String(previousValue) : '';
+
+    if (newValueStr === previousValueStr) {
+      logger.debug(`[useFieldHistory] Значение не изменилось, запись в историю не создана: поле="${fieldKey}", значение="${newValueStr}"`);
+      return;
+    }
+
+    logger.debug(`[useFieldHistory] Создана запись о ручном изменении: поле="${fieldKey}", старое="${previousValueStr}", новое="${newValueStr}"`);
+
     const entry = createHistoryEntry(
       DataSource.Manual,
-      String(newValue),
-      previousValue !== undefined ? String(previousValue) : undefined,
+      newValueStr,
+      previousValueStr || undefined,
       'Отредактировано вручную'
     );
 
@@ -148,7 +155,7 @@ export function useFieldHistory() {
    */
   const clearFieldHistory = (fieldKey: string) => {
     delete store.formHistory[fieldKey];
-    logger.debug('[useFieldHistory] История поля очищена', { fieldKey });
+    logger.debug(`[useFieldHistory] История поля очищена: поле="${fieldKey}"`);
   };
 
   return {
