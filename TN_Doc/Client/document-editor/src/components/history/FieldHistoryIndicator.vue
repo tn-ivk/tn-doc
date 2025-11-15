@@ -34,7 +34,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'mouseenter'): void;
+  (e: 'mouseenter', event: MouseEvent): void;
   (e: 'mouseleave'): void;
 }>();
 
@@ -45,9 +45,9 @@ const displayConfig = computed(() => {
 /**
  * Обработчик наведения курсора
  */
-const handleMouseEnter = () => {
-  logger.debug(`[FieldHistoryIndicator] mouseenter - источник: ${props.source}`);
-  emit('mouseenter');
+const handleMouseEnter = (event: MouseEvent) => {
+  logger.debug(`[FieldHistoryIndicator] mouseenter - источник: ${props.source}, event: ${event ? 'передан' : 'undefined'}`);
+  emit('mouseenter', event);
 };
 
 /**
@@ -82,7 +82,7 @@ const handleMouseLeave = () => {
 }
 
 .indicator-text {
-  font-size: 7px;
+  font-size: 6px;
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1;

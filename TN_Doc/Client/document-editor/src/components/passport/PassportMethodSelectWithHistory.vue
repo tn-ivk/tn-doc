@@ -9,7 +9,7 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
-      @mouseenter="onIndicatorHover"
+      @mouseenter="(event) => onIndicatorHover(event)"
       @mouseleave="onIndicatorLeave"
     />
 
@@ -83,15 +83,15 @@ const handleChange = (newMethod: MethodOption | null) => {
 /**
  * Обработчик наведения на индикатор
  */
-const onIndicatorHover = () => {
+const onIndicatorHover = (event: MouseEvent) => {
   // Отменяем таймер скрытия, если он был запущен
   if (hideTimeout) {
     clearTimeout(hideTimeout);
     hideTimeout = null;
   }
 
-  // Показываем popup (без параметра event, OverlayPanel определит позицию автоматически)
-  historyPopup.value?.show(undefined as any);
+  // Показываем popup, передавая событие для правильного позиционирования
+  historyPopup.value?.show(event);
 };
 
 /**

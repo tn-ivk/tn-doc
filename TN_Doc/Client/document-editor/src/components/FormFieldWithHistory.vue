@@ -13,7 +13,7 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
-      @mouseenter="onIndicatorHover"
+      @mouseenter="(event) => onIndicatorHover(event)"
       @mouseleave="onIndicatorLeave"
     />
 
@@ -89,10 +89,11 @@ const handleChange = (newValue: any) => {
 /**
  * Обработчик наведения на индикатор
  */
-const onIndicatorHover = () => {
+const onIndicatorHover = (event: MouseEvent) => {
   logger.debug(`[FormFieldWithHistory] onIndicatorHover - поле "${props.field.key}"`);
   logger.debug(`[FormFieldWithHistory] История: ${JSON.stringify(fieldHistory.value)}`);
   logger.debug(`[FormFieldWithHistory] historyPopup.value: ${historyPopup.value ? 'определен' : 'undefined'}`);
+  logger.debug(`[FormFieldWithHistory] event: ${event ? 'передан' : 'undefined'}`);
 
   // Отменяем таймер скрытия, если он был запущен
   if (hideTimeout) {
@@ -101,9 +102,9 @@ const onIndicatorHover = () => {
     hideTimeout = null;
   }
 
-  // Показываем popup (без параметра event, OverlayPanel определит позицию автоматически)
+  // Показываем popup, передавая событие для правильного позиционирования
   logger.debug('[FormFieldWithHistory] Вызов historyPopup.show()');
-  historyPopup.value?.show(undefined as any);
+  historyPopup.value?.show(event);
 };
 
 /**
