@@ -241,43 +241,51 @@ code --install-extension dbaeumer.vscode-eslint
    ASPNETCORE_ENVIRONMENT=Development
    ```
 
-## Настройка StatusBar (Vue.js)
+## Настройка Vue компонентов (npm workspaces)
+
+TN_Doc использует npm workspaces для управления тремя Vue 3 компонентами:
 
 ```bash
-cd TN_Doc/Client/statusbar
+cd TN_Doc/Client
 
-# Установить зависимости
+# Установить зависимости для всех компонентов
 npm install
 
-# Запустить dev сервер с hot reload
+# Запустить dev сервер StatusBar с hot reload
 npm run dev
 
+# Или запустить Configurator
+npm run dev:configurator
+
+# Или запустить Document Editor (в разработке)
+npm run dev:editor
+
 # В другом терминале запустить основное приложение
-cd ../..
+cd ..
 dotnet run
 ```
 
-### Структура Vue проекта
+### Структура Vue проектов
 
 ```mermaid
 graph TB
-    subgraph "StatusBar Project"
-        Root[statusbar/]
-        Src[src/]
-        Comp[components/]
-        Store[stores/]
-        Types[types/]
+    subgraph "Client Workspaces"
+        Root[Client/]
+        StatusBar[statusbar/ - Production]
+        Configurator[configurator/ - Production]
+        Editor[document-editor/ - В разработке]
+        Shared[shared/ - Общие утилиты]
     end
 
-    Root --> Src
-    Src --> Comp
-    Src --> Store
-    Src --> Types
+    Root --> StatusBar
+    Root --> Configurator
+    Root --> Editor
+    Root --> Shared
 
-    Comp --> StatusBar[StatusBar.vue]
-    Comp --> Indicator[StatusIndicator.vue]
-    Store --> StatusStore[statusStore.ts]
-    Types --> StatusTypes[status.types.ts]
+    StatusBar --> SB_Src[src/components/]
+    Configurator --> CF_Src[src/components/]
+    Editor --> ED_Src[src/components/]
+    Shared --> SH_Src[src/types/]
 ```
 
 ## Проверка установки
@@ -299,11 +307,12 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run
 ### Checklist готовности
 
 - [ ] .NET SDK 8.0+ установлен
+- [ ] Node.js 18+ и npm 8+ установлены
 - [ ] NuGet источники настроены (ortpr, FastReport)
 - [ ] Проект клонирован
 - [ ] `dotnet restore` выполнен успешно
 - [ ] `dotnet build` проходит без ошибок
-- [ ] StatusBar собран (`npm run build`)
+- [ ] Vue компоненты собраны (`npm run build:all` в TN_Doc/Client/)
 - [ ] Приложение запускается и открывается в браузере
 - [ ] Тесты проходят (`dotnet test`)
 
@@ -330,13 +339,19 @@ sudo apt-get update
 sudo apt-get install libgdiplus
 ```
 
-### Ошибка компиляции Vue проекта
+### Ошибка компиляции Vue проектов
 
 ```bash
-cd TN_Doc/Client/statusbar
-rm -rf node_modules package-lock.json
+cd TN_Doc/Client
+
+# Очистить все зависимости
+npm run clean
+
+# Переустановить зависимости
 npm install
-npm run build
+
+# Собрать все компоненты
+npm run build:all
 ```
 
 ## Следующие шаги

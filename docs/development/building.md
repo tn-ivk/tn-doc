@@ -19,8 +19,8 @@ flowchart TB
 # Полная сборка с нуля
 dotnet clean && dotnet restore && dotnet build
 
-# Сборка Vue компонента
-cd TN_Doc/Client/statusbar && npm run build && cd ../../..
+# Сборка всех Vue компонентов (npm workspaces)
+cd TN_Doc/Client && npm run build:all && cd ../..
 
 # Сборка и запуск
 cd TN_Doc && dotnet run
@@ -64,19 +64,35 @@ dotnet build -v detailed
 dotnet build TN_Doc/TN_Doc.csproj
 ```
 
-### 4. Сборка StatusBar
+### 4. Сборка Vue компонентов (npm workspaces)
+
+TN_Doc использует npm workspaces для управления тремя Vue 3 компонентами:
+- **statusbar** - мониторинг состояния системы (production)
+- **configurator** - веб-интерфейс для управления конфигурацией (production)
+- **document-editor** - редактор документов в браузере (в разработке)
 
 ```bash
-cd TN_Doc/Client/statusbar
+cd TN_Doc/Client
 
-# Установка зависимостей (первый раз)
+# Установка зависимостей для всех workspaces (первый раз)
 npm install
 
-# Development сборка с watch
+# Development сборка StatusBar с watch
 npm run dev
 
-# Production сборка
-npm run build
+# Development сборка Configurator с watch
+npm run dev:configurator
+
+# Development сборка Document Editor с watch
+npm run dev:editor
+
+# Production сборка всех компонентов
+npm run build:all
+
+# Production сборка отдельных компонентов
+npm run build              # только statusbar
+npm run build:configurator # только configurator
+npm run build:editor       # только document-editor
 ```
 
 ## Конфигурации сборки
