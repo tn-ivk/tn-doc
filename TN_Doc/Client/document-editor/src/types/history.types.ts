@@ -71,8 +71,3 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     description: 'Округлено системой ИВК'
   }
 };
-
-/**
- * Максимальное количество записей истории
- */
-export const MAX_HISTORY_ENTRIES = 10;

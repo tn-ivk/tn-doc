@@ -1,5 +1,5 @@
 import { useDocumentStore } from '@/stores/documentStore';
-import { DataSource, type FieldHistoryEntry, MAX_HISTORY_ENTRIES } from '@/types/history.types';
+import { DataSource, type FieldHistoryEntry } from '@/types/history.types';
 import { logger } from '@tn-doc/shared';
 
 /**
@@ -73,11 +73,6 @@ export function useFieldHistory() {
     }
 
     store.formHistory[fieldKey].push(entry);
-
-    // Ограничиваем размер истории (FIFO - First In First Out)
-    if (store.formHistory[fieldKey].length > MAX_HISTORY_ENTRIES) {
-      store.formHistory[fieldKey].shift(); // Удаляем самую старую запись
-    }
 
     logger.debug(`[useFieldHistory] Добавлена запись в историю: поле="${fieldKey}", источник=${entry.source}, автор=${entry.modifiedBy}`);
   };
