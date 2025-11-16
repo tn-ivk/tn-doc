@@ -4,7 +4,7 @@ import { logger } from '@tn-doc/shared';
     <!-- Индикатор загрузки -->
     <div v-if="store.isLoading" class="loading-container">
       <ProgressSpinner />
-      <p>Загрузка паспорта качества...</p>
+      <p>Загрузка формы редактирования паспорта качества...</p>
     </div>
 
     <!-- Сообщение об ошибке -->
