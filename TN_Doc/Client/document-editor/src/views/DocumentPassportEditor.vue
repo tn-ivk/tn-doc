@@ -355,19 +355,6 @@ onMounted(async () => {
     parseInt(id as string, 10)
   );
 
-  // ДИАГНОСТИКА: Проверяем, сколько полей с историей было загружено
-  const historyKeys = Object.keys(store.formData).filter(k => k.includes('__history'));
-  logger.debug(`[DocumentPassportEditor] После loadDocument: formData содержит ${Object.keys(store.formData).length} ключей, из них ${historyKeys.length} __history`);
-
-  if (historyKeys.length > 0) {
-    historyKeys.slice(0, 5).forEach(key => {
-      const history = store.formData[key];
-      logger.debug(`[DocumentPassportEditor] formData['${key}']: ${Array.isArray(history) ? history.length : 'не массив'} записей`);
-    });
-  } else {
-    logger.warn('[DocumentPassportEditor] Ни одного __history ключа не найдено в formData!');
-  }
-
   // Настраиваем автозаполнение связанных полей для Паспортов
   setupAutoFillWatchers();
 

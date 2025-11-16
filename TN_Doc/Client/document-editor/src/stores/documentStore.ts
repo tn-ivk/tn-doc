@@ -119,7 +119,6 @@ export const useDocumentStore = defineStore('document', () => {
       // НОВЫЙ ФОРМАТ: Извлекаем историю из initialValues
       // Бэкенд передает историю под ключами с постфиксом __history
       const historyKeysInInitialValues = Object.keys(loadedConfig.initialValues).filter(k => k.endsWith('__history'));
-      logger.debug(`[DocumentStore.loadConfig] Извлечение истории из initialValues: найдено ${historyKeysInInitialValues.length} ключей __history`);
 
       for (const historyKey of historyKeysInInitialValues) {
         // Убираем постфикс __history, чтобы получить имя поля
@@ -128,7 +127,6 @@ export const useDocumentStore = defineStore('document', () => {
 
         if (Array.isArray(historyData) && historyData.length > 0) {
           formHistory.value[fieldKey] = historyData;
-          logger.debug(`[DocumentStore.loadConfig] Загружена история для '${fieldKey}': ${historyData.length} записей`);
         }
       }
 
@@ -139,7 +137,6 @@ export const useDocumentStore = defineStore('document', () => {
         for (const [key, value] of Object.entries(fieldHistory)) {
           if (!formHistory.value[key]) {
             formHistory.value[key] = value as FieldHistoryEntry[];
-            logger.debug(`[DocumentStore.loadConfig] Загружена история из fieldHistory (СТАРЫЙ ФОРМАТ) для '${key}': ${(value as FieldHistoryEntry[]).length} записей`);
           }
         }
       }
@@ -148,9 +145,6 @@ export const useDocumentStore = defineStore('document', () => {
       if (loadedConfig.docType === 'Passport') {
         const passportConfig = loadedConfig as PassportEditConfig;
         const parametersSchema = passportConfig.qualityParametersSchema || [];
-
-        logger.debug(`[DocumentStore.loadConfig] Проверка истории для ${parametersSchema.length} параметров качества (СТАРЫЙ ФОРМАТ)`);
-        let loadedParamsCount = 0;
 
         for (const paramSchema of parametersSchema) {
           if ((paramSchema as any).history && Array.isArray((paramSchema as any).history)) {
@@ -170,21 +164,8 @@ export const useDocumentStore = defineStore('document', () => {
             if (!formHistory.value[methodKey]) {
               formHistory.value[methodKey] = [...historyEntries];
             }
-            loadedParamsCount++;
           }
         }
-
-        if (loadedParamsCount > 0) {
-          logger.debug(`[DocumentStore.loadConfig] Загружено ${loadedParamsCount} параметров с историей из paramSchema.history (СТАРЫЙ ФОРМАТ)`);
-        }
-      }
-
-      // ДИАГНОСТИКА: Итоговая проверка formHistory
-      logger.debug(`[DocumentStore.loadConfig] formHistory содержит ${Object.keys(formHistory.value).length} ключей после загрузки`);
-      if (Object.keys(formHistory.value).length > 0) {
-        Object.keys(formHistory.value).slice(0, 5).forEach(key => {
-          logger.debug(`[DocumentStore.loadConfig] formHistory['${key}']: ${formHistory.value[key].length} записей`);
-        });
       }
 
       isDirty.value = false;
