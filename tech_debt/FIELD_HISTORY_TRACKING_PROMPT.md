@@ -1,8 +1,12 @@
 # Промпт: Реализация истории изменений полей формы редактирования паспорта качества
 
+> ⚠️ **ВНИМАНИЕ:** Это историческая документация процесса разработки.
+> Актуальное описание функционала смотрите в [docs/features/field-history.md](../docs/features/field-history.md)
+
 **Дата создания:** 2025-01-14
-**Целевая версия:** v1.5.0
+**Целевая версия:** v1.4.4
 **Приоритет:** Высокий
+**Статус:** ✅ Реализовано (актуализировано 2025-11-17)
 
 ---
 
@@ -114,7 +118,7 @@
       "ElisFilled": true
     }
   ],
-  "FieldHistory": {
+  "FieldHistoryMap": {
     "ExportPermit": [
       {
         "Source": "Manual",
@@ -326,6 +330,7 @@ public partial class DataARM
     /// История изменений по идентификатору элемента формы
     /// Ключ - конкретный controlId с фронтенда (например, "ExportPermit", "value.Density")
     /// Значение - список записей истории (до 10 последних записей)
+    /// ВАЖНО: В JSON сериализуется как "FieldHistoryMap"
     /// </summary>
     public Dictionary<string, List<FieldHistoryEntry>> FieldHistoryMap { get; set; }
         = new Dictionary<string, List<FieldHistoryEntry>>(StringComparer.OrdinalIgnoreCase);

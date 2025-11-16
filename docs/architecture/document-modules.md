@@ -140,6 +140,12 @@ graph TB
   - Интеграция с ELIS
   - Справочники показателей качества
   - Методы испытаний
+  - **История изменений полей (v1.4.4+)**:
+    - Отслеживание источника изменения (Manual/ELIS/IVK/Unknown)
+    - Хранение до 10 последних изменений на поле
+    - Визуальные индикаторы источников данных
+    - Popup с детальной историей при наведении
+    - Автоматическая миграция из старого флага `ElisFilled`
 
 #### 2. Poverka (Протоколы поверки) - 21 модуль
 - **Назначение**: Поверка измерительных систем
@@ -444,8 +450,156 @@ flowchart LR
     F --> G[Module Ready]
 ```
 
+## Field History Tracking (v1.4.4+)
+
+### Структура DataARM с историей
+
+**Расширенный формат JSON:**
+```json
+{
+  "ExportPermit": "АБВ123",
+  "Sample": "Образец №1",
+  "LabInfo": [
+    {
+      "ParameterKey": "Density",
+      "Value": "850.57",
+      "Metod": {...},
+      "Document": {...},
+      "ElisFilled": true
+    }
+  ],
+  "FieldHistoryMap": {
+    "ExportPermit": [
+      {
+        "Source": "Manual",
+        "ModifiedAt": "2025-01-14T09:00:00",
+        "ModifiedBy": "Пользователь",
+        "Value": "АБВ123",
+        "PreviousValue": null,
+        "Comment": null
+      }
+    ],
+    "value.Density": [
+      {
+        "Source": "ELIS",
+        "ModifiedAt": "2025-01-14T10:00:00",
+        "ModifiedBy": "ELIS",
+        "Value": "850.5",
+        "PreviousValue": null,
+        "Comment": "Загружено из протокола ПР-2024-12345"
+      },
+      {
+        "Source": "Manual",
+        "ModifiedAt": "2025-01-14T10:32:00",
+        "ModifiedBy": "Пользователь",
+        "Value": "850.567",
+        "PreviousValue": "850.5",
+        "Comment": "Скорректировано вручную"
+      },
+      {
+        "Source": "IVK",
+        "ModifiedAt": "2025-01-14T10:35:00",
+        "ModifiedBy": "IVK",
+        "Value": "850.57",
+        "PreviousValue": "850.567",
+        "Comment": "Округлено системой ИВК"
+      }
+    ],
+    "method.Density": [
+      {
+        "Source": "ELIS",
+        "ModifiedAt": "2025-01-14T10:00:00",
+        "ModifiedBy": "ELIS",
+        "Value": "{\"Name\":\"ГОСТ 3900-85\",\"Id\":5}",
+        "PreviousValue": null,
+        "Comment": "Метод из протокола ELIS"
+      }
+    ]
+  },
+  "ElisProtocol": {...}
+}
+```
+
+### Ключевые особенности реализации
+
+**Backend (C#):**
+- `DataSource` enum: Unknown, ELIS, Manual, IVK
+- `FieldHistoryEntry` класс с полями Source, ModifiedAt, ModifiedBy, Value, PreviousValue, Comment
+- `DataARM.FieldHistoryMap` - Dictionary<string, List<FieldHistoryEntry>>
+- `DataARM.AddFieldHistoryEntry()` - автоматический FIFO (max 10 записей)
+- `DataARM.GetLastSourceForControl()` - получение последнего источника
+
+**Frontend (Vue 3 + TypeScript):**
+- `useFieldHistory.ts` композабл для работы с историей
+- `FieldHistoryIndicator.vue` - индикатор источника (14-16px badge)
+- `FieldHistoryPopup.vue` - popup с детальной историей (PrimeVue OverlayPanel)
+- `FormFieldWithHistory.vue` - обёртка для AdditionalInfo полей
+- Специальные компоненты для таблицы параметров качества:
+  - `PassportMeasurementInputWithHistory.vue` (для value.*)
+  - `PassportMethodSelectWithHistory.vue` (для method.*)
+  - `PassportResultCellWithHistory.vue` (для result.*)
+
+**Раздельные ключи истории:**
+- AdditionalInfo: прямые ключи (`ExportPermit`, `Sample`, `Laboratory_IOF` и т.д.)
+- Параметры качества:
+  - `value.{ParameterKey}` - измеренное значение
+  - `result.{ParameterKey}` - результат для печати
+  - `method.{ParameterKey}` - метод испытаний
+  - `document.{ParameterKey}` - номер документа ELIS
+
+**Миграция:**
+- Автоматическое создание записи истории из старого `ElisFilled` при первой загрузке
+- Обратная совместимость: `ElisFilled` автоматически пересчитывается на основе последнего источника
+
+**Примеры использования:**
+
+```typescript
+// Frontend: Отслеживание ручного изменения
+import { useFieldHistory } from '@/composables/useFieldHistory';
+
+const { trackManualChange } = useFieldHistory();
+
+function handleValueChange(fieldKey: string, newValue: any, oldValue: any) {
+  trackManualChange(fieldKey, newValue, oldValue);
+  // ... остальная логика
+}
+
+// Frontend: Отслеживание загрузки из ELIS
+const { trackElisLoad } = useFieldHistory();
+
+function loadFromElis(fieldKey: string, elisValue: any, protocolNumber: string) {
+  trackElisLoad(fieldKey, elisValue, protocolNumber);
+  // ... остальная логика
+}
+```
+
+```csharp
+// Backend: Добавление записи истории в DocUpdate
+foreach (var item in correctionData.Values.Where(x => x.Tag == "Value"))
+{
+    // ... обработка значения
+
+    if (item.History != null && item.History.Count > 0)
+    {
+        foreach (var historyEntry in item.History)
+        {
+            if (historyEntry.Source == DataSource.Manual &&
+                string.IsNullOrWhiteSpace(historyEntry.ModifiedBy))
+            {
+                historyEntry.ModifiedBy = "Пользователь";
+            }
+
+            dataArm.AddFieldHistoryEntry(item.Key, historyEntry);
+            _logger.Info($"История параметра {parameterKey}: {historyEntry.Source} от {historyEntry.ModifiedBy}");
+        }
+    }
+}
+```
+
 ## См. также
 
 - [Architecture Overview](overview.md)
 - [FastReport Templates Guide](../development/fastreport-templates.md)
 - [Adding New Module Tutorial](../development/new-module-tutorial.md)
+- [Field History Implementation Plan](../../tech_debt/FIELD_HISTORY_IMPLEMENTATION_PLAN.md)
+- [Field History Tracking Prompt](../../tech_debt/FIELD_HISTORY_TRACKING_PROMPT.md)
