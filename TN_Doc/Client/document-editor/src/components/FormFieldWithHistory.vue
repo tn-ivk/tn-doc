@@ -63,18 +63,14 @@ let hideTimeout: ReturnType<typeof setTimeout> | null = null;
  * История поля
  */
 const fieldHistory = computed(() => {
-  const history = getFieldHistory(props.field.key);
-  logger.debug(`[FormFieldWithHistory] История для поля "${props.field.key}": ${JSON.stringify(history)}`);
-  return history;
+  return getFieldHistory(props.field.key);
 });
 
 /**
  * Последний источник изменений
  */
 const lastSource = computed(() => {
-  const source = getLastSource(props.field.key);
-  logger.debug(`[FormFieldWithHistory] Последний источник для поля "${props.field.key}": ${source}`);
-  return source;
+  return getLastSource(props.field.key);
 });
 
 const computedHighlightColor = computed(() => {
@@ -100,20 +96,13 @@ const handleChange = (newValue: any) => {
  * Обработчик наведения на индикатор
  */
 const onIndicatorHover = (event: MouseEvent) => {
-  logger.debug(`[FormFieldWithHistory] onIndicatorHover - поле "${props.field.key}"`);
-  logger.debug(`[FormFieldWithHistory] История: ${JSON.stringify(fieldHistory.value)}`);
-  logger.debug(`[FormFieldWithHistory] historyPopup.value: ${historyPopup.value ? 'определен' : 'undefined'}`);
-  logger.debug(`[FormFieldWithHistory] event: ${event ? 'передан' : 'undefined'}`);
-
   // Отменяем таймер скрытия, если он был запущен
   if (hideTimeout) {
-    logger.debug('[FormFieldWithHistory] Отменён таймер скрытия');
     clearTimeout(hideTimeout);
     hideTimeout = null;
   }
 
   // Показываем popup, передавая событие для правильного позиционирования
-  logger.debug('[FormFieldWithHistory] Вызов historyPopup.show()');
   historyPopup.value?.show(event);
 };
 
@@ -121,11 +110,8 @@ const onIndicatorHover = (event: MouseEvent) => {
  * Обработчик ухода курсора с индикатора
  */
 const onIndicatorLeave = () => {
-  logger.debug(`[FormFieldWithHistory] onIndicatorLeave - поле "${props.field.key}"`);
-
   // Запускаем таймер скрытия с задержкой 300ms
   hideTimeout = setTimeout(() => {
-    logger.debug('[FormFieldWithHistory] Таймер скрытия истёк, скрываем popup');
     historyPopup.value?.hide();
     hideTimeout = null;
   }, 300);
