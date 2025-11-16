@@ -110,53 +110,73 @@ export const useDocumentStore = defineStore('document', () => {
 
       config.value = loadedConfig;
 
-      // ДИАГНОСТИКА: Проверяем initialValues с сервера
-      const initialValuesKeys = Object.keys(loadedConfig.initialValues || {});
-      const historyKeysInInitialValues = initialValuesKeys.filter(k => k.includes('__history'));
-      logger.debug(`[DocumentStore.loadConfig] initialValues содержит ${initialValuesKeys.length} ключей, из них ${historyKeysInInitialValues.length} __history`);
-
-      if (historyKeysInInitialValues.length > 0) {
-        historyKeysInInitialValues.slice(0, 5).forEach(key => {
-          const history = loadedConfig.initialValues[key];
-          logger.debug(`[DocumentStore.loadConfig] initialValues['${key}']: ${Array.isArray(history) ? history.length : 'не массив'} записей`);
-        });
-      } else {
-        logger.warn('[DocumentStore.loadConfig] Ни одного __history ключа не найдено в initialValues!');
-      }
-
       // Инициализируем formData начальными значениями
       formData.value = { ...loadedConfig.initialValues };
 
       // Загружаем историю изменений полей
       formHistory.value = {};
 
-      // Загрузить историю из конфигурации (если есть)
-      if ((loadedConfig as any).fieldHistory) {
-        const fieldHistory = (loadedConfig as any).fieldHistory;
-        formHistory.value = { ...fieldHistory };
-        logger.debug(`[DocumentStore.loadConfig] Загружена история из fieldHistory: ${Object.keys(fieldHistory).length} ключей (СТАРЫЙ ФОРМАТ)`);
+      // НОВЫЙ ФОРМАТ: Извлекаем историю из initialValues
+      // Бэкенд передает историю под ключами с постфиксом __history
+      const historyKeysInInitialValues = Object.keys(loadedConfig.initialValues).filter(k => k.endsWith('__history'));
+      logger.debug(`[DocumentStore.loadConfig] Извлечение истории из initialValues: найдено ${historyKeysInInitialValues.length} ключей __history`);
+
+      for (const historyKey of historyKeysInInitialValues) {
+        // Убираем постфикс __history, чтобы получить имя поля
+        const fieldKey = historyKey.replace('__history', '');
+        const historyData = loadedConfig.initialValues[historyKey];
+
+        if (Array.isArray(historyData) && historyData.length > 0) {
+          formHistory.value[fieldKey] = historyData;
+          logger.debug(`[DocumentStore.loadConfig] Загружена история для '${fieldKey}': ${historyData.length} записей`);
+        }
       }
 
-      // Загрузить историю параметров качества
+      // СТАРЫЙ ФОРМАТ (для обратной совместимости): Загрузить историю из конфигурации (если есть)
+      if ((loadedConfig as any).fieldHistory) {
+        const fieldHistory = (loadedConfig as any).fieldHistory;
+        // Объединяем со старым форматом (новый формат имеет приоритет)
+        for (const [key, value] of Object.entries(fieldHistory)) {
+          if (!formHistory.value[key]) {
+            formHistory.value[key] = value as FieldHistoryEntry[];
+            logger.debug(`[DocumentStore.loadConfig] Загружена история из fieldHistory (СТАРЫЙ ФОРМАТ) для '${key}': ${(value as FieldHistoryEntry[]).length} записей`);
+          }
+        }
+      }
+
+      // СТАРЫЙ ФОРМАТ (для обратной совместимости): Загрузить историю параметров качества
       if (loadedConfig.docType === 'Passport') {
         const passportConfig = loadedConfig as PassportEditConfig;
         const parametersSchema = passportConfig.qualityParametersSchema || [];
 
-        logger.debug(`[DocumentStore.loadConfig] Обработка истории для ${parametersSchema.length} параметров качества (СТАРЫЙ ФОРМАТ)`);
+        logger.debug(`[DocumentStore.loadConfig] Проверка истории для ${parametersSchema.length} параметров качества (СТАРЫЙ ФОРМАТ)`);
         let loadedParamsCount = 0;
 
         for (const paramSchema of parametersSchema) {
           if ((paramSchema as any).history && Array.isArray((paramSchema as any).history)) {
             // Для параметров качества используем составные ключи
             const historyEntries = (paramSchema as any).history as FieldHistoryEntry[];
-            formHistory.value[`value.${paramSchema.key}`] = [...historyEntries];
-            formHistory.value[`result.${paramSchema.key}`] = [...historyEntries];
-            formHistory.value[`method.${paramSchema.key}`] = [...historyEntries];
+            const valueKey = `value.${paramSchema.key}`;
+            const resultKey = `result.${paramSchema.key}`;
+            const methodKey = `method.${paramSchema.key}`;
+
+            // Только если история еще не загружена из нового формата
+            if (!formHistory.value[valueKey]) {
+              formHistory.value[valueKey] = [...historyEntries];
+            }
+            if (!formHistory.value[resultKey]) {
+              formHistory.value[resultKey] = [...historyEntries];
+            }
+            if (!formHistory.value[methodKey]) {
+              formHistory.value[methodKey] = [...historyEntries];
+            }
             loadedParamsCount++;
           }
         }
 
-        logger.debug(`[DocumentStore.loadConfig] Загружено ${loadedParamsCount} параметров с историей из paramSchema.history (СТАРЫЙ ФОРМАТ)`);
+        if (loadedParamsCount > 0) {
+          logger.debug(`[DocumentStore.loadConfig] Загружено ${loadedParamsCount} параметров с историей из paramSchema.history (СТАРЫЙ ФОРМАТ)`);
+        }
       }
 
       // ДИАГНОСТИКА: Итоговая проверка formHistory
