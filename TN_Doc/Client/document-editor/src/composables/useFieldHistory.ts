@@ -63,7 +63,6 @@ export function useFieldHistory() {
       comment
     };
 
-    logger.debug(`[FieldHistoryMap] Создана запись истории: source=${source}, value="${value}", previousValue="${previousValue || 'null'}", modifiedBy="${modifiedBy}"`);
 
     return entry;
   };
@@ -72,39 +71,25 @@ export function useFieldHistory() {
    * Добавить запись в историю поля
    */
   const addHistoryEntry = (fieldKey: string, entry: FieldHistoryEntry) => {
-    const beforeCount = store.formHistory[fieldKey]?.length || 0;
-
     if (!store.formHistory[fieldKey]) {
       store.formHistory[fieldKey] = [];
-      logger.debug(`[FieldHistoryMap] Создан новый массив истории для поля="${fieldKey}"`);
     }
 
     store.formHistory[fieldKey].push(entry);
-
-    const afterCount = store.formHistory[fieldKey].length;
-    const totalFields = Object.keys(store.formHistory).length;
-
-    logger.debug(`[FieldHistoryMap] Добавлена запись в историю: поле="${fieldKey}", источник=${entry.source}, автор=${entry.modifiedBy}, значение="${entry.value}"`);
-    logger.debug(`[FieldHistoryMap] Размер истории для поля="${fieldKey}": было ${beforeCount}, стало ${afterCount}. Всего полей с историей: ${totalFields}`);
   };
 
   /**
    * Отследить ручное изменение поля
    */
   const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any) => {
-    logger.debug(`[FieldHistoryMap] trackManualChange вызван: поле="${fieldKey}", новое="${newValue}", старое="${previousValue}"`);
-
     // Нормализуем значения для корректного сравнения (точка/запятая в числах)
     const newValueNormalized = normalizeValue(newValue);
     const previousValueNormalized = normalizeValue(previousValue);
 
     // Если нормализованные значения совпадают, не создаем запись в истории
     if (newValueNormalized === previousValueNormalized) {
-      logger.debug(`[FieldHistoryMap] Значение не изменилось, запись в историю не создана: поле="${fieldKey}", значение="${newValueNormalized}"`);
       return;
     }
-
-    logger.debug(`[FieldHistoryMap] Регистрация ручного изменения: поле="${fieldKey}", старое="${previousValueNormalized}", новое="${newValueNormalized}"`);
 
     const entry = createHistoryEntry(
       DataSource.Manual,
@@ -120,7 +105,6 @@ export function useFieldHistory() {
    * Отследить загрузку из ELIS
    */
   const trackElisLoad = (fieldKey: string, value: any, protocolNumber?: string) => {
-    logger.debug(`[FieldHistoryMap] trackElisLoad вызван: поле="${fieldKey}", значение="${value}", протокол="${protocolNumber || 'не указан'}"`);
 
     const comment = protocolNumber
       ? `Загружено из протокола ${protocolNumber}`
@@ -145,7 +129,6 @@ export function useFieldHistory() {
     roundedValue: any,
     roundDigits: number
   ) => {
-    logger.debug(`[FieldHistoryMap] trackIVKRounding вызван: поле="${fieldKey}", оригинал="${originalValue}", округлено="${roundedValue}", знаков=${roundDigits}`);
 
     const comment = `Округлено: ${originalValue} → ${roundedValue} (${roundDigits} знаков)`;
 

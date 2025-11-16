@@ -115,23 +115,11 @@ export const useDocumentStore = defineStore('document', () => {
 
       // Загружаем историю изменений полей
       formHistory.value = {};
-      logger.debug('[FieldHistoryMap] Начало загрузки истории изменений из конфигурации');
 
       // Загрузить историю из конфигурации (если есть)
       if ((loadedConfig as any).fieldHistory) {
         const fieldHistory = (loadedConfig as any).fieldHistory;
-        const fieldCount = Object.keys(fieldHistory).length;
-        logger.debug(`[FieldHistoryMap] Загрузка истории из loadedConfig.fieldHistory: найдено ${fieldCount} полей`);
-
         formHistory.value = { ...fieldHistory };
-
-        // Детальная информация о загруженных полях
-        for (const [key, entries] of Object.entries(fieldHistory)) {
-          const entriesArray = entries as FieldHistoryEntry[];
-          logger.debug(`[FieldHistoryMap] Поле "${key}": загружено ${entriesArray.length} записей истории`);
-        }
-      } else {
-        logger.debug('[FieldHistoryMap] loadedConfig.fieldHistory отсутствует');
       }
 
       // Загрузить историю параметров качества
@@ -139,7 +127,6 @@ export const useDocumentStore = defineStore('document', () => {
         const passportConfig = loadedConfig as PassportEditConfig;
         const parametersSchema = passportConfig.qualityParametersSchema || [];
 
-        logger.debug(`[FieldHistoryMap] Загрузка истории параметров качества: найдено ${parametersSchema.length} параметров`);
 
         for (const paramSchema of parametersSchema) {
           if ((paramSchema as any).history && Array.isArray((paramSchema as any).history)) {
@@ -149,18 +136,10 @@ export const useDocumentStore = defineStore('document', () => {
             formHistory.value[`result.${paramSchema.key}`] = [...historyEntries];
             formHistory.value[`method.${paramSchema.key}`] = [...historyEntries];
 
-            logger.debug(`[FieldHistoryMap] Параметр "${paramSchema.key}": создано 3 ключа истории (value/result/method) с ${historyEntries.length} записями каждый`);
           }
         }
       }
 
-      const totalFields = Object.keys(formHistory.value).length;
-      logger.info(`[FieldHistoryMap] История изменений загружена: всего полей с историей = ${totalFields}`);
-
-      // Вывод всех ключей для диагностики
-      if (totalFields > 0) {
-        logger.debug(`[FieldHistoryMap] Ключи истории: ${Object.keys(formHistory.value).join(', ')}`);
-      }
 
       isDirty.value = false;
     } catch (err: any) {
@@ -209,21 +188,12 @@ export const useDocumentStore = defineStore('document', () => {
 
     try {
       // Подготовить данные для сохранения (включая историю)
-      logger.debug('[FieldHistoryMap] Подготовка payload для сохранения документа');
-      logger.debug(`[FieldHistoryMap] formHistory содержит ${Object.keys(formHistory.value).length} полей с историей`);
-
-      // Детальная информация о структуре истории
-      for (const [key, entries] of Object.entries(formHistory.value)) {
-        logger.debug(`[FieldHistoryMap] Поле "${key}": отправка ${entries.length} записей истории`);
-      }
 
       const payload = {
         ...formData.value,
         __history: formHistory.value // Передаем историю
       };
 
-      logger.debug(`[FieldHistoryMap] Payload содержит ${Object.keys(payload).length} ключей (включая __history)`);
-      logger.debug(`[FieldHistoryMap] Структура __history: ${JSON.stringify(Object.keys(formHistory.value))}`);
 
       const response = await documentApi.saveDocument(
         config.value.deviceId,
@@ -234,7 +204,6 @@ export const useDocumentStore = defineStore('document', () => {
 
       if (response.success) {
         isDirty.value = false;
-        logger.info(`[FieldHistoryMap] Документ сохранен с историей: ${Object.keys(formHistory.value).length} полей с историей`);
         return response;
       } else {
         throw new Error(response.error || 'Не удалось сохранить документ');
