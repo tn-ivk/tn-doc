@@ -10,6 +10,13 @@
 
 Система истории изменений отслеживает источник и время всех изменений полей в редакторе документов. Для каждого поля сохраняется до 10 последних изменений с информацией об источнике данных, авторе, времени и значениях.
 
+**⚠️ ВАЖНО: История изменений работает ТОЛЬКО при включенном ELIS в конфигурации приложения (CfgApp.json).**
+Если ELIS выключен (`IsUsedElis = false`), история изменений:
+- Не сохраняется в базу данных
+- Не передается на фронтенд
+- Не отображается пользователю
+- Индикаторы истории (FieldHistoryIndicator) не показываются
+
 **Основные возможности:**
 - Отслеживание источника данных (ELIS, ручное редактирование, округление ИВК)
 - Визуальная индикация источника в UI (цветные значки)
@@ -295,9 +302,13 @@ await store.saveDocument(deviceId, docType, id);
 **Backend обработка:**
 ```csharp
 // DocPassport.DocUpdate()
+// ВАЖНО: История сохраняется ТОЛЬКО если ELIS включен
+var isElisUsed = _appConfig.IsUsedElis(_deviceId);
+
 foreach (var item in correctionData.Values)
 {
-    if (item.History != null && item.History.Count > 0)
+    // Проверка isElisUsed перед сохранением истории
+    if (isElisUsed && item.History != null && item.History.Count > 0)
     {
         foreach (var historyEntry in item.History)
         {
