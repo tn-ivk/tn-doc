@@ -4,8 +4,8 @@
       :field="field"
       :modelValue="modelValue"
       :hideLabel="hideLabel"
-      :invalidChars="invalidChars"
-      :highlightColor="highlightColor"
+                  :invalidChars="invalidChars"
+                  :highlightColor="computedHighlightColor"
       @update:modelValue="handleChange"
     />
 
@@ -54,6 +54,8 @@ const {
   trackManualChange
 } = useFieldHistory();
 
+const ELIS_HIGHLIGHT_COLOR = 'var(--md-elis-highlight, #e8f5e9)';
+
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
 let hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -73,6 +75,14 @@ const lastSource = computed(() => {
   const source = getLastSource(props.field.key);
   logger.debug(`[FormFieldWithHistory] Последний источник для поля "${props.field.key}": ${source}`);
   return source;
+});
+
+const computedHighlightColor = computed(() => {
+  if (props.highlightColor) {
+    return props.highlightColor;
+  }
+
+  return lastSource.value === DataSource.ELIS ? ELIS_HIGHLIGHT_COLOR : undefined;
 });
 
 /**

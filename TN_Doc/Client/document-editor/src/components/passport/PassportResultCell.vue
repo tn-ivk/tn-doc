@@ -6,7 +6,7 @@ import { logger } from '@tn-doc/shared';
     :disabled="!isEditable"
     :class="[
       'result-input',
-      { 'elis-filled': parameter.elisFlags.result },
+      { 'elis-filled': isElisFilled },
       { 'manual-input--disabled': !isEditable }
     ]"
     type="text"
@@ -23,6 +23,7 @@ import type { PassportQualityParameter } from '@/types/passport.types';
 interface Props {
   parameter: PassportQualityParameter;
   isEditable: boolean;
+  isElisFilled?: boolean;
 }
 
 const props = defineProps<Props>();

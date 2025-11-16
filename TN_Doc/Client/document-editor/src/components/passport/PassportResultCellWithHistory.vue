@@ -3,6 +3,7 @@
     <PassportResultCell
       :parameter="parameter"
       :isEditable="isEditable"
+      :isElisFilled="isElisFilled"
       @update:result="handleChange"
     />
 
@@ -68,6 +69,8 @@ const fieldHistory = computed(() => {
 const lastSource = computed(() => {
   return getLastSource(historyKey.value);
 });
+
+const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
  * Обработка изменения результата

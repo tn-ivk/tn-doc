@@ -2,6 +2,7 @@
   <div class="method-with-history">
     <PassportMethodSelect
       :parameter="parameter"
+      :isElisFilled="isElisFilled"
       @update:method="handleChange"
     />
 
@@ -66,6 +67,8 @@ const fieldHistory = computed(() => {
 const lastSource = computed(() => {
   return getLastSource(historyKey.value);
 });
+
+const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
  * Обработка изменения метода

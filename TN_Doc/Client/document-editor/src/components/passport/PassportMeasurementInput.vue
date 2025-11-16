@@ -6,7 +6,7 @@
       :disabled="!parameter.editable"
       :class="[
         { 'p-invalid': !isValid },
-        { 'elis-filled': parameter.elisFlags.measurement },
+        { 'elis-filled': isElisFilled },
         { 'manual-input--disabled': !parameter.editable },
         { 'has-tooltip-error': !isValid && tooltipOptions.value }
       ]"
@@ -26,6 +26,7 @@ import type { PassportQualityParameter } from '@/types/passport.types';
 
 interface Props {
   parameter: PassportQualityParameter;
+  isElisFilled?: boolean;
 }
 
 const props = defineProps<Props>();

@@ -2,6 +2,7 @@
   <div class="measurement-with-history">
     <PassportMeasurementInput
       :parameter="parameter"
+      :isElisFilled="isElisFilled"
       @update:measurement="handleChange"
     />
 
@@ -66,6 +67,8 @@ const fieldHistory = computed(() => {
 const lastSource = computed(() => {
   return getLastSource(historyKey.value);
 });
+
+const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
  * Обработка изменения значения
