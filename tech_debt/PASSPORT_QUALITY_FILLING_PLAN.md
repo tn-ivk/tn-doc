@@ -27,6 +27,7 @@
    - Расширить `TN.DocEditor.Passport.QualityParameter`, `QualityParameterSchema`, `Edit.Parameter`, а также связанные DTO `PassportQualityParameterSchema` и `PassportQualityParameter` (ts-тип из `TN_Doc/Client/document-editor/src/types/passport.types.ts`) полем `IsBalast`.  
    - Обновить `DocPassport.BuildQualityParameters` и `DocPassport.BuildQualityParametersSchema`, чтобы новое поле прокидывалось во все уровни сериализации (DTO → JSON → `PassportEditConfig`).  
    - Убедиться, что `PassportEditConfig` и данные, отдаваемые `usePassportEditor`, содержат `isBalast`, иначе фронтенд не сможет включить балластную логику.
+- Добавить булев признак `IsFromConfig` во все DTO/JSON структуры, описывающие методы (`TN.Doc.Edit.Metod`, `PassportQualityParameterSchema.MethodOptions`, `PassportQualityParameter.method`, `passport.types.ts → MethodOption`). Значение `true` ставится для элементов, пришедших из конфигурации/`LabInfo`, `false` — для ручных значений, в том числе восстановленных из истории. `DocPassport` сериализует флаг обратно в `PassportEditConfig`, чтобы фронтенд различал источники.
 
 ### 5. Бэкенд: переработка DocPassport
 1. **Формирование `QualityParameterSchema`**
@@ -45,12 +46,12 @@
    - При ручном изменении значений, ранее загруженных из ELIS, история фиксирует событие «Manual overrides ELIS» (source `Manual`, previous source `ELIS`), чтобы аудит явно видел факт перезаписи.
 4. **Ручное добавление методов испытаний**
    - Используем текущий пайплайн `DocUpdate` → `AddOrUpdateLabInfo` (`tn.docgeneral/Passport/DocPassport.cs:274-333` и `:616+`), который уже принимает `method.*` JSON и создаёт/обновляет `LabInfo`. Никаких новых endpoint'ов не требуется.  
-   - Модалка должна формировать элемент `Values[]` с `Tag = "Metod"` и `Key = "method.<parameterKey>"`, где `Value` — сериализованный `TN.Doc.Edit.Metod` (Id, Name, LimitValue*, IsDefault, LimitValueString/Activate). История передаётся в `History` с источником `Manual`, чтобы `DocUpdate` корректно отметил автора и `ElisFilled`.  
-   - После записи значения в `store.formData` сохраняем документ через существующий `DocumentEditController.Save`; `DocUpdate` разберёт JSON, положит метод в `DataARM.LabInfo` и, при необходимости, создаст новую запись.  
-   - Возврат обновлённого метода не требуется: фронтенд строит комбобокс из локальных данных (см. п.6.3), поэтому достаточно дождаться успешного `save`, чтобы история и признаки `__elisFilled` синхронизировались.
+- Модалка должна формировать элемент `Values[]` с `Tag = "Metod"` и `Key = "method.<parameterKey>"`, где `Value` — сериализованный `TN.Doc.Edit.Metod` (Id, Name, LimitValue*, IsDefault, LimitValueString/Activate, `IsFromConfig = false`). История передаётся в `History` с источником `Manual`, чтобы `DocUpdate` корректно отметил автора и `ElisFilled`.  
+- После записи значения в `store.formData` сохраняем документ через существующий `DocumentEditController.Save`; `DocUpdate` разберёт JSON, положит метод в `DataARM.LabInfo` и, при необходимости, создаст новую запись.  
+- При сериализации `DocPassport` заполняет `MethodOptions` так, чтобы методы из конфигурации/`LabInfo` имели `IsFromConfig = true`, а элементы, сохранённые вручную, — `false`. Мы больше не «обогащаем» справочник молча: UI получает полный список с флагами и сам решает, как отображать.
 5. **Индикация отсутствия метода**
-   - Проверку наличия метода выполнять на фронте: после загрузки схемы `PassportQualityTable` сравнивает выбранный метод с локальным списком опций комбобокса.  
-   - При отсутствии совпадения UI подсвечивает поле и показывает предупреждение без дополнительных запросов к серверу.
+   - Проверку наличия метода выполнять на фронте с учётом флага `IsFromConfig`: `PassportQualityTable` получает список `MethodOptions` из `PassportEditConfig`, находит выбранный метод и считывает `isFromConfig`.  
+   - Если значение `false` (ручной метод или восстановленное вручную поле), UI подсвечивает поле и показывает предупреждение без дополнительных запросов к серверу; если метод совсем не найден в списке, считается, что он «устарел» и также подсвечивается.
 
 ### 6. Фронтенд: DocumentPassportEditor и связанные компоненты
 1. **Синхронизация measurement/result**
@@ -69,11 +70,11 @@
    - Итоговое значение всегда имеет формат строки `«менее 4,0»` / `«более 0,5»` (локализованные слова + число с запятой), чтобы соответствовать требованиям печати.
 3. **Кнопка ручного метода испытания**
    - UI: кнопка рядом с комбобоксом.  
-   - Модалка: поля (название, `limitValueActivate`, числовое значение или строка, `isDefault`). Дополнительно даём чекбокс «Сделать основным» и подсказку о роли `LimitValueString`.  
-   - После подтверждения сериализуем ввод в структуру `Metod`, записываем её в `store.formData["method.<key>"]` и добавляем запись истории `store.formData["method.<key>__history"]` со `source = Manual`. `usePassportEditor` (`TN_Doc/Client/document-editor/src/composables/usePassportEditor.ts:62-100`) автоматически подтянет незнакомый метод в список опций, поэтому отдельный ответ от сервера не нужен.  
+- Модалка: поля (название, `limitValueActivate`, числовое значение или строка, `isDefault`). Дополнительно даём чекбокс «Сделать основным» и подсказку о роли `LimitValueString`.  
+- После подтверждения сериализуем ввод в структуру `Metod`, устанавливаем `isFromConfig = false`, записываем её в `store.formData["method.<key>"]` и добавляем запись истории `store.formData["method.<key>__history"]` со `source = Manual`. `usePassportEditor` (`TN_Doc/Client/document-editor/src/composables/usePassportEditor.ts:62-100`) добавляет новую запись в локальные `methodOptions`, но сохраняет флаг `isFromConfig = false`, чтобы таблица могла подсветить ручной метод.
    - Сохранение выполняется тем же действием, что и изменение остальных полей (`DocumentPassportEditor` → `documentStore.saveDocument`), значит, на сеть идёт стандартный `DocUpdate` запрос.
 4. **Предупреждение об отсутствии метода**
-   - После загрузки параметра сравнивать выбранный метод с локальным списком опций; если совпадения нет, подсветить селект в жёлтый и показать текст `отсутствует в справочнике` без дополнительных запросов к серверу.
+- После загрузки параметра UI проверяет `selectedMethod?.isFromConfig`: если флаг `false`, подсвечиваем селект в жёлтый и показываем текст `отсутствует в справочнике`. Для совместимости со старыми данными оставляем fallback — при полном отсутствии записи в `methodOptions` подсветка срабатывает автоматически.
    - Дать ссылку/кнопку на модалку ручного добавления для быстрого исправления.
 5. **Валидация точности Measurement**
    - Проверить текущую реализацию (в `FormFieldWithHistory` и `usePassportEditor`).  
