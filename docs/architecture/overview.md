@@ -400,9 +400,221 @@ graph TB
     Systemd --> LinuxLogs
 ```
 
+## Field History Tracking Architecture (v1.4.4+)
+
+Система отслеживания истории изменений полей паспорта качества для аудита источников данных.
+
+```mermaid
+graph TB
+    subgraph "Frontend - Vue Components"
+        FieldIndicator[FieldHistoryIndicator.vue]
+        HistoryPopup[FieldHistoryPopup.vue]
+        FieldWrapper[FormFieldWithHistory.vue]
+        MeasurementInput[PassportMeasurementInputWithHistory.vue]
+        MethodSelect[PassportMethodSelectWithHistory.vue]
+        ResultCell[PassportResultCellWithHistory.vue]
+    end
+
+    subgraph "Frontend - Composables"
+        UseFieldHistory[useFieldHistory.ts]
+        DocumentStore[documentStore - formHistory]
+    end
+
+    subgraph "Backend - Models"
+        DataSource[DataSource enum]
+        HistoryEntry[FieldHistoryEntry]
+        DataARM[DataARM.FieldHistoryMap]
+    end
+
+    subgraph "Backend - Processing"
+        DocUpdate[DocPassport.DocUpdate]
+        GetEditConfig[DocPassport.GetEditConfig]
+    end
+
+    FieldWrapper --> FieldIndicator
+    FieldWrapper --> HistoryPopup
+    MeasurementInput --> FieldIndicator
+    MethodSelect --> FieldIndicator
+    ResultCell --> FieldIndicator
+
+    FieldWrapper --> UseFieldHistory
+    MeasurementInput --> UseFieldHistory
+    MethodSelect --> UseFieldHistory
+    ResultCell --> UseFieldHistory
+
+    UseFieldHistory --> DocumentStore
+    DocumentStore --> DocUpdate
+    DocUpdate --> DataARM
+
+    GetEditConfig --> DataARM
+    DataARM --> DocumentStore
+```
+
+### Структура данных истории
+
+```mermaid
+classDiagram
+    class DataSource {
+        <<enumeration>>
+        Unknown
+        ELIS
+        Manual
+        IVK
+    }
+
+    class FieldHistoryEntry {
+        +DataSource Source
+        +DateTime ModifiedAt
+        +string ModifiedBy
+        +string Value
+        +string? PreviousValue
+        +string? Comment
+        +const int MaxHistoryEntries = 10
+    }
+
+    class DataARM {
+        +Dictionary~string, List~FieldHistoryEntry~~ FieldHistoryMap
+        +AddFieldHistoryEntry(controlId, entry)
+        +GetLastSourceForControl(controlId) DataSource
+    }
+
+    FieldHistoryEntry --> DataSource
+    DataARM --> FieldHistoryEntry
+```
+
+### Поток данных истории изменений
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Vue as Vue Component
+    participant Composable as useFieldHistory
+    participant Store as documentStore
+    participant Backend as DocPassport
+    participant DB as MySQL DataARM
+
+    User->>Vue: Изменяет поле значения
+    Vue->>Composable: trackManualChange(fieldKey, newValue)
+    Composable->>Composable: createHistoryEntry(Manual, value)
+    Composable->>Store: formHistory[fieldKey].push(entry)
+
+    User->>Vue: Кликает "Сохранить"
+    Vue->>Backend: POST saveDocument({ __history: formHistory })
+    Backend->>Backend: DocUpdate(correctionData)
+    Backend->>DB: UPDATE DataARM.FieldHistoryMap
+
+    Note over Backend: FIFO: макс 10 записей на поле
+
+    User->>Vue: Открывает документ снова
+    Vue->>Backend: GET getEditConfig(id)
+    Backend->>DB: SELECT DataARM
+    DB-->>Backend: JSON с FieldHistoryMap
+    Backend->>Backend: GetEditConfig()
+    Backend-->>Vue: initialValues с __history
+    Vue->>Store: Загрузить formHistory
+    Store->>Vue: Отобразить индикаторы
+
+    User->>Vue: Наводит на индикатор
+    Vue->>Vue: Показать FieldHistoryPopup
+    Vue-->>User: История изменений (до 10 записей)
+```
+
+### Ключи истории для разных полей
+
+```mermaid
+graph TB
+    subgraph "AdditionalInfo Fields"
+        AI1["ExportPermit"]
+        AI2["Sample"]
+        AI3["Laboratory_IOF"]
+    end
+
+    subgraph "Quality Parameters"
+        QP1["value.{ParameterKey}"]
+        QP2["result.{ParameterKey}"]
+        QP3["method.{ParameterKey}"]
+        QP4["document.{ParameterKey}"]
+    end
+
+    subgraph "FieldHistoryMap Keys"
+        HM1["ExportPermit → List~Entry~"]
+        HM2["Sample → List~Entry~"]
+        HM3["Laboratory_IOF → List~Entry~"]
+        HM4["value.Density → List~Entry~"]
+        HM5["result.Density → List~Entry~"]
+        HM6["method.Density → List~Entry~"]
+        HM7["document.Density → List~Entry~"]
+    end
+
+    AI1 --> HM1
+    AI2 --> HM2
+    AI3 --> HM3
+    QP1 --> HM4
+    QP2 --> HM5
+    QP3 --> HM6
+    QP4 --> HM7
+```
+
+### UI Компоненты истории
+
+**FieldHistoryIndicator (14-16px badge):**
+- Отображает последний источник изменения
+- Цвета: ELIS (зелёный #4CAF50), Manual (синий #2196F3), IVK (оранжевый #FF9800)
+- Позиция: правый верхний угол поля (absolute, top: 4px, right: 4px)
+- Триггер popup: hover на индикаторе
+
+**FieldHistoryPopup (max 400px height):**
+- PrimeVue OverlayPanel с прокруткой
+- История изменений: последнее изменение сверху
+- Формат: Источник + Дата/время + Старое → Новое значение
+- Закрытие: клик вне области, ESC
+
+### Миграция из ElisFilled
+
+```mermaid
+flowchart LR
+    OldData[labInfo.ElisFilled = true] --> Check{Есть запись в\nFieldHistoryMap?}
+    Check -->|Нет| Create[Создать запись:\nSource=ELIS\nModifiedAt=MinValue\nComment=Миграция]
+    Check -->|Да| Skip[Пропустить]
+    Create --> Store[Сохранить в\nvalue.{ParameterKey}]
+    Store --> Flag[Обновить\nElisFilled из истории]
+```
+
+**Логика миграции в GetEditConfig:**
+```csharp
+if (labInfo.ElisFilled && !dataArm.FieldHistoryMap.ContainsKey($"value.{parameterKey}"))
+{
+    dataArm.AddFieldHistoryEntry($"value.{parameterKey}", new FieldHistoryEntry
+    {
+        Source = DataSource.ELIS,
+        ModifiedAt = DateTime.MinValue,
+        ModifiedBy = "ELIS",
+        Value = labInfo.Value,
+        Comment = "Миграция из ElisFilled"
+    });
+}
+```
+
+### Ограничения и оптимизация
+
+**Лимиты:**
+- Максимум 10 записей истории на поле (FIFO очередь)
+- При добавлении 11-й записи удаляется самая старая
+
+**Производительность:**
+- История хранится в JSON поле DataARM
+- Индексация не требуется (в памяти Dictionary)
+- Размер записи ~150-200 байт
+
+**Обратная совместимость:**
+- Поле `ElisFilled` (bool) помечено как `[Obsolete]` но сохранено
+- Автоматический пересчёт `ElisFilled` на основе последнего источника в истории
+- Миграция старых документов при первой загрузке
+
 ## См. также
 
 - [Document Modules Architecture](document-modules.md)
 - [StatusBar Architecture](statusbar.md)
 - [API Endpoints](../api/endpoints.md)
 - [Deployment Guide](../deployment/linux.md)
+- [Field History Feature Documentation](../features/field-history.md)

@@ -124,13 +124,20 @@ export function usePassportSave() {
         // Продолжаем без объединения данных
       }
 
+      // Добавляем историю изменений полей в mergedData
+      const finalPayload = {
+        ...mergedData,
+        __history: store.formHistory
+      };
+
+
       // Шаг 5: Обновить документ через UpdateDoc
       logger.debug('[usePassportSave] Шаг 5: Обновление документа с объединенными данными...');
       await documentApi.updateDocument(
         config.deviceId,
         config.docType,
         config.docId,
-        mergedData
+        finalPayload
       );
       logger.debug('[usePassportSave] Шаг 5: Документ успешно обновлен');
 

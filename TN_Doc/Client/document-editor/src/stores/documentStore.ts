@@ -4,6 +4,7 @@ import { logger, useInvalidChars } from '@tn-doc/shared';
 import { documentApi } from '@/services/api.service';
 import type { DocumentEditConfig, FormField } from '@/types/document.types';
 import type { PassportEditConfig } from '@/types/passport.types';
+import type { FieldHistoryEntry } from '@/types/history.types';
 
 /**
  * Store для управления состоянием документа
@@ -16,6 +17,12 @@ export const useDocumentStore = defineStore('document', () => {
   const isLoading = ref(false);
   const isSaving = ref(false);
   const error = ref<string | null>(null);
+
+  /**
+   * История изменений полей
+   * Ключ - название поля (controlId), значение - массив записей истории
+   */
+  const formHistory = ref<Record<string, FieldHistoryEntry[]>>({});
 
   // Getters
   const isReady = computed(() => config.value !== null && !isLoading.value);
@@ -106,6 +113,61 @@ export const useDocumentStore = defineStore('document', () => {
       // Инициализируем formData начальными значениями
       formData.value = { ...loadedConfig.initialValues };
 
+      // Загружаем историю изменений полей
+      formHistory.value = {};
+
+      // НОВЫЙ ФОРМАТ: Извлекаем историю из initialValues
+      // Бэкенд передает историю под ключами с постфиксом __history
+      const historyKeysInInitialValues = Object.keys(loadedConfig.initialValues).filter(k => k.endsWith('__history'));
+
+      for (const historyKey of historyKeysInInitialValues) {
+        // Убираем постфикс __history, чтобы получить имя поля
+        const fieldKey = historyKey.replace('__history', '');
+        const historyData = loadedConfig.initialValues[historyKey];
+
+        if (Array.isArray(historyData) && historyData.length > 0) {
+          formHistory.value[fieldKey] = historyData;
+        }
+      }
+
+      // СТАРЫЙ ФОРМАТ (для обратной совместимости): Загрузить историю из конфигурации (если есть)
+      if ((loadedConfig as any).fieldHistory) {
+        const fieldHistory = (loadedConfig as any).fieldHistory;
+        // Объединяем со старым форматом (новый формат имеет приоритет)
+        for (const [key, value] of Object.entries(fieldHistory)) {
+          if (!formHistory.value[key]) {
+            formHistory.value[key] = value as FieldHistoryEntry[];
+          }
+        }
+      }
+
+      // СТАРЫЙ ФОРМАТ (для обратной совместимости): Загрузить историю параметров качества
+      if (loadedConfig.docType === 'Passport') {
+        const passportConfig = loadedConfig as PassportEditConfig;
+        const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+        for (const paramSchema of parametersSchema) {
+          if ((paramSchema as any).history && Array.isArray((paramSchema as any).history)) {
+            // Для параметров качества используем составные ключи
+            const historyEntries = (paramSchema as any).history as FieldHistoryEntry[];
+            const valueKey = `value.${paramSchema.key}`;
+            const resultKey = `result.${paramSchema.key}`;
+            const methodKey = `method.${paramSchema.key}`;
+
+            // Только если история еще не загружена из нового формата
+            if (!formHistory.value[valueKey]) {
+              formHistory.value[valueKey] = [...historyEntries];
+            }
+            if (!formHistory.value[resultKey]) {
+              formHistory.value[resultKey] = [...historyEntries];
+            }
+            if (!formHistory.value[methodKey]) {
+              formHistory.value[methodKey] = [...historyEntries];
+            }
+          }
+        }
+      }
+
       isDirty.value = false;
     } catch (err: any) {
       error.value = err.response?.data?.error || err.message || 'Не удалось загрузить конфигурацию документа';
@@ -152,11 +214,19 @@ export const useDocumentStore = defineStore('document', () => {
     isSaving.value = true;
 
     try {
+      // Подготовить данные для сохранения (включая историю)
+
+      const payload = {
+        ...formData.value,
+        __history: formHistory.value // Передаем историю
+      };
+
+
       const response = await documentApi.saveDocument(
         config.value.deviceId,
         config.value.docType,
         config.value.docId,
-        formData.value
+        payload
       );
 
       if (response.success) {
@@ -187,6 +257,7 @@ export const useDocumentStore = defineStore('document', () => {
   function reset() {
     config.value = null;
     formData.value = {};
+    formHistory.value = {};
     isDirty.value = false;
     isLoading.value = false;
     isSaving.value = false;
@@ -197,6 +268,7 @@ export const useDocumentStore = defineStore('document', () => {
     // State
     config,
     formData,
+    formHistory,
     isDirty,
     isLoading,
     isSaving,

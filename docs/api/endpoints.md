@@ -145,7 +145,37 @@ POST /Document/SaveDoc
   "data": {
     "passportNumber": "ПК-2025-001",
     "productName": "Нефть сырая",
-    "qualityIndicators": [...]
+    "qualityIndicators": [...],
+    "__history": {
+      "passportNumber": [
+        {
+          "source": "Manual",
+          "modifiedAt": "2025-01-14T10:00:00Z",
+          "modifiedBy": "Пользователь",
+          "value": "ПК-2025-001",
+          "previousValue": null,
+          "comment": null
+        }
+      ],
+      "value.Density": [
+        {
+          "source": "ELIS",
+          "modifiedAt": "2025-01-14T09:00:00Z",
+          "modifiedBy": "ELIS",
+          "value": "850.5",
+          "previousValue": null,
+          "comment": "Загружено из протокола ПР-2024-12345"
+        },
+        {
+          "source": "Manual",
+          "modifiedAt": "2025-01-14T10:30:00Z",
+          "modifiedBy": "Пользователь",
+          "value": "850.567",
+          "previousValue": "850.5",
+          "comment": "Скорректировано вручную"
+        }
+      ]
+    }
   }
 }
 ```
@@ -157,6 +187,12 @@ POST /Document/SaveDoc
   "message": "Документ сохранен"
 }
 ```
+
+**История изменений (v1.4.4+):**
+- Поле `__history` содержит историю изменений для каждого поля
+- Ключ - `controlId` поля (например, `passportNumber`, `value.Density`, `method.Temperature`)
+- Значение - массив записей истории (до 10 последних)
+- Backend автоматически обрабатывает FIFO при превышении лимита
 
 ### Status API
 
@@ -454,8 +490,176 @@ sequenceDiagram
     API-->>Client: application/pdf
 ```
 
+## Field History API (v1.4.4+)
+
+### Структура записи истории
+
+```typescript
+interface FieldHistoryEntry {
+  source: 'Unknown' | 'ELIS' | 'Manual' | 'IVK';
+  modifiedAt: string;      // ISO 8601 формат
+  modifiedBy: string;      // "Пользователь", "ELIS", "IVK"
+  value: string;           // Новое значение
+  previousValue?: string;  // Предыдущее значение (для отката)
+  comment?: string;        // Комментарий к изменению
+}
+```
+
+### Передача истории изменений
+
+**При загрузке документа (GET /api/documents/{deviceId}/{docType}/edit/{id}):**
+
+```json
+{
+  "initialValues": {
+    "ExportPermit": "АБВ123",
+    "ExportPermit__history": [
+      {
+        "source": "Manual",
+        "modifiedAt": "2025-01-14T09:00:00Z",
+        "modifiedBy": "Пользователь",
+        "value": "АБВ123",
+        "previousValue": null,
+        "comment": null
+      }
+    ],
+    "value.Density": "850.567",
+    "value.Density__history": [
+      {
+        "source": "ELIS",
+        "modifiedAt": "2025-01-14T10:00:00Z",
+        "modifiedBy": "ELIS",
+        "value": "850.5",
+        "previousValue": null,
+        "comment": "Загружено из протокола ПР-2024-12345"
+      },
+      {
+        "source": "Manual",
+        "modifiedAt": "2025-01-14T10:32:00Z",
+        "modifiedBy": "Пользователь",
+        "value": "850.567",
+        "previousValue": "850.5",
+        "comment": "Скорректировано вручную"
+      }
+    ]
+  }
+}
+```
+
+**При сохранении документа (POST /api/documents/{deviceId}/{docType}/save/{id}):**
+
+```json
+{
+  "ExportPermit": "АБВ123",
+  "value.Density": "850.567",
+  "__history": {
+    "ExportPermit": [
+      {
+        "source": "Manual",
+        "modifiedAt": "2025-01-14T09:00:00Z",
+        "modifiedBy": "Пользователь",
+        "value": "АБВ123",
+        "previousValue": null,
+        "comment": null
+      }
+    ],
+    "value.Density": [
+      {
+        "source": "ELIS",
+        "modifiedAt": "2025-01-14T10:00:00Z",
+        "modifiedBy": "ELIS",
+        "value": "850.5",
+        "previousValue": null,
+        "comment": "Загружено из протокола ПР-2024-12345"
+      },
+      {
+        "source": "Manual",
+        "modifiedAt": "2025-01-14T10:32:00Z",
+        "modifiedBy": "Пользователь",
+        "value": "850.567",
+        "previousValue": "850.5",
+        "comment": "Скорректировано вручную"
+      }
+    ]
+  }
+}
+```
+
+### Ключи истории
+
+**AdditionalInfo поля:**
+- Используют прямые ключи: `ExportPermit`, `Sample`, `Laboratory_IOF` и т.д.
+
+**Параметры качества:**
+- `value.{ParameterKey}` - измеренное значение
+- `result.{ParameterKey}` - результат для печати
+- `method.{ParameterKey}` - метод испытаний (JSON string)
+- `document.{ParameterKey}` - документ ELIS (JSON string)
+
+### Ограничения
+
+- Максимум 10 записей истории на поле
+- При превышении удаляется самая старая запись (FIFO)
+- История передаётся только для изменённых полей
+
+### Примеры
+
+**Отслеживание ручного изменения:**
+```typescript
+// Frontend
+const newEntry: FieldHistoryEntry = {
+  source: 'Manual',
+  modifiedAt: new Date().toISOString(),
+  modifiedBy: 'Пользователь',
+  value: '850.567',
+  previousValue: '850.5',
+  comment: null
+};
+
+formHistory['value.Density'].push(newEntry);
+```
+
+**Отслеживание загрузки из ELIS:**
+```typescript
+// Frontend
+const elisEntry: FieldHistoryEntry = {
+  source: 'ELIS',
+  modifiedAt: new Date().toISOString(),
+  modifiedBy: 'ELIS',
+  value: '850.5',
+  previousValue: null,
+  comment: 'Загружено из протокола ПР-2024-12345'
+};
+
+formHistory['value.Density'].push(elisEntry);
+```
+
+**Обработка истории на backend:**
+```csharp
+// Backend (DocPassport.DocUpdate)
+foreach (var item in correctionData.Values)
+{
+    if (item.History != null && item.History.Count > 0)
+    {
+        foreach (var historyEntry in item.History)
+        {
+            // Проставляем автора для Manual при отсутствии
+            if (historyEntry.Source == DataSource.Manual &&
+                string.IsNullOrWhiteSpace(historyEntry.ModifiedBy))
+            {
+                historyEntry.ModifiedBy = "Пользователь";
+            }
+
+            dataArm.AddFieldHistoryEntry(item.Key, historyEntry);
+            _logger.Info($"История {item.Key}: {historyEntry.Source} от {historyEntry.ModifiedBy}");
+        }
+    }
+}
+```
+
 ## См. также
 
 - [SignalR Documentation](signalr.md)
 - [Architecture Overview](../architecture/overview.md)
 - [Integration Guide](../integration/elis.md)
+- [Field History Feature Documentation](../features/field-history.md)

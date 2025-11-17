@@ -8,7 +8,7 @@
 
     <!-- Метод испытаний -->
     <td class="cell-method">
-      <PassportMethodSelect
+      <PassportMethodSelectWithHistory
         :parameter="parameter"
         @update:method="handleMethodUpdate"
       />
@@ -21,7 +21,7 @@
 
     <!-- Измерение (объединенная колонка) -->
     <td class="cell-measurement">
-      <PassportMeasurementInput
+      <PassportMeasurementInputWithHistory
         :parameter="parameter"
         @update:measurement="handleMeasurementUpdate"
       />
@@ -29,7 +29,7 @@
 
     <!-- Результат (может быть редактируемым) -->
     <td class="cell-result">
-      <PassportResultCell
+      <PassportResultCellWithHistory
         :parameter="parameter"
         :isEditable="isResultEditable"
         @update:result="handleResultUpdate"
@@ -40,10 +40,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import PassportMethodSelect from './PassportMethodSelect.vue';
+import PassportMethodSelectWithHistory from './PassportMethodSelectWithHistory.vue';
 import PassportDocumentField from './PassportDocumentField.vue';
-import PassportMeasurementInput from './PassportMeasurementInput.vue';
-import PassportResultCell from './PassportResultCell.vue';
+import PassportMeasurementInputWithHistory from './PassportMeasurementInputWithHistory.vue';
+import PassportResultCellWithHistory from './PassportResultCellWithHistory.vue';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {

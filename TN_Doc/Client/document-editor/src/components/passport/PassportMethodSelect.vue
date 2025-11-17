@@ -6,7 +6,7 @@
       optionLabel="name"
       :class="[
         { 'p-invalid': !isValid },
-        { 'elis-filled': parameter.elisFlags.method }
+        { 'elis-filled': isElisFilled }
       ]"
       placeholder="Метод не выбран"
       showClear
@@ -29,6 +29,8 @@ import type { PassportQualityParameter, MethodOption } from '@/types/passport.ty
 interface Props {
   /** Параметр качества */
   parameter: PassportQualityParameter;
+  /** Используется ли подсветка ELIS */
+  isElisFilled?: boolean;
 }
 
 const props = defineProps<Props>();

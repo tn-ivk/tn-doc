@@ -1,7 +1,6 @@
 <template>
   <InputText
     :modelValue="documentNumber"
-    :class="{ 'elis-filled': isElisFilled }"
     type="text"
     disabled
     class="document-field manual-input--disabled"
@@ -29,13 +28,6 @@ const documentNumber = computed(() => {
     return '—';
   }
   return props.parameter.document.number;
-});
-
-/**
- * Заполнен ли документ из ELIS
- */
-const isElisFilled = computed(() => {
-  return props.parameter.document?.elisFilled || false;
 });
 
 /**
@@ -78,17 +70,6 @@ const documentTooltip = computed(() => {
   cursor: not-allowed;
   border: none;
   box-sizing: border-box;
-}
-
-/* ELIS подсветка */
-.elis-filled {
-  background-color: var(--md-elis-highlight, #e8f5e9) !important;
-  color: var(--md-text, #212121) !important;
-}
-
-.elis-filled:deep(input) {
-  background-color: var(--md-elis-highlight, #e8f5e9) !important;
-  color: var(--md-text, #212121) !important;
 }
 
 .manual-input--disabled {
