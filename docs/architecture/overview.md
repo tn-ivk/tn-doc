@@ -32,7 +32,7 @@ graph TB
 
     subgraph "Business Logic Layer"
         AppConfig[AppConfigService]
-        DocFactory[Document Factory]
+        DocModuleLoader[DocModuleLoader]
         Services[Business Services]
         FastReport[FastReport Engine]
     end
@@ -60,14 +60,13 @@ graph TB
     StatusBar --> SignalR
     Configurator --> Controllers
     DocumentEditor --> Controllers
-    DocumentEditor --> SignalR
     Controllers --> Services
     Services --> AppConfig
-    Services --> DocFactory
-    DocFactory --> Passport
-    DocFactory --> Poverka
-    DocFactory --> KMH
-    DocFactory --> Other
+    AppConfig --> DocModuleLoader[DocModuleLoader]
+    DocModuleLoader --> Passport
+    DocModuleLoader --> Poverka
+    DocModuleLoader --> KMH
+    DocModuleLoader --> Other
     Passport --> FastReport
     Poverka --> FastReport
     KMH --> FastReport
@@ -129,10 +128,10 @@ graph LR
 ### 2. Business Logic Layer (Бизнес-логика)
 
 **Компоненты:**
-- `IAppConfigService` - управление конфигурацией и фабрика документов
+- `IAppConfigService` - управление конфигурацией приложения
+- `IDocModuleLoader` - динамическая загрузка DLL модулей документов (v1.4.2+)
 - `IReportBuffer` - буфер для PDF в памяти (v1.4.1+)
 - `IConfigurationCacheService` - кэширование конфигурационных файлов с LRU eviction (v1.4.2+)
-- `IDocModuleLoader` - кэширование загрузки DLL документов (v1.4.2+)
 - `PrinterService` - управление печатью
 - `DirectoryService` - работа с файловой системой
 - `StatusProvider` - мониторинг статусов
@@ -141,7 +140,7 @@ graph LR
 **Ответственность:**
 - Бизнес-правила генерации документов
 - Управление конфигурацией с кэшированием
-- Создание экземпляров модулей документов
+- Динамическая загрузка и создание экземпляров модулей документов через рефлексию
 - Мониторинг здоровья системы
 - Отслеживание истории изменений полей (v1.4.4+)
 
@@ -149,20 +148,31 @@ graph LR
 classDiagram
     class IAppConfigService {
         <<interface>>
-        +GetDocumentClass(idDevice, idDoc) IDocClass
         +GetConfig() CfgApp
         +GetDeviceConfig(idDevice) DeviceConfig
+        +GetPathToDocDll(idDevice, idDoc) string
+        +GetDeviceName(idDevice) string
     }
 
     class AppConfigService {
         -CfgApp _config
-        -Dictionary~string, Type~ _documentTypes
-        +GetDocumentClass(idDevice, idDoc) IDocClass
         +LoadConfiguration() void
+        +GetPathToDocDll(idDevice, idDoc) string
     }
 
-    class IDocClass {
+    class IDocModuleLoader {
         <<interface>>
+        +LoadDocsModule(options, idDevice, idDoc, baseDir) DocGeneral
+    }
+
+    class DocModuleLoader {
+        -IAppConfigService _appConfig
+        -IConfigurationCacheService _configCache
+        +LoadDocsModule() DocGeneral
+    }
+
+    class DocGeneral {
+        <<abstract>>
         +GetViewDoc(id) string
         +GetPathTemplateFile() string
         +GetEditDoc(id) string
@@ -170,7 +180,9 @@ classDiagram
     }
 
     IAppConfigService <|.. AppConfigService
-    AppConfigService ..> IDocClass : creates
+    IDocModuleLoader <|.. DocModuleLoader
+    DocModuleLoader --> AppConfigService : uses
+    DocModuleLoader ..> DocGeneral : creates via reflection
 ```
 
 ### 3. Data Access Layer (Доступ к данным)
@@ -187,37 +199,71 @@ classDiagram
 
 ### 4. Document Generation Layer
 
-**Архитектура генерации документов:**
+**Архитектура генерации документов (через HomeController):**
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Controller
-    participant AppConfig
-    participant DocModule
+    participant HomeController
+    participant DocModuleLoader
+    participant DocModule as DocGeneral (DLL)
     participant FastReport
     participant ReportBuffer
 
-    User->>Controller: Запрос документа (deviceId, docId, recordId)
-    Controller->>AppConfig: GetDocumentClass(deviceId, docId)
-    AppConfig->>DocModule: Создать экземпляр модуля
-    DocModule-->>Controller: Instance
+    User->>HomeController: Запрос документа (deviceId, docId, recordId)
+    HomeController->>DocModuleLoader: LoadDocsModule(options, deviceId, docId, baseDir)
+    DocModuleLoader->>DocModuleLoader: Assembly.LoadFrom(dllPath)
+    DocModuleLoader->>DocModuleLoader: Создать экземпляр через Reflection
+    DocModuleLoader-->>HomeController: DocGeneral Instance
 
-    Controller->>DocModule: GetViewDoc(recordId)
+    HomeController->>DocModule: GetViewDoc(recordId)
     DocModule->>DocModule: Загрузить данные из БД
     DocModule->>DocModule: Подготовить JSON
-    DocModule-->>Controller: JSON данные
+    DocModule-->>HomeController: JSON данные
 
-    Controller->>DocModule: GetPathTemplateFile()
-    DocModule-->>Controller: Путь к .frx шаблону
+    HomeController->>DocModule: GetPathTemplateFile()
+    DocModule-->>HomeController: Путь к .frx шаблону
 
-    Controller->>FastReport: LoadTemplate(path)
-    Controller->>FastReport: SetDataSource(json)
-    Controller->>FastReport: PrepareReport()
-    Controller->>FastReport: ExportToPDF(MemoryStream)
+    HomeController->>FastReport: LoadTemplate(path)
+    HomeController->>FastReport: SetDataSource(json)
+    HomeController->>FastReport: PrepareReport()
+    HomeController->>FastReport: ExportToPDF(MemoryStream)
 
     FastReport-->>ReportBuffer: PDF bytes
     ReportBuffer-->>User: PDF документ
+```
+
+**Архитектура редактирования документов (через DocumentEditController):**
+
+```mermaid
+sequenceDiagram
+    participant User as Document Editor Vue
+    participant API as DocumentEditController
+    participant DocModuleLoader
+    participant DocModule as DocGeneral (DLL)
+    participant DB as MySQL DataARM
+
+    User->>API: GET /api/documents/{deviceId}/{docType}/edit/{id}
+    API->>DocModuleLoader: LoadDocsModule(options, deviceId, idDoc, baseDir)
+    DocModuleLoader->>DocModuleLoader: Assembly.LoadFrom(dllPath)
+    DocModuleLoader->>DocModuleLoader: Создать экземпляр через Reflection
+    DocModuleLoader-->>API: DocGeneral Instance
+
+    API->>API: Проверить, что doc реализует IDocumentEditor
+    API->>DocModule: GetEditConfig(id)
+    DocModule->>DB: SELECT данные для редактирования
+    DB-->>DocModule: JSON данные + история полей
+    DocModule-->>API: EditConfig (schema + initialValues + __history)
+    API-->>User: JSON конфигурация формы
+
+    User->>API: POST /api/documents/{deviceId}/{docType}/save/{id}
+    API->>DocModuleLoader: LoadDocsModule()
+    DocModuleLoader-->>API: DocGeneral Instance
+    API->>DocModule: SaveDocument(id, values)
+    DocModule->>DB: UPDATE документа
+    DB-->>DocModule: Success
+    DocModule-->>API: true
+    API-->>User: {success: true}
 ```
 
 ## Dependency Injection Architecture
@@ -360,18 +406,23 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Editor as Document Editor Vue
-    participant API as API Controller
-    participant DocModule as DocPassport
+    participant API as DocumentEditController
+    participant DocModuleLoader
+    participant DocModule as DocPassport (DLL)
     participant DB as MySQL DataARM
     participant OPC as OPC Server
     participant ELIS as ELIS System
 
     User->>Editor: Открыть документ для редактирования
-    Editor->>API: GET /api/document/edit/{id}
+    Editor->>API: GET /api/documents/{deviceId}/Passport/edit/{id}
+    API->>DocModuleLoader: LoadDocsModule(options, deviceId, IdDoc.Passport, baseDir)
+    DocModuleLoader->>DocModuleLoader: Assembly.LoadFrom(dllPath)
+    DocModuleLoader-->>API: DocPassport Instance
+    API->>API: Проверить, что doc реализует IDocumentEditor
     API->>DocModule: GetEditConfig(id)
     DocModule->>DB: SELECT DataARM с FieldHistoryMap
     DB-->>DocModule: JSON данные + история
-    DocModule-->>API: initialValues + __history
+    DocModule-->>API: EditConfig (schema + initialValues + __history)
     API-->>Editor: Конфигурация формы + история
 
     Editor->>Editor: Отобразить поля с индикаторами истории
@@ -382,7 +433,7 @@ sequenceDiagram
     ELIS-->>API: Лабораторные данные
     API->>Editor: ELIS данные
     Editor->>Editor: Автозаполнение полей (Source=ELIS)
-    Editor->>Editor: Обновить историю полей
+    Editor->>Editor: Обновить историю полей (trackElisChange)
 
     User->>Editor: Изменить поле вручную
     Editor->>Editor: trackManualChange(fieldKey, value)
@@ -395,16 +446,20 @@ sequenceDiagram
     OPC-->>API: Значения тегов
     API-->>Editor: Данные измерений
     Editor->>Editor: Заполнить зависимые поля (Source=IVK)
-    Editor->>Editor: Обновить историю полей
+    Editor->>Editor: Обновить историю полей (trackIvkChange)
 
     User->>Editor: Сохранить документ
-    Editor->>API: POST /api/document/save
+    Editor->>API: POST /api/documents/{deviceId}/Passport/save/{id}
     Note over Editor,API: payload включает __history
-    API->>DocModule: DocUpdate(correctionData, history)
+    API->>DocModuleLoader: LoadDocsModule()
+    DocModuleLoader-->>API: DocPassport Instance
+    API->>DocModule: SaveDocument(id, values)
+    DocModule->>DocModule: Преобразовать в CorrectionData
     DocModule->>DB: UPDATE DataARM.FieldHistoryMap
     Note over DocModule,DB: FIFO: макс 10 записей на поле
-    DB-->>API: Success
-    API-->>Editor: Документ сохранён
+    DB-->>DocModule: Success
+    DocModule-->>API: true
+    API-->>Editor: {success: true}
 
     User->>Editor: Наведение на индикатор истории
     Editor->>Editor: Показать FieldHistoryPopup
@@ -415,31 +470,47 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    subgraph "Module Discovery"
-        Scanner[Assembly Scanner]
-        Dll[Dll/ Directory]
-        Compiled[Compiled Assemblies]
+    subgraph "Controller Layer"
+        Controller[DocumentEditController / HomeController]
     end
 
-    subgraph "Module Registry"
-        Registry[Document Type Registry]
-        Cache[Type Cache]
+    subgraph "Module Loader Service"
+        DocModuleLoader[DocModuleLoader]
+        AppConfig[AppConfigService]
+        ConfigCache[ConfigurationCacheService]
     end
 
-    subgraph "Module Instantiation"
-        Factory[Document Factory]
-        Activator[Activator.CreateInstance]
+    subgraph "Reflection & Assembly Loading"
+        GetPath[GetPathToDocDll]
+        LoadAsm[Assembly.LoadFrom]
+        FindType[GetTypes + BaseType check]
+        CreateInst[assembly.CreateInstance]
     end
 
-    Scanner --> Dll
-    Scanner --> Compiled
-    Dll --> Registry
-    Compiled --> Registry
-    Registry --> Cache
+    subgraph "DLL Files"
+        PassportDll[DocPassport.dll]
+        PovDll[DocPoverka*.dll]
+        KmhDll[DocKmh*.dll]
+        OtherDll[Other Doc DLLs]
+    end
 
-    Factory --> Cache
-    Factory --> Activator
-    Activator --> Instance[IDocClass Instance]
+    subgraph "Runtime Instance"
+        Instance[DocGeneral Instance]
+    end
+
+    Controller --> DocModuleLoader
+    DocModuleLoader --> AppConfig
+    DocModuleLoader --> ConfigCache
+    DocModuleLoader --> GetPath
+    GetPath --> LoadAsm
+    LoadAsm --> PassportDll
+    LoadAsm --> PovDll
+    LoadAsm --> KmhDll
+    LoadAsm --> OtherDll
+    LoadAsm --> FindType
+    FindType --> CreateInst
+    CreateInst --> Instance
+    Instance --> Controller
 ```
 
 ## UI Theme & Styling Architecture (v1.4.3+)
