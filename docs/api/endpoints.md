@@ -978,7 +978,7 @@ sequenceDiagram
     participant Client as JavaScript Client
     participant HomeController
     participant DocModuleLoader as IDocModuleLoader
-    participant DocModule as IDocClass
+    participant DocModule as DocGeneral
     participant DB as Database
     participant FastReport
     participant ReportBuffer as IReportBuffer
@@ -986,7 +986,7 @@ sequenceDiagram
     Client->>HomeController: GetDoc(deviceId, idDoc, id, protocolNumber)
     HomeController->>DocModuleLoader: LoadDocsModule(deviceId, idDoc)
     DocModuleLoader->>DocModuleLoader: Load & cache DLL module
-    DocModuleLoader-->>HomeController: IDocClass instance
+    DocModuleLoader-->>HomeController: DocGeneral instance
 
     HomeController->>DocModule: GetPathTemplateFile()
     DocModule-->>HomeController: Path to .frx template
@@ -1018,7 +1018,7 @@ sequenceDiagram
     participant VueApp as Vue Document Editor
     participant API as DocumentEditController
     participant DocModuleLoader as IDocModuleLoader
-    participant DocModule as IDocumentEditor
+    participant DocModule as DocGeneral (IDocumentEditor)
     participant DB as Database
 
     User->>VueApp: Открыть документ для редактирования
@@ -1027,7 +1027,7 @@ sequenceDiagram
     API->>API: Parse docType string to IdDoc enum
     API->>DocModuleLoader: LoadDocsModule(options, deviceId, idDoc)
     DocModuleLoader->>DocModuleLoader: Load & cache DLL module
-    DocModuleLoader-->>API: IDocClass instance
+    DocModuleLoader-->>API: DocGeneral instance
 
     API->>API: Check if doc implements IDocumentEditor
     API->>DocModule: GetEditConfig(id)

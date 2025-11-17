@@ -6,7 +6,7 @@ Document Editor — это веб-приложение для редактиро
 
 **Статус**: 🚧 **В разработке** (планируется в v1.4.4)
 **Ветка**: `developWork`
-**URL**: `/editor/edit/{deviceId}/{docType}/{id}`
+**URL**: `/document-editor/edit/{IdDevice}/{IdDoc}/{id}`
 **Порт dev-сервера**: 5174
 **Production Build**: `TN_Doc/wwwroot/document-editor/`
 **Технологии**: Vue 3.5, TypeScript 5.6, PrimeVue 4.2, Pinia 2.2, Vue Router 4.5
@@ -102,13 +102,13 @@ graph TB
 ### URL Pattern
 
 ```
-/editor/edit/{deviceId}/{docType}/{id}
+/document-editor/edit/{IdDevice}/{IdDoc}/{id}
 ```
 
 **Примеры:**
-- `/editor/edit/1/Passport/12345` - Паспорт качества для ИВК-1, документ #12345
-- `/editor/edit/2/Act/98765` - Акт для ИВК-2, документ #98765
-- `/editor/edit/3/Report/5555` - Отчет для ИВК-3, документ #5555
+- `/document-editor/edit/1/Passport/12345` - Паспорт качества для ИВК-1, документ #12345
+- `/document-editor/edit/2/Act/98765` - Акт для ИВК-2, документ #98765
+- `/document-editor/edit/3/Report/5555` - Отчет для ИВК-3, документ #5555
 
 ### Route Configuration
 

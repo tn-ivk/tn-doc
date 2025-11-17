@@ -802,22 +802,59 @@ graph TB
     Cache --> Mapping
 ```
 
-### Регистрация модулей
+### Загрузка модулей
 
-**Автоматическая регистрация:**
+**Динамическая загрузка через IDocModuleLoader:**
 ```csharp
-// При старте приложения
-foreach (var assembly in LoadedAssemblies)
+// Сервис для загрузки модулей документов из DLL
+public class DocModuleLoader : IDocModuleLoader
 {
-    var documentTypes = assembly.GetTypes()
-        .Where(t => typeof(IDocClass).IsAssignableFrom(t))
-        .Where(t => !t.IsInterface && !t.IsAbstract);
-
-    foreach (var type in documentTypes)
+    public DocGeneral LoadDocsModule(DbContextOptions<DocGeneral> options,
+        int idDevice, IdDoc idDoc, string baseDirectory)
     {
-        var attribute = type.GetCustomAttribute<DocumentTypeAttribute>();
-        _registry[attribute.TypeId] = type;
+        var dllPath = _appConfig.GetPathToDocDll(idDevice, idDoc);
+        var pathToDll = Path.Combine(baseDirectory, dllPath.TrimStart('/', '\\'));
+
+        var assembly = Assembly.LoadFrom(pathToDll);
+        var docType = assembly.GetTypes()
+            .Single(x => x.BaseType?.Name == nameof(DocGeneral));
+
+        return (DocGeneral)assembly.CreateInstance(
+            docType.FullName,
+            false,
+            BindingFlags.Default,
+            null,
+            new object[] { options, _appConfig, _configCache, idDevice, idDoc, baseDirectory },
+            null,
+            null);
     }
+}
+
+// Пример использования в контроллере
+var docInstance = _moduleLoader.LoadDocsModule(options, idDevice, idDoc, baseDirectory);
+if (docInstance is IDocumentEditor editor)
+{
+    var editHtml = editor.GetEditDoc(id);
+}
+```
+
+**Базовая структура модуля:**
+```csharp
+public class DocPassport : DocGeneral, IDocUpdater, IDocumentEditor
+{
+    public DocPassport(DbContextOptions<DocGeneral> options,
+        IAppConfigService appConfig,
+        IConfigurationCacheService configCache,
+        int idDevice, IdDoc idDoc, string path)
+        : base(options, appConfig, configCache, idDevice, idDoc, path)
+    {
+        IdDoc = IdDoc.Passport;
+        PathToDocConfigFile = GetPathConfigFile();
+        PathToDocEditConfigFile = GetPathEditConfigFile();
+        PathToDocTemplateFile = GetPathTemplateFile();
+    }
+
+    // Реализация методов IDocumentEditor...
 }
 ```
 

@@ -308,8 +308,7 @@
 - Современный стек
 
 **Интеграция:**
-- Feature flag `UseVueDocumentEditor` в `CfgApp.json`
-- Метод `IsDocumentSupportedInVueEditor()` для проверки поддержки
+- Production build доступен по адресу `/document-editor`
 - Модифицирован `Common.js` для поддержки обоих редакторов
 
 ### 13. **Обширная документация**
@@ -443,7 +442,7 @@
 
 Сохранена полная обратная совместимость:
 - Старый HTML редактор всё ещё работает
-- Feature flag `UseVueDocumentEditor` для постепенного перехода
+- Переход на Vue редактор выполняется через URL routing
 - Оба редактора могут работать параллельно
 
 ---
@@ -570,7 +569,7 @@
 - [x] Документация создана
 - [x] Production build выполнен
 
-**Production build готов:** `TN_Doc/wwwroot/dist/document-editor/` (index.html + assets)
+**Production build готов:** `TN_Doc/wwwroot/document-editor/` (index.html + assets)
 
 ### 🎉 Готовность к продакшену
 
@@ -580,7 +579,6 @@ Document Editor **выведен в production** и готов к мануаль
 - ✅ ELIS интеграция реализована и протестирована в dev режиме
 - ✅ Система истории изменений полностью интегрирована
 - ✅ Production build создан и доступен по адресу `/document-editor`
-- ✅ Feature flag `UseVueDocumentEditor` готов к активации
 - ✅ Обратная совместимость сохранена (старый редактор работает параллельно)
 
 **Статус:** Готово к мануальному тестированию на реальных данных и последующему merge в develop.
@@ -622,7 +620,7 @@ Document Editor **выведен в production** и готов к мануаль
    - Merge feature/elis-fill-2 → develop
 
 3. **Production deployment (1-2 недели):**
-   - Активация feature flag `UseVueDocumentEditor` для пилотных пользователей
+   - Активация Vue редактора для пилотных пользователей через `/document-editor/edit/{IdDevice}/{IdDoc}/{id}`
    - Постепенный rollout для разных типов документов
    - Настройка мониторинга и логирования
    - Обучение пользователей
@@ -632,7 +630,7 @@ Document Editor **выведен в production** и готов к мануаль
    - Удаление старого кода GetEditDoc из 41 библиотеки
    - Очистка HTML генерации в tn.docgeneral
    - Удаление устаревших файлов в `wwwroot/HTML/`
-   - Удаление feature flag `UseVueDocumentEditor`
+   - Переключение всех пользователей на Vue редактор
    - Оптимизация и рефакторинг
 
 ---
@@ -751,7 +749,7 @@ Document Editor **выведен в production** и готов к мануаль
 2. **Провести полное тестирование** на staging/dev окружении
 3. **Собрать feedback** от тестировщиков и ранних пользователей
 4. **Подготовить инструкции** для конечных пользователей
-5. **Постепенный rollout** через feature flag `UseVueDocumentEditor`
+5. **Постепенный rollout** через переключение URL маршрутов в главном приложении
 
 ---
 
@@ -760,7 +758,7 @@ Document Editor **выведен в production** и готов к мануаль
 **Исходники:**
 - **Frontend Document Editor:** `TN_Doc/Client/document-editor/`
 - **Backend API Controller:** `TN_Doc/Controllers/DocumentEditController.cs`
-- **Production build:** `TN_Doc/wwwroot/dist/document-editor/`
+- **Production build:** `TN_Doc/wwwroot/document-editor/`
 - **Библиотеки документов:** `tn.docgeneral/` (41 библиотека)
 
 **Документация:**

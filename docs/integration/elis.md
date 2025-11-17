@@ -592,37 +592,49 @@ const onMethodSelected = (selectedMethod: string) => {
 ### Backend: Получение данных из ELIS
 
 ```csharp
-public class PassportModule : IDocClass
+public class DocPassport : DocGeneral, IDocUpdater, IDocumentEditor
 {
     private readonly IElisService _elisService;
 
-    public async Task<string> GetViewDoc(int id)
+    public DocPassport(DbContextOptions<DocGeneral> options,
+        IAppConfigService appConfig,
+        IConfigurationCacheService configCache,
+        int idDevice, IdDoc idDoc, string path)
+        : base(options, appConfig, configCache, idDevice, idDoc, path)
+    {
+        IdDoc = IdDoc.Passport;
+        PathToDocConfigFile = GetPathConfigFile();
+        PathToDocEditConfigFile = GetPathEditConfigFile();
+        PathToDocTemplateFile = GetPathTemplateFile();
+    }
+
+    public string GetViewDoc(int id)
     {
         // Получить данные измерений из БД
-        var measurements = await _dbContext.Measurements
-            .Where(m => m.Id == id)
-            .FirstOrDefaultAsync();
+        var measurements = DataDoc.FirstOrDefault(x => x.Id == id);
+        if (measurements == null)
+        {
+            _logger.LogWarning($"Документ {IdDoc} с id={id} не найден");
+            return string.Empty;
+        }
 
-        // Получить данные качества из ELIS
+        // Получить данные качества из ELIS (если включено)
         ElisQualityData qualityData = null;
-        if (_config.UseElis && !string.IsNullOrEmpty(measurements.SampleId))
+        if (_appConfig.IsUsedElis && !string.IsNullOrEmpty(measurements.SampleId))
         {
             try
             {
-                qualityData = await _elisService.GetQualityData(
-                    measurements.SampleId
-                );
+                qualityData = _elisService.GetQualityData(measurements.SampleId);
             }
-            catch (ElisException ex)
+            catch (Exception ex)
             {
                 _logger.LogWarning(ex,
-                    "Failed to get ELIS data for sample {SampleId}",
-                    measurements.SampleId
-                );
+                    "Не удалось получить данные ELIS для пробы {SampleId}",
+                    measurements.SampleId);
             }
         }
 
-        // Объединить данные
+        // Объединить данные для FastReport
         var documentData = new PassportData
         {
             Header = measurements.ToHeader(),
@@ -632,7 +644,7 @@ public class PassportModule : IDocClass
                 .ToList() ?? new List<QualityIndicator>()
         };
 
-        return JsonSerializer.Serialize(documentData);
+        return JsonConvert.SerializeObject(documentData);
     }
 }
 ```
