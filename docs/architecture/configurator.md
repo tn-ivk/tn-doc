@@ -4,7 +4,7 @@
 
 Configurator — это веб-интерфейс для управления конфигурацией приложения TN_Doc, построенный на **Vue 3 + TypeScript + PrimeVue**. Компонент предоставляет удобный UI для редактирования настроек устройств, документов, ELIS и OPC подключений без необходимости ручного редактирования JSON файлов.
 
-**Статус**: Production (с версии 1.4.2, расширен в 1.4.4+)
+**Статус**: Production (с версии 1.4.2, расширения планируются в 1.4.4)
 **URL**: `/configurator`
 **Порт dev-сервера**: 5174
 
@@ -69,7 +69,7 @@ graph TB
   - Настройки печати
   - Привязка к документам
 
-### 3. Управление документами (DocumentsTab) ⭐ NEW в v1.4.4+
+### 3. Управление документами (DocumentsTab) 🚧 Планируется в v1.4.4
 - **Дерево документов**: Иерархическое отображение типов документов с фильтрацией по использованию
   - Показываются только активные документы (Use = true)
   - Двухуровневая структура: документ → шаблоны
@@ -623,7 +623,7 @@ flowchart LR
     Vite --> JS[configurator.js]
     Vite --> Assets[Assets/Fonts]
 
-    CSS --> Output[wwwroot/dist/configurator/]
+    CSS --> Output[wwwroot/configurator/]
     JS --> Output
     Assets --> Output
 
@@ -640,7 +640,7 @@ npm run dev:configurator
 
 # Production build
 npm run build:configurator
-# Выходные файлы: TN_Doc/wwwroot/dist/configurator/
+# Выходные файлы: TN_Doc/wwwroot/configurator/
 ```
 
 ### Integration with ASP.NET Core
@@ -650,18 +650,18 @@ npm run build:configurator
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="~/dist/configurator/configurator.css" />
+    <link rel="stylesheet" href="~/configurator/configurator.css" />
 </head>
 <body>
     <div id="configurator-app"></div>
-    <script src="~/dist/configurator/configurator.js"></script>
+    <script src="~/configurator/configurator.js"></script>
 </body>
 </html>
 ```
 
 **Startup.cs**:
 ```csharp
-app.UseStaticFiles(); // Serves wwwroot/dist/configurator/*
+app.UseStaticFiles(); // Serves wwwroot/configurator/*
 
 app.MapControllerRoute(
     name: "configurator",

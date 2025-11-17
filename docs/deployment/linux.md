@@ -50,10 +50,10 @@ graph TB
 
 ```bash
 # Скачать с сервера сборки
-wget http://build-server/tn-doc_1.4.4_amd64.deb
+wget http://build-server/tn-doc_1.4.3_amd64.deb
 
 # Или скопировать с локальной машины
-scp tn-doc_1.4.4_amd64.deb user@server:/tmp/
+scp tn-doc_1.4.3_amd64.deb user@server:/tmp/
 ```
 
 ### 2. Установить зависимости
@@ -80,7 +80,7 @@ sudo apt-get install -y libgdiplus libc6-dev cups
 ### 3. Установить пакет
 
 ```bash
-sudo dpkg -i tn-doc_1.4.4_amd64.deb
+sudo dpkg -i tn-doc_1.4.3_amd64.deb
 
 # Если есть зависимости, выполните
 sudo apt-get install -f
@@ -102,7 +102,7 @@ sudo -u alphadaemon npm run build:all
 cd /opt/TN_Doc
 ```
 
-**Примечание**: Если .deb пакет уже содержит собранные Vue компоненты в `wwwroot/dist/`, этот шаг можно пропустить.
+**Примечание**: Если .deb пакет уже содержит собранные Vue компоненты в `wwwroot/{statusbar,configurator,document-editor}/`, этот шаг можно пропустить.
 
 ## Процесс установки
 
@@ -149,10 +149,9 @@ sequenceDiagram
 ├── Doc/                        # FastReport шаблоны
 ├── wwwroot/                    # Статические файлы
 │   ├── css/                   # Стили (включая material3.css с CSS переменными)
-│   ├── dist/                  # Собранные Vue компоненты (v1.4.1+)
-│   │   ├── statusbar/         # Строка состояния
-│   │   ├── configurator/      # Веб-конфигуратор
-│   │   └── document-editor/   # Редактор документов (в разработке)
+│   ├── statusbar/             # Собранная строка состояния (v1.4.1+)
+│   ├── configurator/          # Собранный веб-конфигуратор (v1.4.2+)
+│   ├── document-editor/       # Собранный редактор документов (в разработке)
 │   └── ...
 ├── logs/                       # Логи приложения
 └── ...
@@ -323,7 +322,7 @@ sudo journalctl -u tn-doc --since "1 hour ago"
 sudo systemctl stop tn-doc
 
 # Установить новый пакет
-sudo dpkg -i tn-doc_1.4.4_amd64.deb
+sudo dpkg -i tn-doc_1.4.3_amd64.deb
 
 # Пересобрать Vue компоненты (если они не включены в .deb или были изменения)
 cd /opt/TN_Doc/Client
@@ -397,9 +396,9 @@ sudo systemctl restart tn-doc
 
 ```bash
 # Проверить наличие собранных файлов
-ls -la /opt/TN_Doc/wwwroot/dist/statusbar/
-ls -la /opt/TN_Doc/wwwroot/dist/configurator/
-ls -la /opt/TN_Doc/wwwroot/dist/document-editor/
+ls -la /opt/TN_Doc/wwwroot/statusbar/
+ls -la /opt/TN_Doc/wwwroot/configurator/
+ls -la /opt/TN_Doc/wwwroot/document-editor/
 
 # Если директории пусты, пересобрать компоненты
 cd /opt/TN_Doc/Client
@@ -407,7 +406,9 @@ sudo -u alphadaemon npm install
 sudo -u alphadaemon npm run build:all
 
 # Проверить права доступа
-sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/dist/
+sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/statusbar/
+sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/configurator/
+sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/document-editor/
 
 # Перезапустить службу
 sudo systemctl restart tn-doc

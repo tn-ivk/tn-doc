@@ -4,14 +4,17 @@
 
 TN_Doc построен на основе многослойной архитектуры с четким разделением ответственности между компонентами.
 
-**Текущая версия**: 1.4.4
+**Текущая версия**: 1.4.3
 **Основные компоненты**: ASP.NET Core 8.0 backend + Vue 3 frontend (StatusBar, Configurator, Document Editor)
-**Ключевые нововведения v1.4.4**:
-- Document Editor в production (редактирование паспортов качества)
-- Система истории изменений полей с визуальными индикаторами
+**Ключевые нововведения v1.4.3**:
 - Централизация цветов через CSS переменные (material3.css)
 - Расширенный Configurator с вкладками Documents, OPC, ELIS
 - Обновлён docgeneral до версии 1.2.3
+- Исправлена печатная форма журнала регистрации СИ
+
+**В разработке (v1.4.4)**:
+- Document Editor в production (редактирование паспортов качества)
+- Система истории изменений полей с визуальными индикаторами
 
 ## Общая архитектура системы
 
@@ -92,16 +95,16 @@ graph TB
 - **StatusBar** (`TN_Doc/Client/statusbar/`) - мониторинг состояния системы в реальном времени
   - Framework: Vue 3 + TypeScript + PrimeVue
   - Dev server: port 5173
-  - Build output: `wwwroot/dist/statusbar/`
+  - Build output: `wwwroot/statusbar/`
 - **Configurator** (`TN_Doc/Client/configurator/`) - веб-интерфейс управления конфигурацией
   - Framework: Vue 3 + TypeScript + PrimeVue
   - Dev server: port 5174
-  - Build output: `wwwroot/dist/configurator/`
+  - Build output: `wwwroot/configurator/`
   - Вкладки: General, Devices, Documents, OPC Connections, ELIS Connections
 - **Document Editor** (`TN_Doc/Client/document-editor/`) - редактирование паспортов качества
   - Framework: Vue 3 + TypeScript + PrimeVue
-  - Dev server: port 5175
-  - Build output: `wwwroot/dist/document-editor/`
+  - Dev server: port 5174
+  - Build output: `wwwroot/document-editor/`
   - Функции: ELIS интеграция, OPC связь, автозаполнение параметров, история изменений полей
 
 **Ответственность:**

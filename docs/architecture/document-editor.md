@@ -4,16 +4,16 @@
 
 Document Editor — это веб-приложение для редактирования документов непосредственно в браузере, построенное на **Vue 3 + TypeScript + PrimeVue + Vue Router**. Компонент предоставляет продвинутый UI для редактирования паспортов качества с поддержкой интеграции с ELIS, OPC, системой истории изменений и автозаполнением зависимых полей.
 
-**Статус**: ✅ **Production Ready** (v1.4.4+)
-**Ветка**: `developWork` (готов к мержу в `develop`)
+**Статус**: 🚧 **В разработке** (планируется в v1.4.4)
+**Ветка**: `developWork`
 **URL**: `/editor/edit/{deviceId}/{docType}/{id}`
-**Порт dev-сервера**: 5175
-**Production Build**: `TN_Doc/wwwroot/dist/document-editor/`
+**Порт dev-сервера**: 5174
+**Production Build**: `TN_Doc/wwwroot/document-editor/`
 **Технологии**: Vue 3.5, TypeScript 5.6, PrimeVue 4.2, Pinia 2.2, Vue Router 4.5
 
 ## Ключевые возможности
 
-### Реализовано в v1.4.4 ✅
+### Планируется в v1.4.4 🚧
 - ✅ **Production-ready редактор паспортов качества** - полнофункциональная форма с таблицей параметров
 - ✅ **Интеграция с ELIS** - загрузка лабораторных данных из протоколов с визуальной индикацией
 - ✅ **Интеграция с OPC** - прямое чтение данных с измерительных приборов ИВК
@@ -937,7 +937,7 @@ store.addHistoryBatch(historyBatch);
 # Development с hot reload
 cd TN_Doc/Client
 npm run dev:editor
-# Доступен на http://localhost:5175
+# Доступен на http://localhost:5174
 
 # Production build
 cd TN_Doc/Client
@@ -951,7 +951,7 @@ npm run build:all
 
 После успешной сборки артефакты располагаются в:
 ```
-TN_Doc/wwwroot/dist/document-editor/
+TN_Doc/wwwroot/document-editor/
 ├── index.html
 ├── assets/
 │   ├── index-[hash].js       # Main bundle (~150 KB gzipped)
@@ -971,7 +971,7 @@ TN_Doc/wwwroot/dist/document-editor/
 **Перед деплоем на production:**
 1. ✅ Убедитесь, что все тесты проходят: `dotnet test`
 2. ✅ Соберите Vue компоненты: `cd TN_Doc/Client && npm run build:all`
-3. ✅ Проверьте наличие артефактов в `TN_Doc/wwwroot/dist/document-editor/`
+3. ✅ Проверьте наличие артефактов в `TN_Doc/wwwroot/document-editor/`
 4. ✅ Соберите ASP.NET Core приложение: `dotnet publish -c Release`
 5. ✅ Проверьте конфигурацию ELIS в `CfgApp.json` (`IsUsedElis = true` для работы истории)
 6. ✅ Убедитесь, что база данных имеет актуальную схему с поддержкой `FieldHistoryMap`
@@ -988,7 +988,7 @@ flowchart LR
     Vite --> Chunks[Lazy Chunks]
     Vite --> Assets[Assets]
 
-    CSS --> Output[wwwroot/dist/document-editor/]
+    CSS --> Output[wwwroot/document-editor/]
     JS --> Output
     Chunks --> Output
     Assets --> Output
@@ -1017,7 +1017,7 @@ flowchart LR
 
 **Startup.cs**:
 ```csharp
-app.UseStaticFiles(); // Serves wwwroot/dist/document-editor/*
+app.UseStaticFiles(); // Serves wwwroot/document-editor/*
 
 app.MapControllerRoute(
     name: "editor",
