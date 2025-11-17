@@ -14,7 +14,7 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 **Critical Rules:**
 - NEVER mention AI, code generation, or "Claude" in commit messages
 - Use Russian language for all commit messages
-- Current active branch: feature/elis-backlight-2
+- Current active branch: developWork
 
 ## Essential Commands
 
@@ -411,12 +411,19 @@ Real-time data acquisition from measurement systems:
 
 ## In Development (Upcoming v1.4.4)
 
+- **Система истории изменений полей паспорта качества**:
+  - Отслеживание источника данных (ELIS, ручное редактирование, округление ИВК)
+  - Визуальные индикаторы источников в UI (цветные значки)
+  - Детальная история изменений в popup окне (до 10 записей на поле)
+  - Автоматическая миграция из старого флага `ElisFilled`
+  - Раздельная история для value/method/result/document полей
+  - ⚠️ Требует включенного ELIS в конфигурации (`IsUsedElis = true`)
 - **Document Editor Production Release**: Planned promotion from POC to production-ready status
   - Support for editing Passport quality parameters with real-time validation
   - Integration with ELIS (lab data) and OPC (device communication)
   - Advanced auto-fill functionality for dependent parameters
   - Full support for method selection and measurement input
-- **Active development branch**: feature/elis-backlight-2
+- **Active development branch**: developWork
 
 ## Previous Major Changes (v1.4.2 - October 2024)
 
