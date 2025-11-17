@@ -28,7 +28,7 @@ cd TN_Doc && dotnet run                         # Run app (http://localhost:3850
 npm run build:all                               # Build all Vue apps (statusbar, configurator, document-editor)
 npm run dev                                     # StatusBar dev server (port 5173)
 npm run dev:configurator                        # Configurator dev server (port 5174)
-npm run dev:editor                              # Document Editor dev server (port 5175)
+npm run dev:editor                              # Document Editor dev server (port 5174)
 npm run clean                                   # Clean all build artifacts (requires Git Bash/PowerShell on Windows)
 
 # Testing
@@ -277,18 +277,18 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
 - **StatusBar** (`TN_Doc/Client/statusbar/`): Real-time monitoring interface with SignalR
   - Framework: Vue 3 + TypeScript + PrimeVue
   - Dev server: `npm run dev` (port 5173)
-  - Build output: `TN_Doc/wwwroot/dist/statusbar/`
+  - Build output: `TN_Doc/wwwroot/statusbar/`
 
 - **Configurator** (`TN_Doc/Client/configurator/`): Web UI for app configuration (v1.4.2+)
   - Framework: Vue 3 + TypeScript + PrimeVue
   - Dev server: `npm run dev:configurator` (port 5174)
-  - Build output: `TN_Doc/wwwroot/dist/configurator/`
+  - Build output: `TN_Doc/wwwroot/configurator/`
 
 - **Document Editor** (`TN_Doc/Client/document-editor/`): In-browser document editing interface (in development)
   - Framework: Vue 3 + TypeScript + PrimeVue
   - Features: Edit Passport quality parameters, ELIS integration, OPC communication
-  - Dev server: `npm run dev:editor` (port 5175)
-  - Build output: `TN_Doc/wwwroot/dist/document-editor/`
+  - Dev server: `npm run dev:editor` (port 5174)
+  - Build output: `TN_Doc/wwwroot/document-editor/`
   - Status: Under active development on feature branches
 
 **Development workflow:**

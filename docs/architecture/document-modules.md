@@ -9,9 +9,11 @@
 
 ### Текущая версия (v1.4.3)
 
-Текущая версия использует классическую архитектуру с GetEditDoc/SetDocFromJson.
+Текущая версия поддерживает оба подхода:
+- **Новый (рекомендуемый)**: `IDocumentEditor` с `GetEditConfig()`/`SaveDocument()` для Vue SPA
+- **Устаревший**: `GetEditDoc()`/`SetDocFromJson()` для обратной совместимости (помечен `[Obsolete]`)
 
-### Планируемые изменения в v1.4.4 (в разработке)
+### Активная разработка в v1.4.4 (ветка developWork)
 
 ⚠️ **ВАЖНО:** В версии 1.4.4 планируются существенные изменения в архитектуре модулей документов:
 
@@ -501,10 +503,21 @@ if (doc is null)
     return StatusCode(500, "Ошибка загрузки модуля документа");
 }
 
-// Использование загруженного модуля
+// Использование загруженного модуля для просмотра (FastReport)
 var viewData = doc.GetViewDoc(id);
-var html = doc.GetEditDoc(id);
-doc.SetDocFromJson(jsonData);
+
+// Для редактирования через Vue Document Editor
+if (doc is IDocumentEditor editor)
+{
+    var config = editor.GetEditConfig(id);
+    var saved = editor.SaveDocument(id, values);
+}
+
+// Для обновления из ИВК
+if (doc is IDocUpdater updater)
+{
+    updater.DocUpdate(id, values);
+}
 ```
 
 ### Конфигурация путей к DLL
@@ -832,9 +845,19 @@ public class DocModuleLoader : IDocModuleLoader
 
 // Пример использования в контроллере
 var docInstance = _moduleLoader.LoadDocsModule(options, idDevice, idDoc, baseDirectory);
+
+// Для редактирования документа через Vue SPA
 if (docInstance is IDocumentEditor editor)
 {
-    var editHtml = editor.GetEditDoc(id);
+    var config = editor.GetEditConfig(id);
+    // Возвращает DocumentEditConfig с полями формы и начальными значениями
+}
+
+// Для обновления документа данными из ИВК
+if (docInstance is IDocUpdater updater)
+{
+    var values = new Dictionary<string, object> { { "field1", value1 } };
+    updater.DocUpdate(id, values);
 }
 ```
 

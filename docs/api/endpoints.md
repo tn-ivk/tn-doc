@@ -1057,7 +1057,7 @@ sequenceDiagram
 
     API->>API: Parse docType to IdDoc enum
     API->>DocModuleLoader: LoadDocsModule(options, deviceId, idDoc)
-    DocModuleLoader-->>API: IDocClass instance
+    DocModuleLoader-->>API: DocGeneral instance
 
     API->>API: Check if doc implements IDocumentEditor
     API->>API: Deserialize JSON to Dictionary<string, object>
@@ -1110,7 +1110,7 @@ sequenceDiagram
     API->>API: Parse docType to IdDoc.Passport
     API->>API: Validate docType == Passport
     API->>DocModuleLoader: LoadDocsModule(options, deviceId, IdDoc.Passport)
-    DocModuleLoader-->>API: IDocClass instance
+    DocModuleLoader-->>API: DocGeneral instance
 
     API->>API: Check if doc implements IDocUpdater
     API->>API: Deserialize JSON to Dictionary<string, object>

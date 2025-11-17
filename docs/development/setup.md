@@ -358,7 +358,7 @@ npm run dev
 # Или запустить Configurator dev сервер (порт 5174)
 npm run dev:configurator
 
-# Или запустить Document Editor dev сервер (порт 5175)
+# Или запустить Document Editor dev сервер (порт 5174)
 npm run dev:editor
 
 # В другом терминале запустить основное приложение
@@ -561,7 +561,7 @@ npm run dev
 # Configurator - порт 5174
 npm run dev:configurator
 
-# Document Editor - порт 5175
+# Document Editor - порт 5174
 npm run dev:editor
 
 # Проверьте, что ASP.NET Core app настроен на проксирование запросов к Vite dev server
@@ -601,7 +601,7 @@ import { logger } from '@/shared/logger';
 | `npm install` | Установить зависимости для всех workspaces |
 | `npm run dev` | Запустить StatusBar dev server (порт 5173) |
 | `npm run dev:configurator` | Запустить Configurator dev server (порт 5174) |
-| `npm run dev:editor` | Запустить Document Editor dev server (порт 5175) |
+| `npm run dev:editor` | Запустить Document Editor dev server (порт 5174) |
 | `npm run build:all` | Собрать все компоненты |
 | `npm run build` | Собрать только StatusBar |
 | `npm run build:configurator` | Собрать только Configurator |
@@ -622,7 +622,7 @@ import { logger } from '@/shared/logger';
 | ASP.NET Core | 38509 | http://localhost:38509 |
 | StatusBar (dev) | 5173 | http://localhost:5173 |
 | Configurator (dev) | 5174 | http://localhost:5174 |
-| Document Editor (dev) | 5175 | http://localhost:5175 |
+| Document Editor (dev) | 5174 | http://localhost:5174 |
 
 ## Следующие шаги
 
