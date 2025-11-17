@@ -110,7 +110,9 @@ Authorization: Bearer {token}
 Accept: application/json
 ```
 
-### Ответ от ELIS
+### Ответ от ELIS (Backend API)
+
+**Старый формат (для генерации PDF):**
 
 ```json
 {
@@ -129,24 +131,131 @@ Accept: application/json
         "min": 840.0,
         "max": 860.0
       }
-    },
-    {
-      "name": "Вязкость кинематическая при 20°C",
-      "value": 5.2,
-      "unit": "мм²/с",
-      "method": "ГОСТ 33-2016",
-      "testDate": "2025-10-02T16:15:00Z",
-      "result": "Соответствует",
-      "norm": {
-        "min": 4.0,
-        "max": 6.0
-      }
     }
   ]
 }
 ```
 
+### Формат ElisPassportData (Document Editor)
+
+**Используется в Document Editor (v1.4.4+):**
+
+```typescript
+interface ElisPassportData {
+  // Общая информация
+  protocolNumber?: string;              // Номер протокола ELIS
+  labName?: string;                     // Название лаборатории
+
+  // Информация о лаборатории
+  labInfo?: {
+    labName?: string;
+    chiefLabShortSign?: string;         // "И. О. Фамилия" (авто-генерируется)
+    chiefLabPosition?: string;
+    chiefLabOrganization?: string;
+  };
+
+  // Подписанты (исходные данные из ELIS)
+  signers?: {
+    laboratory?: {
+      givenName: string;                // "Иван"
+      middleName: string;               // "Петрович"
+      familyName: string;               // "Сидоров"
+      post: string;                     // "Начальник лаборатории"
+      company: string;                  // "ООО 'ЛабТест'"
+    };
+  };
+
+  // Параметры качества
+  parameters?: ElisParameter[];
+}
+
+interface ElisParameter {
+  // Название параметра (русское или английское)
+  name: string;                         // "Массовая доля воды(%)"
+
+  // Значения (поддержка camelCase и PascalCase)
+  value?: number | string;              // 0.28
+  valueString?: string;                 // "Менее 4,0" (парсится через parseElisValueString)
+
+  // Метод испытаний
+  testMethodName?: string;              // "ГОСТ 2477-2014 п. 8.3"
+
+  // Результат
+  result?: string;                      // "Соответствует" или "Не соответствует"
+
+  // Документ ELIS (дополнительная информация)
+  elisDocument?: {
+    number?: string;
+    date?: string;
+  };
+}
+
+interface ElisMethodData {
+  name: string;                         // "ГОСТ 2477-2014 п. 8.3"
+  limitValue?: number;                  // 4.0 (из "Менее 4,0")
+  operator?: 'less' | 'more' | 'less_equal' | 'more_equal';
+  limitValueString?: string;            // "Менее 4,0"
+}
+```
+
+**Пример реальных данных (Document Editor):**
+
+```json
+{
+  "protocolNumber": "ПР-2024-12345",
+  "labName": "Испытательная лаборатория АО 'ЛУКОЙЛ'",
+  "signers": {
+    "laboratory": {
+      "givenName": "Иван",
+      "middleName": "Петрович",
+      "familyName": "Сидоров",
+      "post": "Начальник лаборатории",
+      "company": "АО 'ЛУКОЙЛ'"
+    }
+  },
+  "parameters": [
+    {
+      "name": "Массовая доля воды(%)",
+      "value": 0.28,
+      "valueString": "Менее 4,0",
+      "testMethodName": "ГОСТ 2477-2014 п. 8.3",
+      "result": "Соответствует"
+    },
+    {
+      "name": "Плотность при 20 градусах Цельсия(кг/м3)",
+      "value": 850.567,
+      "testMethodName": "ГОСТ 3900-85",
+      "result": "Соответствует"
+    }
+  ]
+}
+```
+
+**Автоматическое обогащение данных:**
+
+После получения данных из ELIS, `enrichElisData()` автоматически добавляет:
+
+```json
+{
+  // ... исходные данные ELIS ...
+
+  // Авто-генерируемые поля
+  "chiefLabShortSign": "И. П. Сидоров",
+  "chiefLabPosition": "Начальник лаборатории",
+  "chiefLabOrganization": "АО 'ЛУКОЙЛ'",
+
+  "labInfo": {
+    "labName": "Испытательная лаборатория АО 'ЛУКОЙЛ'",
+    "chiefLabShortSign": "И. П. Сидоров",
+    "chiefLabPosition": "Начальник лаборатории",
+    "chiefLabOrganization": "АО 'ЛУКОЙЛ'"
+  }
+}
+```
+
 ## Маппинг данных
+
+### Backend Mapping (FastReport)
 
 ```mermaid
 graph LR
@@ -175,9 +284,312 @@ graph LR
     EP --> Res
 ```
 
+### Document Editor Mapping (v1.4.4+)
+
+**Поддержка camelCase и PascalCase:**
+
+Document Editor использует fallback механизм через `findElisValue()`:
+
+```typescript
+// Пример маппинга AdditionalInfo полей
+const additionalInfoFields = [
+  {
+    controlId: 'Laboratory',
+    elisAlias: ['labName', 'LabName', 'laboratoryName', 'LaboratoryName'],
+    searchPath: 'labInfo'
+  },
+  {
+    controlId: 'Laboratory_IOF',
+    elisAlias: ['chiefLabShortSign'],
+    searchPath: 'labInfo'
+  },
+  {
+    controlId: 'Sample',
+    elisAlias: ['sampleNumber', 'SampleNumber', 'protocolNumber'],
+    searchPath: undefined  // Поиск в корне объекта
+  }
+];
+
+// Применение
+additionalInfoFields.forEach(field => {
+  const value = findElisValue(elisData, field.elisAlias, field.searchPath);
+  if (value) {
+    store.updateField(field.controlId, value);
+  }
+});
+```
+
+**Маппинг параметров качества:**
+
+```typescript
+// Пример конфигурации параметра
+const qualityParams = [
+  {
+    key: 'WaterContent',                 // ParameterKey в базе данных
+    displayName: 'Массовая доля воды',   // Отображаемое название
+    elisAlias: [                         // Варианты названий в ELIS
+      'Массовая доля воды(%)',
+      'Массовая концентрация воды(%)',
+      'Water Content',
+      'waterContent'
+    ]
+  }
+];
+
+// Поиск соответствующего параметра ELIS
+elisData.parameters.forEach(elisParam => {
+  const param = qualityParams.find(p =>
+    p.elisAlias.some(alias =>
+      alias.toLowerCase() === elisParam.name.toLowerCase()
+    )
+  );
+
+  if (param) {
+    // Применить value
+    if (elisParam.value !== undefined) {
+      store.updateField(`value.${param.key}`, elisParam.value);
+    }
+
+    // Применить method (с парсингом limitValue из valueString)
+    if (elisParam.testMethodName) {
+      const method = createMethodFromElisData(elisParam);
+      store.updateField(`method.${param.key}`, method);
+    }
+
+    // Применить result
+    if (elisParam.result) {
+      store.updateField(`result.${param.key}`, elisParam.result);
+    }
+  }
+});
+```
+
+## ELIS Integration in Document Editor (v1.4.4+)
+
+### Архитектура интеграции
+
+Document Editor использует composable `useElisIntegration.ts` для взаимодействия с ELIS:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant DocumentEditor
+    participant MainWindow
+    participant ElisDialog
+    participant Backend
+    participant ELIS
+
+    User->>MainWindow: Нажимает "Загрузить из ELIS"
+    MainWindow->>Backend: GET /api/elis/protocols
+    Backend->>ELIS: Запрос списка протоколов
+    ELIS-->>Backend: Список протоколов
+    Backend-->>MainWindow: JSON протоколы
+    MainWindow->>ElisDialog: Показать диалог выбора
+    User->>ElisDialog: Выбирает протокол
+    ElisDialog->>MainWindow: Выбранный протокол
+    MainWindow->>Backend: GET /api/elis/protocol/{id}
+    Backend->>ELIS: Запрос данных протокола
+    ELIS-->>Backend: Данные параметров
+    Backend-->>MainWindow: ElisPassportData
+    MainWindow->>DocumentEditor: postMessage(ELIS_DATA)
+    DocumentEditor->>DocumentEditor: Применить данные к форме
+    DocumentEditor->>DocumentEditor: Создать записи истории
+    DocumentEditor->>DocumentEditor: Подсветить изменённые поля
+```
+
+### Composable useElisIntegration
+
+**Расположение:** `TN_Doc/Client/document-editor/src/composables/useElisIntegration.ts`
+
+**Основные функции:**
+
+```typescript
+// 1. Поиск значения в ELIS данных с поддержкой fallback алиасов
+findElisValue(elisData, ["labName", "laboratoryName"], "labInfo")
+
+// 2. Форматирование ФИО в "И. О. Фамилия"
+formatShortName("Иван", "Петрович", "Сидоров") // → "И. П. Сидоров"
+
+// 3. Парсинг текстовых значений ("Менее 4,0" → limitValue: 4.0, operator: 'less')
+parseElisValueString("Не более 5,32") // → { limitValue: 5.32, operator: 'less_equal' }
+
+// 4. Создание объекта метода из ELIS параметра
+createMethodFromElisData(elisParam) // → { name, limitValue, operator }
+
+// 5. Обогащение ELIS данных (добавление вычисляемых полей)
+enrichElisData(elisData) // → добавляет chiefLabShortSign, labInfo.*
+
+// 6. Приём данных через postMessage
+useElisIntegration((elisData) => {
+  // Применить данные к форме
+});
+```
+
+### Процесс загрузки из ELIS
+
+**1. Пользователь выбирает протокол ELIS**
+
+Главное окно TN_Doc отправляет данные в Document Editor через `postMessage`:
+
+```typescript
+// Главное окно TN_Doc
+const sendElisDataToEditor = (elisData: ElisPassportData) => {
+  const editorIframe = document.getElementById('documentEditor') as HTMLIFrameElement;
+  editorIframe.contentWindow?.postMessage({
+    type: 'ELIS_DATA',
+    payload: elisData
+  }, '*');
+};
+```
+
+**2. Document Editor принимает данные**
+
+```typescript
+// TN_Doc/Client/document-editor/src/views/PassportEditView.vue
+useElisIntegration((elisData) => {
+  logger.info('[PassportEditView] Получены данные ELIS', {
+    parametersCount: elisData.parameters?.length || 0
+  });
+
+  applyElisDataToForm(elisData);
+});
+```
+
+**3. Автоматическое заполнение полей**
+
+```typescript
+const applyElisDataToForm = (elisData: ElisPassportData) => {
+  const { trackElisLoad } = useFieldHistory();
+
+  // Применить AdditionalInfo поля
+  additionalInfoFields.forEach(field => {
+    const value = findElisValue(elisData, field.elisAlias, field.searchPath);
+    if (value) {
+      store.updateField(field.controlId, value);
+      trackElisLoad(field.controlId, value, elisData.protocolNumber);
+    }
+  });
+
+  // Применить параметры качества
+  elisData.parameters.forEach(elisParam => {
+    const param = qualityParams.find(p => p.elisAlias.includes(elisParam.name));
+    if (param) {
+      // Значение
+      if (elisParam.value) {
+        store.updateField(`value.${param.key}`, elisParam.value);
+        trackElisLoad(`value.${param.key}`, elisParam.value, elisData.protocolNumber);
+      }
+
+      // Метод
+      if (elisParam.testMethodName) {
+        const method = createMethodFromElisData(elisParam);
+        store.updateField(`method.${param.key}`, method);
+        trackElisLoad(`method.${param.key}`, JSON.stringify(method), elisData.protocolNumber);
+      }
+
+      // Результат
+      if (elisParam.result) {
+        store.updateField(`result.${param.key}`, elisParam.result);
+        trackElisLoad(`result.${param.key}`, elisParam.result, elisData.protocolNumber);
+      }
+    }
+  });
+};
+```
+
+**4. Создание записей истории**
+
+Для каждого заполненного поля автоматически создаётся запись истории:
+
+```typescript
+// useFieldHistory.ts
+const trackElisLoad = (fieldKey: string, value: any, protocolNumber?: string) => {
+  const entry: FieldHistoryEntry = {
+    source: DataSource.ELIS,
+    modifiedAt: new Date().toISOString(),
+    modifiedBy: 'ELIS',
+    value: normalizeValue(value),
+    previousValue: undefined,
+    comment: protocolNumber
+      ? `Загружено из протокола ${protocolNumber}`
+      : 'Загружено из ELIS'
+  };
+
+  // Добавить в историю поля
+  if (!store.formHistory[fieldKey]) {
+    store.formHistory[fieldKey] = [];
+  }
+  store.formHistory[fieldKey].push(entry);
+};
+```
+
+**5. Визуальная индикация**
+
+- Изменённые поля подсвечиваются зелёным фоном `#8fd19e`
+- В правом углу появляется зелёный индикатор "ЕЛИС"
+- При наведении на индикатор показывается история с номером протокола
+
+### Маппинг данных ELIS → Document Editor
+
+**Поддержка camelCase и PascalCase:**
+
+```typescript
+// Пример: поиск названия лаборатории
+const labName = findElisValue(elisData, [
+  "labName",           // camelCase (новый формат ELIS)
+  "LabName",           // PascalCase (старый формат)
+  "laboratoryName",    // альтернативное название
+  "LaboratoryName"
+], "labInfo");
+```
+
+**Автоматическое добавление новых методов:**
+
+Если метод из ELIS отсутствует в локальном списке, он автоматически добавляется:
+
+```typescript
+// PassportMethodSelect.vue
+const onMethodSelected = (selectedMethod: string) => {
+  const existingMethod = methods.value.find(m => m.name === selectedMethod);
+
+  if (!existingMethod) {
+    // Новый метод из ELIS - добавить в список
+    methods.value.push({
+      name: selectedMethod,
+      // limitValue, operator и т.д. из ELIS данных
+    });
+  }
+};
+```
+
+### Field History Integration
+
+Подробнее см. [Field History Documentation](../features/field-history.md)
+
+**Автоматическое создание записей:**
+
+При загрузке из ELIS для каждого поля создаётся запись истории с:
+- `source: DataSource.ELIS`
+- `modifiedBy: "ELIS"`
+- `comment: "Загружено из протокола {номер}"`
+- `value: данные из ELIS`
+
+**Визуальная индикация:**
+
+- ✅ Зелёный индикатор "ЕЛИС" в правом углу поля
+- ✅ Popup с детальной историей при наведении
+- ✅ Номер протокола ELIS в комментарии к записи
+
+**Раздельная история:**
+
+- `value.{ParameterKey}` - измеренное значение
+- `method.{ParameterKey}` - метод испытаний (JSON)
+- `result.{ParameterKey}` - результат для печати
+- `document.{ParameterKey}` - документ ELIS (JSON)
+
 ## Использование в коде
 
-### Получение данных из ELIS
+### Backend: Получение данных из ELIS
 
 ```csharp
 public class PassportModule : IDocClass
@@ -223,6 +635,49 @@ public class PassportModule : IDocClass
         return JsonSerializer.Serialize(documentData);
     }
 }
+```
+
+### Frontend: Использование useElisIntegration
+
+```typescript
+// PassportEditView.vue
+import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/composables/useElisIntegration';
+import { useFieldHistory } from '@/composables/useFieldHistory';
+
+const store = useDocumentStore();
+const { trackElisLoad } = useFieldHistory();
+
+// Настроить слушатель ELIS данных
+useElisIntegration((elisData) => {
+  logger.info('[PassportEditView] Получены данные ELIS');
+
+  // Применить AdditionalInfo
+  const labName = findElisValue(elisData, ["labName", "LabName"], "labInfo");
+  if (labName) {
+    store.updateField("Laboratory", labName);
+    trackElisLoad("Laboratory", labName, elisData.protocolNumber);
+  }
+
+  // Применить параметры качества
+  elisData.parameters.forEach(elisParam => {
+    const param = qualityParams.find(p =>
+      p.elisAlias.includes(elisParam.name)
+    );
+
+    if (param && elisParam.value) {
+      // Значение
+      store.updateField(`value.${param.key}`, elisParam.value);
+      trackElisLoad(`value.${param.key}`, elisParam.value, elisData.protocolNumber);
+
+      // Метод
+      const method = createMethodFromElisData(elisParam);
+      if (method) {
+        store.updateField(`method.${param.key}`, method);
+        trackElisLoad(`method.${param.key}`, JSON.stringify(method), elisData.protocolNumber);
+      }
+    }
+  });
+});
 ```
 
 ## SSL/TLS Сертификаты
@@ -292,7 +747,7 @@ flowchart TD
 
 ## Обработка ошибок
 
-### Типы ошибок
+### Backend: Типы ошибок
 
 ```csharp
 public class ElisException : Exception
@@ -310,7 +765,7 @@ public enum ElisErrorCode
 }
 ```
 
-### Retry Policy
+### Backend: Retry Policy
 
 ```csharp
 var retryPolicy = Policy
@@ -331,6 +786,90 @@ var retryPolicy = Policy
             );
         }
     );
+```
+
+### Frontend: Обработка ошибок в Document Editor
+
+**Проверка наличия данных ELIS:**
+
+```typescript
+// useElisIntegration.ts
+useElisIntegration((elisData) => {
+  if (!elisData || !elisData.parameters) {
+    logger.warn('[ELIS] Получены некорректные данные ELIS', { elisData });
+    toast.add({
+      severity: 'warn',
+      summary: 'Предупреждение',
+      detail: 'Данные ELIS некорректны или пусты',
+      life: 3000
+    });
+    return;
+  }
+
+  logger.info('[ELIS] Получены данные ELIS', {
+    protocolNumber: elisData.protocolNumber,
+    parametersCount: elisData.parameters.length
+  });
+
+  applyElisDataToForm(elisData);
+});
+```
+
+**Обработка отсутствующих параметров:**
+
+```typescript
+const applyElisDataToForm = (elisData: ElisPassportData) => {
+  let appliedCount = 0;
+  let notFoundCount = 0;
+
+  elisData.parameters.forEach(elisParam => {
+    const param = qualityParams.find(p =>
+      p.elisAlias.some(alias =>
+        alias.toLowerCase() === elisParam.name.toLowerCase()
+      )
+    );
+
+    if (param) {
+      // Применить данные
+      appliedCount++;
+    } else {
+      // Параметр не найден в конфигурации
+      notFoundCount++;
+      logger.warn('[ELIS] Параметр из ELIS не найден в конфигурации', {
+        elisParamName: elisParam.name
+      });
+    }
+  });
+
+  // Уведомление пользователя
+  toast.add({
+    severity: 'success',
+    summary: 'Данные загружены из ELIS',
+    detail: `Применено: ${appliedCount}, не найдено: ${notFoundCount}`,
+    life: 5000
+  });
+};
+```
+
+**Обработка ошибок парсинга:**
+
+```typescript
+// parseElisValueString.ts
+export function parseElisValueString(valueString: string): {
+  limitValue: number;
+  operator: 'less' | 'more' | 'less_equal' | 'more_equal';
+  limitValueString: string;
+} | null {
+  // ... проверки ...
+
+  // Если не удалось распознать формат
+  logger.warn('[ELIS] Не удалось распознать формат текстового представления', {
+    valueString: trimmed
+  });
+
+  // Вернуть null - значение будет применено как есть
+  return null;
+}
 ```
 
 ## Мониторинг
@@ -429,6 +968,31 @@ grep "ELIS" /opt/TN_Doc/logs/tn-doc-$(date +%Y-%m-%d).log
 
 ## См. также
 
-- [OPC Integration](opc.md)
-- [MessagingService Integration](messaging-service.md)
-- [Configuration Guide](../deployment/configuration.md)
+- [Field History Documentation](../features/field-history.md) - Система истории изменений полей с интеграцией ELIS
+- [Document Editor Architecture](../architecture/document-editor.md) - Архитектура Document Editor
+- [OPC Integration](opc.md) - Интеграция с OPC для получения данных измерений
+- [MessagingService Integration](messaging-service.md) - Сервис обмена сообщениями
+- [Configuration Guide](../deployment/configuration.md) - Руководство по конфигурации
+
+---
+
+## История изменений документации
+
+**v1.4.4 (2025-01-17)** - Полная актуализация
+- ✅ Добавлен раздел "ELIS Integration in Document Editor"
+- ✅ Описан composable useElisIntegration.ts с функциями
+- ✅ Добавлена диаграмма процесса загрузки из ELIS
+- ✅ Добавлены интерфейсы ElisPassportData, ElisParameter, ElisMethodData
+- ✅ Примеры реальных данных ELIS
+- ✅ Маппинг с поддержкой camelCase/PascalCase
+- ✅ Интеграция с Field History системой
+- ✅ Визуальная индикация (зелёная подсветка, индикаторы)
+- ✅ Обработка ошибок на фронтенде
+- ✅ Автоматическое обогащение данных (enrichElisData)
+- ✅ Парсинг текстовых значений ("Менее 4,0" → limitValue + operator)
+
+**v1.4.2 (2024-10)** - Первая версия
+- Базовая информация о ELIS интеграции для генерации PDF
+- Backend архитектура и API
+- SSL/TLS сертификаты
+- Кэширование и мониторинг

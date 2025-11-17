@@ -4,13 +4,24 @@
 
 TN_Doc построен на основе многослойной архитектуры с четким разделением ответственности между компонентами.
 
+**Текущая версия**: 1.4.4
+**Основные компоненты**: ASP.NET Core 8.0 backend + Vue 3 frontend (StatusBar, Configurator, Document Editor)
+**Ключевые нововведения v1.4.4**:
+- Document Editor в production (редактирование паспортов качества)
+- Система истории изменений полей с визуальными индикаторами
+- Централизация цветов через CSS переменные (material3.css)
+- Расширенный Configurator с вкладками Documents, OPC, ELIS
+- Обновлён docgeneral до версии 1.2.3
+
 ## Общая архитектура системы
 
 ```mermaid
 graph TB
     subgraph "Клиент"
         Browser[Web Browser]
-        StatusBar[StatusBar Vue.js]
+        StatusBar[StatusBar Vue 3]
+        Configurator[Configurator Vue 3]
+        DocumentEditor[Document Editor Vue 3]
     end
 
     subgraph "Web Layer - ASP.NET Core"
@@ -47,6 +58,9 @@ graph TB
 
     Browser --> Controllers
     StatusBar --> SignalR
+    Configurator --> Controllers
+    DocumentEditor --> Controllers
+    DocumentEditor --> SignalR
     Controllers --> Services
     Services --> AppConfig
     Services --> DocFactory
@@ -72,14 +86,31 @@ graph TB
 **Компоненты:**
 - ASP.NET Core MVC Controllers
 - Razor Views
-- Vue.js StatusBar (SPA)
+- Vue 3 Components (StatusBar, Configurator, Document Editor)
 - SignalR Hubs для real-time обновлений
+
+**Vue Components (Production):**
+- **StatusBar** (`TN_Doc/Client/statusbar/`) - мониторинг состояния системы в реальном времени
+  - Framework: Vue 3 + TypeScript + PrimeVue
+  - Dev server: port 5173
+  - Build output: `wwwroot/dist/statusbar/`
+- **Configurator** (`TN_Doc/Client/configurator/`) - веб-интерфейс управления конфигурацией
+  - Framework: Vue 3 + TypeScript + PrimeVue
+  - Dev server: port 5174
+  - Build output: `wwwroot/dist/configurator/`
+  - Вкладки: General, Devices, Documents, OPC Connections, ELIS Connections
+- **Document Editor** (`TN_Doc/Client/document-editor/`) - редактирование паспортов качества
+  - Framework: Vue 3 + TypeScript + PrimeVue
+  - Dev server: port 5175
+  - Build output: `wwwroot/dist/document-editor/`
+  - Функции: ELIS интеграция, OPC связь, автозаполнение параметров, история изменений полей
 
 **Ответственность:**
 - Обработка HTTP запросов
 - Рендеринг пользовательского интерфейса
 - Real-time обновления статусов
 - Валидация входных данных
+- Визуальные индикаторы истории изменений полей
 
 ```mermaid
 graph LR
@@ -99,16 +130,20 @@ graph LR
 
 **Компоненты:**
 - `IAppConfigService` - управление конфигурацией и фабрика документов
+- `IReportBuffer` - буфер для PDF в памяти (v1.4.1+)
+- `IConfigurationCacheService` - кэширование конфигурационных файлов с LRU eviction (v1.4.2+)
+- `IDocModuleLoader` - кэширование загрузки DLL документов (v1.4.2+)
 - `PrinterService` - управление печатью
 - `DirectoryService` - работа с файловой системой
 - `StatusProvider` - мониторинг статусов
-- `IReportBuffer` - буфер для PDF в памяти
+- `IDbSchemaCache` - кэширование схемы БД
 
 **Ответственность:**
 - Бизнес-правила генерации документов
-- Управление конфигурацией
+- Управление конфигурацией с кэшированием
 - Создание экземпляров модулей документов
 - Мониторинг здоровья системы
+- Отслеживание истории изменений полей (v1.4.4+)
 
 ```mermaid
 classDiagram
@@ -196,12 +231,14 @@ graph TB
     subgraph "Singleton Services"
         AppConfig[AppConfigService]
         ReportBuffer[ReportBuffer]
+        ConfigCache[ConfigurationCacheService]
         DocLoader[DocModuleLoader]
     end
 
     subgraph "Scoped Services"
         DbCtx[DbContext]
         StatusProv[StatusProvider]
+        ConfigService[ConfigurationService]
         SchemaCache[DbSchemaCache]
     end
 
@@ -212,9 +249,11 @@ graph TB
 
     SC --> AppConfig
     SC --> ReportBuffer
+    SC --> ConfigCache
     SC --> DocLoader
     SC --> DbCtx
     SC --> StatusProv
+    SC --> ConfigService
     SC --> SchemaCache
     SC --> Printer
     SC --> Directory
@@ -274,6 +313,12 @@ graph TB
    - Поля формы
    - Валидация
    - Маппинг данных
+   - Настройки истории изменений полей
+
+**Кэширование конфигурации (v1.4.2+):**
+- Все конфигурационные файлы кэшируются через `IConfigurationCacheService`
+- LRU eviction (максимум 50 файлов в кэше)
+- Автоматическая инвалидация при изменении файла
 
 ## StatusBar Real-time Architecture
 
@@ -309,6 +354,63 @@ sequenceDiagram
     Provider-->>Vue: StatusResponse
 ```
 
+## Document Editor Architecture (v1.4.4+)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Editor as Document Editor Vue
+    participant API as API Controller
+    participant DocModule as DocPassport
+    participant DB as MySQL DataARM
+    participant OPC as OPC Server
+    participant ELIS as ELIS System
+
+    User->>Editor: Открыть документ для редактирования
+    Editor->>API: GET /api/document/edit/{id}
+    API->>DocModule: GetEditConfig(id)
+    DocModule->>DB: SELECT DataARM с FieldHistoryMap
+    DB-->>DocModule: JSON данные + история
+    DocModule-->>API: initialValues + __history
+    API-->>Editor: Конфигурация формы + история
+
+    Editor->>Editor: Отобразить поля с индикаторами истории
+
+    User->>Editor: Запрос данных ELIS
+    Editor->>API: POST /api/elis/fetch
+    API->>ELIS: HTTP запрос к ELIS API
+    ELIS-->>API: Лабораторные данные
+    API->>Editor: ELIS данные
+    Editor->>Editor: Автозаполнение полей (Source=ELIS)
+    Editor->>Editor: Обновить историю полей
+
+    User->>Editor: Изменить поле вручную
+    Editor->>Editor: trackManualChange(fieldKey, value)
+    Editor->>Editor: Добавить запись в formHistory (Source=Manual)
+    Editor->>Editor: Обновить визуальный индикатор
+
+    User->>Editor: Автозаполнение зависимых параметров
+    Editor->>API: POST /api/opc/read
+    API->>OPC: Чтение тегов OPC
+    OPC-->>API: Значения тегов
+    API-->>Editor: Данные измерений
+    Editor->>Editor: Заполнить зависимые поля (Source=IVK)
+    Editor->>Editor: Обновить историю полей
+
+    User->>Editor: Сохранить документ
+    Editor->>API: POST /api/document/save
+    Note over Editor,API: payload включает __history
+    API->>DocModule: DocUpdate(correctionData, history)
+    DocModule->>DB: UPDATE DataARM.FieldHistoryMap
+    Note over DocModule,DB: FIFO: макс 10 записей на поле
+    DB-->>API: Success
+    API-->>Editor: Документ сохранён
+
+    User->>Editor: Наведение на индикатор истории
+    Editor->>Editor: Показать FieldHistoryPopup
+    Editor-->>User: История изменений (до 10 записей)
+```
+
 ## Module Loading Architecture
 
 ```mermaid
@@ -339,6 +441,74 @@ graph TB
     Factory --> Activator
     Activator --> Instance[IDocClass Instance]
 ```
+
+## UI Theme & Styling Architecture (v1.4.3+)
+
+### Централизация цветов через CSS переменные
+
+```mermaid
+graph TB
+    subgraph "Централизованное управление цветами"
+        Material3[material3.css - :root]
+    end
+
+    subgraph "CSS переменные"
+        Primary["--md-primary, --md-primary-active, --md-primary-light"]
+        Gray["--md-gray-600, --md-gray-700, --md-gray-800"]
+        Elis["--md-elis-highlight"]
+        Error["--md-error-bootstrap, --md-error-light"]
+        Border["--md-border, --md-border-light"]
+        Text["--md-text-muted, --md-text-light"]
+        Disabled["--md-disabled-bg, --md-gray-light"]
+    end
+
+    subgraph "Использование в стилях"
+        Site[site.css]
+        NewStyle[newstyle.css]
+        Elis_CSS[elisRequestWindow.css]
+        Error_CSS[errorDialogWindow.css]
+        LeftPanel[LeftPanel.css]
+        MenuDropdown[menu-dropdown.css]
+        ElisEditForm[elisEditForm.css]
+        CommonEditForm[commonEditForm.css]
+    end
+
+    Material3 --> Primary
+    Material3 --> Gray
+    Material3 --> Elis
+    Material3 --> Error
+    Material3 --> Border
+    Material3 --> Text
+    Material3 --> Disabled
+
+    Primary --> Site
+    Primary --> NewStyle
+    Gray --> Site
+    Gray --> NewStyle
+    Gray --> MenuDropdown
+    Elis --> Elis_CSS
+    Elis --> ElisEditForm
+    Error --> Error_CSS
+    Border --> LeftPanel
+    Border --> Site
+    Text --> Site
+    Text --> NewStyle
+    Disabled --> CommonEditForm
+```
+
+**Принципы:**
+- Все цвета определены в `/TN_Doc/wwwroot/css/material3.css` в блоке `:root`
+- Запрещено использовать hardcoded HEX-коды в других файлах стилей
+- Изменение темы оформления - единственная точка редактирования (material3.css)
+- CSS переменные используются через синтаксис `var(--md-variable-name)`
+
+**Ключевые CSS переменные:**
+- `--md-primary` (#1976D2) - основной цвет приложения
+- `--md-primary-active` (#1565C0) - активное состояние
+- `--md-gray-*` (#616161, #757575, #9E9E9E) - градации серого
+- `--md-elis-highlight` (#e8f5e9) - подсветка данных ELIS
+- `--md-error-*` (#d32f2f, #ffebee) - состояния ошибок
+- `--md-border-*` (#e0e0e0, #f5f5f5) - границы элементов
 
 ## Security & Error Handling
 
@@ -403,6 +573,12 @@ graph TB
 ## Field History Tracking Architecture (v1.4.4+)
 
 Система отслеживания истории изменений полей паспорта качества для аудита источников данных.
+
+**Требования:**
+- ⚠️ **Требует включенного ELIS** в конфигурации (`CfgApp.json`: `IsUsedElis = true`)
+- Работает с паспортами качества (Passport document type)
+- История хранится в поле `FieldHistoryMap` таблицы `DataARM` (JSON)
+- Максимум 10 записей на поле (FIFO очередь)
 
 ```mermaid
 graph TB
@@ -610,6 +786,89 @@ if (labInfo.ElisFilled && !dataArm.FieldHistoryMap.ContainsKey($"value.{paramete
 - Поле `ElisFilled` (bool) помечено как `[Obsolete]` но сохранено
 - Автоматический пересчёт `ElisFilled` на основе последнего источника в истории
 - Миграция старых документов при первой загрузке
+
+## Recent Changes
+
+### v1.4.4 (Текущая версия)
+
+**Document Editor в production:**
+- Полнофункциональный редактор паспортов качества (Vue 3 SPA)
+- ELIS интеграция для автоматического получения лабораторных данных
+- OPC связь для чтения данных измерений в реальном времени
+- Автозаполнение зависимых параметров на основе выбранных значений
+- Система истории изменений полей с визуальными индикаторами
+
+**Система истории изменений полей:**
+- Отслеживание источника данных (ELIS, ручное редактирование, округление ИВК)
+- Визуальные индикаторы источников в UI (цветные значки: зелёный/синий/оранжевый)
+- Детальная история изменений в popup окне (до 10 записей на поле)
+- Автоматическая миграция из старого флага `ElisFilled`
+- Раздельная история для value/method/result/document полей
+- ⚠️ Требует включенного ELIS в конфигурации (`IsUsedElis = true`)
+
+**Configurator Enhancements:**
+- Добавлена вкладка Documents - управление конфигурацией типов документов
+- Расширены вкладки OPC Connections и ELIS Connections
+- Настройки измерительных приборов (СИ)
+
+**UI Theme Improvements:**
+- Централизация цветов через CSS переменные в material3.css
+- Все hardcoded HEX коды заменены на CSS переменные
+- Новые переменные: `--md-primary-active`, `--md-gray-*`, `--md-elis-highlight`, `--md-error-*`
+- Единая точка изменения темы оформления
+
+**Journal Report Fix:**
+- Исправлена форма печати журнала регистрации СИ (совместимость с DataARM)
+
+**Dependencies:**
+- Обновлён docgeneral до версии 1.2.3
+
+### v1.4.3 (October 2024)
+
+**Configurator Basic Version:**
+- Веб-интерфейс управления конфигурацией (`/configurator`)
+- Вкладки: General, Devices, OPC Connections, ELIS Connections
+
+**StatusBar Improvements:**
+- 4 состояния индикаторов (online, offline, ndv, warning)
+- Улучшено выравнивание и размеры индикаторов устройств/сервисов
+- Удалена избыточная кнопка обновления и индикатор SignalR
+
+### v1.4.2 (September 2024)
+
+**Configuration Caching:**
+- `IConfigurationCacheService` с LRU eviction (максимум 50 файлов)
+- Автоматическая инвалидация кэша при изменении файлов
+
+**Document Module Loading:**
+- `IDocModuleLoader` для кэширования загрузки DLL документов
+- Оптимизация производительности при создании экземпляров
+
+**In-memory HTML Generation:**
+- GetEditDoc теперь работает в памяти (исключено построение HTML из файла)
+- Улучшена производительность и устранены race conditions
+
+**Protocol Updates:**
+- Обновлён KMH_MI2816 для поддержки ИВК версии 7.12.14.3000
+
+**Removed Components:**
+- Удалён проект TN.Tools (устаревшая функциональность)
+- Удалён дублирующий шаблон `Act_GOSTR50.2.040(G)_ShiftTime.frx`
+
+### v1.4.1 (August 2024)
+
+**In-memory PDF Generation:**
+- `IReportBuffer` для хранения PDF в памяти
+- Исключены дисковые I/O операции
+- Устранены ошибки "file in use" при параллельных запросах
+
+**Configuration Improvements:**
+- Локальные директории пользователей для подписантов
+- Отчёты и журналы используют локальные ссылки на пользователей
+
+**LoggingPathService Refactoring:**
+- Перенесён в `TN.DocGeneral/Services/` для переиспользования
+- Централизованное управление путями логов
 
 ## См. также
 

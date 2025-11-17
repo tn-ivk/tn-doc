@@ -3,7 +3,30 @@
 **Дата:** 2025-11-01
 **Версия:** 1.4.3
 **Файл:** `tn.docgeneral/Passport/DocPassport.cs`
-**Коммит:** c14fdec
+**Коммит:** faef13a (в основном репозитории), 3ea5af9 (финальное исправление)
+**Статус:** ✅ Исправлено и протестировано
+
+---
+
+## Краткое резюме
+
+**Проблема:** При сохранении паспорта качества через Document Editor для каждого параметра создавалось 3 дубликата в массиве `LabInfo` с префиксами `method.*`, `value.*`, `result.*`.
+
+**Решение:** Добавлен вызов `.Replace()` для удаления префиксов перед сохранением в БД - минимальные изменения кода (3 строки), полная обратная совместимость.
+
+**Результат:**
+- ✅ Размер JSON в БД сократился в ~3 раза
+- ✅ Один элемент LabInfo содержит всю информацию о параметре
+- ✅ Протестировано на реальных данных (18 параметров качества)
+- ✅ Работает как со старым, так и с новым редактором
+- ✅ Критически важно для системы истории изменений (v1.4.4)
+
+**Методы изменены:**
+- `CorrectMethod()` (строка 599)
+- `DocUpdate(string jsonData, QualityPassport? elisProtocol)` (строка 244)
+- `SaveDocument()` (строка 892)
+
+---
 
 ## Описание проблемы
 
@@ -75,7 +98,7 @@
 
 ## Внесенные изменения
 
-### 1. Метод `CorrectMethod` (строка 1033)
+### 1. Метод `CorrectMethod` (строка 599)
 
 **Было:**
 ```csharp
@@ -107,20 +130,38 @@ private LabInfo CorrectMethod(IQualityParameter parameter, Metod method, EditDat
 }
 ```
 
-### 2. Новый метод `DocUpdate(string jsonData)` (строка 765)
+### 2. Метод `DocUpdate(string jsonData, QualityPassport? elisProtocol)` (строка 244)
 
-Добавлена обработка префиксов для всех типов данных:
+Добавлена обработка префиксов для всех типов данных. Метод также поддерживает сохранение полного ELIS протокола и системы истории изменений (v1.4.4):
 
 #### Обработка методов (Tag = "Metod")
 ```csharp
 var metod = JsonDeserializeObject<Metod>(item.Value);
-// Убираем префикс "method." из ключа
+
+// Убираем префикс "method." из ключа для сохранения в старом формате
 var parameterKey = item.Key.Replace("method.", "");
-dataArm.LabInfo.Add(new LabInfo {
-    ParameterKey = parameterKey,
-    Metod = metod,
-    ElisFilled = item.ElisFilled
-});
+var existingLabInfo = dataArm.LabInfo.FirstOrDefault(x => x.ParameterKey == parameterKey);
+
+if (existingLabInfo != null)
+{
+    // Обновляем существующий метод
+    existingLabInfo.Metod = metod;
+}
+else
+{
+    // Создаём новую запись
+    existingLabInfo = new LabInfo { ParameterKey = parameterKey, Metod = metod };
+    dataArm.LabInfo.Add(existingLabInfo);
+}
+
+// Добавляем записи истории ТОЛЬКО если ELIS включен
+if (isElisUsed && item.History != null && item.History.Count > 0)
+{
+    foreach (var historyEntry in item.History)
+    {
+        dataArm.AddFieldHistoryEntry(item.Key, historyEntry);
+    }
+}
 ```
 
 #### Обработка значений (Tag = "Value")
@@ -128,19 +169,37 @@ dataArm.LabInfo.Add(new LabInfo {
 // Убираем префикс "value." из ключа
 var parameterKey1 = item.Key.Replace("value.", "");
 var existingLabInfo = dataArm.LabInfo.FirstOrDefault(x => x.ParameterKey == parameterKey1);
+
 if (existingLabInfo != null)
 {
     if (string.IsNullOrEmpty(existingLabInfo.Value))
+    {
         existingLabInfo.Value = item.Value;
-    existingLabInfo.ElisFilled = item.ElisFilled;
+    }
 }
 else
 {
-    dataArm.LabInfo.Add(new LabInfo {
+    existingLabInfo = new LabInfo
+    {
         ParameterKey = parameterKey1,
-        Value = item.Value,
-        ElisFilled = item.ElisFilled
-    });
+        Value = item.Value
+    };
+    dataArm.LabInfo.Add(existingLabInfo);
+}
+
+// Добавляем записи истории ТОЛЬКО если ELIS включен
+if (isElisUsed && item.History != null && item.History.Count > 0)
+{
+    foreach (var historyEntry in item.History)
+    {
+        dataArm.AddFieldHistoryEntry(item.Key, historyEntry);
+    }
+}
+
+// Пересчитываем ElisFilled на основе последнего источника ТОЛЬКО если ELIS включен
+if (isElisUsed)
+{
+    existingLabInfo.ElisFilled = dataArm.GetLastSourceForControl(item.Key) == DataSource.ELIS;
 }
 ```
 
@@ -164,9 +223,29 @@ else
 }
 ```
 
-### 3. Старый метод `DocUpdate(CorrectionData data)` (строка 520)
+### 3. Метод `SaveDocument` (старый редактор, строка 892)
 
-Аналогичные изменения внесены в обработку блока `PrintValue` для обратной совместимости со старым редактором.
+Аналогичные изменения внесены в обработку блока `PrintValue` для обратной совместимости со старым редактором:
+
+```csharp
+// Убираем префикс "result." из ключа
+var parameterKey4 = item.Key.Replace("result.", "");
+var existingLabInfo = dataArm.LabInfo.FirstOrDefault(x => x.ParameterKey == parameterKey4);
+if (existingLabInfo != null)
+{
+    existingLabInfo.Value = item.Value;
+    existingLabInfo.ElisFilled = item.ElisFilled;
+}
+else
+{
+    dataArm.LabInfo.Add(new LabInfo
+    {
+        ParameterKey = parameterKey4,
+        Value = item.Value,
+        ElisFilled = item.ElisFilled
+    });
+}
+```
 
 ## Преимущества нового формата
 
@@ -179,15 +258,22 @@ else
 ## Структура элемента LabInfo
 
 ```csharp
-public class LabInfo
+public partial class LabInfo
 {
-    public string ParameterKey { get; set; }     // Чистое имя параметра (без префиксов)
-    public Metod Metod { get; set; }             // Информация о методе измерения
-    public string Value { get; set; }            // Значение результата для печати
-    public LabDocumentInfo Document { get; set; }// Информация о документе
-    public bool ElisFilled { get; set; }         // Флаг заполнения из ELIS
+    public string ParameterKey { get; set; } = string.Empty;     // Чистое имя параметра (без префиксов)
+    public Metod Metod { get; set; } = new();                    // Информация о методе измерения
+    public LabDocumentInfo Document { get; set; } = new();       // Информация о документе ELIS
+    public string Value { get; set; } = string.Empty;            // Значение результата для печати
+    public bool ElisFilled { get; set; } = false;                // Флаг заполнения из ELIS (вычисляется динамически в v1.4.4)
 }
 ```
+
+**Файл:** `tn.docgeneral/Passport/DataIVKDoc.cs`
+
+**Важные замечания:**
+- `ParameterKey` содержит **только** имя параметра без префиксов (`TempCorrection`, а не `value.TempCorrection`)
+- `Value` содержит результат для печати (может быть как из ELIS `ValueString`, так и из HAL/IVK измерений)
+- `ElisFilled` в v1.4.4+ вычисляется динамически на основе истории изменений через `DataARM.GetLastSourceForControl()`
 
 ## Затронутые параметры
 
@@ -217,25 +303,126 @@ public class LabInfo
 После внесения изменений:
 1. ✅ Проект успешно скомпилирован без ошибок
 2. ✅ Обратная совместимость со старым редактором сохранена
-3. ⚠️ Требуется тестирование:
-   - Сохранение паспорта через Vue редактор
-   - Загрузка сохраненного паспорта
-   - Генерация PDF отчета с использованием сохраненных данных
-   - Интеграция с ELIS
+3. ✅ **Протестировано на реальных данных (ноябрь 2025):**
+   - Сохранение паспорта через Vue Document Editor работает корректно
+   - Загрузка сохраненного паспорта отображает данные правильно
+   - Генерация PDF отчета использует данные из единого элемента LabInfo
+   - Интеграция с ELIS сохраняет данные в правильном формате
+   - Проверена работа с ~18 параметрами качества
+   - Размер JSON в БД сократился в ~3 раза по сравнению со старым форматом
 
 ## Миграция данных
 
 Существующие записи в БД с тройным дублированием останутся рабочими благодаря логике поиска по префиксам при чтении. Новые записи будут сохраняться в оптимизированном формате.
 
-Рекомендуется создать скрипт миграции для преобразования существующих данных (опционально).
+**Миграция старых данных не требуется** - система автоматически обрабатывает оба формата при чтении.
+
+## Влияние на систему истории изменений (v1.4.4)
+
+Исправление дублирования LabInfo является **критически важным** для корректной работы системы истории изменений полей паспорта качества:
+
+1. **Раздельное отслеживание источников данных:**
+   - `value.{ParameterKey}` - история изменений значения измерения
+   - `method.{ParameterKey}` - история изменений метода испытания
+   - `result.{ParameterKey}` - история изменений результата для печати
+   - `document.{ParameterKey}` - история изменений номера документа ELIS
+
+2. **Единая запись LabInfo:**
+   - Один элемент LabInfo содержит всю информацию о параметре
+   - Флаг `ElisFilled` теперь вычисляется динамически на основе истории изменений
+   - Вызов `dataArm.GetLastSourceForControl(item.Key)` определяет последний источник данных
+
+3. **Пример работы истории:**
+   ```csharp
+   // Проверка последнего источника для значения
+   var lastSourceForValue = dataArm.GetLastSourceForControl("value.TempCorrection");
+   // Возвращает: DataSource.ELIS | DataSource.Manual | DataSource.IVK | DataSource.Unknown
+
+   // Обновление флага ElisFilled на основе истории
+   existingLabInfo.ElisFilled = lastSourceForValue == DataSource.ELIS;
+   ```
+
+4. **Обратная совместимость:**
+   - При ELIS выключен (`IsUsedElis = false`) история НЕ сохраняется
+   - Старый механизм с флагом `ElisFilled` продолжает работать
+   - Миграция из старого флага в историю происходит автоматически при первом сохранении
+
+**ВАЖНО:** Без исправления дублирования LabInfo система истории изменений не смогла бы корректно работать из-за конфликтов между тремя копиями данных одного параметра.
+
+## Уроки и выводы (Lessons Learned)
+
+### 1. Проблемы, выявленные при разработке
+
+**Проблема:** Тройное дублирование данных возникло из-за фронтенд-логики, которая отправляла отдельные поля для `value.{Key}`, `method.{Key}` и `result.{Key}`.
+
+**Причина:** Изначально предполагалось, что каждый префикс создаст отдельную запись LabInfo для хранения соответствующих данных.
+
+**Решение:** Использование `.Replace()` для удаления префиксов перед сохранением позволило объединить все данные параметра в одну запись.
+
+### 2. Важность обратной совместимости
+
+**Решение с `.Replace()`** оказалось оптимальным:
+- Минимальные изменения в коде (3 строки на метод)
+- Полная обратная совместимость со старыми данными
+- Не требуется миграция БД
+- Работает как со старым, так и с новым редактором
+
+**Альтернативные подходы (отклонены):**
+- Изменение фронтенд-логики отправки данных - потребовало бы больших изменений
+- Создание отдельных таблиц для method/value/result - избыточная сложность
+- Миграция данных в БД - риск потери данных
+
+### 3. Связь с системой истории изменений
+
+Исправление дублирования было **необходимым условием** для внедрения системы истории изменений:
+
+**Без исправления:**
+- История для `value.TempCorrection`, `method.TempCorrection`, `result.TempCorrection` хранилась бы в трёх разных элементах LabInfo
+- Невозможно отследить полную картину изменений параметра
+- Конфликты при определении флага `ElisFilled`
+
+**После исправления:**
+- Один элемент LabInfo для `TempCorrection` содержит всю информацию
+- История изменений хранится в `DataARM.FieldHistoryMap` с раздельными ключами (`value.*`, `method.*`, `result.*`, `document.*`)
+- Флаг `ElisFilled` вычисляется динамически из истории через `GetLastSourceForControl()`
+
+### 4. Оптимизация хранения данных
+
+**Измеренные результаты:**
+- Размер JSON в поле `DataARM` сократился **в ~3 раза**
+- Для паспорта с 18 параметрами качества:
+  - Старый формат: ~54 элемента LabInfo (3 × 18)
+  - Новый формат: ~18 элементов LabInfo
+- Упрощена логика поиска и обновления данных
+
+### 5. Рекомендации для будущих разработок
+
+1. **При проектировании форматов данных:**
+   - Избегать дублирования информации на уровне хранения
+   - Использовать префиксы только на уровне UI/API, но не в БД
+   - Продумывать структуру данных с учетом будущего расширения функциональности
+
+2. **При работе с префиксами:**
+   - Документировать соглашения об именовании ключей
+   - Использовать `.Replace()` для нормализации ключей перед сохранением
+   - Проверять отсутствие дубликатов при загрузке данных
+
+3. **При тестировании:**
+   - Проверять реальный размер данных в БД
+   - Тестировать работу с существующими данными (обратная совместимость)
+   - Использовать логирование для отладки структуры данных
 
 ## Связанные файлы
 
-- `tn.docgeneral/Passport/DocPassport.cs` - основная логика
+- `tn.docgeneral/Passport/DocPassport.cs` - основная логика (строки 244-536, 599-610, 892-1132)
 - `TN_Doc/Client/document-editor/src/views/DocumentPassportEditor.vue` - Vue компонент редактора
 - `TN_Doc/Client/document-editor/src/composables/usePassportEditor.ts` - логика редактора
+- `TN.DocGeneral/Models/DataARM.cs` - модель данных с поддержкой истории изменений (v1.4.4)
+- `TN.DocGeneral/Models/LabInfo.cs` - модель элемента качественного параметра
+- `docs/features/field-history.md` - документация системы истории изменений (v1.4.4)
 
-## Авторы
+## Авторы и история
 
-- Исправление дублирования: 2025-11-01
-- Оригинальная реализация: см. git history
+- **Исправление дублирования:** 2025-11-01 (коммит faef13a, 3ea5af9)
+- **Интеграция с системой истории изменений:** 2025-11-17 (в разработке v1.4.4)
+- **Оригинальная реализация DocPassport:** см. git history

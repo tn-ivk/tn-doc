@@ -6,16 +6,30 @@
 
 ---
 
+## ⚠️ КРИТИЧЕСКОЕ ТРЕБОВАНИЕ
+
+**История изменений работает ТОЛЬКО при включенном ELIS в конфигурации приложения.**
+
+В файле `TN_Doc/Cfg/CfgApp.json` устройства должна быть установлена настройка:
+```json
+{
+  "IsUsedElis": true
+}
+```
+
+Если ELIS выключен (`IsUsedElis = false`), функциональность истории изменений:
+- ❌ Не сохраняется в базу данных
+- ❌ Не передается на фронтенд
+- ❌ Не отображается пользователю
+- ❌ Индикаторы истории (FieldHistoryIndicator) не показываются
+
+**Проверка:** После включения ELIS перезапустите приложение TN_Doc.
+
+---
+
 ## Обзор
 
 Система истории изменений отслеживает источник и время всех изменений полей в редакторе документов. Для каждого поля сохраняется до 10 последних изменений с информацией об источнике данных, авторе, времени и значениях.
-
-**⚠️ ВАЖНО: История изменений работает ТОЛЬКО при включенном ELIS в конфигурации приложения (CfgApp.json).**
-Если ELIS выключен (`IsUsedElis = false`), история изменений:
-- Не сохраняется в базу данных
-- Не передается на фронтенд
-- Не отображается пользователю
-- Индикаторы истории (FieldHistoryIndicator) не показываются
 
 **Основные возможности:**
 - Отслеживание источника данных (ELIS, ручное редактирование, округление ИВК)
@@ -174,7 +188,9 @@ await store.saveDocument(deviceId, docType, id);
 - IVK → Текст "ИВК" оранжевый
 - Unknown → Иконка `pi-question-circle` серая
 
-**Триггер:** Наведение курсора → открывается FieldHistoryPopup
+**Триггер:** Наведение курсора (hover) → автоматически открывается FieldHistoryPopup
+
+**Важно:** Popup открывается при наведении мыши на индикатор, а не при клике.
 
 ### FieldHistoryPopup - Детальная история
 
@@ -465,56 +481,109 @@ const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any)
 ### Сценарий 1: Загрузка из ELIS + ручное редактирование
 
 ```typescript
-// 1. Пользователь открывает документ
+import { useDocumentStore } from '@/stores/documentStore';
+import { useFieldHistory } from '@/composables/useFieldHistory';
+
+const store = useDocumentStore();
+const { trackElisLoad, trackManualChange, getFieldHistory } = useFieldHistory();
+
+// 1. Пользователь открывает документ Passport с id=12345 на устройстве 1
 await store.loadConfig(1, 'Passport', 12345);
-// История загружена из БД
+// История автоматически загружена из БД в store.formHistory
 
-// 2. Загружает данные из ELIS
+// 2. Нажимает кнопку "Загрузить из ЕЛИС"
+// Данные приходят из протокола ПР-2024-12345
 trackElisLoad('value.Density', '850.5', 'ПР-2024-12345');
-// Создана запись: Source=ELIS
+// Создана запись истории: Source=ELIS, comment="Загружено из протокола ПР-2024-12345"
 
-// 3. Вручную корректирует значение
+// 3. Вручную корректирует значение в поле (округление до 3 знаков)
 trackManualChange('value.Density', '850.567', '850.5');
-// Создана запись: Source=Manual
+// Создана запись истории: Source=Manual, previousValue='850.5'
 
-// 4. Сохраняет документ
+// 4. Сохраняет документ (Ctrl+S или кнопка "Сохранить")
 await store.saveDocument(1, 'Passport', 12345);
-// Передано: __history['value.Density'] с 2 записями
+// Payload включает __history['value.Density'] с 2 записями
+// Backend сохраняет в DataARM.FieldHistoryMap (ТОЛЬКО если IsUsedElis=true)
 
-// 5. Просматривает историю
+// 5. Наводит курсор на индикатор "ЕЛИС" → видит popup с историей
 const history = getFieldHistory('value.Density');
+console.log(history);
 // [
-//   { source: 'ELIS', value: '850.5', ... },
-//   { source: 'Manual', value: '850.567', previousValue: '850.5', ... }
+//   {
+//     source: 'ELIS',
+//     modifiedAt: '2025-01-14T10:00:00Z',
+//     modifiedBy: 'ELIS',
+//     value: '850.5',
+//     previousValue: null,
+//     comment: 'Загружено из протокола ПР-2024-12345'
+//   },
+//   {
+//     source: 'Manual',
+//     modifiedAt: '2025-01-14T10:32:00Z',
+//     modifiedBy: 'Пользователь',
+//     value: '850.567',
+//     previousValue: '850.5',
+//     comment: null
+//   }
 // ]
 ```
 
 ### Сценарий 2: Округление ИВК
 
 ```typescript
-// Пользователь ввёл значение с избыточной точностью
+import { useFieldHistory } from '@/composables/useFieldHistory';
+
+const { trackManualChange, trackIVKRounding, getFieldHistory } = useFieldHistory();
+
+// Пользователь ввёл значение плотности с избыточной точностью (6 знаков)
 trackManualChange('value.Density', '850.123456', null);
+// Создана запись: Source=Manual, value='850.123456'
 
-// ИВК округлило до 2 знаков
+// Система ИВК автоматически округлила до 2 знаков (согласно настройкам параметра)
 trackIVKRounding('value.Density', '850.123456', '850.12', 2);
+// Создана запись: Source=IVK, value='850.12', previousValue='850.123456'
+// comment="Округлено системой ИВК до 2 знаков"
 
-// История содержит 2 записи:
-// 1. Manual: 850.123456
-// 2. IVK: 850.12 (previousValue: 850.123456)
+// Проверка истории
+const history = getFieldHistory('value.Density');
+console.log(history.length); // 2
+
+// Индикатор теперь показывает "ИВК" (оранжевый) вместо ручного ввода
+// Popup показывает обе записи: исходный ввод и округление
 ```
 
-### Сценарий 3: FIFO очередь
+**Важно:** Округление ИВК происходит автоматически и не может быть отключено пользователем.
+
+### Сценарий 3: FIFO очередь (автоматическое удаление старых записей)
 
 ```typescript
-// Поле изменялось 12 раз
+import { useFieldHistory } from '@/composables/useFieldHistory';
+
+const { trackManualChange, getFieldHistory } = useFieldHistory();
+
+// Симуляция многократного редактирования одного поля
+// (например, пользователь несколько раз корректирует значение)
 for (let i = 1; i <= 12; i++) {
-  trackManualChange('value.Density', `${850 + i}`, `${850 + i - 1}`);
+  const previousValue = i === 1 ? null : `${850 + i - 1}`;
+  trackManualChange('value.Density', `${850 + i}`, previousValue);
+
+  console.log(`Изменение #${i}: ${previousValue || 'null'} → ${850 + i}`);
 }
 
-// История содержит только последние 10 записей
+// История автоматически ограничена 10 записями
 const history = getFieldHistory('value.Density');
-console.log(history.length); // 10 (записи #1 и #2 удалены)
+console.log(history.length); // 10 (записи #1 и #2 автоматически удалены)
+
+// Самая старая запись в истории - изменение #3
+console.log(history[0].value); // "853"
+console.log(history[0].previousValue); // "852"
+
+// Самая новая запись - изменение #12
+console.log(history[9].value); // "862"
+console.log(history[9].previousValue); // "861"
 ```
+
+**Примечание:** Ограничение в 10 записей задано константой `FieldHistoryEntry.MaxHistoryEntries = 10` и применяется как на фронтенде, так и на бэкенде.
 
 ---
 
@@ -542,6 +611,276 @@ console.log(history.length); // 10 (записи #1 и #2 удалены)
 - ✅ Раздельная история для value/method/result полей
 
 **Известные ограничения:**
-- ⚠️ ФИО пользователя недоступно (используется "Пользователь")
-- ⚠️ Реализовано только для документа Passport
-- ⚠️ Unit-тесты в разработке
+- ⚠️ **Требует IsUsedElis = true** - история не работает при выключенном ELIS
+- ⚠️ **Реализовано только для Passport** - другие типы документов в roadmap
+- ⚠️ **ФИО пользователя недоступно** - используется "Пользователь" для ручных изменений
+- ⚠️ **Unit-тесты в разработке** - покрытие тестами запланировано
+
+---
+
+## Быстрый старт
+
+### Для администраторов
+
+**1. Включите ELIS в конфигурации:**
+```bash
+# Откройте TN_Doc/Cfg/CfgApp.json
+nano /opt/TN_Doc/Cfg/CfgApp.json  # Linux
+notepad TN_Doc\Cfg\CfgApp.json    # Windows
+```
+
+```json
+{
+  "Devices": [
+    {
+      "Id": 1,
+      "Name": "ИВК-1",
+      "IsUsedElis": true,  // ← Установите true
+      // ... остальные настройки
+    }
+  ]
+}
+```
+
+**2. Перезапустите TN_Doc:**
+```bash
+# Linux
+sudo systemctl restart tn_doc
+
+# Windows
+Restart-Service TN_Doc
+```
+
+**3. Проверьте работу:**
+- Откройте редактор документа (http://localhost:38509/document-editor)
+- Откройте любой Passport
+- Внесите изменение в поле
+- Сохраните документ (Ctrl+S)
+- Наведите курсор на индикатор → должен появиться popup с историей
+
+### Для разработчиков
+
+**Backend (C#):**
+```csharp
+// Добавление записи в историю
+var entry = new FieldHistoryEntry
+{
+    Source = DataSource.Manual,
+    ModifiedAt = DateTime.UtcNow,
+    ModifiedBy = "Пользователь",
+    Value = "850.5",
+    PreviousValue = "850.4",
+    Comment = null
+};
+
+dataArm.AddFieldHistoryEntry("value.Density", entry);
+
+// Получение последнего источника
+var lastSource = dataArm.GetLastSourceForControl("value.Density");
+```
+
+**Frontend (TypeScript):**
+```typescript
+import { useFieldHistory } from '@/composables/useFieldHistory';
+
+const { trackManualChange, getFieldHistory } = useFieldHistory();
+
+// Отследить изменение
+trackManualChange('value.Density', '850.5', '850.4');
+
+// Получить историю
+const history = getFieldHistory('value.Density');
+```
+
+---
+
+## Roadmap - Планы развития
+
+### v1.4.5 (Q1 2025)
+- 🔄 **Поддержка других типов документов:**
+  - Act (Акты приёма-сдачи)
+  - Report (Отчёты о качестве)
+  - Jornal (Журналы регистрации)
+- 🔄 **Расширенная история для методов испытаний** - отслеживание изменений в документах ELIS
+- 🔄 **Unit-тесты** - полное покрытие backend и frontend
+
+### v1.5.0 (Q2 2025)
+- 🔄 **Аутентификация пользователей** - отслеживание ФИО оператора вместо "Пользователь"
+- 🔄 **Фильтрация истории** - по источнику, дате, автору
+- 🔄 **Экспорт истории** - в Excel/PDF для аудита
+
+### v2.0.0 (Q3 2025)
+- 🔄 **История изменений всего документа** - не только полей, но и структурных изменений
+- 🔄 **Сравнение версий** - diff между двумя состояниями документа
+- 🔄 **Восстановление из истории** - откат к предыдущему значению
+
+---
+
+## Troubleshooting - Устранение неполадок
+
+### Проблема: Индикаторы истории не отображаются
+
+**Причина:** ELIS выключен в конфигурации
+
+**Решение:**
+1. Откройте `TN_Doc/Cfg/CfgApp.json`
+2. Найдите секцию устройства
+3. Установите `"IsUsedElis": true`
+4. Перезапустите приложение TN_Doc
+5. Откройте документ - индикаторы должны появиться
+
+**Проверка настройки:**
+```bash
+# Linux
+grep -A 5 '"IsUsedElis"' /opt/TN_Doc/Cfg/CfgApp.json
+
+# Windows PowerShell
+Select-String -Path "TN_Doc\Cfg\CfgApp.json" -Pattern "IsUsedElis" -Context 0,5
+```
+
+### Проблема: История не сохраняется после редактирования
+
+**Причина 1:** Значение не изменилось (одинаковые значения с учётом нормализации)
+
+**Решение:** Убедитесь, что новое значение отличается от старого. Числа сравниваются с заменой запятой на точку.
+
+**Причина 2:** Ошибка при сохранении документа
+
+**Решение:**
+1. Откройте консоль браузера (F12)
+2. Проверьте вкладку Network → запрос `/api/documents/.../save/...`
+3. Проверьте логи TN_Doc: `logs/tn_doc.log` (Linux: `/opt/TN_Doc/logs/`)
+4. Найдите ошибки с текстом "FieldHistory" или "DocUpdate"
+
+### Проблема: Popup истории пустой
+
+**Причина 1:** Поле ещё не редактировалось
+
+**Решение:** Это нормально для новых документов. Внесите изменение в поле.
+
+**Причина 2:** История не загрузилась из БД
+
+**Решение:**
+1. Проверьте логи: `grep "FieldHistoryMap" logs/tn_doc.log`
+2. Убедитесь, что JSON в БД не повреждён:
+```sql
+SELECT JSON_EXTRACT(DataARMJson, '$.FieldHistoryMap')
+FROM TN_Doc
+WHERE Id = <document_id>;
+```
+
+### Проблема: После обновления с v1.4.3 индикаторы не показывают ELIS
+
+**Причина:** Миграция из старого флага `ElisFilled` не сработала
+
+**Решение:**
+1. Откройте документ в редакторе
+2. Сохраните документ без изменений (миграция произойдёт автоматически)
+3. Перезагрузите страницу - индикаторы ELIS должны появиться
+
+**Проверка миграции в логах:**
+```bash
+grep "Миграция из ElisFilled" logs/tn_doc.log
+```
+
+### Проблема: Индикатор показывает "Unknown" вместо "ELIS"
+
+**Причина:** Старые данные без детальной истории
+
+**Решение:**
+1. Загрузите данные из ELIS заново (кнопка "Загрузить из ЕЛИС")
+2. Новые значения будут помечены правильно
+3. Сохраните документ
+
+### Проблема: Popup открывается при клике, а не при наведении
+
+**Причина:** Использована старая версия компонента
+
+**Решение:**
+1. Проверьте версию: `cat TN_Doc/Client/document-editor/package.json | grep version`
+2. Убедитесь, что установлена v1.4.4+
+3. Пересоберите фронтенд: `cd TN_Doc/Client && npm run build:editor`
+
+### Получение диагностической информации
+
+**Backend (логи):**
+```bash
+# Последние записи об истории изменений
+tail -n 100 logs/tn_doc.log | grep -i "history"
+
+# Ошибки при сохранении
+grep "ERROR.*FieldHistory" logs/tn_doc.log
+```
+
+**Frontend (консоль браузера):**
+```javascript
+// Проверка хранилища истории
+const store = useDocumentStore();
+console.log(store.formHistory);
+
+// Проверка истории конкретного поля
+const { getFieldHistory } = useFieldHistory();
+console.log(getFieldHistory('value.Density'));
+
+// Проверка настройки ELIS
+console.log(store.config?.isElisUsed);
+```
+
+### Проблема: История работает локально, но не на сервере
+
+**Причина:** Разные настройки в Development и Production конфигурациях
+
+**Решение:**
+1. Проверьте конфигурацию на сервере:
+```bash
+# Linux
+cat /opt/TN_Doc/Cfg/CfgApp.json | grep -A 10 '"IsUsedElis"'
+
+# Windows
+type C:\TN_Doc\Cfg\CfgApp.json | findstr /C:"IsUsedElis"
+```
+
+2. Убедитесь, что `IsUsedElis = true` для нужного устройства
+
+3. Проверьте логи после перезапуска службы:
+```bash
+# Linux (systemd)
+sudo systemctl restart tn_doc
+sudo journalctl -u tn_doc -n 50
+
+# Windows (служба)
+Restart-Service TN_Doc
+Get-EventLog -LogName Application -Source TN_Doc -Newest 50
+```
+
+### Быстрая диагностика через API
+
+**Проверка включения ELIS для устройства:**
+```bash
+curl http://localhost:38509/api/config/devices
+# Найдите ваше устройство и проверьте IsUsedElis
+```
+
+**Получение конфигурации редактирования документа:**
+```bash
+curl http://localhost:38509/api/documents/1/Passport/edit/12345 | jq '.initialValues | keys | map(select(endswith("__history")))'
+# Должен вернуть список полей с суффиксом __history
+```
+
+**Проверка сохранения истории:**
+```bash
+# Отправьте тестовое изменение
+curl -X POST http://localhost:38509/api/documents/1/Passport/save/12345 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ExportPermit": "TEST123",
+    "__history": {
+      "ExportPermit": [{
+        "source": "Manual",
+        "modifiedAt": "'$(date -Iseconds)'",
+        "modifiedBy": "Тест",
+        "value": "TEST123"
+      }]
+    }
+  }'
+```

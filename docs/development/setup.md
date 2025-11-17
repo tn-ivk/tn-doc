@@ -7,8 +7,10 @@
 | Компонент | Требование |
 |-----------|------------|
 | ОС | Windows 10/11, Ubuntu 20.04+, macOS 12+ |
-| .NET SDK | 8.0 или выше |
-| .NET Runtime | 8.0.13 или выше |
+| .NET SDK | 9.0 или выше (для разработки) |
+| .NET Runtime | 8.0.13 или выше (для запуска) |
+| Node.js | 18.0 или выше (обязательно) |
+| npm | 8.0 или выше (обязательно) |
 | RAM | 4 GB (рекомендуется 8 GB) |
 | Дисковое пространство | 2 GB |
 | IDE | Visual Studio 2022, VS Code, Rider |
@@ -17,12 +19,31 @@
 
 **Для разработки:**
 - Git
-- Node.js 18+ и npm 8+ (для Vue компонентов: StatusBar, Configurator, Document Editor)
 - Docker (опционально, для тестирования)
 
 **Для Linux:**
 ```bash
 sudo apt-get install libgdiplus
+```
+
+### Проверка требований
+
+```bash
+# Проверить .NET SDK
+dotnet --version
+# Ожидается: 9.0.100 или выше
+
+# Проверить .NET Runtime
+dotnet --list-runtimes | grep "Microsoft.AspNetCore.App 8.0"
+# Ожидается: 8.0.13 или выше
+
+# Проверить Node.js
+node --version
+# Ожидается: v18.0.0 или выше
+
+# Проверить npm
+npm --version
+# Ожидается: 8.0.0 или выше
 ```
 
 ## Установка .NET SDK
@@ -36,7 +57,7 @@ flowchart TD
     Download --> Install[Установить SDK]
     Install --> Verify
 
-    Verify --> CheckVer{Версия >= 8.0?}
+    Verify --> CheckVer{Версия >= 9.0?}
     CheckVer -->|Нет| Update[Обновить SDK]
     CheckVer -->|Да| Ready([Готово])
     Update --> Ready
@@ -61,11 +82,76 @@ dotnet --list-runtimes
 Ожидаемый вывод:
 ```
 $ dotnet --version
-8.0.100
+9.0.100
 
 $ dotnet --list-runtimes
 Microsoft.AspNetCore.App 8.0.13 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
 Microsoft.NETCore.App 8.0.13 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+```
+
+**Важно:** Для разработки требуется .NET SDK 9.0+, но приложение компилируется под .NET 8.0 Runtime.
+
+## Установка Node.js и npm
+
+Node.js и npm обязательны для работы с Vue компонентами (StatusBar, Configurator, Document Editor).
+
+### Проверка установки
+
+```bash
+# Проверить версию Node.js
+node --version
+
+# Проверить версию npm
+npm --version
+```
+
+Ожидаемый вывод:
+```
+$ node --version
+v18.0.0 (или выше)
+
+$ npm --version
+8.0.0 (или выше)
+```
+
+### Установка (если не установлены)
+
+**Linux (через nvm - рекомендуется):**
+```bash
+# Установить nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Перезагрузить оболочку
+source ~/.bashrc
+
+# Установить Node.js 18 LTS
+nvm install 18
+nvm use 18
+nvm alias default 18
+```
+
+**Ubuntu/Debian (через apt):**
+```bash
+# Добавить NodeSource репозиторий
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+
+# Установить Node.js и npm
+sudo apt-get install -y nodejs
+
+# Проверить установку
+node --version
+npm --version
+```
+
+**Windows:**
+1. Скачайте установщик LTS версии с https://nodejs.org/
+2. Запустите установщик
+3. Проверьте установку в PowerShell: `node --version`
+
+**macOS (через Homebrew):**
+```bash
+brew install node@18
+brew link node@18
 ```
 
 ## Клонирование репозитория
@@ -244,25 +330,57 @@ code --install-extension dbaeumer.vscode-eslint
 ## Настройка Vue компонентов (npm workspaces)
 
 TN_Doc использует npm workspaces для управления тремя Vue 3 компонентами:
+- **statusbar** - мониторинг состояния системы в реальном времени (production)
+- **configurator** - веб-интерфейс управления конфигурацией (production)
+- **document-editor** - редактор документов в браузере (production с v1.4.4+)
+
+### Установка зависимостей
 
 ```bash
 cd TN_Doc/Client
 
-# Установить зависимости для всех компонентов
+# Установить зависимости для всех workspaces одной командой
 npm install
 
-# Запустить dev сервер StatusBar с hot reload
+# npm workspaces автоматически установит зависимости для:
+#   - TN_Doc/Client/statusbar/
+#   - TN_Doc/Client/configurator/
+#   - TN_Doc/Client/document-editor/
+#   - TN_Doc/Client/shared/
+```
+
+### Запуск dev серверов
+
+```bash
+# Запустить StatusBar dev сервер с hot reload (порт 5173)
 npm run dev
 
-# Или запустить Configurator
+# Или запустить Configurator dev сервер (порт 5174)
 npm run dev:configurator
 
-# Или запустить Document Editor (в разработке)
+# Или запустить Document Editor dev сервер (порт 5175)
 npm run dev:editor
 
 # В другом терминале запустить основное приложение
 cd ..
-dotnet run
+ASPNETCORE_ENVIRONMENT=Development dotnet run
+```
+
+### Сборка для production
+
+```bash
+cd TN_Doc/Client
+
+# Собрать все компоненты (statusbar, configurator, document-editor)
+npm run build:all
+
+# Или собрать только один компонент
+npm run build              # StatusBar
+npm run build:configurator # Configurator
+npm run build:editor       # Document Editor
+
+# Очистить все артефакты сборки
+npm run clean
 ```
 
 ### Структура Vue проектов
@@ -270,10 +388,10 @@ dotnet run
 ```mermaid
 graph TB
     subgraph "Client Workspaces"
-        Root[Client/]
+        Root[Client/ - корневой package.json]
         StatusBar[statusbar/ - Production]
         Configurator[configurator/ - Production]
-        Editor[document-editor/ - В разработке]
+        Editor[document-editor/ - Production v1.4.4+]
         Shared[shared/ - Общие утилиты]
     end
 
@@ -284,20 +402,46 @@ graph TB
 
     StatusBar --> SB_Src[src/components/]
     Configurator --> CF_Src[src/components/]
-    Editor --> ED_Src[src/components/]
-    Shared --> SH_Src[src/types/]
+    Editor --> ED_Src[src/components/<br/>PassportEditor, ElisPanel, etc.]
+    Shared --> SH_Src[logger.ts, types/, utils/]
 ```
+
+### Общая инфраструктура (shared/)
+
+Все компоненты используют централизованное логирование через `shared/logger.ts`:
+
+```typescript
+import { logger } from '../shared/logger';
+
+// Уровни логирования: trace, debug, info, warn, error
+logger.info('Компонент инициализирован');
+logger.error('Ошибка загрузки данных', error);
+```
+
+**Преимущества:**
+- Единый формат логов для всех Vue компонентов
+- Автоматическое добавление временных меток
+- Настраиваемый уровень логирования через environment variables
 
 ## Проверка установки
 
 ```bash
-# Собрать проект
+# 1. Восстановить зависимости
+dotnet restore
+
+# 2. Собрать проект
 dotnet build
 
-# Запустить тесты
+# 3. Запустить тесты
 dotnet test
 
-# Запустить приложение
+# 4. Собрать Vue компоненты
+cd TN_Doc/Client
+npm install
+npm run build:all
+cd ../..
+
+# 5. Запустить приложение
 cd TN_Doc
 ASPNETCORE_ENVIRONMENT=Development dotnet run
 ```
@@ -306,15 +450,21 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run
 
 ### Checklist готовности
 
-- [ ] .NET SDK 8.0+ установлен
-- [ ] Node.js 18+ и npm 8+ установлены
+- [ ] .NET SDK 9.0+ установлен и проверен (`dotnet --version`)
+- [ ] .NET Runtime 8.0.13+ установлен (`dotnet --list-runtimes`)
+- [ ] Node.js 18+ установлен (`node --version`)
+- [ ] npm 8+ установлен (`npm --version`)
 - [ ] NuGet источники настроены (ortpr, FastReport)
-- [ ] Проект клонирован
+- [ ] Проект клонирован из репозитория
 - [ ] `dotnet restore` выполнен успешно
 - [ ] `dotnet build` проходит без ошибок
+- [ ] npm workspaces установлены (`npm install` в TN_Doc/Client/)
 - [ ] Vue компоненты собраны (`npm run build:all` в TN_Doc/Client/)
 - [ ] Приложение запускается и открывается в браузере
 - [ ] Тесты проходят (`dotnet test`)
+- [ ] StatusBar доступен на главной странице
+- [ ] Configurator доступен по адресу `/configurator`
+- [ ] Document Editor доступен при редактировании документов
 
 ## Частые проблемы
 
@@ -354,6 +504,126 @@ npm install
 npm run build:all
 ```
 
+### Node.js или npm не найдены
+
+Убедитесь, что Node.js 18+ установлен:
+
+```bash
+# Проверить версию Node.js
+node --version
+
+# Проверить версию npm
+npm --version
+
+# Если версия устарела, обновите Node.js
+# Linux/macOS (через nvm):
+nvm install 18
+nvm use 18
+
+# Windows: скачайте установщик с https://nodejs.org/
+```
+
+### Ошибка: "ENOENT: no such file or directory" при сборке Vue
+
+Убедитесь, что вы запускаете команды из правильной директории:
+
+```bash
+# Команды npm должны выполняться из TN_Doc/Client/
+cd TN_Doc/Client
+npm install
+npm run build:all
+
+# НЕ из корня проекта!
+```
+
+### Ошибка: "Cannot find module 'vite'" или другие зависимости
+
+```bash
+cd TN_Doc/Client
+
+# Удалить node_modules и package-lock.json
+rm -rf node_modules package-lock.json
+rm -rf statusbar/node_modules configurator/node_modules document-editor/node_modules
+
+# Переустановить зависимости
+npm install
+```
+
+### Hot reload не работает для Vue компонентов
+
+```bash
+# Убедитесь, что dev сервер запущен на правильном порту
+cd TN_Doc/Client
+
+# StatusBar - порт 5173
+npm run dev
+
+# Configurator - порт 5174
+npm run dev:configurator
+
+# Document Editor - порт 5175
+npm run dev:editor
+
+# Проверьте, что ASP.NET Core app настроен на проксирование запросов к Vite dev server
+```
+
+### Shared logger не работает
+
+Убедитесь, что импорт использует правильный путь:
+
+```typescript
+// Правильно (из компонентов statusbar/configurator/document-editor)
+import { logger } from '../shared/logger';
+
+// Неправильно
+import { logger } from '@/shared/logger';
+```
+
+## Быстрый справочник команд
+
+### .NET команды
+
+| Команда | Описание |
+|---------|----------|
+| `dotnet --version` | Проверить версию SDK |
+| `dotnet --list-runtimes` | Показать установленные runtimes |
+| `dotnet restore` | Восстановить NuGet пакеты |
+| `dotnet build` | Собрать проект |
+| `dotnet test` | Запустить тесты |
+| `dotnet run` | Запустить приложение (из TN_Doc/) |
+| `dotnet format` | Форматировать код |
+| `dotnet nuget list source` | Показать NuGet источники |
+
+### npm команды (из TN_Doc/Client/)
+
+| Команда | Описание |
+|---------|----------|
+| `npm install` | Установить зависимости для всех workspaces |
+| `npm run dev` | Запустить StatusBar dev server (порт 5173) |
+| `npm run dev:configurator` | Запустить Configurator dev server (порт 5174) |
+| `npm run dev:editor` | Запустить Document Editor dev server (порт 5175) |
+| `npm run build:all` | Собрать все компоненты |
+| `npm run build` | Собрать только StatusBar |
+| `npm run build:configurator` | Собрать только Configurator |
+| `npm run build:editor` | Собрать только Document Editor |
+| `npm run clean` | Очистить все артефакты сборки |
+
+### Переменные окружения
+
+| Переменная | Значение | Назначение |
+|------------|----------|------------|
+| `ASPNETCORE_ENVIRONMENT` | `Development` | Режим разработки с подробным логированием |
+| `ASPNETCORE_ENVIRONMENT` | `Production` | Производственный режим |
+
+### Порты приложения
+
+| Компонент | Порт | URL |
+|-----------|------|-----|
+| ASP.NET Core | 38509 | http://localhost:38509 |
+| StatusBar (dev) | 5173 | http://localhost:5173 |
+| Configurator (dev) | 5174 | http://localhost:5174 |
+| Document Editor (dev) | 5175 | http://localhost:5175 |
+
 ## Следующие шаги
 
 - [Сборка проекта](building.md)
@@ -366,3 +636,4 @@ npm run build:all
 - [.NET Installation Guide](https://dotnet.microsoft.com/download)
 - [Node.js Installation](https://nodejs.org/)
 - [Git Basics](https://git-scm.com/book/en/v2/Getting-Started-Git-Basics)
+- [npm Workspaces Documentation](https://docs.npmjs.com/cli/v8/using-npm/workspaces)
