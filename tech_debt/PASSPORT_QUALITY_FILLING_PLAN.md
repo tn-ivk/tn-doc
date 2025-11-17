@@ -23,13 +23,15 @@
    - Проверить поддержку значения по умолчанию (false) для старых конфигов, при отсутствии ― считать небалластным.
    - Балластные показатели: `TempCorrection`, `PressCorrection`, `DensCorrection`, `Dens20Correction`, `Dens15Correction`, `MassWaterFracCorrection`, `Chloride_Salts.Concentration`, `Chloride_Salts.MassFraction`, `Impurity`.
    - Небалластные показатели: `SulfurCorrection`, `DNP.kPa`, `DNP.mercury_mm`, `Yield_fraction_200`, `Yield_fraction_300`, `Yield_fraction_350`, `Mass_fraction_of_paraffin`, `Mass_fraction_of_hydrogen_sulfide`, `Mass_fraction_of_methyl_and_ethyl_mercaptan`, `Mass_fraction_of_organic_chlorides`.
-2. **Модели**  
-   - В `TN.DocEditor.Passport.QualityParameter`, `QualityParameterSchema`, а также в `Edit.Parameter` добавить `IsBalast`.
-   - Протянуть поле до фронтенд-конфига (`PassportEditConfig`), чтобы Vue-слой понимал тип показателя без дополнительных вычислений.
+2. **Модели / DTO / JSON**  
+   - Расширить `TN.DocEditor.Passport.QualityParameter`, `QualityParameterSchema`, `Edit.Parameter`, а также связанные DTO `PassportQualityParameterSchema` и `PassportQualityParameter` (ts-тип из `TN_Doc/Client/document-editor/src/types/passport.types.ts`) полем `IsBalast`.  
+   - Обновить `DocPassport.BuildQualityParameters` и `DocPassport.BuildQualityParametersSchema`, чтобы новое поле прокидывалось во все уровни сериализации (DTO → JSON → `PassportEditConfig`).  
+   - Убедиться, что `PassportEditConfig` и данные, отдаваемые `usePassportEditor`, содержат `isBalast`, иначе фронтенд не сможет включить балластную логику.
 
 ### 5. Бэкенд: переработка DocPassport
 1. **Формирование `QualityParameterSchema`**
    - При загрузке схемы заполнять `IsBalast` из конфигурации.
+   - Переписать `BuildQualityParameters` и `BuildQualityParametersSchema`, чтобы поле попадало в итоговый JSON `PassportQualityParameterSchema`/`PassportEditConfig`, который читает `DocumentPassportEditor` → `usePassportEditor`.
    - Для ELIS-on фронтенд самостоятельно определяет блокировки и вспомогательные состояния (`ResultReadOnly`, `ResultRequiresModal`, предупреждения по методам) на основе полученной схемы и значений.
 2. **Обработка измерений и результатов**
    - При ELIS-on и `IsBalast == true`:  
@@ -51,7 +53,7 @@
 
 ### 6. Фронтенд: DocumentPassportEditor и связанные компоненты
 1. **Синхронизация measurement/result**
-   - В `usePassportEditor` хранить сведения о `IsBalast`.  
+   - В `usePassportEditor` хранить сведения о `IsBalast`, пришедшие из `PassportQualityParameterSchema`/`PassportEditConfig`.  
    - Для балластных полей:  
      - Disable инпут Result; при изменении Measurement мгновенно обновлять `result.*` и `result.*__history`.  
      - При загрузке ELIS записывать `value` в обе колонки (а не `valueString`).
@@ -96,7 +98,7 @@
 - Дополнительные предупреждения оператору при перезаписи ELIS значений пока не требуются (UI просто подсветит источник в истории).
 
 ### 9. Шаги внедрения
-1. Подготовить расширения моделей/DTO и обновить конфиги.  
+1. Подготовить расширения конфигов и моделей: добавить `IsBalast` в `CfgEditPassport_GOSTR50.2.040(I).json`, в `DocPassport.BuildQualityParameters*`, DTO (`QualityParameter`, `QualityParameterSchema`, `PassportQualityParameterSchema`) и фронтовые типы (`passport.types.ts`, `PassportEditConfig`), чтобы JSON для `usePassportEditor` сразу содержал признак.  
 2. Реализовать новую ветку логики в `DocPassport` (поддержка `IsBalast`, переработка `BuildParameterValues`, `DocUpdate`).  
 3. Добавить API для CRUD методов испытаний.  
 4. Обновить фронтенд-компоненты (таблица, модалки, подсветки, валидации).  
