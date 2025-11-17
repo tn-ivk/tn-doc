@@ -7,7 +7,7 @@ flowchart TB
     Start([Начало]) --> Clean[dotnet clean]
     Clean --> Restore[dotnet restore]
     Restore --> BuildBackend[Сборка Backend]
-    BuildBackend --> BuildVue[Сборка Vue StatusBar]
+    BuildBackend --> BuildVue[Сборка Vue компонентов]
     BuildVue --> Tests[Запуск тестов]
     Tests --> Package[Создание пакета]
     Package --> End([Завершение])
@@ -167,7 +167,7 @@ flowchart LR
     Structure --> Control[Создать DEBIAN/control]
     Control --> Scripts[Добавить скрипты]
     Scripts --> Build[dpkg-deb --build]
-    Build --> DEB[tn-doc_1.4.2_amd64.deb]
+    Build --> DEB[tn-doc_1.4.3_amd64.deb]
 ```
 
 См. `.gitlab-ci.yml` для полного процесса.
@@ -188,7 +188,7 @@ build:
   script:
     - dotnet restore
     - dotnet build -c Release
-    - cd TN_Doc/Client/statusbar && npm ci && npm run build
+    - cd TN_Doc/Client && npm ci && npm run build:all
 
 test:
   stage: test

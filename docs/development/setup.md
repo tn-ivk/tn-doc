@@ -17,7 +17,7 @@
 
 **Для разработки:**
 - Git
-- Node.js 18+ и npm (для StatusBar)
+- Node.js 18+ и npm 8+ (для Vue компонентов: StatusBar, Configurator, Document Editor)
 - Docker (опционально, для тестирования)
 
 **Для Linux:**

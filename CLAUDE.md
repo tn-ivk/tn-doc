@@ -8,7 +8,8 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 **Version**: 1.4.3 (.NET 8.0)
 **Main Development Branch**: develop
-**Runtime Requirement**: .NET Runtime 8.0.13+
+**Active Development Branch**: developWork
+**Runtime Requirement**: .NET Runtime 8.0.13+ (SDK 9.0+ для разработки)
 **Node.js Requirement**: Node.js 18.0+ и npm 8.0+ (для Vue компонентов)
 
 **Critical Rules:**
@@ -93,10 +94,11 @@ tn_doc/
 │       └── shared/            # Shared TypeScript utilities and types
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
-├── tn.docgeneral/             # Document module libraries (42 libraries)
+├── tn.docgeneral/             # Document module libraries (48 libraries)
 │   ├── Act, Passport, Report, Jornal (4 core documents)
+│   ├── ActProducer, ActRoute (2 additional act types)
 │   ├── Poverka* (21 verification documents)
-│   ├── KMH*/KMX* (17 quality control documents)
+│   ├── KMH* (18 quality control documents)
 │   └── Common* (3 shared libraries)
 └── Tests/                     # NUnit tests with Moq
 ```
@@ -429,7 +431,7 @@ Real-time data acquisition from measurement systems:
 
 - ⚠️ **Removed TN.Tools project** - obsolete functionality
 - **Updated KMH_MI2816** for IVK version 7.12.14.3000 protocol changes
-- **Updated docgeneral to version 1.2.2**
+- **Updated docgeneral to version 1.2.3**
 - ⚠️ **Removed duplicate Act template**: Removed `Act_GOSTR50.2.040(G)_ShiftTime.frx` (duplicated functionality)
 - **UI Refactoring**: Major application interface improvements
 - **Status bar improvements**: 4 indicator states (online, offline, ndv, warning)

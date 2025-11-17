@@ -4,6 +4,33 @@
 
 Система генерации документов построена на основе модульной архитектуры с использованием паттерна **Factory** и динамической загрузки модулей.
 
+**Версия документации:** v1.4.4+
+**Актуально на:** Ноябрь 2025
+
+### Ключевые изменения в v1.4.4
+
+⚠️ **ВАЖНО:** В версии 1.4.4 произошли существенные изменения в архитектуре модулей документов:
+
+1. **Новый интерфейс IDocumentEditor** заменил концепцию `IDocClass`:
+   - `GetEditConfig(int id)` → возвращает конфигурацию для Vue Editor вместо HTML
+   - `SaveDocument(int id, Dictionary<string, object> values)` → сохранение из Vue Editor
+
+2. **Устаревшие методы** (помечены `[Obsolete]`):
+   - `GetEditDoc(int id)` - генерация HTML форм (заменен на `GetEditConfig()`)
+   - `SaveDoc(string jsonData)` - старый формат сохранения (заменен на `SaveDocument()`)
+
+3. **Система истории изменений полей**:
+   - Отслеживание источника данных (ELIS, Manual, IVK, Unknown)
+   - Хранение истории до 10 последних изменений на поле
+   - Визуальные индикаторы в UI (цветные badges)
+   - Требует включенного ELIS (`IsUsedElis = true`)
+
+4. **Vue Document Editor**:
+   - Полностью на Vue 3 + TypeScript + PrimeVue
+   - Интеграция с ELIS и OPC
+   - Dev server на порту 5175
+   - Build output: `TN_Doc/wwwroot/dist/document-editor/`
+
 ## Жизненный цикл документа
 
 ```mermaid
@@ -19,52 +46,176 @@ stateDiagram-v2
     Storage --> [*]: Return to User
 ```
 
-## Интерфейс модуля документа
+## Интерфейсы модулей документов
 
-Все модули документов реализуют стандартный интерфейс `IDocClass`:
+### Базовый класс DocGeneral
+
+Все модули документов наследуются от базового класса `DocGeneral` и реализуют интерфейс `IDocumentEditor`:
 
 ```mermaid
 classDiagram
-    class IDocClass {
-        <<interface>>
-        +GetViewDoc(int id) string
+    class DocGeneral {
+        <<abstract>>
+        +GetList(UTBegin, UTEnd) List~RequestListDocs~
+        +GetViewDoc(int id) object
+        +GetViewDoc(int id, int protocolNumber) object
         +GetPathTemplateFile() string
-        +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
-        +GetNameDoc() string
-        +GetDocTypeId() string
+        +SaveDoc(string jsonData) bool [Obsolete]
+        +GetEditDoc(int id) string [Obsolete v1.4.4]
+        +GetPeriodDocument(int id) PeriodDocument
+    }
+
+    class IDocumentEditor {
+        <<interface>>
+        +GetEditConfig(int id) DocumentEditConfig
+        +SaveDocument(int id, Dictionary) bool
+    }
+
+    class IDocUpdater {
+        <<interface>>
+        +DocUpdate(int id, Dictionary) void
+        +DocUpdate(string jsonData) void
     }
 
     class PassportModule {
         -DbContext _context
-        -string _templatePath
-        +GetViewDoc(int id) string
-        +GetPathTemplateFile() string
-        +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
+        -IAppConfigService _appConfig
+        +GetList(UTBegin, UTEnd) List~RequestListDocs~
+        +GetViewDoc(int id) object
+        +GetEditConfig(int id) DocumentEditConfig
+        +SaveDocument(int id, Dictionary) bool
+        +DocUpdate(int id, Dictionary) void
     }
 
     class PoverkaModule {
         -DbContext _context
-        -VerificationConfig _config
-        +GetViewDoc(int id) string
-        +GetPathTemplateFile() string
-        +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
+        -IAppConfigService _appConfig
+        +GetList(UTBegin, UTEnd) List~RequestListDocs~
+        +GetViewDoc(int id) object
+        +GetEditConfig(int id) DocumentEditConfig
+        +SaveDocument(int id, Dictionary) bool
     }
 
     class KMHModule {
         -DbContext _context
-        -QualityConfig _config
-        +GetViewDoc(int id) string
-        +GetPathTemplateFile() string
-        +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
+        -IAppConfigService _appConfig
+        +GetList(UTBegin, UTEnd) List~RequestListDocs~
+        +GetViewDoc(int id) object
+        +GetEditConfig(int id) DocumentEditConfig
+        +SaveDocument(int id, Dictionary) bool
     }
 
-    IDocClass <|.. PassportModule
-    IDocClass <|.. PoverkaModule
-    IDocClass <|.. KMHModule
+    DocGeneral <|-- PassportModule
+    DocGeneral <|-- PoverkaModule
+    DocGeneral <|-- KMHModule
+    IDocumentEditor <|.. PassportModule
+    IDocumentEditor <|.. PoverkaModule
+    IDocumentEditor <|.. KMHModule
+    IDocUpdater <|.. PassportModule
+```
+
+### Основные методы модулей (актуально для v1.4.4+)
+
+#### 1. GetList(long UTBegin, long UTEnd)
+Получение списка документов за указанный период времени.
+
+#### 2. GetViewDoc(int id)
+Извлечение данных документа из БД ИВК для отображения в FastReport шаблоне. Возвращает объект с данными для рендеринга.
+
+#### 3. GetViewDoc(int id, int protocolNumber)
+Перегрузка для документов с несколькими протоколами (например, KMH_MI2816).
+
+#### 4. GetPathTemplateFile()
+Возвращает полный путь к файлу шаблона FastReport (.frx).
+
+#### 5. GetEditConfig(int id) *(IDocumentEditor)*
+**Новый метод в v1.4.4+**. Возвращает конфигурацию формы редактирования для Vue Document Editor:
+```csharp
+public DocumentEditConfig GetEditConfig(int id)
+{
+    return new DocumentEditConfig
+    {
+        DocId = id,
+        DocType = IdDoc,
+        DeviceId = _deviceId,
+        Fields = BuildFieldsFromConfig(),
+        InitialValues = ExtractInitialValues(),
+        Dictionaries = LoadDictionaries()
+    };
+}
+```
+
+#### 6. SaveDocument(int id, Dictionary<string, object> values) *(IDocumentEditor)*
+**Новый метод в v1.4.4+**. Сохранение изменений из Vue Document Editor. Возвращает `true` при успешном сохранении.
+
+#### Устаревшие методы (deprecated v1.4.4)
+
+- **GetEditDoc(int id)** - помечен как `[Obsolete]`. Использовался для генерации HTML формы редактирования. Заменен на `GetEditConfig()`.
+- **SaveDoc(string jsonData)** - устаревший метод сохранения. Заменен на `SaveDocument()`.
+
+## Структуры данных для редактирования
+
+### DocumentEditConfig
+
+Структура конфигурации формы редактирования документа для Vue Editor:
+
+```csharp
+public class DocumentEditConfig
+{
+    public int DocId { get; set; }                               // ID документа
+    public IdDoc DocType { get; set; }                           // Тип документа
+    public int DeviceId { get; set; }                            // ID устройства ИВК
+    public List<FormField> Fields { get; set; } = new();         // Поля формы
+    public Dictionary<string, object> InitialValues { get; set; } = new(); // Начальные значения
+    public DocumentDictionaries Dictionaries { get; set; }       // Справочники (лицензии, методы и т.д.)
+}
+```
+
+### FormField
+
+Описание поля формы редактирования:
+
+```csharp
+public class FormField
+{
+    public string Key { get; set; }              // Уникальный ключ поля (например, "ActNumber")
+    public string Label { get; set; }            // Отображаемое название ("Номер акта")
+    public string Type { get; set; }             // Тип: "select", "text", "number", "date", "textarea"
+    public bool Required { get; set; }           // Обязательно ли для заполнения
+    public bool Editable { get; set; }           // Редактируемо ли
+    public List<SelectOption> Options { get; set; }  // Опции для select полей
+    public int? RoundValue { get; set; }         // Округление для числовых полей (знаков после запятой)
+    public string Tag { get; set; }              // Тег группы ("AdditionalInfo", "Value" и т.д.)
+    public List<string> ElisAlias { get; set; }  // Алиасы для интеграции с ELIS
+}
+```
+
+### SelectOption
+
+Опция для выпадающего списка:
+
+```csharp
+public class SelectOption
+{
+    public string Value { get; set; }              // Значение опции
+    public string Label { get; set; }              // Отображаемый текст
+    public bool Selected { get; set; }             // Выбрана ли по умолчанию
+    public Dictionary<string, object> Data { get; set; }  // Дополнительные данные
+}
+```
+
+### DocumentDictionaries
+
+Справочники для формы редактирования:
+
+```csharp
+public class DocumentDictionaries
+{
+    public List<License> Licenses { get; set; } = new();        // Лицензии
+    public List<Method> Methods { get; set; } = new();          // Методы испытаний
+    public List<Product> Products { get; set; } = new();        // Товарная номенклатура
+    public List<Responsible> Responsibles { get; set; } = new(); // Ответственные лица
+}
 ```
 
 ## Фабрика документов
@@ -84,9 +235,9 @@ sequenceDiagram
 
     alt Module found in registry
         AppConfigService->>Activator: CreateInstance(type, args)
-        Activator->>Module: new()
+        Activator->>Module: new DocModule()
         Module-->>AppConfigService: Instance
-        AppConfigService-->>Controller: IDocClass instance
+        AppConfigService-->>Controller: DocGeneral instance
     else Module not found
         AppConfigService-->>Controller: throw Exception
     end
@@ -98,35 +249,50 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    subgraph "Document Modules (43 libraries)"
-        subgraph "Core Documents"
+    subgraph "Document Modules (48 libraries в tn.docgeneral/)"
+        subgraph "Core Documents (7)"
             Passport[Passport]
             Act[Act]
+            ActProducer[ActProducer]
+            ActRoute[ActRoute]
             Report[Report]
             Jornal[Jornal]
+            Utils[tn.utils - утилиты]
         end
 
         subgraph "Verification - Poverka (21)"
-            P1974[Poverka1974 variants]
+            P1974[Poverka1974 - 4 варианта]
             P2816[Poverka2816 MI]
             P3151[Poverka3151 GOST]
-            P3265[Poverka3265 variants]
+            P3265[Poverka3265 - 3 варианта]
+            P3266[Poverka3266]
+            P3267[Poverka3267]
+            P3272[Poverka3272]
+            P3287[Poverka3287]
+            P3288[Poverka3288]
+            P3312[Poverka3312 - 2 варианта]
             P3380[Poverka3380]
-            PSikn[PoverkaSikn425 variants]
+            P3189[Poverka3189]
+            PSikn[PoverkaSikn425 - 2 варианта]
         end
 
-        subgraph "Quality Control - KMH (14)"
-            KMH3265[KMH3265 variants]
-            KMH3288[KMH3288 variants]
-            KMH3312[KMH3312 variants]
+        subgraph "Quality Control - KMH (17)"
+            KMH3265[KMH3265 - 2 варианта]
+            KMH3288[KMH3288_MPR_TPR]
+            KMH3312[KMH3312 - 2 варианта]
             KMHMI[KMH_MI2816]
-            KMHPP[KMH_PP variants]
-            KMHSikn[KMHSikn425 variants]
+            KMHPP[KMH_PP - 2 варианта]
+            KMHMPR[KMH_MPR - 3 варианта]
+            KMHPR[KMH_PR - 2 варианта]
+            KMHPV[KMH_PV]
+            KMHPW[KMH_PW]
+            KMXSikn[KMX_Sikn425 - 2 варианта]
         end
 
-        subgraph "Common Libraries"
+        subgraph "Common Libraries (3)"
             Common1974[CommonPoverka1974]
             CommonSikn[CommonSikn425]
+            General[TN.DocGeneral - базовая библиотека]
         end
     end
 ```
@@ -401,26 +567,57 @@ graph TB
 
 ## Расширение системы новым модулем
 
-### Шаги добавления нового модуля
+### Шаги добавления нового модуля (актуально для v1.4.4+)
 
 1. **Создать класс модуля:**
 ```csharp
-[DocumentType("NewDoc")]
-public class NewDocModule : IDocClass
+public class NewDocModule : DocGeneral, IDocumentEditor
 {
-    public string GetViewDoc(int id) { /* ... */ }
-    public string GetPathTemplateFile() { /* ... */ }
-    public string GetEditDoc(int id) { /* ... */ }
-    public void SetDocFromJson(string json) { /* ... */ }
+    public NewDocModule(DbContextOptions<DocGeneral> options,
+        IAppConfigService appConfig,
+        IConfigurationCacheService configCache,
+        int idDevice,
+        IdDoc idDoc,
+        string path)
+        : base(options, appConfig, configCache, idDevice, idDoc, path)
+    {
+        IdDoc = IdDoc.NewDoc;
+        PathToDocConfigFile = GetPathConfigFile();
+        PathToDocEditConfigFile = GetPathEditConfigFile();
+        PathToDocTemplateFile = GetPathTemplateFile();
+    }
+
+    // Реализация базовых методов
+    public override List<RequestListDocs> GetList(long UTBegin, long UTEnd)
+    {
+        /* Запрос списка документов из БД */
+    }
+
+    public override object GetViewDoc(int id)
+    {
+        /* Извлечение данных для FastReport */
+    }
+
+    // Реализация IDocumentEditor для Vue Editor
+    public DocumentEditConfig GetEditConfig(int id)
+    {
+        /* Конфигурация формы редактирования */
+    }
+
+    public bool SaveDocument(int id, Dictionary<string, object> values)
+    {
+        /* Сохранение изменений из Vue Editor */
+    }
 }
 ```
 
 2. **Создать конфигурацию:**
-   - `Cfg/CfgNewDoc.json`
-   - `Cfg/CfgEditNewDoc.json`
+   - `TN_Doc/Cfg/CfgNewDoc.json` - настройки шаблона и экспорта
+   - `TN_Doc/Cfg/CfgEditNewDoc.json` - конфигурация полей формы редактирования
 
 3. **Создать шаблон FastReport:**
-   - `Doc/NewDoc/{Number}_NewDoc.frx`
+   - `TN_Doc/Doc/NewDoc/{Number}_NewDoc.frx`
+   - Использовать FastReport Designer для создания макета
 
 4. **Зарегистрировать в CfgApp.json:**
 ```json
@@ -440,14 +637,20 @@ public class NewDocModule : IDocClass
 }
 ```
 
+5. **Написать unit тесты:**
+   - Создать `Tests/Libraries/NewDoc/NewDocTests.cs`
+   - Протестировать методы GetList, GetViewDoc, GetEditConfig, SaveDocument
+
 ```mermaid
 flowchart LR
-    A[1. Create Module Class] --> B[2. Implement IDocClass]
-    B --> C[3. Create Configurations]
-    C --> D[4. Design FastReport Template]
-    D --> E[5. Register in CfgApp.json]
-    E --> F[6. Build & Deploy]
-    F --> G[Module Ready]
+    A[1. Create Module Class] --> B[2. Inherit DocGeneral]
+    B --> C[3. Implement IDocumentEditor]
+    C --> D[4. Create Configurations]
+    D --> E[5. Design FastReport Template]
+    E --> F[6. Register in CfgApp.json]
+    F --> G[7. Write Unit Tests]
+    G --> H[8. Build & Deploy]
+    H --> I[Module Ready]
 ```
 
 ## Field History Tracking (v1.4.4+)
@@ -598,8 +801,24 @@ foreach (var item in correctionData.Values.Where(x => x.Tag == "Value"))
 
 ## См. также
 
-- [Architecture Overview](overview.md)
-- [FastReport Templates Guide](../development/fastreport-templates.md)
-- [Adding New Module Tutorial](../development/new-module-tutorial.md)
-- [Field History Implementation Plan](../../tech_debt/FIELD_HISTORY_IMPLEMENTATION_PLAN.md)
-- [Field History Tracking Prompt](../../tech_debt/FIELD_HISTORY_TRACKING_PROMPT.md)
+### Архитектура
+- [Architecture Overview](overview.md) - общий обзор архитектуры системы
+- [TN.DocGeneral/DESIGN_DOCUMENTATION.md](../../tn.docgeneral/DESIGN_DOCUMENTATION.md) - проектная документация базовой библиотеки
+
+### Разработка
+- [FastReport Templates Guide](../development/fastreport-templates.md) - руководство по работе с шаблонами FastReport
+- [Adding New Module Tutorial](../development/new-module-tutorial.md) - туториал по добавлению нового модуля документа
+- [CLAUDE.md](../../CLAUDE.md) - основная документация проекта для разработчиков
+
+### История изменений полей (v1.4.4+)
+- [Field History Implementation Plan](../../tech_debt/FIELD_HISTORY_IMPLEMENTATION_PLAN.md) - план внедрения системы истории
+- [Field History Tracking Prompt](../../tech_debt/FIELD_HISTORY_TRACKING_PROMPT.md) - техническое описание реализации
+
+### API и интеграция
+- [API Documentation](../api/) - документация REST API
+- [ELIS Integration Guide](../integration/elis.md) - интеграция с ELIS
+- [OPC Integration Guide](../integration/opc.md) - интеграция с OPC DA/UA
+
+### История версий
+- [CHANGELOG.md](../../CHANGELOG.md) - журнал изменений версий
+- [TN_Doc/changes.md](../../TN_Doc/changes.md) - детальная история изменений

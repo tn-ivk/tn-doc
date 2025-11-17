@@ -2,7 +2,7 @@
 
 **Система генерации технических документов и отчетов для измерительно-вычислительных комплексов (ИВК)**
 
-[![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)](https://github.com/orpovy/ivk/tn_doc)
+[![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)](https://github.com/orpovy/ivk/tn_doc)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
 
@@ -51,12 +51,12 @@ dotnet run
 
 Приложение будет доступно по адресу: `http://localhost:38509`
 
-### Сборка статус-бара (Vue.js)
+### Сборка Vue компонентов
 
 ```bash
-cd TN_Doc/Client/statusbar
-npm install
-npm run build
+cd TN_Doc/Client
+npm install                # Устанавливает зависимости для всех workspaces
+npm run build:all          # Собирает statusbar, configurator, document-editor
 ```
 
 ## 📖 Документация
@@ -87,7 +87,7 @@ graph TB
         A[ASP.NET Core 8.0]
         B[Controllers]
         C[Services]
-        D[StatusBar Vue.js]
+        D[Vue 3: StatusBar, Configurator, Editor]
     end
 
     subgraph "Document Generation"
@@ -117,11 +117,11 @@ graph TB
 ## 🔧 Основные технологии
 
 - **Backend**: ASP.NET Core 8.0, C#
-- **Frontend**: Vue 3 + TypeScript + PrimeVue (StatusBar)
-- **Генерация отчетов**: FastReport.Web.Skia
-- **База данных**: MySQL/MariaDB (Pomelo.EntityFrameworkCore.MySql)
+- **Frontend**: Vue 3 + TypeScript + PrimeVue (StatusBar, Configurator, Document Editor)
+- **Генерация отчетов**: FastReport.Web.Skia 2025.2.8
+- **База данных**: MySQL/MariaDB (Pomelo.EntityFrameworkCore.MySql 7.0.0)
 - **Real-time**: SignalR
-- **Логирование**: NLog
+- **Логирование**: NLog 5.4.0
 - **OPC**: OPC DA, OPC UA
 - **Интеграция**: ELIS (Единая Лабораторная Информационная Система)
 
@@ -134,16 +134,20 @@ tn_doc/
 │   ├── Models/                  # Модели и сервисы
 │   ├── Views/                   # Razor views
 │   ├── wwwroot/                 # Статические файлы
-│   ├── Client/statusbar/        # Vue.js статус-бар
+│   ├── Client/                  # Vue.js приложения (npm workspaces)
+│   │   ├── statusbar/           # Статус-бар
+│   │   ├── configurator/        # Конфигуратор
+│   │   ├── document-editor/     # Редактор документов (в разработке)
+│   │   └── shared/              # Общие компоненты
 │   ├── Cfg/                     # Конфигурация документов
 │   └── Doc/                     # Шаблоны FastReport
-├── TN.DocGeneral/               # Общая бизнес-логика
+├── TN.DocGeneral/               # Общая бизнес-логика (v1.2.3)
 ├── Ivk.DataBase/                # Библиотека работы с БД
-├── tn.docgeneral/               # Модули документов
-│   ├── Passport/
-│   ├── Poverka*/
-│   ├── KMH*/
-│   └── ...
+├── tn.docgeneral/               # Модули документов (~48 библиотек)
+│   ├── Act, Passport, Report, Jornal
+│   ├── Poverka* (21 библиотек)
+│   ├── KMH* (18 библиотек)
+│   └── Common* (3 библиотеки)
 ├── Tests/                       # Unit-тесты (NUnit)
 └── docs/                        # Документация
 ```
@@ -167,11 +171,13 @@ dotnet test --filter "ClassName=AppConfigServiceTests"
 
 ```bash
 # Установка из пакета
-sudo dpkg -i tn-doc_1.4.2_amd64.deb
+sudo dpkg -i tn-doc_1.4.3_amd64.deb
 
 # Управление службой
 sudo systemctl start tn-doc
 sudo systemctl status tn-doc
+
+# Логи находятся в /opt/TN_Doc/logs/
 ```
 
 ### Windows (как служба)
