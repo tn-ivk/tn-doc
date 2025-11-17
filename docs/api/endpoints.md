@@ -243,180 +243,80 @@ POST /api/documents/{deviceId}/{docType}/update/{id}
 
 ### Documents API (Legacy)
 
-#### Получить список документов
+⚠️ **Устаревшее API** - используется для обратной совместимости со старым JavaScript клиентом. Для новых функций используйте DocumentEditController REST API.
+
+#### Сгенерировать документ (PDF)
 
 ```http
-GET /Document/GetListDoc
+GET /Home/GetDoc
 ```
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| idDevice | string | Yes | ID устройства ИВК |
+| IdDevice | int | Yes | ID устройства ИВК |
+| IdDoc | string | Yes | Тип документа (enum IdDoc) |
+| id | int | Yes | ID записи документа |
+| protocolNumber | int | No | Номер протокола (для документов КМХ и поверок) |
 
 **Response:**
 ```json
-{
-  "success": true,
-  "documents": [
-    {
-      "id": "Passport",
-      "name": "Паспорт качества",
-      "description": "Паспорт качества по ГОСТ Р 50.2.040"
-    },
-    {
-      "id": "Poverka1974",
-      "name": "Протокол поверки ГОСТ Р 8.1011-2022",
-      "description": "Поверка СИКН/СИКНП"
-    }
-  ]
-}
+true  // Успешная генерация
+false // Ошибка генерации
 ```
 
-#### Получить список записей документа
+**Примечание:**
+- PDF генерируется в память через IReportBuffer (v1.4.1+)
+- Клиент загружает PDF через `/PDF/PDF.pdf`
+- Custom middleware обслуживает запрос из in-memory буфера
+
+#### Получить форму редактирования документа
 
 ```http
-GET /Document/GetListIdDoc
+GET /Home/GetDocEdit
 ```
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| idDevice | string | Yes | ID устройства ИВК |
-| idDoc | string | Yes | ID типа документа |
+| IdDevice | int | Yes | ID устройства ИВК |
+| IdDoc | string | Yes | Тип документа (enum IdDoc) |
+| id | int | Yes | ID записи документа |
 
 **Response:**
 ```json
 {
-  "success": true,
-  "records": [
-    {
-      "id": 12345,
-      "date": "2025-10-02T14:30:00",
-      "description": "Паспорт №ПК-2025-001"
-    }
-  ]
+  "useVue": true,
+  "url": "/document-editor/edit/1/Passport/12345"
 }
 ```
 
-#### Сгенерировать документ
+**Примечание:**
+- С версии 1.4.4+ все документы используют Vue Document Editor
+- HTML формы устарели и удалены
+- Метод возвращает URL для Vue SPA
+
+#### Обновить документ после подтверждения от ИВК (Legacy)
 
 ```http
-POST /Document/ViewDoc
-```
-
-**Request Body:**
-```json
-{
-  "idDevice": "IVK-1",
-  "idDoc": "Passport",
-  "id": 12345,
-  "format": "PDF"
-}
-```
-
-**Response:**
-```
-Content-Type: application/pdf
-Content-Disposition: inline; filename="Passport_12345.pdf"
-
-[PDF binary data]
-```
-
-**Format Options:**
-- `PDF` (default)
-- `Excel`
-- `ODS`
-- `HTML`
-
-#### Редактировать документ
-
-```http
-GET /Document/EditDoc
+POST /Home/UpdateDoc
 ```
 
 **Query Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| idDevice | string | Yes | ID устройства ИВК |
-| idDoc | string | Yes | ID типа документа |
-| id | int | Yes | ID записи |
+| IdDevice | int | Yes | ID устройства ИВК |
+| IdDoc | string | Yes | Должно быть "Passport" |
+| data | string | Yes | JSON строка с данными документа |
 
-**Response:**
-```
-Content-Type: text/html
-
-<html>
-  <form>...</form>
-</html>
-```
-
-#### Сохранить изменения документа
-
-```http
-POST /Document/SaveDoc
-```
-
-**Request Body:**
-```json
-{
-  "idDevice": "IVK-1",
-  "idDoc": "Passport",
-  "id": 12345,
-  "data": {
-    "passportNumber": "ПК-2025-001",
-    "productName": "Нефть сырая",
-    "qualityIndicators": [...],
-    "__history": {
-      "passportNumber": [
-        {
-          "source": "Manual",
-          "modifiedAt": "2025-01-14T10:00:00Z",
-          "modifiedBy": "Пользователь",
-          "value": "ПК-2025-001",
-          "previousValue": null,
-          "comment": null
-        }
-      ],
-      "value.Density": [
-        {
-          "source": "ELIS",
-          "modifiedAt": "2025-01-14T09:00:00Z",
-          "modifiedBy": "ELIS",
-          "value": "850.5",
-          "previousValue": null,
-          "comment": "Загружено из протокола ПР-2024-12345"
-        },
-        {
-          "source": "Manual",
-          "modifiedAt": "2025-01-14T10:30:00Z",
-          "modifiedBy": "Пользователь",
-          "value": "850.567",
-          "previousValue": "850.5",
-          "comment": "Скорректировано вручную"
-        }
-      ]
-    }
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Документ сохранен"
-}
-```
-
-**История изменений (v1.4.4+):**
-- Поле `__history` содержит историю изменений для каждого поля
-- Ключ - `controlId` поля (например, `passportNumber`, `value.Density`, `method.Temperature`)
-- Значение - массив записей истории (до 10 последних)
-- Backend автоматически обрабатывает FIFO при превышении лимита
+**Примечание:**
+- ⚠️ **Устаревший метод** - используйте `/api/documents/{deviceId}/Passport/update/{id}`
+- Работает только для паспортов качества
+- Принимает JSON как строку (не объект)
+- Для новых реализаций используйте DocumentEditController.UpdateDocument()
 
 ### Status API
 
@@ -1075,29 +975,39 @@ await File.WriteAllBytesAsync("passport.pdf", pdfBytes);
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant API
-    participant Controller
-    participant Service
+    participant Client as JavaScript Client
+    participant HomeController
+    participant DocModuleLoader as IDocModuleLoader
+    participant DocModule as IDocClass
+    participant DB as Database
     participant FastReport
+    participant ReportBuffer as IReportBuffer
 
-    Client->>API: POST /Document/ViewDoc
-    API->>Controller: Route request
-    Controller->>Service: GetDocumentClass()
-    Service->>Service: Load module
-    Service-->>Controller: IDocClass instance
+    Client->>HomeController: GetDoc(deviceId, idDoc, id, protocolNumber)
+    HomeController->>DocModuleLoader: LoadDocsModule(deviceId, idDoc)
+    DocModuleLoader->>DocModuleLoader: Load & cache DLL module
+    DocModuleLoader-->>HomeController: IDocClass instance
 
-    Controller->>Service: GetViewDoc(id)
-    Service->>Service: Query database
-    Service-->>Controller: JSON data
+    HomeController->>DocModule: GetPathTemplateFile()
+    DocModule-->>HomeController: Path to .frx template
 
-    Controller->>FastReport: Load template
-    Controller->>FastReport: SetData(json)
-    Controller->>FastReport: Export(PDF)
-    FastReport-->>Controller: PDF bytes
+    HomeController->>DocModule: GetViewDoc(id) or GetViewDoc(id, protocolNumber)
+    DocModule->>DB: Query document data
+    DB-->>DocModule: DataIVKDoc
+    DocModule-->>HomeController: JSON string
 
-    Controller->>API: PDF response
-    API-->>Client: application/pdf
+    HomeController->>FastReport: Report.Load(templatePath)
+    HomeController->>FastReport: SetParameterValue("JsonDoc", json)
+    HomeController->>FastReport: Report.Prepare()
+    HomeController->>FastReport: Export(PDFExport, memoryStream)
+    FastReport-->>HomeController: PDF bytes
+
+    HomeController->>ReportBuffer: SetPdfBytes(bytes)
+    Note over ReportBuffer: In-memory storage (v1.4.1+)<br/>Eliminates "file in use" errors
+
+    HomeController-->>Client: true/false (success status)
+
+    Note over Client: Client загружает PDF через /PDF/PDF.pdf<br/>Custom middleware обслуживает из IReportBuffer
 ```
 
 ### Редактирование документа через Vue Editor (v1.4.4+)
@@ -1107,12 +1017,19 @@ sequenceDiagram
     participant User
     participant VueApp as Vue Document Editor
     participant API as DocumentEditController
+    participant DocModuleLoader as IDocModuleLoader
     participant DocModule as IDocumentEditor
     participant DB as Database
 
     User->>VueApp: Открыть документ для редактирования
     VueApp->>API: GET /api/documents/{deviceId}/{docType}/edit/{id}
-    API->>DocModule: LoadDocsModule()
+
+    API->>API: Parse docType string to IdDoc enum
+    API->>DocModuleLoader: LoadDocsModule(options, deviceId, idDoc)
+    DocModuleLoader->>DocModuleLoader: Load & cache DLL module
+    DocModuleLoader-->>API: IDocClass instance
+
+    API->>API: Check if doc implements IDocumentEditor
     API->>DocModule: GetEditConfig(id)
     DocModule->>DB: Query document data
     DB-->>DocModule: DataIVKDoc
@@ -1138,6 +1055,12 @@ sequenceDiagram
     VueApp->>API: POST /api/documents/{deviceId}/{docType}/save/{id}
     Note over VueApp,API: Body: {values, __history}
 
+    API->>API: Parse docType to IdDoc enum
+    API->>DocModuleLoader: LoadDocsModule(options, deviceId, idDoc)
+    DocModuleLoader-->>API: IDocClass instance
+
+    API->>API: Check if doc implements IDocumentEditor
+    API->>API: Deserialize JSON to Dictionary<string, object>
     API->>DocModule: SaveDocument(id, values)
 
     alt ELIS включен
@@ -1163,6 +1086,7 @@ sequenceDiagram
     participant MessagingService as OPC Messaging Service
     participant IVK as ИВК (OPC сервер)
     participant API as DocumentEditController
+    participant DocModuleLoader as IDocModuleLoader
     participant DocModule as IDocUpdater
     participant DB as Database
 
@@ -1183,6 +1107,13 @@ sequenceDiagram
     VueApp->>API: POST /api/documents/{deviceId}/Passport/update/{id}
     Note over VueApp,API: Body: {merged values, __history}
 
+    API->>API: Parse docType to IdDoc.Passport
+    API->>API: Validate docType == Passport
+    API->>DocModuleLoader: LoadDocsModule(options, deviceId, IdDoc.Passport)
+    DocModuleLoader-->>API: IDocClass instance
+
+    API->>API: Check if doc implements IDocUpdater
+    API->>API: Deserialize JSON to Dictionary<string, object>
     API->>DocModule: DocUpdate(id, values)
 
     alt ELIS включен
