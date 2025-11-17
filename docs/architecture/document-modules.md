@@ -426,30 +426,110 @@ public class DocumentDictionaries
 }
 ```
 
-## Фабрика документов
+## Загрузка модулей документов
+
+Модули документов динамически загружаются через сервис `IDocModuleLoader`, который использует reflection для создания экземпляров `DocGeneral` из отдельных DLL библиотек.
+
+### Схема загрузки модулей
 
 ```mermaid
 sequenceDiagram
     participant Controller
+    participant DocModuleLoader
     participant AppConfigService
-    participant Registry
-    participant Activator
-    participant Module
+    participant FileSystem
+    participant Assembly
+    participant DocGeneral
 
-    Controller->>AppConfigService: GetDocumentClass(deviceId, docId)
-    AppConfigService->>AppConfigService: Resolve document type
-    AppConfigService->>Registry: Lookup Type by key
-    Registry-->>AppConfigService: Type info
+    Controller->>DocModuleLoader: LoadDocsModule(options, idDevice, idDoc, baseDirectory)
+    DocModuleLoader->>AppConfigService: GetPathToDocDll(idDevice, idDoc)
+    AppConfigService-->>DocModuleLoader: Относительный путь к DLL
 
-    alt Module found in registry
-        AppConfigService->>Activator: CreateInstance(type, args)
-        Activator->>Module: new DocModule()
-        Module-->>AppConfigService: Instance
-        AppConfigService-->>Controller: DocGeneral instance
-    else Module not found
-        AppConfigService-->>Controller: throw Exception
+    DocModuleLoader->>DocModuleLoader: Path.Combine(baseDirectory, dllPath)
+    DocModuleLoader->>FileSystem: Проверка существования DLL
+    FileSystem-->>DocModuleLoader: FileInfo
+
+    alt DLL файл существует
+        DocModuleLoader->>Assembly: LoadFrom(dllPath)
+        Assembly-->>DocModuleLoader: Загруженная сборка
+        DocModuleLoader->>Assembly: GetTypes() где BaseType == DocGeneral
+        Assembly-->>DocModuleLoader: Type информация
+        DocModuleLoader->>Assembly: CreateInstance(type, args)
+        Assembly->>DocGeneral: new DocModule(options, appConfig, configCache, idDevice, idDoc, baseDirectory)
+        DocGeneral-->>DocModuleLoader: Экземпляр модуля
+        DocModuleLoader-->>Controller: DocGeneral instance
+    else DLL не найдена
+        DocModuleLoader-->>Controller: null (с логированием ошибки)
     end
 ```
+
+### Интерфейс IDocModuleLoader
+
+```csharp
+public interface IDocModuleLoader
+{
+    DocGeneral LoadDocsModule(
+        DbContextOptions<DocGeneral> options,
+        int idDevice,
+        IdDoc idDoc,
+        string baseDirectory);
+}
+```
+
+**Параметры:**
+- `options` — настройки подключения к базе данных (Entity Framework)
+- `idDevice` — идентификатор устройства ИВК
+- `idDoc` — тип документа (`IdDoc` enum)
+- `baseDirectory` — базовый каталог приложения (обычно `AppContext.BaseDirectory`)
+
+**Возвращаемое значение:**
+- Экземпляр `DocGeneral` (базовый класс для всех модулей документов)
+- `null` в случае ошибки (путь не найден, DLL отсутствует, ошибка загрузки)
+
+### Пример использования в контроллерах
+
+```csharp
+// HomeController.cs
+var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
+if (doc is null)
+{
+    _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
+    return StatusCode(500, "Ошибка загрузки модуля документа");
+}
+
+// Использование загруженного модуля
+var viewData = doc.GetViewDoc(id);
+var html = doc.GetEditDoc(id);
+doc.SetDocFromJson(jsonData);
+```
+
+### Конфигурация путей к DLL
+
+Путь к каждому модулю определяется в `CfgApp.json` через конфигурацию устройства и документа:
+
+```json
+{
+  "Devices": [
+    {
+      "IdDevice": 1,
+      "Documents": [
+        {
+          "IdDoc": 2,
+          "DllPath": "tn.docgeneral/Passport/TN.Passport.dll"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Метод `IAppConfigService.GetPathToDocDll(idDevice, idDoc)` возвращает относительный путь к соответствующей DLL.
+
+### Кэширование и оптимизация (v1.4.2+)
+
+- Загруженные сборки кэшируются .NET Runtime автоматически
+- Конфигурационные файлы документов кэшируются через `IConfigurationCacheService`
+- При создании экземпляра модуля передаётся `IConfigurationCacheService` для повторного использования конфигураций
 
 ## Структура модулей документов
 
