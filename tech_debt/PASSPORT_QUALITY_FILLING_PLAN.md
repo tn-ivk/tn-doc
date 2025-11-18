@@ -107,8 +107,8 @@
    - Избавиться от дублирования логики пересчёта: `recalculateResult` должен принимать `isBalast` и `methodSource`, понимать когда `result` запираем.  
    - `qualityParameters` добавляет warnings (`requiresManualMethod`, `elisOverride`, `manualOverride`) на основании истории (`store.formData["*.history"]`) и `method.source`.
 2. **PassportQualityTable**  
-   - Для балластных полей блокируем колонку Result и показываем иконку синхронизации. Изменение measurement через инпут автоматически пишет `result.*` и историю (`store.bulkUpdateFields`).  
-   - Для небалластных полей рядом с результатом рендерим кнопку «Редактировать» → модалка. Default value отображается в read-only input.
+   - Для балластных полей блокируем редактирование значения Result (read‑only), но визуально ячейка выглядит так же, как для небалластных: в ней есть кнопка «Редактировать», которая находится в состоянии disabled. Изменение measurement через инпут автоматически пишет `result.*` и историю (`store.bulkUpdateFields`).  
+   - Для небалластных полей рядом с результатом рендерим активную кнопку «Редактировать» → модалка. Default value отображается в read-only input.
 3. **Модалка редактирования результатов**  
    - Содержит селект (`менее`/`более`), поле ввода значения (валидируем разрядность/локаль) и предпросмотр итоговой строки (`«менее 4,0»`).  
    - После подтверждения вызывает `handleResultUpdate` с уже собранной строкой. Параллельно добавляет запись в историю (`__history`) с `source = Manual` и пометкой `payloadType = ResultModal`.  
@@ -240,20 +240,20 @@
 2. **Фаза 1 — стратегия и контракты (бэкенд)**  
    - **1.1. Введение стратегии качества паспорта**  
      - В `tn.docgeneral/Passport/DocPassport.cs` выделить интерфейс `IPassportQualityStrategy` (ELIS On/Off + балласт/небалласт):  
-       - Определить методы для формирования схемы (`BuildQualityParametersSchema`), значений (`BuildParameterValues`), методов (`BuildParameterMethod`) и `resultEditMode`.  
-       - Реализовать минимум две стратегии: `PassportQualityStrategyLegacy` (старое поведение) и `PassportQualityStrategyElis` (новое, с `IsBalast`).  
-     - Добавить фабрику/решатель стратегии (_внутри_ `DocPassport`, без DI наружу) на основе `UseElis` и наличия `IsBalast` в конфиге.  
+       - Определить методы для формирования схемы (`BuildQualityParametersSchema`), значений (`BuildParameterValues`), методов (`BuildParameterMethod`) и `ResultEditMode`.  
+       - Реализовать минимум две реализации: `PassportQualityStrategy` (текущее/нормальное поведение, флаг `IsBalast` присутствует в контракте, но не влияет на расчёт) и `PassportQualityStrategyElis` (новое поведение, использующее `IsBalast` для разделения балластных/небалластных параметров).  
+     - Добавить фабрику/решатель стратегии (_внутри_ `DocPassport`, без DI наружу) на основе `UseElis`.  
    - **1.2. Расширение DTO и контрактов**  
      - В проектах `TN.DocEditor.Passport.*` и `TN.DocEditor.Passport.Dto/*.cs` расширить модели `QualityParameterSchema`, `PassportQualityParameterSchema` полями `IsBalast`, `ResultEditMode`, `MethodSource`.  
      - Обновить маппинг в `DocPassport.BuildQualityParameters*`, чтобы новые поля заполнялись из стратегии.  
      - Синхронизировать типы на фронтенде: обновить `TN_Doc/Client/document-editor/src/types/passport.types.ts` (интерфейсы `PassportEditConfig`, `QualityParameterSchema`, `MethodOption`).  
    - **1.3. Обратная совместимость**  
      - Убедиться, что при отсутствии `IsBalast` и `ResultEditMode` сериализатор не меняет JSON (старые клиенты/снапшоты остаются валидными).  
-     - В стратегии `Legacy` возвращать те же данные, что и до рефакторинга (можно опираться на снапшот‑тесты `DocPassportTests`).  
+     - В реализации `PassportQualityStrategy` возвращать те же данные, что и до рефакторинга (можно опираться на снапшот‑тесты `DocPassportTests`); при этом `IsBalast` может присутствовать в схеме, но логика расчёта его игнорирует.  
    - **1.4. Тесты стратегии**  
      - Добавить `PassportQualityStrategyTests` с кейсами:  
-       - ELIS выключен, конфиг без `IsBalast` — используется `Legacy`.  
-       - ELIS включен, конфиг с `IsBalast` — используется новая стратегия, `IsBalast` и `ResultEditMode` заполнены.  
+       - ELIS выключен — используется `PassportQualityStrategy`, поведение совпадает с текущим, а наличие/отсутствие `IsBalast` в конфиге не влияет на расчёт.  
+       - ELIS включен и конфиг содержит `IsBalast` — используется `PassportQualityStrategyElis`, `IsBalast` и `ResultEditMode` заполнены и влияют на поведение.  
        - Порядок методов: `config → lab → manual`.  
    - **Проверка после Фазы 1**  
      - Запустить `dotnet test Tests/Services --filter PassportQuality` и убедиться, что новые тесты стратегии зелёные.  
@@ -279,7 +279,7 @@
      - В `BuildParameterMethod` дополнять `MethodOptions` ручными методами (из `LabInfo`), проставлять `source` и флаги `requiresManualAction`, если метод не найден в конфиге.  
    - **2.4. Логирование и диагностика**  
      - Добавить категорию логов `PassportQuality`:  
-       - Логировать выбор стратегии (Legacy/Elis), устройство, признак `UseElis`.  
+       - Логировать выбор стратегии (`PassportQualityStrategy`/`PassportQualityStrategyElis`), устройство, признак `UseElis`.  
        - Логировать случаи конфликтов measurement/result (балластные) и сценарии `Manual overrides ELIS`.  
    - **2.5. Тесты сохранения**  
      - Добавить `Tests/Services/Passport/DocUpdateTests.cs` с интеграционными сценариями:  
@@ -299,8 +299,7 @@
    - **3.2. PassportQualityTable: поведение колонок**  
      - Для балластных параметров:  
        - Заблокировать колонку Result (read‑only инпут).  
-       - При изменении measurement через инпут автоматически обновлять `result.*` и историю (`bulkUpdateFields`).  
-       - Отрисовывать иконку синхронизации и tooltip «Балластный параметр — результат синхронизируется с измерением».  
+       - При изменении measurement через инпут автоматически обновлять `result.*` и историю (`bulkUpdateFields`).    
      - Для небалластных параметров:  
        - Добавить кнопку «Редактировать» в ячейку Result → открытие модалки редактирования результата.  
        - Отображать фактическое значение в формате, пригодном для печати.  
