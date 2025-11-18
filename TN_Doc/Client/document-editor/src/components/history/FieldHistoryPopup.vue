@@ -64,7 +64,6 @@ import { ref, computed } from 'vue';
 import OverlayPanel from 'primevue/overlaypanel';
 import type { FieldHistoryEntry } from '@/types/history.types';
 import { SOURCE_DISPLAY_CONFIG } from '@/types/history.types';
-import { logger } from '@tn-doc/shared';
 
 const props = defineProps<{
   /** История изменений поля */
@@ -101,16 +100,8 @@ const formatDate = (isoDate: string): string => {
  * Показать popup
  */
 const show = (event: Event) => {
-  logger.debug(`[FieldHistoryPopup] show() вызван для поля: ${props.fieldLabel}`);
-  logger.debug(`[FieldHistoryPopup] История (${props.history.length} записей): ${JSON.stringify(props.history)}`);
-  logger.debug(`[FieldHistoryPopup] overlayPanel.value: ${overlayPanel.value ? 'определен' : 'undefined'}`);
-  logger.debug(`[FieldHistoryPopup] event: ${event ? 'передан' : 'undefined'}`);
-
   if (overlayPanel.value) {
-    logger.debug('[FieldHistoryPopup] Вызов overlayPanel.show()');
     overlayPanel.value.show(event);
-  } else {
-    logger.error('[FieldHistoryPopup] overlayPanel.value is undefined!');
   }
 };
 
@@ -118,7 +109,6 @@ const show = (event: Event) => {
  * Скрыть popup
  */
 const hide = () => {
-  logger.debug(`[FieldHistoryPopup] hide() вызван для поля: ${props.fieldLabel}`);
   overlayPanel.value?.hide();
 };
 
