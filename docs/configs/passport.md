@@ -12,7 +12,7 @@
   python3 scripts/generate_passport_matrix.py
   ```
 
-### Поле `IsBalast`
+### Поле `IsBallast`
 - Добавлено в `TN.Doc.Edit.Parameter` и все рабочие конфиги `CfgEditPassport*.json`.  
 - Назначение:
   - `true` — показатель считается балластным, столбец Result синхронизируется с Measurement;

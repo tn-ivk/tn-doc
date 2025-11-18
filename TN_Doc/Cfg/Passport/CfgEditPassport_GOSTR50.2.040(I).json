@@ -388,7 +388,7 @@
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
       "Edit": false,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 2,
@@ -396,7 +396,7 @@
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
       "Edit": false,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 3,
@@ -404,7 +404,7 @@
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 4,
@@ -412,7 +412,7 @@
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 5,
@@ -420,7 +420,7 @@
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 6,
@@ -434,7 +434,7 @@
       "Name": "Массовая доля воды, %",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 7,
@@ -448,7 +448,7 @@
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 8,
@@ -462,7 +462,7 @@
       "RequiredFill": false,
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 9,
@@ -476,7 +476,7 @@
       "RoundValue": 4,
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 10,
@@ -490,7 +490,7 @@
       "RoundValue": 2,
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 11,
@@ -504,7 +504,7 @@
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 12,
@@ -517,7 +517,7 @@
       "RequiredFill": false,
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 13,
@@ -525,7 +525,7 @@
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 14,
@@ -533,7 +533,7 @@
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 15,
@@ -541,7 +541,7 @@
       "Name": "Выход фракций: при температуре до 350 °С, %",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 16,
@@ -550,7 +550,7 @@
       "Name": "Массовая доля парафина, %",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 17,
@@ -565,7 +565,7 @@
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 18,
@@ -580,7 +580,7 @@
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 19,
@@ -595,7 +595,7 @@
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     }
   ],
   "AdditionalInfo": [

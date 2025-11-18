@@ -28,11 +28,11 @@
 
 ### 4. Обновление конфигураций и контрактов
 1. **Расширение схемы параметров качества**  
-   - В `CfgEditPassport_GOSTR50.2.040(I).json` добавить поле `IsBalast` для каждого элемента `Parameters[]`. Отсутствие поля трактуем как `false`.  
+   - В `CfgEditPassport_GOSTR50.2.040(I).json` добавить поле `IsBallast` для каждого элемента `Parameters[]`. Отсутствие поля трактуем как `false`.  
    - Балластные показатели: `TempCorrection`, `PressCorrection`, `DensCorrection`, `Dens20Correction`, `Dens15Correction`, `MassWaterFracCorrection`, `Chloride_Salts.Concentration`, `Chloride_Salts.MassFraction`, `Impurity`.  
    - Небалластные показатели: `SulfurCorrection`, `DNP.kPa`, `DNP.mercury_mm`, `Yield_fraction_200`, `Yield_fraction_300`, `Yield_fraction_350`, `Mass_fraction_of_paraffin`, `Mass_fraction_of_hydrogen_sulfide`, `Mass_fraction_of_methyl_and_ethyl_mercaptan`, `Mass_fraction_of_organic_chlorides`.
 2. **DTO / JSON / типы на стороне клиента**  
-   - Расширить `TN.DocEditor.Passport.QualityParameter`, `QualityParameterSchema`, `Edit.Parameter`, DTO `PassportQualityParameterSchema`, JSON `PassportEditConfig` и ts-типы (`TN_Doc/Client/document-editor/src/types/passport.types.ts`) полем `IsBalast`.  
+   - Расширить `TN.DocEditor.Passport.QualityParameter`, `QualityParameterSchema`, `Edit.Parameter`, DTO `PassportQualityParameterSchema`, JSON `PassportEditConfig` и ts-типы (`TN_Doc/Client/document-editor/src/types/passport.types.ts`) полем `IsBallast`.  
    - Вместо добавления `IsFromConfig` в `TN.Doc.Edit.Metod` вводим отдельное поле `methodSource`/`source` (enum `'config' | 'lab' | 'manual' | 'elis'`) только в ответах `PassportQualityParameterSchema.MethodOptions` и `PassportQualityParameter.method`. Значение вычисляем на бэкенде по происхождению метода:  
      - `config` — пришёл из `CfgEditPassport.Methods`.  
      - `lab` — сохранён в `LabInfo` с источником ELIS.  
@@ -41,7 +41,7 @@
    - Клиент продолжает отправлять в `DocUpdate` чистый JSON `Metod`, без `source`; метаданные нужны только для визуализации.
 3. **История и паспортные конфиги**  
    - Проверить, что `PassportEditConfig.InitialValues` содержит `__history`/`__elisFilled` для всех новых полей, чтобы модалки могли восстановить источник значений.  
-   - Для обратной совместимости ориентироваться только на наличие поля `IsBalast`: если поле отсутствует, считается `false`, сервер использует старую логику.
+   - Для обратной совместимости ориентироваться только на наличие поля `IsBallast`: если поле отсутствует, считается `false`, сервер использует старую логику.
 4. **Примеры контрактов**  
    ```json
    {
@@ -74,8 +74,8 @@
    ```
    - Для параметра без `IsBalast` поле просто опускаем — клиент трактует как `false`.
 5. **Миграция конфигов и обратная совместимость**  
-   - Шаг 1: обновить `IsBalast` во всех актуальных `TN_Doc/Cfg/CfgEditPassport_*.json` (по списку параметров) через существующие процессы управления конфигурациями, без отдельного миграционного скрипта.  
-   - Шаг 2: в `DocPassport` определять стратегию по факту наличия `IsBalast`. Для старых конфигов (`IsBalast` отсутствует) автоматически используем старую ветку — никакой версии хранить не нужно.  
+   - Шаг 1: обновить `IsBallast` во всех актуальных `TN_Doc/Cfg/CfgEditPassport_*.json` (по списку параметров) через существующие процессы управления конфигурациями, без отдельного миграционного скрипта.  
+   - Шаг 2: в `DocPassport` определять стратегию по факту наличия `IsBallast`. Для старых конфигов (`IsBallast` отсутствует) автоматически используем старую ветку — никакой версии хранить не нужно.  
    - Шаг 3: документировать процесс в `docs/configs/passport.md` (описание новых полей, порядок обновления конфигов и требования к их проверке).  
    - Шаг 4: после обновления конфигов прогнать `dotnet test` + smoke (`dotnet run --project TN_Doc/TN_Doc.csproj -- --device <id>`), чтобы убедиться, что паспорт открывается и данные с ELIS подтягиваются без ошибок сериализации.
 
@@ -239,21 +239,21 @@
   
 2. **Фаза 1 — стратегия и контракты (бэкенд)**  
    - **1.1. Введение стратегии качества паспорта**  
-     - В `tn.docgeneral/Passport/DocPassport.cs` выделить интерфейс `IPassportQualityStrategy` (ELIS On/Off + балласт/небалласт):  
+   - В `tn.docgeneral/Passport/DocPassport.cs` выделить интерфейс `IPassportQualityStrategy` (ELIS On/Off + балласт/небалласт):  
        - Определить методы для формирования схемы (`BuildQualityParametersSchema`), значений (`BuildParameterValues`), методов (`BuildParameterMethod`) и `ResultEditMode`.  
-       - Реализовать минимум две реализации: `PassportQualityStrategy` (текущее/нормальное поведение, флаг `IsBalast` присутствует в контракте, но не влияет на расчёт) и `PassportQualityStrategyElis` (новое поведение, использующее `IsBalast` для разделения балластных/небалластных параметров).  
+       - Реализовать минимум две реализации: `PassportQualityStrategy` (текущее/нормальное поведение, флаг `IsBallast` присутствует в контракте, но не влияет на расчёт) и `PassportQualityStrategyElis` (новое поведение, использующее `IsBallast` для разделения балластных/небалластных параметров).  
      - Добавить фабрику/решатель стратегии (_внутри_ `DocPassport`, без DI наружу) на основе `UseElis`.  
    - **1.2. Расширение DTO и контрактов**  
-     - В проектах `TN.DocEditor.Passport.*` и `TN.DocEditor.Passport.Dto/*.cs` расширить модели `QualityParameterSchema`, `PassportQualityParameterSchema` полями `IsBalast`, `ResultEditMode`, `MethodSource`.  
+     - В проектах `TN.DocEditor.Passport.*` и `TN.DocEditor.Passport.Dto/*.cs` расширить модели `QualityParameterSchema`, `PassportQualityParameterSchema` полями `IsBallast`, `ResultEditMode`, `MethodSource`.  
      - Обновить маппинг в `DocPassport.BuildQualityParameters*`, чтобы новые поля заполнялись из стратегии.  
      - Синхронизировать типы на фронтенде: обновить `TN_Doc/Client/document-editor/src/types/passport.types.ts` (интерфейсы `PassportEditConfig`, `QualityParameterSchema`, `MethodOption`).  
    - **1.3. Обратная совместимость**  
-     - Убедиться, что при отсутствии `IsBalast` и `ResultEditMode` сериализатор не меняет JSON (старые клиенты/снапшоты остаются валидными).  
-     - В реализации `PassportQualityStrategy` возвращать те же данные, что и до рефакторинга (можно опираться на снапшот‑тесты `DocPassportTests`); при этом `IsBalast` может присутствовать в схеме, но логика расчёта его игнорирует.  
+     - Убедиться, что при отсутствии `IsBallast` и `ResultEditMode` сериализатор не меняет JSON (старые клиенты/снапшоты остаются валидными).  
+     - В реализации `PassportQualityStrategy` возвращать те же данные, что и до рефакторинга (можно опираться на снапшот‑тесты `DocPassportTests`); при этом `IsBallast` может присутствовать в схеме, но логика расчёта его игнорирует.  
    - **1.4. Тесты стратегии**  
      - Добавить `PassportQualityStrategyTests` с кейсами:  
-       - ELIS выключен — используется `PassportQualityStrategy`, поведение совпадает с текущим, а наличие/отсутствие `IsBalast` в конфиге не влияет на расчёт.  
-       - ELIS включен и конфиг содержит `IsBalast` — используется `PassportQualityStrategyElis`, `IsBalast` и `ResultEditMode` заполнены и влияют на поведение.  
+       - ELIS выключен — используется `PassportQualityStrategy`, поведение совпадает с текущим, а наличие/отсутствие `IsBallast` в конфиге не влияет на расчёт.  
+       - ELIS включен и конфиг содержит `IsBallast` — используется `PassportQualityStrategyElis`, `IsBallast` и `ResultEditMode` заполнены и влияют на поведение.  
        - Порядок методов: `config → lab → manual`.  
    - **Проверка после Фазы 1**  
      - Запустить `dotnet test Tests/Services --filter PassportQuality` и убедиться, что новые тесты стратегии зелёные.  

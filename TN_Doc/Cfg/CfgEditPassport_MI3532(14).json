@@ -1,4 +1,4 @@
-{
+﻿{
   "Methods": [
     {
       "Id": 1,
@@ -521,7 +521,7 @@
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 2,
@@ -529,7 +529,7 @@
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 3,
@@ -537,7 +537,7 @@
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 4,
@@ -545,7 +545,7 @@
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 5,
@@ -553,7 +553,7 @@
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 6,
@@ -561,7 +561,7 @@
       "Name": "Массовая доля воды, %",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 7,
@@ -569,7 +569,7 @@
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 8,
@@ -577,7 +577,7 @@
       "Name": "Массовая концентрация хлористых солей, %",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 9,
@@ -585,7 +585,7 @@
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
       "Edit": true,
-      "IsBalast": true
+      "IsBallast": true
     },
     {
       "Id": 10,
@@ -593,7 +593,7 @@
       "Name": "Массовая доля серы, %",
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 11,
@@ -601,7 +601,7 @@
       "Name": "Давление насыщенных паров, кПа",
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 12,
@@ -609,7 +609,7 @@
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 13,
@@ -617,7 +617,7 @@
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 14,
@@ -625,7 +625,7 @@
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 15,
@@ -633,7 +633,7 @@
       "Name": "Выход фракций: при температуре до 350 °С, %",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 16,
@@ -641,7 +641,7 @@
       "Name": "Массовая доля парафина, %",
       "Use": false,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 17,
@@ -649,7 +649,7 @@
       "Name": "Массовая доля сероводорода, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 18,
@@ -657,7 +657,7 @@
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     },
     {
       "Id": 19,
@@ -665,7 +665,7 @@
       "Name": "Массовая доля органических хлоридов, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBalast": false
+      "IsBallast": false
     }
   ],
   /*
