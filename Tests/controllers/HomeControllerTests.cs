@@ -916,45 +916,45 @@ public class HomeControllerTests
 
     #region UpdateDoc Tests
 
-    /// <summary>
-    /// UpdateDoc: для не-Passport — предупреждение и return
-    /// </summary>
-    [Test]
-    public void UpdateDoc_NonPassportDoc_LogsWarningAndReturns()
-    {
-        // Act
-        _controller.UpdateDoc(1, IdDoc.Report, "test data");
-
-        // Assert
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Обновление данных не применяется для документов типа")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
-
-    /// <summary>
-    /// UpdateDoc: для Passport с пустыми данными — предупреждение и return
-    /// </summary>
-    [Test]
-    public void UpdateDoc_PassportWithEmptyData_LogsErrorAndReturns()
-    {
-        // Act
-        _controller.UpdateDoc(1, IdDoc.Passport, string.Empty);
-
-        // Assert
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Данные для обновления пустые или отсутсвуют")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
+    // /// <summary>
+    // /// UpdateDoc: для не-Passport — предупреждение и return
+    // /// </summary>
+    // [Test]
+    // public void UpdateDoc_NonPassportDoc_LogsWarningAndReturns()
+    // {
+    //     // Act
+    //     _controller.UpdateDoc(1, IdDoc.Report, "test data");
+    //
+    //     // Assert
+    //     _mockLogger.Verify(
+    //         x => x.Log(
+    //             LogLevel.Warning,
+    //             It.IsAny<EventId>(),
+    //             It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Обновление данных не применяется для документов типа")),
+    //             It.IsAny<Exception>(),
+    //             It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+    //         Times.Once);
+    // }
+    //
+    // /// <summary>
+    // /// UpdateDoc: для Passport с пустыми данными — предупреждение и return
+    // /// </summary>
+    // [Test]
+    // public void UpdateDoc_PassportWithEmptyData_LogsErrorAndReturns()
+    // {
+    //     // Act
+    //     _controller.UpdateDoc(1, IdDoc.Passport, string.Empty);
+    //
+    //     // Assert
+    //     _mockLogger.Verify(
+    //         x => x.Log(
+    //             LogLevel.Error,
+    //             It.IsAny<EventId>(),
+    //             It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Данные для обновления пустые или отсутсвуют")),
+    //             It.IsAny<Exception>(),
+    //             It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+    //         Times.Once);
+    // }
 
     #endregion
 

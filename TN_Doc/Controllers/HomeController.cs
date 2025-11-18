@@ -591,39 +591,6 @@ public class HomeController : Controller
         }
     }
 
-    [HttpPost]
-    public void UpdateDoc(int IdDevice, IdDoc IdDoc, string data)
-    {
-        _logger.LogDebug($"Обновление документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        try
-        {
-            if (IdDoc != IdDoc.Passport)
-            {
-                _logger.LogWarning($"Обновление данных не применяется для документов типа {IdDoc}");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(data))
-            {
-                _logger.LogError("Данные для обновления пустые или отсутсвуют");
-                return;                
-            }
-            
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return;
-            }
-            if(doc is IDocUpdater docUpdater)
-                docUpdater.DocUpdate(data);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка обновления документа {IdDoc}");
-        }
-    }
-    
     public PeriodDocument GetPeriodDocument(int IdDevice, IdDoc IdDoc, int id)
     {
         _logger.LogDebug($"Получение периода документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");

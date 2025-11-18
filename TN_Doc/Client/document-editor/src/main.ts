@@ -19,7 +19,7 @@ logger.setGlobalContext({
   version: '1.4.3'
 });
 
-logger.info('DocumentEditor: инициализация приложения');
+logger.trace('DocumentEditor: инициализация приложения');
 
 const app = createApp(App);
 

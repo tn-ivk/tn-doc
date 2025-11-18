@@ -152,7 +152,7 @@ public class DocumentEditController : ControllerBase
 
             if (success)
             {
-                _logger.Info($"Документ успешно сохранён: {docType} (id={id}, deviceId={deviceId})");
+                _logger.Debug($"Документ успешно сохранён: {docType} (id={id}, deviceId={deviceId})");
                 return Ok(new { success = true, message = "Document saved successfully" });
             }
             else
