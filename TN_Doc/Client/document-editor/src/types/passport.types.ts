@@ -4,6 +4,9 @@
 
 import type { DocumentEditConfig } from './document.types';
 
+export type MethodSource = 'config' | 'lab' | 'manual' | 'elis';
+export type ResultEditMode = 'auto' | 'modal' | 'readonly';
+
 /**
  * Расширенная конфигурация для паспорта качества
  */
@@ -36,6 +39,12 @@ export interface PassportQualityParameterSchema {
   elisData?: ElisData;
   /** Доступные методы испытаний (из конфигурации) */
   methodOptions: MethodOption[];
+  /** Признак балластного параметра */
+  isBallast?: boolean;
+  /** Режим редактирования результата */
+  resultEditMode?: ResultEditMode;
+  /** Источник выбранного метода */
+  methodSource?: MethodSource;
 }
 
 /**
@@ -73,6 +82,8 @@ export interface ParameterMethod {
   options: MethodOption[];
   /** Обязательно ли заполнение метода */
   requiredFill?: boolean;
+  /** Источник выбранного метода */
+  source?: MethodSource;
 }
 
 /**
@@ -95,6 +106,8 @@ export interface MethodOption {
   limitValue?: number;
   /** Строка для отображения при значении ниже порога */
   limitValueString?: string;
+  /** Источник метода */
+  source?: MethodSource;
 }
 
 /**

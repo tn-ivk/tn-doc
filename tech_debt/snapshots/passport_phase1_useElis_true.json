@@ -1,0 +1,71 @@
+{
+  "docType": "Passport",
+  "isElisUsed": true,
+  "qualityParametersSchema": [
+    {
+      "id": 2,
+      "key": "PressCorrection",
+      "name": "Коррекция давления",
+      "editable": true,
+      "requiredFill": true,
+      "methodRequiredFill": true,
+      "roundValue": 2,
+      "elisData": {
+        "keyELIS": "PressCorrection",
+        "elisAlias": [
+          "PRESS_CORR"
+        ]
+      },
+      "isBallast": true,
+      "resultEditMode": "readonly",
+      "methodSource": "lab",
+      "methodOptions": [
+        {
+          "id": -1,
+          "use": false,
+          "idParameter": -1,
+          "name": "",
+          "isDefault": false,
+          "limitValueActivate": false,
+          "limitValue": 0.0,
+          "limitValueString": "",
+          "source": "config"
+        },
+        {
+          "id": 21,
+          "use": true,
+          "idParameter": 2,
+          "name": "ГОСТ 3900-85",
+          "isDefault": true,
+          "limitValueActivate": false,
+          "limitValue": null,
+          "limitValueString": null,
+          "source": "config"
+        },
+        {
+          "id": 2001,
+          "use": true,
+          "idParameter": 2,
+          "name": "Lab method #452",
+          "isDefault": false,
+          "limitValueActivate": false,
+          "limitValue": null,
+          "limitValueString": null,
+          "source": "lab"
+        },
+        {
+          "id": 0,
+          "use": true,
+          "idParameter": 2,
+          "name": "Ручной метод 05.2024",
+          "isDefault": false,
+          "limitValueActivate": true,
+          "limitValue": 0.5,
+          "limitValueString": "менее 0,5",
+          "source": "manual"
+        }
+      ]
+    }
+  ]
+}
+
