@@ -1,7 +1,7 @@
-﻿{
+{
   "Methods": [
     {
-      "Id":1,
+      "Id": 1,
       "Use": true,
       "IdParameter": 1,
       "Name": "ГОСТ Р 52247-2004 Метод В",
@@ -10,7 +10,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":2,
+      "Id": 2,
       "Use": true,
       "IdParameter": 1,
       "Name": "ГОСТ 2177-99",
@@ -19,7 +19,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":3,
+      "Id": 3,
       "Use": true,
       "IdParameter": 1,
       "Name": "ГОСТ Р 50802-95",
@@ -28,7 +28,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":4,
+      "Id": 4,
       "Use": true,
       "IdParameter": 2,
       "Name": "ГОСТ Р 52247-2004 Метод В",
@@ -37,7 +37,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":5,
+      "Id": 5,
       "Use": true,
       "IdParameter": 2,
       "Name": "ГОСТ 2177-99",
@@ -46,7 +46,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":6,
+      "Id": 6,
       "Use": true,
       "IdParameter": 2,
       "Name": "ГОСТ Р 50802-95",
@@ -55,7 +55,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":7,
+      "Id": 7,
       "Use": true,
       "IdParameter": 3,
       "Name": "ГОСТ Р 52247-2004 Метод В",
@@ -64,7 +64,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":8,
+      "Id": 8,
       "Use": true,
       "IdParameter": 3,
       "Name": "ГОСТ 2177-99",
@@ -73,7 +73,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":9,
+      "Id": 9,
       "Use": true,
       "IdParameter": 3,
       "Name": "ГОСТ Р 50802-95",
@@ -82,7 +82,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":10,
+      "Id": 10,
       "Use": true,
       "IdParameter": 4,
       "Name": "ГОСТ Р 50802-95",
@@ -91,7 +91,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":11,
+      "Id": 11,
       "Use": true,
       "IdParameter": 4,
       "Name": "ГОСТ 2177-99",
@@ -100,7 +100,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":12,
+      "Id": 12,
       "Use": true,
       "IdParameter": 4,
       "Name": "ГОСТ Р 50802-95",
@@ -109,7 +109,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":13,
+      "Id": 13,
       "Use": true,
       "IdParameter": 5,
       "Name": "ГОСТ 2177-99",
@@ -118,7 +118,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":14,
+      "Id": 14,
       "Use": true,
       "IdParameter": 5,
       "Name": "ГОСТ Р 50802-95",
@@ -127,7 +127,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":15,
+      "Id": 15,
       "Use": true,
       "IdParameter": 5,
       "Name": "ГОСТ 2177-99",
@@ -136,7 +136,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":16,
+      "Id": 16,
       "Use": true,
       "IdParameter": 6,
       "Name": "ГОСТ Р 50802-95",
@@ -145,7 +145,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":17,
+      "Id": 17,
       "Use": true,
       "IdParameter": 6,
       "Name": "ГОСТ 2177-99",
@@ -154,7 +154,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":18,
+      "Id": 18,
       "Use": true,
       "IdParameter": 6,
       "Name": "ГОСТ Р 50802-95",
@@ -163,7 +163,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":19,
+      "Id": 19,
       "Use": true,
       "IdParameter": 7,
       "Name": "ГОСТ 2177-99",
@@ -172,7 +172,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":20,
+      "Id": 20,
       "Use": true,
       "IdParameter": 7,
       "Name": "ГОСТ Р 50802-95",
@@ -181,7 +181,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":21,
+      "Id": 21,
       "Use": true,
       "IdParameter": 7,
       "Name": "ГОСТ 2177-99",
@@ -190,7 +190,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":22,
+      "Id": 22,
       "Use": true,
       "IdParameter": 8,
       "Name": "ГОСТ Р 50802-95",
@@ -199,7 +199,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":23,
+      "Id": 23,
       "Use": true,
       "IdParameter": 8,
       "Name": "ГОСТ 2177-99",
@@ -208,7 +208,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":24,
+      "Id": 24,
       "Use": true,
       "IdParameter": 8,
       "Name": "ГОСТ Р 50802-95",
@@ -217,7 +217,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":25,
+      "Id": 25,
       "Use": true,
       "IdParameter": 9,
       "Name": "ГОСТ 2177-99",
@@ -226,7 +226,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":26,
+      "Id": 26,
       "Use": true,
       "IdParameter": 9,
       "Name": "ГОСТ Р 50802-95",
@@ -235,7 +235,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":27,
+      "Id": 27,
       "Use": true,
       "IdParameter": 9,
       "Name": "ГОСТ 2177-99",
@@ -244,7 +244,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":28,
+      "Id": 28,
       "Use": true,
       "IdParameter": 10,
       "Name": "ГОСТ Р 50802-95",
@@ -253,7 +253,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":29,
+      "Id": 29,
       "Use": true,
       "IdParameter": 10,
       "Name": "ГОСТ 2177-99",
@@ -262,7 +262,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":30,
+      "Id": 30,
       "Use": true,
       "IdParameter": 10,
       "Name": "ГОСТ Р 50802-95",
@@ -271,7 +271,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":31,
+      "Id": 31,
       "Use": true,
       "IdParameter": 11,
       "Name": "ГОСТ 2177-99",
@@ -280,7 +280,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":32,
+      "Id": 32,
       "Use": true,
       "IdParameter": 11,
       "Name": "ГОСТ Р 50802-95",
@@ -289,7 +289,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":33,
+      "Id": 33,
       "Use": true,
       "IdParameter": 11,
       "Name": "ГОСТ 2177-99",
@@ -298,7 +298,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":34,
+      "Id": 34,
       "Use": true,
       "IdParameter": 12,
       "Name": "ГОСТ Р 50802-95",
@@ -307,7 +307,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":35,
+      "Id": 35,
       "Use": true,
       "IdParameter": 12,
       "Name": "ГОСТ 2177-99",
@@ -316,7 +316,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":36,
+      "Id": 36,
       "Use": true,
       "IdParameter": 12,
       "Name": "ГОСТ 2177-99",
@@ -325,7 +325,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":37,
+      "Id": 37,
       "Use": true,
       "IdParameter": 13,
       "Name": "ГОСТ Р 50802-95",
@@ -334,7 +334,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":39,
+      "Id": 39,
       "Use": true,
       "IdParameter": 13,
       "Name": "ГОСТ 2177-99",
@@ -343,7 +343,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":40,
+      "Id": 40,
       "Use": true,
       "IdParameter": 13,
       "Name": "ГОСТ Р 50802-95",
@@ -352,7 +352,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":41,
+      "Id": 41,
       "Use": true,
       "IdParameter": 14,
       "Name": "ГОСТ 2177-99",
@@ -361,7 +361,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":42,
+      "Id": 42,
       "Use": true,
       "IdParameter": 14,
       "Name": "ГОСТ Р 50802-95",
@@ -370,7 +370,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":43,
+      "Id": 43,
       "Use": true,
       "IdParameter": 14,
       "Name": "ГОСТ Р 50802-95",
@@ -379,7 +379,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":44,
+      "Id": 44,
       "Use": true,
       "IdParameter": 15,
       "Name": "ГОСТ Р 50802-95",
@@ -388,7 +388,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":45,
+      "Id": 45,
       "Use": true,
       "IdParameter": 15,
       "Name": "ГОСТ 2177-99",
@@ -397,7 +397,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":46,
+      "Id": 46,
       "Use": true,
       "IdParameter": 15,
       "Name": "ГОСТ 2177-99",
@@ -406,7 +406,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":47,
+      "Id": 47,
       "Use": true,
       "IdParameter": 16,
       "Name": "ГОСТ Р 50802-95",
@@ -415,7 +415,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":48,
+      "Id": 48,
       "Use": true,
       "IdParameter": 16,
       "Name": "ГОСТ Р 50802-95",
@@ -424,7 +424,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":49,
+      "Id": 49,
       "Use": true,
       "IdParameter": 16,
       "Name": "ГОСТ 2177-99",
@@ -433,7 +433,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":50,
+      "Id": 50,
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ Р 50802-95",
@@ -442,7 +442,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":51,
+      "Id": 51,
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ 2177-99",
@@ -451,7 +451,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":52,
+      "Id": 52,
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ Р 50802-95",
@@ -460,7 +460,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":53,
+      "Id": 53,
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ 2177-99",
@@ -469,7 +469,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":54,
+      "Id": 54,
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ Р 50802-95",
@@ -478,7 +478,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":55,
+      "Id": 55,
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ 2177-99",
@@ -487,7 +487,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":56,
+      "Id": 56,
       "Use": true,
       "IdParameter": 19,
       "Name": "ГОСТ Р 50802-95",
@@ -496,7 +496,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":57,
+      "Id": 57,
       "Use": true,
       "IdParameter": 19,
       "Name": "ГОСТ 2177-99",
@@ -505,7 +505,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":58,
+      "Id": 58,
       "Use": true,
       "IdParameter": 19,
       "Name": "ГОСТ Р 50802-95",
@@ -514,7 +514,7 @@
       "LimitValueString": "менее 5.0"
     },
     {
-      "Id":59,
+      "Id": 59,
       "Use": true,
       "IdParameter": 19,
       "Name": "ASTM D4929-22,процедура С",
@@ -529,133 +529,152 @@
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 2,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 3,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 4,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 5,
       "Key": "Dens15Correction",
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 6,
       "Key": "MassWaterFracCorrection",
       "Name": "Массовая доля воды, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 7,
       "Key": "Chloride_Salts.Concentration",
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 8,
       "Key": "Chloride_Salts.MassFraction",
       "Name": "Массовая концентрация хлористых солей, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 9,
       "Key": "Impurity",
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": true
     },
     {
       "Id": 10,
       "Key": "SulfurCorrection",
       "Name": "Массовая доля серы, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 11,
       "Key": "DNP.kPa",
       "Name": "Давление насыщенных паров, кПа",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 12,
       "Key": "DNP.mercury_mm",
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 13,
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 14,
       "Key": "Yield_fraction_300",
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 15,
       "Key": "Yield_fraction_350",
       "Name": "Выход фракций: при температуре до 350 °С, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 16,
       "Key": "Mass_fraction_of_paraffin",
       "Name": "Массовая доля парафина, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 17,
       "Key": "Mass_fraction_of_hydrogen_sulfide",
       "Name": "Массовая доля сероводорода, млнˉ¹ (ppm)",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 18,
       "Key": "Mass_fraction_of_methyl_and_ethyl_mercaptan",
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     },
     {
       "Id": 19,
       "Key": "Mass_fraction_of_organic_chlorides",
       "Name": "Массовая доля органических хлоридов во фракции, выкипающей до\nтемпературы 204 °С, млнˉ¹ (ppm)",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBalast": false
     }
   ],
   /*
