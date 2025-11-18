@@ -2,9 +2,10 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using TN.Doc.Edit;
 
 namespace Tests.Configs;
+
+extern alias PassportLib;
 
 [TestFixture]
 public class CfgEditPassportTests
@@ -24,7 +25,7 @@ public class CfgEditPassportTests
         Assert.That(File.Exists(configPath), $"Не найден файл конфигурации {configPath}");
 
         var json = File.ReadAllText(configPath);
-        var cfg = JsonConvert.DeserializeObject<CfgEditPassport>(json);
+        var cfg = JsonConvert.DeserializeObject<PassportLib::TN.Doc.Edit.CfgEditPassport>(json);
 
         Assert.That(cfg, Is.Not.Null);
         Assert.That(cfg.Parameters, Is.Not.Empty);
@@ -56,7 +57,7 @@ public class CfgEditPassportTests
         }
         """;
 
-        var cfg = JsonConvert.DeserializeObject<CfgEditPassport>(json);
+        var cfg = JsonConvert.DeserializeObject<PassportLib::TN.Doc.Edit.CfgEditPassport>(json);
 
         Assert.That(cfg, Is.Not.Null);
         Assert.That(cfg.Parameters, Has.Count.EqualTo(1));
