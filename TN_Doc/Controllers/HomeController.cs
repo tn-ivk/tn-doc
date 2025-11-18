@@ -472,6 +472,7 @@ public class HomeController : Controller
         return DateTime.UnixEpoch;
     }
     
+    [Obsolete("Используйте IDocumentEditor.GetDoc(). Метод устарел с v1.4.4")]
     public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
     {
         _logger.LogDebug($"Отображение документа устройства {_appConfig.GetDeviceName(IdDevice)}, документа {IdDoc} c ИД: {id}");
@@ -546,6 +547,7 @@ public class HomeController : Controller
         }
     }
 
+    [Obsolete("Используйте IDocumentEditor.GetEditConfig(). Метод устарел с v1.4.4")]
     [HttpGet]
     public IActionResult GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
     {
@@ -571,7 +573,7 @@ public class HomeController : Controller
         }
     }
 
-
+    [Obsolete("Используйте IDocumentEditor.SaveDocument(). Метод устарел с v1.4.4")]
     public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
     {
         _logger.LogDebug($"Сохранение документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
@@ -590,7 +592,41 @@ public class HomeController : Controller
             _logger.LogError(ex, $"Ошибка сохранения документа {IdDoc}");
         }
     }
+    
+    [Obsolete("Используйте IDocumentEditor.UpdateDocument(). Метод устарел с v1.4.4")]
+    [HttpPost]
+    public void UpdateDoc(int IdDevice, IdDoc IdDoc, string data)
+    {
+        _logger.LogDebug($"Обновление документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
+        try
+        {
+            if (IdDoc != IdDoc.Passport)
+            {
+                _logger.LogWarning($"Обновление данных не применяется для документов типа {IdDoc}");
+                return;
+            }
 
+            if (string.IsNullOrEmpty(data))
+            {
+                _logger.LogError("Данные для обновления пустые или отсутсвуют");
+                return;                
+            }
+            
+            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
+            if (doc is null)
+            {
+                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
+                return;
+            }
+            if(doc is IDocUpdater docUpdater)
+                docUpdater.DocUpdate(data);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Ошибка обновления документа {IdDoc}");
+        }
+    }
+    
     public PeriodDocument GetPeriodDocument(int IdDevice, IdDoc IdDoc, int id)
     {
         _logger.LogDebug($"Получение периода документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");

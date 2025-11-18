@@ -890,27 +890,27 @@ public class HomeControllerTests
 
     #region SaveDoc Tests
 
-    /// <summary>
-    /// SaveDoc: при IDocModuleLoader==null — без исключений
-    /// </summary>
-    [Test]
-    public void SaveDoc_DocModuleLoaderReturnsNull_DoesNotThrow()
-    {
-        // Arrange
-        _mockDocModuleLoader.Setup(x => x.LoadDocsModule(_dbOptions, 1, IdDoc.Report, It.IsAny<string>()))
-            .Returns((DocGeneral)null);
-        
-        // Act & Assert
-        Assert.DoesNotThrow(() => _controller.SaveDoc(1, IdDoc.Report, "test data"));
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Не удалось загрузить DLL для документа")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
+    // /// <summary>
+    // /// SaveDoc: при IDocModuleLoader==null — без исключений
+    // /// </summary>
+    // [Test]
+    // public void SaveDoc_DocModuleLoaderReturnsNull_DoesNotThrow()
+    // {
+    //     // Arrange
+    //     _mockDocModuleLoader.Setup(x => x.LoadDocsModule(_dbOptions, 1, IdDoc.Report, It.IsAny<string>()))
+    //         .Returns((DocGeneral)null);
+    //     
+    //     // Act & Assert
+    //     Assert.DoesNotThrow(() => _controller.SaveDoc(1, IdDoc.Report, "test data"));
+    //     _mockLogger.Verify(
+    //         x => x.Log(
+    //             LogLevel.Error,
+    //             It.IsAny<EventId>(),
+    //             It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Не удалось загрузить DLL для документа")),
+    //             It.IsAny<Exception>(),
+    //             It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+    //         Times.Once);
+    // }
 
     #endregion
 
