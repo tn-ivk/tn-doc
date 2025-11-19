@@ -4,7 +4,6 @@
       :parameter="parameter"
       :canEdit="canEdit"
       :isElisFilled="isElisFilled"
-      :showEditButton="true"
       :showSyncIcon="parameter.isBallast === true"
       :editDisabledReason="editDisabledReason"
       @result-edit="handleEditRequest"
@@ -74,17 +73,11 @@ const lastSource = computed(() => {
 
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
-const canEdit = computed(() => props.isEditable && props.parameter.resultEditMode === 'modal' && props.parameter.isBallast !== true);
+const canEdit = computed(() => props.isEditable);
 
 const editDisabledReason = computed(() => {
-  if (props.parameter.isBallast) {
-    return 'Балластный параметр синхронизируется с измерением';
-  }
-  if (props.parameter.resultEditMode !== 'modal') {
-    return 'Результат рассчитывается автоматически';
-  }
   if (!props.isEditable) {
-    return 'Редактирование доступно только при значении ниже порога метода';
+    return 'Балластный параметр синхронизируется с измерением';
   }
   return '';
 });

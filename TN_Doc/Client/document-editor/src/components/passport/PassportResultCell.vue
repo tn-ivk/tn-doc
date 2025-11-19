@@ -16,7 +16,7 @@
     </div>
     <button
       class="result-edit-btn"
-      :disabled="!showEditButton || !canEdit"
+      :disabled="!canEdit"
       :title="!canEdit && editDisabledReason ? editDisabledReason : ''"
       type="button"
       @click="handleEditClick"
@@ -35,7 +35,6 @@ interface Props {
   parameter: PassportQualityParameter;
   canEdit: boolean;
   isElisFilled?: boolean;
-  showEditButton?: boolean;
   editDisabledReason?: string;
   showSyncIcon?: boolean;
 }
@@ -57,10 +56,8 @@ const displayValue = computed(() => {
   return props.parameter.values.result.replace('.', ',');
 });
 
-const showEditButton = computed(() => props.showEditButton !== false);
-
 function handleEditClick() {
-  if (!showEditButton.value || !props.canEdit) {
+  if (!props.canEdit) {
     return;
   }
   emit('result-edit');

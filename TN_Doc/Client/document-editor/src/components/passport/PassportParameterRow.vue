@@ -71,22 +71,7 @@ const emit = defineEmits<{
 /**
  * Определить, редактируема ли ячейка результата
  */
-const isResultEditable = computed(() => {
-  const selectedMethod = props.parameter.method.options.find(
-    (m: MethodOption) => m.name === props.parameter.method.selected
-  );
-
-  if (!selectedMethod || !selectedMethod.limitValueActivate) {
-    return false;
-  }
-
-  const measurementValue = parseFloat(props.parameter.values.measurement.replace(',', '.'));
-  if (isNaN(measurementValue)) {
-    return false;
-  }
-
-  return selectedMethod.limitValue !== undefined && measurementValue < selectedMethod.limitValue;
-});
+const isResultEditable = computed(() => props.parameter.isBallast !== true);
 
 function handleMethodUpdate(method: MethodOption | null) {
   emit('update:method', { paramKey: props.parameter.key, method });
