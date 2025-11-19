@@ -33,12 +33,7 @@
    - Небалластные показатели: `SulfurCorrection`, `DNP.kPa`, `DNP.mercury_mm`, `Yield_fraction_200`, `Yield_fraction_300`, `Yield_fraction_350`, `Mass_fraction_of_paraffin`, `Mass_fraction_of_hydrogen_sulfide`, `Mass_fraction_of_methyl_and_ethyl_mercaptan`, `Mass_fraction_of_organic_chlorides`.
 2. **DTO / JSON / типы на стороне клиента**  
    - Расширить `TN.DocEditor.Passport.QualityParameter`, `QualityParameterSchema`, `Edit.Parameter`, DTO `PassportQualityParameterSchema`, JSON `PassportEditConfig` и ts-типы (`TN_Doc/Client/document-editor/src/types/passport.types.ts`) полем `IsBallast`.  
-   - Вместо добавления `IsFromConfig` в `TN.Doc.Edit.Metod` вводим отдельное поле `methodSource`/`source` (enum `'config' | 'lab' | 'manual' | 'elis'`) только в ответах `PassportQualityParameterSchema.MethodOptions` и `PassportQualityParameter.method`. Значение вычисляем на бэкенде по происхождению метода:  
-     - `config` — пришёл из `CfgEditPassport.Methods`.  
-     - `lab` — сохранён в `LabInfo` с источником ELIS.  
-     - `manual` — последняя запись `FieldHistory` по `method.<key>` имеет `Source = Manual`.  
-     - `elis` — `FieldHistory` показывает загрузку из ELIS для текущего значения, метод не входит в конфиг (нужен для подсказок).  
-   - Клиент продолжает отправлять в `DocUpdate` чистый JSON `Metod`, без `source`; метаданные нужны только для визуализации.
+   - Структуры, описывающие методы (`TN.Doc.Edit.Metod`, `PassportQualityParameter.method`, `MethodOptions[]`), оставляем без дополнительных полей: сервер продолжает собирать список методов из конфига и `LabInfo` так же, как сейчас, а клиент отправляет в `DocUpdate` только сериализованный JSON `Metod`.
 3. **История и паспортные конфиги**  
    - Проверить, что `PassportEditConfig.InitialValues` содержит `__history`/`__elisFilled` для всех новых полей, чтобы модалки могли восстановить источник значений.  
    - Для обратной совместимости ориентироваться только на наличие поля `IsBallast`: если поле отсутствует, считается `false`, сервер использует старую логику.
@@ -55,8 +50,8 @@
          "isBalast": true,
          "methodRequiredFill": true,
          "methodOptions": [
-           { "id": 10, "name": "ASTM D1298", "source": "config", "limitValueActivate": false },
-           { "id": 0, "name": "Ручной метод 05.2024", "source": "manual", "limitValueActivate": true, "limitValue": 0.5, "limitValueString": "менее 0,5" }
+           { "id": 10, "name": "ASTM D1298", "limitValueActivate": false },
+           { "id": 0, "name": "Ручной метод 05.2024", "limitValueActivate": true, "limitValue": 0.5, "limitValueString": "менее 0,5" }
          ],
          "resultEditMode": "readonly"
        }
@@ -83,7 +78,7 @@
 1. **Стратегия поведения**  
    - В `DocPassport` создать внутренний сервис (`PassportQualityStrategy`), который на основе `UseElis` и `IsBalast` решает, как формировать значения/блокировки. Это позволит покрыть стратегию модульными тестами без запуска всего EF-контекста.
 2. **Формирование схемы и значений**  
-   - В `BuildQualityParametersSchema` прокидывать `IsBalast`, `methodSource`, список методов (`config` + `LabInfo` + `manual`).  
+   - В `BuildQualityParametersSchema` прокидывать `IsBalast` и актуальный список методов (как сейчас: данные из конфига дополняются сведениями из `LabInfo`).  
    - `BuildParameterValues` и `BuildParameterMethod` должны учитывать `IsBalast`: measurement/result для балластных всегда синхронны, `result` не перезаписывается ELIS `valueString`, если measurement пришёл вручную.  
    - При генерации данных для UI добавлять признак `ResultEditMode` (`auto`, `modal`, `readonly`) — это упростит работу фронтенда.
 3. **Докапливание истории и проверка инвариантов в `DocUpdate`**  
@@ -92,37 +87,45 @@
    - Результаты, введённые через модалку, передаются как `Values[]` с `Tag = "PrintValue"`, чтобы текущая обработка (`case PrintValue`) обновила `LabInfo.Value` и `History`.
 4. **Ручные методы испытаний**  
    - Используем текущий пайплайн `DocUpdate` → `AddOrUpdateLabInfo`. UI формирует `Values[]` с `Tag = "Metod"` и `Key = "method.<parameterKey>"`, `Value` — сериализованный `TN.Doc.Edit.Metod`.  
-   - После десериализации метод помещаем в `LabInfo`. `MethodSource` вычисляем по истории (`Manual` → `manual`, `ELIS` → `elis`). Никаких новых endpoint'ов не требуется.  
-   - В `BuildParameterMethod` дополняем `MethodOptions` вручную добавленными методами (которые есть в `LabInfo`, но отсутствуют в конфиге) с `source = manual`.
+   - После десериализации метод помещаем в `LabInfo` без дополнительных признаков; источник изменений фиксируется только в истории (`FieldHistory`, как и сейчас). Никаких новых endpoint'ов не требуется.  
+   - В `BuildParameterMethod` оставляем текущую схему формирования `MethodOptions`: методы из конфига и `LabInfo` объединяются в один список без метаданных.
 5. **Индикация отсутствия метода**  
-   - Если выбранный метод отсутствует в `MethodOptions`, но значение сохранено в `LabInfo`, сервер добавляет временную опцию с `source = 'legacy'` и явным флагом `requiresManualAction = true`, чтобы UI отобразил предупреждение.  
-   - Дополнительно в `PassportEditConfig` возвращаем список `methodWarnings[]` для параметров, где метод исчез из конфигурации.
+   - Сценарии, когда метод исчез из конфига, обрабатываем по текущей схеме: UI работает с тем, что пришло из `LabInfo`, а дополняющие предупреждения формируются на основании истории без добавления временных опций или новых флагов.
 6. **Логирование и телеметрия**  
    - Добавить подробный лог `PassportQuality` (уровень Trace/Info) с фиксацией стратегий и источников, чтобы можно было анализировать конфликтующие действия ELIS/оператора.  
    - При сбое десериализации модальных данных сервер должен возвращать понятное сообщение (ValidationProblem) вместо silent fallback.
 
+**Статус Фазы 1 (выполнено)**  
+- `IPassportQualityStrategy` внедрён в `DocPassport`, фабрика выбора стратегии покрыта `PassportQualityStrategyTests`.  
+- DTO/контракты (`PassportQualityParameterSchema`, `resultEditMode`, `isBalast`) синхронизированы c фронтендом.  
+- JSON‑снапшоты `PassportEditConfig` для устройств ELIS on/off обновлены, обратная совместимость подтверждена.  
+- Типы клиента и обработка конфигов без `IsBalast` остаются валидными; документировано в `docs/configs/passport.md`.
+
 ### 6. Фронтенд: DocumentPassportEditor и связанные компоненты
 1. **usePassportEditor / store**  
-   - Расширить `PassportQualityParameter` объектами `isBalast`, `resultEditMode`, `method.source`.  
-   - Избавиться от дублирования логики пересчёта: `recalculateResult` должен принимать `isBalast` и `methodSource`, понимать когда `result` запираем.  
-   - `qualityParameters` добавляет warnings (`requiresManualMethod`, `elisOverride`, `manualOverride`) на основании истории (`store.formData["*.history"]`) и `method.source`.
+   - Расширить `PassportQualityParameter` объектами `isBalast` и `resultEditMode`; данные о методах остаются в текущем JSON без дополнительных признаков.  
+   - Добавить watchers на `formData["value.<key>"]` и `formData["result.<key>"]`:  
+     - для балластных `value` сразу зеркалится в `result` через `documentStore.syncBallastParameter`.  
+     - для небалластных `result` переводится в режим ручного редактирования (`documentStore.markManualOverride`).  
+   - В `documentStore` реализовать методы `syncBallastParameter(key, payload)` и `markManualOverride(key, historyPayload)`; они обновляют `formData`, `__history`, `__elisFilled` пачкой.  
+   - `qualityParameters` добавляет warnings (`requiresManualMethod`, `elisOverride`, `manualOverride`) на основании истории (`store.formData["*.history"]`) и текущих значений формы, без дополнительных метаданных.
 2. **PassportQualityTable**  
-   - Для балластных полей блокируем редактирование значения Result (read‑only), но визуально ячейка выглядит так же, как для небалластных: в ней есть кнопка «Редактировать», которая находится в состоянии disabled. Изменение measurement через инпут автоматически пишет `result.*` и историю (`store.bulkUpdateFields`).  
-   - Для небалластных полей рядом с результатом рендерим активную кнопку «Редактировать» → модалка. Default value отображается в read-only input.
+   - Для балластных полей Result read-only; `@input` на measurement вызывает `documentStore.syncBallastParameter`, чтобы `value/result` оставались идентичны и история отражала источник (Manual/ELIS).  
+   - Для небалластных полей рядом с результатом рендерим активную кнопку «Редактировать» → модалка; после закрытия вызываем `markManualOverride`.
 3. **Модалка редактирования результатов**  
    - Содержит селект (`менее`/`более`), поле ввода значения (валидируем разрядность/локаль) и предпросмотр итоговой строки (`«менее 4,0»`).  
-   - После подтверждения вызывает `handleResultUpdate` с уже собранной строкой. Параллельно добавляет запись в историю (`__history`) с `source = Manual` и пометкой `payloadType = ResultModal`.  
+   - После подтверждения для небалластных вызывает `documentStore.markManualOverride` (история `source = Manual`, `payloadType = ResultModal`). Балластные параметры модалку не открывают (result заблокирован).  
    - Валидация: превышение допустимых разрядов блокирует кнопку «Применить», `store.canSave` учитывает наличие ошибок.
 4. **Модалка ручного метода**  
    - Кнопка рядом с комбобоксом метода. Поля: название, `limitValueActivate`, `limitValue`, `limitValueString`, `isDefault`, чекбокс «Сделать основным».  
-   - После сохранения добавляем метод в локальный список `methodOptions` (`source = manual`), записываем JSON в `store.formData["method.<key>"]` и историю (`source = Manual`).  
+   - После сохранения добавляем метод в локальный список `methodOptions`, записываем JSON в `store.formData["method.<key>"]` и историю (`source = Manual`).  
    - Если имя совпадает с существующим, показываем подтверждение для замены (`method.options` обновляется локально).
 5. **Предупреждения и подсветки**  
-   - `method.source !== 'config'` → жёлтая подсветка, tooltip «Отсутствует в справочнике / ручной метод».  
-   - Если `methodWarnings` от сервера содержит параметр, отображаем баннер с предложением открыть справочник методов.  
+   - Если последняя запись в `method.<key>__history` имеет `Source = Manual` или значение отсутствует в конфиге, подсвечиваем строку и показываем tooltip «Отсутствует в справочнике / ручной метод».  
+   - Если история показывает, что выбранного метода нет в текущем конфиге, отображаем баннер с предложением открыть справочник методов.  
    - Для результатов без метода показываем напоминание о необходимости выбрать/создать метод.
 6. **Обработка ELIS**  
-   - `useElisIntegration` при автозаполнении учитывает `isBalast`: балластные параметры заполняются только `value.*`, `result.*` копируется из measurement.  
+   - `useElisIntegration` вызывает `syncBallastParameter` для балластных и прямое обновление `result.*` + историю `source = ELIS` для небалластных, чтобы далее `markManualOverride` мог сравнить источники.  
    - `pendingElisData` сохраняет исходный протокол (`__elisProtocol`), дополнительно пишем историю `source = ELIS`.
 7. **UI/стили**  
    - Модалки используют `material3.css`: фон `var(--md-surface)`, границы `var(--md-outline)`, радиус `var(--md-radius)`, типографика из `DESIGN_DOCUMENTATION.md`.  
@@ -173,16 +176,16 @@
     ]
   }
   ```
-- Для ручных методов модалка формирует `method.<key>` + историю `method.<key>__history` (source `Manual`). `Value` — сериализованный `TN.Doc.Edit.Metod`. Метод попадает в `LabInfo`, а `PassportEditConfig` вернёт его с `methodSource = "manual"`.  
-- `methodSource` присутствует только в ответе `PassportEditConfig` и в типах клиента (`PassportQualityParameterSchema`, `MethodOption` и т.д.). Клиент не отправляет это поле в `DocUpdate`.  
-- Результаты модалки передаются через `result.<key>` и историю (`result.<key>__history`). `DocPassport` сам решает, нужно ли продублировать значение в measurement (балластные параметры) или оставить раздельным (небалластные).  
-- Для интеграции с ELIS сохраняем полный протокол в `__elisProtocol` (как и сейчас) + историю `Source = ELIS`, чтобы `methodSource = "elis"` можно было вычислить на бэкенде без дополнительных полей в DTO.
+- Для ручных методов модалка формирует `method.<key>` + историю `method.<key>__history` (source `Manual`). `Value` — сериализованный `TN.Doc.Edit.Metod`. Метод попадает в `LabInfo`, а `PassportEditConfig` вернёт его в составе стандартного списка методов.  
+- Дополнительные признаки происхождения метода не передаются — UI восстанавливает контекст по истории (`method.<key>__history`).  
+- Результаты модалки передаются через `result.<key>` и историю (`result.<key>__history`). Клиент сам дублирует значение в `value.<key>` для балластных параметров (через `syncBallastParameter`), сервер просто сохраняет полученные данные.  
+- Для интеграции с ELIS сохраняем полный протокол в `__elisProtocol` (как и сейчас) + историю `Source = ELIS`, чтобы клиент мог подсветить автоматические изменения без дополнительных полей в DTO.
 
 ### 8. Тестирование и наблюдаемость
 - **Backend**:  
   - Написать юниты на новую стратегию (`PassportQualityStrategyTests`) с кейсами ELIS on/off, балласт/небалласт, ручные методы.  
   - Добавить интеграционные тесты на `DocUpdate` (моки `CorrectionData`) в `Tests/Services/Passport` для сценариев «ручной метод + история», «ELIS → ручное переопределение».  
-  - Проверить сериализацию `methodSource` и `IsBalast` через `DocPassportTests`.
+  - Проверить сериализацию `IsBalast` и корректное восстановление истории методов через `DocPassportTests`.
 - **Frontend**:  
   - Vue unit tests на `usePassportEditor` (результат пересчитывается корректно, предупреждения строятся), компонентные тесты модалок (валидаторы, история).  
   - E2E сценарии: импорт ELIS + ручное редактирование, создание нового метода, подсветка устаревших методов.  
@@ -195,14 +198,14 @@
   - Каждый объект `Parameters[]` содержит `IsBalast` (или поле отсутствует и тогда считается `false`).  
   - Скрипт миграции оставляет предыдущие поля нетронутыми и формирует отчёт (JSON/CSV) со списком устройств, где `UseElis = false`, чтобы QA проверили обратную совместимость.
 - **Бэкенд (`tn.docgeneral/Passport/DocPassport.cs`)**  
-  - `BuildQualityParameters`/`BuildQualityParametersSchema` возвращают признак `isBalast`, `resultEditMode`, `methodSource` и отдают методы в порядке `config → lab → manual`.  
-  - `DocUpdate` гарантирует, что при сохранении балластного параметра `value.* == result.*`; в лог попадает предупреждение при попытке сохранить расхождение.  
-  - Для небалластных параметров ручное редактирование результата создаёт запись истории `Manual overrides ELIS`, если предыдущий источник был `ELIS` (проверяется в тесте `DocUpdateManualOverridesElis`).  
+  - `BuildQualityParameters`/`BuildQualityParametersSchema` возвращают признак `isBalast`, `resultEditMode` и текущий набор методов в порядке `config → lab → manual` без дополнительных полей.  
+  - `DocUpdate` валидирует, что для балластных параметров `value.* == result.*`; при расхождении пишет `Warn`, но не исправляет payload (ошибка отправителя).  
+  - Для небалластных параметров сервер принимает ручные данные и, если история отсутствует, добавляет минимальную запись «Manual overrides ELIS» (покрыто тестом `DocUpdateManualOverridesElis`).  
   - `PassportEditConfig` для устройства без ELIS/старой схемы совпадает с текущим контрактом (проверяется снапшот-тестом).
 - **Фронтенд (`usePassportEditor.ts`, `PassportQualityTable.vue`, `DocumentPassportEditor.vue`)**  
   - Балластные строки отображают заблокированный Result и синхронизируются при вводе measurement (unit-тест `usePassportEditor.balast.sync.spec.ts`).  
   - Модалка результатов формирует строки «менее/более + число» и записывает историю; сохранение блокируется при неверном формате.  
-  - В комбобоксе метода отображается источник (tooltip + подсветка), а кнопка ручного метода создаёт новую опцию с `source = manual`.  
+  - В комбобоксе метода отображаем предупреждение только по данным истории (`method.<key>__history`); кнопка ручного метода добавляет новую опцию через стандартный JSON без дополнительных флагов.  
   - В сценарии «ELIS → ручное редактирование → повторный импорт ELIS» последнее действие остаётся в силе, история отображает оба шага.
 - **Смоук проверки**  
   - Сценарий 1: устройство с `UseElis = false` открывает паспорт, редактирует measurement/result как раньше, сохранение проходит (ручной тест).  
@@ -237,103 +240,56 @@
      - Прогнать unit‑тесты на парсер конфигов (`Tests/Configs/CfgEditPassportTests.cs`) и убедиться, что старые конфиги без `IsBalast` не ломают десериализацию.  
      - На одном устройстве с `UseElis = true` и одном с `UseElis = false` вручную открыть паспорт в UI (текущая версия `DocumentPassportEditor.vue`), проверить отсутствие ошибок загрузки/валидации.  
   
-2. **Фаза 1 — стратегия и контракты (бэкенд)**  
-   - **1.1. Введение стратегии качества паспорта**  
-   - В `tn.docgeneral/Passport/DocPassport.cs` выделить интерфейс `IPassportQualityStrategy` (ELIS On/Off + балласт/небалласт):  
-       - Определить методы для формирования схемы (`BuildQualityParametersSchema`), значений (`BuildParameterValues`), методов (`BuildParameterMethod`) и `ResultEditMode`.  
-       - Реализовать минимум две реализации: `PassportQualityStrategy` (текущее/нормальное поведение, флаг `IsBallast` присутствует в контракте, но не влияет на расчёт) и `PassportQualityStrategyElis` (новое поведение, использующее `IsBallast` для разделения балластных/небалластных параметров).  
-     - Добавить фабрику/решатель стратегии (_внутри_ `DocPassport`, без DI наружу) на основе `UseElis`.  
-   - **1.2. Расширение DTO и контрактов**  
-     - В проектах `TN.DocEditor.Passport.*` и `TN.DocEditor.Passport.Dto/*.cs` расширить модели `QualityParameterSchema`, `PassportQualityParameterSchema` полями `IsBallast`, `ResultEditMode`, `MethodSource`.  
-     - Обновить маппинг в `DocPassport.BuildQualityParameters*`, чтобы новые поля заполнялись из стратегии.  
-     - Синхронизировать типы на фронтенде: обновить `TN_Doc/Client/document-editor/src/types/passport.types.ts` (интерфейсы `PassportEditConfig`, `QualityParameterSchema`, `MethodOption`).  
-   - **1.3. Обратная совместимость**  
-     - Убедиться, что при отсутствии `IsBallast` и `ResultEditMode` сериализатор не меняет JSON (старые клиенты/снапшоты остаются валидными).  
-     - В реализации `PassportQualityStrategy` возвращать те же данные, что и до рефакторинга (можно опираться на снапшот‑тесты `DocPassportTests`); при этом `IsBallast` может присутствовать в схеме, но логика расчёта его игнорирует.  
-   - **1.4. Тесты стратегии**  
-     - Добавить `PassportQualityStrategyTests` с кейсами:  
-       - ELIS выключен — используется `PassportQualityStrategy`, поведение совпадает с текущим, а наличие/отсутствие `IsBallast` в конфиге не влияет на расчёт.  
-       - ELIS включен и конфиг содержит `IsBallast` — используется `PassportQualityStrategyElis`, `IsBallast` и `ResultEditMode` заполнены и влияют на поведение.  
-       - Порядок методов: `config → lab → manual`.  
-   - **Проверка после Фазы 1**  
-     - Запустить `dotnet test Tests/Services --filter PassportQuality` и убедиться, что новые тесты стратегии зелёные.  
-     - Снять JSON‑снапшот `PassportEditConfig` для пары устройств (ELIS on/off) до и после изменений, сравнить дифф: новые поля либо отсутствуют, либо равны ожидаемым значениям.  
-     - В тестовом стенде открыть паспорт в UI и убедиться, что интерфейс не изменил поведение (result/measurement редактируются как раньше).  
+2. **Фаза 1 — стратегия и контракты (бэкенд)** — **выполнено**  
+   - Стратегии `PassportQualityStrategy*`, новые DTO (`isBalast`, `resultEditMode`) и снапшоты `PassportEditConfig` внедрены; тесты `PassportQualityStrategyTests` и проверки обратной совместимости пройдены.  
+   - Дальнейшие этапы используют готовые API/типы, возврат к этому блоку не требуется.
   
-3. **Фаза 2 — сохранение и история (бэкенд)**  
-   - **2.1. Расширение DocUpdate / CorrectionData**  
-     - В `DocPassport.DocUpdate(int id, Dictionary<string, object> values)` и `BuildCorrectionData` убедиться, что:  
-       - История `__history` корректно маппится в `Dictionary<string, List<FieldHistoryEntry>>`.  
-       - При ELIS Off история игнорируется, логируется `Trace`‑сообщение (как уже заложено).  
-     - Добавить в `CorrectionData.Values` обработку новых тегов, если нужны для модалок (`PrintValue`, `Metod`, `History`).  
-   - **2.2. Обработка балластных/небалластных параметров при сохранении**  
-     - В `DocUpdate(string jsonData, QualityPassport? elisProtocol)` после десериализации `CorrectionData` внедрить вызов стратегии/помощника, который:  
-       - Для балластных параметров проверяет инвариант `value.* == result.*`; при расхождении логирует `Warn` и приводит `result.*` к `value.*`.  
-       - Для небалластных параметров принимает `result.*` как основное, дописывая историю «Manual overrides ELIS», если предыдущее значение было из ELIS.  
-     - В `AddOrUpdateLabInfo` учитывать новые источники (`Manual`, `ELIS`) и правильно проставлять `ElisFilled`.  
-   - **2.3. Вычисление methodSource и история методов**  
-     - Реализовать функцию/класс, вычисляющий `methodSource` по данным `LabInfo` и `FieldHistoryEntry`:  
-       - `config` — метод из конфига, история пустая/служебная.  
-       - `lab`/`elis` — последнее изменение с `Source = ELIS`.  
-       - `manual` — последнее изменение с `Source = Manual`.  
-     - В `BuildParameterMethod` дополнять `MethodOptions` ручными методами (из `LabInfo`), проставлять `source` и флаги `requiresManualAction`, если метод не найден в конфиге.  
-   - **2.4. Логирование и диагностика**  
-     - Добавить категорию логов `PassportQuality`:  
-       - Логировать выбор стратегии (`PassportQualityStrategy`/`PassportQualityStrategyElis`), устройство, признак `UseElis`.  
-       - Логировать случаи конфликтов measurement/result (балластные) и сценарии `Manual overrides ELIS`.  
-   - **2.5. Тесты сохранения**  
-     - Добавить `Tests/Services/Passport/DocUpdateTests.cs` с интеграционными сценариями:  
-       - Импорт ELIS → ручное изменение результата небалластного параметра → повторный импорт (значение пользователя сохраняется).  
-       - Балластный параметр: попытка сохранить расхождение value/result приводит к выравниванию и записи `Warn`‑лога.  
-       - Создание ручного метода через `Tag = "Metod"` + история, `methodSource = manual`.  
-   - **Проверка после Фазы 2**  
-     - Запустить `dotnet test Tests/Services/Passport/DocUpdateTests.cs` и убедиться в прохождении всех сценариев.  
-     - На тестовом стенде повторить сценарии из раздела 9 (Manual overrides, ELIS import) через UI и проверить консоль/файлы логов на наличие ожидаемых записей.  
-     - Проверить, что при `UseElis = false` сохранение паспорта не пишет историю и продолжает работать по старой модели.  
+3. **Фаза 2 — сохранение и история (бэкенд, валидация поверх фронтовых инвариантов)** — **выполнено**  
+   - **Что сделано:**  
+     - `DocPassport.DocUpdate(int id, Dictionary<string, object> values)` теперь поднимает `__history` в `Dictionary<string, List<FieldHistoryEntry>>`, при `UseElis = false` пишет `Trace` и игнорирует историю.  
+     - В `DocUpdate(string jsonData, QualityPassport? elisProtocol)` формируется карта параметров: для балластных `ValidateBallastPayload` пишет `Warn` (payload не меняем), для небалластных `EnsureManualOverrideHistory` автоматически добавляет запись `Manual overrides ELIS`, если последнее изменение пришло из ELIS.  
+     - `AddOrUpdateLabInfo` принимает признак ELIS и ключ истории, вычисляет `ElisFilled` по последнему источнику (`method.<key>__history`). При ELIS Off логируем `Trace`, что история пропущена.  
+     - Для диагностики задействован отдельный логгер категории `PassportQuality`: фиксируются выбранная стратегия (`PassportQualityStrategy*`), предупреждения по балластным параметрам и все сценарии `Manual overrides ELIS`.  
+   - **Тесты:**  
+     - Добавлен файл `Tests/Services/Passport/DocUpdateTests.cs` (три интеграционных сценария: manual override небалластного параметра, конфликт балластного value/result, создание ручного метода).  
+     - Запуск: `SolutionDir=/home/snafu/projects/ivk/tn_doc dotnet test Tests/Tests.csproj --filter FullyQualifiedName~Tests.Services.Passport.DocUpdateTests`.  
+   - **Примеры логов `PassportQuality`:**  
+     - `Info|DocUpdate strategy resolved: docId=51234, deviceId=101, strategy=PassportQualityStrategyElis, isElisUsed=True`  
+     - `Warn|Балластный параметр: обнаружено расхождение measurement/result (docId=60001, parameter=TempCorrection, measurement='0,45', result='0,40'). Payload не изменён.`  
+     - `Info|Manual overrides ELIS: docId=51234, parameter=SulfurCorrection, value='менее 0,5'`  
+     - `Trace|История method.TempCorrection проигнорирована: ELIS выключен (docId=unknown)`
   
-4. **Фаза 3 — UI и UX (DocumentPassportEditor + PassportQualityTable)**  
-   - **3.1. Расширение usePassportEditor и стора**  
-     - В `usePassportEditor.ts` добавить поддержку полей `isBalast`, `resultEditMode`, `method.source` в `qualityParameters`.  
-     - Вынести общий пересчёт `recalculateResult` с учётом `isBalast` и `methodSource` (когда блокируем/разрешаем редактирование).  
-     - В `documentStore` добавить удобные методы для пакетного обновления `__history` при действиях модалок.  
+4. **Фаза 3 — UI и UX (DocumentPassportEditor + PassportQualityTable, реализация инвариантов)**  
+  - **3.1. Расширение usePassportEditor и стора**  
+    - В `usePassportEditor.ts` добавить поддержку `isBalast`, `resultEditMode` и watchers на `formData["value/result"]`.  
+     - Реализовать методы `documentStore.syncBallastParameter` и `documentStore.markManualOverride`, которые одним вызовом обновляют `formData`, `__history`, `__elisFilled` и служебные флаги для отправки в `DocUpdate`.  
+    - `qualityParameters` дополнять вычисляемыми предупреждениями (`requiresManualMethod`, `elisOverride`, `manualOverride`) на основании истории (`value/result/method.__history`).
    - **3.2. PassportQualityTable: поведение колонок**  
-     - Для балластных параметров:  
-       - Заблокировать колонку Result (read‑only инпут).  
-       - При изменении measurement через инпут автоматически обновлять `result.*` и историю (`bulkUpdateFields`).    
-     - Для небалластных параметров:  
-       - Добавить кнопку «Редактировать» в ячейку Result → открытие модалки редактирования результата.  
-       - Отображать фактическое значение в формате, пригодном для печати.  
+     - Для балластных параметров Result read-only, а инпут measurement триггерит `syncBallastParameter`, чтобы `value/result` оставались равными и сразу писалась история (Manual/ELIS).  
+     - Для небалластных параметров рядом с Result отображать кнопку «Редактировать» (активную), открывающую модалку; после подтверждения вызывать `markManualOverride`. Default value остаётся read-only превью печатной строки.  
    - **3.3. Модалка редактирования результатов**  
-     - Создать компонент `ResultEditDialog.vue` (или аналог) с полями: оператор (`<`, `>`), числовое значение, предпросмотр строки (`"менее 4,0"`).  
-     - Реализовать валидацию локали (запятая как разделитель), диапазона и разрядности; при ошибках блокировать кнопку «Применить».  
-     - При подтверждении:  
-       - Обновлять `result.<key>` и при необходимости `value.<key>` (для балластных).  
-       - Добавлять запись в историю (`result.<key>__history`) с `source = Manual` и `payloadType = ResultModal`.  
+     - Создать компонент `ResultEditDialog.vue` (оператор `<`/`>`, поле значения, предпросмотр).  
+     - Добавить валидацию локали и формата; при ошибках блокировать «Применить».  
+     - При подтверждении вызывать `markManualOverride` с `payloadType = ResultModal`; для балластных модалка не открывается.  
    - **3.4. Модалка ручного метода**  
      - Создать компонент `ManualMethodDialog.vue`: поля имя метода, `limitValueActivate`, `limitValue`, `limitValueString`, чекбокс «Сделать основным».  
      - Интегрировать с `PassportQualityTable`: кнопка рядом с комбобоксом метода открывает модалку.  
      - После сохранения:  
-       - Добавлять метод в локальный список `methodOptions` с `source = manual`.  
+      - Добавлять метод в локальный список `methodOptions`.  
        - Обновлять `store.formData["method.<key>"]` (JSON) и `method.<key>__history` (Source = Manual).  
    - **3.5. Подсветки и предупреждения**  
      - В `useFieldHistory.ts` и компонентах добавить:  
-       - Жёлтую подсветку для методов с `method.source !== 'config'` и tooltip «Ручной/ELIS метод».  
-       - Баннер/иконку предупреждения, если от бэкенда пришёл `methodWarnings[]` для параметра.  
-       - Напоминание, если результат заполнен, а метод отсутствует.  
+      - Жёлтую подсветку комбобокса и текст «метод отсутствует в словаре», если текущее выбранное наименование метода испытаний отсутствует в справочнике (`Methods` из `CfgEditPassport_GOSTR50.2.040(I).json`).   
    - **3.6. UI/стили и локализация**  
      - Оформить модалки в стиле `material3.css` (см. раздел 6.7): радиусы, цвета, размеры инпутов.  
      - Добавить строки в `TN_Doc/Client/document-editor/src/locales/ru.json` для всех новых подписей, подсказок и предупреждений.  
-   - **3.7. Тесты UI**  
-     - Написать unit‑тесты на `usePassportEditor` (балласт/небалласт, пересчёт result, флаги предупреждений).  
-     - Написать компонентные тесты для модалок (валидация, запись истории, поведение кнопки «Применить»).  
    - **Проверка после Фазы 3**  
-     - Запустить `npm run test -- usePassportEditor` и тесты компонентов модалок, убедиться в зелёном прогоне.  
-     - В Storybook/тестовом стенде визуально проверить: балластные строки заблокированы по Result, модалки открываются и корректно сохраняют данные.  
-     - Пройти руками сценарии 2–4 из раздела 9 (ELIS → ручное редактирование, создание метода, печать) и зафиксировать скриншоты для заказчика.  
+    - В Storybook/тестовом стенде визуально проверить: балластные строки заблокированы по Result, модалки открываются и корректно сохраняют данные.  
+    - Пройти руками сценарии 2–4 из раздела 9 (ELIS → ручное редактирование, создание метода, печать) и зафиксировать скриншоты для заказчика.  
   
 5. **Фаза 4 — интеграционные проверки, документация и ручные сценарии**  
-   - **4.1. Документация**  
-     - Обновить `docs/features/field-history.md` с описанием новых источников (`config/lab/manual/elis`) и поведения истории для result/методов.  
+  - **4.1. Документация**  
+    - Обновить `docs/features/field-history.md`, описав, как история (`Source = Manual/ELIS/System`) используется для восстановления происхождения значений без дополнительных полей.  
      - Обновить `docs/elis-summary.md` с описанием того, как ELIS взаимодействует с ручными изменениями (приоритет последнего действия).  
      - В `docs/architecture/document-editor.md` добавить подпункт про `DocumentPassportEditor`, модалки и флаги `isBalast`/`resultEditMode`.  
    - **4.2. Интеграционные и ручные сценарии**  
