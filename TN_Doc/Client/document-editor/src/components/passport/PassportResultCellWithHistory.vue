@@ -2,9 +2,12 @@
   <div class="result-with-history">
     <PassportResultCell
       :parameter="parameter"
-      :isEditable="isEditable"
+      :canEdit="canEdit"
       :isElisFilled="isElisFilled"
-      @update:result="handleChange"
+      :showEditButton="true"
+      :showSyncIcon="parameter.isBallast === true"
+      :editDisabledReason="editDisabledReason"
+      @result-edit="handleEditRequest"
     />
 
     <!-- Индикатор истории -->
@@ -39,13 +42,12 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'update:result': [value: string];
+  'result-edit': [];
 }>();
 
 const {
   getFieldHistory,
-  getLastSource,
-  trackManualChange
+  getLastSource
 } = useFieldHistory();
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
@@ -72,15 +74,26 @@ const lastSource = computed(() => {
 
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
+const canEdit = computed(() => props.isEditable && props.parameter.resultEditMode === 'modal' && props.parameter.isBallast !== true);
+
+const editDisabledReason = computed(() => {
+  if (props.parameter.isBallast) {
+    return 'Балластный параметр синхронизируется с измерением';
+  }
+  if (props.parameter.resultEditMode !== 'modal') {
+    return 'Результат рассчитывается автоматически';
+  }
+  if (!props.isEditable) {
+    return 'Редактирование доступно только при значении ниже порога метода';
+  }
+  return '';
+});
+
 /**
  * Обработка изменения результата
  */
-const handleChange = (newValue: string) => {
-  // Отслеживаем ручное изменение
-  trackManualChange(historyKey.value, newValue, props.parameter.values.result);
-
-  // Передаем изменение дальше
-  emit('update:result', newValue);
+const handleEditRequest = () => {
+  emit('result-edit');
 };
 
 /**

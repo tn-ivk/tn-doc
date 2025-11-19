@@ -11,6 +11,7 @@
       <PassportMethodSelectWithHistory
         :parameter="parameter"
         @update:method="handleMethodUpdate"
+        @manual-method="handleManualMethodRequest"
       />
     </td>
 
@@ -32,7 +33,7 @@
       <PassportResultCellWithHistory
         :parameter="parameter"
         :isEditable="isResultEditable"
-        @update:result="handleResultUpdate"
+        @result-edit="handleResultEditRequest"
       />
     </td>
   </tr>
@@ -61,6 +62,8 @@ const emit = defineEmits<{
   'update:method': [event: { paramKey: string; method: MethodOption | null }];
   'update:measurement': [event: { paramKey: string; value: string }];
   'update:result': [event: { paramKey: string; value: string }];
+  'result-edit': [event: { paramKey: string }];
+  'manual-method': [event: { paramKey: string }];
 }>();
 
 // Component mounted without debug logging
@@ -95,6 +98,14 @@ function handleMeasurementUpdate(value: string) {
 
 function handleResultUpdate(value: string) {
   emit('update:result', { paramKey: props.parameter.key, value });
+}
+
+function handleResultEditRequest() {
+  emit('result-edit', { paramKey: props.parameter.key });
+}
+
+function handleManualMethodRequest() {
+  emit('manual-method', { paramKey: props.parameter.key });
 }
 </script>
 

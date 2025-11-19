@@ -1,5 +1,5 @@
 import { logger } from '@tn-doc/shared';
-import { computed } from 'vue';
+import { computed, ref, watch, type WatchStopHandle } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
 import type {
   PassportEditConfig,
@@ -11,6 +11,42 @@ import type {
   ParameterDocument,
   ResultUpdateEvent
 } from '@/types/passport.types';
+import type { ResultEditMode } from '@/types/passport.types';
+import { DataSource } from '@/types/history.types';
+
+const DEFAULT_RESULT_MODE: ResultEditMode = 'auto';
+
+const measurementWatchers = new Map<string, WatchStopHandle>();
+const resultWatchers = new Map<string, WatchStopHandle>();
+const measurementGuard = new Set<string>();
+const resultGuard = new Set<string>();
+
+const resolveIsBallastFlag = (schema: PassportQualityParameterSchema): boolean => {
+  if (typeof schema.isBallast === 'boolean') {
+    return schema.isBallast;
+  }
+
+  const legacy = (schema as unknown as { isBalast?: boolean }).isBalast;
+  if (typeof legacy === 'boolean') {
+    return legacy;
+  }
+
+  return false;
+};
+
+const resolveResultEditMode = (schema: PassportQualityParameterSchema): ResultEditMode => {
+  const mode = schema.resultEditMode as ResultEditMode | undefined;
+  if (mode) {
+    return mode;
+  }
+
+  const legacy = (schema as unknown as { ResultEditMode?: ResultEditMode }).ResultEditMode;
+  if (legacy) {
+    return legacy;
+  }
+
+  return DEFAULT_RESULT_MODE;
+};
 
 /**
  * Нормализовать значение для сравнения
@@ -72,6 +108,8 @@ export function usePassportEditor() {
     }
 
     return schema.map(paramSchema => {
+      const isBallast = resolveIsBallastFlag(paramSchema);
+      const resultEditMode = resolveResultEditMode(paramSchema);
       // Извлекаем данные из formData
       const measurementValue = store.formData[`value.${paramSchema.key}`] || '';
       const resultValue = store.formData[`result.${paramSchema.key}`] || '';
@@ -79,6 +117,7 @@ export function usePassportEditor() {
       const documentRaw = store.formData[`document.${paramSchema.key}`];
       const documentElisFilled = store.formData[`document.${paramSchema.key}__elisFilled`] === true;
       const documentInfo = tryParseDocument(documentRaw, documentElisFilled);
+      const manualOverride = store.formData[`result.${paramSchema.key}__manualOverride`] === true;
 
       // Парсим выбранный метод
       const selectedMethod = tryParseMethod(methodJson);
@@ -101,6 +140,8 @@ export function usePassportEditor() {
       // Создаем полный объект параметра
       return {
         ...paramSchema,
+        isBallast,
+        resultEditMode,
         values: {
           measurement: measurementValue,
           result: resultValue
@@ -111,7 +152,8 @@ export function usePassportEditor() {
           requiredFill: paramSchema.methodRequiredFill
         },
         document: documentInfo,
-        elisFlags
+        elisFlags,
+        manualOverride
       };
     });
   });
@@ -137,6 +179,10 @@ export function usePassportEditor() {
     return qualityParameters.value.find(p => p.key === paramKey);
   }
 
+  function findParameterSchema(paramKey: string): PassportQualityParameterSchema | undefined {
+    return qualityParametersSchema.value.find(p => p.key === paramKey);
+  }
+
   /**
    * Пересчитать результат на основе метода и значения measurement
    */
@@ -144,6 +190,19 @@ export function usePassportEditor() {
     const selectedMethod = param.method.options.find(
       (m: MethodOption) => m.name === param.method.selected
     );
+
+    if (param.isBallast) {
+      return param.values.measurement;
+    }
+
+    const resultMode = param.resultEditMode ?? DEFAULT_RESULT_MODE;
+    if (resultMode === 'modal' && param.manualOverride) {
+      return param.values.result;
+    }
+
+    if (resultMode === 'readonly') {
+      return param.values.result || param.values.measurement;
+    }
 
     // Если есть результат из ELIS и measurement заполнено из ELIS, используем его
     if (param.elisFlags.result && param.elisFlags.measurement) {
@@ -189,6 +248,131 @@ export function usePassportEditor() {
   }
 
   /**
+   * Регистрация реактивных наблюдателей за value/result
+   */
+  const registerFieldWatchers = (params: PassportQualityParameter[]) => {
+    const keys = params.map(param => param.key);
+
+    keys.forEach((paramKey) => {
+      if (!measurementWatchers.has(paramKey)) {
+        const stop = watch(
+          () => store.formData[`value.${paramKey}`],
+          (newValue, oldValue) => handleMeasurementFieldChange(paramKey, newValue, oldValue)
+        );
+        measurementWatchers.set(paramKey, stop);
+      }
+
+      if (!resultWatchers.has(paramKey)) {
+        const stop = watch(
+          () => store.formData[`result.${paramKey}`],
+          (newValue, oldValue) => handleResultFieldChange(paramKey, newValue, oldValue)
+        );
+        resultWatchers.set(paramKey, stop);
+      }
+    });
+
+    for (const [key, stop] of measurementWatchers.entries()) {
+      if (!keys.includes(key)) {
+        stop();
+        measurementWatchers.delete(key);
+      }
+    }
+
+    for (const [key, stop] of resultWatchers.entries()) {
+      if (!keys.includes(key)) {
+        stop();
+        resultWatchers.delete(key);
+      }
+    }
+  };
+
+  const handleMeasurementFieldChange = (paramKey: string, newValue: unknown, oldValue: unknown) => {
+    const measurementField = `value.${paramKey}`;
+    if (measurementGuard.has(measurementField)) {
+      measurementGuard.delete(measurementField);
+      return;
+    }
+
+    const schema = findParameterSchema(paramKey);
+    if (!schema) {
+      return;
+    }
+
+    if (!resolveIsBallastFlag(schema)) {
+      return;
+    }
+
+    const normalizedNew = normalizeValue(newValue ?? '');
+    const normalizedOld = normalizeValue(oldValue ?? '');
+
+    if (normalizedNew === normalizedOld) {
+      return;
+    }
+
+    const source = store.formData[`${measurementField}__elisFilled`] === true
+      ? DataSource.ELIS
+      : DataSource.Manual;
+
+    measurementGuard.add(measurementField);
+    const resultField = `result.${paramKey}`;
+    resultGuard.add(resultField);
+    store.syncBallastParameter(paramKey, newValue?.toString() ?? '', {
+      source,
+      comment: source === DataSource.ELIS ? 'Синхронизация с ELIS' : 'Синхронизация балластного параметра'
+    });
+  };
+
+  const handleResultFieldChange = (paramKey: string, newValue: unknown, oldValue: unknown) => {
+    const resultField = `result.${paramKey}`;
+    if (resultGuard.has(resultField)) {
+      resultGuard.delete(resultField);
+      return;
+    }
+
+    const schema = findParameterSchema(paramKey);
+    if (!schema) {
+      return;
+    }
+
+    const isBallast = resolveIsBallastFlag(schema);
+    if (isBallast) {
+      const measurementValue = store.formData[`value.${paramKey}`] ?? '';
+      measurementGuard.add(`value.${paramKey}`);
+      resultGuard.add(resultField);
+      store.syncBallastParameter(paramKey, measurementValue?.toString() ?? '', {
+        source: DataSource.Manual,
+        trackMeasurementHistory: false
+      });
+      return;
+    }
+
+    const resultMode = resolveResultEditMode(schema);
+    if (resultMode !== 'modal') {
+      return;
+    }
+
+    const normalizedNew = normalizeValue(newValue ?? '');
+    const normalizedOld = normalizeValue(oldValue ?? '');
+    if (normalizedNew === normalizedOld) {
+      return;
+    }
+
+    const isElisFilled = store.formData[`${resultField}__elisFilled`] === true;
+    if (isElisFilled) {
+      return;
+    }
+
+    resultGuard.add(resultField);
+    store.markManualOverride(paramKey, newValue?.toString() ?? '', {
+      source: DataSource.Manual
+    });
+  };
+
+  watch(qualityParameters, (params) => {
+    registerFieldWatchers(params);
+  }, { immediate: true });
+
+  /**
    * Обработчик обновления measurement
    */
   function handleMeasurementUpdate(event: MeasurementUpdateEvent) {
@@ -198,36 +382,55 @@ export function usePassportEditor() {
       return;
     }
 
-    // Нормализуем значения для корректного сравнения (точка/запятая в числах)
-    const oldValueNormalized = normalizeValue(param.values.measurement);
-    const newValueNormalized = normalizeValue(event.value);
+    const measurementKey = `value.${event.paramKey}`;
+    const currentMeasurement = store.formData[measurementKey] ?? '';
+    const measurementChanged = currentMeasurement !== event.value;
+    const isBallast = param.isBallast === true;
+    if (isBallast) {
+      if (!measurementChanged && store.formData[`result.${event.paramKey}`] === event.value) {
+        return;
+      }
+      measurementGuard.add(measurementKey);
+      const resultKey = `result.${event.paramKey}`;
+      resultGuard.add(resultKey);
+      store.syncBallastParameter(event.paramKey, event.value, {
+        source: DataSource.Manual,
+        trackMeasurementHistory: false,
+        comment: 'Изменено оператором'
+      });
+      return;
+    }
 
-    // Определяем, действительно ли значение изменилось
-    const valueActuallyChanged = oldValueNormalized !== newValueNormalized;
+    if (measurementChanged) {
+      measurementGuard.add(measurementKey);
+      store.bulkUpdateFields({
+        [measurementKey]: event.value,
+        [`${measurementKey}__elisFilled`]: false
+      });
+    }
 
-    logger.debug(
-      `[handleMeasurementUpdate] поле="${event.paramKey}", ` +
-      `старое="${oldValueNormalized}", новое="${newValueNormalized}", ` +
-      `изменилось=${valueActuallyChanged}`
-    );
+    const shouldUpdateResult =
+      (param.resultEditMode === 'auto' || param.resultEditMode === DEFAULT_RESULT_MODE) ||
+      (param.resultEditMode === 'modal' && !param.manualOverride);
 
-    // Пересчитываем результат с новым measurement
+    if (!shouldUpdateResult) {
+      return;
+    }
+
     const tempParam = {
       ...param,
       values: { ...param.values, measurement: event.value }
     };
     const newResult = recalculateResult(tempParam);
-
-    // Если значение реально не изменилось, сохраняем флаг ELIS
-    const shouldResetElisFlag = valueActuallyChanged;
-
-    // Обновляем formData
-    store.bulkUpdateFields({
-      [`value.${event.paramKey}`]: event.value,
-      [`value.${event.paramKey}__elisFilled`]: shouldResetElisFlag ? false : param.elisFlags.measurement,
-      [`result.${event.paramKey}`]: newResult,
-      [`result.${event.paramKey}__elisFilled`]: shouldResetElisFlag ? false : param.elisFlags.result
-    });
+    const resultKey = `result.${event.paramKey}`;
+    if (store.formData[resultKey] !== newResult) {
+      resultGuard.add(resultKey);
+      store.bulkUpdateFields({
+        [resultKey]: newResult,
+        [`${resultKey}__elisFilled`]: false,
+        [`${resultKey}__manualOverride`]: param.manualOverride === true
+      });
+    }
   }
 
   /**
@@ -253,12 +456,24 @@ export function usePassportEditor() {
     };
     const newResult = recalculateResult(tempParam);
 
-    store.bulkUpdateFields({
+    const updates: Record<string, any> = {
       [`method.${event.paramKey}`]: methodJson,
-      [`method.${event.paramKey}__elisFilled`]: false,
-      [`result.${event.paramKey}`]: newResult,
-      [`result.${event.paramKey}__elisFilled`]: false
-    });
+      [`method.${event.paramKey}__elisFilled`]: false
+    };
+
+    const shouldUpdateResult =
+      (param.resultEditMode === 'auto' || param.resultEditMode === DEFAULT_RESULT_MODE) ||
+      (param.resultEditMode === 'modal' && !param.manualOverride);
+
+    if (shouldUpdateResult) {
+      const resultKey = `result.${event.paramKey}`;
+      resultGuard.add(resultKey);
+      updates[resultKey] = newResult;
+      updates[`${resultKey}__elisFilled`] = false;
+      updates[`${resultKey}__manualOverride`] = param.manualOverride === true;
+    }
+
+    store.bulkUpdateFields(updates);
   }
 
   /**
@@ -271,9 +486,14 @@ export function usePassportEditor() {
       return;
     }
 
-    store.bulkUpdateFields({
-      [`result.${event.paramKey}`]: event.value,
-      [`result.${event.paramKey}__elisFilled`]: false
+    const resultKey = `result.${event.paramKey}`;
+    if (store.formData[resultKey] === event.value) {
+      return;
+    }
+    resultGuard.add(resultKey);
+    store.markManualOverride(event.paramKey, event.value, {
+      source: DataSource.Manual,
+      payloadType: 'ResultModal'
     });
   }
 

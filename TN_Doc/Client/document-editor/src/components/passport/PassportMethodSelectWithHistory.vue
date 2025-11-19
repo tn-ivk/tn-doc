@@ -1,10 +1,15 @@
 <template>
   <div class="method-with-history">
-    <PassportMethodSelect
-      :parameter="parameter"
-      :isElisFilled="isElisFilled"
-      @update:method="handleChange"
-    />
+    <div class="method-select-wrapper">
+      <PassportMethodSelect
+        :parameter="parameter"
+        :isElisFilled="isElisFilled"
+        @update:method="handleChange"
+      />
+      <button class="manual-method-btn" type="button" @click="handleManualMethod">
+        Ручной метод
+      </button>
+    </div>
 
     <!-- Индикатор истории -->
     <FieldHistoryIndicator
@@ -38,6 +43,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:method': [method: MethodOption | null];
+  'manual-method': [];
 }>();
 
 const {
@@ -83,6 +89,10 @@ const handleChange = (newMethod: MethodOption | null) => {
   emit('update:method', newMethod);
 };
 
+const handleManualMethod = () => {
+  emit('manual-method');
+};
+
 /**
  * Обработчик наведения на индикатор
  */
@@ -112,5 +122,27 @@ const onIndicatorLeave = () => {
 <style scoped>
 .method-with-history {
   position: relative;
+}
+
+.method-select-wrapper {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.manual-method-btn {
+  flex-shrink: 0;
+  min-width: 120px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px dashed var(--md-primary, #2f6fed);
+  background-color: transparent;
+  color: var(--md-primary, #2f6fed);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.manual-method-btn:hover {
+  background-color: rgba(47, 111, 237, 0.08);
 }
 </style>

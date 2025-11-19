@@ -1,35 +1,55 @@
-import { logger } from '@tn-doc/shared';
 <template>
-  <!-- Всегда отображаем InputText, чтобы визуально совпадать со столбцами Документы/Измерение -->
-  <InputText
-    :modelValue="isEditable ? parameter.values.result : displayValue"
-    :disabled="!isEditable"
-    :class="[
-      'result-input',
-      { 'elis-filled': isElisFilled },
-      { 'manual-input--disabled': !isEditable }
-    ]"
-    type="text"
-    @update:modelValue="handleValueChange"
-  />
+  <div class="result-cell">
+    <div
+      class="result-value"
+      :class="{
+        'elis-filled': isElisFilled,
+        'result-value--disabled': !canEdit
+      }"
+    >
+      <span>{{ displayValue }}</span>
+      <i
+        v-if="showSyncIcon"
+        class="pi pi-refresh sync-icon"
+        v-tooltip.top="'Балластный параметр — результат синхронизирован с измерением'"
+      />
+    </div>
+    <button
+      class="result-edit-btn"
+      :disabled="!showEditButton || !canEdit"
+      :title="!canEdit && editDisabledReason ? editDisabledReason : ''"
+      type="button"
+      @click="handleEditClick"
+    >
+      Редактировать
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { logger } from '@tn-doc/shared';
 import { computed } from 'vue';
-import InputText from 'primevue/inputtext';
+import Tooltip from 'primevue/tooltip';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
 interface Props {
   parameter: PassportQualityParameter;
-  isEditable: boolean;
+  canEdit: boolean;
   isElisFilled?: boolean;
+  showEditButton?: boolean;
+  editDisabledReason?: string;
+  showSyncIcon?: boolean;
 }
 
 const props = defineProps<Props>();
 
+defineOptions({
+  directives: {
+    tooltip: Tooltip
+  }
+});
+
 const emit = defineEmits<{
-  'update:result': [value: string];
+  'result-edit': [];
 }>();
 
 const displayValue = computed(() => {
@@ -37,46 +57,69 @@ const displayValue = computed(() => {
   return props.parameter.values.result.replace('.', ',');
 });
 
-function handleValueChange(value: string | undefined) {
-  const stringValue = value ?? '';
-  emit('update:result', stringValue);
-  logger.debug(`[PassportResultCell] Result изменено: ${props.parameter.key} -> ${stringValue}`);
+const showEditButton = computed(() => props.showEditButton !== false);
+
+function handleEditClick() {
+  if (!showEditButton.value || !props.canEdit) {
+    return;
+  }
+  emit('result-edit');
 }
 </script>
 
 <style scoped>
-.result-input {
+.result-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.result-value {
   width: 100%;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--md-outline, #d5d7da);
+  border-radius: 6px;
   font-size: 15px;
-  text-align: center;
+  padding: 4px 8px;
+  background-color: white;
 }
 
-.result-input:deep(input) {
-  text-align: center;
-  font-size: 15px;
+.result-value.elis-filled {
+  background-color: var(--md-elis-highlight, #e8f5e9);
 }
 
-/* ELIS подсветка для InputText */
-.result-input.elis-filled {
-  background-color: var(--md-elis-highlight, #e8f5e9) !important;
-  color: var(--md-text, #212121) !important;
+.result-value--disabled {
+  background-color: var(--md-surface-variant, #f1f3f4);
+  color: var(--md-text-secondary, #5f6368);
 }
 
-.result-input.elis-filled:deep(input) {
-  background-color: var(--md-elis-highlight, #e8f5e9) !important;
-  color: var(--md-text, #212121) !important;
+.result-edit-btn {
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--md-primary, #2f6fed);
+  background-color: var(--md-primary, #2f6fed);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Disabled стиль как у колонки Документы */
-.manual-input--disabled {
-  background-color: var(--md-surface-variant, #F1F3F4);
-  color: var(--md-text-secondary, #5F6368);
+.result-edit-btn:disabled {
   cursor: not-allowed;
+  opacity: 0.5;
+  background-color: var(--md-outline, #d5d7da);
+  border-color: var(--md-outline, #d5d7da);
+  color: var(--md-text-secondary, #5f6368);
 }
 
-.manual-input--disabled:deep(input) {
-  background-color: var(--md-surface-variant, #F1F3F4);
-  color: var(--md-text-secondary, #5F6368);
-  cursor: not-allowed;
+.sync-icon {
+  margin-left: 6px;
+  font-size: 0.85rem;
+  color: var(--md-primary, #2f6fed);
 }
 </style>

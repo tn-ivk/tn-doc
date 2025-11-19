@@ -60,6 +60,8 @@ export interface PassportQualityParameter extends PassportQualityParameterSchema
   document?: ParameterDocument;
   /** Флаги заполнения из ELIS (вычисляются из formData) */
   elisFlags: ParameterElisFlags;
+  /** Признак ручного переопределения результата */
+  manualOverride?: boolean;
 }
 
 /**
