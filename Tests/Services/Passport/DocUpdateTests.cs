@@ -163,6 +163,61 @@ public class DocUpdateTests
 		Assert.That(storedHistory[0].Source, Is.EqualTo(DataSource.Manual));
 	}
 
+	[Test]
+	public void DocUpdate_ShouldKeepDocumentNull_WhenNotProvided()
+	{
+		// Arrange
+		var payload = new Dictionary<string, object>
+		{
+			["value.SulfurCorrection"] = "0,40"
+		};
+
+		using var passport = CreateDocPassport(isElisUsed: true);
+
+		// Act
+		passport.DocUpdate(88888, payload);
+
+		// Assert
+		Assert.That(passport.LastDataArm, Is.Not.Null);
+		var labInfo = passport.LastDataArm!.LabInfo.Single(x => x.ParameterKey == "SulfurCorrection");
+		Assert.That(labInfo.Document, Is.Null, "Document должен оставаться null при отсутствии данных");
+	}
+
+	[Test]
+	public void DocUpdate_ShouldPersistDocumentInfo_WhenProvided()
+	{
+		// Arrange
+		var documentInfo = new PassportEdit.LabDocumentInfo
+		{
+			Type = "ELIS Protocol",
+			Number = "AB-123",
+			Date = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc)
+		};
+
+		var payload = new Dictionary<string, object>
+		{
+			["document.SulfurCorrection"] = JsonConvert.SerializeObject(documentInfo),
+			["document.SulfurCorrection__elisFilled"] = true
+		};
+
+		using var passport = CreateDocPassport(isElisUsed: true);
+
+		// Act
+		passport.DocUpdate(99999, payload);
+
+		// Assert
+		Assert.That(passport.LastDataArm, Is.Not.Null);
+		var labInfo = passport.LastDataArm!.LabInfo.Single(x => x.ParameterKey == "SulfurCorrection");
+		Assert.That(labInfo.Document, Is.Not.Null, "Document должен быть создан при переданных данных");
+		Assert.Multiple(() =>
+		{
+			Assert.That(labInfo.Document!.Number, Is.EqualTo("AB-123"));
+			Assert.That(labInfo.Document.Type, Is.EqualTo("ELIS Protocol"));
+			Assert.That(labInfo.Document.Date, Is.EqualTo(documentInfo.Date));
+		});
+		Assert.That(labInfo.ElisFilled, Is.True);
+	}
+
 	private static FieldHistoryEntry CreateHistory(DataSource source, string value, DateTime timestamp)
 	{
 		return new FieldHistoryEntry
@@ -286,4 +341,3 @@ public class DocUpdateTests
 		}
 	}
 }
-
