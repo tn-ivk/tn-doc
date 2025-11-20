@@ -1,18 +1,30 @@
 <template>
   <div class="method-field">
-    <Select
-      :modelValue="selectedMethodOption"
-      :options="methodOptions"
-      optionLabel="name"
-      :class="[
-        { 'p-invalid': !isValid },
-        { 'elis-filled': isElisFilled }
-      ]"
-      placeholder="Метод не выбран"
-      showClear
-      class="method-select"
-      @update:modelValue="handleMethodChange"
-    />
+    <div class="method-select-container">
+      <Select
+        :modelValue="selectedMethodOption"
+        :options="methodOptions"
+        optionLabel="name"
+        :class="[
+          { 'p-invalid': !isValid },
+          { 'elis-filled': isElisFilled }
+        ]"
+        placeholder="Метод не выбран"
+        showClear
+        class="method-select"
+        @update:modelValue="handleMethodChange"
+      />
+
+      <!-- Иконка редактирования внутри комбобокса -->
+      <button
+        class="edit-method-btn"
+        type="button"
+        @click="handleEditClick"
+        title="Создать ручной метод"
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
+    </div>
 
     <!-- Сообщение об ошибке валидации -->
     <small v-if="!isValid" class="p-error">
@@ -37,6 +49,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   'update:method': [method: MethodOption | null];
+  'manual-method': [];
 }>();
 
 /**
@@ -75,6 +88,13 @@ const validationMessage = computed(() => {
 function handleMethodChange(method: MethodOption | null) {
   emit('update:method', method);
 }
+
+/**
+ * Обработчик клика на иконку редактирования
+ */
+function handleEditClick() {
+  emit('manual-method');
+}
 </script>
 
 <style scoped>
@@ -82,9 +102,44 @@ function handleMethodChange(method: MethodOption | null) {
   width: 100%;
 }
 
+/* Контейнер для Select и иконки */
+.method-select-container {
+  position: relative;
+  width: 100%;
+}
+
 .method-select {
   width: 100%;
   font-size: 15px;
+}
+
+/* Иконка редактирования внутри Select */
+.edit-method-btn {
+  position: absolute;
+  right: 70px; /* Слева от крестика очистки: [карандаш] [крестик] [dropdown] */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  background-color: transparent;
+  color: var(--md-primary, #2f6fed);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  z-index: 1;
+}
+
+.edit-method-btn:hover {
+  background-color: rgba(47, 111, 237, 0.12);
+}
+
+.edit-method-btn:active {
+  background-color: rgba(47, 111, 237, 0.2);
 }
 
 :deep(.method-field .p-select) {
