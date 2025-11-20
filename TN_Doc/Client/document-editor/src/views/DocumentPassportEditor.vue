@@ -310,8 +310,8 @@ const handleElisData = (elisData: ElisPassportData) => {
             updates[methodKey] = methodJson;
             updates[`${methodKey}__elisFilled`] = true;
 
-            // Создать запись истории для ELIS
-            trackElisLoad(methodKey, methodJson, elisData.protocolNumber);
+            // Создать запись истории для ELIS (сохраняем только name, а не весь объект)
+            trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
           }
         }
 
