@@ -264,13 +264,23 @@ graph TD
 - Управление строками параметров
 - Интеграция с ELIS и OPC
 - Валидация измерений
+- **Новое:** Модальные окна для редактирования результатов и методов
+- **Новое:** Встроенные иконки редактирования
 
-**Структура таблицы:**
+**Структура таблицы (обновлено в v1.4.4):**
 
-| Наименование показателя | НД на методы испытаний | Результат испытаний | Результат для печати |
-|------------------------|------------------------|---------------------|---------------------|
-| Плотность при 20°C     | [Dropdown: ГОСТ 3900] | [Input: 850.567]    | [Auto: 850.57]     |
-| Массовая доля воды     | [Dropdown: ГОСТ 2477] | [Input: 0.035]      | [Auto: 0.04]       |
+| № | Наименование показателя | Метод испытаний | Документы* | Измерение | Результат |
+|---|------------------------|----------------|-----------|-----------|-----------|
+| 1 | Плотность при 20°C | [Select + Кнопка] | [Link]* | [Input: 850.567] | [Display + Иконка редактирования] |
+| 2 | Массовая доля воды | [Select + Кнопка] | [Link]* | [Input: 0.035] | [Display + Иконка редактирования] |
+
+**Примечание:** * Колонка "Документы" отображается только при включенном ELIS (`isElisUsed = true`)
+
+**Изменения в структуре:**
+- Заголовок таблицы теперь содержит одну строку (вместо двух)
+- Ширина колонок увеличена до 150px для лучшей читаемости
+- Исправлено переполнение контента в ячейках
+- Колонка "Документы" условная (только при ELIS)
 
 ### PassportParameterRow
 
@@ -322,6 +332,80 @@ interface FormField {
 - Технология: PrimeVue OverlayPanel
 - Триггер: Hover на FieldHistoryIndicator
 - Содержимое: до 10 последних изменений с датами и значениями
+
+### ResultEditDialog (Новое в v1.4.4)
+
+**Расположение:** `components/passport/ResultEditDialog.vue`
+
+**Назначение:** Модальное окно для редактирования результата для печати
+
+**Функции:**
+- Ручное редактирование значения результата параметра качества
+- Валидация вводимого значения
+- Подтверждение или отмена изменений
+
+**Props:**
+```typescript
+interface Props {
+  visible: boolean;              // Видимость диалога
+  parameterName?: string;        // Название параметра
+  initialValue: string;          // Начальное значение результата
+}
+```
+
+**Events:**
+```typescript
+{
+  'update:visible': (value: boolean) => void;   // Изменение видимости
+  'confirm': (value: string) => void;           // Подтверждение нового значения
+}
+```
+
+**Использование:**
+- Открывается при клике на иконку редактирования в колонке "Результат"
+- Позволяет изменить результат для печати независимо от измерения
+- Применяется для случаев, когда нужно скорректировать значение вручную
+
+### ManualMethodDialog (Новое в v1.4.4)
+
+**Расположение:** `components/passport/ManualMethodDialog.vue`
+
+**Назначение:** Модальное окно для ручного ввода метода испытаний
+
+**Функции:**
+- Ручной ввод названия метода испытаний (текстовое поле)
+- Ввод граничного значения (опционально)
+- Ввод текстового представления результата (например, "Менее 4,0")
+- Сброс метода к стандартному значению
+
+**Props:**
+```typescript
+interface Props {
+  visible: boolean;              // Видимость диалога
+  parameterName?: string;        // Название параметра
+}
+```
+
+**Events:**
+```typescript
+{
+  'update:visible': (value: boolean) => void;   // Изменение видимости
+  'confirm': (payload: ManualMethodPayload) => void;  // Подтверждение нового метода
+  'reset': () => void;                          // Сброс к стандартному методу
+}
+
+interface ManualMethodPayload {
+  name: string;                  // Название метода
+  limitValue?: number;           // Граничное значение (опционально)
+  limitValueString?: string;     // Текстовое представление результата
+}
+```
+
+**Использование:**
+- Открывается при клике на кнопку "Ввести вручную" в ячейке метода
+- Позволяет ввести произвольный метод испытаний, отсутствующий в списке
+- Поддерживает ввод граничных значений для сравнения
+- Кнопка "Сбросить" возвращает стандартный метод из конфигурации
 
 ## Composables Architecture
 
@@ -386,6 +470,8 @@ export function useDocumentEditor() {
 
 **Специфичная логика для паспортов качества**
 
+**Обновлено в v1.4.4:** Добавлена поддержка модальных окон для редактирования результатов и методов
+
 ```typescript
 export function usePassportEditor() {
   const store = useDocumentStore();
@@ -413,12 +499,12 @@ export function usePassportEditor() {
     trackManualChange(fieldKey, value, previousValue);
   }
 
-  function handleMethodUpdate(parameterKey: string, methodData: MethodOption) {
+  function handleMethodUpdate(parameterKey: string, methodData: MethodOption | null) {
     const fieldKey = `method.${parameterKey}`;
     const { trackManualChange } = useFieldHistory();
 
     const previousValue = store.formData[fieldKey];
-    const newValue = JSON.stringify(methodData);
+    const newValue = methodData ? JSON.stringify(methodData) : null;
 
     store.updateField(fieldKey, newValue);
     trackManualChange(fieldKey, newValue, previousValue);
@@ -426,7 +512,40 @@ export function usePassportEditor() {
 
   function handleResultUpdate(parameterKey: string, value: string) {
     const fieldKey = `result.${parameterKey}`;
+    const { trackManualChange } = useFieldHistory();
+
+    const previousValue = store.formData[fieldKey];
     store.updateField(fieldKey, value);
+    trackManualChange(fieldKey, value, previousValue);
+  }
+
+  // Новое в v1.4.4: Работа с модальными окнами
+  function handleResultEdit(parameterKey: string, newValue: string) {
+    handleResultUpdate(parameterKey, newValue);
+  }
+
+  function handleManualMethodConfirm(parameterKey: string, payload: ManualMethodPayload) {
+    const methodOption: MethodOption = {
+      id: Date.now(), // Генерация уникального ID
+      use: true,
+      idParameter: 0, // Будет установлено на бэкенде
+      name: payload.name,
+      isDefault: false,
+      limitValueActivate: !!payload.limitValue,
+      limitValue: payload.limitValue,
+      limitValueString: payload.limitValueString
+    };
+
+    handleMethodUpdate(parameterKey, methodOption);
+  }
+
+  function handleManualMethodReset(parameterKey: string) {
+    // Сброс к стандартному методу из конфигурации
+    const param = qualityParameters.value.find(p => p.key === parameterKey);
+    if (param && param.methodOptions.length > 0) {
+      const defaultMethod = param.methodOptions.find(m => m.isDefault) || param.methodOptions[0];
+      handleMethodUpdate(parameterKey, defaultMethod);
+    }
   }
 
   return {
@@ -435,7 +554,10 @@ export function usePassportEditor() {
     hasQualityParameters,
     handleMeasurementUpdate,
     handleMethodUpdate,
-    handleResultUpdate
+    handleResultUpdate,
+    handleResultEdit,           // Новое
+    handleManualMethodConfirm,  // Новое
+    handleManualMethodReset     // Новое
   };
 }
 ```
@@ -1243,6 +1365,25 @@ describe('ELIS Integration', () => {
 ---
 
 ## История изменений документа
+
+**2025-01-20 - Обновление UI компонентов и архитектуры (v1.4.4)**
+- ✅ **Новые UI компоненты:**
+  - Добавлен `ResultEditDialog` - модальное окно для редактирования результатов
+  - Добавлен `ManualMethodDialog` - модальное окно для ручного ввода методов
+  - Встроенные иконки редактирования в ячейки таблицы качества
+- ✅ **Улучшения PassportQualityTable:**
+  - Структура таблицы обновлена (одна строка заголовка вместо двух)
+  - Ширина колонок увеличена до 150px
+  - Исправлено переполнение контента
+  - Колонка "Документы" условная (только при ELIS)
+- ✅ **Обновлён usePassportEditor composable:**
+  - Добавлены обработчики для модальных окон (`handleResultEdit`, `handleManualMethodConfirm`, `handleManualMethodReset`)
+  - Улучшена обработка изменений методов (поддержка `null`)
+  - Добавлено логирование изменений результатов через систему истории
+- ✅ **Рефакторинг бэкенда DocPassport:**
+  - Внедрены сервисы `DocPassportUpdatePayloadService` и `DocPassportDataArmService`
+  - Разделение класса на partial классы для лучшей организации кода
+  - Добавлена поддержка передачи полного протокола ELIS с фронтенда
 
 **2025-01-17 - Актуализация для Production Ready (v1.4.4)**
 - ✅ Изменён статус с "В активной разработке" на "Production Ready"

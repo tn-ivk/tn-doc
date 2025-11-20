@@ -421,8 +421,87 @@ public partial class LabInfo
 - `TN.DocGeneral/Models/LabInfo.cs` - модель элемента качественного параметра
 - `docs/features/field-history.md` - документация системы истории изменений (v1.4.4)
 
+## Рефакторинг архитектуры DocPassport (v1.4.4 - Январь 2025)
+
+### Внедрение сервисов
+
+В рамках улучшения архитектуры класс `DocPassport` был разделён на partial классы, а логика обработки данных вынесена в отдельные сервисы:
+
+**1. DocPassportUpdatePayloadService**
+```csharp
+public interface IDocPassportUpdatePayloadService
+{
+    CorrectionData BuildCorrectionData(
+        int id,
+        Dictionary<string, string> dictionary,
+        Dictionary<string, List<FieldHistoryEntry>>? history);
+}
+```
+
+**Назначение:**
+- Парсинг payload из Document Editor
+- Извлечение полного протокола ELIS из поля `__elisProtocol`
+- Конвертация JSON данных ELIS в объект `QualityPassport`
+- Построение структуры `CorrectionData` для обновления документа
+
+**Расположение:** `tn.docgeneral/Passport/Services/DocPassportUpdatePayloadService.cs`
+
+**2. DocPassportDataArmService**
+```csharp
+public interface IDocPassportDataArmService
+{
+    void UpdateLabInfo(
+        DataARM dataArm,
+        LabInfo newLabInfo,
+        bool isElisUsed,
+        int? historyControlId,
+        int docId);
+}
+```
+
+**Назначение:**
+- Обновление данных `DataARM` и `LabInfo`
+- Добавление/обновление лабораторной информации
+- Управление историей изменений полей
+- Проверка ELIS режима и обработка флага `ElisFilled`
+
+**Расположение:** `tn.docgeneral/Passport/Services/DocPassportDataArmService.cs`
+
+### Преимущества рефакторинга
+
+1. **Разделение ответственности:** Логика обработки payload и данных DataARM разделена на специализированные сервисы
+2. **Тестируемость:** Каждый сервис можно тестировать независимо
+3. **Переиспользование:** Сервисы могут использоваться в других документах (ActProducer, ActRoute)
+4. **Читаемость:** Класс DocPassport стал компактнее и понятнее
+5. **Масштабируемость:** Легко добавлять новые сервисы без изменения основного класса
+
+### Разделение на partial классы
+
+**DocPassport.cs** - основной класс с конструктором и полями
+```csharp
+public partial class DocPassport : DocGeneral, IDocUpdater, IDocumentEditor
+{
+    private readonly IDocPassportUpdatePayloadService _payloadService;
+    private readonly IDocPassportDataArmService _dataArmService;
+
+    public DocPassport(...)
+    {
+        _payloadService = CreateDefaultPayloadService();
+        _dataArmService = CreateDefaultDataArmService();
+    }
+}
+```
+
+**DocPassport.DocUpdate.cs** - логика обновления документа
+**DocPassport.GetEditDoc.cs** - логика генерации формы редактирования
+**DocPassport.GetViewDoc.cs** - логика подготовки данных для FastReport
+
 ## Авторы и история
 
+- **Рефакторинг архитектуры:** 2025-01-20 (коммит aeb6e2b)
+  - Внедрены сервисы `DocPassportUpdatePayloadService` и `DocPassportDataArmService`
+  - Разделение класса на partial классы
+  - Добавлены unit-тесты для сервисов
 - **Исправление дублирования:** 2025-11-01 (коммит faef13a, 3ea5af9)
 - **Интеграция с системой истории изменений:** 2025-11-17 (в разработке v1.4.4)
 - **Оригинальная реализация DocPassport:** см. git history

@@ -13,7 +13,7 @@
   ```
 
 ### Поле `IsBallast`
-- Добавлено в `TN.Doc.Edit.Parameter` и все рабочие конфиги `CfgEditPassport*.json`.  
+- Добавлено в `TN.Doc.Edit.Parameter` и все рабочие конфиги `CfgEditPassport*.json` (v1.4.4).
 - Назначение:
   - `true` — показатель считается балластным, столбец Result синхронизируется с Measurement;
   - `false` — поведение прежнее, Result редактируется операторами.
@@ -21,6 +21,12 @@
 - Классификация из плана:
   - **Балластные**: `TempCorrection`, `PressCorrection`, `DensCorrection`, `Dens20Correction`, `Dens15Correction`, `MassWaterFracCorrection`, `Chloride_Salts.Concentration`, `Chloride_Salts.MassFraction`, `Impurity`.
   - **Небалластные**: `SulfurCorrection`, `DNP.kPa`, `DNP.mercury_mm`, `Yield_fraction_200`, `Yield_fraction_300`, `Yield_fraction_350`, `Mass_fraction_of_paraffin`, `Mass_fraction_of_hydrogen_sulfide`, `Mass_fraction_of_methyl_and_ethyl_mercaptan`, `Mass_fraction_of_organic_chlorides`.
+
+**Использование в Document Editor (v1.4.4):**
+- Балластные параметры (`IsBallast = true`) не позволяют ручное редактирование результата
+- Кнопка редактирования результата скрывается для балластных параметров
+- При изменении измерения балластного параметра результат автоматически обновляется
+- Небалластные параметры (`IsBallast = false`) имеют кнопку "Редактировать" для ручной корректировки результата
 
 ### Порядок обновления конфигов
 1. **Инвентаризация**  
