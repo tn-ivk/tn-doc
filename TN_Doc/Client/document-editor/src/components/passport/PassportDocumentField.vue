@@ -52,6 +52,7 @@ const documentTooltip = computed(() => {
 <style scoped>
 .document-field {
   width: 100%;
+  max-width: 100%;
   text-align: center;
   font-size: 15px;
   background-color: var(--md-surface-variant, #F1F3F4);
@@ -60,6 +61,9 @@ const documentTooltip = computed(() => {
   border: none;
   padding: 6px 12px;
   box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .document-field:deep(input) {
@@ -69,6 +73,11 @@ const documentTooltip = computed(() => {
   color: var(--md-text-secondary, #5F6368);
   cursor: not-allowed;
   border: none;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   box-sizing: border-box;
 }
 

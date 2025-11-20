@@ -119,15 +119,18 @@ function handleManualMethodRequest() {
 .cell-method,
 .cell-measurement {
   padding: 4px;
+  overflow: hidden;
 }
 
 .cell-documents {
   padding: 4px;
+  overflow: hidden;
 }
 
 .cell-result {
   text-align: center;
   padding: 4px;
+  overflow: hidden;
 }
 
 .manual-input--disabled {

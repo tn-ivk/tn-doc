@@ -120,10 +120,14 @@ function handleValueChange(value: number | null) {
 <style scoped>
 .measurement-field {
   width: 100%;
+  max-width: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
 .measurement-input {
   width: 100%;
+  max-width: 100%;
   text-align: center;
   font-size: 15px;
 }
@@ -131,6 +135,9 @@ function handleValueChange(value: number | null) {
 .measurement-input:deep(input) {
   text-align: center;
   font-size: 15px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Валидация - красная рамка при ошибке */

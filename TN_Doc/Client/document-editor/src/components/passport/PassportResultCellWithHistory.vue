@@ -4,7 +4,6 @@
       :parameter="parameter"
       :canEdit="canEdit"
       :isElisFilled="isElisFilled"
-      :showSyncIcon="parameter.isBallast === true"
       :editDisabledReason="editDisabledReason"
       @result-edit="handleEditRequest"
     />
@@ -118,5 +117,11 @@ const onIndicatorLeave = () => {
 <style scoped>
 .result-with-history {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 </style>

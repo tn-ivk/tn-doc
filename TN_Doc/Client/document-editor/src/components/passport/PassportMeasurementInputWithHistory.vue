@@ -110,5 +110,11 @@ const onIndicatorLeave = () => {
 <style scoped>
 .measurement-with-history {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 </style>

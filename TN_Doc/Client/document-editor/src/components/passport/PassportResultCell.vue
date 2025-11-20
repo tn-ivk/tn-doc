@@ -9,11 +9,6 @@
         }"
       >
         <span>{{ displayValue }}</span>
-        <i
-          v-if="showSyncIcon"
-          class="pi pi-refresh sync-icon"
-          v-tooltip.top="'Балластный параметр — результат синхронизирован с измерением'"
-        />
       </div>
 
       <!-- Иконка редактирования внутри поля результата -->
@@ -32,7 +27,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import Tooltip from 'primevue/tooltip';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
 interface Props {
@@ -40,16 +34,9 @@ interface Props {
   canEdit: boolean;
   isElisFilled?: boolean;
   editDisabledReason?: string;
-  showSyncIcon?: boolean;
 }
 
 const props = defineProps<Props>();
-
-defineOptions({
-  directives: {
-    tooltip: Tooltip
-  }
-});
 
 const emit = defineEmits<{
   'result-edit': [];
@@ -80,10 +67,14 @@ function handleEditClick() {
 .result-value-container {
   position: relative;
   width: 100%;
+  max-width: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
 .result-value {
   width: 100%;
+  max-width: 100%;
   min-height: 36px;
   display: flex;
   align-items: center;
@@ -93,6 +84,10 @@ function handleEditClick() {
   font-size: 15px;
   padding: 4px 8px;
   background-color: white;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .result-value.elis-filled {
@@ -132,11 +127,5 @@ function handleEditClick() {
 .edit-result-btn:active {
   background-color: rgba(0, 0, 0, 0.08) !important;
   color: var(--md-primary, #2f6fed) !important;
-}
-
-.sync-icon {
-  margin-left: 6px;
-  font-size: 0.85rem;
-  color: var(--md-primary, #2f6fed);
 }
 </style>

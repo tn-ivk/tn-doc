@@ -183,6 +183,7 @@ function handleManualMethodDialogVisibility(next: boolean) {
 .quality-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-size: 15px;
   color: var(--md-text);
@@ -228,16 +229,17 @@ function handleManualMethodDialogVisibility(next: boolean) {
 }
 
 .col-documents {
-  min-width: 150px;
+  width: 130px;
+  text-align: center;
 }
 
 .col-measurement {
-  width: 120px;
+  width: 130px;
   text-align: center;
 }
 
 .col-result {
-  width: 150px;
+  width: 130px;
   text-align: center;
 }
 
