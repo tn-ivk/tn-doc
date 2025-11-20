@@ -139,6 +139,12 @@ export function usePassportEditor() {
         methodOptions.push(selectedMethod);
       }
 
+      const methodNameTrimmed = selectedMethodName.trim();
+      const normalizedMethodName = methodNameTrimmed.toLowerCase();
+      const isMethodInDictionary = normalizedMethodName
+        ? paramSchema.methodOptions.some(method => method.name.trim().toLowerCase() === normalizedMethodName)
+        : true;
+
       // Создаем полный объект параметра
       return {
         ...paramSchema,
@@ -151,7 +157,8 @@ export function usePassportEditor() {
         method: {
           selected: selectedMethodName,
           options: methodOptions,
-          requiredFill: paramSchema.methodRequiredFill
+          requiredFill: paramSchema.methodRequiredFill,
+          isInDictionary: isMethodInDictionary
         },
         document: documentInfo,
         elisFlags,

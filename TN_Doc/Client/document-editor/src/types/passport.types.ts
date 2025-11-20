@@ -86,6 +86,8 @@ export interface ParameterMethod {
   requiredFill?: boolean;
   /** Источник выбранного метода */
   source?: MethodSource;
+  /** Присутствует ли выбранный метод в локальном справочнике */
+  isInDictionary?: boolean;
 }
 
 /**

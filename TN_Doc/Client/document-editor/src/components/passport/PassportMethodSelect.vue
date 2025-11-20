@@ -7,7 +7,8 @@
         optionLabel="name"
         :class="[
           { 'p-invalid': !isValid },
-          { 'elis-filled': isElisFilled }
+          { 'elis-filled': isElisFilled },
+          { 'unknown-method': showDictionaryWarning }
         ]"
         placeholder="Метод не выбран"
         class="method-select"
@@ -28,6 +29,9 @@
     <!-- Сообщение об ошибке валидации -->
     <small v-if="!isValid" class="p-error">
       {{ validationMessage }}
+    </small>
+    <small v-else-if="showDictionaryWarning" class="method-warning">
+      отсутствует в справочнике
     </small>
   </div>
 </template>
@@ -79,6 +83,13 @@ const validationMessage = computed(() => {
     return `Необходимо выбрать метод испытаний`;
   }
   return '';
+});
+
+const showDictionaryWarning = computed(() => {
+  if (!props.parameter.method.selected) {
+    return false;
+  }
+  return props.parameter.method.isInDictionary === false;
 });
 
 /**
@@ -154,6 +165,13 @@ function handleEditClick() {
   box-shadow: none !important;
 }
 
+.method-select.unknown-method,
+.method-select.unknown-method:deep(.p-select),
+.method-select.unknown-method:deep(.p-select-label) {
+  border-color: #f5c24c !important;
+  box-shadow: 0 0 0 1px rgba(245, 194, 76, 0.3) !important;
+}
+
 /* ELIS подсветка */
 :deep(.p-select.elis-filled) {
   background-color: #8fd19e !important;
@@ -170,6 +188,14 @@ function handleEditClick() {
   margin-top: 0.25rem;
   font-size: 0.875rem;
   color: var(--md-error, #dc3545);
+  line-height: 1.2;
+}
+
+.method-warning {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #b87902;
   line-height: 1.2;
 }
 </style>
