@@ -530,11 +530,20 @@ export function usePassportEditor() {
     const fieldKey = `method.${parameterKey}`;
     const { trackManualChange } = useFieldHistory();
 
-    const previousValue = store.formData[fieldKey];
-    const newValue = methodData ? JSON.stringify(methodData) : null;
+    // Получаем предыдущий метод для истории
+    const previousMethodJson = store.formData[fieldKey] || '';
+    const previousMethod = previousMethodJson ? JSON.parse(previousMethodJson) : null;
+    const previousMethodName = previousMethod?.name || '';
 
+    // Сохраняем полный JSON метода в formData
+    const newValue = methodData ? JSON.stringify(methodData) : null;
     store.updateField(fieldKey, newValue);
-    trackManualChange(fieldKey, newValue, previousValue);
+
+    // В историю записываем только название метода (v1.4.4+)
+    const newMethodName = methodData?.name || '';
+    if (newMethodName !== previousMethodName) {
+      trackManualChange(fieldKey, newMethodName, previousMethodName || undefined);
+    }
   }
 
   function handleResultUpdate(parameterKey: string, value: string) {
@@ -658,12 +667,16 @@ export function useElisIntegration() {
           // Отследить загрузку из ELIS
           trackElisLoad(fieldKey, param.value, protocolNumber);
 
-          // Обновить метод испытаний
+          // Обновить метод испытаний (v1.4.4+)
           if (param.methodName) {
             const methodKey = `method.${parameterKey}`;
             const methodData = createMethodFromElisData(param);
+
+            // Сохраняем полный JSON метода в formData
             store.updateField(methodKey, JSON.stringify(methodData));
-            trackElisLoad(methodKey, JSON.stringify(methodData), protocolNumber);
+
+            // В историю записываем только читаемое название
+            trackElisLoad(methodKey, methodData.name, protocolNumber);
           }
 
           // Обновить документ ELIS
@@ -1407,6 +1420,12 @@ describe('ELIS Integration', () => {
 ---
 
 ## История изменений документа
+
+**2025-01-20 - Оптимизация истории для методов испытаний**
+- ✅ **История методов испытаний:** теперь сохраняется только название метода (`name`) вместо полного JSON объекта
+- ✅ **Автоматическая запись истории:** добавлена запись истории при ручном изменении метода (ранее только при загрузке из ELIS)
+- 📝 Обновлен `handleMethodUpdate` в usePassportEditor с логикой сохранения только `name` в историю
+- 📝 Обновлена документация с примерами кода
 
 **2025-11-20 - Актуализация документации в соответствии с последними изменениями**
 - 📝 Обновлен статус компонента (v1.4.4 в активной разработке)
