@@ -41,6 +41,10 @@ dotnet format                                   # Format code
 
 **Note**: Commands use forward slashes for cross-platform compatibility. On Windows, these work in PowerShell and Git Bash. For Command Prompt, use backslashes (`cd TN_Doc` works, but `cd TN_Doc\Client` for nested paths).
 
+**Additional Requirements:**
+- `dotnet format` requires .NET SDK (SDK 9.0+ recommended for .NET 8.0 projects)
+- Vue component builds require Node.js 18.0+ and npm 8.0+
+
 **Дополнительные правила**: См. [AGENTS.md](AGENTS.md) для детальных правил по:
 - Организации структуры проекта и модулей
 - Командам сборки, тестирования и разработки
@@ -228,16 +232,18 @@ cd TN_Doc && ASPNETCORE_ENVIRONMENT=Development dotnet run
 
 # 3. Work on Vue components (parallel terminal)
 cd TN_Doc/Client
-npm run dev              # StatusBar with hot reload
-npm run dev:configurator # Configurator with hot reload
+npm run dev              # StatusBar with hot reload (port 5173)
+npm run dev:configurator # Configurator with hot reload (port 5174)
+npm run dev:editor       # Document Editor with hot reload (port 5175)
 
 # 4. Run tests frequently
 dotnet test --filter "ClassName=YourTestClass"
 
 # 5. Before committing
-dotnet format                        # Format code
-dotnet build && dotnet test          # Ensure it builds and tests pass
-cd TN_Doc/Client && npm run build:all # Build Vue components
+dotnet format                         # Format code (requires .NET SDK 9.0+)
+dotnet build && dotnet test           # Ensure it builds and tests pass
+cd TN_Doc/Client && npm run build:all # Build Vue components for production
+git status                            # Review changes before commit
 ```
 
 ## Common Development Tasks
@@ -305,6 +311,11 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
 3. Changes to Vue components hot-reload automatically
 4. Before committing, build all components: `npm run build:all`
 
+**Important notes:**
+- All Vue components use npm workspaces configured in `TN_Doc/Client/package.json`
+- Shared TypeScript types and utilities are in `TN_Doc/Client/shared/`
+- PrimeVue theme customization is in Material Design 3 style via CSS variables
+
 ## Git Workflow and Commit Conventions
 
 ### Branch Strategy
@@ -328,11 +339,16 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
 - **НИКОГДА** не добавлять "Generated with Claude Code" или подобные атрибуции
 - **НИКОГДА** не добавлять "Co-Authored-By: Claude" или любые AI co-author теги
 - **ВСЕГДА** использовать русский язык для коммит-сообщений
+- Коммиты должны выглядеть как написанные человеком-разработчиком
 
 **Стандартные правила:**
 - Следовать стилю conventional commits: "Тип: краткое описание"
 - Включать детальное описание в body коммита при необходимости
 - Ссылаться на номера задач когда применимо
+- Примеры хороших коммитов из истории:
+  - "Рефакторинг архитектуры DocPassport"
+  - "Document Editor: увеличена ширина колонок таблицы паспорта качества до 150px"
+  - "Централизация управления цветами: все цвета в CSS переменных"
 
 **Important Warnings:**
 - Large number of configuration files are tracked - be careful with bulk changes
