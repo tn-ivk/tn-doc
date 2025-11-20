@@ -115,7 +115,7 @@ function handleEditClick() {
 /* Иконка редактирования внутри Select */
 .edit-method-btn {
   position: absolute;
-  right: 40px; /* Слева от dropdown: [карандаш] [dropdown] */
+  right: 34px; /* Вплотную к dropdown */
   top: 50%;
   transform: translateY(-50%);
   width: 28px;

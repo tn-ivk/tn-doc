@@ -1,28 +1,32 @@
 <template>
   <div class="result-cell">
-    <div
-      class="result-value"
-      :class="{
-        'elis-filled': isElisFilled,
-        'result-value--disabled': !canEdit
-      }"
-    >
-      <span>{{ displayValue }}</span>
-      <i
-        v-if="showSyncIcon"
-        class="pi pi-refresh sync-icon"
-        v-tooltip.top="'Балластный параметр — результат синхронизирован с измерением'"
-      />
+    <div class="result-value-container">
+      <div
+        class="result-value"
+        :class="{
+          'elis-filled': isElisFilled,
+          'result-value--disabled': !canEdit
+        }"
+      >
+        <span>{{ displayValue }}</span>
+        <i
+          v-if="showSyncIcon"
+          class="pi pi-refresh sync-icon"
+          v-tooltip.top="'Балластный параметр — результат синхронизирован с измерением'"
+        />
+      </div>
+
+      <!-- Иконка редактирования внутри поля результата -->
+      <button
+        v-if="canEdit"
+        class="edit-result-btn"
+        type="button"
+        @click="handleEditClick"
+        :title="'Редактировать результат'"
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
     </div>
-    <button
-      class="result-edit-btn"
-      :disabled="!canEdit"
-      :title="!canEdit && editDisabledReason ? editDisabledReason : ''"
-      type="button"
-      @click="handleEditClick"
-    >
-      Редактировать
-    </button>
   </div>
 </template>
 
@@ -68,8 +72,14 @@ function handleEditClick() {
 .result-cell {
   display: flex;
   flex-direction: column;
-  gap: 6px;
   align-items: center;
+  width: 100%;
+}
+
+/* Контейнер для поля результата и иконки */
+.result-value-container {
+  position: relative;
+  width: 100%;
 }
 
 .result-value {
@@ -94,24 +104,34 @@ function handleEditClick() {
   color: var(--md-text-secondary, #5f6368);
 }
 
-.result-edit-btn {
-  width: 100%;
-  height: 32px;
-  border-radius: 6px;
-  border: 1px solid var(--md-primary, #2f6fed);
-  background-color: var(--md-primary, #2f6fed);
-  color: #fff;
+/* Иконка редактирования внутри поля результата */
+.edit-result-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
   font-size: 14px;
   cursor: pointer;
-  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  z-index: 1;
 }
 
-.result-edit-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-  background-color: var(--md-outline, #d5d7da);
-  border-color: var(--md-outline, #d5d7da);
-  color: var(--md-text-secondary, #5f6368);
+.edit-result-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  color: var(--md-primary, #2f6fed) !important;
+}
+
+.edit-result-btn:active {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+  color: var(--md-primary, #2f6fed) !important;
 }
 
 .sync-icon {
