@@ -348,7 +348,7 @@ foreach (var item in correctionData.Values)
 При загрузке данных из протокола ELIS автоматически создаются записи истории:
 
 ```typescript
-// useElisIntegration.ts
+// useElisIntegration.ts (в DocumentPassportEditor.vue)
 const applyElisData = (elisData: ElisProtocol) => {
   // Для каждого заполненного поля
   qualityParams.forEach(param => {
@@ -364,11 +364,26 @@ const applyElisData = (elisData: ElisProtocol) => {
         elisData.protocolNumber  // Например, "ПР-2024-12345"
       );
     }
+
+    // Для метода испытаний сохраняем только название (v1.4.4+)
+    if (elisData.methods && elisData.methods[param.key]) {
+      const methodData = elisData.methods[param.key];
+
+      // Сохраняем полный JSON метода в formData
+      store.updateField(`method.${param.key}`, JSON.stringify(methodData));
+
+      // В историю записываем только читаемое название
+      trackElisLoad(
+        `method.${param.key}`,
+        methodData.name,  // Только название, не весь объект
+        elisData.protocolNumber
+      );
+    }
   });
 };
 ```
 
-**Результат:**
+**Результат для измерения:**
 ```json
 {
   "source": "ELIS",
@@ -380,10 +395,22 @@ const applyElisData = (elisData: ElisProtocol) => {
 }
 ```
 
+**Результат для метода испытаний (v1.4.4+):**
+```json
+{
+  "source": "ELIS",
+  "modifiedAt": "2025-01-14T10:00:00Z",
+  "modifiedBy": "ELIS",
+  "value": "ГОСТ 1756-2000",
+  "previousValue": null,
+  "comment": "Загружено из протокола ПР-2024-12345"
+}
+```
+
 **Визуальная индикация:**
 - Зелёная подсветка поля (#8fd19e)
 - Зелёный индикатор "ЕЛИС" в правом углу
-- Popup показывает номер протокола ELIS
+- Popup показывает номер протокола ELIS и **читаемое название метода**
 
 ---
 
@@ -598,6 +625,14 @@ console.log(history[9].previousValue); // "861"
 ---
 
 ## История изменений
+
+**v1.4.4 (2025-01-20)** - Улучшения истории для методов испытаний
+- ✅ **Оптимизация истории методов испытаний:**
+  - История для поля "Метод испытаний" теперь сохраняет только название метода (поле `name`)
+  - Ранее сохранялся полный JSON объект, что делало историю нечитаемой
+  - Добавлена автоматическая запись истории при ручном изменении метода
+  - Ранее история записывалась только при загрузке из ELIS
+- ✅ Улучшена читаемость popup истории изменений
 
 **v1.4.4 (2025-01-15)** - Первый релиз
 - ✅ Базовая функциональность истории изменений
