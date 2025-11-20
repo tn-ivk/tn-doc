@@ -4,18 +4,58 @@
 
 Система генерации документов построена на основе модульной архитектуры с использованием паттерна **Factory** и динамической загрузки модулей.
 
-**Версия документации:** v1.4.3
+**Версия документации:** v1.4.4 (в разработке)
 **Актуально на:** Ноябрь 2025
 
-### Текущая версия (v1.4.3)
+### Текущая версия (v1.4.4 - в разработке)
 
-Текущая версия поддерживает оба подхода:
+**Архитектурные улучшения:**
+- ✅ **Partial Classes для DocPassport** - улучшенная организация кода
+- ✅ **Pipeline сервисов DocUpdate** - модульная обработка обновлений
+- ✅ **Рефакторинг Poverka модулей** - унификация сервисов обновления
+
+Система поддерживает два подхода:
 - **Новый (рекомендуемый)**: `IDocumentEditor` с `GetEditConfig()`/`SaveDocument()` для Vue SPA
 - **Устаревший**: `GetEditDoc()`/`SetDocFromJson()` для обратной совместимости (помечен `[Obsolete]`)
 
-### Активная разработка в v1.4.4 (ветка developWork)
+### Архитектура partial классов (v1.4.4+)
 
-⚠️ **ВАЖНО:** В версии 1.4.4 планируются существенные изменения в архитектуре модулей документов:
+Для улучшения читаемости и поддержки кода основной модуль **DocPassport** разделен на partial классы:
+
+```mermaid
+graph TB
+    subgraph "DocPassport - Partial Classes"
+        Main[DocPassport.cs<br/>Основной класс]
+        Editor[DocPassport.Editor.cs<br/>Редактирование]
+        Listing[DocPassport.Listing.cs<br/>Списки]
+        Update[DocPassport.Update.cs<br/>Обновления]
+    end
+
+    subgraph "Сервисы обновления"
+        UpdatePayload[DocPassportUpdatePayloadService]
+        DataArmService[DocPassportDataArmService]
+    end
+
+    Main --> Editor
+    Main --> Listing
+    Main --> Update
+    Update --> UpdatePayload
+    Update --> DataArmService
+```
+
+**Структура файлов:**
+- `DocPassport.cs` - конструктор, базовые методы, GetViewDoc()
+- `DocPassport.Editor.cs` - GetEditConfig(), SaveDocument() для IDocumentEditor
+- `DocPassport.Listing.cs` - GetList() для получения списков документов
+- `DocPassport.Update.cs` - DocUpdate(), BuildCorrectionData() для обработки обновлений
+
+**Преимущества:**
+- Логическое разделение ответственности
+- Улучшенная навигация по коду
+- Упрощение поддержки и тестирования
+- Возможность параллельной работы разработчиков
+
+### Модульная архитектура v1.4.4
 
 1. **Массовая миграция на IDocumentEditor** - **ВСЕ 41 библиотека документов** мигрированы на новый интерфейс:
    - ✅ **4 основных документа**: Passport, Act, Report, Jornal
@@ -861,9 +901,11 @@ if (docInstance is IDocUpdater updater)
 }
 ```
 
-**Базовая структура модуля:**
+**Структура модуля с partial классами (v1.4.4+):**
+
 ```csharp
-public class DocPassport : DocGeneral, IDocUpdater, IDocumentEditor
+// DocPassport.cs - Основной файл
+public partial class DocPassport : DocGeneral, IDocUpdater, IDocumentEditor
 {
     public DocPassport(DbContextOptions<DocGeneral> options,
         IAppConfigService appConfig,
@@ -877,7 +919,47 @@ public class DocPassport : DocGeneral, IDocUpdater, IDocumentEditor
         PathToDocTemplateFile = GetPathTemplateFile();
     }
 
-    // Реализация методов IDocumentEditor...
+    // Методы GetViewDoc(), GetPathTemplateFile(), GetPeriodDocument()
+}
+
+// DocPassport.Editor.cs - Методы редактирования
+public partial class DocPassport
+{
+    public DocumentEditConfig GetEditConfig(int id) { /* ... */ }
+    public bool SaveDocument(int id, Dictionary<string, object> values) { /* ... */ }
+}
+
+// DocPassport.Listing.cs - Методы получения списков
+public partial class DocPassport
+{
+    public override List<RequestListDocs> GetList(long UTBegin, long UTEnd) { /* ... */ }
+}
+
+// DocPassport.Update.cs - Методы обновления данных
+public partial class DocPassport
+{
+    public void DocUpdate(int id, Dictionary<string, object> values) { /* ... */ }
+    public void DocUpdate(string jsonData) { /* ... */ }
+    private CorrectionData BuildCorrectionData(Dictionary<string, object> values) { /* ... */ }
+}
+```
+
+**Сервисы обработки обновлений:**
+
+```csharp
+// Сервис для парсинга и валидации payload обновлений
+public class DocPassportUpdatePayloadService
+{
+    public CorrectionData ParsePayload(Dictionary<string, object> values);
+    public bool ValidatePayload(CorrectionData data);
+}
+
+// Сервис для работы с DataARM
+public class DocPassportDataArmService
+{
+    public DataARM GetDataARM(int id);
+    public void UpdateFieldHistoryMap(DataARM dataArm, string fieldKey, FieldHistoryEntry entry);
+    public void SaveDataARM(DataARM dataArm);
 }
 ```
 
