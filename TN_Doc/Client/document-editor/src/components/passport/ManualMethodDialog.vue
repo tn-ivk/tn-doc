@@ -54,6 +54,10 @@
     </div>
 
     <template #footer>
+      <button class="btn btn-text" type="button" @click="handleReset">
+        Сброс
+      </button>
+      <div style="flex: 1;"></div>
       <button class="btn btn-text" type="button" @click="handleCancel">
         Отмена
       </button>
@@ -91,6 +95,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   'update:visible': [value: boolean];
   confirm: [payload: ManualMethodPayload];
+  reset: [];
 }>();
 
 const form = reactive({
@@ -161,6 +166,11 @@ function handleConfirm() {
   }
 
   emit('confirm', payload);
+}
+
+function handleReset() {
+  emit('reset');
+  emit('update:visible', false);
 }
 </script>
 

@@ -10,7 +10,6 @@
           { 'elis-filled': isElisFilled }
         ]"
         placeholder="Метод не выбран"
-        showClear
         class="method-select"
         @update:modelValue="handleMethodChange"
       />
@@ -116,30 +115,31 @@ function handleEditClick() {
 /* Иконка редактирования внутри Select */
 .edit-method-btn {
   position: absolute;
-  right: 70px; /* Слева от крестика очистки: [карандаш] [крестик] [dropdown] */
+  right: 40px; /* Слева от dropdown: [карандаш] [dropdown] */
   top: 50%;
   transform: translateY(-50%);
   width: 28px;
   height: 28px;
-  border: none;
-  background-color: transparent;
-  color: var(--md-primary, #2f6fed);
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
   font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: background-color 0.2s ease;
   z-index: 1;
 }
 
 .edit-method-btn:hover {
-  background-color: rgba(47, 111, 237, 0.12);
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
 }
 
 .edit-method-btn:active {
-  background-color: rgba(47, 111, 237, 0.2);
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
 }
 
 :deep(.method-field .p-select) {

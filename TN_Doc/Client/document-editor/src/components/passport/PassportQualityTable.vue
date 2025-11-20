@@ -58,6 +58,7 @@
     :parameter-name="activeManualMethodParameter?.name"
     @update:visible="handleManualMethodDialogVisibility"
     @confirm="handleManualMethodConfirm"
+    @reset="handleManualMethodReset"
   />
 </template>
 
@@ -144,6 +145,16 @@ function handleManualMethodConfirm(payload: ManualMethodPayload) {
   };
 
   emit('update:method', { paramKey: param.key, method: newMethod });
+  manualMethodDialogVisible.value = false;
+  activeManualMethodParameter.value = null;
+}
+
+function handleManualMethodReset() {
+  if (!activeManualMethodParameter.value) {
+    return;
+  }
+
+  emit('update:method', { paramKey: activeManualMethodParameter.value.key, method: null });
   manualMethodDialogVisible.value = false;
   activeManualMethodParameter.value = null;
 }
