@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2025-11-18T07:15:29.781965+00:00",
+  "cfgAppPath": "TN_Doc/Cfg/CfgApp.json",
+  "globalElisUse": false,
+  "configFiles": [
+    "TN_Doc/Cfg/CfgEditPassport.json",
+    "TN_Doc/Cfg/CfgEditPassportExport.json",
+    "TN_Doc/Cfg/CfgEditPassport_MI3532(14).json",
+    "TN_Doc/Cfg/Passport/CfgEditPassportExport.json",
+    "TN_Doc/Cfg/Passport/CfgEditPassportForActNP.json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_EAC.json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(13).json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(14).json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15).json",
+    "TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
+  ],
+  "devices": [
+    {
+      "idDevice": 0,
+      "name": "ИВК-1",
+      "enabled": true,
+      "useElis": false,
+      "elisSource": "global",
+      "passportEditConfigs": [
+        "Cfg/CfgEditPassport.json",
+        "Cfg/Passport/CfgEditPassportExport.json",
+        "Cfg/Passport/CfgEditPassportForActNP.json",
+        "Cfg/Passport/CfgEditPassport_EAC.json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(13).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(14).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(15).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
+      ]
+    },
+    {
+      "idDevice": 1,
+      "name": "ИВК-2",
+      "enabled": false,
+      "useElis": false,
+      "elisSource": "global",
+      "passportEditConfigs": [
+        "Cfg/CfgEditPassport.json",
+        "Cfg/Passport/CfgEditPassportExport.json",
+        "Cfg/Passport/CfgEditPassportForActNP.json",
+        "Cfg/Passport/CfgEditPassport_EAC.json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(13).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(14).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(15).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
+      ]
+    },
+    {
+      "idDevice": 2,
+      "name": "ИВК-РСУ",
+      "enabled": false,
+      "useElis": false,
+      "elisSource": "global",
+      "passportEditConfigs": [
+        "Cfg/CfgEditPassport.json",
+        "Cfg/Passport/CfgEditPassportExport.json",
+        "Cfg/Passport/CfgEditPassportForActNP.json",
+        "Cfg/Passport/CfgEditPassport_EAC.json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json",
+        "Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(13).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(14).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(15).json",
+        "Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
+      ]
+    }
+  ]
+}

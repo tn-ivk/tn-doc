@@ -11,6 +11,7 @@
       <PassportMethodSelectWithHistory
         :parameter="parameter"
         @update:method="handleMethodUpdate"
+        @manual-method="handleManualMethodRequest"
       />
     </td>
 
@@ -32,7 +33,7 @@
       <PassportResultCellWithHistory
         :parameter="parameter"
         :isEditable="isResultEditable"
-        @update:result="handleResultUpdate"
+        @result-edit="handleResultEditRequest"
       />
     </td>
   </tr>
@@ -61,6 +62,8 @@ const emit = defineEmits<{
   'update:method': [event: { paramKey: string; method: MethodOption | null }];
   'update:measurement': [event: { paramKey: string; value: string }];
   'update:result': [event: { paramKey: string; value: string }];
+  'result-edit': [event: { paramKey: string }];
+  'manual-method': [event: { paramKey: string }];
 }>();
 
 // Component mounted without debug logging
@@ -68,22 +71,7 @@ const emit = defineEmits<{
 /**
  * Определить, редактируема ли ячейка результата
  */
-const isResultEditable = computed(() => {
-  const selectedMethod = props.parameter.method.options.find(
-    (m: MethodOption) => m.name === props.parameter.method.selected
-  );
-
-  if (!selectedMethod || !selectedMethod.limitValueActivate) {
-    return false;
-  }
-
-  const measurementValue = parseFloat(props.parameter.values.measurement.replace(',', '.'));
-  if (isNaN(measurementValue)) {
-    return false;
-  }
-
-  return selectedMethod.limitValue !== undefined && measurementValue < selectedMethod.limitValue;
-});
+const isResultEditable = computed(() => props.parameter.isBallast !== true);
 
 function handleMethodUpdate(method: MethodOption | null) {
   emit('update:method', { paramKey: props.parameter.key, method });
@@ -95,6 +83,14 @@ function handleMeasurementUpdate(value: string) {
 
 function handleResultUpdate(value: string) {
   emit('update:result', { paramKey: props.parameter.key, value });
+}
+
+function handleResultEditRequest() {
+  emit('result-edit', { paramKey: props.parameter.key });
+}
+
+function handleManualMethodRequest() {
+  emit('manual-method', { paramKey: props.parameter.key });
 }
 </script>
 
@@ -123,15 +119,18 @@ function handleResultUpdate(value: string) {
 .cell-method,
 .cell-measurement {
   padding: 4px;
+  overflow: hidden;
 }
 
 .cell-documents {
   padding: 4px;
+  overflow: hidden;
 }
 
 .cell-result {
   text-align: center;
   padding: 4px;
+  overflow: hidden;
 }
 
 .manual-input--disabled {

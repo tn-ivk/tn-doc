@@ -1,18 +1,29 @@
 <template>
   <div class="method-field">
-    <Select
-      :modelValue="selectedMethodOption"
-      :options="methodOptions"
-      optionLabel="name"
-      :class="[
-        { 'p-invalid': !isValid },
-        { 'elis-filled': isElisFilled }
-      ]"
-      placeholder="Метод не выбран"
-      showClear
-      class="method-select"
-      @update:modelValue="handleMethodChange"
-    />
+    <div class="method-select-container">
+      <Select
+        :modelValue="selectedMethodOption"
+        :options="methodOptions"
+        optionLabel="name"
+        :class="[
+          { 'p-invalid': !isValid },
+          { 'elis-filled': isElisFilled }
+        ]"
+        placeholder="Метод не выбран"
+        class="method-select"
+        @update:modelValue="handleMethodChange"
+      />
+
+      <!-- Иконка редактирования внутри комбобокса -->
+      <button
+        class="edit-method-btn"
+        type="button"
+        @click="handleEditClick"
+        title="Создать ручной метод"
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
+    </div>
 
     <!-- Сообщение об ошибке валидации -->
     <small v-if="!isValid" class="p-error">
@@ -37,6 +48,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   'update:method': [method: MethodOption | null];
+  'manual-method': [];
 }>();
 
 /**
@@ -75,6 +87,13 @@ const validationMessage = computed(() => {
 function handleMethodChange(method: MethodOption | null) {
   emit('update:method', method);
 }
+
+/**
+ * Обработчик клика на иконку редактирования
+ */
+function handleEditClick() {
+  emit('manual-method');
+}
 </script>
 
 <style scoped>
@@ -82,9 +101,45 @@ function handleMethodChange(method: MethodOption | null) {
   width: 100%;
 }
 
+/* Контейнер для Select и иконки */
+.method-select-container {
+  position: relative;
+  width: 100%;
+}
+
 .method-select {
   width: 100%;
   font-size: 15px;
+}
+
+/* Иконка редактирования внутри Select */
+.edit-method-btn {
+  position: absolute;
+  right: 34px; /* Вплотную к dropdown */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.edit-method-btn:hover {
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
+}
+
+.edit-method-btn:active {
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
 }
 
 :deep(.method-field .p-select) {

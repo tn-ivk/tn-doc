@@ -1,35 +1,45 @@
-import { logger } from '@tn-doc/shared';
 <template>
-  <!-- Всегда отображаем InputText, чтобы визуально совпадать со столбцами Документы/Измерение -->
-  <InputText
-    :modelValue="isEditable ? parameter.values.result : displayValue"
-    :disabled="!isEditable"
-    :class="[
-      'result-input',
-      { 'elis-filled': isElisFilled },
-      { 'manual-input--disabled': !isEditable }
-    ]"
-    type="text"
-    @update:modelValue="handleValueChange"
-  />
+  <div class="result-cell">
+    <div class="result-value-container">
+      <div
+        class="result-value"
+        :class="{
+          'elis-filled': isElisFilled,
+          'result-value--disabled': !canEdit
+        }"
+      >
+        <span>{{ displayValue }}</span>
+      </div>
+
+      <!-- Иконка редактирования внутри поля результата -->
+      <button
+        v-if="canEdit"
+        class="edit-result-btn"
+        type="button"
+        @click="handleEditClick"
+        :title="'Редактировать результат'"
+      >
+        <i class="pi pi-pencil"></i>
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { logger } from '@tn-doc/shared';
 import { computed } from 'vue';
-import InputText from 'primevue/inputtext';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
 interface Props {
   parameter: PassportQualityParameter;
-  isEditable: boolean;
+  canEdit: boolean;
   isElisFilled?: boolean;
+  editDisabledReason?: string;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:result': [value: string];
+  'result-edit': [];
 }>();
 
 const displayValue = computed(() => {
@@ -37,46 +47,85 @@ const displayValue = computed(() => {
   return props.parameter.values.result.replace('.', ',');
 });
 
-function handleValueChange(value: string | undefined) {
-  const stringValue = value ?? '';
-  emit('update:result', stringValue);
-  logger.debug(`[PassportResultCell] Result изменено: ${props.parameter.key} -> ${stringValue}`);
+function handleEditClick() {
+  if (!props.canEdit) {
+    return;
+  }
+  emit('result-edit');
 }
 </script>
 
 <style scoped>
-.result-input {
+.result-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
+}
+
+/* Контейнер для поля результата и иконки */
+.result-value-container {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  flex: 1;
+  min-width: 0;
+}
+
+.result-value {
+  width: 100%;
+  max-width: 100%;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--md-outline, #d5d7da);
+  border-radius: 6px;
   font-size: 15px;
-  text-align: center;
+  padding: 4px 8px;
+  background-color: white;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.result-input:deep(input) {
-  text-align: center;
-  font-size: 15px;
+.result-value.elis-filled {
+  background-color: var(--md-elis-highlight, #e8f5e9);
 }
 
-/* ELIS подсветка для InputText */
-.result-input.elis-filled {
-  background-color: var(--md-elis-highlight, #e8f5e9) !important;
+.result-value--disabled {
+  background-color: var(--md-surface-variant, #f1f3f4);
+  color: var(--md-text-secondary, #5f6368);
+}
+
+/* Иконка редактирования внутри поля результата */
+.edit-result-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
   color: var(--md-text, #212121) !important;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  z-index: 1;
 }
 
-.result-input.elis-filled:deep(input) {
-  background-color: var(--md-elis-highlight, #e8f5e9) !important;
-  color: var(--md-text, #212121) !important;
+.edit-result-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  color: var(--md-primary, #2f6fed) !important;
 }
 
-/* Disabled стиль как у колонки Документы */
-.manual-input--disabled {
-  background-color: var(--md-surface-variant, #F1F3F4);
-  color: var(--md-text-secondary, #5F6368);
-  cursor: not-allowed;
-}
-
-.manual-input--disabled:deep(input) {
-  background-color: var(--md-surface-variant, #F1F3F4);
-  color: var(--md-text-secondary, #5F6368);
-  cursor: not-allowed;
+.edit-result-btn:active {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+  color: var(--md-primary, #2f6fed) !important;
 }
 </style>

@@ -38,14 +38,35 @@
           @update:method="$emit('update:method', $event)"
           @update:measurement="$emit('update:measurement', $event)"
           @update:result="$emit('update:result', $event)"
+          @result-edit="handleResultEditRequest"
+          @manual-method="handleManualMethodRequest"
         />
       </tbody>
     </table>
   </div>
+
+  <ResultEditDialog
+    :visible="resultDialogVisible"
+    :parameter-name="activeResultParameter?.name"
+    :initial-value="activeResultParameter?.values.result || ''"
+    @update:visible="handleResultDialogVisibility"
+    @confirm="handleResultDialogConfirm"
+  />
+
+  <ManualMethodDialog
+    :visible="manualMethodDialogVisible"
+    :parameter-name="activeManualMethodParameter?.name"
+    @update:visible="handleManualMethodDialogVisibility"
+    @confirm="handleManualMethodConfirm"
+    @reset="handleManualMethodReset"
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import PassportParameterRow from './PassportParameterRow.vue';
+import ResultEditDialog from './ResultEditDialog.vue';
+import ManualMethodDialog, { type ManualMethodPayload } from './ManualMethodDialog.vue';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {
@@ -63,7 +84,87 @@ const emit = defineEmits<{
   'update:result': [event: { paramKey: string; value: string }];
 }>();
 
-// Component mounted without debug logging
+const resultDialogVisible = ref(false);
+const manualMethodDialogVisible = ref(false);
+const activeResultParameter = ref<PassportQualityParameter | null>(null);
+const activeManualMethodParameter = ref<PassportQualityParameter | null>(null);
+
+function handleResultEditRequest(event: { paramKey: string }) {
+  const target = props.parameters.find(param => param.key === event.paramKey) || null;
+  if (!target) {
+    return;
+  }
+  activeResultParameter.value = target;
+  resultDialogVisible.value = true;
+}
+
+function handleResultDialogConfirm(formattedValue: string) {
+  if (!activeResultParameter.value) {
+    return;
+  }
+  emit('update:result', {
+    paramKey: activeResultParameter.value.key,
+    value: formattedValue
+  });
+  resultDialogVisible.value = false;
+  activeResultParameter.value = null;
+}
+
+function handleResultDialogVisibility(next: boolean) {
+  resultDialogVisible.value = next;
+  if (!next) {
+    activeResultParameter.value = null;
+  }
+}
+
+function handleManualMethodRequest(event: { paramKey: string }) {
+  const target = props.parameters.find(param => param.key === event.paramKey) || null;
+  if (!target) {
+    return;
+  }
+  activeManualMethodParameter.value = target;
+  manualMethodDialogVisible.value = true;
+}
+
+function handleManualMethodConfirm(payload: ManualMethodPayload) {
+  if (!activeManualMethodParameter.value) {
+    return;
+  }
+
+  const param = activeManualMethodParameter.value;
+  const newMethod: MethodOption = {
+    id: Date.now(),
+    use: true,
+    idParameter: param.id,
+    name: payload.name,
+    isDefault: payload.isDefault,
+    limitValueActivate: payload.limitValueActivate,
+    limitValue: payload.limitValue,
+    limitValueString: payload.limitValueString,
+    source: 'manual'
+  };
+
+  emit('update:method', { paramKey: param.key, method: newMethod });
+  manualMethodDialogVisible.value = false;
+  activeManualMethodParameter.value = null;
+}
+
+function handleManualMethodReset() {
+  if (!activeManualMethodParameter.value) {
+    return;
+  }
+
+  emit('update:method', { paramKey: activeManualMethodParameter.value.key, method: null });
+  manualMethodDialogVisible.value = false;
+  activeManualMethodParameter.value = null;
+}
+
+function handleManualMethodDialogVisibility(next: boolean) {
+  manualMethodDialogVisible.value = next;
+  if (!next) {
+    activeManualMethodParameter.value = null;
+  }
+}
 </script>
 
 <style scoped>
@@ -82,6 +183,7 @@ const emit = defineEmits<{
 .quality-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-family: 'Segoe UI', 'PT Astra Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-size: 15px;
   color: var(--md-text);
@@ -127,11 +229,12 @@ const emit = defineEmits<{
 }
 
 .col-documents {
-  min-width: 150px;
+  width: 150px;
+  text-align: center;
 }
 
 .col-measurement {
-  width: 120px;
+  width: 150px;
   text-align: center;
 }
 

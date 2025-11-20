@@ -8,14 +8,14 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 **Version**: 1.4.3 (.NET 8.0)
 **Main Development Branch**: develop
-**Active Development Branch**: developWork
 **Runtime Requirement**: .NET Runtime 8.0.13+ (SDK 9.0+ для разработки)
 **Node.js Requirement**: Node.js 18.0+ и npm 8.0+ (для Vue компонентов)
 
 **Critical Rules:**
-- NEVER mention AI, code generation, or "Claude" in commit messages
-- Use Russian language for all commit messages
-- Current active branch: developWork
+- ⚠️ **НИКОГДА** не упоминать AI, генерацию кода, автоматизацию или "Claude" в коммитах
+- ⚠️ **НИКОГДА** не добавлять "Generated with Claude Code" или подобные атрибуции
+- ⚠️ **НИКОГДА** не добавлять "Co-Authored-By: Claude" или любые AI co-author теги
+- ⚠️ **ВСЕГДА** использовать русский язык для коммит-сообщений
 
 ## Essential Commands
 
@@ -40,6 +40,14 @@ dotnet format                                   # Format code
 ```
 
 **Note**: Commands use forward slashes for cross-platform compatibility. On Windows, these work in PowerShell and Git Bash. For Command Prompt, use backslashes (`cd TN_Doc` works, but `cd TN_Doc\Client` for nested paths).
+
+**Дополнительные правила**: См. [AGENTS.md](AGENTS.md) для детальных правил по:
+- Организации структуры проекта и модулей
+- Командам сборки, тестирования и разработки
+- Стилю кодирования и соглашениям об именовании
+- Правилам тестирования
+- Правилам коммитов и Pull Request
+- Заметкам о конфигурации и безопасности
 
 ## Quick Start for New Developers
 
@@ -94,12 +102,12 @@ tn_doc/
 │       └── shared/            # Shared TypeScript utilities and types
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
-├── tn.docgeneral/             # Document module libraries (48 libraries)
+├── tn.docgeneral/             # Document module libraries (45 libraries)
 │   ├── Act, Passport, Report, Jornal (4 core documents)
 │   ├── ActProducer, ActRoute (2 additional act types)
-│   ├── Poverka* (21 verification documents)
-│   ├── KMH* (18 quality control documents)
-│   └── Common* (3 shared libraries)
+│   ├── Poverka* (20 verification documents)
+│   ├── KMH*/KMX* (17 quality control documents)
+│   └── Common* (2 shared libraries)
 └── Tests/                     # NUnit tests with Moq
 ```
 
@@ -315,11 +323,16 @@ cd TN_Doc/Client && npm run build:all # Build Vue components
 
 ### Commit Message Rules
 
-- **NEVER** mention AI, automated generation, or "Claude" in commit messages
-- Use Russian language for commit messages
-- Follow conventional commits style: "Тип: краткое описание"
-- Include detailed description in commit body if needed
-- Reference issue numbers when applicable
+⚠️ **КРИТИЧЕСКИ ВАЖНО - НИКОГДА НЕ НАРУШАТЬ:**
+- **НИКОГДА** не упоминать AI, генерацию кода, автоматизацию или "Claude" в коммит-сообщениях
+- **НИКОГДА** не добавлять "Generated with Claude Code" или подобные атрибуции
+- **НИКОГДА** не добавлять "Co-Authored-By: Claude" или любые AI co-author теги
+- **ВСЕГДА** использовать русский язык для коммит-сообщений
+
+**Стандартные правила:**
+- Следовать стилю conventional commits: "Тип: краткое описание"
+- Включать детальное описание в body коммита при необходимости
+- Ссылаться на номера задач когда применимо
 
 **Important Warnings:**
 - Large number of configuration files are tracked - be careful with bulk changes
@@ -376,6 +389,18 @@ Real-time data acquisition from measurement systems:
 - `/TN_Doc/changes.md` - Detailed change log
 - `/docs/` - Additional documentation (architecture, API, deployment, integration)
 - `/README.md` - Project overview
+- `/AGENTS.md` - Repository guidelines and development rules
+
+### Planning and Technical Debt
+- `/tech_debt/` - Планы улучшения архитектуры и отслеживание технического долга
+  - `ARCHITECTURE_IMPROVEMENTS.md` - Предложения по улучшению архитектуры системы
+  - `PASSPORT_QUALITY_FILLING_PLAN.md` - Детальное планирование функций паспорта качества
+  - `PASSPORT_QUALITY_FILLING_PROMPTS.md` - Промпты для реализации паспорта качества
+  - `FASTREPORT_OPTIMIZATION_PLAN.md` - План оптимизации генерации отчетов
+  - `SECURITY_HARDENING_PLAN.md` - Дорожная карта повышения безопасности
+  - `WINDOWS_INSTALLER_IMPLEMENTATION_PLAN.md` - Руководство по реализации установщика Windows
+  - `ELIS_CONFIG_EXAMPLES.md` - Примеры конфигурации интеграции с ELIS
+  - `DOCUMENT_LIBRARIES_LIST.md` - Список всех библиотек документов
 
 ## Common Issues and Solutions
 
@@ -425,7 +450,6 @@ Real-time data acquisition from measurement systems:
   - Integration with ELIS (lab data) and OPC (device communication)
   - Advanced auto-fill functionality for dependent parameters
   - Full support for method selection and measurement input
-- **Active development branch**: developWork
 
 ## Previous Major Changes (v1.4.2 - October 2024)
 

@@ -5,10 +5,55 @@ import { documentApi } from '@/services/api.service';
 import type { DocumentEditConfig, FormField } from '@/types/document.types';
 import type { PassportEditConfig } from '@/types/passport.types';
 import type { FieldHistoryEntry } from '@/types/history.types';
+import { DataSource } from '@/types/history.types';
 
-/**
- * Store для управления состоянием документа
- */
+const MANUAL_AUTHOR = 'Пользователь';
+
+type SyncBallastOptions = {
+  source?: DataSource;
+  comment?: string;
+  trackMeasurementHistory?: boolean;
+  trackResultHistory?: boolean;
+};
+
+type ManualOverrideOptions = {
+  source?: DataSource;
+  comment?: string;
+  payloadType?: string;
+};
+
+const resolveAuthor = (source: DataSource) => {
+  switch (source) {
+    case DataSource.ELIS:
+      return 'ELIS';
+    case DataSource.IVK:
+      return 'IVK';
+    default:
+      return MANUAL_AUTHOR;
+  }
+};
+
+const createHistoryEntry = (
+  source: DataSource,
+  value: string,
+  previousValue?: string,
+  comment?: string
+): FieldHistoryEntry => ({
+  source,
+  modifiedAt: new Date().toISOString(),
+  modifiedBy: resolveAuthor(source),
+  value,
+  previousValue,
+  comment
+});
+
+const ensureArray = <T>(value: T[] | undefined): T[] => {
+  if (value) {
+    return value;
+  }
+  return [];
+};
+
 export const useDocumentStore = defineStore('document', () => {
   // State
   const config = ref<DocumentEditConfig | null>(null);
@@ -203,9 +248,68 @@ export const useDocumentStore = defineStore('document', () => {
     }
   }
 
-  /**
-   * Сохранить документ
-   */
+  const pushHistoryEntry = (fieldKey: string, entry: FieldHistoryEntry) => {
+    const currentHistory = ensureArray(formHistory.value[fieldKey]);
+    currentHistory.push(entry);
+    formHistory.value[fieldKey] = currentHistory;
+  };
+
+  function syncBallastParameter(paramKey: string, value: string, options?: SyncBallastOptions) {
+    const measurementKey = `value.${paramKey}`;
+    const resultKey = `result.${paramKey}`;
+    const normalizedValue = value ?? '';
+    const previousMeasurement = formData.value[measurementKey] ?? '';
+    const previousResult = formData.value[resultKey] ?? '';
+    const source = options?.source ?? DataSource.Manual;
+    const isElisFilled = source === DataSource.ELIS;
+
+    formData.value[measurementKey] = normalizedValue;
+    formData.value[resultKey] = normalizedValue;
+    formData.value[`${measurementKey}__elisFilled`] = isElisFilled;
+    formData.value[`${resultKey}__elisFilled`] = isElisFilled;
+    formData.value[`${resultKey}__manualOverride`] = false;
+    isDirty.value = true;
+
+    if (options?.trackMeasurementHistory !== false && previousMeasurement !== normalizedValue) {
+      pushHistoryEntry(
+        measurementKey,
+        createHistoryEntry(source, normalizedValue, previousMeasurement, options?.comment)
+      );
+    }
+
+    if (options?.trackResultHistory !== false && previousResult !== normalizedValue) {
+      pushHistoryEntry(
+        resultKey,
+        createHistoryEntry(source, normalizedValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
+      );
+    }
+  }
+
+  function markManualOverride(paramKey: string, resultValue: string, options?: ManualOverrideOptions) {
+    const resultKey = `result.${paramKey}`;
+    const normalizedValue = resultValue ?? '';
+    const previousResult = formData.value[resultKey] ?? '';
+    const source = options?.source ?? DataSource.Manual;
+    const isElisFilled = source === DataSource.ELIS;
+
+    formData.value[resultKey] = normalizedValue;
+    formData.value[`${resultKey}__elisFilled`] = isElisFilled;
+    formData.value[`${resultKey}__manualOverride`] = source === DataSource.Manual;
+    isDirty.value = true;
+
+    if (previousResult !== normalizedValue) {
+      pushHistoryEntry(
+        resultKey,
+        createHistoryEntry(
+          source,
+          normalizedValue,
+          previousResult,
+          options?.comment ?? (options?.payloadType === 'ResultModal' ? 'Изменено через модалку результата' : undefined)
+        )
+      );
+    }
+  }
+
   async function saveDocument() {
     if (!config.value) {
       throw new Error('Конфигурация документа не загружена');
@@ -286,6 +390,8 @@ export const useDocumentStore = defineStore('document', () => {
     loadConfig,
     updateField,
     bulkUpdateFields,
+    syncBallastParameter,
+    markManualOverride,
     saveDocument,
     reset
   };

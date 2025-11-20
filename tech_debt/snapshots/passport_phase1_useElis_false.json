@@ -1,0 +1,42 @@
+{
+  "docType": "Passport",
+  "isElisUsed": false,
+  "qualityParametersSchema": [
+    {
+      "id": 1,
+      "key": "TempCorrection",
+      "name": "Коррекция температуры",
+      "editable": true,
+      "requiredFill": true,
+      "methodRequiredFill": true,
+      "roundValue": 2,
+      "isBallast": true,
+      "methodSource": "config",
+      "methodOptions": [
+        {
+          "id": -1,
+          "use": false,
+          "idParameter": -1,
+          "name": "",
+          "isDefault": false,
+          "limitValueActivate": false,
+          "limitValue": 0.0,
+          "limitValueString": "",
+          "source": "config"
+        },
+        {
+          "id": 10,
+          "use": true,
+          "idParameter": 1,
+          "name": "ASTM D1298",
+          "isDefault": true,
+          "limitValueActivate": false,
+          "limitValue": null,
+          "limitValueString": null,
+          "source": "config"
+        }
+      ]
+    }
+  ]
+}
+

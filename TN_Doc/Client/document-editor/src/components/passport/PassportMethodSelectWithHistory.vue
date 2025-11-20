@@ -4,6 +4,7 @@
       :parameter="parameter"
       :isElisFilled="isElisFilled"
       @update:method="handleChange"
+      @manual-method="handleManualMethod"
     />
 
     <!-- Индикатор истории -->
@@ -38,6 +39,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:method': [method: MethodOption | null];
+  'manual-method': [];
 }>();
 
 const {
@@ -81,6 +83,10 @@ const handleChange = (newMethod: MethodOption | null) => {
 
   // Передаем изменение дальше
   emit('update:method', newMethod);
+};
+
+const handleManualMethod = () => {
+  emit('manual-method');
 };
 
 /**

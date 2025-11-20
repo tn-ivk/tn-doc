@@ -385,126 +385,144 @@
       "Key": "Mass_fraction_of_hydrogen_sulfide",
       "Name": "Массовая доля сероводорода, млнˉ¹ (ppm)",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 2,
       "Key": "Mass_fraction_of_methyl_and_ethyl_mercaptan",
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 3,
       "Key": "MassWaterFracCorrection",
       "Name": "Массовая доля воды, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 4,
       "Key": "Chloride_Salts.Concentration",
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 5,
       "Key": "Chloride_Salts.MassFraction",
       "Name": "Массовая доля хлористых солей, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 6,
       "Key": "DNP.kPa",
       "Name": "Давление насыщенных паров, кПа",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 7,
       "Key": "DNP.mercury_mm",
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 8,
       "Key": "Mass_fraction_of_organic_chlorides",
       "Name": "Массовая доля органических хлоридов, млнˉ¹ (ppm)",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 9,
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 10,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 11,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 12,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 13,
       "Key": "Dens15Correction",
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 14,
       "Key": "Impurity",
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 15,
       "Key": "SulfurCorrection",
       "Name": "Массовая доля серы, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 16,
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 17,
       "Key": "Yield_fraction_300",
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 18,
       "Key": "Mass_fraction_of_paraffin",
       "Name": "Массовая доля парафина, %",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     }
   ],
   "AdditionalInfo": [
