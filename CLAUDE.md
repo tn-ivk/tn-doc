@@ -28,7 +28,7 @@ cd TN_Doc && dotnet run                         # Run app (http://localhost:3850
 npm run build:all                               # Build all Vue apps (statusbar, configurator, document-editor)
 npm run dev                                     # StatusBar dev server (port 5173)
 npm run dev:configurator                        # Configurator dev server (port 5174)
-npm run dev:editor                              # Document Editor dev server (port 5174)
+npm run dev:editor                              # Document Editor dev server (port 5175)
 npm run clean                                   # Clean all build artifacts (requires Git Bash/PowerShell on Windows)
 
 # Testing
@@ -36,14 +36,10 @@ dotnet test                                     # Run all tests
 dotnet test --filter "ClassName=YourTestClass"  # Run specific test class
 
 # Code quality
-dotnet format                                   # Format code
+dotnet format                                   # Format code (requires .NET SDK)
 ```
 
-**Note**: Commands use forward slashes for cross-platform compatibility. On Windows, these work in PowerShell and Git Bash. For Command Prompt, use backslashes (`cd TN_Doc` works, but `cd TN_Doc\Client` for nested paths).
-
-**Additional Requirements:**
-- `dotnet format` requires .NET SDK (SDK 9.0+ recommended for .NET 8.0 projects)
-- Vue component builds require Node.js 18.0+ and npm 8.0+
+**Note**: Commands use forward slashes for cross-platform compatibility. On Windows, these work in PowerShell and Git Bash.
 
 **Дополнительные правила**: См. [AGENTS.md](AGENTS.md) для детальных правил по:
 - Организации структуры проекта и модулей
@@ -221,10 +217,9 @@ git pull origin develop
 dotnet restore && dotnet build
 
 # 2. Run application (from solution root)
-# Windows PowerShell/Git Bash:
+# Windows PowerShell:
 cd TN_Doc
-$env:ASPNETCORE_ENVIRONMENT="Development"  # PowerShell
-# or: set ASPNETCORE_ENVIRONMENT=Development  # CMD
+$env:ASPNETCORE_ENVIRONMENT="Development"
 dotnet run
 
 # Linux/macOS:
@@ -240,7 +235,7 @@ npm run dev:editor       # Document Editor with hot reload (port 5175)
 dotnet test --filter "ClassName=YourTestClass"
 
 # 5. Before committing
-dotnet format                         # Format code (requires .NET SDK 9.0+)
+dotnet format                         # Format code
 dotnet build && dotnet test           # Ensure it builds and tests pass
 cd TN_Doc/Client && npm run build:all # Build Vue components for production
 git status                            # Review changes before commit
@@ -301,7 +296,7 @@ git status                            # Review changes before commit
 - **Document Editor** (`TN_Doc/Client/document-editor/`): In-browser document editing interface (in development)
   - Framework: Vue 3 + TypeScript + PrimeVue
   - Features: Edit Passport quality parameters, ELIS integration, OPC communication
-  - Dev server: `npm run dev:editor` (port 5174)
+  - Dev server: `npm run dev:editor` (port 5175)
   - Build output: `TN_Doc/wwwroot/document-editor/`
   - Status: Under active development on feature branches
 
