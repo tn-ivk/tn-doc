@@ -229,17 +229,17 @@ function handleManualMethodDialogVisibility(next: boolean) {
 }
 
 .col-documents {
-  width: 130px;
+  width: 150px;
   text-align: center;
 }
 
 .col-measurement {
-  width: 130px;
+  width: 150px;
   text-align: center;
 }
 
 .col-result {
-  width: 130px;
+  width: 150px;
   text-align: center;
 }
 
