@@ -29,8 +29,8 @@ import { logger } from '@tn-doc/shared';
         <div class="editor-table-wrapper">
           <table class="editor-table">
             <tbody>
-              <!-- Динамические строки: обычные поля и группы подписантов в исходном порядке -->
-              <template v-for="row in displayRows" :key="row.type === 'field' ? row.field.key : row.group.prefix">
+              <!-- Динамические строки: обычные поля, группы дат и группы подписантов в исходном порядке -->
+              <template v-for="row in displayRows" :key="row.type === 'field' ? row.field.key : row.type === 'dateRange' ? 'dateRange' : row.group.prefix">
                 <!-- Обычное поле -->
                 <tr v-if="row.type === 'field'">
                   <td class="editor-label-cell">
@@ -46,6 +46,27 @@ import { logger } from '@tn-doc/shared';
                       :hide-label="true"
                       :invalidChars="store.config?.invalidChars || []"
                       @update:modelValue="(value) => store.updateField(row.field.key, value)"
+                    />
+                  </td>
+                </tr>
+
+                <!-- Группа дат (диапазон) -->
+                <tr v-else-if="row.type === 'dateRange'">
+                  <td class="editor-label-cell">
+                    <div class="label-wrapper">
+                      <span class="label-text">{{ row.group.label }}</span>
+                      <span v-if="row.group.required" class="required-mark">*</span>
+                    </div>
+                  </td>
+                  <td class="editor-input-cell">
+                    <DateRangeFieldGroup
+                      :beginField="row.group.begin"
+                      :endField="row.group.end"
+                      :beginValue="store.formData[row.group.begin.key]"
+                      :endValue="store.formData[row.group.end.key]"
+                      :invalidChars="store.config?.invalidChars || []"
+                      @update:begin="(value) => store.updateField(row.group.begin.key, value)"
+                      @update:end="(value) => store.updateField(row.group.end.key, value)"
                     />
                   </td>
                 </tr>
@@ -98,6 +119,7 @@ import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FormFieldWithHistory from '@/components/FormFieldWithHistory.vue';
 import SignerFieldGroup from '@/components/SignerFieldGroup.vue';
+import DateRangeFieldGroup from '@/components/DateRangeFieldGroup.vue';
 import PassportQualityTable from '@/components/passport/PassportQualityTable.vue';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -144,11 +166,22 @@ interface SignerGroup {
 }
 
 /**
- * Строка для отображения в таблице (либо обычное поле, либо группа подписантов)
+ * Группа полей даты и времени (диапазон)
+ */
+interface DateRangeGroup {
+  label: string;
+  begin: FormField;
+  end: FormField;
+  required: boolean;
+}
+
+/**
+ * Строка для отображения в таблице (обычное поле, группа подписантов или группа дат)
  */
 type DisplayRow =
   | { type: 'field'; field: FormField }
-  | { type: 'signerGroup'; group: SignerGroup };
+  | { type: 'signerGroup'; group: SignerGroup }
+  | { type: 'dateRange'; group: DateRangeGroup };
 
 /**
  * Объединенный массив полей для отображения в правильном порядке
@@ -162,6 +195,27 @@ const displayRows = computed((): DisplayRow[] => {
     // Пропускаем уже обработанные поля
     if (processedKeys.has(field.key)) {
       continue;
+    }
+
+    // Проверяем, является ли это началом диапазона дат
+    if (field.key === 'PassportPeriodDT.Begin') {
+      const beginField = field;
+      const endField = store.fields.find(f => f.key === 'PassportPeriodDT.End');
+
+      if (beginField && endField) {
+        rows.push({
+          type: 'dateRange',
+          group: {
+            label: 'Дата и время отбора пробы', // Очищенный label без уточнений
+            begin: beginField,
+            end: endField,
+            required: beginField.required || endField.required || false
+          }
+        });
+        processedKeys.add(beginField.key);
+        processedKeys.add(endField.key);
+        continue;
+      }
     }
 
     // Проверяем, является ли это первым полем группы подписантов
@@ -194,8 +248,8 @@ const displayRows = computed((): DisplayRow[] => {
       }
     }
 
-    // Если это не часть группы подписантов, добавляем как обычное поле
-    if (!isSignerField(field.key)) {
+    // Если это не часть группы подписантов и не PassportPeriodDT.End, добавляем как обычное поле
+    if (!isSignerField(field.key) && field.key !== 'PassportPeriodDT.End') {
       rows.push({
         type: 'field',
         field
