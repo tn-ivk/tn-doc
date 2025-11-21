@@ -29,7 +29,8 @@ import { logger } from '@tn-doc/shared';
         <div class="editor-table-wrapper">
           <table class="editor-table">
             <tbody>
-              <tr v-for="field in store.fields" :key="field.key">
+              <!-- Обычные поля -->
+              <tr v-for="field in regularFields" :key="field.key">
                 <td class="editor-label-cell">
                   <div class="label-wrapper">
                     <span class="label-text">{{ field.label }}</span>
@@ -43,6 +44,30 @@ import { logger } from '@tn-doc/shared';
                     :hide-label="true"
                     :invalidChars="store.config?.invalidChars || []"
                     @update:modelValue="(value) => store.updateField(field.key, value)"
+                  />
+                </td>
+              </tr>
+
+              <!-- Группы подписантов -->
+              <tr v-for="group in signerGroups" :key="group.prefix">
+                <td class="editor-label-cell">
+                  <div class="label-wrapper">
+                    <span class="label-text">{{ group.label }}</span>
+                    <span v-if="group.required" class="required-mark">*</span>
+                  </div>
+                </td>
+                <td class="editor-input-cell">
+                  <SignerFieldGroup
+                    :iof="group.iof"
+                    :post="group.post"
+                    :factory="group.factory"
+                    :iofValue="store.formData[group.iof.key]"
+                    :postValue="store.formData[group.post.key]"
+                    :factoryValue="store.formData[group.factory.key]"
+                    :invalidChars="store.config?.invalidChars || []"
+                    @update:iof="(value) => store.updateField(group.iof.key, value)"
+                    @update:post="(value) => store.updateField(group.post.key, value)"
+                    @update:factory="(value) => store.updateField(group.factory.key, value)"
                   />
                 </td>
               </tr>
@@ -69,6 +94,7 @@ import { logger } from '@tn-doc/shared';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FormFieldWithHistory from '@/components/FormFieldWithHistory.vue';
+import SignerFieldGroup from '@/components/SignerFieldGroup.vue';
 import PassportQualityTable from '@/components/passport/PassportQualityTable.vue';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -79,11 +105,74 @@ import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/c
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
 import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
+import type { FormField } from '@/types/document.types';
 
 const route = useRoute();
 
 // Получаем функцию для отслеживания загрузки из ELIS
 const { trackElisLoad } = useFieldHistory();
+
+// Вспомогательные функции для работы с полями подписантов
+/**
+ * Проверяет, является ли поле полем подписанта
+ */
+const isSignerField = (key: string): boolean => {
+  return key.endsWith('_IOF') || key.endsWith('_Post') || key.endsWith('_Factory');
+};
+
+/**
+ * Очищает label от уточнений в скобках
+ * "Представитель испытательной лаборатории (ИОФ)" -> "Представитель испытательной лаборатории"
+ */
+const cleanSignerLabel = (label: string): string => {
+  return label.replace(/\s*\((?:ИОФ|должность|предприятие)\)\s*$/i, '').trim();
+};
+
+/**
+ * Группа полей подписанта
+ */
+interface SignerGroup {
+  prefix: string;
+  label: string;
+  iof: FormField;
+  post: FormField;
+  factory: FormField;
+  required: boolean;
+}
+
+/**
+ * Обычные поля (не подписанты)
+ */
+const regularFields = computed(() => {
+  return store.fields.filter(field => !isSignerField(field.key));
+});
+
+/**
+ * Группы полей подписантов
+ */
+const signerGroups = computed((): SignerGroup[] => {
+  const groups: SignerGroup[] = [];
+  const signerPrefixes = ['Laboratory', 'Delive', 'Receive'];
+
+  signerPrefixes.forEach(prefix => {
+    const iofField = store.fields.find(f => f.key === `${prefix}_IOF`);
+    const postField = store.fields.find(f => f.key === `${prefix}_Post`);
+    const factoryField = store.fields.find(f => f.key === `${prefix}_Factory`);
+
+    if (iofField && postField && factoryField) {
+      groups.push({
+        prefix,
+        label: cleanSignerLabel(iofField.label), // Очищаем от "(ИОФ)"
+        iof: iofField,
+        post: postField,
+        factory: factoryField,
+        required: iofField.required || false
+      });
+    }
+  });
+
+  return groups;
+});
 
 // Используем общую логику редактирования документов
 const {
@@ -449,6 +538,11 @@ setupBeforeUnloadHandler();
   color: var(--md-text);
   white-space: nowrap;
   padding-right: 0.75rem;
+}
+
+.editor-input-cell {
+  width: auto;
+  min-width: 300px; /* Минимальная ширина для размещения трёх полей подписанта */
 }
 
 .label-text {
