@@ -16,6 +16,7 @@ using TN_DocGeneral.Services;
 using TN.Utils.Helpers;
 using PassportCore = PassportLib::TN.Doc;
 using PassportEdit = PassportLib::TN.Doc.Edit;
+using PassportElis = PassportLib::Passport.Elis;
 using TN.DocData;
 using DataSource = PassportLib::TN.Doc.DataSource;
 using FieldHistoryEntry = PassportLib::TN.Doc.FieldHistoryEntry;
@@ -163,6 +164,129 @@ public class DocUpdateTests
 		Assert.That(storedHistory[0].Source, Is.EqualTo(DataSource.Manual));
 	}
 
+	[Test]
+	public void DocUpdate_ShouldKeepDocumentNull_WhenNotProvided()
+	{
+		// Arrange
+		var payload = new Dictionary<string, object>
+		{
+			["value.SulfurCorrection"] = "0,40"
+		};
+
+		using var passport = CreateDocPassport(isElisUsed: true);
+
+		// Act
+		passport.DocUpdate(88888, payload);
+
+		// Assert
+		Assert.That(passport.LastDataArm, Is.Not.Null);
+		var labInfo = passport.LastDataArm!.LabInfo.Single(x => x.ParameterKey == "SulfurCorrection");
+		Assert.That(labInfo.Document, Is.Null, "Document должен оставаться null при отсутствии данных");
+	}
+
+	[Test]
+	public void DocUpdate_ShouldPersistDocumentInfo_WhenProvided()
+	{
+		// Arrange
+		var documentInfo = new PassportEdit.LabDocumentInfo
+		{
+			Type = "ELIS Protocol",
+			Number = "AB-123",
+			Date = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc)
+		};
+
+		var payload = new Dictionary<string, object>
+		{
+			["document.SulfurCorrection"] = JsonConvert.SerializeObject(documentInfo),
+			["document.SulfurCorrection__elisFilled"] = true
+		};
+
+		using var passport = CreateDocPassport(isElisUsed: true);
+
+		// Act
+		passport.DocUpdate(99999, payload);
+
+		// Assert
+		Assert.That(passport.LastDataArm, Is.Not.Null);
+		var labInfo = passport.LastDataArm!.LabInfo.Single(x => x.ParameterKey == "SulfurCorrection");
+		Assert.That(labInfo.Document, Is.Not.Null, "Document должен быть создан при переданных данных");
+		Assert.Multiple(() =>
+		{
+			Assert.That(labInfo.Document!.Number, Is.EqualTo("AB-123"));
+			Assert.That(labInfo.Document.Type, Is.EqualTo("ELIS Protocol"));
+			Assert.That(labInfo.Document.Date, Is.EqualTo(documentInfo.Date));
+		});
+		Assert.That(labInfo.ElisFilled, Is.True);
+	}
+
+	[Test]
+	public void DocUpdate_ShouldReuseStoredElisProtocol_WhenPayloadDoesNotContainProtocol()
+	{
+		// Arrange
+		var payload = new Dictionary<string, object>
+		{
+			["value.SulfurCorrection"] = "0,40"
+		};
+
+		using var passport = CreateDocPassport(isElisUsed: true);
+		passport.SeedExistingDataArm(new PassportCore.DataARM
+		{
+			ElisProtocolNumber = "EL-001",
+			ElisProtocol = new PassportElis.QualityPassport
+			{
+				ProtocolNumber = "EL-001",
+				LabName = "Lab A"
+			}
+		});
+
+		// Act
+		passport.DocUpdate(12345, payload);
+
+		// Assert
+		Assert.That(passport.LastDataArm, Is.Not.Null);
+		Assert.That(passport.LastDataArm!.ElisProtocol, Is.Not.Null);
+		Assert.That(passport.LastDataArm.ElisProtocol.ProtocolNumber, Is.EqualTo("EL-001"));
+		Assert.That(passport.LastDataArm.ElisProtocol.LabName, Is.EqualTo("Lab A"));
+	}
+
+	[Test]
+	public void DocUpdate_ShouldOverrideStoredElisProtocol_WhenPayloadContainsNewProtocol()
+	{
+		// Arrange
+		var history = new Dictionary<string, List<FieldHistoryEntry>>();
+		var newProtocolPayload = new
+		{
+			protocolNumber = "EL-NEW-777",
+			labName = "New Lab"
+		};
+
+		var payload = new Dictionary<string, object>
+		{
+			["value.SulfurCorrection"] = "0,55",
+			["__history"] = JsonConvert.SerializeObject(history),
+			["__elisProtocol"] = JsonConvert.SerializeObject(newProtocolPayload)
+		};
+
+		using var passport = CreateDocPassport(isElisUsed: true);
+		passport.SeedExistingDataArm(new PassportCore.DataARM
+		{
+			ElisProtocolNumber = "EL-OLD",
+			ElisProtocol = new PassportElis.QualityPassport
+			{
+				ProtocolNumber = "EL-OLD",
+				LabName = "Legacy Lab"
+			}
+		});
+
+		// Act
+		passport.DocUpdate(54321, payload);
+
+		// Assert
+		Assert.That(passport.LastDataArm, Is.Not.Null);
+		Assert.That(passport.LastDataArm!.ElisProtocol.ProtocolNumber, Is.EqualTo("EL-NEW-777"));
+		Assert.That(passport.LastDataArm.ElisProtocol.LabName, Is.EqualTo("New Lab"));
+	}
+
 	private static FieldHistoryEntry CreateHistory(DataSource source, string value, DateTime timestamp)
 	{
 		return new FieldHistoryEntry
@@ -274,6 +398,7 @@ public class DocUpdateTests
 		}
 
 		public PassportCore.DataARM LastDataArm { get; private set; } = null!;
+		private PassportCore.DataARM? _existingDataArm;
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -284,6 +409,15 @@ public class DocUpdateTests
 		{
 			LastDataArm = JsonDeserializeObject<PassportCore.DataARM>(serializedDataArm);
 		}
+
+		protected override PassportCore.DataARM? LoadExistingDataArm(int documentId)
+		{
+			return _existingDataArm;
+		}
+
+		public void SeedExistingDataArm(PassportCore.DataARM dataArm)
+		{
+			_existingDataArm = dataArm;
+		}
 	}
 }
-

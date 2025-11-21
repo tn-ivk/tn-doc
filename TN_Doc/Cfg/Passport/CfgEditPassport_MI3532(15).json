@@ -666,7 +666,7 @@
     {
       "Id": 18,
       "Use": true,
-      "Key": "TestProtocolNumberELIS",
+      "Key": "ElisProtocolNumber",
       "KeyELIS": "protocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",

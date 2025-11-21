@@ -108,7 +108,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 12,
@@ -128,7 +128,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 14,
@@ -148,7 +148,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 16,
@@ -168,7 +168,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 18,
@@ -188,7 +188,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 20,
@@ -208,7 +208,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 22,
@@ -228,7 +228,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 24,
@@ -328,7 +328,7 @@
       "LimitValueActivate": true,
       "LimitValue": 2,
       "LimitValueString": "Менее 2",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 34,
@@ -348,7 +348,7 @@
       "LimitValueActivate": true,
       "LimitValue": 4,
       "LimitValueString": "Менее 4",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 36,
@@ -368,7 +368,7 @@
       "LimitValueActivate": true,
       "LimitValue": 0.5,
       "LimitValueString": "Менее 0,5",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 38,
@@ -755,7 +755,7 @@
     {
       "Id": 17,
       "Use": true,
-      "Key": "TestProtocolNumberELIS",
+      "Key": "ElisProtocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",
       "KeyELIS": "protocolNumber",

@@ -1,6 +1,7 @@
 import { logger } from '@tn-doc/shared';
 import { computed, ref, watch, type WatchStopHandle } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
+import { useFieldHistory } from '@/composables/useFieldHistory';
 import type {
   PassportEditConfig,
   PassportQualityParameter,
@@ -79,6 +80,7 @@ const normalizeValue = (value: any): string => {
  */
 export function usePassportEditor() {
   const store = useDocumentStore();
+  const { trackManualChange } = useFieldHistory();
 
   /**
    * Приведение конфигурации к типу PassportEditConfig
@@ -137,6 +139,12 @@ export function usePassportEditor() {
         methodOptions.push(selectedMethod);
       }
 
+      const methodNameTrimmed = selectedMethodName.trim();
+      const normalizedMethodName = methodNameTrimmed.toLowerCase();
+      const isMethodInDictionary = normalizedMethodName
+        ? paramSchema.methodOptions.some(method => method.name.trim().toLowerCase() === normalizedMethodName)
+        : true;
+
       // Создаем полный объект параметра
       return {
         ...paramSchema,
@@ -149,7 +157,8 @@ export function usePassportEditor() {
         method: {
           selected: selectedMethodName,
           options: methodOptions,
-          requiredFill: paramSchema.methodRequiredFill
+          requiredFill: paramSchema.methodRequiredFill,
+          isInDictionary: isMethodInDictionary
         },
         document: documentInfo,
         elisFlags,
@@ -446,6 +455,13 @@ export function usePassportEditor() {
     const methodOption = event.method;
     const methodJson = methodOption ? serializeMethodOption(methodOption) : '';
 
+    // Сохраняем предыдущее значение для истории
+    const methodKey = `method.${event.paramKey}`;
+    const previousMethodJson = store.formData[methodKey] || '';
+    const previousMethod = tryParseMethod(previousMethodJson);
+    const previousMethodName = previousMethod?.name || '';
+    const newMethodName = methodOption?.name || '';
+
     // Пересчитываем результат с новым методом
     const tempParam = {
       ...param,
@@ -474,6 +490,15 @@ export function usePassportEditor() {
     }
 
     store.bulkUpdateFields(updates);
+
+    // Записать историю изменения метода (только name, а не весь объект)
+    if (newMethodName !== previousMethodName) {
+      trackManualChange(
+        methodKey,
+        newMethodName,
+        previousMethodName || undefined
+      );
+    }
   }
 
   /**
