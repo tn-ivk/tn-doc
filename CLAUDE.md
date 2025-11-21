@@ -461,6 +461,13 @@ Real-time data acquisition from measurement systems:
   - Integration with ELIS (lab data) and OPC (device communication)
   - Advanced auto-fill functionality for dependent parameters
   - Full support for method selection and measurement input
+- **Улучшенная UX редактирования паспорта качества** (Ноябрь 2025):
+  - ✅ **Визуальная индикация методов вне справочника**: желтая рамка (#f5c24c) и предупреждение для методов, не зарегистрированных в локальной конфигурации
+  - ✅ **Отключена автоматическая подстановка методов**: убраны флаги `IsDefault` для параметров с Id: 11, 13, 15, 17, 19, 21, 23, 33, 35, 37 в `CfgEditPassport_GOSTR50.2.040(I).json`
+  - ✅ **Явная индикация незаполненных методов**: placeholder "Метод не выбран" вместо автовыбора первого метода
+  - ✅ Обновлен подмодуль `tn.docgeneral` с улучшенной логикой выбора методов
+  - Компонент: `PassportMethodSelect.vue` с CSS классом `.unknown-method`
+  - Новое поле: `isInDictionary` в интерфейсе `ParameterMethod`
 
 ## Previous Major Changes (v1.4.2 - October 2024)
 
