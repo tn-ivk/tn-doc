@@ -29,48 +29,51 @@ import { logger } from '@tn-doc/shared';
         <div class="editor-table-wrapper">
           <table class="editor-table">
             <tbody>
-              <!-- Обычные поля -->
-              <tr v-for="field in regularFields" :key="field.key">
-                <td class="editor-label-cell">
-                  <div class="label-wrapper">
-                    <span class="label-text">{{ field.label }}</span>
-                    <span v-if="field.required" class="required-mark">*</span>
-                  </div>
-                </td>
-                <td class="editor-input-cell">
-                  <FormFieldWithHistory
-                    :field="field"
-                    :modelValue="store.formData[field.key]"
-                    :hide-label="true"
-                    :invalidChars="store.config?.invalidChars || []"
-                    @update:modelValue="(value) => store.updateField(field.key, value)"
-                  />
-                </td>
-              </tr>
+              <!-- Динамические строки: обычные поля и группы подписантов в исходном порядке -->
+              <template v-for="row in displayRows" :key="row.type === 'field' ? row.field.key : row.group.prefix">
+                <!-- Обычное поле -->
+                <tr v-if="row.type === 'field'">
+                  <td class="editor-label-cell">
+                    <div class="label-wrapper">
+                      <span class="label-text">{{ row.field.label }}</span>
+                      <span v-if="row.field.required" class="required-mark">*</span>
+                    </div>
+                  </td>
+                  <td class="editor-input-cell">
+                    <FormFieldWithHistory
+                      :field="row.field"
+                      :modelValue="store.formData[row.field.key]"
+                      :hide-label="true"
+                      :invalidChars="store.config?.invalidChars || []"
+                      @update:modelValue="(value) => store.updateField(row.field.key, value)"
+                    />
+                  </td>
+                </tr>
 
-              <!-- Группы подписантов -->
-              <tr v-for="group in signerGroups" :key="group.prefix">
-                <td class="editor-label-cell">
-                  <div class="label-wrapper">
-                    <span class="label-text">{{ group.label }}</span>
-                    <span v-if="group.required" class="required-mark">*</span>
-                  </div>
-                </td>
-                <td class="editor-input-cell">
-                  <SignerFieldGroup
-                    :iof="group.iof"
-                    :post="group.post"
-                    :factory="group.factory"
-                    :iofValue="store.formData[group.iof.key]"
-                    :postValue="store.formData[group.post.key]"
-                    :factoryValue="store.formData[group.factory.key]"
-                    :invalidChars="store.config?.invalidChars || []"
-                    @update:iof="(value) => store.updateField(group.iof.key, value)"
-                    @update:post="(value) => store.updateField(group.post.key, value)"
-                    @update:factory="(value) => store.updateField(group.factory.key, value)"
-                  />
-                </td>
-              </tr>
+                <!-- Группа подписантов -->
+                <tr v-else-if="row.type === 'signerGroup'">
+                  <td class="editor-label-cell">
+                    <div class="label-wrapper">
+                      <span class="label-text">{{ row.group.label }}</span>
+                      <span v-if="row.group.required" class="required-mark">*</span>
+                    </div>
+                  </td>
+                  <td class="editor-input-cell">
+                    <SignerFieldGroup
+                      :iof="row.group.iof"
+                      :post="row.group.post"
+                      :factory="row.group.factory"
+                      :iofValue="store.formData[row.group.iof.key]"
+                      :postValue="store.formData[row.group.post.key]"
+                      :factoryValue="store.formData[row.group.factory.key]"
+                      :invalidChars="store.config?.invalidChars || []"
+                      @update:iof="(value) => store.updateField(row.group.iof.key, value)"
+                      @update:post="(value) => store.updateField(row.group.post.key, value)"
+                      @update:factory="(value) => store.updateField(row.group.factory.key, value)"
+                    />
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -141,37 +144,67 @@ interface SignerGroup {
 }
 
 /**
- * Обычные поля (не подписанты)
+ * Строка для отображения в таблице (либо обычное поле, либо группа подписантов)
  */
-const regularFields = computed(() => {
-  return store.fields.filter(field => !isSignerField(field.key));
-});
+type DisplayRow =
+  | { type: 'field'; field: FormField }
+  | { type: 'signerGroup'; group: SignerGroup };
 
 /**
- * Группы полей подписантов
+ * Объединенный массив полей для отображения в правильном порядке
+ * Сохраняет порядок из конфигурации, но группирует поля подписантов
  */
-const signerGroups = computed((): SignerGroup[] => {
-  const groups: SignerGroup[] = [];
-  const signerPrefixes = ['Laboratory', 'Delive', 'Receive'];
+const displayRows = computed((): DisplayRow[] => {
+  const rows: DisplayRow[] = [];
+  const processedKeys = new Set<string>();
 
-  signerPrefixes.forEach(prefix => {
-    const iofField = store.fields.find(f => f.key === `${prefix}_IOF`);
-    const postField = store.fields.find(f => f.key === `${prefix}_Post`);
-    const factoryField = store.fields.find(f => f.key === `${prefix}_Factory`);
-
-    if (iofField && postField && factoryField) {
-      groups.push({
-        prefix,
-        label: cleanSignerLabel(iofField.label), // Очищаем от "(ИОФ)"
-        iof: iofField,
-        post: postField,
-        factory: factoryField,
-        required: iofField.required || false
-      });
+  for (const field of store.fields) {
+    // Пропускаем уже обработанные поля
+    if (processedKeys.has(field.key)) {
+      continue;
     }
-  });
 
-  return groups;
+    // Проверяем, является ли это первым полем группы подписантов
+    // (порядок в конфигурации: Post, Factory, IOF)
+    if (field.key.endsWith('_Post')) {
+      const prefix = field.key.replace('_Post', '');
+      const postField = field;
+      const factoryField = store.fields.find(f => f.key === `${prefix}_Factory`);
+      const iofField = store.fields.find(f => f.key === `${prefix}_IOF`);
+
+      // Если нашли все три поля, создаем группу
+      if (postField && factoryField && iofField) {
+        rows.push({
+          type: 'signerGroup',
+          group: {
+            prefix,
+            label: cleanSignerLabel(iofField.label), // Используем label из IOF, очищаем от "(ИОФ)"
+            iof: iofField,
+            post: postField,
+            factory: factoryField,
+            required: iofField.required || false
+          }
+        });
+
+        // Отмечаем все три поля как обработанные
+        processedKeys.add(postField.key);
+        processedKeys.add(factoryField.key);
+        processedKeys.add(iofField.key);
+        continue;
+      }
+    }
+
+    // Если это не часть группы подписантов, добавляем как обычное поле
+    if (!isSignerField(field.key)) {
+      rows.push({
+        type: 'field',
+        field
+      });
+      processedKeys.add(field.key);
+    }
+  }
+
+  return rows;
 });
 
 // Используем общую логику редактирования документов
