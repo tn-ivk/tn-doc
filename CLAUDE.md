@@ -461,6 +461,7 @@ Real-time data acquisition from measurement systems:
   - Integration with ELIS (lab data) and OPC (device communication)
   - Advanced auto-fill functionality for dependent parameters
   - Full support for method selection and measurement input
+  - ✅ **Fixed signer fields display order**: Signer fields now appear in correct position (between СИКН № and sampling date), preserving original order from CfgEditPassport.json
 - **Улучшенная UX редактирования паспорта качества** (Ноябрь 2025):
   - ✅ **Визуальная индикация методов вне справочника**: желтая рамка (#f5c24c) и предупреждение для методов, не зарегистрированных в локальной конфигурации
   - ✅ **Отключена автоматическая подстановка методов**: убраны флаги `IsDefault` для параметров с Id: 11, 13, 15, 17, 19, 21, 23, 33, 35, 37 в `CfgEditPassport_GOSTR50.2.040(I).json`
