@@ -102,14 +102,27 @@ tn_doc/
 │       └── shared/            # Shared TypeScript utilities and types
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
-├── tn.docgeneral/             # Document module libraries (45 libraries)
+├── tn.docgeneral/             # Document module libraries (git submodule, 45 libraries)
 │   ├── Act, Passport, Report, Jornal (4 core documents)
 │   ├── ActProducer, ActRoute (2 additional act types)
 │   ├── Poverka* (20 verification documents)
 │   ├── KMH*/KMX* (17 quality control documents)
 │   └── Common* (2 shared libraries)
+├── tn_toolsfastreport/        # FastReport utilities (git submodule)
+├── winprutil/                 # Windows printing utility (git submodule)
 └── Tests/                     # NUnit tests with Moq
 ```
+
+**Git Submodules:**
+The project uses git submodules for document libraries and utilities. After cloning:
+```bash
+git submodule update --init --recursive
+```
+
+Submodules:
+- `tn.docgeneral` - Document module libraries (v1.2.3)
+- `tn_toolsfastreport` - FastReport helper utilities
+- `winprutil` - Windows printing utility (winprutil.exe)
 
 ### Document Module Pattern
 
@@ -206,7 +219,14 @@ From `.cursor/rules/tests-guide.mdc`:
 
 Run specific tests:
 ```bash
+# Specific test class
 dotnet test --filter "ClassName=AppConfigServiceTests"
+
+# Test specific document type libraries
+dotnet test --filter "FullyQualifiedName~KMH"        # All KMH document tests
+dotnet test --filter "FullyQualifiedName~Passport"   # Passport tests
+dotnet test --filter "FullyQualifiedName~Poverka"    # Verification tests
+dotnet test --filter "FullyQualifiedName~Act"        # Act tests
 ```
 
 ## Daily Development Workflow
@@ -257,6 +277,9 @@ git status                            # Review changes before commit
 
 1. ALWAYS make a backup copy first
 2. Use FastReport Designer to edit .frx files
+   - **Required version**: FastReport 2025.2.8 or compatible
+   - Templates may not open correctly in older/newer versions
+   - Ensure proper licensing for FastReport Designer
 3. Test with real data from multiple devices
 4. Validate all export formats (PDF, Excel, ODS)
 5. Check logs for any rendering errors
@@ -304,12 +327,22 @@ git status                            # Review changes before commit
 1. Start ASP.NET Core app: `cd TN_Doc && dotnet run`
 2. In parallel terminal, start Vue dev server: `cd TN_Doc/Client && npm run dev`
 3. Changes to Vue components hot-reload automatically
-4. Before committing, build all components: `npm run build:all`
+4. Before committing:
+   ```bash
+   cd TN_Doc/Client
+   npm run build:all                    # Build all Vue apps for production
+
+   # Verify TypeScript types (no unit tests configured yet)
+   cd statusbar && npm run type-check   # Check StatusBar types
+   cd ../configurator && npm run type-check  # Check Configurator types
+   cd ../document-editor && npm run type-check  # Check Editor types
+   ```
 
 **Important notes:**
 - All Vue components use npm workspaces configured in `TN_Doc/Client/package.json`
 - Shared TypeScript types and utilities are in `TN_Doc/Client/shared/`
 - PrimeVue theme customization is in Material Design 3 style via CSS variables
+- **No unit tests configured** for Vue components - use `type-check` to catch type errors
 
 ## Git Workflow and Commit Conventions
 
@@ -398,7 +431,8 @@ Real-time data acquisition from measurement systems:
 ### Documentation
 - `/CHANGELOG.md` - Version history
 - `/TN_Doc/changes.md` - Detailed change log
-- `/docs/` - Additional documentation (architecture, API, deployment, integration)
+- `/docs/` - Additional documentation (architecture, API, deployment, integration, operations)
+- `/docs/operations/logging.md` - ⭐ **Руководство по управлению логами** (просмотр, копирование, архивирование)
 - `/README.md` - Project overview
 - `/AGENTS.md` - Repository guidelines and development rules
 
