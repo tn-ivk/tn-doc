@@ -29,23 +29,72 @@ import { logger } from '@tn-doc/shared';
         <div class="editor-table-wrapper">
           <table class="editor-table">
             <tbody>
-              <tr v-for="field in store.fields" :key="field.key">
-                <td class="editor-label-cell">
-                  <div class="label-wrapper">
-                    <span class="label-text">{{ field.label }}</span>
-                    <span v-if="field.required" class="required-mark">*</span>
-                  </div>
-                </td>
-                <td class="editor-input-cell">
-                  <FormFieldWithHistory
-                    :field="field"
-                    :modelValue="store.formData[field.key]"
-                    :hide-label="true"
-                    :invalidChars="store.config?.invalidChars || []"
-                    @update:modelValue="(value) => store.updateField(field.key, value)"
-                  />
-                </td>
-              </tr>
+              <!-- Динамические строки: обычные поля, группы дат и группы подписантов в исходном порядке -->
+              <template v-for="row in displayRows" :key="row.type === 'field' ? row.field.key : row.type === 'dateRange' ? 'dateRange' : row.group.prefix">
+                <!-- Обычное поле -->
+                <tr v-if="row.type === 'field'">
+                  <td class="editor-label-cell">
+                    <div class="label-wrapper">
+                      <span class="label-text">{{ row.field.label }}</span>
+                      <span v-if="row.field.required" class="required-mark">*</span>
+                    </div>
+                  </td>
+                  <td class="editor-input-cell">
+                    <FormFieldWithHistory
+                      :field="row.field"
+                      :modelValue="store.formData[row.field.key]"
+                      :hide-label="true"
+                      :invalidChars="store.config?.invalidChars || []"
+                      @update:modelValue="(value) => store.updateField(row.field.key, value)"
+                    />
+                  </td>
+                </tr>
+
+                <!-- Группа дат (диапазон) -->
+                <tr v-else-if="row.type === 'dateRange'">
+                  <td class="editor-label-cell">
+                    <div class="label-wrapper">
+                      <span class="label-text">{{ row.group.label }}</span>
+                      <span v-if="row.group.required" class="required-mark">*</span>
+                    </div>
+                  </td>
+                  <td class="editor-input-cell">
+                    <DateRangeFieldGroup
+                      :beginField="row.group.begin"
+                      :endField="row.group.end"
+                      :beginValue="store.formData[row.group.begin.key]"
+                      :endValue="store.formData[row.group.end.key]"
+                      :invalidChars="store.config?.invalidChars || []"
+                      @update:begin="(value) => store.updateField(row.group.begin.key, value)"
+                      @update:end="(value) => store.updateField(row.group.end.key, value)"
+                    />
+                  </td>
+                </tr>
+
+                <!-- Группа подписантов -->
+                <tr v-else-if="row.type === 'signerGroup'">
+                  <td class="editor-label-cell">
+                    <div class="label-wrapper">
+                      <span class="label-text">{{ row.group.label }}</span>
+                      <span v-if="row.group.required" class="required-mark">*</span>
+                    </div>
+                  </td>
+                  <td class="editor-input-cell">
+                    <SignerFieldGroup
+                      :iof="row.group.iof"
+                      :post="row.group.post"
+                      :factory="row.group.factory"
+                      :iofValue="store.formData[row.group.iof.key]"
+                      :postValue="store.formData[row.group.post.key]"
+                      :factoryValue="store.formData[row.group.factory.key]"
+                      :invalidChars="store.config?.invalidChars || []"
+                      @update:iof="(value) => store.updateField(row.group.iof.key, value)"
+                      @update:post="(value) => store.updateField(row.group.post.key, value)"
+                      @update:factory="(value) => store.updateField(row.group.factory.key, value)"
+                    />
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -69,6 +118,8 @@ import { logger } from '@tn-doc/shared';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FormFieldWithHistory from '@/components/FormFieldWithHistory.vue';
+import SignerFieldGroup from '@/components/SignerFieldGroup.vue';
+import DateRangeFieldGroup from '@/components/DateRangeFieldGroup.vue';
 import PassportQualityTable from '@/components/passport/PassportQualityTable.vue';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -79,11 +130,136 @@ import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/c
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
 import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
+import type { FormField } from '@/types/document.types';
 
 const route = useRoute();
 
 // Получаем функцию для отслеживания загрузки из ELIS
 const { trackElisLoad } = useFieldHistory();
+
+// Вспомогательные функции для работы с полями подписантов
+/**
+ * Проверяет, является ли поле полем подписанта
+ */
+const isSignerField = (key: string): boolean => {
+  return key.endsWith('_IOF') || key.endsWith('_Post') || key.endsWith('_Factory');
+};
+
+/**
+ * Очищает label от уточнений в скобках
+ * "Представитель испытательной лаборатории (ИОФ)" -> "Представитель испытательной лаборатории"
+ */
+const cleanSignerLabel = (label: string): string => {
+  return label.replace(/\s*\((?:ИОФ|должность|предприятие)\)\s*$/i, '').trim();
+};
+
+/**
+ * Группа полей подписанта
+ */
+interface SignerGroup {
+  prefix: string;
+  label: string;
+  iof: FormField;
+  post: FormField;
+  factory: FormField;
+  required: boolean;
+}
+
+/**
+ * Группа полей даты и времени (диапазон)
+ */
+interface DateRangeGroup {
+  label: string;
+  begin: FormField;
+  end: FormField;
+  required: boolean;
+}
+
+/**
+ * Строка для отображения в таблице (обычное поле, группа подписантов или группа дат)
+ */
+type DisplayRow =
+  | { type: 'field'; field: FormField }
+  | { type: 'signerGroup'; group: SignerGroup }
+  | { type: 'dateRange'; group: DateRangeGroup };
+
+/**
+ * Объединенный массив полей для отображения в правильном порядке
+ * Сохраняет порядок из конфигурации, но группирует поля подписантов
+ */
+const displayRows = computed((): DisplayRow[] => {
+  const rows: DisplayRow[] = [];
+  const processedKeys = new Set<string>();
+
+  for (const field of store.fields) {
+    // Пропускаем уже обработанные поля
+    if (processedKeys.has(field.key)) {
+      continue;
+    }
+
+    // Проверяем, является ли это началом диапазона дат
+    if (field.key === 'PassportPeriodDT.Begin') {
+      const beginField = field;
+      const endField = store.fields.find(f => f.key === 'PassportPeriodDT.End');
+
+      if (beginField && endField) {
+        rows.push({
+          type: 'dateRange',
+          group: {
+            label: 'Дата и время отбора пробы', // Очищенный label без уточнений
+            begin: beginField,
+            end: endField,
+            required: beginField.required || endField.required || false
+          }
+        });
+        processedKeys.add(beginField.key);
+        processedKeys.add(endField.key);
+        continue;
+      }
+    }
+
+    // Проверяем, является ли это первым полем группы подписантов
+    // (порядок в конфигурации: Post, Factory, IOF)
+    if (field.key.endsWith('_Post')) {
+      const prefix = field.key.replace('_Post', '');
+      const postField = field;
+      const factoryField = store.fields.find(f => f.key === `${prefix}_Factory`);
+      const iofField = store.fields.find(f => f.key === `${prefix}_IOF`);
+
+      // Если нашли все три поля, создаем группу
+      if (postField && factoryField && iofField) {
+        rows.push({
+          type: 'signerGroup',
+          group: {
+            prefix,
+            label: cleanSignerLabel(iofField.label), // Используем label из IOF, очищаем от "(ИОФ)"
+            iof: iofField,
+            post: postField,
+            factory: factoryField,
+            required: iofField.required || false
+          }
+        });
+
+        // Отмечаем все три поля как обработанные
+        processedKeys.add(postField.key);
+        processedKeys.add(factoryField.key);
+        processedKeys.add(iofField.key);
+        continue;
+      }
+    }
+
+    // Если это не часть группы подписантов и не PassportPeriodDT.End, добавляем как обычное поле
+    if (!isSignerField(field.key) && field.key !== 'PassportPeriodDT.End') {
+      rows.push({
+        type: 'field',
+        field
+      });
+      processedKeys.add(field.key);
+    }
+  }
+
+  return rows;
+});
 
 // Используем общую логику редактирования документов
 const {
@@ -449,6 +625,11 @@ setupBeforeUnloadHandler();
   color: var(--md-text);
   white-space: nowrap;
   padding-right: 0.75rem;
+}
+
+.editor-input-cell {
+  width: auto;
+  min-width: 300px; /* Минимальная ширина для размещения трёх полей подписанта */
 }
 
 .label-text {
