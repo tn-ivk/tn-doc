@@ -154,8 +154,22 @@ function handleEditClick() {
   color: var(--md-text, #212121) !important;
 }
 
-:deep(.method-field .p-select) {
+/* Базовые стили для Select компонента */
+:deep(.method-select.p-select) {
   width: 100%;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-radius);
+  background: #ffffff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+:deep(.method-select.p-select:not(.p-disabled):hover) {
+  border-color: var(--md-primary);
+}
+
+:deep(.method-select.p-select:not(.p-disabled).p-focus) {
+  border-color: var(--md-primary);
+  box-shadow: 0 0 0 1px rgba(33, 150, 243, 0.3);
 }
 
 /* Валидация - красная рамка при ошибке */
@@ -201,16 +215,16 @@ function handleEditClick() {
 }
 
 /* Скрытие dropdown иконки для унификации с комбобоксом подписантов */
-:deep(.method-select.no-dropdown-icon .p-select-dropdown) {
+:deep(.no-dropdown-icon .p-select-dropdown) {
   display: none !important;
 }
 
-:deep(.method-select.no-dropdown-icon .p-select-label) {
+:deep(.no-dropdown-icon .p-select-label) {
   padding-right: 40px !important; /* Увеличенный отступ для кнопки редактирования */
 }
 
 /* Стилизация выпадающего списка для унификации с FormField */
-:deep(.method-select .p-select-overlay) {
+.method-select-container :deep(.p-select-overlay) {
   margin-top: 2px;
   border: 1px solid var(--md-outline);
   border-radius: var(--md-radius);
@@ -218,28 +232,28 @@ function handleEditClick() {
   background: #ffffff;
 }
 
-:deep(.method-select .p-select-list) {
+.method-select-container :deep(.p-select-list) {
   padding: 4px 0;
   font-size: var(--md-font-size-base);
 }
 
-:deep(.method-select .p-select-option) {
+.method-select-container :deep(.p-select-option) {
   padding: 6px 12px;
   color: var(--md-text);
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
-:deep(.method-select .p-select-option:not(.p-disabled):hover) {
+.method-select-container :deep(.p-select-option:not(.p-disabled):hover) {
   background: var(--md-primary-light);
   color: var(--md-text);
 }
 
-:deep(.method-select .p-select-option.p-focus) {
+.method-select-container :deep(.p-select-option.p-focus) {
   background: var(--md-primary-light);
   color: var(--md-text);
 }
 
-:deep(.method-select .p-select-option.p-focus:not(.p-disabled):hover) {
+.method-select-container :deep(.p-select-option.p-focus:not(.p-disabled):hover) {
   background: var(--md-primary);
   color: #ffffff;
 }
