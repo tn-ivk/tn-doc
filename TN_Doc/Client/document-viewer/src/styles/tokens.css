@@ -1,0 +1,28 @@
+#app {
+  font-family: 'Segoe UI', 'PT Astra Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--doc-text);
+}
+
+:root {
+  --doc-bg: #0f172a;
+  --doc-panel: #111827;
+  --doc-surface: #1f2937;
+  --doc-surface-weak: #2b3546;
+  --doc-accent: #7dd3fc;
+  --doc-accent-strong: #38bdf8;
+  --doc-text: #e5e7eb;
+  --doc-text-dim: #9ca3af;
+  --doc-border: #374151;
+  --doc-success: #34d399;
+  --doc-warning: #fbbf24;
+  --doc-danger: #f87171;
+  --doc-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  --doc-radius: 14px;
+  --doc-radius-sm: 10px;
+  --doc-gap: 14px;
+  --doc-transition: 0.2s ease;
+}
+
+#app * {
+  box-sizing: border-box;
+}

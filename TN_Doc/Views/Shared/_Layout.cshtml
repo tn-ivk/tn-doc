@@ -35,11 +35,11 @@
     <script src="~/js/system.js"></script>
     <script src="~/js/DirEditorComponentScript.js"></script>
     <script src="~/js/Logger.js"></script>
-    <script src="~/js/Common.js"></script>
     <script src="~/js/loading-spinner.js"></script>
 
     <!-- Status Bar styles -->
     <link rel="stylesheet" href="~/statusbar/status-bar.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
 </head>
 <body>
     <div class="container">

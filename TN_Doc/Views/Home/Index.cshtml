@@ -2,124 +2,10 @@
     
     ViewData["Title"] = $" Модуль просмотра документов ({ ViewData["Version"]})";
 }
-<body>
-    <div class="cont">
-        <table class="mainTable">
-            <tr>
-                <td class="leftPanel">
-                    <table class="filterTable">
-                        <tr>
-                            <td height="25" width="150">
-                                Устройство:
-                            </td>
-                            <td height="25">
-                                <select class="filterSelect" id="ComboboxDevice"></select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td height="25">
-                                Документ:
-                            </td>
-                            <td height="25">
-                                <select class="filterSelect" id="ComboboxDocGUID"></select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td height="25">
-                                Дата начала:
-                            </td>
-                            <td height="25">
-                                <input class="filterDatepicker" id="DatepickerBegin"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td height="25">
-                                Дата окончания:
-                            </td>
-                            <td height="25">
-                                <input class="filterDatepicker" id="DatepickerEnd"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td height="25" colspan="2" align="right">
-                                <button class="filterButton" id="ButtonGetData" type="button" onclick="GetDataWithSpinner()">
-                                    <span id="ButtonGetDataSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
-                                    <span id="ButtonGetDataText">Получить данные</span>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" valign="top">
-                                <table id="DataTable" class="display compact searched-table" style="width: 100%; height: 100%;">
-                                    <thead>
-                                    <tr>
-                                        <th>Документ</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td height="25"></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td class="rightPanel">
-                    <table class="docTable">
-                        <tr>
-                            <td height="37" width="250">
-                                <input id="viewModeButton" type="button" value="Редактирование" width="100" hidden="hidden" onclick="ToggleMode()">
-                            </td>
-                            <td id="viewPanel">
-                                <table width="100%" height="100%" style="border: 1px none rgb(248, 2, 2)">
-                                    <td align="left" style="border: 1px none rgb(248, 2, 2)">
-                                        <select id="ComboboxTemplateDoc">Форма документа</select>
-                                        <select id="ComboboxProtocolNumber">Номер протокола</select>
-                                    </td>
-                                    <td align="right" style="border: 1px none rgb(248, 2, 2)">
-                                        <select id="ComboboxExportFormat">Экспорт</select>
-                                        <input class="bExport" id="ButtonExport" type="button" value="Экспорт"
-                                               onclick="ExportDoc()">
-                                        <select id="ComboboxPrinterName">Принтер</select>
-                                        <input id="ButtonPrint" type="button" value="Печать" onclick="PrintDoc()">
-                                        <div class="dropdown" style="display: inline-block;">
-                                            <button class="dropdown-toggle" type="button" id="MenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <i class="fa fa-bars" aria-hidden="true"></i>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-right custom-dropdown-menu" aria-labelledby="MenuButton">
-                                                <a class="dropdown-item custom-dropdown-item" href="#" id="MenuItemDictionaries" data-toggle="modal" data-target="#modal-window" data-backdrop="static" data-keyboard="false">
-                                                    <i class="fa fa-book" aria-hidden="true"></i>
-                                                    <span>Справочники</span>
-                                                </a>
-                                                <a class="dropdown-item custom-dropdown-item" href="#" id="MenuItemConfigurator" data-toggle="modal" data-target="#configurator-window" data-backdrop="static" data-keyboard="false">
-                                                    <i class="fa fa-cog" aria-hidden="true"></i>
-                                                    <span>Конфигуратор</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </table>
-                            </td>
-                            <td id="editPanel" align="right" hidden>
-                                <input id="ButtonElis" type="button" value="Запросить данные из ЕЛИС" data-toggle="modal" data-target="#elis" onclick="OpenElisDialog()" hidden>
-                                <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <iframe name=print_frame class="FR" src=""></iframe>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </div>
 
-    
-    @*todo: вынести в отдельный  html*@
+<div id="app"></div>
+
+@*todo: вынести в отдельный  html*@
     <div class="modal fade"
      onselectstart="return false"
      oncontextmenu="return false"
@@ -310,20 +196,24 @@
 </div>
 
 
-<script>
+@section Styles {
+    <link rel="stylesheet" href="~/document-viewer/document-viewer.css" asp-append-version="true"/>
+}
+
+@section Scripts {
+    <script>
         RedefinitionConfirmWindow();
-        InitElement();
-        // загрузка статичного html
         $(document).ready(function () {
             $("#ErrorDialogContent").load("/HTML/ErrorDialogWindow.html");
             $("#ElisRequestContent").load("/HTML/ElisRequestWindow.html");
         });
 
         // Обработчик сообщений из iframe конфигуратора
-        window.addEventListener('message', function(event) {
+        window.addEventListener('message', function (event) {
             if (event.data && event.data.action === 'closeConfiguratorModal') {
                 $('#configurator-window').modal('hide');
             }
         });
-</script>
-</body>
+    </script>
+    <script type="module" src="~/document-viewer/document-viewer.js" asp-append-version="true"></script>
+}
