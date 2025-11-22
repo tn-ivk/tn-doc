@@ -99,34 +99,12 @@ export function useFieldHistory() {
    * Отследить ручное изменение поля
    */
   const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any) => {
-    // ДИАГНОСТИКА: Логируем входные параметры
-    logger.info('[trackManualChange] Начало обработки', {
-      fieldKey,
-      newValue,
-      previousValue,
-      newValueType: typeof newValue,
-      previousValueType: typeof previousValue
-    });
-
     // Нормализуем значения для корректного сравнения (точка/запятая в числах)
     const newValueNormalized = normalizeValue(newValue);
     const previousValueNormalized = normalizeValue(previousValue);
 
-    // ДИАГНОСТИКА: Логируем нормализованные значения и результат сравнения
-    logger.info('[trackManualChange] После нормализации', {
-      fieldKey,
-      newValueNormalized,
-      previousValueNormalized,
-      areEqual: newValueNormalized === previousValueNormalized,
-      stringComparison: `"${newValueNormalized}" === "${previousValueNormalized}"`
-    });
-
     // Если нормализованные значения совпадают, не создаем запись в истории
     if (newValueNormalized === previousValueNormalized) {
-      logger.warn('[trackManualChange] ПРОПУСК: значения идентичны после нормализации', {
-        fieldKey,
-        reason: 'normalized values are equal'
-      });
       return;
     }
 
@@ -136,11 +114,6 @@ export function useFieldHistory() {
       previousValueNormalized || undefined,
       'Отредактировано вручную'
     );
-
-    logger.info('[trackManualChange] Создана запись истории', {
-      fieldKey,
-      entry
-    });
 
     addHistoryEntry(fieldKey, entry);
   };

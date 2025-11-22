@@ -34,7 +34,6 @@ import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
-import { logger } from '@tn-doc/shared';
 
 const props = defineProps<{
   field: FormFieldType;
@@ -85,16 +84,6 @@ const computedHighlightColor = computed(() => {
  * Обработка изменения значения
  */
 const handleChange = (newValue: any) => {
-  // ДИАГНОСТИКА: Логируем состояние в момент изменения
-  logger.info('[FormFieldWithHistory] handleChange вызван', {
-    fieldKey: props.field.key,
-    fieldType: props.field.type,
-    newValue,
-    currentPropsModelValue: props.modelValue,
-    isDateTimeField: props.field.type === 'datetime-local',
-    timestamp: new Date().toISOString()
-  });
-
   // Отслеживаем ручное изменение
   trackManualChange(props.field.key, newValue, props.modelValue);
 
