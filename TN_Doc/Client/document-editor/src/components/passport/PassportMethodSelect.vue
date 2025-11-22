@@ -13,6 +13,7 @@
         ]"
         placeholder="Метод не выбран"
         class="method-select"
+        panelClass="method-select-panel"
         @update:modelValue="handleMethodChange"
       />
 
@@ -223,8 +224,11 @@ function handleEditClick() {
   padding-right: 40px !important; /* Увеличенный отступ для кнопки редактирования */
 }
 
-/* Стилизация выпадающего списка для унификации с FormField */
-.method-select-container :deep(.p-select-overlay) {
+</style>
+
+<!-- Глобальные стили для выпадающего списка методов -->
+<style>
+.method-select-panel.p-select-overlay {
   margin-top: 2px;
   border: 1px solid var(--md-outline);
   border-radius: var(--md-radius);
@@ -232,28 +236,28 @@ function handleEditClick() {
   background: #ffffff;
 }
 
-.method-select-container :deep(.p-select-list) {
+.method-select-panel .p-select-list {
   padding: 4px 0;
   font-size: var(--md-font-size-base);
 }
 
-.method-select-container :deep(.p-select-option) {
+.method-select-panel .p-select-option {
   padding: 6px 12px;
   color: var(--md-text);
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
-.method-select-container :deep(.p-select-option:not(.p-disabled):hover) {
+.method-select-panel .p-select-option:not(.p-disabled):hover {
   background: var(--md-primary-light);
   color: var(--md-text);
 }
 
-.method-select-container :deep(.p-select-option.p-focus) {
+.method-select-panel .p-select-option.p-focus {
   background: var(--md-primary-light);
   color: var(--md-text);
 }
 
-.method-select-container :deep(.p-select-option.p-focus:not(.p-disabled):hover) {
+.method-select-panel .p-select-option.p-focus:not(.p-disabled):hover {
   background: var(--md-primary);
   color: #ffffff;
 }
