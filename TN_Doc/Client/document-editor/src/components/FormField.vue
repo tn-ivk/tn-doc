@@ -25,7 +25,7 @@
       :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor, 'no-dropdown-icon': hideDropdownIcon }"
       :style="fieldBackgroundStyle"
       class="field-control"
-      appendTo="self"
+      appendTo="body"
       @change="handleChange"
     />
 
@@ -413,40 +413,6 @@ function handleDateTimeChange() {
   color: var(--md-text-secondary);
 }
 
-:deep(.field-control .p-select-overlay) {
-  margin-top: 2px;
-  border: 1px solid var(--md-outline);
-  border-radius: var(--md-radius);
-  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12);
-  background: #ffffff;
-}
-
-:deep(.field-control .p-select-list) {
-  padding: 4px 0;
-  font-size: var(--md-font-size-base);
-}
-
-:deep(.field-control .p-select-option) {
-  padding: 6px 12px;
-  color: var(--md-text);
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-}
-
-:deep(.field-control .p-select-option:not(.p-disabled):hover) {
-  background: var(--md-primary-light);
-  color: var(--md-text);
-}
-
-:deep(.field-control .p-select-option.p-focus) {
-  background: var(--md-primary-light);
-  color: var(--md-text);
-}
-
-:deep(.field-control .p-select-option.p-focus:not(.p-disabled):hover) {
-  background: var(--md-primary);
-  color: #ffffff;
-}
-
 :deep(.field-control.p-select.p-disabled) {
   background: var(--md-disabled-bg);
   border-color: var(--md-disabled-border);
@@ -533,5 +499,42 @@ function handleDateTimeChange() {
 
 :deep(.field-control.p-select.no-dropdown-icon .p-select-label) {
   padding-right: 10px !important;
+}
+</style>
+
+<style>
+/* Глобальные стили для выпадающего списка Select (когда appendTo="body") */
+.p-select-overlay {
+  margin-top: 2px;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-radius);
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12);
+  background: #ffffff;
+}
+
+.p-select-list {
+  padding: 4px 0;
+  font-size: var(--md-font-size-base);
+}
+
+.p-select-option {
+  padding: 6px 12px;
+  color: var(--md-text);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.p-select-option:not(.p-disabled):hover {
+  background: var(--md-primary-light);
+  color: var(--md-text);
+}
+
+.p-select-option.p-focus {
+  background: var(--md-primary-light);
+  color: var(--md-text);
+}
+
+.p-select-option.p-focus:not(.p-disabled):hover {
+  background: var(--md-primary);
+  color: #ffffff;
 }
 </style>
