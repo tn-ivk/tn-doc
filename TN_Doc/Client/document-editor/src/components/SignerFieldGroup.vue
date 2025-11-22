@@ -7,6 +7,7 @@
         :modelValue="iofValue"
         :hide-label="true"
         :invalidChars="invalidChars"
+        :hideDropdownIcon="true"
         @update:modelValue="(value) => emit('update:iof', value)"
       />
     </div>

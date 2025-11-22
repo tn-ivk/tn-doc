@@ -4,8 +4,9 @@
       :field="field"
       :modelValue="modelValue"
       :hideLabel="hideLabel"
-                  :invalidChars="invalidChars"
-                  :highlightColor="computedHighlightColor"
+      :invalidChars="invalidChars"
+      :highlightColor="computedHighlightColor"
+      :hideDropdownIcon="hideDropdownIcon"
       @update:modelValue="handleChange"
     />
 
@@ -41,6 +42,7 @@ const props = defineProps<{
   hideLabel?: boolean;
   invalidChars?: string[];
   highlightColor?: string;
+  hideDropdownIcon?: boolean;
 }>();
 
 const emit = defineEmits<{

@@ -22,7 +22,7 @@
       optionValue="value"
       :placeholder="hideLabel ? '' : `Выберите ${field.label.toLowerCase()}`"
       :disabled="!field.editable"
-      :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor }"
+      :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor, 'no-dropdown-icon': hideDropdownIcon }"
       :style="fieldBackgroundStyle"
       class="field-control"
       appendTo="self"
@@ -143,6 +143,7 @@ const props = defineProps<{
   hideLabel?: boolean;
   invalidChars?: string[];
   highlightColor?: string;
+  hideDropdownIcon?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -523,5 +524,14 @@ function handleDateTimeChange() {
 :deep(.field-control.p-datepicker.elis-highlighted .p-inputtext:focus),
 :deep(.field-control.p-datepicker.elis-highlighted .p-inputtext:focus-visible) {
   background: var(--md-primary-light) !important;
+}
+
+/* Скрытие dropdown иконки для Select */
+:deep(.field-control.p-select.no-dropdown-icon .p-select-dropdown) {
+  display: none !important;
+}
+
+:deep(.field-control.p-select.no-dropdown-icon .p-select-label) {
+  padding-right: 10px !important;
 }
 </style>
