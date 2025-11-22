@@ -82,11 +82,12 @@
       dateFormat="dd.mm.yy"
       :showTime="true"
       hourFormat="24"
-      updateModelType="replace"
       :style="{ width: '100%' }"
       :inputStyle="{ width: '100%' }"
       class="field-control"
-      @update:modelValue="handleChange"
+      @update:modelValue="handleDateTimeChange"
+      @blur="handleDateTimeChange"
+      @clear="handleDateTimeChange"
     />
 
     <!-- Сообщение об ошибке валидации -->
@@ -165,14 +166,49 @@ const fieldBackgroundStyle = computed(() => {
  * Конвертирует значение для datetime-local/date полей в объект Date
  */
 function convertToDate(value: any, fieldType: string): any {
+  // ДИАГНОСТИКА: Логируем конвертацию в Date
+  if (fieldType === 'datetime-local' || fieldType === 'date') {
+    logger.info('[convertToDate] Конвертация в Date', {
+      fieldType,
+      inputValue: value,
+      inputType: typeof value,
+      isString: typeof value === 'string',
+      valueLength: typeof value === 'string' ? value.length : null
+    });
+  }
+
   if (!value) return value;
 
   // Для datetime-local и date полей конвертируем строку в Date
   if ((fieldType === 'datetime-local' || fieldType === 'date') && typeof value === 'string') {
     try {
-      return new Date(value);
+      // Парсим дату из строки
+      // Формат должен быть "2025-10-22T02:07:33" для datetime-local
+      const dateResult = new Date(value);
+
+      logger.info('[convertToDate] Результат конвертации', {
+        originalString: value,
+        dateObject: {
+          toString: dateResult.toString(),
+          toISOString: dateResult.toISOString(),
+          toLocaleString: dateResult.toLocaleString('ru-RU'),
+          getTime: dateResult.getTime(),
+          year: dateResult.getFullYear(),
+          month: dateResult.getMonth() + 1,
+          day: dateResult.getDate(),
+          hours: dateResult.getHours(),
+          minutes: dateResult.getMinutes(),
+          seconds: dateResult.getSeconds()
+        },
+        isValidDate: !isNaN(dateResult.getTime()),
+        timezoneOffset: dateResult.getTimezoneOffset()
+      });
+      return dateResult;
     } catch (e) {
-      logger.error('FormField: ошибка конвертации даты', { error: e instanceof Error ? e.message : String(e) });
+      logger.error('FormField: ошибка конвертации даты', {
+        error: e instanceof Error ? e.message : String(e),
+        value
+      });
       return value;
     }
   }
@@ -184,6 +220,22 @@ function convertToDate(value: any, fieldType: string): any {
  * Конвертирует объект Date обратно в строку ISO для сохранения
  */
 function convertFromDate(value: any, fieldType: string): any {
+  // ДИАГНОСТИКА: Логируем конвертацию из Date
+  if (fieldType === 'datetime-local' || fieldType === 'date') {
+    logger.info('[convertFromDate] Конвертация из Date', {
+      fieldType,
+      inputValue: value,
+      inputType: typeof value,
+      isDate: value instanceof Date,
+      dateValue: value instanceof Date ? {
+        toString: value.toString(),
+        toISOString: value.toISOString(),
+        toLocaleString: value.toLocaleString('ru-RU'),
+        getTime: value.getTime()
+      } : null
+    });
+  }
+
   if (!value) return value;
 
   // Для datetime-local и date полей конвертируем Date в ISO строку
@@ -194,8 +246,35 @@ function convertFromDate(value: any, fieldType: string): any {
       return null;
     }
 
-    // Конвертируем в ISO строку с локальным временем (без Z)
-    return value.toISOString().slice(0, 19); // "2025-10-22T02:07:33"
+    // ВАЖНО: Конвертируем в локальное время, а не UTC!
+    // toISOString() возвращает UTC время, что приводит к сдвигу временной зоны
+    // Нужно получить локальную дату в формате ISO без временной зоны
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    const hours = String(value.getHours()).padStart(2, '0');
+    const minutes = String(value.getMinutes()).padStart(2, '0');
+    const seconds = String(value.getSeconds()).padStart(2, '0');
+
+    const localISOString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+
+    logger.info('[convertFromDate] Результат конвертации', {
+      dateObject: {
+        year,
+        month,
+        day,
+        hours,
+        minutes,
+        seconds,
+        toString: value.toString(),
+        toISOString: value.toISOString(),
+        toLocaleString: value.toLocaleString('ru-RU')
+      },
+      resultString: localISOString,
+      originalISOString: value.toISOString(),
+      timezoneOffset: value.getTimezoneOffset()
+    });
+    return localISOString;
   }
 
   return value;
@@ -267,7 +346,17 @@ const validationMessage = computed(() => {
 });
 
 // Синхронизация с внешним modelValue
-watch(() => props.modelValue, (newValue) => {
+watch(() => props.modelValue, (newValue, oldValue) => {
+  // ДИАГНОСТИКА: Логируем изменение props.modelValue
+  if (props.field.type === 'datetime-local') {
+    logger.debug('[FormField] watch props.modelValue', {
+      fieldKey: props.field.key,
+      fieldType: props.field.type,
+      oldValue,
+      newValue,
+      currentLocalValue: localValue.value
+    });
+  }
   // Конвертируем новое значение для datetime-local/date полей
   localValue.value = convertToDate(newValue, props.field.type);
 });
@@ -276,7 +365,102 @@ watch(() => props.modelValue, (newValue) => {
 function handleChange() {
   // Конвертируем Date обратно в строку для datetime-local/date полей перед отправкой
   const valueToEmit = convertFromDate(localValue.value, props.field.type);
-  logger.debug('FormField: handleChange', { fieldKey: props.field.key, value: valueToEmit });
+
+  // ДИАГНОСТИКА: Усиленное логирование для datetime-local
+  if (props.field.type === 'datetime-local') {
+    logger.info('[FormField] handleChange для datetime-local', {
+      fieldKey: props.field.key,
+      localValueBeforeConvert: localValue.value,
+      localValueType: typeof localValue.value,
+      localValueIsDate: localValue.value instanceof Date,
+      valueToEmit,
+      valueToEmitType: typeof valueToEmit,
+      currentPropsModelValue: props.modelValue,
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    logger.debug('FormField: handleChange', { fieldKey: props.field.key, value: valueToEmit });
+  }
+
+  emit('update:modelValue', valueToEmit);
+}
+
+// Специальная обработка для datetime полей с защитой от дублирования
+let lastEmittedDateTime = '';
+function handleDateTimeChange(event?: any) {
+  logger.info('[FormField] handleDateTimeChange НАЧАЛО', {
+    fieldKey: props.field.key,
+    eventType: event?.type || 'direct',
+    localValue: localValue.value,
+    localValueType: typeof localValue.value,
+    localValueIsDate: localValue.value instanceof Date,
+    localValueDetails: localValue.value instanceof Date ? {
+      toString: localValue.value.toString(),
+      toISOString: localValue.value.toISOString(),
+      toLocaleString: localValue.value.toLocaleString('ru-RU'),
+      year: localValue.value.getFullYear(),
+      month: localValue.value.getMonth() + 1,
+      day: localValue.value.getDate(),
+      hours: localValue.value.getHours(),
+      minutes: localValue.value.getMinutes()
+    } : null,
+    currentModelValue: props.modelValue,
+    timestamp: new Date().toISOString()
+  });
+
+  // Для datetime полей localValue это Date объект
+  if (!localValue.value || !(localValue.value instanceof Date)) {
+    logger.warn('[FormField] handleDateTimeChange - пропущено, не Date объект', {
+      fieldKey: props.field.key,
+      localValue: localValue.value,
+      localValueType: typeof localValue.value
+    });
+    return;
+  }
+
+  // Конвертируем Date в строку ISO
+  const valueToEmit = convertFromDate(localValue.value, props.field.type);
+
+  logger.info('[FormField] handleDateTimeChange ПОСЛЕ КОНВЕРТАЦИИ', {
+    fieldKey: props.field.key,
+    localValueBeforeConvert: {
+      toString: localValue.value.toString(),
+      toISOString: localValue.value.toISOString(),
+      toLocaleString: localValue.value.toLocaleString('ru-RU')
+    },
+    valueToEmit,
+    valueToEmitType: typeof valueToEmit,
+    lastEmittedDateTime,
+    currentModelValue: props.modelValue
+  });
+
+  // Защита от дублирования событий
+  if (valueToEmit === lastEmittedDateTime) {
+    logger.debug('[FormField] handleDateTimeChange - пропущено дублирование', {
+      fieldKey: props.field.key,
+      value: valueToEmit
+    });
+    return;
+  }
+
+  // Проверяем что значение действительно изменилось
+  if (valueToEmit === props.modelValue) {
+    logger.debug('[FormField] handleDateTimeChange - значение не изменилось', {
+      fieldKey: props.field.key,
+      value: valueToEmit
+    });
+    return;
+  }
+
+  lastEmittedDateTime = valueToEmit;
+
+  logger.info('[FormField] handleDateTimeChange EMIT', {
+    fieldKey: props.field.key,
+    valueToEmit,
+    previousModelValue: props.modelValue,
+    timestamp: new Date().toISOString()
+  });
+
   emit('update:modelValue', valueToEmit);
 }
 </script>

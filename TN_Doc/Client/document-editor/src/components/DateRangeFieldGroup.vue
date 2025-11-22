@@ -7,7 +7,7 @@
         :modelValue="beginValue"
         :hide-label="true"
         :invalidChars="invalidChars"
-        @update:modelValue="(value) => emit('update:begin', value)"
+        @update:modelValue="emitBeginUpdate"
       />
     </div>
 
@@ -21,13 +21,14 @@
         :modelValue="endValue"
         :hide-label="true"
         :invalidChars="invalidChars"
-        @update:modelValue="(value) => emit('update:end', value)"
+        @update:modelValue="emitEndUpdate"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { logger } from '@tn-doc/shared';
 import FormFieldWithHistory from './FormFieldWithHistory.vue';
 import type { FormField } from '@/types/document.types';
 
@@ -43,6 +44,27 @@ const emit = defineEmits<{
   (e: 'update:begin', value: any): void;
   (e: 'update:end', value: any): void;
 }>();
+
+// ДИАГНОСТИКА: Добавляем обертки для эмитов с логированием
+const emitBeginUpdate = (value: any) => {
+  logger.info('[DateRangeFieldGroup] Обновление начала периода', {
+    fieldKey: props.beginField.key,
+    newValue: value,
+    oldValue: props.beginValue,
+    timestamp: new Date().toISOString()
+  });
+  emit('update:begin', value);
+};
+
+const emitEndUpdate = (value: any) => {
+  logger.info('[DateRangeFieldGroup] Обновление конца периода', {
+    fieldKey: props.endField.key,
+    newValue: value,
+    oldValue: props.endValue,
+    timestamp: new Date().toISOString()
+  });
+  emit('update:end', value);
+};
 </script>
 
 <style scoped>

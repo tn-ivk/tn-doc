@@ -85,6 +85,16 @@ const computedHighlightColor = computed(() => {
  * Обработка изменения значения
  */
 const handleChange = (newValue: any) => {
+  // ДИАГНОСТИКА: Логируем состояние в момент изменения
+  logger.info('[FormFieldWithHistory] handleChange вызван', {
+    fieldKey: props.field.key,
+    fieldType: props.field.type,
+    newValue,
+    currentPropsModelValue: props.modelValue,
+    isDateTimeField: props.field.type === 'datetime-local',
+    timestamp: new Date().toISOString()
+  });
+
   // Отслеживаем ручное изменение
   trackManualChange(props.field.key, newValue, props.modelValue);
 

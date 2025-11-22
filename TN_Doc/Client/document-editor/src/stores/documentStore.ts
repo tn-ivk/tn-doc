@@ -230,6 +230,16 @@ export const useDocumentStore = defineStore('document', () => {
    * Обновить значение поля формы
    */
   function updateField(key: string, value: any) {
+    // ДИАГНОСТИКА: Логируем обновление store
+    if (key.includes('PassportPeriodDT')) {
+      logger.info('[DocumentStore] updateField для datetime поля', {
+        key,
+        newValue: value,
+        oldValue: formData.value[key],
+        timestamp: new Date().toISOString()
+      });
+    }
+
     formData.value[key] = value;
     isDirty.value = true;
   }

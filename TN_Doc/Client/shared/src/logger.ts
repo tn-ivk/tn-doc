@@ -76,10 +76,20 @@ class Logger {
     }
 
     try {
-      const payload: LogEntry = {
+      // Объединяем контекст с глобальным
+      const fullContext = { ...this.globalContext, ...context };
+
+      // Формируем сообщение с контекстом для сервера
+      // Если есть контекст, добавляем его в сообщение как JSON
+      let fullMessage = message;
+      if (Object.keys(fullContext).length > 0) {
+        fullMessage = `${message} | ${JSON.stringify(fullContext)}`;
+      }
+
+      // Отправляем только level и message (без context), так как сервер не поддерживает context
+      const payload = {
         level,
-        message,
-        context: { ...this.globalContext, ...context }
+        message: fullMessage
       };
 
       await fetch(this.endpoint, {

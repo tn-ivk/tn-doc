@@ -7,6 +7,15 @@ import { logger } from '@tn-doc/shared';
  * Приводит числа к единому формату (точка вместо запятой, удаляет лишние пробелы)
  */
 const normalizeValue = (value: any): string => {
+  // ДИАГНОСТИКА: Логируем входное значение
+  logger.debug('[normalizeValue] Входное значение', {
+    value,
+    type: typeof value,
+    isNull: value === null,
+    isUndefined: value === undefined,
+    isEmpty: value === ''
+  });
+
   if (value === null || value === undefined || value === '') {
     return '';
   }
@@ -20,10 +29,18 @@ const normalizeValue = (value: any): string => {
   const numValue = parseFloat(normalized);
   if (!isNaN(numValue)) {
     // Возвращаем нормализованную строку с точкой
+    logger.debug('[normalizeValue] Нормализовано как число', {
+      original: value,
+      normalized
+    });
     return normalized;
   }
 
   // Для нечисловых значений возвращаем оригинальную строку (без замены запятой)
+  logger.debug('[normalizeValue] Нормализовано как строка', {
+    original: value,
+    normalized: strValue
+  });
   return strValue;
 };
 
@@ -82,12 +99,34 @@ export function useFieldHistory() {
    * Отследить ручное изменение поля
    */
   const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any) => {
+    // ДИАГНОСТИКА: Логируем входные параметры
+    logger.info('[trackManualChange] Начало обработки', {
+      fieldKey,
+      newValue,
+      previousValue,
+      newValueType: typeof newValue,
+      previousValueType: typeof previousValue
+    });
+
     // Нормализуем значения для корректного сравнения (точка/запятая в числах)
     const newValueNormalized = normalizeValue(newValue);
     const previousValueNormalized = normalizeValue(previousValue);
 
+    // ДИАГНОСТИКА: Логируем нормализованные значения и результат сравнения
+    logger.info('[trackManualChange] После нормализации', {
+      fieldKey,
+      newValueNormalized,
+      previousValueNormalized,
+      areEqual: newValueNormalized === previousValueNormalized,
+      stringComparison: `"${newValueNormalized}" === "${previousValueNormalized}"`
+    });
+
     // Если нормализованные значения совпадают, не создаем запись в истории
     if (newValueNormalized === previousValueNormalized) {
+      logger.warn('[trackManualChange] ПРОПУСК: значения идентичны после нормализации', {
+        fieldKey,
+        reason: 'normalized values are equal'
+      });
       return;
     }
 
@@ -97,6 +136,11 @@ export function useFieldHistory() {
       previousValueNormalized || undefined,
       'Отредактировано вручную'
     );
+
+    logger.info('[trackManualChange] Создана запись истории', {
+      fieldKey,
+      entry
+    });
 
     addHistoryEntry(fieldKey, entry);
   };
