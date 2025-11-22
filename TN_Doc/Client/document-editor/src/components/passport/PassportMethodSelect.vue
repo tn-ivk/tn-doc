@@ -8,7 +8,8 @@
         :class="[
           { 'p-invalid': !isValid },
           { 'elis-filled': isElisFilled },
-          { 'unknown-method': showDictionaryWarning }
+          { 'unknown-method': showDictionaryWarning },
+          'no-dropdown-icon'
         ]"
         placeholder="Метод не выбран"
         class="method-select"
@@ -126,7 +127,7 @@ function handleEditClick() {
 /* Иконка редактирования внутри Select */
 .edit-method-btn {
   position: absolute;
-  right: 34px; /* Вплотную к dropdown */
+  right: 6px; /* Справа с небольшим отступом */
   top: 50%;
   transform: translateY(-50%);
   width: 28px;
@@ -197,5 +198,49 @@ function handleEditClick() {
   font-size: 0.875rem;
   color: #b87902;
   line-height: 1.2;
+}
+
+/* Скрытие dropdown иконки для унификации с комбобоксом подписантов */
+:deep(.method-select.no-dropdown-icon .p-select-dropdown) {
+  display: none !important;
+}
+
+:deep(.method-select.no-dropdown-icon .p-select-label) {
+  padding-right: 40px !important; /* Увеличенный отступ для кнопки редактирования */
+}
+
+/* Стилизация выпадающего списка для унификации с FormField */
+:deep(.method-select .p-select-overlay) {
+  margin-top: 2px;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-radius);
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12);
+  background: #ffffff;
+}
+
+:deep(.method-select .p-select-list) {
+  padding: 4px 0;
+  font-size: var(--md-font-size-base);
+}
+
+:deep(.method-select .p-select-option) {
+  padding: 6px 12px;
+  color: var(--md-text);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+:deep(.method-select .p-select-option:not(.p-disabled):hover) {
+  background: var(--md-primary-light);
+  color: var(--md-text);
+}
+
+:deep(.method-select .p-select-option.p-focus) {
+  background: var(--md-primary-light);
+  color: var(--md-text);
+}
+
+:deep(.method-select .p-select-option.p-focus:not(.p-disabled):hover) {
+  background: var(--md-primary);
+  color: #ffffff;
 }
 </style>
