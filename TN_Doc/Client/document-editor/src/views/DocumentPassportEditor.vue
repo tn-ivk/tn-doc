@@ -36,7 +36,6 @@ import { logger } from '@tn-doc/shared';
                   <td class="editor-label-cell">
                     <div class="label-wrapper">
                       <span class="label-text">{{ row.field.label }}</span>
-                      <span v-if="row.field.required" class="required-mark">*</span>
                     </div>
                   </td>
                   <td class="editor-input-cell">
@@ -55,7 +54,6 @@ import { logger } from '@tn-doc/shared';
                   <td class="editor-label-cell">
                     <div class="label-wrapper">
                       <span class="label-text">{{ row.group.label }}</span>
-                      <span v-if="row.group.required" class="required-mark">*</span>
                     </div>
                   </td>
                   <td class="editor-input-cell">
@@ -76,7 +74,6 @@ import { logger } from '@tn-doc/shared';
                   <td class="editor-label-cell">
                     <div class="label-wrapper">
                       <span class="label-text">{{ row.group.label }}</span>
-                      <span v-if="row.group.required" class="required-mark">*</span>
                     </div>
                   </td>
                   <td class="editor-input-cell">
@@ -635,12 +632,6 @@ setupBeforeUnloadHandler();
 .label-text {
   display: inline-block;
   line-height: 1.3;
-}
-
-.required-mark {
-  margin-left: 4px;
-  color: var(--md-error);
-  font-weight: 600;
 }
 
 .editor-table tr:first-child td:first-child {
