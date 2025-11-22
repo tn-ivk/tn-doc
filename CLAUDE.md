@@ -503,6 +503,13 @@ Real-time data acquisition from measurement systems:
   - ✅ Обновлен подмодуль `tn.docgeneral` с улучшенной логикой выбора методов
   - Компонент: `PassportMethodSelect.vue` с CSS классом `.unknown-method`
   - Новое поле: `isInDictionary` в интерфейсе `ParameterMethod`
+  - ✅ **Исправлена обработка datetime-local полей**:
+    - Исправлена конвертация Date в локальное время (было: UTC через `toISOString()`, стало: локальное время через компоненты даты)
+    - Добавлена специализированная функция `handleDateTimeChange()` для обработки событий PrimeVue DatePicker
+    - Реализована защита от дублирования событий при изменении даты/времени
+    - Теперь корректно создаются записи истории для datetime-local полей
+    - Индикаторы источников данных (ELIS/Manual) корректно отображаются для datetime-local полей
+    - Устранены искажения времени при сохранении (проблема сдвига часового пояса)
 
 ## Previous Major Changes (v1.4.2 - October 2024)
 
