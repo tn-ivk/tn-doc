@@ -4,6 +4,7 @@
       :parameter="parameter"
       :isElisFilled="isElisFilled"
       :hideEditButton="true"
+      :hasHistoryIndicator="lastSource !== DataSource.Unknown"
       @update:method="handleChange"
       @manual-method="handleManualMethod"
     />
@@ -11,6 +12,7 @@
     <!-- Кнопка редактирования (перемещена на уровень method-with-history) -->
     <button
       class="edit-method-btn-external"
+      :style="{ right: editButtonPosition }"
       type="button"
       @click="handleManualMethod"
       title="Создать ручной метод"
@@ -85,6 +87,15 @@ const lastSource = computed(() => {
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
+ * Динамическая позиция кнопки редактирования
+ * Если индикатор истории отображается - сдвигаем карандаш левее (40px)
+ * Если индикатора нет - прижимаем карандаш к правому краю (6px)
+ */
+const editButtonPosition = computed(() => {
+  return lastSource.value !== DataSource.Unknown ? '40px' : '6px';
+});
+
+/**
  * Обработка изменения метода
  */
 const handleChange = (newMethod: MethodOption | null) => {
@@ -135,7 +146,7 @@ const onIndicatorLeave = () => {
 /* Кнопка редактирования на уровне method-with-history */
 .edit-method-btn-external {
   position: absolute;
-  right: 40px; /* Карандаш левее */
+  /* right управляется динамически через computed свойство editButtonPosition */
   top: 50%;
   transform: translateY(-50%);
   width: 28px;

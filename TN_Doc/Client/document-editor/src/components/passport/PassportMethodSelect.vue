@@ -9,7 +9,8 @@
           { 'p-invalid': !isValid },
           { 'elis-filled': isElisFilled },
           { 'unknown-method': showDictionaryWarning },
-          'no-dropdown-icon'
+          'no-dropdown-icon',
+          paddingClass
         ]"
         placeholder="Метод не выбран"
         class="method-select"
@@ -51,6 +52,8 @@ interface Props {
   isElisFilled?: boolean;
   /** Скрыть кнопку редактирования */
   hideEditButton?: boolean;
+  /** Отображается ли индикатор истории (для расчета padding) */
+  hasHistoryIndicator?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -95,6 +98,15 @@ const showDictionaryWarning = computed(() => {
     return false;
   }
   return props.parameter.method.isInDictionary === false;
+});
+
+/**
+ * Динамический класс для padding текста
+ * Если есть индикатор истории - нужно больше места (две иконки)
+ * Если нет - достаточно места для одной иконки карандаша
+ */
+const paddingClass = computed(() => {
+  return props.hasHistoryIndicator ? 'with-two-icons' : 'with-one-icon';
 });
 
 /**
@@ -223,8 +235,13 @@ function handleEditClick() {
   display: none !important;
 }
 
-:deep(.no-dropdown-icon .p-select-label) {
-  padding-right: 75px !important; /* Увеличенный отступ для двух иконок: карандаш и индикатор истории */
+/* Динамический padding в зависимости от наличия индикатора истории */
+:deep(.with-two-icons .p-select-label) {
+  padding-right: 75px !important; /* Две иконки: карандаш + индикатор истории */
+}
+
+:deep(.with-one-icon .p-select-label) {
+  padding-right: 40px !important; /* Одна иконка: только карандаш */
 }
 
 </style>
