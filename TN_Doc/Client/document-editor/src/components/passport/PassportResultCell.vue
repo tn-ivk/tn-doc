@@ -62,9 +62,27 @@ const editButtonPosition = computed(() => {
 
 /**
  * Динамический класс для padding текста результата
+ * Три состояния:
+ * - no-icons: нет иконок - минимальный padding (8px)
+ * - with-one-icon: одна иконка (редактирования ИЛИ истории) - средний padding (30px)
+ * - with-two-icons: обе иконки (редактирования И истории) - максимальный padding (62px)
  */
 const paddingClass = computed(() => {
-  return props.hasHistoryIndicator ? 'with-two-icons' : 'with-one-icon';
+  const hasEditIcon = props.canEdit;
+  const hasHistoryIcon = props.hasHistoryIndicator;
+
+  // Нет иконок вообще
+  if (!hasEditIcon && !hasHistoryIcon) {
+    return 'no-icons';
+  }
+
+  // Обе иконки одновременно
+  if (hasEditIcon && hasHistoryIcon) {
+    return 'with-two-icons';
+  }
+
+  // Одна иконка (неважно какая - редактирования или истории)
+  return 'with-one-icon';
 });
 
 function handleEditClick() {
@@ -154,12 +172,16 @@ function handleEditClick() {
   color: var(--md-primary-active, #1e54d4) !important;
 }
 
-/* Динамический padding в зависимости от наличия индикатора истории */
-.result-value.with-two-icons {
-  padding-right: 75px !important; /* Две иконки: кнопка + индикатор истории */
+/* Динамический padding в зависимости от наличия иконок */
+.result-value.no-icons {
+  padding-right: 8px !important; /* Нет иконок: минимальный padding, значение по центру */
 }
 
 .result-value.with-one-icon {
-  padding-right: 40px !important; /* Одна иконка: только кнопка */
+  padding-right: 30px !important; /* Одна иконка: только кнопка редактирования */
+}
+
+.result-value.with-two-icons {
+  padding-right: 62px !important; /* Две иконки: кнопка + индикатор истории */
 }
 </style>
