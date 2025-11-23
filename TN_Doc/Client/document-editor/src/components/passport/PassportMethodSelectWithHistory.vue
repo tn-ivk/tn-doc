@@ -12,6 +12,7 @@
     <!-- Кнопка редактирования (перемещена на уровень method-with-history) -->
     <button
       class="edit-method-btn-external"
+      :class="{ 'edit-method-btn-external--elis': isElisFilled }"
       :style="{ right: editButtonPosition }"
       type="button"
       @click="handleManualMethod"
@@ -153,7 +154,7 @@ const onIndicatorLeave = () => {
   height: 28px;
   border: 1px solid transparent !important;
   background-color: transparent !important;
-  color: var(--md-text, #212121) !important;
+  color: var(--md-outline-light, #E0E0E0) !important;
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -163,13 +164,18 @@ const onIndicatorLeave = () => {
   z-index: 2; /* Выше индикатора истории */
 }
 
+/* Тёмная иконка для ELIS-заполненного поля (зелёный фон) */
+.edit-method-btn-external--elis {
+  color: var(--md-text, #212121) !important;
+}
+
 .edit-method-btn-external:hover {
   background-color: transparent !important;
-  color: var(--md-text, #212121) !important;
+  color: var(--md-primary, #2f6fed) !important;
 }
 
 .edit-method-btn-external:active {
   background-color: transparent !important;
-  color: var(--md-text, #212121) !important;
+  color: var(--md-primary-active, #1e54d4) !important;
 }
 </style>

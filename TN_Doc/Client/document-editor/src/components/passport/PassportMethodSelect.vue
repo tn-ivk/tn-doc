@@ -22,6 +22,7 @@
       <button
         v-if="!hideEditButton"
         class="edit-method-btn"
+        :class="{ 'edit-method-btn--elis': isElisFilled }"
         type="button"
         @click="handleEditClick"
         title="Редактирование..."
@@ -150,7 +151,7 @@ function handleEditClick() {
   height: 28px;
   border: 1px solid transparent !important;
   background-color: transparent !important;
-  color: var(--md-text, #212121) !important;
+  color: var(--md-outline-light, #E0E0E0) !important;
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -160,14 +161,19 @@ function handleEditClick() {
   z-index: 1;
 }
 
+/* Тёмная иконка для ELIS-заполненного поля (зелёный фон) */
+.edit-method-btn--elis {
+  color: var(--md-text, #212121) !important;
+}
+
 .edit-method-btn:hover {
   background-color: transparent !important;
-  color: var(--md-text, #212121) !important;
+  color: var(--md-primary, #2f6fed) !important;
 }
 
 .edit-method-btn:active {
   background-color: transparent !important;
-  color: var(--md-text, #212121) !important;
+  color: var(--md-primary-active, #1e54d4) !important;
 }
 
 /* Базовые стили для Select компонента */
