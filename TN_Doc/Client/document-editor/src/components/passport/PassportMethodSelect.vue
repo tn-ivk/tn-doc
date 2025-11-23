@@ -19,6 +19,7 @@
 
       <!-- Иконка редактирования внутри комбобокса -->
       <button
+        v-if="!hideEditButton"
         class="edit-method-btn"
         type="button"
         @click="handleEditClick"
@@ -48,6 +49,8 @@ interface Props {
   parameter: PassportQualityParameter;
   /** Используется ли подсветка ELIS */
   isElisFilled?: boolean;
+  /** Скрыть кнопку редактирования */
+  hideEditButton?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -221,7 +224,7 @@ function handleEditClick() {
 }
 
 :deep(.no-dropdown-icon .p-select-label) {
-  padding-right: 40px !important; /* Увеличенный отступ для кнопки редактирования */
+  padding-right: 75px !important; /* Увеличенный отступ для двух иконок: карандаш и индикатор истории */
 }
 
 </style>

@@ -2,6 +2,7 @@
   <div
     v-if="source !== DataSource.Unknown"
     class="field-history-indicator"
+    :style="{ right: `${rightOffset}px` }"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
   >
@@ -28,10 +29,14 @@ import { computed } from 'vue';
 import { DataSource, SOURCE_DISPLAY_CONFIG } from '@/types/history.types';
 import { logger } from '@tn-doc/shared';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   /** Источник данных */
   source: DataSource;
-}>();
+  /** Отступ справа (в пикселях) */
+  rightOffset?: number;
+}>(), {
+  rightOffset: 4
+});
 
 const emit = defineEmits<{
   (e: 'mouseenter', event: MouseEvent): void;
@@ -63,7 +68,7 @@ const handleMouseLeave = () => {
 .field-history-indicator {
   position: absolute;
   top: 4px;
-  right: 4px;
+  /* right управляется через проп rightOffset */
   display: flex;
   align-items: center;
   justify-content: center;

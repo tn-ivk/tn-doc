@@ -3,14 +3,26 @@
     <PassportMethodSelect
       :parameter="parameter"
       :isElisFilled="isElisFilled"
+      :hideEditButton="true"
       @update:method="handleChange"
       @manual-method="handleManualMethod"
     />
+
+    <!-- Кнопка редактирования (перемещена на уровень method-with-history) -->
+    <button
+      class="edit-method-btn-external"
+      type="button"
+      @click="handleManualMethod"
+      title="Создать ручной метод"
+    >
+      <i class="pi pi-pencil"></i>
+    </button>
 
     <!-- Индикатор истории -->
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
+      :rightOffset="6"
       @mouseenter="(event) => onIndicatorHover(event)"
       @mouseleave="onIndicatorLeave"
     />
@@ -118,5 +130,35 @@ const onIndicatorLeave = () => {
 <style scoped>
 .method-with-history {
   position: relative;
+}
+
+/* Кнопка редактирования на уровне method-with-history */
+.edit-method-btn-external {
+  position: absolute;
+  right: 40px; /* Карандаш левее */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  z-index: 2; /* Выше индикатора истории */
+}
+
+.edit-method-btn-external:hover {
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
+}
+
+.edit-method-btn-external:active {
+  background-color: transparent !important;
+  color: var(--md-text, #212121) !important;
 }
 </style>
