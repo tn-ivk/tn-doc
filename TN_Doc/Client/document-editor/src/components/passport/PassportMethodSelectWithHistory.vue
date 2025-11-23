@@ -15,7 +15,7 @@
       :style="{ right: editButtonPosition }"
       type="button"
       @click="handleManualMethod"
-      title="Создать ручной метод"
+      title="Редактирование..."
     >
       <i class="pi pi-pencil"></i>
     </button>
@@ -24,7 +24,7 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
-      :rightOffset="6"
+      :rightOffset="4"
       @mouseenter="(event) => onIndicatorHover(event)"
       @mouseleave="onIndicatorLeave"
     />
@@ -88,11 +88,11 @@ const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
  * Динамическая позиция кнопки редактирования
- * Если индикатор истории отображается - сдвигаем карандаш левее (40px)
- * Если индикатора нет - прижимаем карандаш к правому краю (6px)
+ * Если индикатор истории отображается - сдвигаем карандаш левее (36px)
+ * Если индикатора нет - прижимаем карандаш к правому краю (2px)
  */
 const editButtonPosition = computed(() => {
-  return lastSource.value !== DataSource.Unknown ? '40px' : '6px';
+  return lastSource.value !== DataSource.Unknown ? '30px' : '2px';
 });
 
 /**

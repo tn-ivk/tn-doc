@@ -24,7 +24,7 @@
         class="edit-method-btn"
         type="button"
         @click="handleEditClick"
-        title="Создать ручной метод"
+        title="Редактирование..."
       >
         <i class="pi pi-pencil"></i>
       </button>
