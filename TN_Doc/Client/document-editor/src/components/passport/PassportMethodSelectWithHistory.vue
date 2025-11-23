@@ -17,7 +17,7 @@
       @click="handleManualMethod"
       title="Редактирование..."
     >
-      <i class="pi pi-pencil"></i>
+      <i class="pi pi-pen-to-square"></i>
     </button>
 
     <!-- Индикатор истории -->
