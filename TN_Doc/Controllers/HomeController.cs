@@ -547,32 +547,6 @@ public class HomeController : Controller
         }
     }
 
-    [Obsolete("Используйте IDocumentEditor.GetEditConfig(). Метод устарел с v1.4.4")]
-    [HttpGet]
-    public IActionResult GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
-    {
-        try
-        {
-            _logger.LogDebug($"Отображение формы редактирования документа устройства {_appConfig.GetDeviceName(IdDevice)}, документа {IdDoc} c ИД: {id}");
-            if (id == 0)
-            {
-                _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
-                return Content(string.Empty);
-            }
-
-            // Используем Vue Document Editor для всех документов
-            // Все 41 библиотека реализуют IDocumentEditor
-            var vueUrl = $"/document-editor/edit/{IdDevice}/{IdDoc}/{id}";
-            _logger.LogDebug($"Используется Vue Document Editor для документа {IdDoc}, URL: {vueUrl}");
-            return Json(new { useVue = true, url = vueUrl });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка при получении формы редактирования документа {IdDoc} для устройства {IdDevice}");
-            return Content(string.Empty);
-        }
-    }
-
     // [Obsolete("Используйте IDocumentEditor.UpdateDocument(). Метод устарел с v1.4.4")]
     // [HttpPost]
     // public void UpdateDoc(int IdDevice, IdDoc IdDoc, string data)
