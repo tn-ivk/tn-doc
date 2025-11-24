@@ -126,17 +126,26 @@ Submodules:
 
 ### Document Module Pattern
 
-Each document type follows a consistent 4-method interface:
+Each document type implements the **IDocumentEditor** interface with these core methods:
 
 1. **`GetViewDoc(id)`**: Returns JSON data for FastReport template
 2. **`GetPathTemplateFile()`**: Returns path to `.frx` template file
-3. **`GetEditDoc(id)`**: Generates HTML editing form **in-memory** (v1.4.2+)
-   - ⚠️ **IMPORTANT**: Always use `Path.Combine()` for cross-platform compatibility
-   - ⚠️ **IMPORTANT**: Add trace logging:
-     ```csharp
-     _logger.Trace($"HTML форма документа {IdDoc} (id={id}) сгенерирована, размер: {html.Length} символов");
-     ```
-4. **`SetDocFromJson(json)`**: Updates document data from JSON
+3. **`GetEditConfig(id)`**: Returns configuration for Vue Document Editor **(v1.4.4+)**
+   - Replaces deprecated `GetEditDoc()` HTML form generation
+   - Returns `DocumentEditConfig` with fields, initial values, dictionaries
+   - Supports field history tracking when ELIS is enabled (`IsUsedElis = true`)
+4. **`SaveDocument(id, values)`**: Saves document from Vue Editor **(v1.4.4+)**
+   - Replaces deprecated `SaveDoc()` and `SetDocFromJson()`
+   - Accepts `Dictionary<string, object>` with form values and history
+   - Processes field history when ELIS is enabled
+
+**All 41 document libraries migrated to IDocumentEditor in v1.4.4**
+
+**Deprecated methods (removed in v1.4.4):**
+- ~~`GetEditDoc(id)`~~ - HTML form generation (use `GetEditConfig()` instead)
+- ~~`SaveDoc(jsonData)`~~ - old format saving (use `SaveDocument()` instead)
+- ~~`SetDocFromJson(json)`~~ - old format updates (use `SaveDocument()` instead)
+- ~~HTML editing forms~~ (DocEdit.html, DocEditAct.html, DocEditPassport.html, html.html, EditDoc.js) - marked OBSOLETE, use Vue Document Editor
 
 **Configuration files per document:**
 - `TN_Doc/Cfg/Cfg{DocumentType}.json` - template and report settings
@@ -266,12 +275,18 @@ git status                            # Review changes before commit
 ### Adding a new document type
 
 1. Create new library in `tn.docgeneral/{DocumentType}/`
-2. Implement standard 4-method interface (GetViewDoc, GetEditDoc, GetPathTemplateFile, SetDocFromJson)
-3. Add logging with `Path.Combine()` in GetEditDoc
-4. Create FastReport template in `TN_Doc/Doc/{DocumentType}/`
-5. Add configuration files: `Cfg{DocumentType}.json`, `CfgEdit{DocumentType}.json`
-6. Register in IAppConfigService factory
-7. Write unit tests in `Tests/`
+2. Implement **IDocumentEditor** interface with these methods (v1.4.4+):
+   - `GetViewDoc(id)` - returns JSON for FastReport template
+   - `GetPathTemplateFile()` - returns path to .frx template
+   - `GetEditConfig(id)` - returns DocumentEditConfig for Vue Editor
+   - `SaveDocument(id, values)` - saves document from Vue Editor
+3. Create FastReport template in `TN_Doc/Doc/{DocumentType}/`
+4. Add configuration files: `Cfg{DocumentType}.json`, `CfgEdit{DocumentType}.json`
+5. Register in IAppConfigService factory
+6. Write unit tests in `Tests/`
+
+**Deprecated approach (v1.4.4+):**
+- ~~GetEditDoc()~~ and ~~SaveDoc()~~ - removed, use IDocumentEditor methods instead
 
 ### Modifying a FastReport template
 
@@ -483,6 +498,13 @@ Real-time data acquisition from measurement systems:
 
 ## In Development (Upcoming v1.4.4)
 
+- ✅ **Завершена миграция на IDocumentEditor.SaveDocument**:
+  - Все 41 библиотека документов используют только IDocumentEditor.SaveDocument
+  - Удален устаревший метод HomeController.SaveDoc
+  - DocumentEditController использует только новый API
+  - Обновлен субмодуль tn.docgeneral до версии 3f636a1
+  - HTML формы редактирования помечены OBSOLETE (планируется удаление в v2.0.0)
+  - Обновлены тесты для использования нового API
 - **Система истории изменений полей паспорта качества**:
   - Отслеживание источника данных (ELIS, ручное редактирование, округление ИВК)
   - Визуальные индикаторы источников в UI (цветные значки)
@@ -574,7 +596,7 @@ Real-time data acquisition from measurement systems:
 - ⚠️ **Базовая версия строки состояния**: диагностические индикаторы связи
 - ⚠️ **Кэширование конфигурационных файлов**: `IConfigurationCacheService` с LRU eviction
 - ⚠️ **Кэширование загрузки документов**: `IDocModuleLoader` оптимизация загрузки DLL
-- ⚠️ **Исключено построение HTML из файла**: GetEditDoc теперь работает в памяти
+- ⚠️ **Исключено построение HTML из файла**: GetEditDoc работал в памяти (устарел в v1.4.4, заменен на GetEditConfig для Vue Editor)
 - ⚠️ **In-memory document generation**: `IReportBuffer` eliminates disk I/O for PDF generation
 - **Local user directories for signatories**: Reports and journals now use local user references
 

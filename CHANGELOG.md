@@ -22,6 +22,11 @@
   - Автозаполнение зависимых параметров
 
 ### Changed
+- ⚠️ **Завершена миграция на IDocumentEditor.SaveDocument**
+  - Все 41 библиотека документов используют только IDocumentEditor.SaveDocument
+  - DocumentEditController использует только новый API
+  - Обновлен субмодуль tn.docgeneral до версии 3f636a1 (все библиотеки мигрированы)
+  - Обновлены тесты для использования нового API (ActDocumentTests, JornalDocumentTests, ReportDocumentTests)
 - Рефакторинг подсветки ELIS полей: логика на основе истории изменений
 - Снято ограничение на количество записей истории полей (фронтенд)
 - Улучшено логирование истории изменений полей
@@ -86,6 +91,20 @@
   - Удалены избыточные scoped стили, не работавшие при рендеринге overlay в body
   - Сохранён оригинальный внешний вид и UX-поведение выпадающих списков
   - Компонент: `FormField.vue`
+
+### Deprecated
+- ⚠️ **HTML формы редактирования помечены OBSOLETE**
+  - DocEdit.html, DocEditAct.html, DocEditPassport.html
+  - html.html, EditDoc.js
+  - Рекомендуется использовать Vue Document Editor
+  - Полное удаление планируется в версии 2.0.0
+
+### Removed
+- ⚠️ **Удален устаревший API SaveDoc**
+  - Удален HomeController.SaveDoc в основном проекте
+  - Удален из всех 41 библиотек документов в субмодуле tn.docgeneral (v3f636a1)
+  - Удалена обратная совместимость со старым SaveDoc API
+  - Все компоненты используют только IDocumentEditor.SaveDocument
 
 ## [1.4.3] - 2024-10-17
 
