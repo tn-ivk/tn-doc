@@ -3,7 +3,7 @@
     :visible="visible"
     modal
     class="manual-method-dialog"
-    header="Создание ручного метода"
+    header="Редактирование метода испытаний"
     :closable="false"
     @update:visible="updateVisible"
   >
@@ -24,7 +24,7 @@
         </small>
       </div>
 
-      <label class="checkbox-field">
+      <label class="checkbox-field" v-if="!isElisEnabled">
         <input type="checkbox" v-model="form.limitValueActivate" />
         <span>Использовать предельное значение</span>
       </label>
@@ -54,21 +54,22 @@
     </div>
 
     <template #footer>
-      <button class="btn btn-text" type="button" @click="handleReset">
-        Сброс
-      </button>
-      <div style="flex: 1;"></div>
-      <button class="btn btn-text" type="button" @click="handleCancel">
-        Отмена
-      </button>
-      <button
-        class="btn btn-primary"
-        type="button"
-        :disabled="Boolean(validationError)"
-        @click="handleConfirm"
-      >
-        Сохранить
-      </button>
+      <div class="dialog-footer">
+        <button class="btn btn-text" type="button" @click="handleReset">
+          Сброс
+        </button>
+        <button class="btn btn-text" type="button" @click="handleCancel">
+          Отмена
+        </button>
+        <button
+          class="btn btn-primary"
+          type="button"
+          :disabled="Boolean(validationError)"
+          @click="handleConfirm"
+        >
+          Сохранить
+        </button>
+      </div>
     </template>
   </Dialog>
 </template>
@@ -76,6 +77,8 @@
 <script setup lang="ts">
 import { reactive, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
+
+import type { MethodOption } from '@/types/passport.types';
 
 export interface ManualMethodPayload {
   name: string;
@@ -88,6 +91,9 @@ export interface ManualMethodPayload {
 interface Props {
   visible: boolean;
   parameterName?: string;
+  isElisEnabled?: boolean;
+  /** Исходный метод для инициализации формы */
+  initialMethod?: MethodOption;
 }
 
 const props = defineProps<Props>();
@@ -107,9 +113,6 @@ const form = reactive({
 });
 
 const validationError = computed(() => {
-  if (!form.name.trim()) {
-    return 'Название метода обязательно';
-  }
   if (form.limitValueActivate) {
     const numeric = Number(form.limitValue.replace(',', '.'));
     if (Number.isNaN(numeric)) {
@@ -123,10 +126,30 @@ watch(
   () => props.visible,
   (next) => {
     if (next) {
-      resetForm();
+      initializeForm();
     }
   }
 );
+
+/**
+ * Инициализация формы данными из initialMethod (если есть)
+ * или сброс к пустому состоянию
+ */
+function initializeForm() {
+  if (props.initialMethod) {
+    // Инициализация данными существующего метода
+    form.name = props.initialMethod.name || '';
+    form.limitValueActivate = props.initialMethod.limitValueActivate || false;
+    form.limitValue = props.initialMethod.limitValue !== undefined
+      ? String(props.initialMethod.limitValue).replace('.', ',')
+      : '';
+    form.limitValueString = props.initialMethod.limitValueString || '';
+    form.isDefault = props.initialMethod.isDefault || false;
+  } else {
+    // Сброс формы к пустому состоянию
+    resetForm();
+  }
+}
 
 function resetForm() {
   form.name = '';
@@ -175,8 +198,23 @@ function handleReset() {
 </script>
 
 <style scoped>
+.manual-method-dialog :global(.p-dialog) {
+  padding: 10px;
+}
+
+.manual-method-dialog :global(.p-dialog-header) {
+  text-align: center;
+  justify-content: center;
+}
+
 .manual-method-dialog :global(.p-dialog-content) {
   padding: 1.5rem;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .dialog-body {

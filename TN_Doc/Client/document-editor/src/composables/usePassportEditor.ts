@@ -141,8 +141,11 @@ export function usePassportEditor() {
 
       const methodNameTrimmed = selectedMethodName.trim();
       const normalizedMethodName = methodNameTrimmed.toLowerCase();
+      // Проверяем наличие метода в локальном справочнике (CfgEditPassport*.json)
+      // Используем отдельный список localMethodNames, который содержит только методы из конфигурации
+      const localMethods = paramSchema.localMethodNames || [];
       const isMethodInDictionary = normalizedMethodName
-        ? paramSchema.methodOptions.some(method => method.name.trim().toLowerCase() === normalizedMethodName)
+        ? localMethods.some(name => name.trim().toLowerCase() === normalizedMethodName)
         : true;
 
       // Создаем полный объект параметра

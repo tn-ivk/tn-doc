@@ -56,6 +56,8 @@
   <ManualMethodDialog
     :visible="manualMethodDialogVisible"
     :parameter-name="activeManualMethodParameter?.name"
+    :is-elis-enabled="props.isElisUsed"
+    :initial-method="getCurrentMethod()"
     @update:visible="handleManualMethodDialogVisibility"
     @confirm="handleManualMethodConfirm"
     @reset="handleManualMethodReset"
@@ -164,6 +166,26 @@ function handleManualMethodDialogVisibility(next: boolean) {
   if (!next) {
     activeManualMethodParameter.value = null;
   }
+}
+
+/**
+ * Получить текущий метод активного параметра
+ * Ищет метод по имени из method.selected в массиве method.options
+ */
+function getCurrentMethod(): MethodOption | undefined {
+  if (!activeManualMethodParameter.value) {
+    return undefined;
+  }
+
+  const param = activeManualMethodParameter.value;
+  const selectedName = param.method.selected;
+
+  if (!selectedName) {
+    return undefined;
+  }
+
+  // Найти метод по имени
+  return param.method.options.find(opt => opt.name === selectedName);
 }
 </script>
 
