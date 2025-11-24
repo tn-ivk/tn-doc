@@ -23,6 +23,7 @@
         v-if="!hideEditButton"
         class="edit-method-btn"
         :class="{ 'edit-method-btn--elis': isElisFilled }"
+        :style="{ right: editButtonPosition }"
         type="button"
         @click="handleEditClick"
         title="Редактирование..."
@@ -111,6 +112,15 @@ const paddingClass = computed(() => {
 });
 
 /**
+ * Динамическая позиция кнопки редактирования
+ * Если есть индикатор истории - сдвигаем левее (30px)
+ * Если нет - прижимаем к правому краю (2px)
+ */
+const editButtonPosition = computed(() => {
+  return props.hasHistoryIndicator ? '30px' : '2px';
+});
+
+/**
  * Обработчик изменения метода
  */
 function handleMethodChange(method: MethodOption | null) {
@@ -144,7 +154,7 @@ function handleEditClick() {
 /* Иконка редактирования внутри Select */
 .edit-method-btn {
   position: absolute;
-  right: 6px; /* Справа с небольшим отступом */
+  /* right управляется динамически через computed свойство editButtonPosition */
   top: 50%;
   transform: translateY(-50%);
   width: 28px;
