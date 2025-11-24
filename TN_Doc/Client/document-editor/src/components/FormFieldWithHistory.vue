@@ -4,8 +4,9 @@
       :field="field"
       :modelValue="modelValue"
       :hideLabel="hideLabel"
-                  :invalidChars="invalidChars"
-                  :highlightColor="computedHighlightColor"
+      :invalidChars="invalidChars"
+      :highlightColor="computedHighlightColor"
+      :hideDropdownIcon="hideDropdownIcon"
       @update:modelValue="handleChange"
     />
 
@@ -34,7 +35,6 @@ import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
-import { logger } from '@tn-doc/shared';
 
 const props = defineProps<{
   field: FormFieldType;
@@ -42,6 +42,7 @@ const props = defineProps<{
   hideLabel?: boolean;
   invalidChars?: string[];
   highlightColor?: string;
+  hideDropdownIcon?: boolean;
 }>();
 
 const emit = defineEmits<{

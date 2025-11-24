@@ -10,7 +10,7 @@
           :label="device.name"
           :status="getDeviceStatus(device)"
           :tooltip="`${device.name}: ${device.isConnected ? 'Подключено' : 'Отключено'}${device.error ? ` - ${device.error}` : ''}`"
-          @click="handleDeviceClick(device)"
+          :clickable="false"
         />
       </div>
 
@@ -20,12 +20,14 @@
           label="MS"
           :status="getServiceStatus(store.services.messagingService.isConnected, store.services.messagingService.error)"
           tooltip="Messaging Service"
+          :clickable="false"
         />
         <StatusIndicator
           v-if="store.services.elis"
           label="ELIS"
           :status="getServiceStatus(store.services.elis.isConnected, store.services.elis.error)"
           tooltip="Лабораторная система"
+          :clickable="false"
         />
       </div>
     </div>
@@ -68,15 +70,6 @@ onMounted(() => {
     store.fetchStatus();
   }, 2000);
 });
-
-function handleDeviceClick(device: DeviceStatus) {
-  logger.debug('StatusBar: клик по устройству', {
-    deviceId: device.id,
-    deviceName: device.name,
-    isConnected: device.isConnected
-  });
-  // Будущее: показать модальное окно с деталями устройства
-}
 
 function getDeviceStatus(device: DeviceStatus): IndicatorStatus {
   if (device.isConnected) {

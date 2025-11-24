@@ -22,10 +22,10 @@
       optionValue="value"
       :placeholder="hideLabel ? '' : `Выберите ${field.label.toLowerCase()}`"
       :disabled="!field.editable"
-      :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor }"
+      :class="{ 'p-invalid': !isValid, 'elis-highlighted': !!highlightColor, 'no-dropdown-icon': hideDropdownIcon }"
       :style="fieldBackgroundStyle"
       class="field-control"
-      appendTo="self"
+      appendTo="body"
       @change="handleChange"
     />
 
@@ -82,11 +82,12 @@
       dateFormat="dd.mm.yy"
       :showTime="true"
       hourFormat="24"
-      updateModelType="replace"
       :style="{ width: '100%' }"
       :inputStyle="{ width: '100%' }"
       class="field-control"
-      @update:modelValue="handleChange"
+      @update:modelValue="handleDateTimeChange"
+      @blur="handleDateTimeChange"
+      @clear="handleDateTimeChange"
     />
 
     <!-- Сообщение об ошибке валидации -->
@@ -142,6 +143,7 @@ const props = defineProps<{
   hideLabel?: boolean;
   invalidChars?: string[];
   highlightColor?: string;
+  hideDropdownIcon?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -170,9 +172,13 @@ function convertToDate(value: any, fieldType: string): any {
   // Для datetime-local и date полей конвертируем строку в Date
   if ((fieldType === 'datetime-local' || fieldType === 'date') && typeof value === 'string') {
     try {
-      return new Date(value);
+      const dateResult = new Date(value);
+      return dateResult;
     } catch (e) {
-      logger.error('FormField: ошибка конвертации даты', { error: e instanceof Error ? e.message : String(e) });
+      logger.error('FormField: ошибка конвертации даты', {
+        error: e instanceof Error ? e.message : String(e),
+        value
+      });
       return value;
     }
   }
@@ -194,8 +200,18 @@ function convertFromDate(value: any, fieldType: string): any {
       return null;
     }
 
-    // Конвертируем в ISO строку с локальным временем (без Z)
-    return value.toISOString().slice(0, 19); // "2025-10-22T02:07:33"
+    // ВАЖНО: Конвертируем в локальное время, а не UTC!
+    // toISOString() возвращает UTC время, что приводит к сдвигу временной зоны
+    // Нужно получить локальную дату в формате ISO без временной зоны
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    const hours = String(value.getHours()).padStart(2, '0');
+    const minutes = String(value.getMinutes()).padStart(2, '0');
+    const seconds = String(value.getSeconds()).padStart(2, '0');
+
+    const localISOString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    return localISOString;
   }
 
   return value;
@@ -276,7 +292,35 @@ watch(() => props.modelValue, (newValue) => {
 function handleChange() {
   // Конвертируем Date обратно в строку для datetime-local/date полей перед отправкой
   const valueToEmit = convertFromDate(localValue.value, props.field.type);
+
   logger.debug('FormField: handleChange', { fieldKey: props.field.key, value: valueToEmit });
+
+  emit('update:modelValue', valueToEmit);
+}
+
+// Специальная обработка для datetime полей с защитой от дублирования
+let lastEmittedDateTime = '';
+function handleDateTimeChange() {
+  // Для datetime полей localValue это Date объект
+  if (!localValue.value || !(localValue.value instanceof Date)) {
+    return;
+  }
+
+  // Конвертируем Date в строку ISO
+  const valueToEmit = convertFromDate(localValue.value, props.field.type);
+
+  // Защита от дублирования событий
+  if (valueToEmit === lastEmittedDateTime) {
+    return;
+  }
+
+  // Проверяем что значение действительно изменилось
+  if (valueToEmit === props.modelValue) {
+    return;
+  }
+
+  lastEmittedDateTime = valueToEmit;
+
   emit('update:modelValue', valueToEmit);
 }
 </script>
@@ -369,40 +413,6 @@ function handleChange() {
   color: var(--md-text-secondary);
 }
 
-:deep(.field-control .p-select-overlay) {
-  margin-top: 2px;
-  border: 1px solid var(--md-outline);
-  border-radius: var(--md-radius);
-  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12);
-  background: #ffffff;
-}
-
-:deep(.field-control .p-select-list) {
-  padding: 4px 0;
-  font-size: var(--md-font-size-base);
-}
-
-:deep(.field-control .p-select-option) {
-  padding: 6px 12px;
-  color: var(--md-text);
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-}
-
-:deep(.field-control .p-select-option:not(.p-disabled):hover) {
-  background: var(--md-primary-light);
-  color: var(--md-text);
-}
-
-:deep(.field-control .p-select-option.p-focus) {
-  background: var(--md-primary-light);
-  color: var(--md-text);
-}
-
-:deep(.field-control .p-select-option.p-focus:not(.p-disabled):hover) {
-  background: var(--md-primary);
-  color: #ffffff;
-}
-
 :deep(.field-control.p-select.p-disabled) {
   background: var(--md-disabled-bg);
   border-color: var(--md-disabled-border);
@@ -480,5 +490,51 @@ function handleChange() {
 :deep(.field-control.p-datepicker.elis-highlighted .p-inputtext:focus),
 :deep(.field-control.p-datepicker.elis-highlighted .p-inputtext:focus-visible) {
   background: var(--md-primary-light) !important;
+}
+
+/* Скрытие dropdown иконки для Select */
+:deep(.field-control.p-select.no-dropdown-icon .p-select-dropdown) {
+  display: none !important;
+}
+
+:deep(.field-control.p-select.no-dropdown-icon .p-select-label) {
+  padding-right: 10px !important;
+}
+</style>
+
+<style>
+/* Глобальные стили для выпадающего списка Select (когда appendTo="body") */
+.p-select-overlay {
+  margin-top: 2px;
+  border: 1px solid var(--md-outline);
+  border-radius: var(--md-radius);
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12);
+  background: #ffffff;
+}
+
+.p-select-list {
+  padding: 4px 0;
+  font-size: var(--md-font-size-base);
+}
+
+.p-select-option {
+  padding: 6px 12px;
+  color: var(--md-text);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.p-select-option:not(.p-disabled):hover {
+  background: var(--md-primary-light);
+  color: var(--md-text);
+}
+
+.p-select-option.p-focus {
+  background: var(--md-primary-light);
+  color: var(--md-text);
+}
+
+.p-select-option.p-focus:not(.p-disabled):hover {
+  background: var(--md-primary);
+  color: #ffffff;
 }
 </style>

@@ -3,14 +3,29 @@
     <PassportMethodSelect
       :parameter="parameter"
       :isElisFilled="isElisFilled"
+      :hideEditButton="true"
+      :hasHistoryIndicator="lastSource !== DataSource.Unknown"
       @update:method="handleChange"
       @manual-method="handleManualMethod"
     />
+
+    <!-- Кнопка редактирования (перемещена на уровень method-with-history) -->
+    <button
+      class="edit-method-btn-external"
+      :class="{ 'edit-method-btn-external--elis': isElisFilled }"
+      :style="{ right: editButtonPosition }"
+      type="button"
+      @click="handleManualMethod"
+      title="Редактирование..."
+    >
+      <i class="pi pi-pen-to-square"></i>
+    </button>
 
     <!-- Индикатор истории -->
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
+      :rightOffset="4"
       @mouseenter="(event) => onIndicatorHover(event)"
       @mouseleave="onIndicatorLeave"
     />
@@ -73,6 +88,15 @@ const lastSource = computed(() => {
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
+ * Динамическая позиция кнопки редактирования
+ * Если индикатор истории отображается - сдвигаем карандаш левее (36px)
+ * Если индикатора нет - прижимаем карандаш к правому краю (2px)
+ */
+const editButtonPosition = computed(() => {
+  return lastSource.value !== DataSource.Unknown ? '30px' : '2px';
+});
+
+/**
  * Обработка изменения метода
  */
 const handleChange = (newMethod: MethodOption | null) => {
@@ -118,5 +142,40 @@ const onIndicatorLeave = () => {
 <style scoped>
 .method-with-history {
   position: relative;
+}
+
+/* Кнопка редактирования на уровне method-with-history */
+.edit-method-btn-external {
+  position: absolute;
+  /* right управляется динамически через computed свойство editButtonPosition */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  color: var(--md-outline-light, #E0E0E0) !important;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  z-index: 2; /* Выше индикатора истории */
+}
+
+/* Тёмная иконка для ELIS-заполненного поля (зелёный фон) */
+.edit-method-btn-external--elis {
+  color: var(--md-text, #212121) !important;
+}
+
+.edit-method-btn-external:hover {
+  background-color: transparent !important;
+  color: var(--md-primary, #2f6fed) !important;
+}
+
+.edit-method-btn-external:active {
+  background-color: transparent !important;
+  color: var(--md-primary-active, #1e54d4) !important;
 }
 </style>

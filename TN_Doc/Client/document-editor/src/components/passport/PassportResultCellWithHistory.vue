@@ -5,6 +5,7 @@
       :canEdit="canEdit"
       :isElisFilled="isElisFilled"
       :editDisabledReason="editDisabledReason"
+      :hasHistoryIndicator="lastSource !== DataSource.Unknown"
       @result-edit="handleEditRequest"
     />
 
@@ -12,6 +13,7 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
+      :rightOffset="4"
       @mouseenter="(event) => onIndicatorHover(event)"
       @mouseleave="onIndicatorLeave"
     />

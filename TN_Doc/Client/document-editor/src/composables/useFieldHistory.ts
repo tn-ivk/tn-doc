@@ -7,6 +7,15 @@ import { logger } from '@tn-doc/shared';
  * Приводит числа к единому формату (точка вместо запятой, удаляет лишние пробелы)
  */
 const normalizeValue = (value: any): string => {
+  // ДИАГНОСТИКА: Логируем входное значение
+  logger.debug('[normalizeValue] Входное значение', {
+    value,
+    type: typeof value,
+    isNull: value === null,
+    isUndefined: value === undefined,
+    isEmpty: value === ''
+  });
+
   if (value === null || value === undefined || value === '') {
     return '';
   }
@@ -20,10 +29,18 @@ const normalizeValue = (value: any): string => {
   const numValue = parseFloat(normalized);
   if (!isNaN(numValue)) {
     // Возвращаем нормализованную строку с точкой
+    logger.debug('[normalizeValue] Нормализовано как число', {
+      original: value,
+      normalized
+    });
     return normalized;
   }
 
   // Для нечисловых значений возвращаем оригинальную строку (без замены запятой)
+  logger.debug('[normalizeValue] Нормализовано как строка', {
+    original: value,
+    normalized: strValue
+  });
   return strValue;
 };
 

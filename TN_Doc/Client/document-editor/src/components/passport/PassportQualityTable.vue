@@ -215,13 +215,12 @@ function handleManualMethodDialogVisibility(next: boolean) {
 
 /* Ширина колонок */
 .col-num {
-  width: 40px;
+  width: 30px;
   text-align: center;
 }
 
 .col-name {
-  min-width: 200px;
-  max-width: 400px;
+  width: 400px;
 }
 
 .col-method {

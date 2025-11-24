@@ -69,10 +69,10 @@
                 <td class="rightPanel">
                     <table class="docTable">
                         <tr>
-                            <td height="37" width="250">
+                            <td height="37" width="250" class="pb-1">
                                 <input id="viewModeButton" type="button" value="Редактирование" width="100" hidden="hidden" onclick="ToggleMode()">
                             </td>
-                            <td id="viewPanel">
+                            <td id="viewPanel" class="pb-1">
                                 <table width="100%" height="100%" style="border: 1px none rgb(248, 2, 2)">
                                     <td align="left" style="border: 1px none rgb(248, 2, 2)">
                                         <select id="ComboboxTemplateDoc">Форма документа</select>
@@ -102,7 +102,7 @@
                                     </td>
                                 </table>
                             </td>
-                            <td id="editPanel" align="right" hidden>
+                            <td id="editPanel" align="right" hidden class="pb-1">
                                 <input id="ButtonElis" type="button" value="Запросить данные из ЕЛИС" data-toggle="modal" data-target="#elis" onclick="OpenElisDialog()" hidden>
                                 <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
                             </td>

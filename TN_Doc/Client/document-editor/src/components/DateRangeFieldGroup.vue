@@ -7,7 +7,7 @@
         :modelValue="beginValue"
         :hide-label="true"
         :invalidChars="invalidChars"
-        @update:modelValue="(value) => emit('update:begin', value)"
+        @update:modelValue="emitBeginUpdate"
       />
     </div>
 
@@ -21,7 +21,7 @@
         :modelValue="endValue"
         :hide-label="true"
         :invalidChars="invalidChars"
-        @update:modelValue="(value) => emit('update:end', value)"
+        @update:modelValue="emitEndUpdate"
       />
     </div>
   </div>
@@ -43,6 +43,14 @@ const emit = defineEmits<{
   (e: 'update:begin', value: any): void;
   (e: 'update:end', value: any): void;
 }>();
+
+const emitBeginUpdate = (value: any) => {
+  emit('update:begin', value);
+};
+
+const emitEndUpdate = (value: any) => {
+  emit('update:end', value);
+};
 </script>
 
 <style scoped>
