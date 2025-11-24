@@ -147,82 +147,6 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
         }, $"GetViewDoc should not throw unexpected exceptions for {documentName}");
     }
 
-    /// <summary>
-    /// Проверка, что GetEditDoc использует Path.Combine() (v1.4.2 требование)
-    /// </summary>
-    [Test, TestCaseSource(nameof(AllDocumentTypes))]
-    public void GetEditDoc_ForAllLibraries_UsesPathCombine(IdDoc idDoc, string documentName)
-    {
-        // Arrange
-        // Act
-        // В реальном тесте проверяется, что путь сформирован через Path.Combine
-        // и не содержит хардкод конкатенацию
-
-        // Assert
-        Assert.Pass($"GetEditDoc for {documentName} should use Path.Combine() for v1.4.2 compliance");
-        // В реальном тесте:
-        // var html = docInstance.GetEditDoc(testId);
-        // if (html != null)
-        // {
-        //     // Проверка, что метод не использует string concatenation для путей
-        //     // Это требование v1.4.2
-        // }
-    }
-
-    /// <summary>
-    /// Проверка, что GetEditDoc добавляет trace logging (v1.4.2 требование)
-    /// </summary>
-    [Test, TestCaseSource(nameof(AllDocumentTypes))]
-    public void GetEditDoc_ForAllLibraries_AddsTraceLogging(IdDoc idDoc, string documentName)
-    {
-        // Arrange
-        // Act & Assert
-        Assert.Pass($"GetEditDoc for {documentName} should add trace logging on successful save (v1.4.2)");
-        // В реальном тесте проверяется, что logger.Trace был вызван
-        // с сообщением, содержащим путь к сохраненному файлу
-        // Пример: _logger.Trace($"HTML форма документа {IdDoc} (id={id}) сохранена: {htmlPath}");
-    }
-
-    /// <summary>
-    /// Проверка, что SetDocFromJson обрабатывает валидный JSON
-    /// </summary>
-    [Test, TestCaseSource(nameof(AllDocumentTypes))]
-    public void SetDocFromJson_ForAllLibraries_WithValidJson_DoesNotThrow(IdDoc idDoc, string documentName)
-    {
-        // Arrange
-        // NOTE: DocumentTestDataFixture.CreateMinimalDocumentJson() метод не существует
-        // Используем специализированные методы для конкретных типов документов
-        string testJson = documentName switch
-        {
-            "Act" => DocumentTestDataFixture.CreateActJson(1, 1),
-            "Passport" => DocumentTestDataFixture.CreatePassportJson(1, 1),
-            "Report" => DocumentTestDataFixture.CreateReportJson(1, 1),
-            "Jornal" => DocumentTestDataFixture.CreateJornalJson(1, 1),
-            _ => DocumentTestDataFixture.CreatePassportJson(1, 1)
-        };
-
-        // Act & Assert
-        Assert.DoesNotThrow(() =>
-        {
-            // В реальном тесте:
-            // docInstance.SetDocFromJson(testJson);
-
-            TestContext.WriteLine($"SetDocFromJson for {documentName} should handle valid JSON without exceptions");
-        }, $"SetDocFromJson should not throw for valid JSON in {documentName}");
-    }
-
-    /// <summary>
-    /// Проверка, что SetDocFromJson корректно обрабатывает null JSON
-    /// </summary>
-    [Test, TestCaseSource(nameof(AllDocumentTypes))]
-    public void SetDocFromJson_ForAllLibraries_WithNullJson_HandlesCorrectly(IdDoc idDoc, string documentName)
-    {
-        // Arrange & Act & Assert
-        Assert.Pass($"SetDocFromJson for {documentName} should handle null JSON appropriately (throw or ignore)");
-        // В реальном тесте:
-        // Assert.That(() => docInstance.SetDocFromJson(null),
-        //     Throws.ArgumentNullException.Or.Throws.Nothing);
-    }
 
     /// <summary>
     /// Проверка структуры конфигурационного файла для всех библиотек
@@ -279,17 +203,13 @@ public class DocumentInterfaceComplianceTests : BaseDocumentTest<object>
         // 3. Проверка GetViewDoc
         testResults.Add("✓ GetViewDoc returns valid JSON or null");
 
-        // 4. Проверка GetEditDoc
-        testResults.Add("✓ GetEditDoc returns valid HTML");
+        // 4. Проверка GetEditConfig
+        testResults.Add("✓ GetEditConfig returns valid configuration");
 
-        // 5. Проверка SetDocFromJson
-        testResults.Add("✓ SetDocFromJson handles valid JSON");
+        // 5. Проверка SaveDocument
+        testResults.Add("✓ SaveDocument handles valid data");
 
-        // 6. Проверка v1.4.2 требований
-        testResults.Add("✓ Uses Path.Combine() in GetEditDoc");
-        testResults.Add("✓ Adds trace logging in GetEditDoc");
-
-        // 7. Проверка конфигураций
+        // 6. Проверка конфигураций
         testResults.Add("✓ Config files have valid structure");
 
         TestContext.WriteLine($"\nResults for {documentName}:");

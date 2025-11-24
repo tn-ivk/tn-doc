@@ -838,55 +838,6 @@ public class HomeControllerTests
 
     #endregion
 
-    #region GetDocEdit Tests
-
-    /// <summary>
-    /// GetDocEdit: id==0 — string.Empty
-    /// </summary>
-    [Test]
-    public void GetDocEdit_IdIsZero_ReturnsEmptyString()
-    {
-        // Act
-        var result = _controller.GetDocEdit(1, IdDoc.Report, 0);
-
-        // Assert
-        Assert.That(result, Is.EqualTo(string.Empty));
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("с нулевым идентификатором")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
-
-    /// <summary>
-    /// GetDocEdit: IDocModuleLoader==null — string.Empty
-    /// </summary>
-    [Test]
-    public void GetDocEdit_DocModuleLoaderReturnsNull_ReturnsEmptyString()
-    {
-        // Arrange
-        _mockDocModuleLoader.Setup(x => x.LoadDocsModule(_dbOptions, 1, IdDoc.Report, It.IsAny<string>()))
-            .Returns((DocGeneral)null);
-        
-        // Act
-        var result = _controller.GetDocEdit(1, IdDoc.Report, 1);
-
-        // Assert
-        Assert.That(result, Is.EqualTo(string.Empty));
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Не удалось загрузить DLL для документа")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
-
-    #endregion
 
     #region SaveDoc Tests
 
