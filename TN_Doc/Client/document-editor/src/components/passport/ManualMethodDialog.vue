@@ -3,7 +3,7 @@
     :visible="visible"
     modal
     class="manual-method-dialog"
-    header="Создание ручного метода"
+    header="Редактирование метода испытаний"
     :closable="false"
     @update:visible="updateVisible"
   >
@@ -24,7 +24,7 @@
         </small>
       </div>
 
-      <label class="checkbox-field">
+      <label class="checkbox-field" v-if="!isElisEnabled">
         <input type="checkbox" v-model="form.limitValueActivate" />
         <span>Использовать предельное значение</span>
       </label>
@@ -54,21 +54,22 @@
     </div>
 
     <template #footer>
-      <button class="btn btn-text" type="button" @click="handleReset">
-        Сброс
-      </button>
-      <div style="flex: 1;"></div>
-      <button class="btn btn-text" type="button" @click="handleCancel">
-        Отмена
-      </button>
-      <button
-        class="btn btn-primary"
-        type="button"
-        :disabled="Boolean(validationError)"
-        @click="handleConfirm"
-      >
-        Сохранить
-      </button>
+      <div class="dialog-footer">
+        <button class="btn btn-text" type="button" @click="handleReset">
+          Сброс
+        </button>
+        <button class="btn btn-text" type="button" @click="handleCancel">
+          Отмена
+        </button>
+        <button
+          class="btn btn-primary"
+          type="button"
+          :disabled="Boolean(validationError)"
+          @click="handleConfirm"
+        >
+          Сохранить
+        </button>
+      </div>
     </template>
   </Dialog>
 </template>
@@ -88,6 +89,7 @@ export interface ManualMethodPayload {
 interface Props {
   visible: boolean;
   parameterName?: string;
+  isElisEnabled?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -107,9 +109,6 @@ const form = reactive({
 });
 
 const validationError = computed(() => {
-  if (!form.name.trim()) {
-    return 'Название метода обязательно';
-  }
   if (form.limitValueActivate) {
     const numeric = Number(form.limitValue.replace(',', '.'));
     if (Number.isNaN(numeric)) {
@@ -175,8 +174,23 @@ function handleReset() {
 </script>
 
 <style scoped>
+.manual-method-dialog :global(.p-dialog) {
+  padding: 10px;
+}
+
+.manual-method-dialog :global(.p-dialog-header) {
+  text-align: center;
+  justify-content: center;
+}
+
 .manual-method-dialog :global(.p-dialog-content) {
   padding: 1.5rem;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .dialog-body {

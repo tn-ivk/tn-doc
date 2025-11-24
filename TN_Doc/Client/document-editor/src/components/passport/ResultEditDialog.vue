@@ -13,7 +13,7 @@
       </p>
 
       <div class="dialog-field">
-        <label>Оператор</label>
+        <label>Префикс</label>
         <select v-model="operator">
           <option value="less">менее</option>
           <option value="greater">более</option>
@@ -145,8 +145,12 @@ function handleConfirm() {
 </script>
 
 <style scoped>
+.result-edit-dialog :global(.p-dialog-header) {
+  text-align: center;
+}
+
 .result-edit-dialog :global(.p-dialog-content) {
-  padding: 1.5rem;
+  padding: 10px;
 }
 
 .dialog-body {

@@ -56,6 +56,7 @@
   <ManualMethodDialog
     :visible="manualMethodDialogVisible"
     :parameter-name="activeManualMethodParameter?.name"
+    :is-elis-enabled="props.isElisUsed"
     @update:visible="handleManualMethodDialogVisibility"
     @confirm="handleManualMethodConfirm"
     @reset="handleManualMethodReset"
