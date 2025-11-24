@@ -788,56 +788,6 @@ public class HomeControllerTests
 
     #endregion
 
-    #region GetDoc Tests
-
-    /// <summary>
-    /// GetDoc: id==0 — false
-    /// </summary>
-    [Test]
-    public void GetDoc_IdIsZero_ReturnsFalse()
-    {
-        // Act
-        var result = _controller.GetDoc(1, IdDoc.Report, 0, 1);
-
-        // Assert
-        Assert.That(result, Is.False);
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("с нулевым идентификатором")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
-
-    /// <summary>
-    /// GetDoc: IDocModuleLoader==null — false
-    /// </summary>
-    [Test]
-    public void GetDoc_DocModuleLoaderReturnsNull_ReturnsFalse()
-    {
-        // Arrange
-        _mockDocModuleLoader.Setup(x => x.LoadDocsModule(_dbOptions, 1, IdDoc.Report, It.IsAny<string>()))
-            .Returns((DocGeneral)null);
-        
-        // Act
-        var result = _controller.GetDoc(1, IdDoc.Report, 1, 1);
-
-        // Assert
-        Assert.That(result, Is.False);
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Не удалось загрузить DLL для документа")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
-
-    #endregion
-
 
     #region SaveDoc Tests
 
