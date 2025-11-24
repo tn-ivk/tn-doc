@@ -100,11 +100,14 @@
   - Полное удаление планируется в версии 2.0.0
 
 ### Removed
-- ⚠️ **Удален устаревший API SaveDoc**
-  - Удален HomeController.SaveDoc в основном проекте
-  - Удален из всех 41 библиотек документов в субмодуле tn.docgeneral (v3f636a1)
-  - Удалена обратная совместимость со старым SaveDoc API
-  - Все компоненты используют только IDocumentEditor.SaveDocument
+- ⚠️ **Завершено удаление устаревших методов редактирования документов**
+  - **Удален HomeController.SaveDoc** - все компоненты используют IDocumentEditor.SaveDocument
+  - **Удален HomeController.GetDocEdit** - все компоненты используют IDocumentEditor.GetEditConfig
+  - **Удалены методы из всех 41 библиотек документов** в субмодуле tn.docgeneral (v7755993):
+    - SaveDoc() - заменен на IDocumentEditor.SaveDocument()
+    - GetEditDoc() - заменен на IDocumentEditor.GetEditConfig()
+    - SetDocFromJson() - заменен на IDocumentEditor.SaveDocument()
+  - Удалена вся обратная совместимость со старым API редактирования
 
 ## [1.4.3] - 2024-10-17
 

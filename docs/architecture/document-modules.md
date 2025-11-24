@@ -14,9 +14,9 @@
 - ✅ **Pipeline сервисов DocUpdate** - модульная обработка обновлений
 - ✅ **Рефакторинг Poverka модулей** - унификация сервисов обновления
 
-Система поддерживает два подхода:
-- **Новый (рекомендуемый)**: `IDocumentEditor` с `GetEditConfig()`/`SaveDocument()` для Vue SPA
-- **Устаревший**: `GetEditDoc()`/`SetDocFromJson()` для обратной совместимости (помечен `[Obsolete]`)
+Система использует единый подход:
+- **IDocumentEditor** с `GetEditConfig()`/`SaveDocument()` для Vue Document Editor
+- ⚠️ **Устаревшие методы удалены в v1.4.4**: `GetEditDoc()`, `SaveDoc()`, `SetDocFromJson()`
 
 ### Архитектура partial классов (v1.4.4+)
 
@@ -68,11 +68,11 @@ graph TB
    - `SaveDocument(int id, Dictionary<string, object> values)` → сохранение из Vue Editor
    - Все 41 библиотека реализуют оба метода
 
-3. **Устаревшие методы** (помечены `[Obsolete]` во всех библиотеках):
-   - `GetEditDoc(int id)` - генерация HTML форм (заменен на `GetEditConfig()`)
-   - `SaveDoc(string jsonData)` - старый формат сохранения (заменен на `SaveDocument()`)
-   - ⚠️ Методы оставлены для обратной совместимости, но не рекомендуются к использованию
-   - Удаление планируется в версии 2.0.0
+3. **Удаленные методы** (удалены в v1.4.4 из всех 41 библиотек):
+   - ~~`GetEditDoc(int id)`~~ - генерация HTML форм (заменен на `GetEditConfig()`) ✅ УДАЛЕН
+   - ~~`SaveDoc(string jsonData)`~~ - старый формат сохранения (заменен на `SaveDocument()`) ✅ УДАЛЕН
+   - ~~`SetDocFromJson(string json)`~~ - старый формат обновлений (заменен на `SaveDocument()`) ✅ УДАЛЕН
+   - HTML формы редактирования помечены OBSOLETE, полное удаление в v2.0.0
 
 4. **Система истории изменений полей** (FieldHistoryMap):
    - Отслеживание источника данных (ELIS, Manual, IVK, Unknown)
@@ -124,8 +124,6 @@ classDiagram
         +GetViewDoc(int id, int protocolNumber) object
         +GetPathTemplateFile() string
         +GetPeriodDocument(int id) PeriodDocument
-        +SaveDoc(string jsonData) bool [Obsolete v1.4.4]
-        +GetEditDoc(int id) string [Obsolete v1.4.4]
     }
 
     class IDocumentEditor {
@@ -170,7 +168,6 @@ classDiagram
         +GetEditConfig(int id) DocumentEditConfig ✅
         +SaveDocument(int id, Dictionary) bool ✅
         +DocUpdate(int id, Dictionary) void
-        +GetEditDoc(int id) string [Obsolete]
     }
 
     class PoverkaModule {
@@ -181,7 +178,6 @@ classDiagram
         +GetViewDoc(int id) object
         +GetEditConfig(int id) DocumentEditConfig ✅
         +SaveDocument(int id, Dictionary) bool ✅
-        +GetEditDoc(int id) string [Obsolete]
     }
 
     class KMHModule {
@@ -192,7 +188,6 @@ classDiagram
         +GetViewDoc(int id) object
         +GetEditConfig(int id) DocumentEditConfig ✅
         +SaveDocument(int id, Dictionary) bool ✅
-        +GetEditDoc(int id) string [Obsolete]
     }
 
     class ActModule {

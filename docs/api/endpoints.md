@@ -271,32 +271,21 @@ false // Ошибка генерации
 - Клиент загружает PDF через `/PDF/PDF.pdf`
 - Custom middleware обслуживает запрос из in-memory буфера
 
-#### Получить форму редактирования документа
+#### ~~Получить форму редактирования документа~~ (Удалено в v1.4.4)
 
 ```http
-GET /Home/GetDocEdit
+GET /Home/GetDocEdit [REMOVED]
 ```
 
-**Query Parameters:**
+⚠️ **Метод удален в версии 1.4.4**. Используйте новый REST API: `GET /api/documents/{deviceId}/{docType}/edit/{id}`
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| IdDevice | int | Yes | ID устройства ИВК |
-| IdDoc | string | Yes | Тип документа (enum IdDoc) |
-| id | int | Yes | ID записи документа |
+**Причина удаления:**
+- С версии 1.4.4+ все документы используют Vue Document Editor через REST API
+- HTML формы полностью удалены
+- Метод GetDocEdit в HomeController удален
 
-**Response:**
-```json
-{
-  "useVue": true,
-  "url": "/document-editor/edit/1/Passport/12345"
-}
-```
-
-**Примечание:**
-- С версии 1.4.4+ все документы используют Vue Document Editor
-- HTML формы устарели и удалены
-- Метод возвращает URL для Vue SPA
+**Замена:**
+См. раздел [Document Editor API (v1.4.4+)](#document-editor-api-v144) выше для работы с Vue Document Editor.
 
 #### Обновить документ после подтверждения от ИВК (Legacy)
 
