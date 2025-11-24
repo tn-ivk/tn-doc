@@ -1,4 +1,12 @@
-﻿
+﻿/*
+ * OBSOLETE: Этот файл устарел с версии 1.4.4.
+ * Используйте Vue Document Editor вместо этого.
+ * Все документы теперь редактируются через /document-editor/edit/{deviceId}/{docType}/{id}
+ * См. usePassportSave.ts и useDocumentEditor.ts для нового API.
+ *
+ * Этот файл оставлен только для справки и будет удалён в будущих версиях.
+ */
+
 function GetUsers() {
     var dic;
     $.ajax(

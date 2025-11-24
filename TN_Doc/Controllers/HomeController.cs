@@ -573,26 +573,6 @@ public class HomeController : Controller
         }
     }
 
-    [Obsolete("Используйте IDocumentEditor.SaveDocument(). Метод устарел с v1.4.4")]
-    public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
-    {
-        _logger.LogDebug($"Сохранение документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        try
-        {
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return;
-            }
-            doc.SaveDoc(data);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка сохранения документа {IdDoc}");
-        }
-    }
-    
     // [Obsolete("Используйте IDocumentEditor.UpdateDocument(). Метод устарел с v1.4.4")]
     // [HttpPost]
     // public void UpdateDoc(int IdDevice, IdDoc IdDoc, string data)

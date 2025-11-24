@@ -124,31 +124,24 @@ public class DocumentEditController : ControllerBase
                 return StatusCode(500, new { error = "Failed to load document module" });
             }
 
-            // Сохраняем документ
-            bool success;
-
-            // Проверяем, реализует ли документ IDocumentEditor (новый формат)
-            if (doc is IDocumentEditor editor)
+            // Проверяем, что документ реализует IDocumentEditor
+            if (doc is not IDocumentEditor editor)
             {
-                _logger.Trace($"Использование IDocumentEditor.SaveDocument для {docType}");
-
-                // Десериализуем JSON в словарь
-                var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(data.GetRawText());
-                if (values == null)
-                {
-                    _logger.Error("Не удалось десериализовать данные документа");
-                    return BadRequest(new { error = "Invalid document data" });
-                }
-
-                success = editor.SaveDocument(id, values);
+                _logger.Error($"Документ типа {docType} не реализует IDocumentEditor");
+                return StatusCode(500, new { error = "Document type does not support the editor interface" });
             }
-            else
+
+            _logger.Trace($"Использование IDocumentEditor.SaveDocument для {docType}");
+
+            // Десериализуем JSON в словарь
+            var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(data.GetRawText());
+            if (values == null)
             {
-                _logger.Trace($"Использование старого SaveDoc для {docType}");
-                // Используем старый метод для обратной совместимости
-                var jsonString = data.GetRawText();
-                success = doc.SaveDoc(jsonString);
+                _logger.Error("Не удалось десериализовать данные документа");
+                return BadRequest(new { error = "Invalid document data" });
             }
+
+            bool success = editor.SaveDocument(id, values);
 
             if (success)
             {

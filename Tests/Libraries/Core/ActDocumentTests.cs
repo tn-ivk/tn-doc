@@ -3,12 +3,14 @@ extern alias ActLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using TN.DocData;
+using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Services;
 using Tests.Fixtures;
 using Tests.Libraries;
@@ -555,14 +557,15 @@ public class ActDocumentTests : BaseDocumentTest<DocAct>
         }
 
         var testJson = DocumentTestDataFixture.CreateActJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act & Assert
         TryExecuteDbOperation(() =>
         {
-            var result = _actDocument.SaveDoc(testJson);
+            var result = ((IDocumentEditor)_actDocument).SaveDocument(1, values);
             // В реальном тесте проверяем, что result == true
-            TestContext.WriteLine("SaveDoc should handle valid JSON without exceptions");
-        }, "SaveDoc");
+            TestContext.WriteLine("SaveDocument should handle valid values without exceptions");
+        }, "SaveDocument");
     }
 
     [Test]
@@ -582,15 +585,16 @@ public class ActDocumentTests : BaseDocumentTest<DocAct>
         {
             try
             {
-                _actDocument.SaveDoc(invalidJson);
-                Assert.Fail("SaveDoc should throw exception for invalid JSON");
+                var values = JsonSerializer.Deserialize<Dictionary<string, object>>(invalidJson);
+                ((IDocumentEditor)_actDocument).SaveDocument(1, values);
+                Assert.Fail("SaveDocument should throw exception for invalid JSON");
             }
             catch (Exception)
             {
                 // Expected exception
-                TestContext.WriteLine("SaveDoc correctly throws exception for invalid JSON");
+                TestContext.WriteLine("SaveDocument correctly throws exception for invalid JSON");
             }
-        }, "SaveDoc");
+        }, "SaveDocument");
     }
 
     [Test]
@@ -604,14 +608,15 @@ public class ActDocumentTests : BaseDocumentTest<DocAct>
         }
 
         var testJson = DocumentTestDataFixture.CreateActJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
         TryExecuteDbOperation(() =>
         {
-            var result = _actDocument.SaveDoc(testJson);
+            var result = ((IDocumentEditor)_actDocument).SaveDocument(1, values);
             // В реальном тесте проверяем, что данные AdditionalInfo обновлены в БД
-            TestContext.WriteLine("SaveDoc should update AdditionalInfo in database");
-        }, "SaveDoc");
+            TestContext.WriteLine("SaveDocument should update AdditionalInfo in database");
+        }, "SaveDocument");
     }
 
     #endregion

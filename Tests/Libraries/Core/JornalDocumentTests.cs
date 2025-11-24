@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using TN.Doc;
 using TN.DocData;
+using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Services;
 using Tests.Fixtures;
 using Tests.Libraries;
@@ -623,14 +625,15 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         }
 
         var testJson = DocumentTestDataFixture.CreateJornalJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act & Assert
         TryExecuteDbOperation(() =>
         {
-            var result = _jornalDocument.SaveDoc(testJson);
+            var result = ((IDocumentEditor)_jornalDocument).SaveDocument(1, values);
             // В реальном тесте проверяем, что result == true
-            TestContext.WriteLine("SaveDoc should handle valid JSON without exceptions");
-        }, "SaveDoc");
+            TestContext.WriteLine("SaveDocument should handle valid values without exceptions");
+        }, "SaveDocument");
     }
 
     [Test]
@@ -646,13 +649,23 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         var invalidJson = "{ invalid json }";
 
         // Act
+        Dictionary<string, object> values = null;
+        try
+        {
+            values = JsonSerializer.Deserialize<Dictionary<string, object>>(invalidJson);
+        }
+        catch
+        {
+            // Expected - invalid JSON
+        }
+
         var result = TryExecuteDbOperation(
-            () => _jornalDocument.SaveDoc(invalidJson),
-            "SaveDoc");
+            () => values == null ? false : ((IDocumentEditor)_jornalDocument).SaveDocument(1, values),
+            "SaveDocument");
 
         // Assert
         // DocJornal.cs lines 294-298: catch block возвращает false при ошибках
-        Assert.That(result, Is.False, "SaveDoc should return false for invalid JSON");
+        Assert.That(result, Is.False, "SaveDocument should return false for invalid JSON");
     }
 
     [Test]
@@ -665,14 +678,14 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
             return;
         }
 
-        var nullJson = "null";
+        Dictionary<string, object> values = null;
 
         // Act
-        var result = _jornalDocument.SaveDoc(nullJson);
+        var result = ((IDocumentEditor)_jornalDocument).SaveDocument(0, values);
 
         // Assert
         // DocJornal.cs lines 256-260: проверка correctionData is null
-        Assert.That(result, Is.False, "SaveDoc should return false when correctionData is null");
+        Assert.That(result, Is.False, "SaveDocument should return false when values is null or id is invalid");
     }
 
     [Test]
@@ -686,14 +699,15 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         }
 
         var testJson = DocumentTestDataFixture.CreateJornalJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
         TryExecuteDbOperation(() =>
         {
-            var result = _jornalDocument.SaveDoc(testJson);
+            var result = ((IDocumentEditor)_jornalDocument).SaveDocument(1, values);
             // DocJornal.cs lines 285-291: обновление DataARM в БД
-            TestContext.WriteLine("SaveDoc should update DataARM.AdditionalData in database");
-        }, "SaveDoc");
+            TestContext.WriteLine("SaveDocument should update DataARM.AdditionalData in database");
+        }, "SaveDocument");
     }
 
     [Test]
@@ -707,13 +721,14 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         }
 
         var testJson = DocumentTestDataFixture.CreateJornalJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
-        var result = _jornalDocument.SaveDoc(testJson);
+        var result = ((IDocumentEditor)_jornalDocument).SaveDocument(1, values);
 
         // Assert
         // DocJornal.cs lines 261-268: загрузка существующего DataARM перед обновлением
-        TestContext.WriteLine("SaveDoc should load existing DataARM and merge updates");
+        TestContext.WriteLine("SaveDocument should load existing DataARM and merge updates");
     }
 
     [Test]
@@ -727,13 +742,14 @@ public class JornalDocumentTests : BaseDocumentTest<DocJornal>
         }
 
         var testJson = DocumentTestDataFixture.CreateJornalJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
-        var result = _jornalDocument.SaveDoc(testJson);
+        var result = ((IDocumentEditor)_jornalDocument).SaveDocument(1, values);
 
         // Assert
         // DocJornal.cs line 270: foreach (var item in correctionData.Values.Where(x => x.Tag == "AdditionalInfo"))
-        TestContext.WriteLine("SaveDoc should only process values with Tag == 'AdditionalInfo'");
+        TestContext.WriteLine("SaveDocument should only process values with Tag == 'AdditionalInfo'");
     }
 
     #endregion

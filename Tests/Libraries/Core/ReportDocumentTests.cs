@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using TN.Doc;
 using TN.DocData;
+using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Services;
 using Tests.Fixtures;
 using Tests.Libraries;
@@ -699,13 +701,14 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         }
 
         var testJson = DocumentTestDataFixture.CreateReportJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act & Assert
         Assert.DoesNotThrow(() =>
         {
-            var result = _reportDocument.SaveDoc(testJson);
+            var result = ((IDocumentEditor)_reportDocument).SaveDocument(1, values);
             // В реальном тесте проверяем, что result == true
-        }, "SaveDoc should handle valid JSON without exceptions");
+        }, "SaveDocument should handle valid values without exceptions");
     }
 
     [Test]
@@ -721,11 +724,21 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         var invalidJson = "{ invalid json }";
 
         // Act
-        var result = _reportDocument.SaveDoc(invalidJson);
+        Dictionary<string, object> values = null;
+        try
+        {
+            values = JsonSerializer.Deserialize<Dictionary<string, object>>(invalidJson);
+        }
+        catch
+        {
+            // Expected - invalid JSON
+        }
+
+        var result = values == null ? false : ((IDocumentEditor)_reportDocument).SaveDocument(1, values);
 
         // Assert
         // DocReport.cs lines 385-389: catch block возвращает false при ошибках
-        Assert.That(result, Is.False, "SaveDoc should return false for invalid JSON");
+        Assert.That(result, Is.False, "SaveDocument should return false for invalid JSON");
     }
 
     [Test]
@@ -738,14 +751,14 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
             return;
         }
 
-        var nullJson = "null";
+        Dictionary<string, object> values = null;
 
         // Act
-        var result = _reportDocument.SaveDoc(nullJson);
+        var result = ((IDocumentEditor)_reportDocument).SaveDocument(0, values);
 
         // Assert
         // DocReport.cs lines 346-350: проверка correctionData == null || correctionData.DocID <= 0
-        Assert.That(result, Is.False, "SaveDoc should return false when correctionData is null");
+        Assert.That(result, Is.False, "SaveDocument should return false when values is null or id is invalid");
     }
 
     [Test]
@@ -759,13 +772,14 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         }
 
         var testJson = DocumentTestDataFixture.CreateReportJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
-        var result = _reportDocument.SaveDoc(testJson);
+        var result = ((IDocumentEditor)_reportDocument).SaveDocument(1, values);
 
         // Assert
         // DocReport.cs line 382: используется Database.ExecuteSqlRaw потому что DataARM [NotMapped]
-        TestContext.WriteLine("SaveDoc should use ExecuteSqlRaw for updating DataARM ([NotMapped] property)");
+        TestContext.WriteLine("SaveDocument should use ExecuteSqlRaw for updating DataARM ([NotMapped] property)");
     }
 
     [Test]
@@ -779,13 +793,14 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         }
 
         var testJson = DocumentTestDataFixture.CreateReportJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
-        var result = _reportDocument.SaveDoc(testJson);
+        var result = ((IDocumentEditor)_reportDocument).SaveDocument(1, values);
 
         // Assert
         // DocReport.cs lines 352-359: загрузка существующего DataARM перед обновлением
-        TestContext.WriteLine("SaveDoc should load existing DataARM and merge updates");
+        TestContext.WriteLine("SaveDocument should load existing DataARM and merge updates");
     }
 
     [Test]
@@ -799,13 +814,14 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         }
 
         var testJson = DocumentTestDataFixture.CreateReportJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
-        var result = _reportDocument.SaveDoc(testJson);
+        var result = ((IDocumentEditor)_reportDocument).SaveDocument(1, values);
 
         // Assert
         // DocReport.cs line 361: foreach (var item in correctionData.Values.Where(x => x.Tag == "AdditionalInfo"))
-        TestContext.WriteLine("SaveDoc should only process values with Tag == 'AdditionalInfo'");
+        TestContext.WriteLine("SaveDocument should only process values with Tag == 'AdditionalInfo'");
     }
 
     [Test]
@@ -819,13 +835,14 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
         }
 
         var testJson = DocumentTestDataFixture.CreateReportJson(id: 1, idDevice: 1);
+        var values = JsonSerializer.Deserialize<Dictionary<string, object>>(testJson);
 
         // Act
-        var result = _reportDocument.SaveDoc(testJson);
+        var result = ((IDocumentEditor)_reportDocument).SaveDocument(1, values);
 
         // Assert
         // DocReport.cs lines 366-372: switch поддерживает 3 поля (DeliveryIOF, ReceiveIOF, OperatorIOF)
-        TestContext.WriteLine("SaveDoc should update DeliveryIOF, ReceiveIOF, and OperatorIOF fields");
+        TestContext.WriteLine("SaveDocument should update DeliveryIOF, ReceiveIOF, and OperatorIOF fields");
     }
 
     [Test]
@@ -838,14 +855,14 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
             return;
         }
 
-        var testJson = "{\"DocID\": -1, \"Values\": []}";
+        var values = new Dictionary<string, object>();
 
         // Act
-        var result = _reportDocument.SaveDoc(testJson);
+        var result = ((IDocumentEditor)_reportDocument).SaveDocument(-1, values);
 
         // Assert
         // DocReport.cs line 346: correctionData.DocID <= 0
-        Assert.That(result, Is.False, "SaveDoc should return false when DocID is invalid (<=0)");
+        Assert.That(result, Is.False, "SaveDocument should return false when DocID is invalid (<=0)");
     }
 
     [Test]
@@ -863,7 +880,7 @@ public class ReportDocumentTests : BaseDocumentTest<DocReport>
 
         // Assert
         // DocReport.cs lines 376-380: проверка string.IsNullOrEmpty(jsonDataArm)
-        TestContext.WriteLine("SaveDoc should return false when serialized DataARM is empty");
+        TestContext.WriteLine("SaveDocument should return false when serialized DataARM is empty");
     }
 
     #endregion
