@@ -37,8 +37,10 @@ export interface PassportQualityParameterSchema {
   roundValue?: number;
   /** ELIS метаданные (содержит KeyELIS и ElisAlias) */
   elisData?: ElisData;
-  /** Доступные методы испытаний (из конфигурации) */
+  /** Доступные методы испытаний (из конфигурации + БД) */
   methodOptions: MethodOption[];
+  /** Названия методов из локального справочника (CfgEditPassport*.json) */
+  localMethodNames: string[];
   /** Признак балластного параметра */
   isBallast?: boolean;
   /** Режим редактирования результата */
