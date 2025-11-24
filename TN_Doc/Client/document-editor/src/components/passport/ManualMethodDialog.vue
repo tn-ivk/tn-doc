@@ -78,6 +78,8 @@
 import { reactive, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
 
+import type { MethodOption } from '@/types/passport.types';
+
 export interface ManualMethodPayload {
   name: string;
   limitValueActivate: boolean;
@@ -90,6 +92,8 @@ interface Props {
   visible: boolean;
   parameterName?: string;
   isElisEnabled?: boolean;
+  /** Исходный метод для инициализации формы */
+  initialMethod?: MethodOption;
 }
 
 const props = defineProps<Props>();
@@ -122,10 +126,30 @@ watch(
   () => props.visible,
   (next) => {
     if (next) {
-      resetForm();
+      initializeForm();
     }
   }
 );
+
+/**
+ * Инициализация формы данными из initialMethod (если есть)
+ * или сброс к пустому состоянию
+ */
+function initializeForm() {
+  if (props.initialMethod) {
+    // Инициализация данными существующего метода
+    form.name = props.initialMethod.name || '';
+    form.limitValueActivate = props.initialMethod.limitValueActivate || false;
+    form.limitValue = props.initialMethod.limitValue !== undefined
+      ? String(props.initialMethod.limitValue).replace('.', ',')
+      : '';
+    form.limitValueString = props.initialMethod.limitValueString || '';
+    form.isDefault = props.initialMethod.isDefault || false;
+  } else {
+    // Сброс формы к пустому состоянию
+    resetForm();
+  }
+}
 
 function resetForm() {
   form.name = '';

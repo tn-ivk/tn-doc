@@ -182,6 +182,7 @@ function handleConfirm() {
   border: 1px solid var(--md-outline, #d5d7da);
   padding: 0 10px;
   font-size: 14px;
+  text-align: center;
 }
 
 .dialog-preview {
