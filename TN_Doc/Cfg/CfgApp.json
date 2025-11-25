@@ -63,7 +63,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 1,
           "Name": "Паспорта",
           "Description": "",
@@ -155,7 +155,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 2,
           "Name": "Акты",
           "Description": "",
@@ -223,7 +223,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 3,
           "Name": "Журналы",
           "Description": "",
@@ -251,7 +251,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 4,
           "Name": "Поверка МИ3287",
           "Description": "",
@@ -279,7 +279,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 5,
           "Name": "КМХ ПП по лаб. СИ",
           "Description": "",
@@ -315,7 +315,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 6,
           "Name": "КМХ ПР по ПУ",
           "Description": "",
@@ -351,7 +351,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 7,
           "Name": "КМХ ПВл",
           "Description": "",
@@ -387,7 +387,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 8,
           "Name": "КМХ ПВз",
           "Description": "",
@@ -423,7 +423,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 9,
           "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП",
           "Description": "",
@@ -459,7 +459,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 10,
           "Name": "КМХ РАБ ПП по МИ 2816",
           "Description": "",
@@ -495,7 +495,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 11,
           "Name": "Поверка ПП по МИ 2816",
           "Description": "",
@@ -515,7 +515,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -543,7 +543,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 13,
           "Name": "КМХ МПР по МПР",
           "Description": "",
@@ -571,7 +571,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 14,
           "Name": "Поверка МИ 3380",
           "Description": "",
@@ -591,7 +591,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 15,
           "Name": "Поверка МИ3265 ПР по ПУ",
           "Description": "",
@@ -611,7 +611,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 16,
           "Name": "Поверка МИ3265 УПР с помощью ПУ",
           "Description": "",
@@ -631,7 +631,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 17,
           "Name": "Поверка МИ3265 УПР с помощью ПУ и ПР",
           "Description": "",
@@ -651,7 +651,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 18,
           "Name": "КМХ МИ3265 ПР с помощью ПУ",
           "Description": "",
@@ -671,7 +671,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 19,
           "Name": "КМХ МИ3265 ПР РСУ по ПР ОСУ",
           "Description": "",
@@ -691,7 +691,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 20,
           "Name": "Поверка МИ 3312-2011 МПР по ПУ",
           "Description": "",
@@ -711,7 +711,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 21,
           "Name": "Поверка МИ 3312-2011 УПР с помощью ПУ, ПП и СРМ",
           "Description": "",
@@ -731,7 +731,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 22,
           "Name": "КМХ МИ 3312-2011 УПР с помощью ПУ, ПП и СРМ",
           "Description": "",
@@ -751,7 +751,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 23,
           "Name": "КМХ МИ 3312-2011 ПР РСУ по ПР ОСУ",
           "Description": "Протокол КМХ ПР РСУ по ПР основной схемы учета",
@@ -771,7 +771,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 24,
           "Name": "Поверка МИ 1974-2004",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
@@ -839,7 +839,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 25,
           "Name": "Поверка МИ 3151-2008",
           "Description": "Протокол поверки массового преобразователя расхода по МИ 3151-2008",
@@ -859,7 +859,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 26,
           "Name": "КМХ рабочего МПР по ПУ",
           "Description": "",
@@ -887,7 +887,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 27,
           "Name": "Поверка МИ 3288-2010",
           "Description": "Протокол поверки СРМ с помощью КП, ПП и ПР по МИ 3288-2010",
@@ -907,7 +907,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 28,
           "Name": "КМХ МИ 3288-2010",
           "Description": "Протокол КМХ СРМ с помощью КП, ПП и ПР по МИ 3288-2010",
@@ -927,7 +927,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 29,
           "Name": "Поверка МИ 3272-2010",
           "Description": "Протокол поверки счетчика-расходомера массового (массомера) ПР по МИ 3272-2010",
@@ -947,7 +947,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 30,
           "Name": "КМХ МИ 3272-2010",
           "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
@@ -967,7 +967,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 31,
           "Name": "Поверка МИ 3189-2009",
           "Description": "",
@@ -987,7 +987,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 33,
           "Name": "Поверка МИ3267",
           "Description": "",
@@ -1007,7 +1007,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 34,
           "Name": "Поверка МИ 3266 - 2010",
           "Description": "",
@@ -1217,7 +1217,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 1,
           "Name": "Паспорта",
           "Description": "",
@@ -1309,7 +1309,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 2,
           "Name": "Акты",
           "Description": "",
@@ -1377,7 +1377,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 3,
           "Name": "Журналы",
           "Description": "",
@@ -1405,7 +1405,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 4,
           "Name": "Поверка МИ3287",
           "Description": "",
@@ -1433,7 +1433,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 5,
           "Name": "КМХ ПП по лаб. СИ",
           "Description": "",
@@ -1469,7 +1469,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 6,
           "Name": "КМХ ПР по ПУ",
           "Description": "",
@@ -1505,7 +1505,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 7,
           "Name": "КМХ ПВл",
           "Description": "",
@@ -1541,7 +1541,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 8,
           "Name": "КМХ ПВз",
           "Description": "",
@@ -1577,7 +1577,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 9,
           "Name": "КМХ РАБ ПП ПО РЕЗ/ЭТАЛ ПП",
           "Description": "",
@@ -1613,7 +1613,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 10,
           "Name": "КМХ РАБ ПП по МИ 2816",
           "Description": "",
@@ -1649,7 +1649,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 11,
           "Name": "Поверка ПП по МИ 2816",
           "Description": "",
@@ -1669,7 +1669,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 12,
           "Name": "КМХ ПР по ПР (ТПР)",
           "Description": "",
@@ -1697,7 +1697,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 13,
           "Name": "КМХ МПР по МПР",
           "Description": "",
@@ -1725,7 +1725,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 14,
           "Name": "Поверка МИ 3380",
           "Description": "",
@@ -1745,7 +1745,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 15,
           "Name": "Поверка МИ3265 ПР по ПУ",
           "Description": "",
@@ -1765,7 +1765,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 16,
           "Name": "Поверка МИ3265 УПР с помощью ПУ",
           "Description": "",
@@ -1785,7 +1785,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 17,
           "Name": "Поверка МИ3265 УПР с помощью ПУ и ПР",
           "Description": "",
@@ -1805,7 +1805,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 18,
           "Name": "КМХ МИ3265 ПР с помощью ПУ",
           "Description": "",
@@ -1825,7 +1825,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 19,
           "Name": "КМХ МИ3265 ПР РСУ по ПР ОСУ",
           "Description": "",
@@ -1845,7 +1845,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 20,
           "Name": "Поверка МИ 3312-2011 МПР по ПУ",
           "Description": "",
@@ -1865,7 +1865,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 21,
           "Name": "Поверка МИ 3312-2011 УПР с помощью ПУ, ПП и СРМ",
           "Description": "",
@@ -1885,7 +1885,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 22,
           "Name": "КМХ МИ 3312-2011 УПР с помощью ПУ, ПП и СРМ",
           "Description": "",
@@ -1905,7 +1905,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 23,
           "Name": "КМХ МИ 3312-2011 ПР РСУ по ПР ОСУ",
           "Description": "Протокол КМХ ПР РСУ по ПР основной схемы учета",
@@ -1925,7 +1925,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 24,
           "Name": "Поверка МИ 1974-2004",
           "Description": "Протокол поверки преобразователя расхода с помощью поверочной установки по МИ 1974-2004",
@@ -1993,7 +1993,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 25,
           "Name": "Поверка МИ 3151-2008",
           "Description": "Протокол поверки массового преобразователя расхода по МИ 3151-2008",
@@ -2013,7 +2013,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 26,
           "Name": "КМХ рабочего МПР по ПУ",
           "Description": "",
@@ -2041,7 +2041,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 27,
           "Name": "Поверка МИ 3288-2010",
           "Description": "Протокол поверки СРМ с помощью КП, ПП и ПР по МИ 3288-2010",
@@ -2061,7 +2061,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 28,
           "Name": "КМХ МИ 3288-2010",
           "Description": "Протокол КМХ СРМ с помощью КП, ПП и ПР по МИ 3288-2010",
@@ -2081,7 +2081,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 29,
           "Name": "Поверка МИ 3272-2010",
           "Description": "Протокол поверки счетчика-расходомера массового (массомера) ПР по МИ 3272-2010",
@@ -2101,7 +2101,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 30,
           "Name": "КМХ МИ 3272-2010",
           "Description": "Протокол КМХ рабочего массового ПР по КП с ТПР и ПП по МИ 3272-2010",
@@ -2121,7 +2121,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 31,
           "Name": "Поверка МИ 3189-2009",
           "Description": "",
@@ -2141,7 +2141,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 33,
           "Name": "Поверка МИ3267",
           "Description": "",
@@ -2161,7 +2161,7 @@
           ]
         },
         {
-          "Use": true,
+          "Use": false,
           "IdDoc": 34,
           "Name": "Поверка МИ 3266 - 2010",
           "Description": "",
