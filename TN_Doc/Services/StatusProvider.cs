@@ -183,17 +183,12 @@ public class StatusProvider : IStatusProvider
 
             var csb = new MySqlConnectionStringBuilder(connectionString)
             {
-                ConnectionTimeout = 2,
-                DefaultCommandTimeout = 2
+                ConnectionTimeout = 2
             };
 
             using var connection = new MySqlConnection(csb.ConnectionString);
             await connection.OpenAsync(ct);
-
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT 1";
-            command.CommandTimeout = 2;
-            await command.ExecuteScalarAsync(ct);
+            await connection.PingAsync(ct);
 
             channel.IsConnected = true;
             channel.LatencyMs = (int)channelStopwatch.ElapsedMilliseconds;
