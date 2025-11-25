@@ -21,7 +21,7 @@ public class StatusMonitoringService : BackgroundService
     private readonly IHubContext<StatusHub> _hubContext;
     private readonly ILogger<StatusMonitoringService> _logger;
     private readonly AppClientTracker _clientTracker;
-    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(60);
+    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(600);
     private StatusResponse _lastStatus;
     private int _consecutiveErrors = 0;
     private const int MAX_CONSECUTIVE_ERRORS = 5;
