@@ -383,6 +383,13 @@
     {
       "Id": 1,
       "Key": "Mass_fraction_of_hydrogen_sulfide",
+      "KeyELIS": "Массовая доля сероводорода(млн⁻¹ (ppm))",
+      "ElisAlias": [
+        "Массовая доля сероводорода(млн⁻¹)",
+        "Массовая доля сероводорода(млн⁻¹ (ppm))"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 1,
       "Name": "Массовая доля сероводорода, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
@@ -391,6 +398,13 @@
     {
       "Id": 2,
       "Key": "Mass_fraction_of_methyl_and_ethyl_mercaptan",
+      "KeyELIS": "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹ (ppm))",
+      "ElisAlias": [
+        "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹ (ppm))",
+        "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹)"
+      ],
+      "RequiredFill": false,
+      "RoundValue": 1,
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
@@ -399,6 +413,12 @@
     {
       "Id": 3,
       "Key": "MassWaterFracCorrection",
+      "KeyELIS": "Массовая доля воды(%)",
+      "ElisAlias": [
+        "Массовая доля воды(%)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 2,
       "Name": "Массовая доля воды, %",
       "Use": true,
       "Edit": true,
@@ -407,6 +427,12 @@
     {
       "Id": 4,
       "Key": "Chloride_Salts.Concentration",
+      "KeyELIS": "Массовая концентрация хлористых солей(мг/дм³)",
+      "ElisAlias": [
+        "Массовая концентрация хлористых солей(мг/дм³)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 1,
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": true,
       "Edit": true,
@@ -415,6 +441,12 @@
     {
       "Id": 5,
       "Key": "Chloride_Salts.MassFraction",
+      "KeyELIS": "Массовая концентрация хлористых солей(%)",
+      "ElisAlias": [
+        "Массовая концентрация хлористых солей(%)",
+        "Массовая доля хлористых солей(%)"
+      ],
+      "RequiredFill": false,
       "Name": "Массовая доля хлористых солей, %",
       "Use": true,
       "Edit": true,
@@ -423,6 +455,12 @@
     {
       "Id": 6,
       "Key": "DNP.kPa",
+      "KeyELIS": "Давление насыщенных паров(кПа)",
+      "ElisAlias": [
+        "Давление насыщенных паров(кПа)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 1,
       "Name": "Давление насыщенных паров, кПа",
       "Use": true,
       "Edit": true,
@@ -431,6 +469,11 @@
     {
       "Id": 7,
       "Key": "DNP.mercury_mm",
+      "KeyELIS": "Давление насыщенных паров(мм рт. ст.)",
+      "ElisAlias": [
+        "Давление насыщенных паров(мм рт. ст.)"
+      ],
+      "RequiredFill": false,
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
       "Edit": true,
@@ -439,6 +482,13 @@
     {
       "Id": 8,
       "Key": "Mass_fraction_of_organic_chlorides",
+      "KeyELIS": "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹ (ppm))",
+      "ElisAlias": [
+        "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹ (ppm))",
+        "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹)"
+      ],
+      "RequiredFill": false,
+      "RoundValue": 1,
       "Name": "Массовая доля органических хлоридов, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
@@ -487,6 +537,12 @@
     {
       "Id": 14,
       "Key": "Impurity",
+      "KeyELIS": "Массовая доля механических примесей(%)",
+      "ElisAlias": [
+        "Массовая доля механических примесей(%)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 4,
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
       "Edit": true,
@@ -495,6 +551,12 @@
     {
       "Id": 15,
       "Key": "SulfurCorrection",
+      "KeyELIS": "Массовая доля серы(%)",
+      "ElisAlias": [
+        "Массовая доля серы(%)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 2,
       "Name": "Массовая доля серы, %",
       "Use": true,
       "Edit": true,
@@ -519,6 +581,10 @@
     {
       "Id": 18,
       "Key": "Mass_fraction_of_paraffin",
+      "KeyELIS": "Массовая доля парафина(%)",
+      "ElisAlias": [
+        "Массовая доля парафина(%)"
+      ],
       "Name": "Массовая доля парафина, %",
       "Use": false,
       "Edit": true,
@@ -588,14 +654,22 @@
       "Use": true,
       "Key": "PassportPeriodDT.Begin",
       "Type": "datetime-local",
-      "Name": "Дата и время отбора пробы (начало)"
+      "Name": "Дата и время отбора пробы (начало)",
+      "KeyELIS": "startPeriodTime",
+      "ElisAlias": [
+        "startPeriodTime"
+      ]
     },
     {
       "Id": 9,
       "Use": true,
       "Key": "PassportPeriodDT.End",
       "Type": "datetime-local",
-      "Name": "Дата и время отбора пробы (окончание)"
+      "Name": "Дата и время отбора пробы (окончание)",
+      "KeyELIS": "endPeriodTime",
+      "ElisAlias": [
+        "endPeriodTime"
+      ]
     },
     {
       "Id": 10,
@@ -643,10 +717,12 @@
       "Id": 16,
       "Use": true,
       "Key": "ElisProtocolNumber",
-      "KeyELIS": "protocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",
-      "Edit": false
+      "KeyELIS": "protocolNumber",
+      "ElisAlias": [
+        "protocolNumber"
+      ]
     }
   ]
 }

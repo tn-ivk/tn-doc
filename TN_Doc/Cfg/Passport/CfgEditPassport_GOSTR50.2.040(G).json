@@ -425,15 +425,16 @@
     {
       "Id": 6,
       "Key": "MassWaterFracCorrection",
-      "Name": "Массовая доля воды, %",
-      "Use": true,
-      "Edit": true,
-      "IsBallast": true,
+      "KeyELIS": "Массовая доля воды(%)",
       "ElisAlias": [
         "Массовая доля воды(%)"
       ],
       "RequiredFill": true,
-      "RoundValue": 2
+      "RoundValue": 2,
+      "Name": "Массовая доля воды, %",
+      "Use": true,
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 7,
@@ -757,6 +758,7 @@
     {
       "Id": 17,
       "Use": true,
+      "Key": "ElisProtocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",
       "Edit": false,
