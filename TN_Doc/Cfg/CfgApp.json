@@ -1111,18 +1111,18 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.11",
+          "Server": "192.168.249.11",
           "Userid": "user",
-          "Password": "$1$83F+qTyYmHOfVHKPsApmT1xgFnO64A/lEkxNn9k8VKs=",
+          "Password": "6ViQgjps",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.233.139",
+          "Server": "192.168.249.139",
           "Userid": "user",
-          "Password": "$1$cA34ZrL19FeEuzhyvEmZvAzFAfLBIivo3/LKZfbfoVg=",
+          "Password": "6ViQgjps",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
@@ -2265,18 +2265,18 @@
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.233.12",
+          "Server": "192.168.249.12",
           "Userid": "user",
-          "Password": "$1$lWYmN8fbjJBXRxMriPw5JLsfa6PbyzBcZthtH5hRJQ8=",
+          "Password": "6ViQgjps",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
           "Use": true,
           "GuidDevice": 1,
-          "Server": "192.168.233.140",
+          "Server": "192.168.249.140",
           "Userid": "user",
-          "Password": "$1$Da1vbiUU2jMTiRqMJKHD4Yh0s0CDqJg2IBl47HuEx8c=",
+          "Password": "6ViQgjps",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
@@ -3419,18 +3419,18 @@
         {
           "Use": true,
           "GuidDevice": 2,
-          "Server": "192.168.233.13",
+          "Server": "192.168.249.13",
           "Userid": "user",
-          "Password": "$1$tMxr/hnj4vSosbFKfg4zl3FS3gSxe/whDp4SZFPTL+I=",
+          "Password": "6ViQgjps",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
           "Use": true,
           "GuidDevice": 2,
-          "Server": "192.168.233.141",
+          "Server": "192.168.249.141",
           "Userid": "user",
-          "Password": "$1$KqBhyXeSlR25iUyUR3ohFnwoNEgBmaK494RV6WyP4NI=",
+          "Password": "6ViQgjps",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         }
