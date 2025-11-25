@@ -504,7 +504,8 @@
         "Давление насыщенных паров(кПа)"
       ],
       "RequiredFill": true,
-      "RoundValue": 1
+      "RoundValue": 1,
+      "SlaveKey": "DNP.mercury_mm"
     },
     {
       "Id": 12,

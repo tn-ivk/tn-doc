@@ -504,7 +504,8 @@
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "SlaveKey": "DNP.mercury_mm"
     },
     {
       "Id": 12,
