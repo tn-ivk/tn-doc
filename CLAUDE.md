@@ -150,6 +150,8 @@ Each document type implements the **IDocumentEditor** interface with these core 
 **Configuration files per document:**
 - `TN_Doc/Cfg/Cfg{DocumentType}.json` - template and report settings
 - `TN_Doc/Cfg/CfgEdit{DocumentType}.json` - edit form configuration
+  - Supports `SlaveKey` field for defining master-slave parameter relationships (v1.4.4+)
+  - Used for linked parameters (e.g., DNP.kPa → DNP.mercury_mm for vapor pressure in different units)
 - `TN_Doc/Doc/{Number}_{DocumentType}.frx` - FastReport template
 
 ### Key Services (Dependency Injection)
@@ -505,6 +507,12 @@ Real-time data acquisition from measurement systems:
   - Обновлен субмодуль tn.docgeneral до версии 3f636a1
   - HTML формы редактирования помечены OBSOLETE (планируется удаление в v2.0.0)
   - Обновлены тесты для использования нового API
+- ✅ **Механизм связанных параметров (master-slave) для паспорта качества**:
+  - Добавлено поле `SlaveKey` в конфигурацию параметров (`CfgEditPassport*.json`)
+  - Зафиксирована связь DNP.kPa (мастер) → DNP.mercury_mm (слейв) для давления насыщенных паров
+  - Правила: наличие `SlaveKey` → мастер, ссылка из `SlaveKey` → слейв, отсутствие → независимый параметр
+  - Документация обновлена в `docs/configs/passport.md`
+  - Логика автоматического пересчета значений будет реализована в будущих версиях
 - **Система истории изменений полей паспорта качества**:
   - Отслеживание источника данных (ELIS, ручное редактирование, округление ИВК)
   - Визуальные индикаторы источников в UI (цветные значки)
