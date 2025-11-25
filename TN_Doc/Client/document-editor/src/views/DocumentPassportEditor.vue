@@ -430,7 +430,29 @@ const handleElisData = (elisData: ElisPassportData) => {
         // Заполнить measurement (value)
         if (elisParam.value !== undefined && elisParam.value !== null) {
           const valueKey = `value.${param.key}`;
-          const valueStr = elisParam.value.toString();
+          let valueStr = elisParam.value.toString();
+
+          // Нормализовать значение согласно roundValue
+          const roundValue = param.roundValue ?? 0;
+          if (roundValue > 0) {
+            const numValue = parseFloat(valueStr.replace(',', '.'));
+            if (!isNaN(numValue)) {
+              // Получаем текущее количество знаков после запятой
+              const normalizedStr = valueStr.replace(',', '.');
+              const parts = normalizedStr.split('.');
+              const currentDecimalPlaces = parts.length > 1 ? parts[1].length : 0;
+
+              // Если знаков меньше - дополняем нулями
+              // Если знаков больше - оставляем как есть (для показа ошибки валидации)
+              if (currentDecimalPlaces < roundValue) {
+                valueStr = numValue.toFixed(roundValue).replace('.', ',');
+              } else {
+                // Оставляем оригинальное значение, но с запятой
+                valueStr = normalizedStr.replace('.', ',');
+              }
+            }
+          }
+
           updates[valueKey] = valueStr;
           updates[`${valueKey}__elisFilled`] = true;
 
