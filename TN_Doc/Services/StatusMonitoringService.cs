@@ -41,7 +41,7 @@ public class StatusMonitoringService : BackgroundService
     /// <param name="stoppingToken">Токен остановки сервиса</param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation(
+        _logger.LogDebug(
             "Фоновый сервис мониторинга статуса запущен с интервалом {CheckInterval}с",
             _checkInterval.TotalSeconds);
 
@@ -84,17 +84,13 @@ public class StatusMonitoringService : BackgroundService
                         currentStatus,
                         stoppingToken);
                 }
-                else
-                {
-                    _logger.LogTrace("Изменений статуса не обнаружено в цикле мониторинга");
-                }
 
                 // Сброс счетчика ошибок при успешном выполнении
                 _consecutiveErrors = 0;
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Сервис мониторинга статуса останавливается");
+                _logger.LogDebug("Сервис мониторинга статуса останавливается");
                 break;
             }
             catch (Exception ex)
@@ -128,7 +124,7 @@ public class StatusMonitoringService : BackgroundService
             await Task.Delay(_checkInterval, stoppingToken);
         }
 
-        _logger.LogInformation("Фоновый сервис мониторинга статуса остановлен");
+        _logger.LogDebug("Фоновый сервис мониторинга статуса остановлен");
     }
 
     /// <summary>

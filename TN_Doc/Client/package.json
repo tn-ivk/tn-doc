@@ -1,20 +1,23 @@
 {
   "name": "@tn-doc/client",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
   "workspaces": [
     "statusbar",
     "configurator",
+    "document-editor",
     "shared"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=statusbar",
     "dev:configurator": "npm run dev --workspace=configurator",
+    "dev:editor": "npm run dev --workspace=document-editor",
     "build": "npm run build --workspace=statusbar",
     "build:configurator": "npm run build --workspace=configurator",
+    "build:editor": "npm run build --workspace=document-editor",
     "build:all": "npm run build --workspaces --if-present",
     "type-check": "npm run type-check --workspaces --if-present",
-    "clean": "rm -rf statusbar/node_modules configurator/node_modules shared/node_modules node_modules"
+    "clean": "rm -rf statusbar/node_modules configurator/node_modules document-editor/node_modules shared/node_modules node_modules"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

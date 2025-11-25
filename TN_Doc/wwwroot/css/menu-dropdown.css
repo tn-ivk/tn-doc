@@ -5,6 +5,17 @@ table.mainTable button.dropdown-toggle::after {
     display: none;
 }
 
+/* Заблокированное состояние кнопки меню */
+table.mainTable button.dropdown-toggle:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+table.mainTable button.dropdown-toggle:disabled i {
+    opacity: 0.5;
+}
+
 /* Контейнер dropdown меню */
 .custom-dropdown-menu {
     border: 1px solid var(--md-border);
@@ -68,4 +79,18 @@ table.mainTable button.dropdown-toggle::after {
 .custom-dropdown-item:active {
     background-color: var(--md-primary-hover);
     color: var(--md-white);
+}
+
+/* Заблокированное состояние пункта меню */
+.custom-dropdown-item.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+    color: var(--md-text-muted);
+    background-color: transparent;
+}
+
+.custom-dropdown-item.disabled i,
+.custom-dropdown-item.disabled span {
+    opacity: 0.5;
 }

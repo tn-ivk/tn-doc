@@ -472,6 +472,7 @@ public class HomeController : Controller
         return DateTime.UnixEpoch;
     }
     
+    [Obsolete("Используйте IDocumentEditor.GetDoc(). Метод устарел с v1.4.4")]
     public bool GetDoc(int IdDevice, IdDoc IdDoc, int id, int protocolNumber)
     {
         _logger.LogDebug($"Отображение документа устройства {_appConfig.GetDeviceName(IdDevice)}, документа {IdDoc} c ИД: {id}");
@@ -546,7 +547,9 @@ public class HomeController : Controller
         }
     }
 
-    public string GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
+    [Obsolete("Используйте IDocumentEditor.GetEditConfig(). Метод устарел с v1.4.4")]
+    [HttpGet]
+    public IActionResult GetDocEdit(int IdDevice, IdDoc IdDoc, int id)
     {
         try
         {
@@ -554,76 +557,55 @@ public class HomeController : Controller
             if (id == 0)
             {
                 _logger.LogWarning($"Попытка редактирования документа {IdDoc} с нулевым идентификатором");
-                return string.Empty;
+                return Content(string.Empty);
             }
-            
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return string.Empty;
-            }
-            return doc.GetEditDoc(id);
+
+            // Используем Vue Document Editor для всех документов
+            // Все 41 библиотека реализуют IDocumentEditor
+            var vueUrl = $"/document-editor/edit/{IdDevice}/{IdDoc}/{id}";
+            _logger.LogDebug($"Используется Vue Document Editor для документа {IdDoc}, URL: {vueUrl}");
+            return Json(new { useVue = true, url = vueUrl });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Ошибка при получении формы редактирования документа {IdDoc} для устройства {IdDevice}");
-            return string.Empty;
+            return Content(string.Empty);
         }
     }
-
-
-    public void SaveDoc(int IdDevice, IdDoc IdDoc, string data)
-    {
-        _logger.LogDebug($"Сохранение документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        try
-        {
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return;
-            }
-            doc.SaveDoc(data);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка сохранения документа {IdDoc}");
-        }
-    }
-
-    [HttpPost]
-    public void UpdateDoc(int IdDevice, IdDoc IdDoc, string data)
-    {
-        _logger.LogDebug($"Обновление документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
-        try
-        {
-            if (IdDoc != IdDoc.Passport)
-            {
-                _logger.LogWarning($"Обновление данных не применяется для документов типа {IdDoc}");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(data))
-            {
-                _logger.LogError("Данные для обновления пустые или отсутсвуют");
-                return;                
-            }
-            
-            var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
-            if (doc is null)
-            {
-                _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
-                return;
-            }
-            if(doc is IDocUpdater docUpdater)
-                docUpdater.DocUpdate(data);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Ошибка обновления документа {IdDoc}");
-        }
-    }
+        
+    // [Obsolete("Используйте IDocumentEditor.UpdateDocument(). Метод устарел с v1.4.4")]
+    // [HttpPost]
+    // public void UpdateDoc(int IdDevice, IdDoc IdDoc, string data)
+    // {
+    //     _logger.LogDebug($"Обновление документа {IdDoc} для устройства {_appConfig.GetDeviceName(IdDevice)}");
+    //     try
+    //     {
+    //         if (IdDoc != IdDoc.Passport)
+    //         {
+    //             _logger.LogWarning($"Обновление данных не применяется для документов типа {IdDoc}");
+    //             return;
+    //         }
+    //
+    //         if (string.IsNullOrEmpty(data))
+    //         {
+    //             _logger.LogError("Данные для обновления пустые или отсутсвуют");
+    //             return;                
+    //         }
+    //         
+    //         var doc = _docModuleLoader.LoadDocsModule(_options, IdDevice, IdDoc, AppContext.BaseDirectory);
+    //         if (doc is null)
+    //         {
+    //             _logger.LogError($"Не удалось загрузить DLL для документа {IdDoc}");
+    //             return;
+    //         }
+    //         if(doc is IDocUpdater docUpdater)
+    //             docUpdater.DocUpdate(data);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, $"Ошибка обновления документа {IdDoc}");
+    //     }
+    // }
     
     public PeriodDocument GetPeriodDocument(int IdDevice, IdDoc IdDoc, int id)
     {

@@ -10,7 +10,7 @@
           :label="device.name"
           :status="getDeviceStatus(device)"
           :tooltip="`${device.name}: ${device.isConnected ? 'Подключено' : 'Отключено'}${device.error ? ` - ${device.error}` : ''}`"
-          @click="handleDeviceClick(device)"
+          :clickable="false"
         />
       </div>
 
@@ -20,12 +20,14 @@
           label="MS"
           :status="getServiceStatus(store.services.messagingService.isConnected, store.services.messagingService.error)"
           tooltip="Messaging Service"
+          :clickable="false"
         />
         <StatusIndicator
           v-if="store.services.elis"
           label="ELIS"
           :status="getServiceStatus(store.services.elis.isConnected, store.services.elis.error)"
           tooltip="Лабораторная система"
+          :clickable="false"
         />
       </div>
     </div>
@@ -34,6 +36,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { logger } from '@tn-doc/shared';
 import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
@@ -53,17 +56,20 @@ const { pause, resume } = useIntervalFn(() => {
 // SignalR real-time обновления
 on('statusUpdated', (data: StatusResponse) => {
   store.updateFromSignalR(data);
+  logger.trace('StatusBar: получено обновление через SignalR', {
+    deviceCount: data.devices?.length || 0
+  });
 });
 
-// Начальная загрузка
+// Начальная загрузка с задержкой для гарантии готовности сервера
 onMounted(() => {
-  store.fetchStatus();
-});
+  logger.debug('StatusBar: компонент монтирован, загрузка статусов через 2 секунды');
 
-function handleDeviceClick(device: DeviceStatus) {
-  console.log('Device clicked:', device);
-  // Будущее: показать модальное окно с деталями устройства
-}
+  // Задержка 2 секунды перед первым запросом, чтобы сервер успел инициализироваться
+  setTimeout(() => {
+    store.fetchStatus();
+  }, 2000);
+});
 
 function getDeviceStatus(device: DeviceStatus): IndicatorStatus {
   if (device.isConnected) {

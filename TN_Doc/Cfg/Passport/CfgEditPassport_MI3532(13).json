@@ -387,35 +387,40 @@
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 2,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 3,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 4,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": false,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 5,
       "Key": "Dens15Correction",
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 6,
@@ -428,7 +433,8 @@
       "RoundValue": 2,
       "Name": "Массовая доля воды, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 7,
@@ -440,7 +446,8 @@
       ],
       "RequiredFill": true,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 8,
@@ -453,7 +460,8 @@
       "RequiredFill": true,
       "RoundValue": 4,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 9,
@@ -466,7 +474,8 @@
       "RequiredFill": true,
       "RoundValue": 4,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 10,
@@ -479,7 +488,8 @@
       "RequiredFill": true,
       "RoundValue": 2,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 11,
@@ -491,7 +501,8 @@
       "Name": "Давление насыщенных паров, кПа",
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 12,
@@ -503,28 +514,32 @@
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 13,
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 14,
       "Key": "Yield_fraction_300",
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 15,
       "Key": "Yield_fraction_350",
       "Name": "Выход фракций: при температуре до 350 °С, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 16,
@@ -536,7 +551,8 @@
       ],
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 17,
@@ -549,7 +565,8 @@
       ],
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 18,
@@ -562,7 +579,8 @@
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 19,
@@ -575,7 +593,8 @@
       ],
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     }
   ],
   "AdditionalInfo": [
@@ -734,7 +753,7 @@
     {
       "Id": 17,
       "Use": true,
-      "Key": "TestProtocolNumberELIS",
+      "Key": "ElisProtocolNumber",
       "KeyELIS": "protocolNumber",
       "ElisAlias": [
         "protocolNumber"

@@ -108,7 +108,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 12,
@@ -128,7 +128,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 14,
@@ -148,7 +148,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 16,
@@ -168,7 +168,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 18,
@@ -188,7 +188,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 20,
@@ -208,7 +208,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 22,
@@ -228,7 +228,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "-",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 24,
@@ -328,7 +328,7 @@
       "LimitValueActivate": true,
       "LimitValue": 2,
       "LimitValueString": "Менее 2",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 34,
@@ -348,7 +348,7 @@
       "LimitValueActivate": true,
       "LimitValue": 4,
       "LimitValueString": "Менее 4",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 36,
@@ -368,7 +368,7 @@
       "LimitValueActivate": true,
       "LimitValue": 0.5,
       "LimitValueString": "Менее 0,5",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 38,
@@ -387,35 +387,40 @@
       "Key": "TempCorrection",
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 2,
       "Key": "PressCorrection",
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 3,
       "Key": "DensCorrection",
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 4,
       "Key": "Dens20Correction",
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 5,
       "Key": "Dens15Correction",
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
-      "Edit": false
+      "Edit": false,
+      "IsBallast": true
     },
     {
       "Id": 6,
@@ -428,7 +433,8 @@
       "RoundValue": 2,
       "Name": "Массовая доля воды, %",
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 7,
@@ -441,7 +447,8 @@
       "RequiredFill": true,
       "RoundValue": 1,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 8,
@@ -454,7 +461,8 @@
       ],
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 9,
@@ -467,7 +475,8 @@
       "RequiredFill": true,
       "RoundValue": 4,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": true
     },
     {
       "Id": 10,
@@ -480,7 +489,8 @@
       "RequiredFill": true,
       "RoundValue": 2,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 11,
@@ -493,7 +503,8 @@
       "RequiredFill": true,
       "RoundValue": 1,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 12,
@@ -505,36 +516,44 @@
       ],
       "RequiredFill": false,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 13,
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 14,
       "Key": "Yield_fraction_300",
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 15,
       "Key": "Yield_fraction_350",
       "Name": "Выход фракций: при температуре до 350 °С, %",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 16,
       "Key": "Mass_fraction_of_paraffin",
       "KeyELIS": "Массовая доля парафина(%)",
+      "ElisAlias": [
+        "Массовая доля парафина(%)"
+      ],
       "Name": "Массовая доля парафина, %",
       "Use": false,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 17,
@@ -548,7 +567,8 @@
       "RequiredFill": true,
       "RoundValue": 1,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 18,
@@ -562,7 +582,8 @@
       "RequiredFill": false,
       "RoundValue": 1,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     },
     {
       "Id": 19,
@@ -576,7 +597,8 @@
       "RequiredFill": false,
       "RoundValue": 1,
       "Use": true,
-      "Edit": true
+      "Edit": true,
+      "IsBallast": false
     }
   ],
   "AdditionalInfo": [
@@ -736,7 +758,7 @@
     {
       "Id": 17,
       "Use": true,
-      "Key": "TestProtocolNumberELIS",
+      "Key": "ElisProtocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",
       "KeyELIS": "protocolNumber",

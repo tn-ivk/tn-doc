@@ -1,0 +1,114 @@
+﻿<!--
+    OBSOLETE: Эта HTML форма редактирования устарела с версии 1.4.4.
+    Используйте Vue Document Editor вместо этого.
+    Все документы теперь редактируются через /document-editor/edit/{deviceId}/{docType}/{id}
+    См. IDocumentEditor для нового API.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <style>
+        /*chrome*/
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /*mozilla*/
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
+        td, th 
+        {
+            font-size: 70%;             /* Размер шрифта в процентах */
+            padding: 2px;               /* Поля вокруг содержимого таблицы */
+            border: 0.5px solid black;  /* Параметры рамки */
+        }
+
+        Edit 
+        {
+            border-collapse: collapse;  /* Убираем двойные линии между ячейками */
+        }
+    </style>
+
+    <link rel="stylesheet" href="/css/commonEditForm.css">
+    
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="/lib/jquery-ui-1.13.1.custom/jquery-ui.min.css">
+    <script src="/js/Logger.js"></script>
+    <script src="/js/EditDoc.js"></script>
+    <script src="/js/loading-spinner.js"></script>
+
+    <script id="ElementChangeEventHandling" type="text/javascript">
+
+        var dictionaries;
+
+        function funcOnLoad() {
+            dictionaries = GetUsers();
+        }
+
+        function UserChangeEvent(selectObject)
+        {
+            try {
+                logTrace(`UserChangeEvent: начало обработки изменения для ${selectObject.name}, значение: ${selectObject.value}`);
+                
+                if (selectObject.name == "Delive_IOF")
+                {
+                    var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                    
+                    if (user && user.length > 0 && user[0]) {
+                        logTrace(`UserChangeEvent: найден пользователь сдающей стороны - ${user[0].IOF || 'неизвестно'}, должность: ${user[0].Post || 'не указана'}, предприятие: ${user[0].Factory || 'не указано'}`);
+                        
+                        document.getElementById("Delive_Post").value = user[0].Post || '';
+                        document.getElementById("Delive_Factory").value = user[0].Factory || '';
+                        
+                        logTrace(`UserChangeEvent: обновлены поля должности и предприятия для сдающей стороны`);
+                    } else {
+                        logWarn(`UserChangeEvent: пользователь сдающей стороны с ID ${selectObject.value} не найден`);
+                        document.getElementById("Delive_Post").value = '';
+                        document.getElementById("Delive_Factory").value = '';
+                    }
+                }
+                else if (selectObject.name == "Receive_IOF")
+                {
+                    var user = dictionaries.Users.filter(users => users["Id"] == $(selectObject).val());
+                    
+                    if (user && user.length > 0 && user[0]) {
+                        logTrace(`UserChangeEvent: найден пользователь принимающей стороны - ${user[0].IOF || 'неизвестно'}, должность: ${user[0].Post || 'не указана'}, предприятие: ${user[0].Factory || 'не указано'}`);
+                        
+                        document.getElementById("Receive_Post").value = user[0].Post || '';
+                        document.getElementById("Receive_Factory").value = user[0].Factory || '';
+                        
+                        logTrace(`UserChangeEvent: обновлены поля должности и предприятия для принимающей стороны`);
+                    } else {
+                        logWarn(`UserChangeEvent: пользователь принимающей стороны с ID ${selectObject.value} не найден`);
+                        document.getElementById("Receive_Post").value = '';
+                        document.getElementById("Receive_Factory").value = '';
+                    }
+                }
+                
+                logTrace(`UserChangeEvent: обработка изменения для ${selectObject.name} завершена успешно`);
+            } catch (error) {
+                logError(`UserChangeEvent: ошибка при обработке изменения ${selectObject.name}: ${error.message}`);
+                console.error('UserChangeEvent error:', error);
+            }
+        }
+    </script>
+
+</head>
+<body onload="funcOnLoad()">
+
+    <table id="AdditionalInfo">
+        <tbody>
+
+        <tr><td>Операторы предприятия, сдающего нефть - Смену сдал</td><td><select id="DeliveryIOF1" name="DeliveryIOF1" data-edit="1" data-key="DeliveryIOF1" data-tag="AdditionalInfo"><option value="-1"> </option><option selected="" value="4">И.Ф. Попов</option><option value="5">Г.Е. Власов</option><option value="6">Ф.А. Колесников</option></select></td></tr><tr><td>Операторы предприятия, сдающего нефть - Смену принял</td><td><select id="DeliveryIOF2" name="DeliveryIOF2" data-edit="1" data-key="DeliveryIOF2" data-tag="AdditionalInfo"><option value="-1"> </option><option value="4">И.Ф. Попов</option><option value="5">Г.Е. Власов</option><option value="6">Ф.А. Колесников</option></select></td></tr><tr><td>Операторы предприятия, принимающего нефть - Смену сдал</td><td><select id="ReceiveIOF1" name="ReceiveIOF1" data-edit="1" data-key="ReceiveIOF1" data-tag="AdditionalInfo"><option value="-1"> </option><option value="7">К.А. Никитин</option><option value="8">А.Д. Игнатьев</option><option value="9">М.И. Леонов</option><option value="10">华丽王</option></select></td></tr><tr><td>Операторы предприятия, принимающего нефть - Смену принял</td><td><select id="ReceiveIOF2" name="ReceiveIOF2" data-edit="1" data-key="ReceiveIOF2" data-tag="AdditionalInfo"><option value="-1"> </option><option value="7">К.А. Никитин</option><option value="8">А.Д. Игнатьев</option><option value="9">М.И. Леонов</option><option value="10">华丽王</option></select></td></tr></tbody>
+    </table>
+
+</body>
+</html>

@@ -11,7 +11,8 @@
   border-radius: 12px !important;
   font-size: 14px;
   font-family: Arial, sans-serif !important;
-  overflow: hidden !important;
+  max-height: 90vh; /* Максимальная высота - 90% высоты экрана */
+  min-width: 500px; /* Минимальная ширина окна */
 }
 
 #elis .modal-header {
@@ -32,11 +33,13 @@
   background-color: transparent !important; /* Убираем фон */
   display: flex;
   flex-direction: column;
-  justify-content: left;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   padding: 0 !important;
   margin: 0 !important;
   border-bottom: 1px solid var(--md-outline-light);
+  overflow-y: auto; /* Вертикальный скроллинг при переполнении */
+  max-height: calc(90vh - 180px); /* Ограничение по высоте для скроллинга */
 }
 
 #elis .modal-info {
@@ -71,6 +74,10 @@
   margin: 10px 6px; /* меньшее расстояние между кнопками */
 }
 
+#elis #buttonDataRequest {
+  margin-left: 10px; /* Выравнивание с блоками протоколов */
+}
+
 /* Эффект при наведении на кнопку */
 #elis .btn:hover {
   background-color: var(--md-primary-hover);
@@ -98,6 +105,10 @@
   border: none !important;
   padding: 0 !important;
   margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Максимальная высота содержимого */
+  min-height: 200px; /* Минимальная высота окна */
 }
 
 #elis div.modal-footer {
@@ -107,13 +118,51 @@
 }
 
 #elis .list-group {
-  width: calc(100% - 20px); /* Ширина кнопки с учетом отступов */
+  width: calc(100% - 20px); /* Ширина с учетом отступов */
   margin: 10px;
   font-size: 14px;
   font-family: Arial, sans-serif;
 }
 
 #elis .list-group-item {
-  
   display: block; /* Блоковый элемент для полной ширины */
+  padding: 12px 15px; /* Отступы внутри элемента */
+  min-height: 70px; /* Минимальная высота элемента протокола */
+  line-height: 1.5; /* Межстрочный интервал */
+  white-space: normal; /* Разрешить перенос текста */
+  word-wrap: break-word; /* Перенос длинных слов */
+  background-color: var(--md-white) !important;
+  color: var(--md-text) !important;
+  border: 1px solid var(--md-outline-light) !important;
+  box-shadow: none !important;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+#elis .list-group-item:not(.active):hover {
+  background-color: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+#elis .list-group-item:focus-visible {
+  background-color: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+  border-color: var(--md-primary) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--md-primary) 25%, transparent) !important;
+  outline: none !important;
+}
+
+#elis .list-group-item.active {
+  background-color: var(--md-primary) !important;
+  color: var(--md-white) !important;
+  border-color: var(--md-primary) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+#elis .list-group-item b {
+  font-weight: normal; /* Убрать жирное начертание с меток */
+}
+
+#elis .list-group-item small {
+  font-size: inherit;
+  font-family: inherit;
 }

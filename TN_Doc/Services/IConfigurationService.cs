@@ -27,4 +27,19 @@ public interface IConfigurationService
     /// <param name="config">Конфигурация для валидации</param>
     /// <returns>Результат валидации</returns>
     Task<ValidationResult> ValidateConfigurationAsync(CfgApp config);
+
+    /// <summary>
+    /// Загрузить содержимое конфигурационного файла документа
+    /// </summary>
+    /// <param name="configPath">Путь к файлу конфигурации (относительный от корня приложения)</param>
+    /// <returns>Содержимое файла в формате JSON</returns>
+    Task<string> LoadDocumentConfigAsync(string configPath);
+
+    /// <summary>
+    /// Сохранить содержимое конфигурационного файла документа
+    /// </summary>
+    /// <param name="configPath">Путь к файлу конфигурации (относительный от корня приложения)</param>
+    /// <param name="content">Содержимое в формате JSON</param>
+    /// <returns>true если сохранение успешно, иначе false</returns>
+    Task<bool> SaveDocumentConfigAsync(string configPath, string content);
 }

@@ -135,15 +135,335 @@ a:hover { color: var(--md-primary-hover); text-decoration: none; }
 
 /* Forms */
 input[type="text"], input[type="date"], input[type="number"], input[type="search"],
-select, textarea, .form-control, .filterDatepicker, select.filterSelect {
+select, textarea, .form-control, .filterDatepicker, select.filterSelect,
+.p-inputtext, .p-inputnumber-input, .p-calendar .p-inputtext,
+.p-dropdown, .p-dropdown .p-dropdown-label, .p-dropdown .p-dropdown-trigger {
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+  font-weight: var(--md-font-weight-normal) !important;
+}
+
+input[type="text"], input[type="date"], input[type="number"], input[type="search"],
+select, textarea, .form-control, .filterDatepicker, select.filterSelect,
+.p-inputtext, .p-inputnumber-input, .p-calendar .p-inputtext {
   background: var(--md-surface);
   color: var(--md-text);
   border-radius: var(--md-radius) !important;
-  border: 1px solid var(--md-outline);
-  padding: 6px 10px; /* Reduced vertical padding to match button height */
+  border: 1px solid var(--md-outline) !important;
+  padding: 6px 10px !important; /* Reduced vertical padding to match button height */
   height: var(--md-control-height) !important;
+  box-shadow: none !important;
 }
-input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicker:focus, select.filterSelect:focus {
+
+.p-dropdown {
+  width: 100%;
+  min-height: var(--md-control-height);
+  height: var(--md-control-height);
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  background: #ffffff !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.p-dropdown:not(.p-disabled):hover {
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
+}
+
+.p-dropdown.p-focus,
+.p-dropdown:not(.p-disabled):focus-within {
+  border-color: var(--md-primary) !important;
+  background: var(--md-primary-light) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+.p-dropdown .p-dropdown-label {
+  display: flex !important;
+  align-items: center !important;
+  height: var(--md-control-height);
+  padding: 0 10px !important;
+  color: var(--md-text) !important;
+  line-height: 1.2 !important;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  width: 32px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--md-text-secondary) !important;
+}
+
+.p-dropdown .p-dropdown-trigger-icon {
+  font-size: 0.85rem !important;
+}
+
+.p-dropdown .p-dropdown-label.p-placeholder {
+  color: var(--md-text-secondary) !important;
+}
+
+.p-dropdown.p-disabled,
+.p-inputtext:disabled,
+.p-inputnumber-input:disabled,
+.p-calendar .p-inputtext:disabled {
+  background: var(--md-disabled-bg) !important;
+  border-color: var(--md-disabled-border) !important;
+  color: var(--md-disabled-text) !important;
+}
+
+.p-dropdown.p-disabled .p-dropdown-label {
+  color: var(--md-disabled-text) !important;
+}
+
+.p-dropdown-panel {
+  margin-top: 2px;
+  border: 1px solid var(--md-outline) !important;
+  border-radius: var(--md-radius) !important;
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12) !important;
+  background: #ffffff !important;
+  overflow: hidden;
+}
+
+.p-dropdown-items {
+  padding: 4px 0 !important;
+  font-size: var(--md-font-size-base) !important;
+}
+
+.p-dropdown-item {
+  padding: 6px 12px !important;
+  color: var(--md-text) !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.p-dropdown-item:not(.p-disabled):hover {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-dropdown-item.p-highlight {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-dropdown-item.p-highlight:not(.p-disabled):hover {
+  background: var(--md-primary) !important;
+  color: #ffffff !important;
+}
+
+/* PrimeVue Select (new API) */
+.p-select,
+.p-select.p-component {
+  width: 100%;
+  min-height: var(--md-control-height);
+  height: var(--md-control-height);
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  background: #ffffff !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.p-select:not(.p-disabled):hover {
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
+}
+
+.p-select.p-focus,
+.p-select:not(.p-disabled):focus-within {
+  border-color: var(--md-primary) !important;
+  background: var(--md-primary-light) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+.p-select .p-select-label {
+  display: flex !important;
+  align-items: center !important;
+  height: var(--md-control-height);
+  padding: 0 10px !important;
+  color: var(--md-text) !important;
+  line-height: 1.2 !important;
+}
+
+.p-select .p-select-trigger {
+  width: 32px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--md-text-secondary) !important;
+}
+
+.p-select .p-select-trigger-icon {
+  font-size: 0.85rem !important;
+}
+
+.p-select .p-select-label.p-placeholder {
+  color: var(--md-text-secondary) !important;
+}
+
+.p-select.p-disabled {
+  background: var(--md-disabled-bg) !important;
+  border-color: var(--md-disabled-border) !important;
+  color: var(--md-disabled-text) !important;
+}
+
+.p-select.p-disabled .p-select-label {
+  color: var(--md-disabled-text) !important;
+}
+
+/* Select panel */
+.p-focusable-list[role="listbox"] {
+  padding: 4px 0 !important;
+  font-size: var(--md-font-size-base) !important;
+}
+
+.p-focusable-list[role="listbox"] .p-select-option {
+  padding: 6px 12px !important;
+  color: var(--md-text) !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.p-focusable-list[role="listbox"] .p-select-option:not(.p-disabled):hover {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-focusable-list[role="listbox"] .p-select-option.p-focus,
+.p-focusable-list[role="listbox"] .p-select-option.p-active {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-select-list,
+.p-select-option {
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+}
+
+/* Explicit overrides for document editor (PrimeVue components) */
+.document-editor .p-dropdown,
+.document-editor .p-dropdown.p-component,
+.document-editor .p-select,
+.document-editor .p-select.p-component,
+.document-editor [data-pc-name="dropdown"],
+.document-editor [data-pc-name="select"],
+.document-editor .p-inputtext,
+.document-editor .p-inputnumber-input,
+.document-editor .p-calendar .p-inputtext {
+  min-height: var(--md-control-height) !important;
+  height: var(--md-control-height) !important;
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+  color: var(--md-text) !important;
+  box-shadow: none !important;
+}
+
+.document-editor .p-dropdown:not(.p-disabled):hover,
+.document-editor .p-select:not(.p-disabled):hover,
+.document-editor [data-pc-name="dropdown"]:not(.p-disabled):hover,
+.document-editor [data-pc-name="select"]:not(.p-disabled):hover,
+.document-editor .p-inputtext:hover,
+.document-editor .p-inputnumber-input:hover,
+.document-editor .p-calendar .p-inputtext:hover {
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
+}
+
+.document-editor .p-dropdown.p-focus,
+.document-editor .p-dropdown:not(.p-disabled):focus-within,
+.document-editor .p-select.p-focus,
+.document-editor .p-select:not(.p-disabled):focus-within,
+.document-editor [data-pc-name="dropdown"].p-focus,
+.document-editor [data-pc-name="dropdown"]:not(.p-disabled):focus-within,
+.document-editor [data-pc-name="select"].p-focus,
+.document-editor [data-pc-name="select"]:not(.p-disabled):focus-within,
+.document-editor .p-inputtext:focus,
+.document-editor .p-inputnumber-input:focus,
+.document-editor .p-calendar .p-inputtext:focus {
+  border-color: var(--md-primary) !important;
+  background: var(--md-primary-light) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+.document-editor .p-dropdown .p-dropdown-label,
+.document-editor .p-select .p-select-label,
+.document-editor [data-pc-name="dropdown"] .p-dropdown-label,
+.document-editor [data-pc-name="select"] .p-select-label {
+  padding: 0 10px !important;
+}
+
+.document-editor .p-dropdown .p-dropdown-trigger,
+.document-editor .p-select .p-select-trigger,
+.document-editor [data-pc-name="dropdown"] .p-dropdown-trigger,
+.document-editor [data-pc-name="select"] .p-select-trigger {
+  width: 32px !important;
+  color: var(--md-text-secondary) !important;
+}
+
+.document-editor .p-dropdown .p-dropdown-label.p-placeholder,
+.document-editor .p-select .p-select-label.p-placeholder,
+.document-editor [data-pc-name="dropdown"] .p-dropdown-label.p-placeholder,
+.document-editor [data-pc-name="select"] .p-select-label.p-placeholder {
+  color: var(--md-text-secondary) !important;
+}
+
+.document-editor .p-dropdown.p-disabled,
+.document-editor .p-select.p-disabled,
+.document-editor [data-pc-name="dropdown"].p-disabled,
+.document-editor [data-pc-name="select"].p-disabled,
+.document-editor .p-inputtext:disabled,
+.document-editor .p-inputnumber-input:disabled,
+.document-editor .p-calendar .p-inputtext:disabled {
+  background: var(--md-disabled-bg) !important;
+  border-color: var(--md-disabled-border) !important;
+  color: var(--md-disabled-text) !important;
+}
+
+.document-editor .p-dropdown-panel {
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12) !important;
+}
+
+.document-editor .p-dropdown-item:not(.p-disabled):hover {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+/* Selected item in PrimeVue Dropdown within the document editor */
+.document-editor .p-dropdown-item.p-highlight {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.document-editor .p-dropdown-item.p-highlight:not(.p-disabled):hover {
+  background: var(--md-primary-hover) !important;
+}
+
+/* PrimeVue Select (new API) selected states in the document editor */
+.document-editor .p-select-option.p-selected,
+.document-editor .p-select-option.p-highlight,
+.document-editor .p-select-option[aria-selected="true"] {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.document-editor .p-select-option.p-selected:not(.p-disabled):hover,
+.document-editor .p-select-option.p-highlight:not(.p-disabled):hover,
+.document-editor .p-select-option[aria-selected="true"]:not(.p-disabled):hover {
+  background: var(--md-primary) !important;
+  color: #ffffff !important;
+}
+
+input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicker:focus, select.filterSelect:focus,
+.p-inputtext:focus, .p-inputnumber-input:focus, .p-calendar .p-inputtext:focus {
   outline: none;
   border-color: var(--md-primary) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
