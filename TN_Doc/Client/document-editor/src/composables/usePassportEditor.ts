@@ -458,6 +458,18 @@ export function usePassportEditor() {
     const methodOption = event.method;
     const methodJson = methodOption ? serializeMethodOption(methodOption) : '';
 
+    logger.debug('[usePassportEditor] handleMethodUpdate', {
+      paramKey: event.paramKey,
+      methodOption: methodOption ? {
+        id: methodOption.id,
+        name: methodOption.name,
+        limitValueActivate: methodOption.limitValueActivate,
+        limitValue: methodOption.limitValue,
+        limitValueString: methodOption.limitValueString
+      } : null,
+      methodJson: methodJson.substring(0, 200) // первые 200 символов
+    });
+
     // Сохраняем предыдущее значение для истории
     const methodKey = `method.${event.paramKey}`;
     const previousMethodJson = store.formData[methodKey] || '';
@@ -466,11 +478,20 @@ export function usePassportEditor() {
     const newMethodName = methodOption?.name || '';
 
     // Пересчитываем результат с новым методом
+    // ВАЖНО: добавляем обновлённый метод в options, чтобы recalculateResult
+    // использовал актуальные значения limitValue/limitValueActivate/limitValueString
+    const updatedOptions = methodOption
+      ? [
+          ...param.method.options.filter(m => m.name !== methodOption.name),
+          methodOption
+        ]
+      : param.method.options;
+
     const tempParam = {
       ...param,
       method: {
         selected: methodOption?.name || '',
-        options: param.method.options
+        options: updatedOptions
       }
     };
     const newResult = recalculateResult(tempParam);
@@ -491,6 +512,13 @@ export function usePassportEditor() {
       updates[`${resultKey}__elisFilled`] = false;
       updates[`${resultKey}__manualOverride`] = param.manualOverride === true;
     }
+
+    logger.debug('[usePassportEditor] bulkUpdateFields для метода', {
+      methodKey: `method.${event.paramKey}`,
+      methodJsonLength: updates[`method.${event.paramKey}`]?.length,
+      resultKey: `result.${event.paramKey}`,
+      newResult: updates[`result.${event.paramKey}`]
+    });
 
     store.bulkUpdateFields(updates);
 

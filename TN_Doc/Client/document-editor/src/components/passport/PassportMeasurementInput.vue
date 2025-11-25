@@ -1,26 +1,27 @@
 <template>
   <div class="measurement-field">
     <InputNumber
-      v-tooltip.left="tooltipOptions"
       :modelValue="numericValue"
       :disabled="!parameter.editable"
       :class="[
         { 'p-invalid': !isValid },
         { 'elis-filled': isElisFilled },
-        { 'manual-input--disabled': !parameter.editable },
-        { 'has-tooltip-error': !isValid && tooltipOptions.value }
+        { 'manual-input--disabled': !parameter.editable }
       ]"
       :minFractionDigits="0"
       :maxFractionDigits="8"
       class="measurement-input"
       @update:modelValue="handleValueChange"
     />
+    <!-- Подсказка об ошибке под полем -->
+    <small v-if="!isValid" class="p-error">
+      {{ validationMessage }}
+    </small>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import Tooltip from 'primevue/tooltip';
 import InputNumber from 'primevue/inputnumber';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
@@ -35,12 +36,23 @@ const emit = defineEmits<{
   'update:measurement': [value: string];
 }>();
 
-// Регистрируем директиву tooltip
-defineOptions({
-  directives: {
-    tooltip: Tooltip
-  }
+/**
+ * Количество знаков после запятой из конфигурации (RoundValue)
+ * Используется для валидации и дополнения нулями
+ */
+const roundValue = computed(() => {
+  return props.parameter.roundValue ?? 0;
 });
+
+/**
+ * Получить количество знаков после запятой в строке
+ */
+const getDecimalPlaces = (value: string): number => {
+  if (!value) return 0;
+  const normalized = value.replace(',', '.');
+  const parts = normalized.split('.');
+  return parts.length > 1 ? parts[1].length : 0;
+};
 
 const numericValue = computed(() => {
   if (!props.parameter.values.measurement) return null;
@@ -69,12 +81,12 @@ const isValid = computed(() => {
   return true;
 });
 
-// Сообщение об ошибке валидации
+// Сообщение об ошибке валидации (короткий текст для экономии места)
 const validationMessage = computed(() => {
   // Проверка обязательных полей
   if (props.parameter.requiredFill) {
     if (!props.parameter.values.measurement || props.parameter.values.measurement === '') {
-      return `Поле "${props.parameter.name}" обязательно для заполнения`;
+      return 'поле обязательно';
     }
   }
 
@@ -83,37 +95,34 @@ const validationMessage = computed(() => {
     const value = props.parameter.values.measurement.replace(',', '.');
     const parts = value.split('.');
     if (parts.length > 1 && parts[1].length > props.parameter.roundValue) {
-      return `Максимум ${props.parameter.roundValue} знаков после запятой`;
+      return `макс ${props.parameter.roundValue} знаков`;
     }
   }
 
   return '';
 });
 
-// Настройки для tooltip
-const tooltipOptions = computed(() => {
-  if (!isValid.value && validationMessage.value) {
-    return {
-      value: validationMessage.value,
-      showOnFocus: true,
-      showOnHover: true,
-      class: 'p-error-tooltip',
-      style: {
-        backgroundColor: '#dc3545',
-        color: 'white',
-        fontSize: '0.875rem',
-        borderRadius: '4px',
-        maxWidth: '300px',
-        lineHeight: '1.3'
-      }
-    };
-  }
-  return { value: '' };
-});
-
 function handleValueChange(value: number | null) {
-  const stringValue = value !== null ? value.toString().replace('.', ',') : '';
-  emit('update:measurement', stringValue);
+  if (value === null) {
+    emit('update:measurement', '');
+    return;
+  }
+
+  // Преобразуем число в строку
+  let stringValue = value.toString();
+
+  // Получаем текущее количество знаков после запятой
+  const currentDecimalPlaces = getDecimalPlaces(stringValue);
+  const requiredDecimalPlaces = roundValue.value;
+
+  // Если знаков меньше, чем требуется - дополняем нулями
+  // Если знаков больше - оставляем как есть (для показа ошибки валидации)
+  if (currentDecimalPlaces < requiredDecimalPlaces && requiredDecimalPlaces > 0) {
+    stringValue = value.toFixed(requiredDecimalPlaces);
+  }
+
+  // Заменяем точку на запятую для русской локали
+  emit('update:measurement', stringValue.replace('.', ','));
 }
 </script>
 
@@ -148,9 +157,13 @@ function handleValueChange(value: number | null) {
   box-shadow: none !important;
 }
 
-/* Стиль для поля с ошибкой и tooltip */
-.has-tooltip-error:deep(.p-inputnumber-input) {
-  border-color: var(--md-error, #dc3545) !important;
+/* Подсказка об ошибке под полем */
+.p-error {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--md-error, #dc3545);
+  text-align: center;
 }
 
 /* ELIS подсветка - применяем ТОЛЬКО к самому input внутри PrimeVue InputNumber */
@@ -178,20 +191,5 @@ function handleValueChange(value: number | null) {
 .manual-input--disabled.p-invalid:deep(.p-inputnumber-input) {
   border-color: var(--md-error, #dc3545) !important;
   background: color-mix(in srgb, var(--md-error) 5%, var(--md-disabled-bg)) !important;
-}
-
-/* Стили для tooltip с ошибкой */
-:deep(.p-error-tooltip),
-:deep(.p-tooltip.p-error-tooltip),
-:deep(.p-tooltip.p-error-tooltip .p-tooltip-text) {
-  background-color: var(--md-error, #dc3545) !important;
-  color: white !important;
-  font-size: 0.875rem !important;
-  padding: 0.75rem 1rem 0.75rem 1.25rem !important;
-  border-radius: 6px !important;
-  max-width: 300px !important;
-  word-wrap: break-word !important;
-  line-height: 1.4 !important;
-  margin: 0.5rem !important;
 }
 </style>

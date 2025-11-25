@@ -425,6 +425,12 @@
     {
       "Id": 6,
       "Key": "MassWaterFracCorrection",
+      "KeyELIS": "Массовая доля воды(%)",
+      "ElisAlias": [
+        "Массовая доля воды(%)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 2,
       "Name": "Массовая доля воды, %",
       "Use": true,
       "Edit": true,
@@ -436,7 +442,13 @@
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "KeyELIS": "Массовая концентрация хлористых солей(мг/дм³)",
+      "ElisAlias": [
+        "Массовая концентрация хлористых солей(мг/дм³)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 1
     },
     {
       "Id": 8,
@@ -444,7 +456,13 @@
       "Name": "Массовая концентрация хлористых солей, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "KeyELIS": "Массовая концентрация хлористых солей(%)",
+      "ElisAlias": [
+        "Массовая концентрация хлористых солей(%)",
+        "Массовая доля хлористых солей(%)"
+      ],
+      "RequiredFill": false
     },
     {
       "Id": 9,
@@ -452,7 +470,13 @@
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "KeyELIS": "Массовая доля механических примесей(%)",
+      "ElisAlias": [
+        "Массовая доля механических примесей(%)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 4
     },
     {
       "Id": 10,
@@ -460,7 +484,13 @@
       "Name": "Массовая доля серы, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "KeyELIS": "Массовая доля серы(%)",
+      "ElisAlias": [
+        "Массовая доля серы(%)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 2
     },
     {
       "Id": 11,
@@ -468,7 +498,13 @@
       "Name": "Давление насыщенных паров, кПа",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "KeyELIS": "Давление насыщенных паров(кПа)",
+      "ElisAlias": [
+        "Давление насыщенных паров(кПа)"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 1
     },
     {
       "Id": 12,
@@ -476,7 +512,12 @@
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "KeyELIS": "Давление насыщенных паров(мм рт. ст.)",
+      "ElisAlias": [
+        "Давление насыщенных паров(мм рт. ст.)"
+      ],
+      "RequiredFill": false
     },
     {
       "Id": 13,
@@ -508,7 +549,11 @@
       "Name": "Массовая доля парафина, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "KeyELIS": "Массовая доля парафина(%)",
+      "ElisAlias": [
+        "Массовая доля парафина(%)"
+      ]
     },
     {
       "Id": 17,
@@ -516,7 +561,14 @@
       "Name": "Массовая доля сероводорода, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "KeyELIS": "Массовая доля сероводорода(млн⁻¹ (ppm))",
+      "ElisAlias": [
+        "Массовая доля сероводорода(млн⁻¹)",
+        "Массовая доля сероводорода(млн⁻¹ (ppm))"
+      ],
+      "RequiredFill": true,
+      "RoundValue": 1
     },
     {
       "Id": 18,
@@ -524,7 +576,14 @@
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "KeyELIS": "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹ (ppm))",
+      "ElisAlias": [
+        "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹ (ppm))",
+        "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹)"
+      ],
+      "RequiredFill": false,
+      "RoundValue": 1
     },
     {
       "Id": 19,
@@ -532,7 +591,14 @@
       "Name": "Массовая доля органических хлоридов во фракции, выкипающей до\nтемпературы 204 °С, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "KeyELIS": "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹ (ppm))",
+      "ElisAlias": [
+        "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹ (ppm))",
+        "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹)"
+      ],
+      "RequiredFill": false,
+      "RoundValue": 1
     }
   ],
   "AdditionalInfo": [
@@ -549,21 +615,34 @@
       "Use": true,
       "Key": "DelivePoint",
       "Type": "text",
-      "Name": "Пункт приема сдачи нефти"
+      "Name": "Пункт приема сдачи нефти",
+      "KeyELIS": "pointDeliveryName",
+      "ElisAlias": [
+        "pointDeliveryName"
+      ],
+      "RequiredFill": true
     },
     {
       "Id": 2,
       "Use": true,
       "Key": "AccrSertifNumber",
       "Type": "text",
-      "Name": "Номер аттестата аккредитации"
+      "Name": "Номер аттестата аккредитации",
+      "KeyELIS": "AccreditationNumber",
+      "ElisAlias": [
+        "accreditationNumber"
+      ]
     },
     {
       "Id": 3,
       "Use": true,
       "Key": "Laboratory",
       "Type": "text",
-      "Name": "Лаборатория предприятия"
+      "Name": "Лаборатория предприятия",
+      "KeyELIS": "labName",
+      "ElisAlias": [
+        "labName"
+      ]
     },
     {
       "Id": 4,
@@ -577,21 +656,33 @@
       "Use": true,
       "Key": "Laboratory_Post",
       "Type": "text",
-      "Name": "Представитель испытательной лаборатории (должность)"
+      "Name": "Представитель испытательной лаборатории (должность)",
+      "KeyELIS": "chiefLabPosition",
+      "ElisAlias": [
+        "chiefLabPosition"
+      ]
     },
     {
       "Id": 6,
       "Use": true,
       "Key": "Laboratory_Factory",
       "Type": "text",
-      "Name": "Представитель испытательной лаборатории (предприятие)"
+      "Name": "Представитель испытательной лаборатории (предприятие)",
+      "KeyELIS": "chiefLabOrganization",
+      "ElisAlias": [
+        "chiefLabOrganization"
+      ]
     },
     {
       "Id": 7,
       "Use": true,
       "Key": "Laboratory_IOF",
       "Type": "list",
-      "Name": "Представитель испытательной лаборатории (ИОФ)"
+      "Name": "Представитель испытательной лаборатории (ИОФ)",
+      "KeyELIS": "chiefLabShortSign",
+      "ElisAlias": [
+        "chiefLabShortSign"
+      ]
     },
     {
       "Id": 8,
@@ -640,14 +731,22 @@
       "Use": true,
       "Key": "PassportPeriodDT.Begin",
       "Type": "datetime-local",
-      "Name": "Дата и время отбора пробы (начало)"
+      "Name": "Дата и время отбора пробы (начало)",
+      "KeyELIS": "startPeriodTime",
+      "ElisAlias": [
+        "startPeriodTime"
+      ]
     },
     {
       "Id": 15,
       "Use": true,
       "Key": "PassportPeriodDT.End",
       "Type": "datetime-local",
-      "Name": "Дата и время отбора пробы (окончание)"
+      "Name": "Дата и время отбора пробы (окончание)",
+      "KeyELIS": "endPeriodTime",
+      "ElisAlias": [
+        "endPeriodTime"
+      ]
     },
     {
       "Id": 16,
@@ -660,10 +759,13 @@
       "Id": 17,
       "Use": true,
       "Key": "ElisProtocolNumber",
-      "KeyELIS": "protocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",
-      "Edit": false
+      "Edit": false,
+      "KeyELIS": "protocolNumber",
+      "ElisAlias": [
+        "protocolNumber"
+      ]
     }
   ]
 }

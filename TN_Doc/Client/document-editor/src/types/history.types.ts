@@ -9,7 +9,9 @@ export enum DataSource {
   /** Отредактировано вручную пользователем */
   Manual = 'Manual',
   /** Изменено системой ИВК (округление) */
-  IVK = 'IVK'
+  IVK = 'IVK',
+  /** Ожидалось из ЕЛИС, но не было загружено */
+  ElisMissing = 'ElisMissing'
 }
 
 /**
@@ -69,5 +71,10 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     color: '#FF9800',
     text: 'ИВК',
     description: 'Округлено системой ИВК'
+  },
+  [DataSource.ElisMissing]: {
+    icon: 'pi-exclamation-triangle',
+    color: '#f5c24c',
+    description: 'Ожидалось из ЕЛИС, но не загружено'
   }
 };

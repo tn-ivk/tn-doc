@@ -215,6 +215,14 @@ public class DocumentEditController : ControllerBase
 
             _logger.Trace($"Обновление паспорта через DocUpdate (после подтверждения от ИВК), количество полей: {values.Count}");
 
+            // Логируем ключи method.* для диагностики
+            foreach (var kvp in values.Where(k => k.Key.StartsWith("method.")))
+            {
+                var valueStr = kvp.Value?.ToString() ?? "null";
+                var valueType = kvp.Value?.GetType().Name ?? "null";
+                _logger.Debug($"UpdateDocument: Key={kvp.Key}, Type={valueType}, Value={valueStr.Substring(0, Math.Min(200, valueStr.Length))}");
+            }
+
             // Используем DocUpdate с плоским объектом - метод сам преобразует в CorrectionData
             docUpdater.DocUpdate(id, values);
 

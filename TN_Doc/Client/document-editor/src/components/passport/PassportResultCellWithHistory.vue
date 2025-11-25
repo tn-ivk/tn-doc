@@ -1,5 +1,9 @@
 <template>
-  <div class="result-with-history">
+  <div
+    class="result-with-history"
+    :class="{ 'elis-missing-border': isElisMissing }"
+    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : undefined"
+  >
     <PassportResultCell
       :parameter="parameter"
       :canEdit="canEdit"
@@ -74,6 +78,11 @@ const lastSource = computed(() => {
 
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
+/**
+ * Проверка, ожидалось ли поле из ELIS, но не было загружено
+ */
+const isElisMissing = computed(() => lastSource.value === DataSource.ElisMissing);
+
 const canEdit = computed(() => props.isEditable);
 
 const editDisabledReason = computed(() => {
@@ -125,5 +134,11 @@ const onIndicatorLeave = () => {
   width: 100%;
   max-width: 100%;
   overflow: hidden;
+}
+
+/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
+.result-with-history.elis-missing-border :deep(.result-cell) {
+  border: 2px solid #f5c24c !important;
+  border-radius: var(--md-radius, 4px);
 }
 </style>

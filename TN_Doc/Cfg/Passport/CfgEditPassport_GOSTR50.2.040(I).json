@@ -547,6 +547,9 @@
       "Id": 16,
       "Key": "Mass_fraction_of_paraffin",
       "KeyELIS": "Массовая доля парафина(%)",
+      "ElisAlias": [
+        "Массовая доля парафина(%)"
+      ],
       "Name": "Массовая доля парафина, %",
       "Use": false,
       "Edit": true,

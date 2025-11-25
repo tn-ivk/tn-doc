@@ -17,7 +17,7 @@
 
     <!-- Документы (только если ELIS используется) -->
     <td v-if="isElisUsed" class="cell-documents td-documents">
-      <PassportDocumentField :parameter="parameter" />
+      <PassportDocumentField :parameter="parameter" :isElisMissing="isDocumentElisMissing" />
     </td>
 
     <!-- Измерение (объединенная колонка) -->
@@ -45,6 +45,8 @@ import PassportMethodSelectWithHistory from './PassportMethodSelectWithHistory.v
 import PassportDocumentField from './PassportDocumentField.vue';
 import PassportMeasurementInputWithHistory from './PassportMeasurementInputWithHistory.vue';
 import PassportResultCellWithHistory from './PassportResultCellWithHistory.vue';
+import { useFieldHistory } from '@/composables/useFieldHistory';
+import { DataSource } from '@/types/history.types';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {
@@ -57,6 +59,16 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const { getLastSource } = useFieldHistory();
+
+/**
+ * Проверка: документ ожидался из ELIS, но не был загружен
+ */
+const isDocumentElisMissing = computed(() => {
+  const documentKey = `document.${props.parameter.key}`;
+  return getLastSource(documentKey) === DataSource.ElisMissing;
+});
 
 const emit = defineEmits<{
   'update:method': [event: { paramKey: string; method: MethodOption | null }];
