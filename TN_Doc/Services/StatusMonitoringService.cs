@@ -154,6 +154,12 @@ public class StatusMonitoringService : BackgroundService
             {
                 changes.Add($"Устройство {device.Name}: {(device.IsConnected ? "подключено" : "отключено")}");
             }
+            else if (lastDevice.IsFullyConnected != device.IsFullyConnected)
+            {
+                var connectedCount = device.Channels?.Count(c => c.IsConnected) ?? 0;
+                var totalCount = device.Channels?.Count ?? 0;
+                changes.Add($"Устройство {device.Name}: {connectedCount}/{totalCount} каналов");
+            }
         }
 
         // Сравниваем сервисы

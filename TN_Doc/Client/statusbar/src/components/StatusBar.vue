@@ -9,7 +9,7 @@
           :key="device.id"
           :label="device.name"
           :status="getDeviceStatus(device)"
-          :tooltip="`${device.name}: ${device.isConnected ? 'Подключено' : 'Отключено'}${device.error ? ` - ${device.error}` : ''}`"
+          :tooltip="getDeviceTooltip(device)"
           :clickable="false"
         />
       </div>
@@ -72,15 +72,61 @@ onMounted(() => {
 });
 
 function getDeviceStatus(device: DeviceStatus): IndicatorStatus {
-  if (device.isConnected) {
-    return 'online';
-  }
   // Если есть ошибка "Нет связи с сервером", то это ndv (недостоверно)
   if (device.error?.includes('Нет связи с сервером')) {
     return 'ndv';
   }
-  // Иначе устройство просто не на связи
+
+  // Все каналы работают — зелёный
+  if (device.isFullyConnected) {
+    return 'online';
+  }
+
+  // Хотя бы один канал работает, но не все — жёлтый
+  if (device.isConnected) {
+    return 'warning';
+  }
+
+  // Ни один канал не работает — красный
   return 'offline';
+}
+
+function getDeviceTooltip(device: DeviceStatus): string {
+  const channels = device.channels || [];
+  const totalChannels = channels.length;
+  const connectedChannels = channels.filter(c => c.isConnected).length;
+
+  // Если нет связи с сервером
+  if (device.error?.includes('Нет связи с сервером')) {
+    return `${device.name}: Нет связи с сервером (статус неизвестен)`;
+  }
+
+  // Заголовок с общим статусом
+  let statusText: string;
+  if (device.isFullyConnected) {
+    statusText = 'Подключено';
+  } else if (device.isConnected) {
+    statusText = 'Частичное подключение';
+  } else {
+    statusText = 'Отключено';
+  }
+
+  const header = `${device.name}: ${statusText} (${connectedChannels}/${totalChannels})`;
+
+  // Если нет каналов — возвращаем только заголовок
+  if (totalChannels === 0) {
+    return `${device.name}: Нет настроенных каналов`;
+  }
+
+  // Формируем детальную информацию по каналам
+  const channelLines = channels.map(channel => {
+    const icon = channel.isConnected ? '\u2713' : '\u2717';
+    const latency = channel.isConnected && channel.latencyMs ? ` ${channel.latencyMs}ms` : '';
+    const error = !channel.isConnected && channel.error ? ` - ${channel.error}` : '';
+    return `${icon} ${channel.name}${latency}${error}`;
+  });
+
+  return `${header}\n${channelLines.join('\n')}`;
 }
 
 function getServiceStatus(isConnected: boolean, error?: string): IndicatorStatus {
