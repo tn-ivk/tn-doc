@@ -69,6 +69,8 @@ export function useFieldHistory() {
       ? 'ELIS'
       : source === DataSource.IVK
       ? 'IVK'
+      : source === DataSource.ElisMissing
+      ? 'ELIS'
       : MANUAL_AUTHOR;
 
     const entry = {
@@ -160,6 +162,25 @@ export function useFieldHistory() {
   };
 
   /**
+   * Отследить поле, которое ожидалось из ELIS, но не было загружено
+   */
+  const trackElisMissing = (fieldKey: string, protocolNumber?: string) => {
+
+    const comment = protocolNumber
+      ? `Не найдено в протоколе ${protocolNumber}`
+      : 'Ожидалось из ЕЛИС, но не загружено';
+
+    const entry = createHistoryEntry(
+      DataSource.ElisMissing,
+      '', // пустое значение
+      undefined,
+      comment
+    );
+
+    addHistoryEntry(fieldKey, entry);
+  };
+
+  /**
    * Получить историю поля
    */
   const getFieldHistory = (fieldKey: string): FieldHistoryEntry[] => {
@@ -201,6 +222,7 @@ export function useFieldHistory() {
     addHistoryEntry,
     trackManualChange,
     trackElisLoad,
+    trackElisMissing,
     trackIVKRounding,
     getFieldHistory,
     getLastSource,

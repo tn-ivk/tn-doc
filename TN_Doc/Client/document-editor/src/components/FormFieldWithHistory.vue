@@ -1,5 +1,9 @@
 <template>
-  <div class="form-field-with-history">
+  <div
+    class="form-field-with-history"
+    :class="{ 'elis-missing-border': isElisMissing }"
+    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : undefined"
+  >
     <FormField
       :field="field"
       :modelValue="modelValue"
@@ -74,6 +78,13 @@ const lastSource = computed(() => {
   return getLastSource(props.field.key);
 });
 
+/**
+ * Проверка, ожидалось ли поле из ELIS, но не было загружено
+ */
+const isElisMissing = computed(() => {
+  return lastSource.value === DataSource.ElisMissing;
+});
+
 const computedHighlightColor = computed(() => {
   if (props.highlightColor) {
     return props.highlightColor;
@@ -122,5 +133,17 @@ const onIndicatorLeave = () => {
 <style scoped>
 .form-field-with-history {
   position: relative;
+}
+
+/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
+.form-field-with-history.elis-missing-border :deep(.field-control) {
+  border: 2px solid #f5c24c !important;
+  border-radius: var(--md-radius, 4px);
+}
+
+.form-field-with-history.elis-missing-border :deep(.p-inputtext),
+.form-field-with-history.elis-missing-border :deep(.p-select),
+.form-field-with-history.elis-missing-border :deep(.p-datepicker .p-inputtext) {
+  border: 2px solid #f5c24c !important;
 }
 </style>

@@ -1,11 +1,16 @@
 <template>
-  <InputText
-    :modelValue="documentNumber"
-    type="text"
-    disabled
-    class="document-field manual-input--disabled"
-    :title="documentTooltip"
-  />
+  <div
+    class="document-field-wrapper"
+    :class="{ 'elis-missing-border': isElisMissing }"
+    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : documentTooltip"
+  >
+    <InputText
+      :modelValue="documentNumber"
+      type="text"
+      disabled
+      class="document-field manual-input--disabled"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -16,6 +21,8 @@ import type { PassportQualityParameter } from '@/types/passport.types';
 interface Props {
   /** Параметр качества */
   parameter: PassportQualityParameter;
+  /** Флаг: ожидалось из ELIS, но не загружено */
+  isElisMissing?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -50,6 +57,10 @@ const documentTooltip = computed(() => {
 </script>
 
 <style scoped>
+.document-field-wrapper {
+  width: 100%;
+}
+
 .document-field {
   width: 100%;
   max-width: 100%;
@@ -83,5 +94,16 @@ const documentTooltip = computed(() => {
 
 .manual-input--disabled {
   opacity: 1;
+}
+
+/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
+.document-field-wrapper.elis-missing-border .document-field {
+  border: 2px solid #f5c24c !important;
+  border-radius: var(--md-radius, 4px);
+}
+
+.document-field-wrapper.elis-missing-border :deep(.p-inputtext) {
+  border: 2px solid #f5c24c !important;
+  border-radius: var(--md-radius, 4px);
 }
 </style>

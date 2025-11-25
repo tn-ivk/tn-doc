@@ -1,5 +1,9 @@
 <template>
-  <div class="measurement-with-history">
+  <div
+    class="measurement-with-history"
+    :class="{ 'elis-missing-border': isElisMissing }"
+    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : undefined"
+  >
     <PassportMeasurementInput
       :parameter="parameter"
       :isElisFilled="isElisFilled"
@@ -71,6 +75,11 @@ const lastSource = computed(() => {
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
+ * Проверка, ожидалось ли поле из ELIS, но не было загружено
+ */
+const isElisMissing = computed(() => lastSource.value === DataSource.ElisMissing);
+
+/**
  * Обработка изменения значения
  */
 const handleChange = (newValue: string) => {
@@ -116,5 +125,10 @@ const onIndicatorLeave = () => {
   width: 100%;
   max-width: 100%;
   overflow: hidden;
+}
+
+/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
+.measurement-with-history.elis-missing-border :deep(.p-inputtext) {
+  border: 2px solid #f5c24c !important;
 }
 </style>

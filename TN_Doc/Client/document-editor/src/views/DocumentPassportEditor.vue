@@ -131,8 +131,8 @@ import type { FormField } from '@/types/document.types';
 
 const route = useRoute();
 
-// Получаем функцию для отслеживания загрузки из ELIS
-const { trackElisLoad } = useFieldHistory();
+// Получаем функции для отслеживания загрузки из ELIS
+const { trackElisLoad, trackElisMissing } = useFieldHistory();
 
 // Вспомогательные функции для работы с полями подписантов
 /**
@@ -404,6 +404,12 @@ const handleElisData = (elisData: ElisPassportData) => {
         // Создать запись истории для ELIS
         trackElisLoad(field.key, value, elisData.protocolNumber);
       }
+    } else {
+      // Значение ожидалось из ELIS (есть elisAlias), но не было найдено
+      updates[`${field.key}__elisMissing`] = true;
+
+      // Создать запись истории для ELIS Missing
+      trackElisMissing(field.key, elisData.protocolNumber);
     }
   });
 
@@ -422,14 +428,20 @@ const handleElisData = (elisData: ElisPassportData) => {
         return; // Пропустить параметры без ELIS интеграции
       }
 
+      // Ключи полей параметра
+      const valueKey = `value.${param.key}`;
+      const methodKey = `method.${param.key}`;
+      const resultKey = `result.${param.key}`;
+      const documentKey = `document.${param.key}`;
+
       // Искать параметр в elisData.parameters (русские полные названия)
       const elisParam = findElisValue(elisData, elisAlias, 'parameters') as ElisParameter | undefined;
 
       if (elisParam) {
+        // Параметр найден в ELIS, обрабатываем отдельные поля
 
         // Заполнить measurement (value)
         if (elisParam.value !== undefined && elisParam.value !== null) {
-          const valueKey = `value.${param.key}`;
           let valueStr = elisParam.value.toString();
 
           // Нормализовать значение согласно roundValue
@@ -458,16 +470,23 @@ const handleElisData = (elisData: ElisPassportData) => {
 
           // Создать запись истории для ELIS
           trackElisLoad(valueKey, valueStr, elisData.protocolNumber);
+        } else {
+          // value ожидалось, но не пришло
+          updates[`${valueKey}__elisMissing`] = true;
+          trackElisMissing(valueKey, elisData.protocolNumber);
         }
 
         // Заполнить result (valueString)
         if (elisParam.valueString) {
-          const resultKey = `result.${param.key}`;
           updates[resultKey] = elisParam.valueString.toString();
           updates[`${resultKey}__elisFilled`] = true;
 
           // Создать запись истории для ELIS
           trackElisLoad(resultKey, elisParam.valueString.toString(), elisData.protocolNumber);
+        } else {
+          // result ожидалось, но не пришло
+          updates[`${resultKey}__elisMissing`] = true;
+          trackElisMissing(resultKey, elisData.protocolNumber);
         }
 
         // Создать метод испытаний из ELIS данных
@@ -500,18 +519,24 @@ const handleElisData = (elisData: ElisPassportData) => {
             }
 
             // Сохранить метод как JSON string (теперь ВСЕГДА заполняем)
-            const methodKey = `method.${param.key}`;
             const methodJson = JSON.stringify(matchingMethod);
             updates[methodKey] = methodJson;
             updates[`${methodKey}__elisFilled`] = true;
 
             // Создать запись истории для ELIS (сохраняем только name, а не весь объект)
             trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
+          } else {
+            // Метод не удалось создать
+            updates[`${methodKey}__elisMissing`] = true;
+            trackElisMissing(methodKey, elisData.protocolNumber);
           }
+        } else {
+          // method ожидалось, но не пришло
+          updates[`${methodKey}__elisMissing`] = true;
+          trackElisMissing(methodKey, elisData.protocolNumber);
         }
 
         // Заполнить документ (LabDocumentInfo)
-        const documentKey = `document.${param.key}`;
         const documentPayload = buildDocumentPayload(elisParam);
 
         if (documentPayload) {
@@ -520,7 +545,22 @@ const handleElisData = (elisData: ElisPassportData) => {
 
           // Создать запись истории для ELIS
           trackElisLoad(documentKey, documentPayload, elisData.protocolNumber);
+        } else {
+          // document ожидалось, но не пришло
+          updates[`${documentKey}__elisMissing`] = true;
+          trackElisMissing(documentKey, elisData.protocolNumber);
         }
+      } else {
+        // Параметр не найден в ELIS - все поля помечаем как missing
+        updates[`${valueKey}__elisMissing`] = true;
+        updates[`${methodKey}__elisMissing`] = true;
+        updates[`${resultKey}__elisMissing`] = true;
+        updates[`${documentKey}__elisMissing`] = true;
+
+        trackElisMissing(valueKey, elisData.protocolNumber);
+        trackElisMissing(methodKey, elisData.protocolNumber);
+        trackElisMissing(resultKey, elisData.protocolNumber);
+        trackElisMissing(documentKey, elisData.protocolNumber);
       }
     });
   }
