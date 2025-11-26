@@ -585,6 +585,10 @@ Real-time data acquisition from measurement systems:
     - Индикатор истории на фиксированном расстоянии 4px от правого края
     - Оптимизированы отступы для кнопки редактирования метода (30px и 2px)
     - Обновлен текст подсказки: "Создать ручной метод" → "Редактирование..."
+  - ✅ **Удалена жёлтая рамка для полей без данных ELIS**: упрощена визуальная индикация
+    - Убран CSS класс `elis-missing-border` из компонентов с историей изменений
+    - Сохранены: значок истории, зелёная подсветка ELIS-данных, флаги `__elisMissing`
+    - Компоненты: FormFieldWithHistory, PassportMeasurementInputWithHistory, PassportMethodSelectWithHistory, PassportResultCellWithHistory, PassportDocumentField
 
 ## Previous Major Changes (v1.4.2 - October 2024)
 
