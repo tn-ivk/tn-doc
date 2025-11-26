@@ -1,8 +1,7 @@
 <template>
   <div
     class="document-field-wrapper"
-    :class="{ 'elis-missing-border': isElisMissing }"
-    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : documentTooltip"
+    :title="documentTooltip"
   >
     <InputText
       :modelValue="documentNumber"
@@ -21,8 +20,6 @@ import type { PassportQualityParameter } from '@/types/passport.types';
 interface Props {
   /** Параметр качества */
   parameter: PassportQualityParameter;
-  /** Флаг: ожидалось из ELIS, но не загружено */
-  isElisMissing?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -96,14 +93,4 @@ const documentTooltip = computed(() => {
   opacity: 1;
 }
 
-/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
-.document-field-wrapper.elis-missing-border .document-field {
-  border: 2px solid #f5c24c !important;
-  border-radius: var(--md-radius, 4px);
-}
-
-.document-field-wrapper.elis-missing-border :deep(.p-inputtext) {
-  border: 2px solid #f5c24c !important;
-  border-radius: var(--md-radius, 4px);
-}
 </style>

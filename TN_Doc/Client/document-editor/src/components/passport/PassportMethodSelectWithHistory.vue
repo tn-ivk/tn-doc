@@ -1,8 +1,6 @@
 <template>
   <div
     class="method-with-history"
-    :class="{ 'elis-missing-border': isElisMissing }"
-    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : undefined"
   >
     <PassportMethodSelect
       :parameter="parameter"
@@ -80,11 +78,6 @@ const lastSource = computed(() => {
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
- * Проверка, ожидалось ли поле из ELIS, но не было загружено
- */
-const isElisMissing = computed(() => lastSource.value === DataSource.ElisMissing);
-
-/**
  * Обработка изменения метода
  */
 const handleChange = (newMethod: MethodOption | null) => {
@@ -132,8 +125,4 @@ const onIndicatorLeave = () => {
   position: relative;
 }
 
-/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
-.method-with-history.elis-missing-border :deep(.p-select) {
-  border: 2px solid #f5c24c !important;
-}
 </style>
