@@ -172,17 +172,21 @@ function handleValueChange(value: number | null) {
   color: var(--md-text, #212121) !important;
 }
 
-/* Disabled стиль */
-.manual-input--disabled {
-  background-color: var(--md-surface-variant, #F1F3F4);
-  color: var(--md-text-secondary, #5F6368);
+/* Disabled стиль - только цвет текста (фон сохраняется для ELIS) */
+.manual-input--disabled:deep(input),
+.manual-input--disabled:deep(.p-inputnumber-input),
+.measurement-input:deep(input:disabled),
+.measurement-input:deep(.p-inputnumber-input:disabled) {
+  color: var(--md-text-secondary, #5F6368) !important;
   cursor: not-allowed;
 }
 
-.manual-input--disabled:deep(input) {
-  background-color: var(--md-surface-variant, #F1F3F4);
-  color: var(--md-text-secondary, #5F6368);
-  cursor: not-allowed;
+/* Disabled без ELIS - серый фон */
+.manual-input--disabled:not(.elis-filled):deep(input),
+.manual-input--disabled:not(.elis-filled):deep(.p-inputnumber-input),
+.measurement-input:not(.elis-filled):deep(input:disabled),
+.measurement-input:not(.elis-filled):deep(.p-inputnumber-input:disabled) {
+  background-color: var(--md-surface-variant, #F1F3F4) !important;
 }
 
 /* Disabled поле с ошибкой валидации */
