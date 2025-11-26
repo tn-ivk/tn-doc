@@ -70,8 +70,13 @@ const emit = defineEmits<{
 
 /**
  * Определить, редактируема ли ячейка результата
+ * Условия редактируемости:
+ * - editable = true (учитывает Edit из конфига И что параметр не Slave)
+ * - isBallast = false (балластные показатели не редактируются)
  */
-const isResultEditable = computed(() => props.parameter.isBallast !== true);
+const isResultEditable = computed(() =>
+  props.parameter.editable && props.parameter.isBallast !== true
+);
 
 function handleMethodUpdate(method: MethodOption | null) {
   emit('update:method', { paramKey: props.parameter.key, method });
