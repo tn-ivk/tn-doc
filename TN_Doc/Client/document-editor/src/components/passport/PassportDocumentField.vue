@@ -1,7 +1,6 @@
 <template>
   <div
     class="document-field-wrapper"
-    :title="documentTooltip"
   >
     <InputText
       :modelValue="documentNumber"
@@ -32,24 +31,6 @@ const documentNumber = computed(() => {
     return '—';
   }
   return props.parameter.document.number;
-});
-
-/**
- * Подсказка с дополнительной информацией о документе
- */
-const documentTooltip = computed(() => {
-  if (!props.parameter.document) {
-    return '';
-  }
-
-  const parts: string[] = [];
-  if (props.parameter.document.type) {
-    parts.push(props.parameter.document.type);
-  }
-  if (props.parameter.document.date) {
-    parts.push(props.parameter.document.date);
-  }
-  return parts.join(' • ');
 });
 </script>
 
