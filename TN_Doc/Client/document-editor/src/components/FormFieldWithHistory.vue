@@ -16,8 +16,7 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
-      @mouseenter="(event) => onIndicatorHover(event)"
-      @mouseleave="onIndicatorLeave"
+      @click="onIndicatorClick"
     />
 
     <!-- Popup с историей -->
@@ -60,7 +59,6 @@ const {
 const ELIS_HIGHLIGHT_COLOR = 'var(--md-elis-highlight, #e8f5e9)';
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
-let hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * История поля
@@ -96,28 +94,10 @@ const handleChange = (newValue: any) => {
 };
 
 /**
- * Обработчик наведения на индикатор
+ * Обработчик клика на индикатор - показываем popup
  */
-const onIndicatorHover = (event: MouseEvent) => {
-  // Отменяем таймер скрытия, если он был запущен
-  if (hideTimeout) {
-    clearTimeout(hideTimeout);
-    hideTimeout = null;
-  }
-
-  // Показываем popup, передавая событие для правильного позиционирования
+const onIndicatorClick = (event: MouseEvent) => {
   historyPopup.value?.show(event);
-};
-
-/**
- * Обработчик ухода курсора с индикатора
- */
-const onIndicatorLeave = () => {
-  // Запускаем таймер скрытия с задержкой 300ms
-  hideTimeout = setTimeout(() => {
-    historyPopup.value?.hide();
-    hideTimeout = null;
-  }, 300);
 };
 </script>
 
