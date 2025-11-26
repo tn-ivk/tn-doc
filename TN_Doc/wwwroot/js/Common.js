@@ -1335,6 +1335,16 @@ function SetClientToken() {
 
 }
 
+// Форматирование ISO даты в формат dd.MM.yyyy HH:mm:ss
+function formatIsoDateTime(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
 function DrawTablePassports(dataELIS) {
     logTrace('Начало отрисовки таблицы протоколов испытаний ЕЛИС');
     let element = document.querySelector('#listPassports');
@@ -1346,7 +1356,7 @@ function DrawTablePassports(dataELIS) {
         li.className = 'list-group-item list-group-item-action';
         li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
                          <b>Лаборатория:</b> <small>${item.labName}</small><br>
-                         <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
+                         <b>Период:</b> <small>${formatIsoDateTime(item.startPeriodTime)} - ${formatIsoDateTime(item.endPeriodTime)}</small>`;
         li.dataPassport = item;
         li.addEventListener('click', function (e) {
             let elisPassport = this;
