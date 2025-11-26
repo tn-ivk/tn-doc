@@ -46,12 +46,12 @@ import type { DeviceStatus, StatusResponse, IndicatorStatus } from '../types/sta
 const store = useStatusStore();
 const { connectionState, on } = useSignalR('/statusHub');
 
-// Автообновление каждые 10 секунд если SignalR не подключен
+// Автообновление каждые 600 секунд если SignalR не подключен
 const { pause, resume } = useIntervalFn(() => {
   if (connectionState.value !== 'connected') {
     store.fetchStatus();
   }
-}, 10000);
+}, 600000);
 
 // SignalR real-time обновления
 on('statusUpdated', (data: StatusResponse) => {
