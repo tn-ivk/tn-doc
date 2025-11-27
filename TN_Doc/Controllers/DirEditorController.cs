@@ -88,4 +88,37 @@ public class DirEditorController : ControllerBase
         _configCache.ClearCache();
         return Ok();
     }
+
+    /// <summary>
+    /// Добавление метода испытаний в справочник
+    /// </summary>
+    /// <param name="dto">Данные метода испытаний</param>
+    /// <returns>200 с ID добавленного метода, 400 при ошибке</returns>
+    [HttpPost]
+    [Route("AddMethod")]
+    public async Task<IActionResult> AddMethodAsync([FromBody] AddMethodDto dto)
+    {
+        _logger.LogTrace($"Добавление метода испытаний '{dto.MethodName}' для параметра {dto.ParameterId}");
+
+        if (string.IsNullOrWhiteSpace(dto.EditConfigFilePath))
+            return BadRequest("EditConfigFilePath is required");
+
+        if (string.IsNullOrWhiteSpace(dto.MethodName))
+            return BadRequest("MethodName is required");
+
+        var methodId = await _service.AddMethodToConfigAsync(
+            dto.EditConfigFilePath,
+            dto.ParameterId,
+            dto.MethodName,
+            dto.IsDefault,
+            dto.LimitValueActivate,
+            dto.LimitValue,
+            dto.LimitValueString);
+
+        if (methodId < 0)
+            return BadRequest("Failed to add method");
+
+        _configCache.ClearCache();
+        return Ok(new { id = methodId });
+    }
 }

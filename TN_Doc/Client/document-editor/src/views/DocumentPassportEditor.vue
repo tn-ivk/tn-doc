@@ -102,6 +102,7 @@ import { logger } from '@tn-doc/shared';
         v-if="hasQualityParameters"
         :parameters="qualityParameters"
         :isElisUsed="isElisUsed"
+        :editConfigFilePath="editConfigFilePath"
         @update:method="handleMethodUpdate"
         @update:measurement="handleMeasurementUpdate"
         @update:result="handleResultUpdate"
@@ -272,6 +273,7 @@ const {
   qualityParameters,
   isElisUsed,
   hasQualityParameters,
+  editConfigFilePath,
   handleMeasurementUpdate,
   handleMethodUpdate,
   handleResultUpdate

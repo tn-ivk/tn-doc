@@ -100,6 +100,13 @@ export function usePassportEditor() {
   });
 
   /**
+   * Путь к файлу конфигурации (для добавления методов в справочник)
+   */
+  const editConfigFilePath = computed<string>(() => {
+    return passportConfig.value?.editConfigFilePath || '';
+  });
+
+  /**
    * Вычисляемое свойство для объединения схемы + данных из formData
    * Создает полные объекты PassportQualityParameter динамически
    */
@@ -666,6 +673,7 @@ export function usePassportEditor() {
     qualityParameters, // Теперь вычисляется динамически из схемы + formData!
     isElisUsed,
     hasQualityParameters,
+    editConfigFilePath, // Путь к файлу конфигурации для добавления методов
     findParameter,
     recalculateResult,
     isResultEditable,
