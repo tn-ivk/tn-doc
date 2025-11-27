@@ -23,7 +23,7 @@
     <FieldHistoryPopup
       ref="historyPopup"
       :history="fieldHistory"
-      :fieldLabel="`${parameter.name} (Метод испытаний)`"
+      :fieldLabel="parameter.name"
     />
   </div>
 </template>

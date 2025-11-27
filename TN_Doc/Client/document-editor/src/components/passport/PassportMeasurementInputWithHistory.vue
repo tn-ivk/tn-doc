@@ -19,7 +19,7 @@
     <FieldHistoryPopup
       ref="historyPopup"
       :history="fieldHistory"
-      :fieldLabel="`${parameter.name} (Измерение)`"
+      :fieldLabel="parameter.name"
     />
   </div>
 </template>
