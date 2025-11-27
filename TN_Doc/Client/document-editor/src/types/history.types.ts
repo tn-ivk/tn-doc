@@ -70,7 +70,7 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     icon: 'pi-cog',
     color: '#FF9800',
     text: 'ИВК',
-    description: 'Округлено системой ИВК'
+    description: 'Отредактировано ИВК'
   },
   [DataSource.ElisMissing]: {
     icon: 'pi-exclamation-triangle',
