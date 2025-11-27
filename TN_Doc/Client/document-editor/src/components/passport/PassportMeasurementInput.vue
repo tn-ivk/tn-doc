@@ -62,6 +62,12 @@ const numericValue = computed(() => {
 
 // Валидация поля
 const isValid = computed(() => {
+  // Если поле заблокировано для ввода, валидация requiredFill не применяется
+  // (пользователь не может заполнить заблокированное поле)
+  if (!props.parameter.editable) {
+    return true;
+  }
+
   // Проверка обязательных полей
   if (props.parameter.requiredFill) {
     if (!props.parameter.values.measurement || props.parameter.values.measurement === '') {
@@ -83,6 +89,11 @@ const isValid = computed(() => {
 
 // Сообщение об ошибке валидации (короткий текст для экономии места)
 const validationMessage = computed(() => {
+  // Если поле заблокировано для ввода, ошибки не показываем
+  if (!props.parameter.editable) {
+    return '';
+  }
+
   // Проверка обязательных полей
   if (props.parameter.requiredFill) {
     if (!props.parameter.values.measurement || props.parameter.values.measurement === '') {

@@ -109,6 +109,11 @@ export const useDocumentStore = defineStore('document', () => {
       const parametersSchema = passportConfig.qualityParametersSchema || [];
 
       for (const paramSchema of parametersSchema) {
+        // Если поле заблокировано для ввода, валидация requiredFill не применяется
+        if (!paramSchema.editable) {
+          continue;
+        }
+
         // Берем значения из formData вместо param.values
         const measurement = (formData.value[`value.${paramSchema.key}`] ?? '').toString();
 
