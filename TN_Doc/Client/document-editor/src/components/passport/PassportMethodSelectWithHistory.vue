@@ -36,6 +36,7 @@ import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
+import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
 
 const props = defineProps<{
   parameter: PassportQualityParameter;
@@ -96,6 +97,8 @@ const handleManualMethod = () => {
  * Обработчик клика на индикатор - показываем popup
  */
 const onIndicatorClick = (event: MouseEvent) => {
+  // Закрыть все другие popup-ы истории перед открытием нового
+  closeAllHistoryPopups();
   historyPopup.value?.show(event);
 };
 </script>

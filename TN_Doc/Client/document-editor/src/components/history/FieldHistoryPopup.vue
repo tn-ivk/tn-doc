@@ -60,10 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import OverlayPanel from 'primevue/overlaypanel';
 import type { FieldHistoryEntry } from '@/types/history.types';
 import { SOURCE_DISPLAY_CONFIG } from '@/types/history.types';
+import { onCloseAllHistoryPopups } from '@/utils/historyPopupEvents';
 
 const props = defineProps<{
   /** История изменений поля */
@@ -73,6 +74,19 @@ const props = defineProps<{
 }>();
 
 const overlayPanel = ref<InstanceType<typeof OverlayPanel>>();
+
+// Подписка на событие закрытия всех popup-ов
+let unsubscribe: (() => void) | null = null;
+
+onMounted(() => {
+  unsubscribe = onCloseAllHistoryPopups(() => {
+    overlayPanel.value?.hide();
+  });
+});
+
+onUnmounted(() => {
+  unsubscribe?.();
+});
 
 /**
  * История в обратном порядке (последнее изменение сверху)
