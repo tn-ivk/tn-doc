@@ -621,6 +621,44 @@ export function usePassportEditor() {
     }
   }
 
+  /**
+   * Добавить метод в локальный список методов параметра
+   * Вызывается после успешного добавления метода в справочник через API
+   * Это обновляет localMethodNames, что убирает предупреждение "отсутствует в справочнике"
+   */
+  function addMethodToLocalDictionary(paramKey: string, methodName: string): void {
+    if (!passportConfig.value?.qualityParametersSchema) {
+      logger.warn('[usePassportEditor] addMethodToLocalDictionary: схема не найдена');
+      return;
+    }
+
+    const schema = passportConfig.value.qualityParametersSchema.find(p => p.key === paramKey);
+    if (!schema) {
+      logger.warn('[usePassportEditor] addMethodToLocalDictionary: параметр не найден', { paramKey });
+      return;
+    }
+
+    // Проверяем, что метод ещё не в списке
+    const normalizedName = methodName.trim().toLowerCase();
+    const alreadyExists = schema.localMethodNames?.some(
+      name => name.trim().toLowerCase() === normalizedName
+    );
+
+    if (!alreadyExists) {
+      if (!schema.localMethodNames) {
+        schema.localMethodNames = [];
+      }
+      schema.localMethodNames.push(methodName);
+      logger.info('[usePassportEditor] Метод добавлен в локальный справочник', {
+        paramKey,
+        methodName,
+        localMethodNamesCount: schema.localMethodNames.length
+      });
+    } else {
+      logger.debug('[usePassportEditor] Метод уже в локальном справочнике', { paramKey, methodName });
+    }
+  }
+
   function tryParseDocument(value: unknown, elisFilled: boolean): ParameterDocument | undefined {
     if (value === null || value === undefined) {
       return undefined;
@@ -679,6 +717,7 @@ export function usePassportEditor() {
     isResultEditable,
     handleMeasurementUpdate,
     handleMethodUpdate,
-    handleResultUpdate
+    handleResultUpdate,
+    addMethodToLocalDictionary // Добавить метод в локальный справочник (убирает предупреждение)
   };
 }

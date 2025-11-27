@@ -103,6 +103,7 @@ import { logger } from '@tn-doc/shared';
         :parameters="qualityParameters"
         :isElisUsed="isElisUsed"
         :editConfigFilePath="editConfigFilePath"
+        :onMethodAddedToDictionary="addMethodToLocalDictionary"
         @update:method="handleMethodUpdate"
         @update:measurement="handleMeasurementUpdate"
         @update:result="handleResultUpdate"
@@ -276,7 +277,8 @@ const {
   editConfigFilePath,
   handleMeasurementUpdate,
   handleMethodUpdate,
-  handleResultUpdate
+  handleResultUpdate,
+  addMethodToLocalDictionary
 } = usePassportEditor();
 
 // Используем логику автозаполнения для Паспортов

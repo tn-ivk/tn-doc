@@ -80,6 +80,8 @@ interface Props {
   isElisUsed: boolean;
   /** Путь к файлу конфигурации (для добавления методов в справочник) */
   editConfigFilePath?: string;
+  /** Callback для обновления локального списка методов после добавления в справочник */
+  onMethodAddedToDictionary?: (paramKey: string, methodName: string) => void;
 }
 
 const props = defineProps<Props>();
@@ -236,6 +238,11 @@ async function handleManualMethodConfirm(payload: ManualMethodPayload) {
         methodName: payload.name,
         parameterId: param.id
       });
+
+      // Обновляем локальный список методов для убирания предупреждения "отсутствует в справочнике"
+      if (props.onMethodAddedToDictionary) {
+        props.onMethodAddedToDictionary(param.key, payload.name);
+      }
     } catch (error) {
       logger.error('[PassportQualityTable] Ошибка добавления метода в справочник', {
         error: error instanceof Error ? error.message : String(error),
