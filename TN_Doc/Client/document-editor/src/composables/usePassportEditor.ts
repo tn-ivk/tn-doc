@@ -503,9 +503,17 @@ export function usePassportEditor() {
     };
     const newResult = recalculateResult(tempParam);
 
+    // Определяем, изменилось ли название метода
+    const methodNameChanged = newMethodName !== previousMethodName;
+
+    // Если название метода не изменилось - сохраняем текущий флаг ELIS
+    // Если название изменилось - метод становится "ручным" (флаг сбрасывается)
+    const currentMethodElisFlag = store.formData[`method.${event.paramKey}__elisFilled`] === true;
+    const newMethodElisFlag = methodNameChanged ? false : currentMethodElisFlag;
+
     const updates: Record<string, any> = {
       [`method.${event.paramKey}`]: methodJson,
-      [`method.${event.paramKey}__elisFilled`]: false
+      [`method.${event.paramKey}__elisFilled`]: newMethodElisFlag
     };
 
     const shouldUpdateResult =
@@ -514,9 +522,17 @@ export function usePassportEditor() {
 
     if (shouldUpdateResult) {
       const resultKey = `result.${event.paramKey}`;
+      const currentResult = store.formData[resultKey] || '';
+      const resultChanged = currentResult !== newResult;
+
+      // Если результат не изменился - сохраняем текущий флаг ELIS
+      // Если результат изменился (из-за пересчёта) - сбрасываем флаг
+      const currentResultElisFlag = store.formData[`${resultKey}__elisFilled`] === true;
+      const newResultElisFlag = resultChanged ? false : currentResultElisFlag;
+
       resultGuard.add(resultKey);
       updates[resultKey] = newResult;
-      updates[`${resultKey}__elisFilled`] = false;
+      updates[`${resultKey}__elisFilled`] = newResultElisFlag;
       updates[`${resultKey}__manualOverride`] = param.manualOverride === true;
     }
 
