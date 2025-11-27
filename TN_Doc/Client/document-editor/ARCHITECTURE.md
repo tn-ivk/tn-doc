@@ -142,3 +142,48 @@ watch(() => store.formData['Delive_IOF'], (newValue) => {
 ✅ **Типобезопасность**: TypeScript интерфейсы для всех данных
 ✅ **Тестируемость**: Композаблы легко тестировать изолированно
 ✅ **Читаемость**: Разделение ответственности между композаблами
+
+## Сохранение флага ELIS при редактировании метода
+
+При редактировании метода испытаний через диалог "Редактирование метода испытаний" важно сохранять информацию об источнике данных (флаг ELIS).
+
+### Логика сохранения флага
+
+**handleMethodUpdate в usePassportEditor.ts:**
+
+```typescript
+// Определяем, изменилось ли название метода
+const methodNameChanged = newMethodName !== previousMethodName;
+
+// Если название метода не изменилось - сохраняем текущий флаг ELIS
+// Если название изменилось - метод становится "ручным" (флаг сбрасывается)
+const currentMethodElisFlag = store.formData[`method.${event.paramKey}__elisFilled`] === true;
+const newMethodElisFlag = methodNameChanged ? false : currentMethodElisFlag;
+```
+
+**Правила:**
+- Если **название метода НЕ изменилось** → сохраняем флаг ELIS (индикатор остается)
+- Если **название метода изменилось** → сбрасываем флаг ELIS (метод становится "ручным")
+- Изменение `limitValue`, `limitValueActivate`, `limitValueString` **НЕ влияет** на флаг ELIS
+
+### Обновление локального справочника
+
+После добавления метода в справочник через API, предупреждение "отсутствует в справочнике" должно исчезнуть мгновенно.
+
+**addMethodToLocalDictionary в usePassportEditor.ts:**
+
+```typescript
+function addMethodToLocalDictionary(paramKey: string, methodName: string): void {
+  const schema = passportConfig.value.qualityParametersSchema.find(p => p.key === paramKey);
+  if (schema && !schema.localMethodNames?.includes(methodName)) {
+    schema.localMethodNames.push(methodName);
+  }
+}
+```
+
+**Цепочка вызовов:**
+1. `PassportQualityTable.vue` → `handleManualMethodConfirm()` → `documentApi.addMethodToDictionary()`
+2. После успешного API вызова → `props.onMethodAddedToDictionary(param.key, payload.name)`
+3. `DocumentPassportEditor.vue` передает `addMethodToLocalDictionary` как проп
+4. Обновляется `localMethodNames` в схеме → computed `isMethodInDictionary` пересчитывается
+5. Предупреждение исчезает без перезагрузки страницы
