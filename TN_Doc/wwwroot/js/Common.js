@@ -1335,6 +1335,16 @@ function SetClientToken() {
 
 }
 
+// Форматирование ISO даты в формат dd.MM.yyyy HH:mm:ss
+function formatIsoDateTime(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
 function DrawTablePassports(dataELIS) {
     logTrace('Начало отрисовки таблицы протоколов испытаний ЕЛИС');
     let element = document.querySelector('#listPassports');
@@ -1344,15 +1354,32 @@ function DrawTablePassports(dataELIS) {
         logTrace('Добавление протокола испытаний ЕЛИС в таблицу: ' + (item.protocolNumber || '[нет номера]'));
         let li = document.createElement('button');
         li.className = 'list-group-item list-group-item-action';
-        li.innerHTML = `<b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
-                         <b>Лаборатория:</b> <small>${item.labName}</small><br>
-                         <b>Период:</b> <small>${item.startPeriodTime}-${item.endPeriodTime}</small>`;
+        li.innerHTML = `<div class="protocol-item-container">
+                            <div class="protocol-item-content">
+                                <b>Номер протокола:</b> <small>${item.protocolNumber}</small><br>
+                                <b>Лаборатория:</b> <small>${item.labName}</small><br>
+                                <b>Период:</b> <small>${formatIsoDateTime(item.startPeriodTime)} - ${formatIsoDateTime(item.endPeriodTime)}</small>
+                            </div>
+                            <button type="button" class="btn protocol-view-btn" title="Просмотр данных протокола">
+                                <i class="fa fa-file-text-o"></i>
+                            </button>
+                        </div>`;
         li.dataPassport = item;
+
+        // Обработчик клика на кнопку просмотра протокола
+        li.querySelector('.protocol-view-btn').addEventListener('click', function (e) {
+            e.stopPropagation(); // Предотвратить выбор протокола
+            showProtocolView(item);
+        });
+
         li.addEventListener('click', function (e) {
+            // Игнорировать клик если это была кнопка просмотра
+            if (e.target.closest('.protocol-view-btn')) return;
+
             let elisPassport = this;
             sessionStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
             localStorage.setItem('dataPassport', JSON.stringify(elisPassport.dataPassport));
-            
+
             let passports = document.querySelectorAll('.list-group-item')
             passports.forEach(function (item, i, arr) {
                 if (item.classList.contains('active'))
@@ -1364,7 +1391,7 @@ function DrawTablePassports(dataELIS) {
         element.append(li);
     });
     logTrace('Таблица протоколов испытаний ЕЛИС успешно отрисована. Количество протоколов: ' + (dataELIS.passports ? dataELIS.passports.length : 0));
-    
+
     // Автоматически выбираем первый протокол, если протоколы загружены
     if (dataELIS.passports && dataELIS.passports.length > 0) {
         const firstProtocol = document.querySelector('#listPassports .list-group-item:first-child');
@@ -1375,6 +1402,34 @@ function DrawTablePassports(dataELIS) {
     } else {
         UpdateElisApplyButtonState();
     }
+}
+
+// Показать окно просмотра данных протокола ЕЛИС
+function showProtocolView(protocolData) {
+    logTrace('Открытие окна просмотра протокола ЕЛИС: ' + (protocolData.protocolNumber || '[нет номера]'));
+
+    // Форматируем JSON для читаемого отображения
+    const formattedJson = JSON.stringify(protocolData, null, 2);
+
+    // Заполняем содержимое окна
+    document.getElementById('protocolViewContent').textContent = formattedJson;
+    document.getElementById('protocolViewTitle').textContent =
+        'Данные протокола ЕЛИС: ' + (protocolData.protocolNumber || '');
+
+    // Скрываем окно запроса ЕЛИС и показываем окно просмотра
+    $('#elis').modal('hide');
+    setTimeout(function() {
+        $('#elisProtocolView').modal('show');
+    }, 300);
+}
+
+// Закрыть окно просмотра протокола и вернуться к списку
+function closeProtocolView() {
+    logTrace('Закрытие окна просмотра протокола ЕЛИС');
+    $('#elisProtocolView').modal('hide');
+    setTimeout(function() {
+        $('#elis').modal('show');
+    }, 300);
 }
 
 function ResetPassportDataElis() {

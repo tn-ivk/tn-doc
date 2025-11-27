@@ -103,6 +103,43 @@ class DocumentApiService {
     return response.data;
   }
 
+  /**
+   * Добавить метод испытаний в справочник
+   * @param editConfigFilePath Относительный путь к файлу конфигурации
+   * @param parameterId ID параметра качества
+   * @param methodName Название метода
+   * @param isDefault Метод по умолчанию
+   * @param limitValueActivate Активирован ли лимит
+   * @param limitValue Пороговое значение
+   * @param limitValueString Строка лимита
+   * @returns ID добавленного метода
+   */
+  async addMethodToDictionary(
+    editConfigFilePath: string,
+    parameterId: number,
+    methodName: string,
+    isDefault = false,
+    limitValueActivate = false,
+    limitValue?: number,
+    limitValueString?: string
+  ): Promise<{ id: number }> {
+    logger.debug('API: addMethodToDictionary запрос', { editConfigFilePath, parameterId, methodName });
+    const response = await axios.post<{ id: number }>(
+      '/direditor/AddMethod',
+      {
+        editConfigFilePath,
+        parameterId,
+        methodName,
+        isDefault,
+        limitValueActivate,
+        limitValue,
+        limitValueString
+      }
+    );
+    logger.info('API: addMethodToDictionary успешно', { methodId: response.data.id });
+    return response.data;
+  }
+
 }
 
 // Экспортируем синглтон

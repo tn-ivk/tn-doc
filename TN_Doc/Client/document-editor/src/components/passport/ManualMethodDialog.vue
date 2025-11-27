@@ -226,6 +226,7 @@ function handleReset() {
 .parameter-name {
   font-weight: 600;
   margin: 0;
+  text-align: center;
 }
 
 .dialog-field {

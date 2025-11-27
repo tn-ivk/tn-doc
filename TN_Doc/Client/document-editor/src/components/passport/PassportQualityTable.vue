@@ -70,6 +70,7 @@ import { ref } from 'vue';
 import PassportParameterRow from './PassportParameterRow.vue';
 import ResultEditDialog from './ResultEditDialog.vue';
 import ManualMethodDialog, { type ManualMethodPayload } from './ManualMethodDialog.vue';
+import { documentApi } from '@/services/api.service';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {
@@ -77,6 +78,10 @@ interface Props {
   parameters: PassportQualityParameter[];
   /** Используется ли ELIS */
   isElisUsed: boolean;
+  /** Путь к файлу конфигурации (для добавления методов в справочник) */
+  editConfigFilePath?: string;
+  /** Callback для обновления локального списка методов после добавления в справочник */
+  onMethodAddedToDictionary?: (paramKey: string, methodName: string) => void;
 }
 
 const props = defineProps<Props>();
@@ -207,14 +212,49 @@ function handleManualMethodRequest(event: { paramKey: string }) {
   manualMethodDialogVisible.value = true;
 }
 
-function handleManualMethodConfirm(payload: ManualMethodPayload) {
+async function handleManualMethodConfirm(payload: ManualMethodPayload) {
   if (!activeManualMethodParameter.value) {
     return;
   }
 
   const param = activeManualMethodParameter.value;
+
+  // Добавляем метод в справочник, если путь к конфигурации доступен
+  let methodId = Date.now(); // Временный ID по умолчанию
+  if (props.editConfigFilePath && payload.name.trim()) {
+    try {
+      const result = await documentApi.addMethodToDictionary(
+        props.editConfigFilePath,
+        param.id,
+        payload.name,
+        payload.isDefault,
+        payload.limitValueActivate,
+        payload.limitValue,
+        payload.limitValueString
+      );
+      methodId = result.id;
+      logger.info('[PassportQualityTable] Метод добавлен в справочник', {
+        methodId,
+        methodName: payload.name,
+        parameterId: param.id
+      });
+
+      // Обновляем локальный список методов для убирания предупреждения "отсутствует в справочнике"
+      if (props.onMethodAddedToDictionary) {
+        props.onMethodAddedToDictionary(param.key, payload.name);
+      }
+    } catch (error) {
+      logger.error('[PassportQualityTable] Ошибка добавления метода в справочник', {
+        error: error instanceof Error ? error.message : String(error),
+        methodName: payload.name,
+        parameterId: param.id
+      });
+      // Продолжаем сохранение в документ даже при ошибке добавления в справочник
+    }
+  }
+
   const newMethod: MethodOption = {
-    id: Date.now(),
+    id: methodId,
     use: true,
     idParameter: param.id,
     name: payload.name,

@@ -1,8 +1,6 @@
 <template>
   <div
     class="result-with-history"
-    :class="{ 'elis-missing-border': isElisMissing }"
-    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : undefined"
   >
     <PassportResultCell
       :parameter="parameter"
@@ -18,15 +16,14 @@
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
       :rightOffset="4"
-      @mouseenter="(event) => onIndicatorHover(event)"
-      @mouseleave="onIndicatorLeave"
+      @click="onIndicatorClick"
     />
 
     <!-- Popup с историей -->
     <FieldHistoryPopup
       ref="historyPopup"
       :history="fieldHistory"
-      :fieldLabel="`${parameter.name} (Результат)`"
+      :fieldLabel="parameter.name"
     />
   </div>
 </template>
@@ -39,6 +36,7 @@ import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
 import type { PassportQualityParameter } from '@/types/passport.types';
+import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
 
 const props = defineProps<{
   parameter: PassportQualityParameter;
@@ -55,7 +53,6 @@ const {
 } = useFieldHistory();
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
-let hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * Ключ для истории: result.{parameterKey}
@@ -78,11 +75,6 @@ const lastSource = computed(() => {
 
 const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
-/**
- * Проверка, ожидалось ли поле из ELIS, но не было загружено
- */
-const isElisMissing = computed(() => lastSource.value === DataSource.ElisMissing);
-
 const canEdit = computed(() => props.isEditable);
 
 const editDisabledReason = computed(() => {
@@ -100,28 +92,12 @@ const handleEditRequest = () => {
 };
 
 /**
- * Обработчик наведения на индикатор
+ * Обработчик клика на индикатор - показываем popup
  */
-const onIndicatorHover = (event: MouseEvent) => {
-  // Отменяем таймер скрытия, если он был запущен
-  if (hideTimeout) {
-    clearTimeout(hideTimeout);
-    hideTimeout = null;
-  }
-
-  // Показываем popup, передавая событие для правильного позиционирования
+const onIndicatorClick = (event: MouseEvent) => {
+  // Закрыть все другие popup-ы истории перед открытием нового
+  closeAllHistoryPopups();
   historyPopup.value?.show(event);
-};
-
-/**
- * Обработчик ухода курсора с индикатора
- */
-const onIndicatorLeave = () => {
-  // Запускаем таймер скрытия с задержкой 300ms
-  hideTimeout = setTimeout(() => {
-    historyPopup.value?.hide();
-    hideTimeout = null;
-  }, 300);
 };
 </script>
 
@@ -136,9 +112,4 @@ const onIndicatorLeave = () => {
   overflow: hidden;
 }
 
-/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
-.result-with-history.elis-missing-border :deep(.result-cell) {
-  border: 2px solid #f5c24c !important;
-  border-radius: var(--md-radius, 4px);
-}
 </style>

@@ -3,8 +3,7 @@
     v-if="source !== DataSource.Unknown"
     class="field-history-indicator"
     :style="{ right: `${rightOffset}px` }"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
+    @click.stop="handleClick"
   >
     <!-- Текстовая метка (для ELIS и ИВК) -->
     <span
@@ -39,8 +38,7 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{
-  (e: 'mouseenter', event: MouseEvent): void;
-  (e: 'mouseleave'): void;
+  (e: 'click', event: MouseEvent): void;
 }>();
 
 const displayConfig = computed(() => {
@@ -48,19 +46,11 @@ const displayConfig = computed(() => {
 });
 
 /**
- * Обработчик наведения курсора
+ * Обработчик клика по индикатору
  */
-const handleMouseEnter = (event: MouseEvent) => {
-  logger.debug(`[FieldHistoryIndicator] mouseenter - источник: ${props.source}, event: ${event ? 'передан' : 'undefined'}`);
-  emit('mouseenter', event);
-};
-
-/**
- * Обработчик ухода курсора
- */
-const handleMouseLeave = () => {
-  logger.debug(`[FieldHistoryIndicator] mouseleave - источник: ${props.source}`);
-  emit('mouseleave');
+const handleClick = (event: MouseEvent) => {
+  logger.debug(`[FieldHistoryIndicator] click - источник: ${props.source}`);
+  emit('click', event);
 };
 </script>
 

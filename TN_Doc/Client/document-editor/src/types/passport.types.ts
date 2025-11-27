@@ -15,6 +15,8 @@ export interface PassportEditConfig extends DocumentEditConfig {
   isElisUsed: boolean;
   /** Схема параметров качества (только метаданные, без данных) */
   qualityParametersSchema?: PassportQualityParameterSchema[];
+  /** Относительный путь к файлу конфигурации (для добавления методов в справочник) */
+  editConfigFilePath?: string;
 }
 
 /**

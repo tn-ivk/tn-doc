@@ -462,7 +462,8 @@
         "Массовая концентрация хлористых солей(%)",
         "Массовая доля хлористых солей(%)"
       ],
-      "RequiredFill": false
+      "RequiredFill": false,
+      "RoundValue": 4
     },
     {
       "Id": 9,
@@ -489,7 +490,7 @@
       "ElisAlias": [
         "Массовая доля серы(%)"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 2
     },
     {
@@ -503,8 +504,9 @@
       "ElisAlias": [
         "Давление насыщенных паров(кПа)"
       ],
-      "RequiredFill": true,
-      "RoundValue": 1
+      "RequiredFill": false,
+      "RoundValue": 1,
+      "SlaveKey": "DNP.mercury_mm"
     },
     {
       "Id": 12,
@@ -517,7 +519,8 @@
       "ElisAlias": [
         "Давление насыщенных паров(мм рт. ст.)"
       ],
-      "RequiredFill": false
+      "RequiredFill": false,
+      "RoundValue": 0
     },
     {
       "Id": 13,
@@ -525,7 +528,8 @@
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 14,
@@ -533,7 +537,8 @@
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 15,
@@ -541,7 +546,8 @@
       "Name": "Выход фракций: при температуре до 350 °С, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 16,
@@ -553,7 +559,8 @@
       "KeyELIS": "Массовая доля парафина(%)",
       "ElisAlias": [
         "Массовая доля парафина(%)"
-      ]
+      ],
+      "RoundValue": 1
     },
     {
       "Id": 17,
@@ -567,7 +574,7 @@
         "Массовая доля сероводорода(млн⁻¹)",
         "Массовая доля сероводорода(млн⁻¹ (ppm))"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 1
     },
     {

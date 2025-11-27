@@ -21,7 +21,7 @@ public class StatusMonitoringService : BackgroundService
     private readonly IHubContext<StatusHub> _hubContext;
     private readonly ILogger<StatusMonitoringService> _logger;
     private readonly AppClientTracker _clientTracker;
-    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(60);
+    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(600);
     private StatusResponse _lastStatus;
     private int _consecutiveErrors = 0;
     private const int MAX_CONSECUTIVE_ERRORS = 5;
@@ -153,6 +153,12 @@ public class StatusMonitoringService : BackgroundService
             else if (lastDevice.IsConnected != device.IsConnected)
             {
                 changes.Add($"Устройство {device.Name}: {(device.IsConnected ? "подключено" : "отключено")}");
+            }
+            else if (lastDevice.IsFullyConnected != device.IsFullyConnected)
+            {
+                var connectedCount = device.Channels?.Count(c => c.IsConnected) ?? 0;
+                var totalCount = device.Channels?.Count ?? 0;
+                changes.Add($"Устройство {device.Name}: {connectedCount}/{totalCount} каналов");
             }
         }
 

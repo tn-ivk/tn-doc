@@ -17,7 +17,7 @@
 
     <!-- Документы (только если ELIS используется) -->
     <td v-if="isElisUsed" class="cell-documents td-documents">
-      <PassportDocumentField :parameter="parameter" :isElisMissing="isDocumentElisMissing" />
+      <PassportDocumentField :parameter="parameter" />
     </td>
 
     <!-- Измерение (объединенная колонка) -->
@@ -45,8 +45,6 @@ import PassportMethodSelectWithHistory from './PassportMethodSelectWithHistory.v
 import PassportDocumentField from './PassportDocumentField.vue';
 import PassportMeasurementInputWithHistory from './PassportMeasurementInputWithHistory.vue';
 import PassportResultCellWithHistory from './PassportResultCellWithHistory.vue';
-import { useFieldHistory } from '@/composables/useFieldHistory';
-import { DataSource } from '@/types/history.types';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
 interface Props {
@@ -60,16 +58,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { getLastSource } = useFieldHistory();
-
-/**
- * Проверка: документ ожидался из ELIS, но не был загружен
- */
-const isDocumentElisMissing = computed(() => {
-  const documentKey = `document.${props.parameter.key}`;
-  return getLastSource(documentKey) === DataSource.ElisMissing;
-});
-
 const emit = defineEmits<{
   'update:method': [event: { paramKey: string; method: MethodOption | null }];
   'update:measurement': [event: { paramKey: string; value: string }];
@@ -82,8 +70,13 @@ const emit = defineEmits<{
 
 /**
  * Определить, редактируема ли ячейка результата
+ * Условия редактируемости:
+ * - editable = true (учитывает Edit из конфига И что параметр не Slave)
+ * - isBallast = false (балластные показатели не редактируются)
  */
-const isResultEditable = computed(() => props.parameter.isBallast !== true);
+const isResultEditable = computed(() =>
+  props.parameter.editable && props.parameter.isBallast !== true
+);
 
 function handleMethodUpdate(method: MethodOption | null) {
   emit('update:method', { paramKey: props.parameter.key, method });

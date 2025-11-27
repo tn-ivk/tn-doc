@@ -166,3 +166,122 @@
   font-size: inherit;
   font-family: inherit;
 }
+
+/* Контейнер элемента протокола с кнопкой просмотра */
+#elis .protocol-item-container {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+#elis .protocol-item-content {
+  flex: 1;
+}
+
+#elis .protocol-view-btn {
+  min-width: 32px !important;
+  width: 32px;
+  height: 32px;
+  padding: 0 !important;
+  margin: 0 0 0 10px !important;
+  border-radius: 4px !important;
+  background-color: transparent !important;
+  color: var(--md-text-muted, #757575) !important;
+  border: 1px solid var(--md-outline-light, #e0e0e0) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#elis .protocol-view-btn:hover {
+  background-color: var(--md-primary-light, #e3f2fd) !important;
+  color: var(--md-primary) !important;
+  border-color: var(--md-primary) !important;
+}
+
+#elis .list-group-item.active .protocol-view-btn {
+  color: var(--md-white) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+#elis .list-group-item.active .protocol-view-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: var(--md-white) !important;
+}
+
+/* ========================================
+   Стили для окна просмотра протокола ЕЛИС
+   ======================================== */
+
+#elisProtocolView .modal-dialog {
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 14px;
+  font-family: Arial, sans-serif !important;
+  max-height: 90vh;
+  min-width: 700px;
+  max-width: 900px;
+}
+
+#elisProtocolView .modal-header {
+  border: none !important;
+  margin-bottom: 0;
+  background-color: var(--md-primary) !important;
+  color: var(--md-white) !important;
+}
+
+#elisProtocolView .modal-title {
+  border: none !important;
+  margin: 0;
+  padding: 10px 20px;
+}
+
+#elisProtocolView .modal-body {
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: auto;
+  max-height: calc(90vh - 140px);
+}
+
+#elisProtocolView .modal-content {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#elisProtocolView .modal-footer {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#elisProtocolView .btn-secondary {
+  background-color: var(--md-gray-600) !important;
+  color: var(--md-white);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 10px;
+}
+
+#elisProtocolView .btn-secondary:hover {
+  background-color: var(--md-gray-700) !important;
+}
+
+/* Стили для JSON содержимого */
+.protocol-json-content {
+  margin: 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: none;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #333;
+  overflow: auto;
+}

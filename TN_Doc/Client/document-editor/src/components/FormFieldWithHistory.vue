@@ -1,8 +1,6 @@
 <template>
   <div
     class="form-field-with-history"
-    :class="{ 'elis-missing-border': isElisMissing }"
-    :title="isElisMissing ? 'Ожидалось из ЕЛИС' : undefined"
   >
     <FormField
       :field="field"
@@ -18,8 +16,7 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
-      @mouseenter="(event) => onIndicatorHover(event)"
-      @mouseleave="onIndicatorLeave"
+      @click="onIndicatorClick"
     />
 
     <!-- Popup с историей -->
@@ -39,6 +36,7 @@ import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
+import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
 
 const props = defineProps<{
   field: FormFieldType;
@@ -62,7 +60,6 @@ const {
 const ELIS_HIGHLIGHT_COLOR = 'var(--md-elis-highlight, #e8f5e9)';
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
-let hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * История поля
@@ -76,13 +73,6 @@ const fieldHistory = computed(() => {
  */
 const lastSource = computed(() => {
   return getLastSource(props.field.key);
-});
-
-/**
- * Проверка, ожидалось ли поле из ELIS, но не было загружено
- */
-const isElisMissing = computed(() => {
-  return lastSource.value === DataSource.ElisMissing;
 });
 
 const computedHighlightColor = computed(() => {
@@ -105,28 +95,12 @@ const handleChange = (newValue: any) => {
 };
 
 /**
- * Обработчик наведения на индикатор
+ * Обработчик клика на индикатор - показываем popup
  */
-const onIndicatorHover = (event: MouseEvent) => {
-  // Отменяем таймер скрытия, если он был запущен
-  if (hideTimeout) {
-    clearTimeout(hideTimeout);
-    hideTimeout = null;
-  }
-
-  // Показываем popup, передавая событие для правильного позиционирования
+const onIndicatorClick = (event: MouseEvent) => {
+  // Закрыть все другие popup-ы истории перед открытием нового
+  closeAllHistoryPopups();
   historyPopup.value?.show(event);
-};
-
-/**
- * Обработчик ухода курсора с индикатора
- */
-const onIndicatorLeave = () => {
-  // Запускаем таймер скрытия с задержкой 300ms
-  hideTimeout = setTimeout(() => {
-    historyPopup.value?.hide();
-    hideTimeout = null;
-  }, 300);
 };
 </script>
 
@@ -135,15 +109,4 @@ const onIndicatorLeave = () => {
   position: relative;
 }
 
-/* Желтая рамка для полей, ожидавшихся из ELIS, но не загруженных */
-.form-field-with-history.elis-missing-border :deep(.field-control) {
-  border: 2px solid #f5c24c !important;
-  border-radius: var(--md-radius, 4px);
-}
-
-.form-field-with-history.elis-missing-border :deep(.p-inputtext),
-.form-field-with-history.elis-missing-border :deep(.p-select),
-.form-field-with-history.elis-missing-border :deep(.p-datepicker .p-inputtext) {
-  border: 2px solid #f5c24c !important;
-}
 </style>

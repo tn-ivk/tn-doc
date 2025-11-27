@@ -102,6 +102,8 @@ import { logger } from '@tn-doc/shared';
         v-if="hasQualityParameters"
         :parameters="qualityParameters"
         :isElisUsed="isElisUsed"
+        :editConfigFilePath="editConfigFilePath"
+        :onMethodAddedToDictionary="addMethodToLocalDictionary"
         @update:method="handleMethodUpdate"
         @update:measurement="handleMeasurementUpdate"
         @update:result="handleResultUpdate"
@@ -272,9 +274,11 @@ const {
   qualityParameters,
   isElisUsed,
   hasQualityParameters,
+  editConfigFilePath,
   handleMeasurementUpdate,
   handleMethodUpdate,
-  handleResultUpdate
+  handleResultUpdate,
+  addMethodToLocalDictionary
 } = usePassportEditor();
 
 // Используем логику автозаполнения для Паспортов

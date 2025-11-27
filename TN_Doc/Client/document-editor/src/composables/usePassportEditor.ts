@@ -100,6 +100,13 @@ export function usePassportEditor() {
   });
 
   /**
+   * Путь к файлу конфигурации (для добавления методов в справочник)
+   */
+  const editConfigFilePath = computed<string>(() => {
+    return passportConfig.value?.editConfigFilePath || '';
+  });
+
+  /**
    * Вычисляемое свойство для объединения схемы + данных из formData
    * Создает полные объекты PassportQualityParameter динамически
    */
@@ -435,13 +442,17 @@ export function usePassportEditor() {
     };
     const newResult = recalculateResult(tempParam);
     const resultKey = `result.${event.paramKey}`;
-    if (store.formData[resultKey] !== newResult) {
+    const previousResult = store.formData[resultKey] ?? '';
+    if (previousResult !== newResult) {
       resultGuard.add(resultKey);
       store.bulkUpdateFields({
         [resultKey]: newResult,
         [`${resultKey}__elisFilled`]: false,
         [`${resultKey}__manualOverride`]: param.manualOverride === true
       });
+
+      // Записываем историю для результата (пересчитан из измерения)
+      trackManualChange(resultKey, newResult, previousResult);
     }
   }
 
@@ -496,9 +507,17 @@ export function usePassportEditor() {
     };
     const newResult = recalculateResult(tempParam);
 
+    // Определяем, изменилось ли название метода
+    const methodNameChanged = newMethodName !== previousMethodName;
+
+    // Если название метода не изменилось - сохраняем текущий флаг ELIS
+    // Если название изменилось - метод становится "ручным" (флаг сбрасывается)
+    const currentMethodElisFlag = store.formData[`method.${event.paramKey}__elisFilled`] === true;
+    const newMethodElisFlag = methodNameChanged ? false : currentMethodElisFlag;
+
     const updates: Record<string, any> = {
       [`method.${event.paramKey}`]: methodJson,
-      [`method.${event.paramKey}__elisFilled`]: false
+      [`method.${event.paramKey}__elisFilled`]: newMethodElisFlag
     };
 
     const shouldUpdateResult =
@@ -507,9 +526,17 @@ export function usePassportEditor() {
 
     if (shouldUpdateResult) {
       const resultKey = `result.${event.paramKey}`;
+      const currentResult = store.formData[resultKey] || '';
+      const resultChanged = currentResult !== newResult;
+
+      // Если результат не изменился - сохраняем текущий флаг ELIS
+      // Если результат изменился (из-за пересчёта) - сбрасываем флаг
+      const currentResultElisFlag = store.formData[`${resultKey}__elisFilled`] === true;
+      const newResultElisFlag = resultChanged ? false : currentResultElisFlag;
+
       resultGuard.add(resultKey);
       updates[resultKey] = newResult;
-      updates[`${resultKey}__elisFilled`] = false;
+      updates[`${resultKey}__elisFilled`] = newResultElisFlag;
       updates[`${resultKey}__manualOverride`] = param.manualOverride === true;
     }
 
@@ -614,6 +641,44 @@ export function usePassportEditor() {
     }
   }
 
+  /**
+   * Добавить метод в локальный список методов параметра
+   * Вызывается после успешного добавления метода в справочник через API
+   * Это обновляет localMethodNames, что убирает предупреждение "отсутствует в справочнике"
+   */
+  function addMethodToLocalDictionary(paramKey: string, methodName: string): void {
+    if (!passportConfig.value?.qualityParametersSchema) {
+      logger.warn('[usePassportEditor] addMethodToLocalDictionary: схема не найдена');
+      return;
+    }
+
+    const schema = passportConfig.value.qualityParametersSchema.find(p => p.key === paramKey);
+    if (!schema) {
+      logger.warn('[usePassportEditor] addMethodToLocalDictionary: параметр не найден', { paramKey });
+      return;
+    }
+
+    // Проверяем, что метод ещё не в списке
+    const normalizedName = methodName.trim().toLowerCase();
+    const alreadyExists = schema.localMethodNames?.some(
+      name => name.trim().toLowerCase() === normalizedName
+    );
+
+    if (!alreadyExists) {
+      if (!schema.localMethodNames) {
+        schema.localMethodNames = [];
+      }
+      schema.localMethodNames.push(methodName);
+      logger.info('[usePassportEditor] Метод добавлен в локальный справочник', {
+        paramKey,
+        methodName,
+        localMethodNamesCount: schema.localMethodNames.length
+      });
+    } else {
+      logger.debug('[usePassportEditor] Метод уже в локальном справочнике', { paramKey, methodName });
+    }
+  }
+
   function tryParseDocument(value: unknown, elisFilled: boolean): ParameterDocument | undefined {
     if (value === null || value === undefined) {
       return undefined;
@@ -666,11 +731,13 @@ export function usePassportEditor() {
     qualityParameters, // Теперь вычисляется динамически из схемы + formData!
     isElisUsed,
     hasQualityParameters,
+    editConfigFilePath, // Путь к файлу конфигурации для добавления методов
     findParameter,
     recalculateResult,
     isResultEditable,
     handleMeasurementUpdate,
     handleMethodUpdate,
-    handleResultUpdate
+    handleResultUpdate,
+    addMethodToLocalDictionary // Добавить метод в локальный справочник (убирает предупреждение)
   };
 }
