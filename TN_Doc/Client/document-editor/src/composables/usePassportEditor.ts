@@ -442,13 +442,17 @@ export function usePassportEditor() {
     };
     const newResult = recalculateResult(tempParam);
     const resultKey = `result.${event.paramKey}`;
-    if (store.formData[resultKey] !== newResult) {
+    const previousResult = store.formData[resultKey] ?? '';
+    if (previousResult !== newResult) {
       resultGuard.add(resultKey);
       store.bulkUpdateFields({
         [resultKey]: newResult,
         [`${resultKey}__elisFilled`]: false,
         [`${resultKey}__manualOverride`]: param.manualOverride === true
       });
+
+      // Записываем историю для результата (пересчитан из измерения)
+      trackManualChange(resultKey, newResult, previousResult);
     }
   }
 
