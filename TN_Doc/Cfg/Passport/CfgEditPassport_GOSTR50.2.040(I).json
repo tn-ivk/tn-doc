@@ -1,4 +1,4 @@
-{
+﻿{
   "Methods": [
     {
       "Id": 1,
@@ -487,7 +487,7 @@
       "ElisAlias": [
         "Массовая доля серы(%)"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 2,
       "Use": true,
       "Edit": true,
@@ -501,7 +501,7 @@
       "ElisAlias": [
         "Давление насыщенных паров(кПа)"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
@@ -571,7 +571,7 @@
         "Массовая доля сероводорода(млн⁻¹)",
         "Массовая доля сероводорода(млн⁻¹ (ppm))"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
@@ -586,7 +586,7 @@
         "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹ (ppm))",
         "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹)"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 1,
       "Use": true,
       "Edit": true,
@@ -601,7 +601,7 @@
         "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹ (ppm))",
         "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹)"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 1,
       "Use": true,
       "Edit": true,

@@ -490,7 +490,7 @@
       "ElisAlias": [
         "Массовая доля серы(%)"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 2
     },
     {
@@ -504,7 +504,7 @@
       "ElisAlias": [
         "Давление насыщенных паров(кПа)"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 1,
       "SlaveKey": "DNP.mercury_mm"
     },
@@ -574,7 +574,7 @@
         "Массовая доля сероводорода(млн⁻¹)",
         "Массовая доля сероводорода(млн⁻¹ (ppm))"
       ],
-      "RequiredFill": true,
+      "RequiredFill": false,
       "RoundValue": 1
     },
     {
