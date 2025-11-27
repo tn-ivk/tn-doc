@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents and reports from measurement system data (ИВК - Измерительно-вычислительный комплекс). The system generates quality certificates, verification protocols, acceptance acts, and various measurement reports using FastReport templates.
 
-**Version**: 1.4.3 (.NET 8.0)
+**Version**: 1.4.4-dev (.NET 8.0)
 **Main Development Branch**: develop
 **Runtime**: .NET Runtime 8.0.13+ (SDK 9.0+ для разработки)
 **Node.js**: 18.0+ и npm 8.0+ (для Vue компонентов)
@@ -25,10 +25,12 @@ dotnet build                                    # Build entire solution
 cd TN_Doc && dotnet run                         # Run app (http://localhost:38509)
 
 # Vue components (from TN_Doc/Client/)
+npm install                                     # Install dependencies for all workspaces
 npm run build:all                               # Build all Vue apps
 npm run dev                                     # StatusBar dev (port 5173)
 npm run dev:configurator                        # Configurator dev (port 5174)
 npm run dev:editor                              # Document Editor dev (port 5175)
+npm run type-check                              # TypeScript type checking for all workspaces
 
 # Testing
 dotnet test                                     # Run all tests
@@ -71,7 +73,7 @@ tn_doc/
 │       └── shared/            # Shared TypeScript utilities
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
-├── tn.docgeneral/             # Document module libraries (git submodule, 45 libraries)
+├── tn.docgeneral/             # Document module libraries (git submodule, ~41 libraries)
 ├── tn_toolsfastreport/        # FastReport utilities (git submodule)
 ├── winprutil/                 # Windows printing utility (git submodule)
 └── Tests/                     # NUnit tests with Moq
@@ -79,17 +81,23 @@ tn_doc/
 
 ### Document Module Pattern
 
-Each document type implements **IDocumentEditor** interface:
+Each document type implements **IDocumentEditor** interface (defined in `TN.DocGeneral/IDocumentEditor.cs`):
 
 1. **`GetViewDoc(id)`**: Returns JSON data for FastReport template
 2. **`GetPathTemplateFile()`**: Returns path to `.frx` template file
 3. **`GetEditConfig(id)`**: Returns configuration for Vue Document Editor
-4. **`SaveDocument(id, values)`**: Saves document from Vue Editor
+4. **`SaveDocument(id, values)`**: Saves document from Vue Editor (⚠️ all libraries migrated to this API in v1.4.4)
 
 **Configuration files per document:**
 - `TN_Doc/Cfg/Cfg{DocumentType}.json` - template and report settings
 - `TN_Doc/Cfg/CfgEdit{DocumentType}.json` - edit form configuration (supports `SlaveKey` for master-slave parameters)
 - `TN_Doc/Doc/{Number}_{DocumentType}.frx` - FastReport template
+
+**Field History System (v1.4.4+):**
+- Tracks data source for each field (ELIS, manual edit, IVK rounding)
+- History stored in `__fieldHistory` object with field key prefix
+- Visual indicators in Document Editor (colored badges for data source)
+- Requires `IsUsedElis = true` in configuration
 
 ### Key Services (Dependency Injection)
 
@@ -135,6 +143,12 @@ Layered configuration (loaded in order):
 ### UI Theme (v1.4.3+)
 All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables, never hardcode HEX colors.
 
+### Vue Component Guidelines
+- Use PrimeVue component library for UI elements
+- For dropdown overlays, use `appendTo="body"` to avoid clipping issues
+- For datetime-local fields, use local time (not UTC) to prevent timezone shifts
+- Panel classes for PrimeVue overlays require global styles (not scoped)
+
 ## Key Dependencies and External Systems
 
 ### ELIS Integration
@@ -170,8 +184,10 @@ All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables
 - Development: `TN_Doc/bin/Debug/net8.0/logs/`
 
 ### Documentation
-- `/CHANGELOG.md` - Version history
+- `/CHANGELOG.md` - Version history (⚠️ check for recent changes before major work)
 - `/docs/` - Architecture, API, deployment guides
+- `/docs/features/field-history.md` - Field history system documentation
+- `/docs/configs/passport.md` - Passport configuration and SlaveKey mechanism
 - `/tech_debt/` - Architecture improvement plans
 
 ## Common Issues
@@ -180,6 +196,8 @@ All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables
 |-------|----------|
 | Build errors | Ensure NuGet sources configured (ortpr, FastReport) |
 | Vue build fails | Run `npm install` in `TN_Doc/Client/` first |
+| PrimeVue overlay clipped | Use `appendTo="body"` and global styles |
+| Datetime timezone shift | Use local time conversion, not UTC |
 | Database connection | Verify credentials in CfgApp.json |
 | OPC DA tag errors | Pre-register tags in `opc.da.tags.json` |
 | Linux permission issues | Ensure `alphadaemon` user has `/opt/TN_Doc/` access |
