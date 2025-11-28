@@ -215,9 +215,8 @@ export function usePassportEditor() {
     }
 
     const resultMode = param.resultEditMode ?? DEFAULT_RESULT_MODE;
-    if (resultMode === 'modal' && param.manualOverride) {
-      return param.values.result;
-    }
+    // Примечание: проверка manualOverride убрана - решение о пересчёте
+    // принимается снаружи (в handleMeasurementUpdate/handleMethodUpdate)
 
     if (resultMode === 'readonly') {
       return param.values.result || param.values.measurement;
@@ -464,17 +463,19 @@ export function usePassportEditor() {
       });
     }
 
-    // Если result загружен из ЕЛИС - не пересчитывать
-    if (isResultFromElis) {
-      logger.debug('[handleMeasurementUpdate] result из ЕЛИС, пропускаем пересчёт', {
-        paramKey: event.paramKey
-      });
-      return;
-    }
+    // Если result загружен из ЕЛИС И measurement НЕ изменён - не пересчитывать
+    // Но если measurement изменён вручную - result должен пересчитаться
+    // (данные из ELIS больше не актуальны после ручной правки measurement)
+    // if (isResultFromElis && !measurementChanged) {
+    //   logger.debug('[handleMeasurementUpdate] result из ЕЛИС, measurement не изменился, пропускаем пересчёт', {
+    //     paramKey: event.paramKey
+    //   });
+    //   return;
+    // }
 
-    const shouldUpdateResult =
-      (param.resultEditMode === 'auto' || param.resultEditMode === DEFAULT_RESULT_MODE) ||
-      (param.resultEditMode === 'modal' && !param.manualOverride);
+    // Результат пересчитывается для всех режимов кроме 'readonly'
+    // При изменении measurement флаг manualOverride сбрасывается
+    const shouldUpdateResult = param.resultEditMode !== 'readonly';
 
     if (!shouldUpdateResult) {
       return;
@@ -482,7 +483,12 @@ export function usePassportEditor() {
 
     const tempParam = {
       ...param,
-      values: { ...param.values, measurement: event.value }
+      values: { ...param.values, measurement: event.value },
+      // Сбрасываем флаг ELIS для measurement, т.к. значение изменено вручную
+      elisFlags: {
+        ...param.elisFlags,
+        measurement: false
+      }
     };
     const newResult = recalculateResult(tempParam);
     const previousResult = store.formData[resultKey] ?? '';
@@ -491,7 +497,7 @@ export function usePassportEditor() {
       store.bulkUpdateFields({
         [resultKey]: newResult,
         [`${resultKey}__elisFilled`]: false,
-        [`${resultKey}__manualOverride`]: param.manualOverride === true
+        [`${resultKey}__manualOverride`]: false  // Сбрасываем manualOverride при пересчёте
       });
 
       // Записываем историю для результата (пересчитан из измерения)
@@ -541,17 +547,25 @@ export function usePassportEditor() {
         ]
       : param.method.options;
 
+    // Определяем, изменилось ли название метода (для elisFlags)
+    const methodNameChangedForFlags = newMethodName !== previousMethodName;
+
     const tempParam = {
       ...param,
       method: {
         selected: methodOption?.name || '',
         options: updatedOptions
+      },
+      // Сбрасываем флаг ELIS для метода, если он изменён вручную
+      elisFlags: {
+        ...param.elisFlags,
+        method: methodNameChangedForFlags ? false : param.elisFlags.method
       }
     };
     const newResult = recalculateResult(tempParam);
 
-    // Определяем, изменилось ли название метода
-    const methodNameChanged = newMethodName !== previousMethodName;
+    // Используем ранее вычисленную переменную
+    const methodNameChanged = methodNameChangedForFlags;
 
     // Если название метода не изменилось - сохраняем текущий флаг ELIS
     // Если название изменилось - метод становится "ручным" (флаг сбрасывается)
@@ -563,9 +577,9 @@ export function usePassportEditor() {
       [`method.${event.paramKey}__elisFilled`]: newMethodElisFlag
     };
 
-    const shouldUpdateResult =
-      (param.resultEditMode === 'auto' || param.resultEditMode === DEFAULT_RESULT_MODE) ||
-      (param.resultEditMode === 'modal' && !param.manualOverride);
+    // Результат пересчитывается для всех режимов кроме 'readonly'
+    // При изменении метода флаг manualOverride сбрасывается
+    const shouldUpdateResult = param.resultEditMode !== 'readonly';
 
     if (shouldUpdateResult) {
       const resultKey = `result.${event.paramKey}`;
@@ -580,7 +594,7 @@ export function usePassportEditor() {
       resultGuard.add(resultKey);
       updates[resultKey] = newResult;
       updates[`${resultKey}__elisFilled`] = newResultElisFlag;
-      updates[`${resultKey}__manualOverride`] = param.manualOverride === true;
+      updates[`${resultKey}__manualOverride`] = false;  // Сбрасываем manualOverride при пересчёте
     }
 
     logger.debug('[usePassportEditor] bulkUpdateFields для метода', {
