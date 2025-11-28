@@ -93,8 +93,8 @@ watch(() => store.canSave, (canSave) => {
   notifyParentAboutSaveState(canSave);
 }, { immediate: true });
 
-// Предупреждение перед закрытием с несохранёнными изменениями
-setupBeforeUnloadHandler();
+// Предупреждение перед закрытием отключено для Act:
+// setupAutoFillWatchers с immediate:true ложно устанавливает isDirty при инициализации
 </script>
 
 <style scoped>

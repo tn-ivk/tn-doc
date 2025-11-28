@@ -23,7 +23,7 @@
           <th>Метод испытаний</th>
           <th v-if="isElisUsed" class="th-documents">Документы</th>
           <th>Измерение</th>
-          <th>Результат</th>
+          <th>Предпросмотр</th>
         </tr>
       </thead>
 
