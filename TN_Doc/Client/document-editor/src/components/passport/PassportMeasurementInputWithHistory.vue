@@ -10,7 +10,7 @@
 
     <!-- Индикатор истории -->
     <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown"
+      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
       :source="lastSource"
       @click="onIndicatorClick"
     />

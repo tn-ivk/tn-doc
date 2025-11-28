@@ -134,7 +134,7 @@ import type { FormField } from '@/types/document.types';
 const route = useRoute();
 
 // Получаем функции для отслеживания загрузки из ELIS
-const { trackElisLoad, trackElisMissing } = useFieldHistory();
+const { trackElisLoad, trackElisMissing, trackAutoFill } = useFieldHistory();
 
 // Вспомогательные функции для работы с полями подписантов
 /**
@@ -505,10 +505,15 @@ const handleElisData = (elisData: ElisPassportData) => {
           }
 
           updates[resultKey] = resultStr;
-          updates[`${resultKey}__elisFilled`] = true;
 
-          // Создать запись истории для ELIS
-          trackElisLoad(resultKey, resultStr, elisData.protocolNumber);
+          if (isBallast) {
+            // Балластный: автозаполнение без индикатора ЕЛИС
+            trackAutoFill(resultKey, resultStr, 'Балластный показатель');
+            // НЕ устанавливаем elisFilled
+          } else {
+            updates[`${resultKey}__elisFilled`] = true;
+            trackElisLoad(resultKey, resultStr, elisData.protocolNumber);
+          }
         } else {
           // result ожидалось, но не пришло
           updates[`${resultKey}__elisMissing`] = true;
