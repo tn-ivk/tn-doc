@@ -449,7 +449,8 @@ const handleElisData = (elisData: ElisPassportData) => {
           let valueStr = elisParam.value.toString();
 
           // Нормализовать значение согласно roundValue
-          const roundValue = param.roundValue ?? 0;
+          // Поддержка как camelCase (roundValue), так и PascalCase (RoundValue) для совместимости с бэкендом
+          const roundValue = param.roundValue ?? (param as any).RoundValue ?? 0;
           if (roundValue > 0) {
             const numValue = parseFloat(valueStr.replace(',', '.'));
             if (!isNaN(numValue)) {

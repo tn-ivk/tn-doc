@@ -75,6 +75,14 @@ const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
  * Обработка изменения значения
  */
 const handleChange = (newValue: string) => {
+  // Если поле загружено из ЕЛИС - не трекать как ручное изменение
+  // Это предотвращает ложные записи "Отредактировано вручную" при нормализации значений
+  if (props.parameter.elisFlags.measurement) {
+    // Просто передаём изменение дальше без записи в историю
+    emit('update:measurement', newValue);
+    return;
+  }
+
   // Отслеживаем ручное изменение
   trackManualChange(historyKey.value, newValue, props.parameter.values.measurement);
 

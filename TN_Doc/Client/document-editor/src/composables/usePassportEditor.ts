@@ -328,12 +328,23 @@ export function usePassportEditor() {
       return;
     }
 
+    const resultField = `result.${paramKey}`;
+
+    // Если result загружен из ЕЛИС - не синхронизировать балластный параметр
+    // Это предотвращает перезапись result из ЕЛИС при программном изменении measurement
+    const isResultFromElis = store.formData[`${resultField}__elisFilled`] === true;
+    if (isResultFromElis) {
+      logger.debug('[handleMeasurementFieldChange] result из ЕЛИС, пропускаем синхронизацию балластного параметра', {
+        paramKey
+      });
+      return;
+    }
+
     const source = store.formData[`${measurementField}__elisFilled`] === true
       ? DataSource.ELIS
       : DataSource.Manual;
 
     measurementGuard.add(measurementField);
-    const resultField = `result.${paramKey}`;
     resultGuard.add(resultField);
     store.syncBallastParameter(paramKey, newValue?.toString() ?? '', {
       source,
@@ -402,15 +413,28 @@ export function usePassportEditor() {
     }
 
     const measurementKey = `value.${event.paramKey}`;
+    const resultKey = `result.${event.paramKey}`;
     const currentMeasurement = store.formData[measurementKey] ?? '';
     const measurementChanged = currentMeasurement !== event.value;
+
+    // Проверяем, загружены ли данные из ЕЛИС
+    // Если result загружен из ЕЛИС - не пересчитывать его
+    const isResultFromElis = store.formData[`${resultKey}__elisFilled`] === true;
+
     const isBallast = param.isBallast === true;
     if (isBallast) {
-      if (!measurementChanged && store.formData[`result.${event.paramKey}`] === event.value) {
+      // Для балластных параметров: если result из ЕЛИС - не синхронизировать
+      if (isResultFromElis) {
+        logger.debug('[handleMeasurementUpdate] Балластный параметр: result из ЕЛИС, пропускаем синхронизацию', {
+          paramKey: event.paramKey
+        });
+        return;
+      }
+
+      if (!measurementChanged && store.formData[resultKey] === event.value) {
         return;
       }
       measurementGuard.add(measurementKey);
-      const resultKey = `result.${event.paramKey}`;
       resultGuard.add(resultKey);
       store.syncBallastParameter(event.paramKey, event.value, {
         source: DataSource.Manual,
@@ -428,6 +452,14 @@ export function usePassportEditor() {
       });
     }
 
+    // Если result загружен из ЕЛИС - не пересчитывать
+    if (isResultFromElis) {
+      logger.debug('[handleMeasurementUpdate] result из ЕЛИС, пропускаем пересчёт', {
+        paramKey: event.paramKey
+      });
+      return;
+    }
+
     const shouldUpdateResult =
       (param.resultEditMode === 'auto' || param.resultEditMode === DEFAULT_RESULT_MODE) ||
       (param.resultEditMode === 'modal' && !param.manualOverride);
@@ -441,7 +473,6 @@ export function usePassportEditor() {
       values: { ...param.values, measurement: event.value }
     };
     const newResult = recalculateResult(tempParam);
-    const resultKey = `result.${event.paramKey}`;
     const previousResult = store.formData[resultKey] ?? '';
     if (previousResult !== newResult) {
       resultGuard.add(resultKey);
