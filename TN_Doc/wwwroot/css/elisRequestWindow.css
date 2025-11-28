@@ -128,9 +128,11 @@
   display: block; /* Блоковый элемент для полной ширины */
   padding: 12px 15px; /* Отступы внутри элемента */
   min-height: 70px; /* Минимальная высота элемента протокола */
+  height: auto !important; /* Автоматическая высота при переносе текста */
   line-height: 1.5; /* Межстрочный интервал */
   white-space: normal; /* Разрешить перенос текста */
   word-wrap: break-word; /* Перенос длинных слов */
+  overflow: visible !important; /* Не обрезать содержимое */
   background-color: var(--md-white) !important;
   color: var(--md-text) !important;
   border: 1px solid var(--md-outline-light) !important;
