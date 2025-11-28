@@ -234,7 +234,19 @@ export function usePassportEditor() {
       return '-';
     }
 
-    // Если у метода активирован лимит и значение ниже порога
+    // Логика зависит от режима ELIS
+    if (isElisUsed.value) {
+      // ELIS включён: проверяем только флаг limitValueActivate (без сравнения значений)
+      // Потому что при ELIS данные приходят уже обработанными, и оператор
+      // вручную указывает только "менее X" / "более X" без ввода порогового значения
+      if (selectedMethod?.limitValueActivate) {
+        return selectedMethod.limitValueString || '-';
+      }
+      return param.values.measurement;
+    }
+
+    // ELIS выключён: существующая логика с проверкой порога
+    // Если у метода активирован лимит и значение НИЖЕ порога
     if (
       selectedMethod?.limitValueActivate &&
       selectedMethod.limitValue !== undefined &&
