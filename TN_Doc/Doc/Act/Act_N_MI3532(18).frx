@@ -554,7 +554,7 @@ namespace FastReport
           <TableCell Name="Cell1566" Font="Arial, 10pt"/>
         </TableRow>
         <TableRow Name="Row194">
-          <TableCell Name="LabMIDensity" Text="* заполняют  при от казе пот очного преобразоват еля плот ност и (определяют  по Р 50.2.075)" Padding="0, 0, 0, 2" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" LineHeight="12" ColSpan="3"/>
+          <TableCell Name="LabMIDensity" Text="* заполняют  при отказе поточного преобразователя плотности (определяют  по Р 50.2.075)" Padding="0, 0, 0, 2" Font="Arial, 7pt, style=Italic" FontWidthRatio="0.85" LineHeight="12" ColSpan="3"/>
           <TableCell Name="Cell1565" Padding="0, 0, 2, 2" HorzAlign="Center" VertAlign="Center" Font="Arial, 8pt" FontWidthRatio="0.85" LineHeight="12"/>
           <TableCell Name="Cell1567" Font="Arial, 10pt"/>
         </TableRow>
