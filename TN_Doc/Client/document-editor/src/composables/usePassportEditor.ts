@@ -428,20 +428,10 @@ export function usePassportEditor() {
     const currentMeasurement = store.formData[measurementKey] ?? '';
     const measurementChanged = currentMeasurement !== event.value;
 
-    // Проверяем, загружены ли данные из ЕЛИС
-    // Если result загружен из ЕЛИС - не пересчитывать его
-    const isResultFromElis = store.formData[`${resultKey}__elisFilled`] === true;
-
     const isBallast = param.isBallast === true;
     if (isBallast) {
-      // Для балластных параметров: если result из ЕЛИС - не синхронизировать
-      if (isResultFromElis) {
-        logger.debug('[handleMeasurementUpdate] Балластный параметр: result из ЕЛИС, пропускаем синхронизацию', {
-          paramKey: event.paramKey
-        });
-        return;
-      }
-
+      // handleMeasurementUpdate вызывается ТОЛЬКО при ручном изменении через UI
+      // Поэтому результат всегда должен пересчитываться (флаги ELIS сбрасываются)
       if (!measurementChanged && store.formData[resultKey] === event.value) {
         return;
       }
@@ -462,16 +452,6 @@ export function usePassportEditor() {
         [`${measurementKey}__elisFilled`]: false
       });
     }
-
-    // Если result загружен из ЕЛИС И measurement НЕ изменён - не пересчитывать
-    // Но если measurement изменён вручную - result должен пересчитаться
-    // (данные из ELIS больше не актуальны после ручной правки measurement)
-    // if (isResultFromElis && !measurementChanged) {
-    //   logger.debug('[handleMeasurementUpdate] result из ЕЛИС, measurement не изменился, пропускаем пересчёт', {
-    //     paramKey: event.paramKey
-    //   });
-    //   return;
-    // }
 
     // Результат пересчитывается для всех режимов кроме 'readonly'
     // При изменении measurement флаг manualOverride сбрасывается
