@@ -238,9 +238,9 @@ export function usePassportEditor() {
       // ELIS включён: проверяем только флаг limitValueActivate (без сравнения значений)
       // Потому что при ELIS данные приходят уже обработанными, и оператор
       // вручную указывает только "менее X" / "более X" без ввода порогового значения
-      if (selectedMethod?.limitValueActivate) {
-        return selectedMethod.limitValueString || '-';
-      }
+      // if (selectedMethod?.limitValueActivate) {
+      //   return selectedMethod.limitValueString || '-';
+      // }
       return param.values.measurement;
     }
 
