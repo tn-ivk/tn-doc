@@ -238,9 +238,9 @@ export function usePassportEditor() {
       // ELIS включён: проверяем только флаг limitValueActivate (без сравнения значений)
       // Потому что при ELIS данные приходят уже обработанными, и оператор
       // вручную указывает только "менее X" / "более X" без ввода порогового значения
-      if (selectedMethod?.limitValueActivate) {
-        return selectedMethod.limitValueString || '-';
-      }
+      // if (selectedMethod?.limitValueActivate) {
+      //   return selectedMethod.limitValueString || '-';
+      // }
       return param.values.measurement;
     }
 
@@ -507,6 +507,7 @@ export function usePassportEditor() {
 
   /**
    * Обработчик обновления метода испытаний
+   * Примечание: пересчёт результата при изменении метода отключён
    */
   function handleMethodUpdate(event: MethodUpdateEvent) {
     const param = findParameter(event.paramKey);
@@ -520,14 +521,7 @@ export function usePassportEditor() {
 
     logger.debug('[usePassportEditor] handleMethodUpdate', {
       paramKey: event.paramKey,
-      methodOption: methodOption ? {
-        id: methodOption.id,
-        name: methodOption.name,
-        limitValueActivate: methodOption.limitValueActivate,
-        limitValue: methodOption.limitValue,
-        limitValueString: methodOption.limitValueString
-      } : null,
-      methodJson: methodJson.substring(0, 200) // первые 200 символов
+      methodName: methodOption?.name || null
     });
 
     // Сохраняем предыдущее значение для истории
@@ -537,35 +531,8 @@ export function usePassportEditor() {
     const previousMethodName = previousMethod?.name || '';
     const newMethodName = methodOption?.name || '';
 
-    // Пересчитываем результат с новым методом
-    // ВАЖНО: добавляем обновлённый метод в options, чтобы recalculateResult
-    // использовал актуальные значения limitValue/limitValueActivate/limitValueString
-    const updatedOptions = methodOption
-      ? [
-          ...param.method.options.filter(m => m.name !== methodOption.name),
-          methodOption
-        ]
-      : param.method.options;
-
     // Определяем, изменилось ли название метода (для elisFlags)
-    const methodNameChangedForFlags = newMethodName !== previousMethodName;
-
-    const tempParam = {
-      ...param,
-      method: {
-        selected: methodOption?.name || '',
-        options: updatedOptions
-      },
-      // Сбрасываем флаг ELIS для метода, если он изменён вручную
-      elisFlags: {
-        ...param.elisFlags,
-        method: methodNameChangedForFlags ? false : param.elisFlags.method
-      }
-    };
-    const newResult = recalculateResult(tempParam);
-
-    // Используем ранее вычисленную переменную
-    const methodNameChanged = methodNameChangedForFlags;
+    const methodNameChanged = newMethodName !== previousMethodName;
 
     // Если название метода не изменилось - сохраняем текущий флаг ELIS
     // Если название изменилось - метод становится "ручным" (флаг сбрасывается)
@@ -577,37 +544,10 @@ export function usePassportEditor() {
       [`method.${event.paramKey}__elisFilled`]: newMethodElisFlag
     };
 
-    // Результат пересчитывается для всех режимов кроме 'readonly'
-    // При изменении метода флаг manualOverride сбрасывается
-    const shouldUpdateResult = param.resultEditMode !== 'readonly';
-
-    if (shouldUpdateResult) {
-      const resultKey = `result.${event.paramKey}`;
-      const currentResult = store.formData[resultKey] || '';
-      const resultChanged = currentResult !== newResult;
-
-      // Если результат не изменился - сохраняем текущий флаг ELIS
-      // Если результат изменился (из-за пересчёта) - сбрасываем флаг
-      const currentResultElisFlag = store.formData[`${resultKey}__elisFilled`] === true;
-      const newResultElisFlag = resultChanged ? false : currentResultElisFlag;
-
-      resultGuard.add(resultKey);
-      updates[resultKey] = newResult;
-      updates[`${resultKey}__elisFilled`] = newResultElisFlag;
-      updates[`${resultKey}__manualOverride`] = false;  // Сбрасываем manualOverride при пересчёте
-    }
-
-    logger.debug('[usePassportEditor] bulkUpdateFields для метода', {
-      methodKey: `method.${event.paramKey}`,
-      methodJsonLength: updates[`method.${event.paramKey}`]?.length,
-      resultKey: `result.${event.paramKey}`,
-      newResult: updates[`result.${event.paramKey}`]
-    });
-
     store.bulkUpdateFields(updates);
 
     // Записать историю изменения метода (только name, а не весь объект)
-    if (newMethodName !== previousMethodName) {
+    if (methodNameChanged) {
       trackManualChange(
         methodKey,
         newMethodName,

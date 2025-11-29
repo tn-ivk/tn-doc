@@ -427,6 +427,12 @@ const handleElisData = (elisData: ElisPassportData) => {
     }
 
     parametersSchema.forEach((param, paramIndex) => {
+      // Slave-параметры не заполняются из ELIS (значение вычисляется от Master)
+      // Для них не устанавливаем ни elisFilled, ни elisMissing
+      if (param.role === 'Slave') {
+        return;
+      }
+
       const elisAlias = param.elisData?.elisAlias;
       if (!elisAlias || elisAlias.length === 0) {
         return; // Пропустить параметры без ELIS интеграции
