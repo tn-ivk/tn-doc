@@ -215,9 +215,8 @@ export function usePassportEditor() {
     }
 
     const resultMode = param.resultEditMode ?? DEFAULT_RESULT_MODE;
-    if (resultMode === 'modal' && param.manualOverride) {
-      return param.values.result;
-    }
+    // Примечание: проверка manualOverride убрана - решение о пересчёте
+    // принимается снаружи (в handleMeasurementUpdate/handleMethodUpdate)
 
     if (resultMode === 'readonly') {
       return param.values.result || param.values.measurement;
@@ -234,7 +233,19 @@ export function usePassportEditor() {
       return '-';
     }
 
-    // Если у метода активирован лимит и значение ниже порога
+    // Логика зависит от режима ELIS
+    if (isElisUsed.value) {
+      // ELIS включён: проверяем только флаг limitValueActivate (без сравнения значений)
+      // Потому что при ELIS данные приходят уже обработанными, и оператор
+      // вручную указывает только "менее X" / "более X" без ввода порогового значения
+      if (selectedMethod?.limitValueActivate) {
+        return selectedMethod.limitValueString || '-';
+      }
+      return param.values.measurement;
+    }
+
+    // ELIS выключён: существующая логика с проверкой порога
+    // Если у метода активирован лимит и значение НИЖЕ порога
     if (
       selectedMethod?.limitValueActivate &&
       selectedMethod.limitValue !== undefined &&
@@ -328,12 +339,23 @@ export function usePassportEditor() {
       return;
     }
 
+    const resultField = `result.${paramKey}`;
+
+    // Если result загружен из ЕЛИС - не синхронизировать балластный параметр
+    // Это предотвращает перезапись result из ЕЛИС при программном изменении measurement
+    const isResultFromElis = store.formData[`${resultField}__elisFilled`] === true;
+    if (isResultFromElis) {
+      logger.debug('[handleMeasurementFieldChange] result из ЕЛИС, пропускаем синхронизацию балластного параметра', {
+        paramKey
+      });
+      return;
+    }
+
     const source = store.formData[`${measurementField}__elisFilled`] === true
       ? DataSource.ELIS
       : DataSource.Manual;
 
     measurementGuard.add(measurementField);
-    const resultField = `result.${paramKey}`;
     resultGuard.add(resultField);
     store.syncBallastParameter(paramKey, newValue?.toString() ?? '', {
       source,
@@ -402,15 +424,28 @@ export function usePassportEditor() {
     }
 
     const measurementKey = `value.${event.paramKey}`;
+    const resultKey = `result.${event.paramKey}`;
     const currentMeasurement = store.formData[measurementKey] ?? '';
     const measurementChanged = currentMeasurement !== event.value;
+
+    // Проверяем, загружены ли данные из ЕЛИС
+    // Если result загружен из ЕЛИС - не пересчитывать его
+    const isResultFromElis = store.formData[`${resultKey}__elisFilled`] === true;
+
     const isBallast = param.isBallast === true;
     if (isBallast) {
-      if (!measurementChanged && store.formData[`result.${event.paramKey}`] === event.value) {
+      // Для балластных параметров: если result из ЕЛИС - не синхронизировать
+      if (isResultFromElis) {
+        logger.debug('[handleMeasurementUpdate] Балластный параметр: result из ЕЛИС, пропускаем синхронизацию', {
+          paramKey: event.paramKey
+        });
+        return;
+      }
+
+      if (!measurementChanged && store.formData[resultKey] === event.value) {
         return;
       }
       measurementGuard.add(measurementKey);
-      const resultKey = `result.${event.paramKey}`;
       resultGuard.add(resultKey);
       store.syncBallastParameter(event.paramKey, event.value, {
         source: DataSource.Manual,
@@ -428,9 +463,19 @@ export function usePassportEditor() {
       });
     }
 
-    const shouldUpdateResult =
-      (param.resultEditMode === 'auto' || param.resultEditMode === DEFAULT_RESULT_MODE) ||
-      (param.resultEditMode === 'modal' && !param.manualOverride);
+    // Если result загружен из ЕЛИС И measurement НЕ изменён - не пересчитывать
+    // Но если measurement изменён вручную - result должен пересчитаться
+    // (данные из ELIS больше не актуальны после ручной правки measurement)
+    // if (isResultFromElis && !measurementChanged) {
+    //   logger.debug('[handleMeasurementUpdate] result из ЕЛИС, measurement не изменился, пропускаем пересчёт', {
+    //     paramKey: event.paramKey
+    //   });
+    //   return;
+    // }
+
+    // Результат пересчитывается для всех режимов кроме 'readonly'
+    // При изменении measurement флаг manualOverride сбрасывается
+    const shouldUpdateResult = param.resultEditMode !== 'readonly';
 
     if (!shouldUpdateResult) {
       return;
@@ -438,17 +483,21 @@ export function usePassportEditor() {
 
     const tempParam = {
       ...param,
-      values: { ...param.values, measurement: event.value }
+      values: { ...param.values, measurement: event.value },
+      // Сбрасываем флаг ELIS для measurement, т.к. значение изменено вручную
+      elisFlags: {
+        ...param.elisFlags,
+        measurement: false
+      }
     };
     const newResult = recalculateResult(tempParam);
-    const resultKey = `result.${event.paramKey}`;
     const previousResult = store.formData[resultKey] ?? '';
     if (previousResult !== newResult) {
       resultGuard.add(resultKey);
       store.bulkUpdateFields({
         [resultKey]: newResult,
         [`${resultKey}__elisFilled`]: false,
-        [`${resultKey}__manualOverride`]: param.manualOverride === true
+        [`${resultKey}__manualOverride`]: false  // Сбрасываем manualOverride при пересчёте
       });
 
       // Записываем историю для результата (пересчитан из измерения)
@@ -498,17 +547,25 @@ export function usePassportEditor() {
         ]
       : param.method.options;
 
+    // Определяем, изменилось ли название метода (для elisFlags)
+    const methodNameChangedForFlags = newMethodName !== previousMethodName;
+
     const tempParam = {
       ...param,
       method: {
         selected: methodOption?.name || '',
         options: updatedOptions
+      },
+      // Сбрасываем флаг ELIS для метода, если он изменён вручную
+      elisFlags: {
+        ...param.elisFlags,
+        method: methodNameChangedForFlags ? false : param.elisFlags.method
       }
     };
     const newResult = recalculateResult(tempParam);
 
-    // Определяем, изменилось ли название метода
-    const methodNameChanged = newMethodName !== previousMethodName;
+    // Используем ранее вычисленную переменную
+    const methodNameChanged = methodNameChangedForFlags;
 
     // Если название метода не изменилось - сохраняем текущий флаг ELIS
     // Если название изменилось - метод становится "ручным" (флаг сбрасывается)
@@ -520,9 +577,9 @@ export function usePassportEditor() {
       [`method.${event.paramKey}__elisFilled`]: newMethodElisFlag
     };
 
-    const shouldUpdateResult =
-      (param.resultEditMode === 'auto' || param.resultEditMode === DEFAULT_RESULT_MODE) ||
-      (param.resultEditMode === 'modal' && !param.manualOverride);
+    // Результат пересчитывается для всех режимов кроме 'readonly'
+    // При изменении метода флаг manualOverride сбрасывается
+    const shouldUpdateResult = param.resultEditMode !== 'readonly';
 
     if (shouldUpdateResult) {
       const resultKey = `result.${event.paramKey}`;
@@ -537,7 +594,7 @@ export function usePassportEditor() {
       resultGuard.add(resultKey);
       updates[resultKey] = newResult;
       updates[`${resultKey}__elisFilled`] = newResultElisFlag;
-      updates[`${resultKey}__manualOverride`] = param.manualOverride === true;
+      updates[`${resultKey}__manualOverride`] = false;  // Сбрасываем manualOverride при пересчёте
     }
 
     logger.debug('[usePassportEditor] bulkUpdateFields для метода', {

@@ -134,7 +134,7 @@ import type { FormField } from '@/types/document.types';
 const route = useRoute();
 
 // Получаем функции для отслеживания загрузки из ELIS
-const { trackElisLoad, trackElisMissing } = useFieldHistory();
+const { trackElisLoad, trackElisMissing, trackAutoFill } = useFieldHistory();
 
 // Вспомогательные функции для работы с полями подписантов
 /**
@@ -444,12 +444,14 @@ const handleElisData = (elisData: ElisPassportData) => {
       if (elisParam) {
         // Параметр найден в ELIS, обрабатываем отдельные поля
 
+        // Поддержка как camelCase (roundValue), так и PascalCase (RoundValue) для совместимости с бэкендом
+        const roundValue = param.roundValue ?? (param as any).RoundValue ?? 0;
+
         // Заполнить measurement (value)
         if (elisParam.value !== undefined && elisParam.value !== null) {
           let valueStr = elisParam.value.toString();
 
           // Нормализовать значение согласно roundValue
-          const roundValue = param.roundValue ?? 0;
           if (roundValue > 0) {
             const numValue = parseFloat(valueStr.replace(',', '.'));
             if (!isNaN(numValue)) {
@@ -482,11 +484,36 @@ const handleElisData = (elisData: ElisPassportData) => {
 
         // Заполнить result (valueString)
         if (elisParam.valueString) {
-          updates[resultKey] = elisParam.valueString.toString();
-          updates[`${resultKey}__elisFilled`] = true;
+          let resultStr = elisParam.valueString.toString();
 
-          // Создать запись истории для ELIS
-          trackElisLoad(resultKey, elisParam.valueString.toString(), elisData.protocolNumber);
+          // Для ballast параметров нормализовать result так же как measurement
+          // Это предотвращает ложное срабатывание watcher'а из-за разницы "1,6" vs "1,6000"
+          const isBallast = param.isBallast ?? (param as any).IsBallast ?? false;
+          if (isBallast && roundValue > 0) {
+            const numValue = parseFloat(resultStr.replace(',', '.'));
+            if (!isNaN(numValue)) {
+              const normalizedStr = resultStr.replace(',', '.');
+              const parts = normalizedStr.split('.');
+              const currentDecimalPlaces = parts.length > 1 ? parts[1].length : 0;
+
+              if (currentDecimalPlaces < roundValue) {
+                resultStr = numValue.toFixed(roundValue).replace('.', ',');
+              } else {
+                resultStr = normalizedStr.replace('.', ',');
+              }
+            }
+          }
+
+          updates[resultKey] = resultStr;
+
+          if (isBallast) {
+            // Балластный: автозаполнение без индикатора ЕЛИС
+            trackAutoFill(resultKey, resultStr, 'Балластный показатель');
+            // НЕ устанавливаем elisFilled
+          } else {
+            updates[`${resultKey}__elisFilled`] = true;
+            trackElisLoad(resultKey, resultStr, elisData.protocolNumber);
+          }
         } else {
           // result ожидалось, но не пришло
           updates[`${resultKey}__elisMissing`] = true;

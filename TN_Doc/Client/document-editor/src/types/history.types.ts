@@ -11,7 +11,9 @@ export enum DataSource {
   /** Изменено системой ИВК (округление) */
   IVK = 'IVK',
   /** Ожидалось из ЕЛИС, но не было загружено */
-  ElisMissing = 'ElisMissing'
+  ElisMissing = 'ElisMissing',
+  /** Автоматическое заполнение (без визуального индикатора) */
+  Auto = 'Auto'
 }
 
 /**
@@ -76,5 +78,10 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     icon: 'pi-exclamation-triangle',
     color: '#f5c24c',
     description: 'Ожидалось из ЕЛИС, но не загружено'
+  },
+  [DataSource.Auto]: {
+    icon: '',
+    color: 'transparent',
+    description: 'Заполнено автоматически'
   }
 };

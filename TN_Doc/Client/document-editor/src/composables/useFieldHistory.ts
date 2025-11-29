@@ -181,6 +181,22 @@ export function useFieldHistory() {
   };
 
   /**
+   * Отследить автоматическое заполнение поля
+   * Используется когда значение установлено системой, но не из внешнего источника
+   */
+  const trackAutoFill = (fieldKey: string, value: any, comment?: string) => {
+    const entry: FieldHistoryEntry = {
+      source: DataSource.Auto,
+      modifiedAt: new Date().toISOString(),
+      modifiedBy: 'Система',
+      value: String(value ?? ''),
+      previousValue: undefined,
+      comment: comment ?? 'Заполнено автоматически'
+    };
+    addHistoryEntry(fieldKey, entry);
+  };
+
+  /**
    * Получить историю поля
    */
   const getFieldHistory = (fieldKey: string): FieldHistoryEntry[] => {
@@ -224,6 +240,7 @@ export function useFieldHistory() {
     trackElisLoad,
     trackElisMissing,
     trackIVKRounding,
+    trackAutoFill,
     getFieldHistory,
     getLastSource,
     getLastModifiedBy,
