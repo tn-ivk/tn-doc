@@ -325,7 +325,7 @@
       "Use": true,
       "IdParameter": 17,
       "Name": "ГОСТ Р 00017-2001 Метод А",
-      "LimitValueActivate": true,
+      "LimitValueActivate": false,
       "LimitValue": 2,
       "LimitValueString": "Менее 2",
       "IsDefault": false
@@ -345,7 +345,7 @@
       "Use": true,
       "IdParameter": 18,
       "Name": "ГОСТ Р 00018-2001 Метод А",
-      "LimitValueActivate": true,
+      "LimitValueActivate": false,
       "LimitValue": 4,
       "LimitValueString": "Менее 4",
       "IsDefault": false
@@ -365,7 +365,7 @@
       "Use": true,
       "IdParameter": 19,
       "Name": "ГОСТ Р 00019-2001 Метод А",
-      "LimitValueActivate": true,
+      "LimitValueActivate": false,
       "LimitValue": 0.5,
       "LimitValueString": "Менее 0,5",
       "IsDefault": false
@@ -614,8 +614,7 @@
       "Use": true,
       "Key": "Passport.PassportID",
       "Type": "text",
-      "Name": "Номер паспорта",
-      "RequiredFill": true
+      "Name": "Номер паспорта"
     },
     {
       "Id": 1,
@@ -626,8 +625,7 @@
       "KeyELIS": "pointDeliveryName",
       "ElisAlias": [
         "pointDeliveryName"
-      ],
-      "RequiredFill": true
+      ]
     },
     {
       "Id": 2,

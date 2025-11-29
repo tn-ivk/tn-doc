@@ -6,14 +6,14 @@
       :parameter="parameter"
       :isElisFilled="isElisFilled"
       :hideEditButton="false"
-      :hasHistoryIndicator="lastSource !== DataSource.Unknown"
+      :hasHistoryIndicator="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
       @update:method="handleChange"
       @manual-method="handleManualMethod"
     />
 
     <!-- Индикатор истории -->
     <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown"
+      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
       :source="lastSource"
       :rightOffset="4"
       @click="onIndicatorClick"

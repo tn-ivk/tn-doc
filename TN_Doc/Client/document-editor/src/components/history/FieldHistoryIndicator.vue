@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="source !== DataSource.Unknown"
+    v-if="source !== DataSource.Unknown && source !== DataSource.Auto"
     class="field-history-indicator"
     :style="{ right: `${rightOffset}px` }"
     @click.stop="handleClick"

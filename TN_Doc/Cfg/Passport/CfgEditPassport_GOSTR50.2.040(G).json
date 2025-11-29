@@ -541,15 +541,6 @@
       "RoundValue": 1
     },
     {
-      "Id": 15,
-      "Key": "Yield_fraction_350",
-      "Name": "Выход фракций: при температуре до 350 °С, %",
-      "Use": true,
-      "Edit": true,
-      "IsBallast": false,
-      "RoundValue": 1
-    },
-    {
       "Id": 16,
       "Key": "Mass_fraction_of_paraffin",
       "Name": "Массовая доля парафина, %",
@@ -614,8 +605,7 @@
       "Use": true,
       "Key": "Passport.PassportID",
       "Type": "text",
-      "Name": "Номер паспорта",
-      "RequiredFill": true
+      "Name": "Номер паспорта"
     },
     {
       "Id": 1,
@@ -626,8 +616,7 @@
       "KeyELIS": "pointDeliveryName",
       "ElisAlias": [
         "pointDeliveryName"
-      ],
-      "RequiredFill": true
+      ]
     },
     {
       "Id": 2,

@@ -106,88 +106,12 @@ function handleResultEditRequest(event: { paramKey: string }) {
   resultDialogVisible.value = true;
 }
 
-/**
- * Парсит числовое значение из строки результата
- * "менее 4,0" → 4.0, "более 5,5" → 5.5
- */
-function parseResultNumericValue(formattedValue: string): number | null {
-  const match = formattedValue.match(/(?:менее|более)\s*([\d.,]+)/i);
-  if (!match || !match[1]) {
-    return null;
-  }
-  const normalized = match[1].replace(',', '.');
-  const num = parseFloat(normalized);
-  return isNaN(num) ? null : num;
-}
-
 function handleResultDialogConfirm(formattedValue: string) {
   if (!activeResultParameter.value) {
     return;
   }
 
-  const param = activeResultParameter.value;
-  const paramKey = param.key;
-
-  logger.debug('[PassportQualityTable] handleResultDialogConfirm', {
-    paramKey,
-    formattedValue,
-    selectedMethod: param.method.selected,
-    methodOptionsCount: param.method.options.length
-  });
-
-  // Проверяем, есть ли выбранный метод испытаний
-  const selectedMethodName = param.method.selected;
-  if (selectedMethodName) {
-    // Находим текущий метод в options
-    const currentMethod = param.method.options.find(
-      opt => opt.name === selectedMethodName
-    );
-
-    logger.debug('[PassportQualityTable] Поиск метода', {
-      selectedMethodName,
-      currentMethod: currentMethod ? {
-        id: currentMethod.id,
-        name: currentMethod.name,
-        limitValueActivate: currentMethod.limitValueActivate,
-        limitValue: currentMethod.limitValue,
-        limitValueString: currentMethod.limitValueString
-      } : null
-    });
-
-    if (currentMethod) {
-      // Парсим числовое значение из "менее 4,0" → 4.0
-      const numericValue = parseResultNumericValue(formattedValue);
-
-      logger.debug('[PassportQualityTable] Парсинг числового значения', {
-        formattedValue,
-        numericValue
-      });
-
-      if (numericValue !== null) {
-        // Создаём обновлённый метод с новыми значениями limitValue
-        const updatedMethod: MethodOption = {
-          ...currentMethod,
-          limitValueActivate: true,
-          limitValue: numericValue,
-          limitValueString: formattedValue
-        };
-
-        logger.info('[PassportQualityTable] Обновление метода при редактировании результата', {
-          paramKey,
-          updatedMethod: {
-            id: updatedMethod.id,
-            name: updatedMethod.name,
-            limitValueActivate: updatedMethod.limitValueActivate,
-            limitValue: updatedMethod.limitValue,
-            limitValueString: updatedMethod.limitValueString
-          }
-        });
-
-        // Эмитим обновление метода
-        emit('update:method', { paramKey, method: updatedMethod });
-      }
-    }
-  }
+  const paramKey = activeResultParameter.value.key;
 
   // Эмитим обновление результата
   emit('update:result', { paramKey, value: formattedValue });

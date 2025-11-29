@@ -10,7 +10,7 @@
 
     <!-- Индикатор истории -->
     <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown"
+      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
       :source="lastSource"
       @click="onIndicatorClick"
     />
@@ -73,6 +73,7 @@ const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
  * Обработка изменения значения
+ * trackManualChange сама отфильтрует ложные изменения через нормализацию значений
  */
 const handleChange = (newValue: string) => {
   // Отслеживаем ручное изменение

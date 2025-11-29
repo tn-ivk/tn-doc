@@ -29,7 +29,7 @@
         <span>Использовать предельное значение</span>
       </label>
 
-      <div class="dialog-field" v-if="form.limitValueActivate">
+      <div class="dialog-field" v-if="!isElisEnabled">
         <label>Предельное значение</label>
         <input
           v-model="form.limitValue"
@@ -38,7 +38,7 @@
         />
       </div>
 
-      <div class="dialog-field" v-if="form.limitValueActivate">
+      <div class="dialog-field" v-if="!isElisEnabled">
         <label>Строка результата при превышении</label>
         <input
           v-model="form.limitValueString"
@@ -55,7 +55,7 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <button class="btn btn-text" type="button" @click="handleReset">
+        <button v-if="form.limitValueActivate" class="btn btn-text" type="button" @click="handleReset">
           Сброс
         </button>
         <button class="btn btn-text" type="button" @click="handleCancel">

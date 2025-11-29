@@ -7,13 +7,13 @@
       :canEdit="canEdit"
       :isElisFilled="isElisFilled"
       :editDisabledReason="editDisabledReason"
-      :hasHistoryIndicator="lastSource !== DataSource.Unknown"
+      :hasHistoryIndicator="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
       @result-edit="handleEditRequest"
     />
 
     <!-- Индикатор истории -->
     <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown"
+      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
       :source="lastSource"
       :rightOffset="4"
       @click="onIndicatorClick"
