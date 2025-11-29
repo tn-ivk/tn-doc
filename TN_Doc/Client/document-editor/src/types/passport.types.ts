@@ -6,6 +6,7 @@ import type { DocumentEditConfig } from './document.types';
 
 export type MethodSource = 'config' | 'lab' | 'manual' | 'elis';
 export type ResultEditMode = 'auto' | 'modal' | 'readonly';
+export type ParameterRole = 'Independent' | 'Master' | 'Slave';
 
 /**
  * Расширенная конфигурация для паспорта качества
@@ -49,6 +50,8 @@ export interface PassportQualityParameterSchema {
   resultEditMode?: ResultEditMode;
   /** Источник выбранного метода */
   methodSource?: MethodSource;
+  /** Роль параметра в связке master-slave (Slave-параметры не заполняются из ELIS) */
+  role?: ParameterRole;
 }
 
 /**
