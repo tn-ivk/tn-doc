@@ -36,7 +36,7 @@
     {
       "Id": 5,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Delive_Factory",
       "Type": "text",
       "Name": "Уполномоченный представитель сдающей стороны"
@@ -44,7 +44,7 @@
     {
       "Id": 6,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Delive_FIO",
       "Type": "text",
       "Name": "Фамилия И.О."
@@ -60,7 +60,7 @@
     {
       "Id": 8,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Delive_Lic_Date",
       "Type": "text",
       "Name": "Дата доверенности"
@@ -68,7 +68,7 @@
     {
       "Id": 9,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Delive_Lic_Number",
       "Type": "text",
       "Name": "Номер доверенности"
@@ -76,7 +76,7 @@
     {
       "Id": 10,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Receive_Factory",
       "Type": "text",
       "Name": "Уполномоченный представитель принимающей стороны"
@@ -84,7 +84,7 @@
     {
       "Id": 11,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Receive_FIO",
       "Type": "text",
       "Name": "Фамилия И.О."
@@ -100,7 +100,7 @@
     {
       "Id": 13,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Receive_Lic_Date",
       "Type": "text",
       "Name": "Дата доверенности"
@@ -108,7 +108,7 @@
     {
       "Id": 14,
       "Use": true,
-      "Edit": false,
+      "Edit": true,
       "Key": "Receive_Lic_Number",
       "Type": "false",
       "Name": "Номер доверенности"

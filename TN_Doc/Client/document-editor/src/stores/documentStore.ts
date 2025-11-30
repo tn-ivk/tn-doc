@@ -109,6 +109,11 @@ export const useDocumentStore = defineStore('document', () => {
       const parametersSchema = passportConfig.qualityParametersSchema || [];
 
       for (const paramSchema of parametersSchema) {
+        // Slave-параметры не валидируются (не отображаются в UI, значение вычисляется в ИВК)
+        if (paramSchema.role === 'Slave') {
+          continue;
+        }
+
         // Если поле заблокировано для ввода, валидация requiredFill не применяется
         if (!paramSchema.editable) {
           continue;
