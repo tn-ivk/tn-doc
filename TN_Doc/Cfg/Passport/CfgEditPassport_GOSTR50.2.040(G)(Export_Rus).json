@@ -759,6 +759,7 @@
       "Key": "ElisProtocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",
+      "Edit": false,
       "KeyELIS": "protocolNumber",
       "ElisAlias": [
         "protocolNumber"
