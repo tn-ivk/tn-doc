@@ -220,3 +220,4 @@ Deploy at the same level (share TN_Doc configuration):
 - See [AGENTS.md](AGENTS.md) for detailed coding style, testing, and commit guidelines
 - See [CHANGELOG.md](CHANGELOG.md) for version history and recent changes
 - See `/docs/` for API documentation and deployment guides
+- при выполнении команды /commit вместе с основным репозиторием делай коммит в submodule tn.docgeneral
