@@ -225,14 +225,6 @@ export function useFieldHistory() {
     return history[history.length - 1].modifiedBy;
   };
 
-  /**
-   * Очистить историю поля
-   */
-  const clearFieldHistory = (fieldKey: string) => {
-    delete store.formHistory[fieldKey];
-    logger.debug(`[useFieldHistory] История поля очищена: поле="${fieldKey}"`);
-  };
-
   return {
     createHistoryEntry,
     addHistoryEntry,
@@ -243,7 +235,6 @@ export function useFieldHistory() {
     trackAutoFill,
     getFieldHistory,
     getLastSource,
-    getLastModifiedBy,
-    clearFieldHistory
+    getLastModifiedBy
   };
 }
