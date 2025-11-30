@@ -119,7 +119,7 @@ extract-version-job:
 
 package-job:      # This job runs in the deploy stage.
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - build-job
     - extract-version-job
@@ -129,7 +129,7 @@ package-job:      # This job runs in the deploy stage.
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
     - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-full-${FULL_VERSION}"
@@ -523,7 +523,7 @@ package-job:      # This job runs in the deploy stage.
 
 package-minimal-job:      # Minimal package without dependencies
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - build-job
     - extract-version-job
@@ -533,7 +533,7 @@ package-minimal-job:      # Minimal package without dependencies
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Packaging the application into a minimal .deb file..."
     - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
@@ -795,7 +795,7 @@ package-minimal-job:      # Minimal package without dependencies
 
 package-net-runtime-job:      # .NET Runtime standalone package
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - extract-version-job
   tags:
@@ -804,7 +804,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Creating .NET Runtime standalone package..."
     - DEB_NAME="tn.dotnet-runtime-8.0.13"
@@ -1030,7 +1030,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
 
 package-fonts-job:      # System fonts standalone package
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - extract-version-job
   tags:
@@ -1039,7 +1039,7 @@ package-fonts-job:      # System fonts standalone package
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Creating system fonts standalone package..."
     - DEB_NAME="tn.fonts-${VERSION}"
