@@ -109,6 +109,7 @@ export function usePassportEditor() {
   /**
    * Вычисляемое свойство для объединения схемы + данных из formData
    * Создает полные объекты PassportQualityParameter динамически
+   * Примечание: Slave-параметры исключены из списка (не отображаются в UI)
    */
   const qualityParameters = computed<PassportQualityParameter[]>(() => {
     const schema = qualityParametersSchema.value;
@@ -116,7 +117,9 @@ export function usePassportEditor() {
       return [];
     }
 
-    return schema.map(paramSchema => {
+    // Фильтруем Slave-параметры - они не отображаются в таблице редактирования
+    // (значение Slave вычисляется автоматически в ИВК от Master-параметра)
+    return schema.filter(paramSchema => paramSchema.role !== 'Slave').map(paramSchema => {
       const isBallast = resolveIsBallastFlag(paramSchema);
       const resultEditMode = resolveResultEditMode(paramSchema);
       // Извлекаем данные из formData
