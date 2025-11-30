@@ -30,21 +30,20 @@ build-job:
     # Строить при теге в любой ветке и при обычных правилах workflow
     - if: '$CI_COMMIT_TAG'
     - when: on_success
+  variables:
+    NUGET_PACKAGES: ${CI_PROJECT_DIR}/.nuget/packages
+    DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+    DOTNET_NOLOGO: "true"
+  cache:
+    key: nuget-${CI_COMMIT_REF_SLUG}
+    paths:
+      - .nuget/packages/
   before_script:
-    # Создание директории для публикации
-    - mkdir -p ./publish
-    - mkdir -p TN_Doc/Dll
+    - mkdir -p ./publish TN_Doc/Dll
   script:
-    - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
     - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
-    - echo "Rebuilding solution ..."
-    - dotnet build
-    - echo "Moving to TN_Doc..."
-    - cd TN_Doc
-    - echo "Current directory after cd:$(pwd)"
-    - echo "Building the application..."
-    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
+    - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
   artifacts:
     name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
@@ -119,7 +118,7 @@ extract-version-job:
 
 package-job:      # This job runs in the deploy stage.
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - build-job
     - extract-version-job
@@ -129,7 +128,7 @@ package-job:      # This job runs in the deploy stage.
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
     - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-full-${FULL_VERSION}"
@@ -523,7 +522,7 @@ package-job:      # This job runs in the deploy stage.
 
 package-minimal-job:      # Minimal package without dependencies
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - build-job
     - extract-version-job
@@ -533,7 +532,7 @@ package-minimal-job:      # Minimal package without dependencies
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Packaging the application into a minimal .deb file..."
     - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
@@ -795,7 +794,7 @@ package-minimal-job:      # Minimal package without dependencies
 
 package-net-runtime-job:      # .NET Runtime standalone package
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - extract-version-job
   tags:
@@ -804,7 +803,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Creating .NET Runtime standalone package..."
     - DEB_NAME="tn.dotnet-runtime-8.0.13"
@@ -1030,7 +1029,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
 
 package-fonts-job:      # System fonts standalone package
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - extract-version-job
   tags:
@@ -1039,7 +1038,7 @@ package-fonts-job:      # System fonts standalone package
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Creating system fonts standalone package..."
     - DEB_NAME="tn.fonts-${VERSION}"

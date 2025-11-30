@@ -82,6 +82,7 @@
       dateFormat="dd.mm.yy"
       :showTime="true"
       hourFormat="24"
+      :manualInput="false"
       :style="{ width: '100%' }"
       :inputStyle="{ width: '100%' }"
       class="field-control"

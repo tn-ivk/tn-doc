@@ -1,7 +1,7 @@
 ## План доработки логики заполнения паспорта качества
 
 ### 0. Контекст текущей реализации
-- `DocPassport.BuildQualityParameters*` (`tn.docgeneral/Passport/DocPassport.cs:862-1500`) уже формирует схему/значения, собирает методы из конфигурации (`CfgEditPassport`) и `LabInfo`, а также подмешивает данные ELIS в measurement/result. Сейчас признак использования ELIS и синхронизация колонок разбросаны по методам (`BuildParameterValues`, `RecalculateResultValue`, `DocUpdate`).
+- `DocPassport.BuildQualityParameters*` (`tn.docgeneral/Passport/DocPassport.cs:862-1500`) уже формирует схему/значения, собирает методы из конфигурации (`CfgEditPassport`) и `LabInfo`, а также подмешивает данные ELIS в measurement/result. Сейчас признак использования ELIS и синхронизация колонок разбросаны по методам (`BuildParameterValues`, `DocUpdate`).
 - `DocUpdate`, `AddOrUpdateLabInfo` и `FieldHistoryMap` (`tn.docgeneral/Passport/DocPassport.cs:274-420`, `:600-760`, `:1019+`, `tn.docgeneral/Passport/DataIVKDoc.cs:254-320`) принимают пары `method/result/value/document`, пишут историю источников (Manual/ELIS) и определяют `ElisFilled`. Ручная логика метода сейчас отсутствует: UI отправляет JSON `TN.Doc.Edit.Metod`, а бэкенд просто дописывает его в `LabInfo`.
 - `DocumentPassportEditor.vue` + `usePassportEditor.ts` (`TN_Doc/Client/document-editor/src/views/DocumentPassportEditor.vue`, `.../composables/usePassportEditor.ts`) вычисляют список параметров на лету, синхронизируют measurement/result и при необходимости добавляют отсутствующие методы в `methodOptions`. Все ограничения по UX (история, подсветки, доступность кнопок) реализуются на клиенте.
 
