@@ -12,10 +12,7 @@ import type {
   ParameterDocument,
   ResultUpdateEvent
 } from '@/types/passport.types';
-import type { ResultEditMode } from '@/types/passport.types';
 import { DataSource } from '@/types/history.types';
-
-const DEFAULT_RESULT_MODE: ResultEditMode = 'auto';
 
 const measurementWatchers = new Map<string, WatchStopHandle>();
 const resultWatchers = new Map<string, WatchStopHandle>();
@@ -33,20 +30,6 @@ const resolveIsBallastFlag = (schema: PassportQualityParameterSchema): boolean =
   }
 
   return false;
-};
-
-const resolveResultEditMode = (schema: PassportQualityParameterSchema): ResultEditMode => {
-  const mode = schema.resultEditMode as ResultEditMode | undefined;
-  if (mode) {
-    return mode;
-  }
-
-  const legacy = (schema as unknown as { ResultEditMode?: ResultEditMode }).ResultEditMode;
-  if (legacy) {
-    return legacy;
-  }
-
-  return DEFAULT_RESULT_MODE;
 };
 
 /**
@@ -121,7 +104,6 @@ export function usePassportEditor() {
     // (значение Slave вычисляется автоматически в ИВК от Master-параметра)
     return schema.filter(paramSchema => paramSchema.role !== 'Slave').map(paramSchema => {
       const isBallast = resolveIsBallastFlag(paramSchema);
-      const resultEditMode = resolveResultEditMode(paramSchema);
       // Извлекаем данные из formData
       const measurementValue = store.formData[`value.${paramSchema.key}`] || '';
       const resultValue = store.formData[`result.${paramSchema.key}`] || '';
@@ -162,7 +144,6 @@ export function usePassportEditor() {
       return {
         ...paramSchema,
         isBallast,
-        resultEditMode,
         values: {
           measurement: measurementValue,
           result: resultValue
@@ -217,11 +198,8 @@ export function usePassportEditor() {
       return param.values.measurement;
     }
 
-    const resultMode = param.resultEditMode ?? DEFAULT_RESULT_MODE;
-    // Примечание: проверка manualOverride убрана - решение о пересчёте
-    // принимается снаружи (в handleMeasurementUpdate/handleMethodUpdate)
-
-    if (resultMode === 'readonly') {
+    // Нередактируемый параметр - не пересчитывать
+    if (!param.editable) {
       return param.values.result || param.values.measurement;
     }
 
@@ -390,8 +368,9 @@ export function usePassportEditor() {
       return;
     }
 
-    const resultMode = resolveResultEditMode(schema);
-    if (resultMode !== 'modal') {
+    // Modal поведение: только при ELIS и редактируемом параметре
+    const isModalMode = isElisUsed.value && schema.editable;
+    if (!isModalMode) {
       return;
     }
 
@@ -456,11 +435,9 @@ export function usePassportEditor() {
       });
     }
 
-    // Результат пересчитывается для всех режимов кроме 'readonly'
+    // Результат пересчитывается только для редактируемых параметров
     // При изменении measurement флаг manualOverride сбрасывается
-    const shouldUpdateResult = param.resultEditMode !== 'readonly';
-
-    if (!shouldUpdateResult) {
+    if (!param.editable) {
       return;
     }
 

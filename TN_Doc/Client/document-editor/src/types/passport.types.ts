@@ -5,7 +5,6 @@
 import type { DocumentEditConfig } from './document.types';
 
 export type MethodSource = 'config' | 'lab' | 'manual' | 'elis';
-export type ResultEditMode = 'auto' | 'modal' | 'readonly';
 export type ParameterRole = 'Independent' | 'Master' | 'Slave';
 
 /**
@@ -46,8 +45,6 @@ export interface PassportQualityParameterSchema {
   localMethodNames: string[];
   /** Признак балластного параметра */
   isBallast?: boolean;
-  /** Режим редактирования результата */
-  resultEditMode?: ResultEditMode;
   /** Источник выбранного метода */
   methodSource?: MethodSource;
   /** Роль параметра в связке master-slave (Slave-параметры не заполняются из ELIS) */
