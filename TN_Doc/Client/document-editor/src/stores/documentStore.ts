@@ -276,7 +276,7 @@ export const useDocumentStore = defineStore('document', () => {
     formData.value[measurementKey] = normalizedValue;
     formData.value[resultKey] = normalizedValue;
     formData.value[`${measurementKey}__elisFilled`] = isElisFilled;
-    formData.value[`${resultKey}__elisFilled`] = isElisFilled;
+    formData.value[`${resultKey}__elisFilled`] = false;
     formData.value[`${resultKey}__manualOverride`] = false;
     isDirty.value = true;
 
@@ -290,7 +290,7 @@ export const useDocumentStore = defineStore('document', () => {
     if (options?.trackResultHistory !== false && previousResult !== normalizedValue) {
       pushHistoryEntry(
         resultKey,
-        createHistoryEntry(source, normalizedValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
+        createHistoryEntry(DataSource.Auto, normalizedValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
       );
     }
   }
