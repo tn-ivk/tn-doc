@@ -49,8 +49,7 @@ const emit = defineEmits<{
 
 const {
   getFieldHistory,
-  getLastSource,
-  trackManualChange
+  getLastSource
 } = useFieldHistory();
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
@@ -78,14 +77,10 @@ const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
  * Обработка изменения метода
+ * История записывается централизованно в handleMethodUpdate (usePassportEditor)
  */
 const handleChange = (newMethod: MethodOption | null) => {
-  // Отслеживаем ручное изменение
-  const newValue = newMethod?.name || '';
-  const previousValue = props.parameter.method.selected || '';
-  trackManualChange(historyKey.value, newValue, previousValue);
-
-  // Передаем изменение дальше
+  // Передаем изменение дальше (история записывается в композабле)
   emit('update:method', newMethod);
 };
 

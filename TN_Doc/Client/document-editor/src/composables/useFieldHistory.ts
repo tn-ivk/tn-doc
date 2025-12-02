@@ -184,14 +184,14 @@ export function useFieldHistory() {
    * Отследить автоматическое заполнение поля
    * Используется когда значение установлено системой, но не из внешнего источника
    */
-  const trackAutoFill = (fieldKey: string, value: any, comment?: string) => {
+  const trackAutoFill = (fieldKey: string, newValue: any, previousValue?: any) => {
     const entry: FieldHistoryEntry = {
       source: DataSource.Auto,
       modifiedAt: new Date().toISOString(),
       modifiedBy: 'Система',
-      value: String(value ?? ''),
-      previousValue: undefined,
-      comment: comment ?? 'Заполнено автоматически'
+      value: String(newValue ?? ''),
+      previousValue: String(previousValue ?? ''),
+      comment: 'Заполнено автоматически'
     };
     addHistoryEntry(fieldKey, entry);
   };

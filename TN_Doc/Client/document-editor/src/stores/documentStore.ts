@@ -265,12 +265,13 @@ export const useDocumentStore = defineStore('document', () => {
   };
 
   function syncBallastParameter(paramKey: string, value: string, options?: SyncBallastOptions) {
+    console.log('syncBallastParameter')
     const measurementKey = `value.${paramKey}`;
     const resultKey = `result.${paramKey}`;
     const normalizedValue = value ?? '';
     const previousMeasurement = formData.value[measurementKey] ?? '';
     const previousResult = formData.value[resultKey] ?? '';
-    const source = options?.source ?? DataSource.Manual;
+    const source = options?.source ?? DataSource.Unknown;
     const isElisFilled = source === DataSource.ELIS;
 
     formData.value[measurementKey] = normalizedValue;
