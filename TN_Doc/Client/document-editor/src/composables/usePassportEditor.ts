@@ -63,7 +63,7 @@ const normalizeValue = (value: any): string => {
  */
 export function usePassportEditor() {
   const store = useDocumentStore();
-  const { trackManualChange } = useFieldHistory();
+  const { trackManualChange, trackAutoFill } = useFieldHistory();
 
   /**
    * Приведение конфигурации к типу PassportEditConfig
@@ -298,6 +298,7 @@ export function usePassportEditor() {
   };
 
   const handleMeasurementFieldChange = (paramKey: string, newValue: unknown, oldValue: unknown) => {
+    console.log('handleMeasurementFieldChange');
     const measurementField = `value.${paramKey}`;
     if (measurementGuard.has(measurementField)) {
       measurementGuard.delete(measurementField);
@@ -399,6 +400,7 @@ export function usePassportEditor() {
    * Обработчик обновления measurement
    */
   function handleMeasurementUpdate(event: MeasurementUpdateEvent) {
+    console.log('handleMeasurementUpdate');
     const param = findParameter(event.paramKey);
     if (!param) {
       logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
@@ -410,8 +412,18 @@ export function usePassportEditor() {
     const currentMeasurement = store.formData[measurementKey] ?? '';
     const measurementChanged = currentMeasurement !== event.value;
 
+    if(!measurementChanged) {
+      console.log(`Значение параметра с ключом ${event.paramKey} не было изменено`);
+      return;
+    }
+    else {
+      console.log(`Значение параметра с ключом ${event.paramKey} было изменено: ${currentMeasurement} -> ${event.value}`);
+    }
+      
+      
     const isBallast = param.isBallast === true;
     if (isBallast) {
+      console.log('isBallast');
       // handleMeasurementUpdate вызывается ТОЛЬКО при ручном изменении через UI
       // Поэтому результат всегда должен пересчитываться (флаги ELIS сбрасываются)
       if (!measurementChanged && store.formData[resultKey] === event.value) {
@@ -461,7 +473,8 @@ export function usePassportEditor() {
       });
 
       // Записываем историю для результата (пересчитан из измерения)
-      trackManualChange(resultKey, newResult, previousResult);
+      trackAutoFill(resultKey, newResult, previousResult);
+      console.log('trackAutoFill');
     }
   }
 
