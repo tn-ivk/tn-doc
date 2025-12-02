@@ -13,6 +13,7 @@ import type {
   ResultUpdateEvent
 } from '@/types/passport.types';
 import { DataSource } from '@/types/history.types';
+import { normalizeValue } from '@/utils/passport-utils';
 
 const measurementWatchers = new Map<string, WatchStopHandle>();
 const resultWatchers = new Map<string, WatchStopHandle>();
@@ -30,26 +31,6 @@ const resolveIsBallastFlag = (schema: PassportQualityParameterSchema): boolean =
   }
 
   return false;
-};
-
-/**
- * Нормализовать значение для сравнения
- */
-const normalizeValue = (value: any): string => {
-  if (value === null || value === undefined || value === '') {
-    return '';
-  }
-
-  const strValue = String(value).trim();
-  const normalized = strValue.replace(',', '.');
-
-  // Если это число, проверяем что преобразование корректно
-  const numValue = parseFloat(normalized);
-  if (!isNaN(numValue)) {
-    return numValue.toString();
-  }
-
-  return strValue;
 };
 
 /**
