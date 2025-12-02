@@ -34,7 +34,6 @@ const resolveIsBallastFlag = (schema: PassportQualityParameterSchema): boolean =
 
 /**
  * Нормализовать значение для сравнения
- * Приводит числа к единому формату (точка вместо запятой, удаляет лишние пробелы)
  */
 const normalizeValue = (value: any): string => {
   if (value === null || value === undefined || value === '') {
@@ -42,18 +41,14 @@ const normalizeValue = (value: any): string => {
   }
 
   const strValue = String(value).trim();
-
-  // Заменяем запятую на точку для чисел
   const normalized = strValue.replace(',', '.');
 
   // Если это число, проверяем что преобразование корректно
   const numValue = parseFloat(normalized);
   if (!isNaN(numValue)) {
-    // Возвращаем нормализованную строку с точкой
-    return normalized;
+    return numValue.toString();
   }
 
-  // Для нечисловых значений возвращаем оригинальную строку (без замены запятой)
   return strValue;
 };
 
@@ -190,51 +185,25 @@ export function usePassportEditor() {
    * Пересчитать результат на основе метода и значения measurement
    */
   function recalculateResult(param: PassportQualityParameter): string {
-    const selectedMethod = param.method.options.find(
-      (m: MethodOption) => m.name === param.method.selected
-    );
-
-    if (param.isBallast) {
-      return param.values.measurement;
-    }
-
     // Нередактируемый параметр - не пересчитывать
     if (!param.editable) {
       return param.values.result || param.values.measurement;
     }
-
+    
+    if (param.isBallast) {
+      return param.values.measurement;
+    }
+    
     // Если есть результат из ELIS и measurement заполнено из ELIS, используем его
     if (param.elisFlags.result && param.elisFlags.measurement) {
       return param.values.result;
     }
 
     const measurementValue = parseFloat(param.values.measurement.replace(',', '.'));
-
     if (isNaN(measurementValue)) {
       return '-';
     }
-
-    // Логика зависит от режима ELIS
-    if (isElisUsed.value) {
-      // ELIS включён: проверяем только флаг limitValueActivate (без сравнения значений)
-      // Потому что при ELIS данные приходят уже обработанными, и оператор
-      // вручную указывает только "менее X" / "более X" без ввода порогового значения
-      // if (selectedMethod?.limitValueActivate) {
-      //   return selectedMethod.limitValueString || '-';
-      // }
-      return param.values.measurement;
-    }
-
-    // ELIS выключён: существующая логика с проверкой порога
-    // Если у метода активирован лимит и значение НИЖЕ порога
-    if (
-      selectedMethod?.limitValueActivate &&
-      selectedMethod.limitValue !== undefined &&
-      measurementValue < selectedMethod.limitValue
-    ) {
-      return selectedMethod.limitValueString || '-';
-    }
-
+    
     return param.values.measurement;
   }
 
@@ -410,14 +379,17 @@ export function usePassportEditor() {
     const measurementKey = `value.${event.paramKey}`;
     const resultKey = `result.${event.paramKey}`;
     const currentMeasurement = store.formData[measurementKey] ?? '';
-    const measurementChanged = currentMeasurement !== event.value;
+    // Нормализуем значения для корректного сравнения
+    const normalizedCurrent = normalizeValue(currentMeasurement);
+    const normalizedNew = normalizeValue(event.value);
+    const measurementChanged = normalizedCurrent !== normalizedNew;
 
     if(!measurementChanged) {
       console.log(`Значение параметра с ключом ${event.paramKey} не было изменено`);
       return;
     }
     else {
-      console.log(`Значение параметра с ключом ${event.paramKey} было изменено: ${currentMeasurement} -> ${event.value}`);
+      console.log(`Значение параметра с ключом ${event.paramKey} было изменено: ${normalizedCurrent} -> ${normalizedNew}`);
     }
       
       
@@ -483,6 +455,7 @@ export function usePassportEditor() {
    * Примечание: пересчёт результата при изменении метода отключён
    */
   function handleMethodUpdate(event: MethodUpdateEvent) {
+    console.log('handleMethodUpdate');
     const param = findParameter(event.paramKey);
     if (!param) {
       logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
@@ -533,6 +506,7 @@ export function usePassportEditor() {
    * Обработчик обновления результата (ручное редактирование)
    */
   function handleResultUpdate(event: ResultUpdateEvent) {
+    console.log('handleResultUpdate');
     const param = findParameter(event.paramKey);
     if (!param) {
       logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
