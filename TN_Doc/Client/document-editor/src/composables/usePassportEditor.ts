@@ -403,9 +403,9 @@ export function usePassportEditor() {
       }
       measurementGuard.add(measurementKey);
       resultGuard.add(resultKey);
+      // syncBallastParameter запишет историю для measurement и result
       store.syncBallastParameter(event.paramKey, event.value, {
         source: DataSource.Manual,
-        trackMeasurementHistory: false,
         comment: 'Изменено оператором'
       });
       return;
@@ -413,6 +413,10 @@ export function usePassportEditor() {
 
     if (measurementChanged) {
       measurementGuard.add(measurementKey);
+
+      // Записываем историю изменения measurement (для обычных параметров)
+      trackManualChange(measurementKey, event.value, currentMeasurement);
+
       store.bulkUpdateFields({
         [measurementKey]: event.value,
         [`${measurementKey}__elisFilled`]: false
