@@ -130,6 +130,7 @@ import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
 import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
 import type { FormField } from '@/types/document.types';
+import {normalizeValue} from "@/utils/passport-utils.ts";
 
 const route = useRoute();
 
@@ -514,15 +515,19 @@ const handleElisData = (elisData: ElisPassportData) => {
 
           if (isBallast) {
             // Балластный: автозаполнение без индикатора ЕЛИС
-            trackAutoFill(resultKey, resultStr, 'Балластный показатель');
-            // НЕ устанавливаем elisFilled
-          } else {
+            updates[`${resultKey}__elisFilled`] = false;
+            trackAutoFill(resultKey, resultStr);
+          } else if(elisParam.valueString && (normalizeValue(elisParam.value) !== normalizeValue(elisParam.valueString))) {
             updates[`${resultKey}__elisFilled`] = true;
             trackElisLoad(resultKey, resultStr, elisData.protocolNumber);
           }
+          else {
+            updates[`${resultKey}__elisFilled`] = false;
+            trackAutoFill(resultKey, resultStr);
+          }
         } else {
           // result ожидалось, но не пришло
-          updates[`${resultKey}__elisMissing`] = true;
+          updates[`${resultKey}__elisMissing`] = false;
           trackElisMissing(resultKey, elisData.protocolNumber);
         }
 
@@ -591,12 +596,11 @@ const handleElisData = (elisData: ElisPassportData) => {
         // Параметр не найден в ELIS - все поля помечаем как missing
         updates[`${valueKey}__elisMissing`] = true;
         updates[`${methodKey}__elisMissing`] = true;
-        updates[`${resultKey}__elisMissing`] = true;
+        updates[`${resultKey}__elisMissing`] = false;
         updates[`${documentKey}__elisMissing`] = true;
 
         trackElisMissing(valueKey, elisData.protocolNumber);
         trackElisMissing(methodKey, elisData.protocolNumber);
-        trackElisMissing(resultKey, elisData.protocolNumber);
         trackElisMissing(documentKey, elisData.protocolNumber);
       }
     });

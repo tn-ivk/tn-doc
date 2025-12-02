@@ -265,18 +265,19 @@ export const useDocumentStore = defineStore('document', () => {
   };
 
   function syncBallastParameter(paramKey: string, value: string, options?: SyncBallastOptions) {
+    console.log('syncBallastParameter')
     const measurementKey = `value.${paramKey}`;
     const resultKey = `result.${paramKey}`;
     const normalizedValue = value ?? '';
     const previousMeasurement = formData.value[measurementKey] ?? '';
     const previousResult = formData.value[resultKey] ?? '';
-    const source = options?.source ?? DataSource.Manual;
+    const source = options?.source ?? DataSource.Unknown;
     const isElisFilled = source === DataSource.ELIS;
 
     formData.value[measurementKey] = normalizedValue;
     formData.value[resultKey] = normalizedValue;
     formData.value[`${measurementKey}__elisFilled`] = isElisFilled;
-    formData.value[`${resultKey}__elisFilled`] = isElisFilled;
+    formData.value[`${resultKey}__elisFilled`] = false;
     formData.value[`${resultKey}__manualOverride`] = false;
     isDirty.value = true;
 
@@ -290,7 +291,7 @@ export const useDocumentStore = defineStore('document', () => {
     if (options?.trackResultHistory !== false && previousResult !== normalizedValue) {
       pushHistoryEntry(
         resultKey,
-        createHistoryEntry(source, normalizedValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
+        createHistoryEntry(DataSource.Auto, normalizedValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
       );
     }
   }

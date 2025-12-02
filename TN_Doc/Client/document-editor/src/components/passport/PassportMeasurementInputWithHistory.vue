@@ -44,8 +44,7 @@ const emit = defineEmits<{
 
 const {
   getFieldHistory,
-  getLastSource,
-  trackManualChange
+  getLastSource
 } = useFieldHistory();
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
@@ -73,13 +72,10 @@ const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
 
 /**
  * Обработка изменения значения
- * trackManualChange сама отфильтрует ложные изменения через нормализацию значений
+ * История записывается централизованно в handleMeasurementUpdate (usePassportEditor)
  */
 const handleChange = (newValue: string) => {
-  // Отслеживаем ручное изменение
-  trackManualChange(historyKey.value, newValue, props.parameter.values.measurement);
-
-  // Передаем изменение дальше
+  // Передаем изменение дальше (история записывается в композабле)
   emit('update:measurement', newValue);
 };
 
