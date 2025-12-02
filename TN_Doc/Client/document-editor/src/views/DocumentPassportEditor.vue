@@ -130,6 +130,7 @@ import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
 import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
 import type { FormField } from '@/types/document.types';
+import {normalizeValue} from "@/utils/passport-utils.ts";
 
 const route = useRoute();
 
@@ -514,11 +515,15 @@ const handleElisData = (elisData: ElisPassportData) => {
 
           if (isBallast) {
             // Балластный: автозаполнение без индикатора ЕЛИС
+            updates[`${resultKey}__elisFilled`] = false;
             trackAutoFill(resultKey, resultStr);
-            // НЕ устанавливаем elisFilled
-          } else {
+          } else if(elisParam.valueString && (normalizeValue(elisParam.value) !== normalizeValue(elisParam.valueString))) {
             updates[`${resultKey}__elisFilled`] = true;
             trackElisLoad(resultKey, resultStr, elisData.protocolNumber);
+          }
+          else {
+            updates[`${resultKey}__elisFilled`] = false;
+            trackAutoFill(resultKey, resultStr);
           }
         } else {
           // result ожидалось, но не пришло
