@@ -699,7 +699,103 @@ console.log(history[9].previousValue); // "861"
 
 ---
 
+## Восстановление elisOriginal при повторном открытии документа
+
+### Проблема
+
+При первичной загрузке протокола ELIS сохраняется оригинальное значение (`elisOriginal`) для каждого заполненного поля. Это значение используется для определения, вернулось ли поле к значению ELIS после редактирования.
+
+Однако `elisOriginal` хранится только в памяти клиента и **не сохраняется на сервер**. При повторном открытии документа:
+- `elisFilled = true` загружается с сервера
+- `elisOriginal` отсутствует
+- Механизм "возврата к значению ELIS" не работает
+
+### Решение
+
+Функция `restoreElisOriginals()` в `useDocumentEditor.ts` автоматически восстанавливает `elisOriginal` при загрузке документа:
+
+```typescript
+// useDocumentEditor.ts
+const loadDocument = async (deviceId: number, docType: string, id: number) => {
+  await store.loadConfig(deviceId, docType, id);
+
+  // Восстанавливаем elisOriginal для полей с elisFilled=true
+  restoreElisOriginals();
+};
+```
+
+### Логика восстановления
+
+**Принцип:** Если `elisFilled = true`, значит значение не было изменено пользователем, следовательно текущее значение равно оригинальному ELIS значению.
+
+```
+Для каждого поля с elisFilled = true:
+│
+├─► Если elisOriginal уже существует → пропустить
+│
+├─► Если baseKey.startsWith('method.'):
+│   ├─► Распарсить JSON из formData[baseKey]
+│   ├─► elisOriginal = methodObj.name
+│   └─► elisOption = methodObj (полный объект для возврата к методу ELIS)
+│
+└─► Для остальных полей:
+    └─► elisOriginal = formData[baseKey]
+```
+
+### Особая обработка методов
+
+Для методов испытаний сохраняется два значения:
+- `elisOriginal` — имя метода (для сравнения)
+- `elisOption` — полный объект метода (для возврата к нему)
+
+```typescript
+// При восстановлении метода
+const methodObj = JSON.parse(formData['method.Density']);
+formData['method.Density__elisOriginal'] = methodObj.name;  // "ГОСТ 3900-2022"
+formData['method.Density__elisOption'] = methodObj;          // Полный объект
+```
+
+### Диаграмма потока
+
+```
+Сессия 1: Первичное заполнение из ELIS
+├── handleElisData()
+│   ├── formData[key] = value
+│   ├── formData[key__elisFilled] = true
+│   └── formData[key__elisOriginal] = value  ✓
+└── Сохранение → elisOriginal НЕ сохраняется на сервер
+
+Сессия 2: Повторное открытие документа
+├── store.loadConfig()
+│   ├── formData[key] = value (с сервера)
+│   └── formData[key__elisFilled] = true (с сервера)
+│
+├── restoreElisOriginals()  ◄── НОВОЕ
+│   └── formData[key__elisOriginal] = formData[key]  ✓
+│
+└── Механизм "возврата к ELIS" работает корректно ✓
+```
+
+### Логирование
+
+При восстановлении создаются записи в логе:
+
+```
+[restoreElisOriginals] Восстановлен elisOriginal { key: "value.Density", value: "850.5" }
+[restoreElisOriginals] Восстановлен elisOriginal для метода { key: "method.Density", methodName: "ГОСТ 3900-2022" }
+[restoreElisOriginals] Восстановлено elisOriginal значений { count: 15 }
+```
+
+---
+
 ## История изменений
+
+**v1.4.4 (2025-12-04)** - Восстановление elisOriginal при повторном открытии документа
+- ✅ **Добавлена функция `restoreElisOriginals()` в `useDocumentEditor.ts`:**
+  - Автоматически восстанавливает `elisOriginal` для полей с `elisFilled = true`
+  - Для методов также восстанавливает `elisOption` (полный объект метода)
+  - Вызывается после `loadDocument()`, до активации watcher'ов
+  - **Решает проблему:** механизм "возврата к значению ELIS" теперь работает при повторном открытии документа
 
 **v1.4.4 (2025-11-29)** - Исправление пересчёта результата при изменении измерения (ELIS)
 - ✅ **Исправлен баг "два Enter" при редактировании измерения после загрузки из ELIS:**
