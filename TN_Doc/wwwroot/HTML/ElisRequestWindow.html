@@ -40,9 +40,45 @@
                 <div class="modal-header">
                     <span class="modal-title" id="protocolViewTitle">Данные протокола ЕЛИС</span>
                 </div>
+                <!-- Переключатель режима отображения -->
+                <div class="protocol-view-toggle">
+                    <button type="button" class="toggle-btn active" id="btnViewTable" onclick="switchProtocolView('table')">
+                        <i class="fa fa-table"></i> Таблица
+                    </button>
+                    <button type="button" class="toggle-btn" id="btnViewJson" onclick="switchProtocolView('json')">
+                        <i class="fa fa-code"></i> JSON
+                    </button>
+                </div>
                 <!-- Содержимое модального окна -->
                 <div class="modal-body">
-                    <pre id="protocolViewContent" class="protocol-json-content"></pre>
+                    <!-- Табличное представление -->
+                    <div id="protocolTableView" class="protocol-table-view">
+                        <!-- Таблица исходных данных -->
+                        <div class="protocol-section">
+                            <div class="protocol-section-title">Исходные данные</div>
+                            <table class="protocol-data-table" id="protocolBaseDataTable">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <!-- Таблица показателей качества -->
+                        <div class="protocol-section">
+                            <div class="protocol-section-title">Показатели качества</div>
+                            <table class="protocol-params-table" id="protocolParamsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Наименование</th>
+                                        <th>Метод испытаний</th>
+                                        <th>Документы</th>
+                                        <th>Числовое значение</th>
+                                        <th>Текстовое представление</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- JSON представление -->
+                    <pre id="protocolViewContent" class="protocol-json-content" style="display: none;"></pre>
                 </div>
                 <!-- Футер модального окна -->
                 <div class="modal-footer">
