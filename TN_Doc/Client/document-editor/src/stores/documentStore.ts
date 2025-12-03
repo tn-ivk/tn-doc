@@ -6,6 +6,7 @@ import type { DocumentEditConfig, FormField } from '@/types/document.types';
 import type { PassportEditConfig } from '@/types/passport.types';
 import type { FieldHistoryEntry } from '@/types/history.types';
 import { DataSource } from '@/types/history.types';
+import { normalizeValue } from '@/utils/passport-utils';
 
 const MANUAL_AUTHOR = 'Пользователь';
 
@@ -268,52 +269,67 @@ export const useDocumentStore = defineStore('document', () => {
     console.log('syncBallastParameter')
     const measurementKey = `value.${paramKey}`;
     const resultKey = `result.${paramKey}`;
-    const normalizedValue = value ?? '';
+    const normalizedNewValue = value ?? '';
     const previousMeasurement = formData.value[measurementKey] ?? '';
     const previousResult = formData.value[resultKey] ?? '';
     const source = options?.source ?? DataSource.Unknown;
-    const isElisFilled = source === DataSource.ELIS;
 
-    formData.value[measurementKey] = normalizedValue;
-    formData.value[resultKey] = normalizedValue;
-    formData.value[`${measurementKey}__elisFilled`] = isElisFilled;
-    formData.value[`${resultKey}__elisFilled`] = false;
+    // Проверяем, вернулось ли значение к оригинальному из ELIS
+    const measurementElisOriginal = formData.value[`${measurementKey}__elisOriginal`];
+    const isBackToElisMeasurement = measurementElisOriginal !== undefined &&
+      normalizeValue(normalizedNewValue) === normalizeValue(measurementElisOriginal);
+
+    // Для measurement: если source=ELIS или вернулись к оригиналу
+    const isMeasurementElisFilled = source === DataSource.ELIS || isBackToElisMeasurement;
+
+    formData.value[measurementKey] = normalizedNewValue;
+    formData.value[resultKey] = normalizedNewValue;
+    formData.value[`${measurementKey}__elisFilled`] = isMeasurementElisFilled;
+    formData.value[`${resultKey}__elisFilled`] = false; // result балластного параметра не помечается как ELIS
     formData.value[`${resultKey}__manualOverride`] = false;
     isDirty.value = true;
 
-    if (options?.trackMeasurementHistory !== false && previousMeasurement !== normalizedValue) {
+    if (options?.trackMeasurementHistory !== false && previousMeasurement !== normalizedNewValue) {
       pushHistoryEntry(
         measurementKey,
-        createHistoryEntry(source, normalizedValue, previousMeasurement, options?.comment)
+        createHistoryEntry(source, normalizedNewValue, previousMeasurement, options?.comment)
       );
     }
 
-    if (options?.trackResultHistory !== false && previousResult !== normalizedValue) {
+    if (options?.trackResultHistory !== false && previousResult !== normalizedNewValue) {
       pushHistoryEntry(
         resultKey,
-        createHistoryEntry(DataSource.Auto, normalizedValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
+        createHistoryEntry(DataSource.Auto, normalizedNewValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
       );
     }
   }
 
   function markManualOverride(paramKey: string, resultValue: string, options?: ManualOverrideOptions) {
     const resultKey = `result.${paramKey}`;
-    const normalizedValue = resultValue ?? '';
+    const normalizedNewValue = resultValue ?? '';
     const previousResult = formData.value[resultKey] ?? '';
     const source = options?.source ?? DataSource.Manual;
-    const isElisFilled = source === DataSource.ELIS;
 
-    formData.value[resultKey] = normalizedValue;
+    // Проверяем, вернулось ли значение к оригинальному из ELIS
+    const resultElisOriginal = formData.value[`${resultKey}__elisOriginal`];
+    const isBackToElisResult = resultElisOriginal !== undefined &&
+      normalizeValue(normalizedNewValue) === normalizeValue(resultElisOriginal);
+
+    // Если source=ELIS или вернулись к оригиналу - устанавливаем флаг
+    const isElisFilled = source === DataSource.ELIS || isBackToElisResult;
+
+    formData.value[resultKey] = normalizedNewValue;
     formData.value[`${resultKey}__elisFilled`] = isElisFilled;
-    formData.value[`${resultKey}__manualOverride`] = source === DataSource.Manual;
+    // manualOverride: true только если ручное изменение И НЕ вернулись к ELIS
+    formData.value[`${resultKey}__manualOverride`] = source === DataSource.Manual && !isBackToElisResult;
     isDirty.value = true;
 
-    if (previousResult !== normalizedValue) {
+    if (previousResult !== normalizedNewValue) {
       pushHistoryEntry(
         resultKey,
         createHistoryEntry(
           source,
-          normalizedValue,
+          normalizedNewValue,
           previousResult,
           options?.comment ?? (options?.payloadType === 'ResultModal' ? 'Изменено через модалку результата' : undefined)
         )
