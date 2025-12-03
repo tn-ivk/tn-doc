@@ -398,6 +398,7 @@ const handleElisData = (elisData: ElisPassportData) => {
         updates[field.key] = matchingOption.value; // Используем ID пользователя
         updates[`${field.key}__label`] = matchingOption.label; // ИСПРАВЛЕНИЕ: Обновляем label
         updates[`${field.key}__elisFilled`] = true;
+        updates[`${field.key}__elisOriginal`] = matchingOption.value; // Сохраняем оригинал для восстановления флага
 
         // Создать запись истории для ELIS
         trackElisLoad(field.key, matchingOption.value, elisData.protocolNumber);
@@ -405,6 +406,7 @@ const handleElisData = (elisData: ElisPassportData) => {
         // Для обычных полей (text, number, date, datetime-local) просто сохраняем значение
         updates[field.key] = value;
         updates[`${field.key}__elisFilled`] = true;
+        updates[`${field.key}__elisOriginal`] = value; // Сохраняем оригинал для восстановления флага
 
         // Создать запись истории для ELIS
         trackElisLoad(field.key, value, elisData.protocolNumber);
@@ -480,6 +482,9 @@ const handleElisData = (elisData: ElisPassportData) => {
 
           updates[valueKey] = valueStr;
           updates[`${valueKey}__elisFilled`] = true;
+          updates[`${valueKey}__elisOriginal`] = valueStr; // Сохраняем оригинал для восстановления флага
+
+          console.log(`[handleElisData] Сохранен elisOriginal для ${valueKey}:`, valueStr, 'normalized:', normalizeValue(valueStr));
 
           // Создать запись истории для ELIS
           trackElisLoad(valueKey, valueStr, elisData.protocolNumber);
@@ -519,6 +524,7 @@ const handleElisData = (elisData: ElisPassportData) => {
             trackAutoFill(resultKey, resultStr);
           } else if(elisParam.valueString && (normalizeValue(elisParam.value) !== normalizeValue(elisParam.valueString))) {
             updates[`${resultKey}__elisFilled`] = true;
+            updates[`${resultKey}__elisOriginal`] = resultStr; // Сохраняем оригинал для восстановления флага
             trackElisLoad(resultKey, resultStr, elisData.protocolNumber);
           }
           else {
@@ -564,6 +570,8 @@ const handleElisData = (elisData: ElisPassportData) => {
             const methodJson = JSON.stringify(matchingMethod);
             updates[methodKey] = methodJson;
             updates[`${methodKey}__elisFilled`] = true;
+            updates[`${methodKey}__elisOriginal`] = matchingMethod.name; // Сохраняем оригинал (name) для восстановления флага
+            updates[`${methodKey}__elisOption`] = matchingMethod; // Сохраняем полный объект метода для возврата к нему после выбора другого
 
             // Создать запись истории для ELIS (сохраняем только name, а не весь объект)
             trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
@@ -584,6 +592,7 @@ const handleElisData = (elisData: ElisPassportData) => {
         if (documentPayload) {
           updates[documentKey] = documentPayload;
           updates[`${documentKey}__elisFilled`] = true;
+          updates[`${documentKey}__elisOriginal`] = documentPayload; // Сохраняем оригинал для восстановления флага
 
           // Создать запись истории для ELIS
           trackElisLoad(documentKey, documentPayload, elisData.protocolNumber);

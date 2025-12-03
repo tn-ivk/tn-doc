@@ -287,3 +287,178 @@
   color: #333;
   overflow: auto;
 }
+
+/* ========================================
+   Переключатель режима отображения
+   ======================================== */
+
+.protocol-view-toggle {
+  display: flex;
+  gap: 0;
+  padding: 10px 15px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid var(--md-outline-light, #e0e0e0);
+}
+
+.protocol-view-toggle .toggle-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  border: 1px solid var(--md-outline-light, #e0e0e0);
+  background-color: var(--md-white, #fff);
+  color: var(--md-text, #333);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.protocol-view-toggle .toggle-btn:first-child {
+  border-radius: 6px 0 0 6px;
+  border-right: none;
+}
+
+.protocol-view-toggle .toggle-btn:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.protocol-view-toggle .toggle-btn:hover:not(.active) {
+  background-color: var(--md-primary-light, #e3f2fd);
+}
+
+.protocol-view-toggle .toggle-btn.active {
+  background-color: var(--md-primary, #1976d2);
+  color: var(--md-white, #fff);
+  border-color: var(--md-primary, #1976d2);
+}
+
+.protocol-view-toggle .toggle-btn i {
+  font-size: 14px;
+}
+
+/* ========================================
+   Табличное представление протокола
+   ======================================== */
+
+.protocol-table-view {
+  padding: 15px;
+}
+
+.protocol-section {
+  margin-bottom: 20px;
+}
+
+.protocol-section:last-child {
+  margin-bottom: 0;
+}
+
+.protocol-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--md-text, #333);
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--md-primary, #1976d2);
+}
+
+/* Таблица исходных данных (без шапки) */
+.protocol-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+.protocol-data-table td {
+  padding: 8px 12px;
+  border: 1px solid var(--md-outline-light, #e0e0e0);
+  vertical-align: top;
+}
+
+.protocol-data-table td:first-child {
+  width: 40%;
+  font-weight: 500;
+  background-color: #fafafa;
+  color: var(--md-text, #333);
+}
+
+.protocol-data-table td:last-child {
+  width: 60%;
+  color: var(--md-text, #333);
+}
+
+.protocol-data-table tr:hover td {
+  background-color: var(--md-primary-light, #e3f2fd);
+}
+
+.protocol-data-table tr:hover td:first-child {
+  background-color: #e8f4fc;
+}
+
+/* Таблица показателей качества (с шапкой) */
+.protocol-params-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+.protocol-params-table th {
+  padding: 10px 12px;
+  border: 1px solid var(--md-outline-light, #e0e0e0);
+  background-color: var(--md-primary, #1976d2);
+  color: var(--md-white, #fff);
+  font-weight: 600;
+  text-align: left;
+}
+
+.protocol-params-table td {
+  padding: 8px 12px;
+  border: 1px solid var(--md-outline-light, #e0e0e0);
+  vertical-align: top;
+  color: var(--md-text, #333);
+}
+
+.protocol-params-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.protocol-params-table tbody tr:hover {
+  background-color: var(--md-primary-light, #e3f2fd);
+}
+
+/* Колонки таблицы показателей */
+.protocol-params-table th:nth-child(1),
+.protocol-params-table td:nth-child(1) {
+  width: 25%;
+}
+
+.protocol-params-table th:nth-child(2),
+.protocol-params-table td:nth-child(2) {
+  width: 25%;
+}
+
+.protocol-params-table th:nth-child(3),
+.protocol-params-table td:nth-child(3) {
+  width: 20%;
+}
+
+.protocol-params-table th:nth-child(4),
+.protocol-params-table td:nth-child(4) {
+  width: 15%;
+  text-align: right;
+}
+
+.protocol-params-table th:nth-child(5),
+.protocol-params-table td:nth-child(5) {
+  width: 15%;
+}
+
+/* Пустое состояние таблицы */
+.protocol-empty-message {
+  padding: 20px;
+  text-align: center;
+  color: var(--md-text-muted, #757575);
+  font-style: italic;
+}

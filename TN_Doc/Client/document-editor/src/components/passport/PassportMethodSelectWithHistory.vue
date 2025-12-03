@@ -73,7 +73,13 @@ const lastSource = computed(() => {
   return getLastSource(historyKey.value);
 });
 
-const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
+/**
+ * Флаг ELIS-заполненности: определяется по последнему источнику в истории
+ * ELIS и ReturnToELIS отображаются одинаково (зелёная подсветка)
+ */
+const isElisFilled = computed(() => {
+  return lastSource.value === DataSource.ELIS || lastSource.value === DataSource.ReturnToELIS;
+});
 
 /**
  * Обработка изменения метода

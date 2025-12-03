@@ -13,7 +13,9 @@ export enum DataSource {
   /** Ожидалось из ЕЛИС, но не было загружено */
   ElisMissing = 'ElisMissing',
   /** Автоматическое заполнение (без визуального индикатора) */
-  Auto = 'Auto'
+  Auto = 'Auto',
+  /** Возврат к оригинальному значению ЕЛИС */
+  ReturnToELIS = 'ReturnToELIS'
 }
 
 /**
@@ -83,5 +85,11 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     icon: '',
     color: 'transparent',
     description: 'Заполнено автоматически'
+  },
+  [DataSource.ReturnToELIS]: {
+    icon: 'pi-database',
+    color: '#4CAF50',
+    text: 'ЕЛИС',
+    description: 'Возврат к значению из протокола ЕЛИС'
   }
 };

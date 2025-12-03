@@ -161,7 +161,7 @@ function handleEditClick() {
   height: 28px;
   border: 1px solid transparent !important;
   background-color: transparent !important;
-  color: var(--md-outline-light, #E0E0E0) !important;
+  color: var(--md-text, #212121) !important;
   font-size: 14px;
   cursor: pointer;
   display: flex;
