@@ -34,6 +34,7 @@ import PassportResultCell from './PassportResultCell.vue';
 import FieldHistoryIndicator from '@/components/history/FieldHistoryIndicator.vue';
 import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
+import { useDocumentStore } from '@/stores/documentStore';
 import { DataSource } from '@/types/history.types';
 import type { PassportQualityParameter } from '@/types/passport.types';
 import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
@@ -73,7 +74,13 @@ const lastSource = computed(() => {
   return getLastSource(historyKey.value);
 });
 
-const isElisFilled = computed(() => lastSource.value === DataSource.ELIS);
+// Используем флаг из formData, а не из истории - так корректно отрабатывает возврат к ELIS
+const store = useDocumentStore();
+const isElisFilled = computed(() => {
+  const flag = store.formData[`${historyKey.value}__elisFilled`] === true;
+  console.log(`[PassportResultCellWithHistory] isElisFilled для ${historyKey.value}:`, flag, 'lastSource:', lastSource.value);
+  return flag;
+});
 
 const canEdit = computed(() => props.isEditable);
 
