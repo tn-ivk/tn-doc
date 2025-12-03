@@ -383,7 +383,20 @@ export function usePassportEditor() {
       
     const isBallast = param.isBallast === true;
     if (isBallast) {
-      console.log('isBallast');
+      // Проверяем, вернулось ли значение к оригинальному из ELIS
+      const elisOriginal = store.formData[`${measurementKey}__elisOriginal`];
+      const normalizedElisOriginal = elisOriginal !== undefined ? normalizeValue(elisOriginal) : undefined;
+      const isBackToElisValue = elisOriginal !== undefined &&
+        normalizedNew === normalizedElisOriginal;
+
+      console.log(`[handleMeasurementUpdate] isBallast ${measurementKey}:`, {
+        newValue: event.value,
+        normalizedNew,
+        elisOriginal,
+        normalizedElisOriginal,
+        isBackToElisValue
+      });
+
       // handleMeasurementUpdate вызывается ТОЛЬКО при ручном изменении через UI
       // Поэтому результат всегда должен пересчитываться (флаги ELIS сбрасываются)
       if (!measurementChanged && store.formData[resultKey] === event.value) {
@@ -392,9 +405,11 @@ export function usePassportEditor() {
       measurementGuard.add(measurementKey);
       resultGuard.add(resultKey);
       // syncBallastParameter запишет историю для measurement и result
+      // Если вернулись к оригиналу ELIS, передаем source: ELIS
+      const source = isBackToElisValue ? DataSource.ELIS : DataSource.Manual;
       store.syncBallastParameter(event.paramKey, event.value, {
-        source: DataSource.Manual,
-        comment: 'Изменено оператором'
+        source,
+        comment: isBackToElisValue ? 'Возврат к значению ELIS' : 'Изменено оператором'
       });
       return;
     }
@@ -404,8 +419,17 @@ export function usePassportEditor() {
 
       // Проверяем, вернулось ли значение к оригинальному из ELIS
       const elisOriginal = store.formData[`${measurementKey}__elisOriginal`];
+      const normalizedElisOriginal = elisOriginal !== undefined ? normalizeValue(elisOriginal) : undefined;
       const isBackToElisValue = elisOriginal !== undefined &&
-        normalizedNew === normalizeValue(elisOriginal);
+        normalizedNew === normalizedElisOriginal;
+
+      console.log(`[handleMeasurementUpdate] ${measurementKey}:`, {
+        newValue: event.value,
+        normalizedNew,
+        elisOriginal,
+        normalizedElisOriginal,
+        isBackToElisValue
+      });
 
       // Записываем историю изменения measurement (для обычных параметров)
       trackManualChange(measurementKey, event.value, currentMeasurement);

@@ -266,7 +266,6 @@ export const useDocumentStore = defineStore('document', () => {
   };
 
   function syncBallastParameter(paramKey: string, value: string, options?: SyncBallastOptions) {
-    console.log('syncBallastParameter')
     const measurementKey = `value.${paramKey}`;
     const resultKey = `result.${paramKey}`;
     const normalizedNewValue = value ?? '';
@@ -276,11 +275,23 @@ export const useDocumentStore = defineStore('document', () => {
 
     // Проверяем, вернулось ли значение к оригинальному из ELIS
     const measurementElisOriginal = formData.value[`${measurementKey}__elisOriginal`];
+    const normalizedElisOriginal = measurementElisOriginal !== undefined ? normalizeValue(measurementElisOriginal) : undefined;
+    const normalizedNew = normalizeValue(normalizedNewValue);
     const isBackToElisMeasurement = measurementElisOriginal !== undefined &&
-      normalizeValue(normalizedNewValue) === normalizeValue(measurementElisOriginal);
+      normalizedNew === normalizedElisOriginal;
 
     // Для measurement: если source=ELIS или вернулись к оригиналу
     const isMeasurementElisFilled = source === DataSource.ELIS || isBackToElisMeasurement;
+
+    console.log(`[syncBallastParameter] ${measurementKey}:`, {
+      value: normalizedNewValue,
+      normalizedNew,
+      source,
+      measurementElisOriginal,
+      normalizedElisOriginal,
+      isBackToElisMeasurement,
+      isMeasurementElisFilled
+    });
 
     formData.value[measurementKey] = normalizedNewValue;
     formData.value[resultKey] = normalizedNewValue;
