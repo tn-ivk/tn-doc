@@ -517,7 +517,6 @@ export function usePassportEditor() {
    * Примечание: пересчёт результата при изменении метода отключён
    */
   function handleMethodUpdate(event: MethodUpdateEvent) {
-    console.log('handleMethodUpdate');
     const param = findParameter(event.paramKey);
     if (!param) {
       logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
@@ -550,42 +549,14 @@ export function usePassportEditor() {
     const isBackToElisMethod = (elisMethodName !== undefined && newMethodName === elisMethodName) ||
       (methodElisOriginal !== undefined && newMethodName === methodElisOriginal);
 
-    // Если название метода не изменилось - сохраняем текущий флаг ELIS
-    // Если название изменилось - проверяем, вернулись ли к оригиналу ELIS
-    const currentMethodElisFlag = store.formData[`${methodKey}__elisFilled`] === true;
-    const newMethodElisFlag = methodNameChanged ? isBackToElisMethod : currentMethodElisFlag;
-
-    console.log(`[handleMethodUpdate] ДИАГНОСТИКА обновления флагов для ${methodKey}:`, {
-      methodNameChanged,
-      currentMethodElisFlag,
-      newMethodElisFlag,
-      isBackToElisMethod,
-      elisOption,
-      elisMethodName,
-      methodElisOriginal,
-      previousMethodName,
-      newMethodName
-    });
-
     const updates: Record<string, any> = {
-      [methodKey]: methodJson,
-      [`${methodKey}__elisFilled`]: newMethodElisFlag
+      [methodKey]: methodJson
     };
-
-    console.log(`[handleMethodUpdate] Применяем обновления:`, updates);
 
     store.bulkUpdateFields(updates);
 
     // Записать историю изменения метода (только name, а не весь объект)
     if (methodNameChanged) {
-      console.log(`[handleMethodUpdate] ДИАГНОСТИКА записи истории для ${methodKey}:`, {
-        isBackToElisMethod,
-        newMethodElisFlag,
-        previousMethodName,
-        newMethodName,
-        willUseTrackReturnToElis: isBackToElisMethod
-      });
-
       if (isBackToElisMethod) {
         // Возврат к методу ELIS - используем trackReturnToElis
         trackReturnToElis(methodKey, newMethodName, previousMethodName || undefined);

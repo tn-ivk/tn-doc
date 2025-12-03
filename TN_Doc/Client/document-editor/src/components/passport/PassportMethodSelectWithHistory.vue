@@ -29,12 +29,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import PassportMethodSelect from './PassportMethodSelect.vue';
 import FieldHistoryIndicator from '@/components/history/FieldHistoryIndicator.vue';
 import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
-import { useDocumentStore } from '@/stores/documentStore';
 import { DataSource } from '@/types/history.types';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
@@ -52,8 +51,6 @@ const {
   getFieldHistory,
   getLastSource
 } = useFieldHistory();
-
-const store = useDocumentStore();
 
 const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
 
@@ -76,32 +73,13 @@ const lastSource = computed(() => {
   return getLastSource(historyKey.value);
 });
 
-// ДИАГНОСТИКА: Используем флаг из formData, как для measurement и result
+/**
+ * Флаг ELIS-заполненности: определяется по последнему источнику в истории
+ * ELIS и ReturnToELIS отображаются одинаково (зелёная подсветка)
+ */
 const isElisFilled = computed(() => {
-  const flag = store.formData[`${historyKey.value}__elisFilled`] === true;
-  console.log(`[PassportMethodSelectWithHistory] ДИАГНОСТИКА для ${historyKey.value}:`, {
-    flag,
-    lastSource: lastSource.value,
-    historyLength: fieldHistory.value.length,
-    elisFilledFlagKey: `${historyKey.value}__elisFilled`,
-    elisFilledFlagValue: store.formData[`${historyKey.value}__elisFilled`],
-    elisOriginalKey: `${historyKey.value}__elisOriginal`,
-    elisOriginalValue: store.formData[`${historyKey.value}__elisOriginal`],
-    elisOptionKey: `${historyKey.value}__elisOption`,
-    elisOptionValue: store.formData[`${historyKey.value}__elisOption`],
-    currentMethodValue: store.formData[historyKey.value]
-  });
-  return flag;
+  return lastSource.value === DataSource.ELIS || lastSource.value === DataSource.ReturnToELIS;
 });
-
-// Отслеживаем изменения для диагностики
-watch(isElisFilled, (newVal, oldVal) => {
-  console.log(`[PassportMethodSelectWithHistory] isElisFilled изменился для ${historyKey.value}:`, {
-    oldVal,
-    newVal,
-    lastSource: lastSource.value
-  });
-}, { immediate: true });
 
 /**
  * Обработка изменения метода
