@@ -223,6 +223,39 @@ export const useDocumentStore = defineStore('document', () => {
               formHistory.value[methodKey] = [...historyEntries];
             }
           }
+
+          // Сохранение ELIS-метода для возможности возврата к нему после выбора другого метода
+          const methodKey = `method.${paramSchema.key}`;
+          const isMethodFromElis = formData.value[`${methodKey}__elisFilled`] === true;
+          console.log(`[documentStore] Проверка ELIS-метода для ${paramSchema.key}:`, {
+            methodKey,
+            isMethodFromElis,
+            methodValue: formData.value[methodKey]
+          });
+          if (isMethodFromElis) {
+            const methodJson = formData.value[methodKey];
+            if (methodJson && typeof methodJson === 'string' && methodJson.trim() !== '') {
+              try {
+                const methodObject = JSON.parse(methodJson);
+                // Сохраняем полный объект метода из ELIS для возможности выбора его позже
+                formData.value[`${methodKey}__elisOption`] = methodObject;
+                console.log(`[documentStore] ✅ Сохранён ELIS-метод для ${paramSchema.key}:`, {
+                  methodName: methodObject.Name || methodObject.name,
+                  methodObject
+                });
+                logger.debug('[documentStore] Сохранён ELIS-метод для параметра', {
+                  paramKey: paramSchema.key,
+                  methodName: methodObject.Name || methodObject.name
+                });
+              } catch (e) {
+                console.error(`[documentStore] ❌ Ошибка парсинга ELIS-метода для ${paramSchema.key}:`, e);
+                logger.warn('[documentStore] Не удалось распарсить ELIS-метод', {
+                  paramKey: paramSchema.key,
+                  methodJson
+                });
+              }
+            }
+          }
         }
       }
 
@@ -250,6 +283,16 @@ export const useDocumentStore = defineStore('document', () => {
   function bulkUpdateFields(payload: Record<string, any>) {
     if (!payload) return;
     let changed = false;
+
+    // Диагностика: логируем все __elisOption ключи
+    const elisOptionKeys = Object.keys(payload).filter(k => k.includes('__elisOption'));
+    if (elisOptionKeys.length > 0) {
+      console.log('[documentStore] bulkUpdateFields - elisOption ключи:', elisOptionKeys.map(k => ({
+        key: k,
+        value: payload[k]
+      })));
+    }
+
     for (const [key, value] of Object.entries(payload)) {
       if (formData.value[key] !== value) {
         formData.value[key] = value;
