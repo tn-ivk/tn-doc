@@ -71,6 +71,8 @@ export function useFieldHistory() {
       ? 'IVK'
       : source === DataSource.ElisMissing
       ? 'ELIS'
+      : source === DataSource.ReturnToELIS
+      ? MANUAL_AUTHOR  // Возврат к ELIS - это действие пользователя
       : MANUAL_AUTHOR;
 
     const entry = {
@@ -181,6 +183,27 @@ export function useFieldHistory() {
   };
 
   /**
+   * Отследить возврат к оригинальному значению ELIS
+   */
+  const trackReturnToElis = (fieldKey: string, newValue: any, previousValue?: any) => {
+    const newValueNormalized = normalizeValue(newValue);
+    const previousValueNormalized = normalizeValue(previousValue);
+
+    if (newValueNormalized === previousValueNormalized) {
+      return;
+    }
+
+    const entry = createHistoryEntry(
+      DataSource.ReturnToELIS,
+      newValueNormalized,
+      previousValueNormalized || undefined,
+      'Возврат к значению ELIS'
+    );
+
+    addHistoryEntry(fieldKey, entry);
+  };
+
+  /**
    * Отследить автоматическое заполнение поля
    * Используется когда значение установлено системой, но не из внешнего источника
    */
@@ -232,6 +255,7 @@ export function useFieldHistory() {
     trackElisLoad,
     trackElisMissing,
     trackIVKRounding,
+    trackReturnToElis,
     trackAutoFill,
     getFieldHistory,
     getLastSource,

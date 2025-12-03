@@ -39,7 +39,7 @@ const resolveIsBallastFlag = (schema: PassportQualityParameterSchema): boolean =
  */
 export function usePassportEditor() {
   const store = useDocumentStore();
-  const { trackManualChange, trackAutoFill } = useFieldHistory();
+  const { trackManualChange, trackAutoFill, trackReturnToElis } = useFieldHistory();
 
   /**
    * Приведение конфигурации к типу PassportEditConfig
@@ -288,17 +288,23 @@ export function usePassportEditor() {
     const isBackToElisValue = elisOriginal !== undefined &&
       normalizedNew === normalizeValue(elisOriginal);
 
-    // Определяем source: ELIS если текущий флаг или вернулись к оригиналу
+    // Определяем source: ELIS если текущий флаг, ReturnToELIS если вернулись к оригиналу
     const currentElisFilled = store.formData[`${measurementField}__elisFilled`] === true;
-    const source = (currentElisFilled || isBackToElisValue)
+    const source = currentElisFilled
       ? DataSource.ELIS
-      : DataSource.Manual;
+      : isBackToElisValue
+        ? DataSource.ReturnToELIS
+        : DataSource.Manual;
 
     measurementGuard.add(measurementField);
     resultGuard.add(resultField);
     store.syncBallastParameter(paramKey, newValue?.toString() ?? '', {
       source,
-      comment: source === DataSource.ELIS ? 'Синхронизация с ELIS' : 'Синхронизация балластного параметра'
+      comment: source === DataSource.ELIS
+        ? 'Синхронизация с ELIS'
+        : source === DataSource.ReturnToELIS
+          ? 'Возврат к значению ELIS'
+          : 'Синхронизация балластного параметра'
     });
   };
 
@@ -405,8 +411,8 @@ export function usePassportEditor() {
       measurementGuard.add(measurementKey);
       resultGuard.add(resultKey);
       // syncBallastParameter запишет историю для measurement и result
-      // Если вернулись к оригиналу ELIS, передаем source: ELIS
-      const source = isBackToElisValue ? DataSource.ELIS : DataSource.Manual;
+      // Если вернулись к оригиналу ELIS, передаем source: ReturnToELIS
+      const source = isBackToElisValue ? DataSource.ReturnToELIS : DataSource.Manual;
       store.syncBallastParameter(event.paramKey, event.value, {
         source,
         comment: isBackToElisValue ? 'Возврат к значению ELIS' : 'Изменено оператором'
@@ -432,7 +438,11 @@ export function usePassportEditor() {
       });
 
       // Записываем историю изменения measurement (для обычных параметров)
-      trackManualChange(measurementKey, event.value, currentMeasurement);
+      if (isBackToElisValue) {
+        trackReturnToElis(measurementKey, event.value, currentMeasurement);
+      } else {
+        trackManualChange(measurementKey, event.value, currentMeasurement);
+      }
 
       store.bulkUpdateFields({
         [measurementKey]: event.value,

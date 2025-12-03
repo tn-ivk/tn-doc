@@ -29,6 +29,8 @@ const resolveAuthor = (source: DataSource) => {
       return 'ELIS';
     case DataSource.IVK:
       return 'IVK';
+    case DataSource.ReturnToELIS:
+      return MANUAL_AUTHOR; // Возврат к ELIS - это действие пользователя
     default:
       return MANUAL_AUTHOR;
   }
@@ -280,8 +282,8 @@ export const useDocumentStore = defineStore('document', () => {
     const isBackToElisMeasurement = measurementElisOriginal !== undefined &&
       normalizedNew === normalizedElisOriginal;
 
-    // Для measurement: если source=ELIS или вернулись к оригиналу
-    const isMeasurementElisFilled = source === DataSource.ELIS || isBackToElisMeasurement;
+    // Для measurement: если source=ELIS, ReturnToELIS или вернулись к оригиналу
+    const isMeasurementElisFilled = source === DataSource.ELIS || source === DataSource.ReturnToELIS || isBackToElisMeasurement;
 
     console.log(`[syncBallastParameter] ${measurementKey}:`, {
       value: normalizedNewValue,
@@ -319,30 +321,35 @@ export const useDocumentStore = defineStore('document', () => {
     const resultKey = `result.${paramKey}`;
     const normalizedNewValue = resultValue ?? '';
     const previousResult = formData.value[resultKey] ?? '';
-    const source = options?.source ?? DataSource.Manual;
+    const inputSource = options?.source ?? DataSource.Manual;
 
     // Проверяем, вернулось ли значение к оригинальному из ELIS
     const resultElisOriginal = formData.value[`${resultKey}__elisOriginal`];
     const isBackToElisResult = resultElisOriginal !== undefined &&
       normalizeValue(normalizedNewValue) === normalizeValue(resultElisOriginal);
 
-    // Если source=ELIS или вернулись к оригиналу - устанавливаем флаг
-    const isElisFilled = source === DataSource.ELIS || isBackToElisResult;
+    // Определяем финальный source: если вернулись к ELIS - используем ReturnToELIS
+    const historySource = isBackToElisResult ? DataSource.ReturnToELIS : inputSource;
+
+    // Если source=ELIS, ReturnToELIS или вернулись к оригиналу - устанавливаем флаг
+    const isElisFilled = inputSource === DataSource.ELIS || inputSource === DataSource.ReturnToELIS || isBackToElisResult;
 
     formData.value[resultKey] = normalizedNewValue;
     formData.value[`${resultKey}__elisFilled`] = isElisFilled;
     // manualOverride: true только если ручное изменение И НЕ вернулись к ELIS
-    formData.value[`${resultKey}__manualOverride`] = source === DataSource.Manual && !isBackToElisResult;
+    formData.value[`${resultKey}__manualOverride`] = inputSource === DataSource.Manual && !isBackToElisResult;
     isDirty.value = true;
 
     if (previousResult !== normalizedNewValue) {
       pushHistoryEntry(
         resultKey,
         createHistoryEntry(
-          source,
+          historySource,
           normalizedNewValue,
           previousResult,
-          options?.comment ?? (options?.payloadType === 'ResultModal' ? 'Изменено через модалку результата' : undefined)
+          isBackToElisResult
+            ? 'Возврат к значению ELIS'
+            : (options?.comment ?? (options?.payloadType === 'ResultModal' ? 'Изменено через модалку результата' : undefined))
         )
       );
     }
