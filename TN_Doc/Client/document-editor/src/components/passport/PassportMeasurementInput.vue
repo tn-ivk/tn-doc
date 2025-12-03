@@ -172,7 +172,7 @@ function handleValueChange(value: number | null) {
 .p-error {
   display: block;
   margin-top: 2px;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--md-error, #dc3545);
   text-align: center;
 }
