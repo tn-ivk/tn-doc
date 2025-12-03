@@ -39,7 +39,7 @@ const resolveIsBallastFlag = (schema: PassportQualityParameterSchema): boolean =
  */
 export function usePassportEditor() {
   const store = useDocumentStore();
-  const { trackManualChange, trackAutoFill } = useFieldHistory();
+  const { trackManualChange, trackAutoFill, trackReturnToElis } = useFieldHistory();
 
   /**
    * Приведение конфигурации к типу PassportEditConfig
@@ -101,8 +101,33 @@ export function usePassportEditor() {
         document: documentElisFilled
       };
 
-      // Объединяем методы из схемы + выбранный метод (если есть и его нет в списке)
+      // Объединяем методы из схемы + ELIS-метод (если есть) + выбранный метод
       const methodOptions = [...paramSchema.methodOptions];
+
+      // Добавляем ELIS-метод (сохранённый при загрузке или из handleElisData), если его нет в списке
+      // Это позволяет вернуться к методу из ELIS после выбора другого метода из справочника
+      const elisOptionKey = `method.${paramSchema.key}__elisOption`;
+      const elisOption = store.formData[elisOptionKey];
+
+      if (elisOption) {
+        const elisMethodName = elisOption.Name || elisOption.name;
+        const alreadyInList = methodOptions.find(m => m.name === elisMethodName);
+        if (elisMethodName && !alreadyInList) {
+          const elisMethodOption = {
+            id: elisOption.Id || elisOption.id || 0,
+            use: Boolean(elisOption.Use ?? elisOption.use),
+            idParameter: elisOption.IdParameter || elisOption.idParameter || 0,
+            name: elisMethodName,
+            isDefault: Boolean(elisOption.IsDefault ?? elisOption.isDefault),
+            limitValueActivate: Boolean(elisOption.LimitValueActivate ?? elisOption.limitValueActivate),
+            limitValue: elisOption.LimitValue || elisOption.limitValue || 0,
+            limitValueString: elisOption.LimitValueString || elisOption.limitValueString || ''
+          };
+          methodOptions.push(elisMethodOption);
+        }
+      }
+
+      // Добавляем текущий выбранный метод, если его нет в списке
       if (selectedMethod && !methodOptions.find(m => m.name === selectedMethod.name)) {
         methodOptions.push(selectedMethod);
       }
@@ -283,15 +308,28 @@ export function usePassportEditor() {
       return;
     }
 
-    const source = store.formData[`${measurementField}__elisFilled`] === true
+    // Проверяем, является ли новое значение оригинальным из ELIS
+    const elisOriginal = store.formData[`${measurementField}__elisOriginal`];
+    const isBackToElisValue = elisOriginal !== undefined &&
+      normalizedNew === normalizeValue(elisOriginal);
+
+    // Определяем source: ELIS если текущий флаг, ReturnToELIS если вернулись к оригиналу
+    const currentElisFilled = store.formData[`${measurementField}__elisFilled`] === true;
+    const source = currentElisFilled
       ? DataSource.ELIS
-      : DataSource.Manual;
+      : isBackToElisValue
+        ? DataSource.ReturnToELIS
+        : DataSource.Manual;
 
     measurementGuard.add(measurementField);
     resultGuard.add(resultField);
     store.syncBallastParameter(paramKey, newValue?.toString() ?? '', {
       source,
-      comment: source === DataSource.ELIS ? 'Синхронизация с ELIS' : 'Синхронизация балластного параметра'
+      comment: source === DataSource.ELIS
+        ? 'Синхронизация с ELIS'
+        : source === DataSource.ReturnToELIS
+          ? 'Возврат к значению ELIS'
+          : 'Синхронизация балластного параметра'
     });
   };
 
@@ -376,7 +414,20 @@ export function usePassportEditor() {
       
     const isBallast = param.isBallast === true;
     if (isBallast) {
-      console.log('isBallast');
+      // Проверяем, вернулось ли значение к оригинальному из ELIS
+      const elisOriginal = store.formData[`${measurementKey}__elisOriginal`];
+      const normalizedElisOriginal = elisOriginal !== undefined ? normalizeValue(elisOriginal) : undefined;
+      const isBackToElisValue = elisOriginal !== undefined &&
+        normalizedNew === normalizedElisOriginal;
+
+      console.log(`[handleMeasurementUpdate] isBallast ${measurementKey}:`, {
+        newValue: event.value,
+        normalizedNew,
+        elisOriginal,
+        normalizedElisOriginal,
+        isBackToElisValue
+      });
+
       // handleMeasurementUpdate вызывается ТОЛЬКО при ручном изменении через UI
       // Поэтому результат всегда должен пересчитываться (флаги ELIS сбрасываются)
       if (!measurementChanged && store.formData[resultKey] === event.value) {
@@ -385,9 +436,11 @@ export function usePassportEditor() {
       measurementGuard.add(measurementKey);
       resultGuard.add(resultKey);
       // syncBallastParameter запишет историю для measurement и result
+      // Если вернулись к оригиналу ELIS, передаем source: ReturnToELIS
+      const source = isBackToElisValue ? DataSource.ReturnToELIS : DataSource.Manual;
       store.syncBallastParameter(event.paramKey, event.value, {
-        source: DataSource.Manual,
-        comment: 'Изменено оператором'
+        source,
+        comment: isBackToElisValue ? 'Возврат к значению ELIS' : 'Изменено оператором'
       });
       return;
     }
@@ -395,12 +448,30 @@ export function usePassportEditor() {
     if (measurementChanged) {
       measurementGuard.add(measurementKey);
 
+      // Проверяем, вернулось ли значение к оригинальному из ELIS
+      const elisOriginal = store.formData[`${measurementKey}__elisOriginal`];
+      const normalizedElisOriginal = elisOriginal !== undefined ? normalizeValue(elisOriginal) : undefined;
+      const isBackToElisValue = elisOriginal !== undefined &&
+        normalizedNew === normalizedElisOriginal;
+
+      console.log(`[handleMeasurementUpdate] ${measurementKey}:`, {
+        newValue: event.value,
+        normalizedNew,
+        elisOriginal,
+        normalizedElisOriginal,
+        isBackToElisValue
+      });
+
       // Записываем историю изменения measurement (для обычных параметров)
-      trackManualChange(measurementKey, event.value, currentMeasurement);
+      if (isBackToElisValue) {
+        trackReturnToElis(measurementKey, event.value, currentMeasurement);
+      } else {
+        trackManualChange(measurementKey, event.value, currentMeasurement);
+      }
 
       store.bulkUpdateFields({
         [measurementKey]: event.value,
-        [`${measurementKey}__elisFilled`]: false
+        [`${measurementKey}__elisFilled`]: isBackToElisValue // Восстанавливаем флаг если вернулись к оригиналу
       });
     }
 
@@ -423,9 +494,15 @@ export function usePassportEditor() {
     const previousResult = store.formData[resultKey] ?? '';
     if (previousResult !== newResult) {
       resultGuard.add(resultKey);
+
+      // Проверяем, вернулось ли значение result к оригинальному из ELIS
+      const resultElisOriginal = store.formData[`${resultKey}__elisOriginal`];
+      const isResultBackToElis = resultElisOriginal !== undefined &&
+        normalizeValue(newResult) === normalizeValue(resultElisOriginal);
+
       store.bulkUpdateFields({
         [resultKey]: newResult,
-        [`${resultKey}__elisFilled`]: false,
+        [`${resultKey}__elisFilled`]: isResultBackToElis, // Восстанавливаем флаг если вернулись к оригиналу
         [`${resultKey}__manualOverride`]: false  // Сбрасываем manualOverride при пересчёте
       });
 
@@ -440,7 +517,6 @@ export function usePassportEditor() {
    * Примечание: пересчёт результата при изменении метода отключён
    */
   function handleMethodUpdate(event: MethodUpdateEvent) {
-    console.log('handleMethodUpdate');
     const param = findParameter(event.paramKey);
     if (!param) {
       logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
@@ -465,25 +541,29 @@ export function usePassportEditor() {
     // Определяем, изменилось ли название метода (для elisFlags)
     const methodNameChanged = newMethodName !== previousMethodName;
 
-    // Если название метода не изменилось - сохраняем текущий флаг ELIS
-    // Если название изменилось - метод становится "ручным" (флаг сбрасывается)
-    const currentMethodElisFlag = store.formData[`method.${event.paramKey}__elisFilled`] === true;
-    const newMethodElisFlag = methodNameChanged ? false : currentMethodElisFlag;
+    // Проверяем, вернулся ли метод к оригинальному значению из ELIS
+    // Используем __elisOption (полный объект) или __elisOriginal (имя) для определения
+    const elisOption = store.formData[`${methodKey}__elisOption`];
+    const elisMethodName = elisOption?.Name || elisOption?.name;
+    const methodElisOriginal = store.formData[`${methodKey}__elisOriginal`];
+    const isBackToElisMethod = (elisMethodName !== undefined && newMethodName === elisMethodName) ||
+      (methodElisOriginal !== undefined && newMethodName === methodElisOriginal);
 
     const updates: Record<string, any> = {
-      [`method.${event.paramKey}`]: methodJson,
-      [`method.${event.paramKey}__elisFilled`]: newMethodElisFlag
+      [methodKey]: methodJson
     };
 
     store.bulkUpdateFields(updates);
 
     // Записать историю изменения метода (только name, а не весь объект)
     if (methodNameChanged) {
-      trackManualChange(
-        methodKey,
-        newMethodName,
-        previousMethodName || undefined
-      );
+      if (isBackToElisMethod) {
+        // Возврат к методу ELIS - используем trackReturnToElis
+        trackReturnToElis(methodKey, newMethodName, previousMethodName || undefined);
+      } else {
+        // Обычное ручное изменение
+        trackManualChange(methodKey, newMethodName, previousMethodName || undefined);
+      }
     }
   }
 

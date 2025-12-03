@@ -1404,34 +1404,6 @@ function DrawTablePassports(dataELIS) {
     }
 }
 
-// Показать окно просмотра данных протокола ЕЛИС
-function showProtocolView(protocolData) {
-    logTrace('Открытие окна просмотра протокола ЕЛИС: ' + (protocolData.protocolNumber || '[нет номера]'));
-
-    // Форматируем JSON для читаемого отображения
-    const formattedJson = JSON.stringify(protocolData, null, 2);
-
-    // Заполняем содержимое окна
-    document.getElementById('protocolViewContent').textContent = formattedJson;
-    document.getElementById('protocolViewTitle').textContent =
-        'Данные протокола ЕЛИС: ' + (protocolData.protocolNumber || '');
-
-    // Скрываем окно запроса ЕЛИС и показываем окно просмотра
-    $('#elis').modal('hide');
-    setTimeout(function() {
-        $('#elisProtocolView').modal('show');
-    }, 300);
-}
-
-// Закрыть окно просмотра протокола и вернуться к списку
-function closeProtocolView() {
-    logTrace('Закрытие окна просмотра протокола ЕЛИС');
-    $('#elisProtocolView').modal('hide');
-    setTimeout(function() {
-        $('#elis').modal('show');
-    }, 300);
-}
-
 function ResetPassportDataElis() {
     $('#info').text('');
     StateButtonGetElisData(false);

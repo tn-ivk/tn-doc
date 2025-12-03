@@ -102,8 +102,14 @@ class Logger {
         body: JSON.stringify(payload),
       });
     } catch (error) {
-      // Fallback на консоль при ошибке отправки (избегаем бесконечной рекурсии)
-      if (!this.consoleLog) {
+      // При закрытии страницы fetch обрывается с "Failed to fetch" или AbortError
+      // Это нормальное поведение, не засоряем консоль предупреждениями
+      // Fallback на консоль только если consoleLog отключен и это не обрыв соединения
+      const isAbortedOrNetworkError =
+        error instanceof TypeError ||
+        (error instanceof DOMException && error.name === 'AbortError');
+
+      if (!this.consoleLog && !isAbortedOrNetworkError) {
         console.warn('Не удалось отправить лог на сервер:', message, error);
       }
     }
