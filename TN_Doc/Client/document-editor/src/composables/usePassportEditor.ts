@@ -109,24 +109,9 @@ export function usePassportEditor() {
       const elisOptionKey = `method.${paramSchema.key}__elisOption`;
       const elisOption = store.formData[elisOptionKey];
 
-      // Детальная диагностика: проверяем все связанные ключи в formData
-      const relatedKeys = Object.keys(store.formData).filter(k => k.startsWith(`method.${paramSchema.key}`));
-      console.log(`[usePassportEditor] Проверка ELIS-опции для ${paramSchema.key}:`, {
-        elisOptionKey,
-        elisOption,
-        elisOptionType: typeof elisOption,
-        schemaMethodsCount: paramSchema.methodOptions.length,
-        schemaMethodNames: paramSchema.methodOptions.map(m => m.name),
-        relatedFormDataKeys: relatedKeys,
-        relatedValues: relatedKeys.reduce((acc, k) => { acc[k] = store.formData[k]; return acc; }, {} as Record<string, any>)
-      });
       if (elisOption) {
         const elisMethodName = elisOption.Name || elisOption.name;
         const alreadyInList = methodOptions.find(m => m.name === elisMethodName);
-        console.log(`[usePassportEditor] ELIS-метод "${elisMethodName}" для ${paramSchema.key}:`, {
-          alreadyInList: !!alreadyInList,
-          willBeAdded: !alreadyInList && !!elisMethodName
-        });
         if (elisMethodName && !alreadyInList) {
           const elisMethodOption = {
             id: elisOption.Id || elisOption.id || 0,
@@ -139,21 +124,13 @@ export function usePassportEditor() {
             limitValueString: elisOption.LimitValueString || elisOption.limitValueString || ''
           };
           methodOptions.push(elisMethodOption);
-          console.log(`[usePassportEditor] ✅ Добавлен ELIS-метод в список для ${paramSchema.key}:`, elisMethodOption);
         }
       }
 
       // Добавляем текущий выбранный метод, если его нет в списке
       if (selectedMethod && !methodOptions.find(m => m.name === selectedMethod.name)) {
         methodOptions.push(selectedMethod);
-        console.log(`[usePassportEditor] Добавлен выбранный метод "${selectedMethod.name}" для ${paramSchema.key}`);
       }
-
-      console.log(`[usePassportEditor] Итоговый список методов для ${paramSchema.key}:`, {
-        count: methodOptions.length,
-        names: methodOptions.map(m => m.name),
-        selectedMethod: selectedMethodName
-      });
 
       const methodNameTrimmed = selectedMethodName.trim();
       const normalizedMethodName = methodNameTrimmed.toLowerCase();
@@ -572,16 +549,6 @@ export function usePassportEditor() {
     const methodElisOriginal = store.formData[`${methodKey}__elisOriginal`];
     const isBackToElisMethod = (elisMethodName !== undefined && newMethodName === elisMethodName) ||
       (methodElisOriginal !== undefined && newMethodName === methodElisOriginal);
-
-    console.log(`[usePassportEditor] handleMethodUpdate для ${event.paramKey}:`, {
-      previousMethodName,
-      newMethodName,
-      methodNameChanged,
-      elisOption,
-      elisMethodName,
-      methodElisOriginal,
-      isBackToElisMethod
-    });
 
     // Если название метода не изменилось - сохраняем текущий флаг ELIS
     // Если название изменилось - проверяем, вернулись ли к оригиналу ELIS

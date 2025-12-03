@@ -573,12 +573,6 @@ const handleElisData = (elisData: ElisPassportData) => {
             updates[`${methodKey}__elisOriginal`] = matchingMethod.name; // Сохраняем оригинал (name) для восстановления флага
             updates[`${methodKey}__elisOption`] = matchingMethod; // Сохраняем полный объект метода для возврата к нему после выбора другого
 
-            console.log(`[handleElisData] Сохранён ELIS-метод для ${param.key}:`, {
-              methodKey,
-              methodName: matchingMethod.name,
-              elisOption: matchingMethod
-            });
-
             // Создать запись истории для ELIS (сохраняем только name, а не весь объект)
             trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
           } else {
