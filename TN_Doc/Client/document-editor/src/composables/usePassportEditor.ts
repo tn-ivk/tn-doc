@@ -555,20 +555,44 @@ export function usePassportEditor() {
     const currentMethodElisFlag = store.formData[`${methodKey}__elisFilled`] === true;
     const newMethodElisFlag = methodNameChanged ? isBackToElisMethod : currentMethodElisFlag;
 
+    console.log(`[handleMethodUpdate] ДИАГНОСТИКА обновления флагов для ${methodKey}:`, {
+      methodNameChanged,
+      currentMethodElisFlag,
+      newMethodElisFlag,
+      isBackToElisMethod,
+      elisOption,
+      elisMethodName,
+      methodElisOriginal,
+      previousMethodName,
+      newMethodName
+    });
+
     const updates: Record<string, any> = {
       [methodKey]: methodJson,
       [`${methodKey}__elisFilled`]: newMethodElisFlag
     };
 
+    console.log(`[handleMethodUpdate] Применяем обновления:`, updates);
+
     store.bulkUpdateFields(updates);
 
     // Записать историю изменения метода (только name, а не весь объект)
     if (methodNameChanged) {
-      trackManualChange(
-        methodKey,
+      console.log(`[handleMethodUpdate] ДИАГНОСТИКА записи истории для ${methodKey}:`, {
+        isBackToElisMethod,
+        newMethodElisFlag,
+        previousMethodName,
         newMethodName,
-        previousMethodName || undefined
-      );
+        willUseTrackReturnToElis: isBackToElisMethod
+      });
+
+      if (isBackToElisMethod) {
+        // Возврат к методу ELIS - используем trackReturnToElis
+        trackReturnToElis(methodKey, newMethodName, previousMethodName || undefined);
+      } else {
+        // Обычное ручное изменение
+        trackManualChange(methodKey, newMethodName, previousMethodName || undefined);
+      }
     }
   }
 
