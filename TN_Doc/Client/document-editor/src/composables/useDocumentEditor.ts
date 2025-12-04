@@ -1,5 +1,6 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { logger } from '@tn-doc/shared';
 import { useDocumentStore } from '@/stores/documentStore';
 import { usePassportSave } from './usePassportSave';
 import { useOpcParams } from './useOpcParams';
@@ -13,6 +14,87 @@ export function useDocumentEditor() {
   const toast = useToast();
   const { saveDocumentWithOpc } = usePassportSave();
   const { opcParams } = useOpcParams();
+
+  /**
+   * Восстанавливает elisOriginal для полей с elisFilled=true при загрузке документа.
+   *
+   * Это необходимо для корректной работы механизма "возврата к значению ELIS":
+   * - При первичной загрузке протокола ELIS, elisOriginal устанавливается в handleElisData
+   * - При повторном открытии документа, elisOriginal не сохраняется на сервер,
+   *   поэтому его нужно восстановить из текущего значения
+   *
+   * Логика: если elisFilled=true, значит значение не было изменено пользователем,
+   * следовательно текущее значение равно оригинальному ELIS значению.
+   */
+  const restoreElisOriginals = () => {
+    const formData = store.formData;
+
+    // Найти все ключи с elisFilled = true
+    const elisFilledKeys = Object.keys(formData)
+      .filter(key => key.endsWith('__elisFilled') && formData[key] === true);
+
+    let restoredCount = 0;
+
+    for (const elisFilledKey of elisFilledKeys) {
+      const baseKey = elisFilledKey.replace('__elisFilled', '');
+      const originalKey = `${baseKey}__elisOriginal`;
+
+      // Пропускаем, если elisOriginal уже существует
+      if (formData[originalKey] !== undefined) {
+        continue;
+      }
+
+      const currentValue = formData[baseKey];
+
+      // Пропускаем пустые значения
+      if (currentValue === undefined || currentValue === null || currentValue === '') {
+        continue;
+      }
+
+      // Особая обработка для методов испытаний
+      if (baseKey.startsWith('method.')) {
+        if (typeof currentValue === 'string' && currentValue.trim() !== '') {
+          try {
+            const methodObj = JSON.parse(currentValue);
+            // Сохраняем имя метода для сравнения
+            formData[originalKey] = methodObj.name || methodObj.Name;
+            // Сохраняем полный объект для возможности возврата к нему
+            formData[`${baseKey}__elisOption`] = methodObj;
+            restoredCount++;
+
+            logger.debug('[restoreElisOriginals] Восстановлен elisOriginal для метода', {
+              key: baseKey,
+              methodName: formData[originalKey]
+            });
+          } catch (e) {
+            // Если не удалось распарсить JSON, используем значение как есть
+            formData[originalKey] = currentValue;
+            restoredCount++;
+
+            logger.warn('[restoreElisOriginals] Не удалось распарсить метод, используем как строку', {
+              key: baseKey,
+              value: currentValue
+            });
+          }
+        }
+      } else {
+        // Для остальных полей просто копируем текущее значение
+        formData[originalKey] = currentValue;
+        restoredCount++;
+
+        logger.debug('[restoreElisOriginals] Восстановлен elisOriginal', {
+          key: baseKey,
+          value: currentValue
+        });
+      }
+    }
+
+    if (restoredCount > 0) {
+      logger.info('[restoreElisOriginals] Восстановлено elisOriginal значений', {
+        count: restoredCount
+      });
+    }
+  };
 
   /**
    * Функция сохранения документа с поддержкой OPC тегов
@@ -72,6 +154,10 @@ export function useDocumentEditor() {
    */
   const loadDocument = async (deviceId: number, docType: string, id: number) => {
     await store.loadConfig(deviceId, docType, id);
+
+    // Восстанавливаем elisOriginal для полей с elisFilled=true
+    // Это нужно для корректной работы "возврата к значению ELIS" при повторном открытии документа
+    restoreElisOriginals();
   };
 
   /**
