@@ -129,7 +129,7 @@ import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/c
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
 import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
-import type { FormField } from '@/types/document.types';
+import type { FormField, UserData } from '@/types/document.types';
 import {normalizeValue} from "@/utils/passport-utils.ts";
 
 const route = useRoute();
@@ -294,6 +294,31 @@ type LabDocumentInfoPayload = {
 // Хранилище для отложенной обработки ELIS данных
 let pendingElisData: ElisPassportData | null = null;
 
+/**
+ * Извлекает UserData из ЕЛИС данных для поля Laboratory_IOF
+ * @param elisData - данные ЕЛИС
+ * @returns UserData или undefined, если данные отсутствуют
+ */
+const extractUserDataFromElis = (elisData: ElisPassportData): UserData | undefined => {
+  const laboratory = elisData.signers?.laboratory;
+  if (!laboratory) {
+    return undefined;
+  }
+
+  // Формируем полное ФИО для поля fio
+  const fullName = [
+    laboratory.familyName,
+    laboratory.givenName,
+    laboratory.middleName
+  ].filter(Boolean).join(' ');
+
+  return {
+    factory: laboratory.company || '',
+    post: laboratory.post || '',
+    fio: fullName || undefined
+  };
+};
+
 const buildDocumentPayload = (elisParam?: ElisParameter): string => {
   if (!elisParam) {
     return '';
@@ -384,10 +409,16 @@ const handleElisData = (elisData: ElisPassportData) => {
           }));
           const newId = (maxId + 1).toString();
 
+          // Для Laboratory_IOF извлекаем UserData из ЕЛИС (post, company)
+          const userData = field.key === 'Laboratory_IOF'
+            ? extractUserDataFromElis(elisData)
+            : undefined;
+
           matchingOption = {
             value: newId,
             label: value,
-            selected: false
+            selected: false,
+            data: userData  // Добавляем UserData для автозаполнения Post/Factory
           };
 
           // Добавляем новую опцию в список
