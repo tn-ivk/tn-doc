@@ -264,10 +264,42 @@ export const useDocumentStore = defineStore('document', () => {
 
   /**
    * Обновить значение поля формы
+   * Для полей AdditionalInfo проверяет возврат к оригинальному значению ELIS
+   *
+   * @returns объект с информацией о типе изменения:
+   *   - isReturnToElis: true если значение вернулось к оригинальному ELIS
+   *   - wasElisField: true если поле имело elisOriginal (было заполнено из ELIS)
    */
-  function updateField(key: string, value: any) {
+  function updateField(key: string, value: any): { isReturnToElis: boolean; wasElisField: boolean } {
+    const previousValue = formData.value[key];
     formData.value[key] = value;
     isDirty.value = true;
+
+    // Проверяем возврат к оригинальному значению ELIS
+    const elisOriginal = formData.value[`${key}__elisOriginal`];
+    const wasElisField = elisOriginal !== undefined;
+
+    if (wasElisField) {
+      const normalizedNew = normalizeValue(value);
+      const normalizedOriginal = normalizeValue(elisOriginal);
+      const isReturnToElis = normalizedNew === normalizedOriginal;
+
+      // Обновляем флаг elisFilled
+      formData.value[`${key}__elisFilled`] = isReturnToElis;
+
+      logger.debug('[updateField] Проверка возврата к ELIS', {
+        key,
+        value,
+        elisOriginal,
+        normalizedNew,
+        normalizedOriginal,
+        isReturnToElis
+      });
+
+      return { isReturnToElis, wasElisField };
+    }
+
+    return { isReturnToElis: false, wasElisField: false };
   }
 
   function bulkUpdateFields(payload: Record<string, any>) {
