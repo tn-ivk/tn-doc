@@ -3,6 +3,7 @@ import { watch } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { UserData } from '@/types/document.types';
+import { normalizeValue } from '@/utils/passport-utils';
 
 /**
  * Композабл для автозаполнения связанных полей в документе "Паспорт качества"
@@ -11,10 +12,13 @@ import type { UserData } from '@/types/document.types';
  * - При выборе подписанта (Laboratory_IOF/Delive_IOF/Receive_IOF) автоматически заполняются:
  *   * Factory (организация)
  *   * Post (должность)
+ * - Проверяется возврат к оригинальным значениям ЕЛИС:
+ *   * Если Post/Factory вернулись к elisOriginal → trackReturnToElis + elisFilled=true
+ *   * Если изменились → trackManualChange + elisFilled=false
  */
 export function usePassportAutoFill() {
   const store = useDocumentStore();
-  const { trackManualChange } = useFieldHistory();
+  const { trackManualChange, trackReturnToElis } = useFieldHistory();
 
   /**
    * Найти опцию поля по значению
@@ -22,6 +26,51 @@ export function usePassportAutoFill() {
   const findFieldOption = (fieldKey: string, value: string) => {
     const field = store.fields.find(f => f.key === fieldKey);
     return field?.options?.find(opt => opt.value === value);
+  };
+
+  /**
+   * Умная запись истории изменения поля
+   * Проверяет, вернулось ли значение к оригинальному из ЕЛИС
+   *
+   * @param fieldKey - ключ поля (например, "Laboratory_Factory")
+   * @param newValue - новое значение
+   * @param previousValue - предыдущее значение
+   * @returns true если произошел возврат к ЕЛИС, false если ручное изменение
+   */
+  const trackFieldChange = (
+    fieldKey: string,
+    newValue: string,
+    previousValue: string
+  ): boolean => {
+    // Проверяем наличие оригинального значения ЕЛИС
+    const elisOriginal = store.formData[`${fieldKey}__elisOriginal`];
+
+    if (elisOriginal === undefined) {
+      // Поле никогда не заполнялось из ЕЛИС - обычное ручное изменение
+      trackManualChange(fieldKey, newValue, previousValue);
+      return false;
+    }
+
+    // Нормализуем значения для корректного сравнения
+    const normalizedNew = normalizeValue(newValue);
+    const normalizedOriginal = normalizeValue(elisOriginal);
+
+    const isReturnToElis = normalizedNew === normalizedOriginal;
+
+    if (isReturnToElis) {
+      // Значение вернулось к оригинальному из ЕЛИС
+      trackReturnToElis(fieldKey, newValue, previousValue);
+      logger.debug('[PassportAutoFill] Возврат к значению ЕЛИС', {
+        fieldKey,
+        elisOriginal,
+        newValue
+      });
+    } else {
+      // Обычное ручное изменение
+      trackManualChange(fieldKey, newValue, previousValue);
+    }
+
+    return isReturnToElis;
   };
 
   /**
@@ -48,17 +97,31 @@ export function usePassportAutoFill() {
       const newFactory = userData.factory || '';
       const newPost = userData.post || '';
 
-      // Заполняем связанные поля из данных пользователя
-      store.updateField('Laboratory_Factory', newFactory);
-      store.updateField('Laboratory_Post', newPost);
+      // Проверяем возврат к ЕЛИС для каждого поля
+      const isFactoryReturnToElis = trackFieldChange(
+        'Laboratory_Factory',
+        newFactory,
+        previousFactory
+      );
+      const isPostReturnToElis = trackFieldChange(
+        'Laboratory_Post',
+        newPost,
+        previousPost
+      );
 
-      // Создаем записи истории для автозаполненных полей
-      trackManualChange('Laboratory_Factory', newFactory, previousFactory);
-      trackManualChange('Laboratory_Post', newPost, previousPost);
+      // Обновляем поля и флаги одной операцией
+      store.bulkUpdateFields({
+        'Laboratory_Factory': newFactory,
+        'Laboratory_Factory__elisFilled': isFactoryReturnToElis,
+        'Laboratory_Post': newPost,
+        'Laboratory_Post__elisFilled': isPostReturnToElis
+      });
 
       logger.debug('[PassportAutoFill] Автозаполнение полей представителя лаборатории:', {
         factory: newFactory,
-        post: newPost
+        factoryReturnToElis: isFactoryReturnToElis,
+        post: newPost,
+        postReturnToElis: isPostReturnToElis
       });
     }
   };
@@ -87,17 +150,31 @@ export function usePassportAutoFill() {
       const newFactory = userData.factory || '';
       const newPost = userData.post || '';
 
-      // Заполняем связанные поля из данных пользователя
-      store.updateField('Delive_Factory', newFactory);
-      store.updateField('Delive_Post', newPost);
+      // Проверяем возврат к ЕЛИС для каждого поля
+      const isFactoryReturnToElis = trackFieldChange(
+        'Delive_Factory',
+        newFactory,
+        previousFactory
+      );
+      const isPostReturnToElis = trackFieldChange(
+        'Delive_Post',
+        newPost,
+        previousPost
+      );
 
-      // Создаем записи истории для автозаполненных полей
-      trackManualChange('Delive_Factory', newFactory, previousFactory);
-      trackManualChange('Delive_Post', newPost, previousPost);
+      // Обновляем поля и флаги одной операцией
+      store.bulkUpdateFields({
+        'Delive_Factory': newFactory,
+        'Delive_Factory__elisFilled': isFactoryReturnToElis,
+        'Delive_Post': newPost,
+        'Delive_Post__elisFilled': isPostReturnToElis
+      });
 
       logger.debug('[PassportAutoFill] Автозаполнение полей представителя сдающей стороны:', {
         factory: newFactory,
-        post: newPost
+        factoryReturnToElis: isFactoryReturnToElis,
+        post: newPost,
+        postReturnToElis: isPostReturnToElis
       });
     }
   };
@@ -126,17 +203,31 @@ export function usePassportAutoFill() {
       const newFactory = userData.factory || '';
       const newPost = userData.post || '';
 
-      // Заполняем связанные поля из данных пользователя
-      store.updateField('Receive_Factory', newFactory);
-      store.updateField('Receive_Post', newPost);
+      // Проверяем возврат к ЕЛИС для каждого поля
+      const isFactoryReturnToElis = trackFieldChange(
+        'Receive_Factory',
+        newFactory,
+        previousFactory
+      );
+      const isPostReturnToElis = trackFieldChange(
+        'Receive_Post',
+        newPost,
+        previousPost
+      );
 
-      // Создаем записи истории для автозаполненных полей
-      trackManualChange('Receive_Factory', newFactory, previousFactory);
-      trackManualChange('Receive_Post', newPost, previousPost);
+      // Обновляем поля и флаги одной операцией
+      store.bulkUpdateFields({
+        'Receive_Factory': newFactory,
+        'Receive_Factory__elisFilled': isFactoryReturnToElis,
+        'Receive_Post': newPost,
+        'Receive_Post__elisFilled': isPostReturnToElis
+      });
 
       logger.debug('[PassportAutoFill] Автозаполнение полей представителя принимающей стороны:', {
         factory: newFactory,
-        post: newPost
+        factoryReturnToElis: isFactoryReturnToElis,
+        post: newPost,
+        postReturnToElis: isPostReturnToElis
       });
     }
   };
