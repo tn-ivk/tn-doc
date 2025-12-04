@@ -38,7 +38,7 @@ import { useDocumentStore } from '@/stores/documentStore';
 import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
 import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
-import { normalizeValue } from '@/utils/passport-utils';
+import { normalizeValue, normalizeDateTimeForComparison } from '@/utils/passport-utils';
 
 const props = defineProps<{
   field: FormFieldType;
@@ -95,6 +95,9 @@ const computedHighlightColor = computed(() => {
 /**
  * Обработка изменения значения
  * Проверяет возврат к оригинальному значению ELIS и записывает соответствующий тип в историю
+ *
+ * ВАЖНО: Для полей datetime-local и date использует специальную нормализацию по timestamp,
+ * которая корректно сравнивает UTC и local time без конвертации исходных данных из ELIS
  */
 const handleChange = (newValue: any) => {
   const fieldKey = props.field.key;
@@ -105,8 +108,20 @@ const handleChange = (newValue: any) => {
 
   if (elisOriginal !== undefined) {
     // Поле было заполнено из ELIS - проверяем возврат к оригиналу
-    const normalizedNew = normalizeValue(newValue);
-    const normalizedOriginal = normalizeValue(elisOriginal);
+    let normalizedNew: string;
+    let normalizedOriginal: string;
+
+    // Для полей даты/времени используем специальную нормализацию по timestamp
+    // Это позволяет корректно сравнивать "2025-12-02T00:00:00Z" (UTC) и "2025-12-02T03:00:00" (local)
+    if (props.field.type === 'datetime-local' || props.field.type === 'date') {
+      normalizedNew = normalizeDateTimeForComparison(newValue);
+      normalizedOriginal = normalizeDateTimeForComparison(elisOriginal);
+    } else {
+      // Для остальных полей используем стандартную нормализацию
+      normalizedNew = normalizeValue(newValue);
+      normalizedOriginal = normalizeValue(elisOriginal);
+    }
+
     const isReturnToElis = normalizedNew === normalizedOriginal;
 
     if (isReturnToElis) {
