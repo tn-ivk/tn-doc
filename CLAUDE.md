@@ -23,19 +23,27 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 # Build and run
 dotnet build                                    # Build entire solution
 cd TN_Doc && dotnet run                         # Run app (http://localhost:38509)
+dotnet publish -c Release -o distrib/out        # Create release build
+
+# Git submodules (⚠️ required after clone)
+git submodule update --init --recursive         # Initialize all submodules
+git submodule update --remote                   # Update submodules to latest
 
 # Vue components (from TN_Doc/Client/)
 npm install                                     # Install dependencies for all workspaces
-npm run build:all                               # Build all Vue apps
-npm run dev                                     # StatusBar dev (port 5173)
-npm run dev:configurator                        # Configurator dev (port 5174)
-npm run dev:editor                              # Document Editor dev (port 5175)
+npm run build:all                               # Build all Vue apps (statusbar, configurator, editor)
+npm run dev                                     # StatusBar dev server (port 5173)
+npm run dev:configurator                        # Configurator dev server (port 5174)
+npm run dev:editor                              # Document Editor dev server (port 5175)
 npm run type-check                              # TypeScript type checking for all workspaces
+npm run clean                                   # Clean all node_modules
 
 # Testing
 dotnet test                                     # Run all tests
 dotnet test --filter "ClassName=YourTestClass"  # Run specific test class
 dotnet test --filter "FullyQualifiedName~KMH"   # Test document type libraries
+dotnet test --logger:"console;verbosity=detailed" # Verbose test output
+dotnet test /p:CollectCoverage=true             # Run tests with coverage
 ```
 
 ## Quick Start
@@ -73,11 +81,19 @@ tn_doc/
 │       └── shared/            # Shared TypeScript utilities
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
-├── tn.docgeneral/             # Document module libraries (git submodule, ~41 libraries)
-├── tn_toolsfastreport/        # FastReport utilities (git submodule)
-├── winprutil/                 # Windows printing utility (git submodule)
+├── tn.docgeneral/             # ⚠️ Document module libraries (git submodule, ~41 libraries)
+├── tn_toolsfastreport/        # ⚠️ FastReport utilities (git submodule)
+├── winprutil/                 # ⚠️ Windows printing utility (git submodule)
 └── Tests/                     # NUnit tests with Moq
 ```
+
+**⚠️ Git Submodules:**
+Three directories are git submodules and must be initialized after cloning:
+- `tn.docgeneral/` - All document type implementations (Act, Passport, Report, Jornal, Poverka*, KMH*)
+- `tn_toolsfastreport/` - FastReport helper utilities
+- `winprutil/` - Windows printing service
+
+Run `git submodule update --init --recursive` after initial clone.
 
 ### Document Module Pattern
 
@@ -134,20 +150,26 @@ Layered configuration (loaded in order):
 - **Control Flow**: Prefer early returns, avoid deep nesting
 - **Error Handling**: Never suppress exceptions, log and return meaningful errors
 - **Dependencies**: Register in `Startup.cs`, bind settings via `IOptions<T>`
+- **Formatting**: 4-space indentation, braces on separate lines (follow ReSharper profile in `TN_Doc.sln.DotSettings`)
+- **Async**: Suffix async methods with `Async`
 
 ### Test Guidelines
 - **Naming**: `MethodName_WhenCondition_ThenExpectedResult`
 - **Pattern**: AAA (Arrange-Act-Assert)
 - **Mocking**: Use mocks/fakes for external services and databases
+- **Coverage**: Run `dotnet test /p:CollectCoverage=true` before risky refactors
+- **Independent**: Tests must not depend on environment or execution order
 
 ### UI Theme (v1.4.3+)
 All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables, never hardcode HEX colors.
 
 ### Vue Component Guidelines
-- Use PrimeVue component library for UI elements
-- For dropdown overlays, use `appendTo="body"` to avoid clipping issues
-- For datetime-local fields, use local time (not UTC) to prevent timezone shifts
-- Panel classes for PrimeVue overlays require global styles (not scoped)
+- **UI Library**: PrimeVue for all UI components
+- **Overlays**: Use `appendTo="body"` for dropdowns to avoid clipping
+- **DateTime**: Use local time (not UTC) to prevent timezone shifts
+- **Styles**: PrimeVue overlay panels require global styles (not scoped)
+- **Naming**: PascalCase for component files, kebab-case for directories
+- **Workspaces**: Project uses npm workspaces (statusbar, configurator, document-editor, shared)
 
 ## Key Dependencies and External Systems
 
@@ -195,7 +217,9 @@ All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables
 | Issue | Solution |
 |-------|----------|
 | Build errors | Ensure NuGet sources configured (ortpr, FastReport) |
+| Submodules empty | Run `git submodule update --init --recursive` |
 | Vue build fails | Run `npm install` in `TN_Doc/Client/` first |
+| Config changes ignored | Restart app - configuration files are cached |
 | PrimeVue overlay clipped | Use `appendTo="body"` and global styles |
 | Datetime timezone shift | Use local time conversion, not UTC |
 | Database connection | Verify credentials in CfgApp.json |
@@ -215,9 +239,17 @@ Deploy at the same level (share TN_Doc configuration):
 - **TN_MessagingService**: OPC клиент (samara_build for OPC DA, master for OPC UA)
 - **TN.ElisConnector**: ELIS integration
 
+## Commit Guidelines
+
+- **Language**: Всегда использовать русский язык для коммит-сообщений
+- **Format**: Одно предложение с заглавной буквы, область изменения в начале (например: `Poverka: исправление расчёта`)
+- **Submodules**: При выполнении /commit делать коммит в основном репозитории и в submodule tn.docgeneral
+- **No AI Attribution**: НИКОГДА не упоминать AI, Claude, автоматическую генерацию в коммитах
+
 ## Additional Resources
 
-- See [AGENTS.md](AGENTS.md) for detailed coding style, testing, and commit guidelines
-- See [CHANGELOG.md](CHANGELOG.md) for version history and recent changes
-- See `/docs/` for API documentation and deployment guides
-- при выполнении команды /commit вместе с основным репозиторием делай коммит в submodule tn.docgeneral
+- [AGENTS.md](AGENTS.md) - Подробные правила стиля кода, тестирования и коммитов
+- [CHANGELOG.md](CHANGELOG.md) - История версий (⚠️ проверить перед большими изменениями)
+- [README.md](README.md) - Общее описание проекта и быстрый старт
+- `/docs/` - Документация по архитектуре, API, развёртыванию
+- `.cursor/rules/` - Дополнительные правила для Cursor IDE
