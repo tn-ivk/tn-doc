@@ -43,7 +43,7 @@
     },
     {
       "Id": 6,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Delive_FIO",
       "Type": "text",
@@ -83,7 +83,7 @@
     },
     {
       "Id": 11,
-      "Use": true,
+      "Use": false,
       "Edit": true,
       "Key": "Receive_FIO",
       "Type": "text",
