@@ -40,15 +40,6 @@
                 <div class="modal-header">
                     <span class="modal-title" id="protocolViewTitle">Данные протокола ЕЛИС</span>
                 </div>
-                <!-- Переключатель режима отображения -->
-                <div class="protocol-view-toggle">
-                    <button type="button" class="toggle-btn active" id="btnViewTable" onclick="switchProtocolView('table')">
-                        <i class="fa fa-table"></i> Таблица
-                    </button>
-                    <button type="button" class="toggle-btn" id="btnViewJson" onclick="switchProtocolView('json')">
-                        <i class="fa fa-code"></i> JSON
-                    </button>
-                </div>
                 <!-- Содержимое модального окна -->
                 <div class="modal-body">
                     <!-- Табличное представление -->
@@ -82,6 +73,12 @@
                 </div>
                 <!-- Футер модального окна -->
                 <div class="modal-footer">
+                    <button type="button" class="toggle-btn active" id="btnViewTable" onclick="switchProtocolView('table')">
+                        <i class="fa fa-table"></i> Таблица
+                    </button>
+                    <button type="button" class="toggle-btn" id="btnViewJson" onclick="switchProtocolView('json')">
+                        <i class="fa fa-code"></i> JSON
+                    </button>
                     <button type="button" class="btn btn-secondary" onclick="closeProtocolView()">Закрыть</button>
                 </div>
             </div>
