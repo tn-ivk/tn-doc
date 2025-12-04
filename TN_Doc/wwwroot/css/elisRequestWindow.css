@@ -289,18 +289,10 @@
 }
 
 /* ========================================
-   Переключатель режима отображения
+   Переключатель режима отображения (в футере)
    ======================================== */
 
-.protocol-view-toggle {
-  display: flex;
-  gap: 0;
-  padding: 10px 15px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid var(--md-outline-light, #e0e0e0);
-}
-
-.protocol-view-toggle .toggle-btn {
+.modal-footer .toggle-btn {
   padding: 8px 16px;
   font-size: 13px;
   font-family: Arial, sans-serif;
@@ -312,28 +304,20 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  border-radius: 4px;
 }
 
-.protocol-view-toggle .toggle-btn:first-child {
-  border-radius: 6px 0 0 6px;
-  border-right: none;
-}
-
-.protocol-view-toggle .toggle-btn:last-child {
-  border-radius: 0 6px 6px 0;
-}
-
-.protocol-view-toggle .toggle-btn:hover:not(.active) {
+.modal-footer .toggle-btn:hover:not(.active) {
   background-color: var(--md-primary-light, #e3f2fd);
 }
 
-.protocol-view-toggle .toggle-btn.active {
+.modal-footer .toggle-btn.active {
   background-color: var(--md-primary, #1976d2);
   color: var(--md-white, #fff);
   border-color: var(--md-primary, #1976d2);
 }
 
-.protocol-view-toggle .toggle-btn i {
+.modal-footer .toggle-btn i {
   font-size: 14px;
 }
 
