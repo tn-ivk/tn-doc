@@ -94,6 +94,71 @@ export function useDocumentEditor() {
         count: restoredCount
       });
     }
+
+    // Восстанавливаем userData в опциях IOF полей для корректной работы автозаполнения Post/Factory
+    restoreUserDataInSignerOptions();
+  };
+
+  /**
+   * Восстанавливает userData в опциях полей IOF (подписанты).
+   *
+   * При первичной загрузке ELIS, userData (post, factory) сохраняется в опции IOF поля.
+   * При повторном открытии документа эти данные теряются, т.к. опции загружаются из конфигурации.
+   * Эта функция восстанавливает userData из elisOriginal значений Post/Factory,
+   * чтобы механизм автозаполнения работал корректно.
+   */
+  const restoreUserDataInSignerOptions = () => {
+    const formData = store.formData;
+    const config = store.config;
+
+    if (!config) return;
+
+    // Группы полей подписантов: IOF -> Post, Factory
+    const signerGroups = [
+      { iof: 'Laboratory_IOF', post: 'Laboratory_Post', factory: 'Laboratory_Factory' },
+      { iof: 'Delive_IOF', post: 'Delive_Post', factory: 'Delive_Factory' },
+      { iof: 'Receive_IOF', post: 'Receive_Post', factory: 'Receive_Factory' }
+    ];
+
+    for (const group of signerGroups) {
+      const iofValue = formData[group.iof];
+      const postElisOriginal = formData[`${group.post}__elisOriginal`];
+      const factoryElisOriginal = formData[`${group.factory}__elisOriginal`];
+
+      // Проверяем, есть ли ELIS данные для восстановления
+      if (!iofValue || (postElisOriginal === undefined && factoryElisOriginal === undefined)) {
+        continue;
+      }
+
+      // Найти поле IOF в конфигурации
+      const iofField = config.fields.find(f => f.key === group.iof);
+      if (!iofField?.options) {
+        continue;
+      }
+
+      // Найти текущую выбранную опцию
+      const option = iofField.options.find(opt => opt.value === iofValue);
+      if (!option) {
+        continue;
+      }
+
+      // Восстанавливаем userData с ELIS значениями
+      // Приоритет: elisOriginal > существующие данные в опции > пустая строка
+      const restoredData = {
+        ...(option.data || {}),
+        post: postElisOriginal ?? option.data?.post ?? '',
+        factory: factoryElisOriginal ?? option.data?.factory ?? ''
+      };
+
+      option.data = restoredData;
+
+      logger.debug('[restoreUserDataInSignerOptions] Восстановлен userData для IOF', {
+        iofKey: group.iof,
+        iofValue,
+        post: restoredData.post,
+        factory: restoredData.factory
+      });
+    }
   };
 
   /**
