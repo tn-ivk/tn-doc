@@ -5,6 +5,7 @@
     class="manual-method-dialog"
     header="Редактирование метода испытаний"
     :closable="false"
+    :style="{ minWidth: '500px' }"
     @update:visible="updateVisible"
   >
     <div class="dialog-body">

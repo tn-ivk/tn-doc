@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents and reports from measurement system data (ИВК - Измерительно-вычислительный комплекс). The system generates quality certificates, verification protocols, acceptance acts, and various measurement reports using FastReport templates.
 
 **Version**: 1.4.4-dev (.NET 8.0)
-**Main Development Branch**: develop
+**Main Branch**: master (для PR и релизов)
 **Runtime**: .NET Runtime 8.0.13+ (SDK 9.0+ для разработки)
 **Node.js**: 18.0+ и npm 8.0+ (для Vue компонентов)
 
@@ -97,7 +97,7 @@ Run `git submodule update --init --recursive` after initial clone.
 
 ### Document Module Pattern
 
-Each document type implements **IDocumentEditor** interface (defined in `TN.DocGeneral/IDocumentEditor.cs`):
+Each document type implements **IDocumentEditor** interface (defined in `TN.DocGeneral/Interfaces/IDocumentEditor.cs`):
 
 1. **`GetViewDoc(id)`**: Returns JSON data for FastReport template
 2. **`GetPathTemplateFile()`**: Returns path to `.frx` template file
@@ -108,6 +108,12 @@ Each document type implements **IDocumentEditor** interface (defined in `TN.DocG
 - `TN_Doc/Cfg/Cfg{DocumentType}.json` - template and report settings
 - `TN_Doc/Cfg/CfgEdit{DocumentType}.json` - edit form configuration (supports `SlaveKey` for master-slave parameters)
 - `TN_Doc/Doc/{Number}_{DocumentType}.frx` - FastReport template
+
+**Master-Slave Parameters (v1.4.4+):**
+- `SlaveKey` в конфигурации определяет связь между параметрами
+- Мастер-параметр содержит `SlaveKey` со ссылкой на слейв
+- Пример: DNP.kPa (мастер) → DNP.mercury_mm (слейв)
+- Подробнее: `docs/configs/passport.md`
 
 **Field History System (v1.4.4+):**
 - Tracks data source for each field (ELIS, manual edit, IVK rounding)
@@ -121,7 +127,7 @@ Registered in `Startup.cs:ConfigureServices()`:
 
 **Singleton:**
 - `IAppConfigService` - Configuration management and document class factory
-- `IReportBuffer` - In-memory PDF storage (eliminates disk I/O)
+- `IReportBuffer` - In-memory PDF/HTML storage (исключает дисковые операции, возврат через StringWriter)
 - `IConfigurationCacheService` - Configuration file caching with LRU eviction
 - `IDocModuleLoader` - Document DLL loading cache
 

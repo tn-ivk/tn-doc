@@ -5,6 +5,7 @@
     class="result-edit-dialog"
     header="Редактирование результата"
     :closable="false"
+    :style="{ minWidth: '500px' }"
     @update:visible="updateVisible"
   >
     <div class="dialog-body">
