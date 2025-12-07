@@ -340,7 +340,6 @@ defineExpose({
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 1rem;
 }
 
 :deep(.p-message) {

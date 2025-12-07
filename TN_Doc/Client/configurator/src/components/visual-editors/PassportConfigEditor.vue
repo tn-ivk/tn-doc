@@ -88,7 +88,7 @@ function updateAdditionalFields(fields: PassportAdditionalField[]) {
 }
 
 :deep(.p-tablist) {
-  flex-shrink: 0;
+  flex: 0 0 auto !important;
 }
 
 :deep(.p-tabpanels) {
@@ -96,6 +96,7 @@ function updateAdditionalFields(fields: PassportAdditionalField[]) {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  padding: 0.5rem 0 0 0 !important;
 }
 
 :deep(.p-tabpanel) {
@@ -103,7 +104,7 @@ function updateAdditionalFields(fields: PassportAdditionalField[]) {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
+  padding: 0;
 }
 
 :deep(.p-tab) {
