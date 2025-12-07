@@ -106,16 +106,13 @@ function clearSlaveKey(index: number) {
         </template>
       </Column>
 
-      <Column field="IsBallast" header="Балласт" :style="{ width: '90px' }">
+      <Column field="IsBallast" header="Балласт" :style="{ width: '70px' }">
         <template #body="{ data, index }">
-          <div class="ballast-cell">
-            <Checkbox
-              :modelValue="data.IsBallast"
-              @update:modelValue="updateParameter(index, 'IsBallast', $event)"
-              binary
-            />
-            <Tag v-if="data.IsBallast" value="R=M" severity="secondary" />
-          </div>
+          <Checkbox
+            :modelValue="data.IsBallast"
+            @update:modelValue="updateParameter(index, 'IsBallast', $event)"
+            binary
+          />
         </template>
       </Column>
 
@@ -207,12 +204,6 @@ function clearSlaveKey(index: number) {
 .param-name {
   font-size: 0.9rem;
   white-space: pre-line;
-}
-
-.ballast-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .slave-cell {
