@@ -89,7 +89,7 @@ function clearSlaveKey(index: number) {
         </template>
       </Column>
 
-      <Column field="Use" header="Вкл" :style="{ width: '60px' }">
+      <Column field="Use" header="Вкл" :style="{ width: '60px' }" headerClass="text-center" bodyClass="text-center">
         <template #body="{ data, index }">
           <Checkbox
             :modelValue="data.Use"
@@ -99,7 +99,7 @@ function clearSlaveKey(index: number) {
         </template>
       </Column>
 
-      <Column field="Edit" header="Редакт." :style="{ width: '80px' }">
+      <Column field="Edit" header="Редакт." :style="{ width: '80px' }" headerClass="text-center" bodyClass="text-center">
         <template #body="{ data, index }">
           <Checkbox
             :modelValue="data.Edit"
@@ -109,7 +109,7 @@ function clearSlaveKey(index: number) {
         </template>
       </Column>
 
-      <Column field="IsBallast" header="Балласт" :style="{ width: '70px' }">
+      <Column field="IsBallast" header="Балласт" :style="{ width: '70px' }" headerClass="text-center" bodyClass="text-center">
         <template #body="{ data, index }">
           <Checkbox
             :modelValue="data.IsBallast"
@@ -158,7 +158,7 @@ function clearSlaveKey(index: number) {
         </template>
       </Column>
 
-      <Column field="RequiredFill" header="Обяз." :style="{ width: '70px' }">
+      <Column field="RequiredFill" header="Обяз." :style="{ width: '70px' }" headerClass="text-center" bodyClass="text-center">
         <template #body="{ data, index }">
           <Checkbox
             :modelValue="data.RequiredFill ?? false"
@@ -233,5 +233,9 @@ function clearSlaveKey(index: number) {
 :deep(.p-tag) {
   font-size: 0.75rem;
   padding: 0.15rem 0.4rem;
+}
+
+:deep(.text-center) {
+  text-align: center;
 }
 </style>

@@ -61,7 +61,7 @@ function updateField(index: number, field: keyof PassportAdditionalField, value:
         </template>
       </Column>
 
-      <Column field="Use" header="Вкл" :style="{ width: '60px' }">
+      <Column field="Use" header="Вкл" :style="{ width: '60px' }" headerClass="text-center" bodyClass="text-center">
         <template #body="{ data, index }">
           <Checkbox
             :modelValue="data.Use"
@@ -118,5 +118,9 @@ function updateField(index: number, field: keyof PassportAdditionalField, value:
 .type-label {
   font-size: 0.9rem;
   color: var(--md-on-surface, #424242);
+}
+
+:deep(.text-center) {
+  text-align: center;
 }
 </style>
