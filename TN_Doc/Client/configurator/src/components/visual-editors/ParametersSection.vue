@@ -40,10 +40,13 @@ function getMasterKey(slaveKey: string): string {
 
 // Доступные ключи для выбора в качестве slave
 function getAvailableSlaves(currentKey: string) {
+  const currentParam = props.parameters.find(p => p.Key === currentKey);
+  const currentSlaveKey = currentParam?.SlaveKey;
+
   return props.parameters
     .filter(p =>
       p.Key !== currentKey &&      // Не сам себя
-      !isSlaveOf(p.Key) &&         // Не уже slave другого
+      (!isSlaveOf(p.Key) || p.Key === currentSlaveKey) &&  // Не уже slave другого, ИЛИ это текущий slave
       !p.SlaveKey                  // Не является мастером
     )
     .map(p => ({ label: p.Key, value: p.Key }));
