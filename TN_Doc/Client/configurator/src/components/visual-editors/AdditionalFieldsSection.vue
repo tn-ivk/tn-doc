@@ -3,7 +3,6 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
-import Select from 'primevue/select';
 import type { PassportAdditionalField } from '@/types/passport-config.types';
 import { FIELD_TYPES } from '@/types/passport-config.types';
 
@@ -46,7 +45,7 @@ function updateField(index: number, field: keyof PassportAdditionalField, value:
         </template>
       </Column>
 
-      <Column field="Name" header="Название" :style="{ minWidth: '250px' }">
+      <Column field="Name" header="Наименование" :style="{ minWidth: '250px' }">
         <template #body="{ data, index }">
           <InputText
             :modelValue="data.Name"
@@ -57,15 +56,8 @@ function updateField(index: number, field: keyof PassportAdditionalField, value:
       </Column>
 
       <Column field="Type" header="Тип" :style="{ width: '180px' }">
-        <template #body="{ data, index }">
-          <Select
-            :modelValue="data.Type"
-            @update:modelValue="updateField(index, 'Type', $event)"
-            :options="fieldTypeOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="type-dropdown"
-          />
+        <template #body="{ data }">
+          <span class="type-label">{{ fieldTypeOptions.find(ft => ft.value === data.Type)?.label || data.Type }}</span>
         </template>
       </Column>
 
@@ -123,11 +115,8 @@ function updateField(index: number, field: keyof PassportAdditionalField, value:
   width: 100%;
 }
 
-.type-dropdown {
-  width: 100%;
-}
-
-:deep(.type-dropdown .p-select) {
-  width: 100%;
+.type-label {
+  font-size: 0.9rem;
+  color: var(--md-on-surface, #424242);
 }
 </style>
