@@ -306,7 +306,8 @@ public class ConfigurationService : IConfigurationService
     }
 
     /// <summary>
-    /// Сохранить содержимое конфигурационного файла документа
+    /// Сохранить содержимое конфигурационного файла документа.
+    /// Сохраняет в AppContext.BaseDirectory для немедленного применения и корректной инвалидации кэша.
     /// </summary>
     public async Task<bool> SaveDocumentConfigAsync(string configPath, string content)
     {
@@ -323,10 +324,10 @@ public class ConfigurationService : IConfigurationService
         try
         {
             // Нормализуем путь (удаляем начальный слеш, если есть)
-            var normalizedPath = configPath.TrimStart('/');
+            var normalizedPath = configPath.TrimStart('/', '\\');
 
-            // Получаем полный путь к файлу относительно корня приложения
-            var fullPath = Path.Combine(_environment.ContentRootPath, normalizedPath);
+            // Сохраняем в AppContext.BaseDirectory - где реально читаются файлы
+            var fullPath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
 
             _logger.LogInformation("Сохранение конфигурации документа: {FilePath}", fullPath);
 
