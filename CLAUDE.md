@@ -8,6 +8,7 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 
 **Version**: 1.4.4-dev (.NET 8.0)
 **Main Branch**: master (для PR и релизов)
+**Development Branch**: developWork (текущая разработка)
 **Runtime**: .NET Runtime 8.0.13+ (SDK 9.0+ для разработки)
 **Node.js**: 18.0+ и npm 8.0+ (для Vue компонентов)
 
@@ -81,7 +82,7 @@ tn_doc/
 │       └── shared/            # Shared TypeScript utilities
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
-├── tn.docgeneral/             # ⚠️ Document module libraries (git submodule, ~41 libraries)
+├── tn.docgeneral/             # ⚠️ Document module libraries (git submodule, 41+ библиотек)
 ├── tn_toolsfastreport/        # ⚠️ FastReport utilities (git submodule)
 ├── winprutil/                 # ⚠️ Windows printing utility (git submodule)
 └── Tests/                     # NUnit tests with Moq
@@ -120,6 +121,19 @@ Each document type implements **IDocumentEditor** interface (defined in `TN.DocG
 - History stored in `__fieldHistory` object with field key prefix
 - Visual indicators in Document Editor (colored badges for data source)
 - Requires `IsUsedElis = true` in configuration
+
+### API Controllers
+
+Ключевые контроллеры в `TN_Doc/Controllers/`:
+
+| Controller | Назначение |
+|------------|------------|
+| `HomeController` | Главная страница, просмотр/печать документов |
+| `DocumentEditController` | API редактирования документов (Vue Document Editor) |
+| `ConfiguratorController` | API конфигуратора устройств и настроек |
+| `StatusController` | API статуса системы (SignalR) |
+| `ElisController` | Интеграция с ELIS (лабораторные данные) |
+| `DictionaryController` | Справочники (методы испытаний, подписанты) |
 
 ### Key Services (Dependency Injection)
 
@@ -176,6 +190,21 @@ All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables
 - **Styles**: PrimeVue overlay panels require global styles (not scoped)
 - **Naming**: PascalCase for component files, kebab-case for directories
 - **Workspaces**: Project uses npm workspaces (statusbar, configurator, document-editor, shared)
+
+## Current Development Focus (v1.4.4)
+
+**Document Editor** - Vue 3 компонент для редактирования документов в браузере:
+- Расположение: `TN_Doc/Client/document-editor/`
+- Статус: **В активной разработке**
+- Ключевые файлы:
+  - `src/components/DocumentPassportEditor.vue` - редактор паспорта качества
+  - `src/stores/documentStore.ts` - Pinia store для состояния документа
+  - `src/composables/usePassportEditor.ts` - логика редактирования паспорта
+
+**Завершённые миграции v1.4.4:**
+- Все 41 библиотека используют `IDocumentEditor.SaveDocument`
+- Система истории изменений полей (Field History)
+- Механизм связанных параметров (master-slave) для паспорта
 
 ## Key Dependencies and External Systems
 
@@ -252,10 +281,19 @@ Deploy at the same level (share TN_Doc configuration):
 - **Submodules**: При выполнении /commit делать коммит в основном репозитории и в submodule tn.docgeneral
 - **No AI Attribution**: НИКОГДА не упоминать AI, Claude, автоматическую генерацию в коммитах
 
+**Примеры хороших коммитов:**
+```
+Document Editor: исправлена валидация datetime-local полей
+Passport: добавлен механизм master-slave параметров
+StatusBar: убрана ложная кликабельность индикаторов
+```
+
 ## Additional Resources
 
 - [AGENTS.md](AGENTS.md) - Подробные правила стиля кода, тестирования и коммитов
 - [CHANGELOG.md](CHANGELOG.md) - История версий (⚠️ проверить перед большими изменениями)
 - [README.md](README.md) - Общее описание проекта и быстрый старт
 - `/docs/` - Документация по архитектуре, API, развёртыванию
+- `/docs/features/field-history.md` - Документация системы истории полей
+- `/docs/configs/passport.md` - Конфигурация паспорта и SlaveKey
 - `.cursor/rules/` - Дополнительные правила для Cursor IDE
