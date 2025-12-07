@@ -29,6 +29,14 @@
   - Интеграция с ELIS для загрузки данных лаборатории
   - Интеграция с OPC для связи с устройствами
   - Автозаполнение зависимых параметров
+- 🚀 Configurator: визуальный редактор конфигурации паспорта качества
+  - Визуальное редактирование `CfgEditPassport*.json` вместо ручного JSON
+  - Вкладка "Параметры": таблица с колонками Key, Name, Use, Edit, IsBallast, SlaveKey, RoundValue, RequiredFill
+  - Вкладка "Дополнительные поля": таблица AdditionalInfo с редактированием Name и Type
+  - Переключатель режима "Визуальный / JSON" для fallback на сырой JSON
+  - Расширяемая архитектура: легко добавить редакторы для других типов документов (KMH, Poverka)
+  - Новые компоненты: `PassportConfigEditor.vue`, `ParametersSection.vue`, `AdditionalFieldsSection.vue`
+  - Composable `useVisualEditor.ts` для определения типа редактора по имени файла
 
 ### Changed
 - ⚠️ **Завершена миграция на IDocumentEditor.SaveDocument**
@@ -77,6 +85,11 @@
   - Позволяет скрыть незавершённые или не настроенные шаблоны
 
 ### Fixed
+- 🐞 Исправлена инвалидация кэша конфигурационных файлов в Конфигураторе
+  - Проблема: изменения CfgEditPassport*.json через Конфигуратор не применялись при редактировании паспорта
+  - Причина: ConfigurationService сохранял в ContentRootPath, а DocPassport читал из AppContext.BaseDirectory
+  - Решение: ConfigurationService.SaveDocumentConfigAsync теперь сохраняет в AppContext.BaseDirectory
+  - Кэш корректно инвалидируется, т.к. ключ кэша и путь сохранения совпадают
 - 🐞 Исправлена валидация requiredFill для заблокированных полей Измерение
   - Если поле Измерение заблокировано для ввода (`editable: false`), валидация `requiredFill` не применяется
   - Позволяет сохранять паспорта качества с заблокированными полями без заполнения
