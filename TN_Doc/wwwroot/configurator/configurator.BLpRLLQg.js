@@ -1,1 +1,0 @@
-import{d as s,c as t,o as e,a,_ as n}from"./configurator.js";const r={class:"passport-config-editor"},c=s({__name:"PassportConfigEditor",props:{config:{},configPath:{}},emits:["update:config"],setup(p){return(i,o)=>(e(),t("div",r,[...o[0]||(o[0]=[a("p",null,"Визуальный редактор паспорта (в разработке)",-1)])]))}}),_=n(c,[["__scopeId","data-v-edc2abac"]]);export{_ as default};
