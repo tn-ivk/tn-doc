@@ -83,10 +83,13 @@ const treeNodes = computed<TreeNodeType[]>(() => {
       if (!documentMap.has(doc.IdDoc)) {
         const children: TreeNodeType[] = [];
 
-        // Добавляем только используемые шаблоны
+        // Добавляем только используемые шаблоны с существующим конфигурационным файлом
         if (doc.TemplateDocs) {
           const usedTemplateIds = usedDocuments.get(doc.IdDoc);
           for (const template of doc.TemplateDocs) {
+            // Пропускаем шаблоны без конфигурационного файла редактирования
+            if (!template.PathToDocEditConfigFile) continue;
+
             if (usedTemplateIds?.has(`${template.Id}`)) {
               children.push({
                 key: `doc-${doc.IdDoc}-template-${template.Id}`,
