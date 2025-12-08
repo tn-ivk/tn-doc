@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="source !== DataSource.Unknown && source !== DataSource.Auto"
+    v-tooltip.top="displayConfig.description"
     class="field-history-indicator"
     :style="{ right: `${rightOffset}px` }"
   >
@@ -53,6 +54,7 @@ const displayConfig = computed(() => {
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: help;
 }
 
 .indicator-text {
