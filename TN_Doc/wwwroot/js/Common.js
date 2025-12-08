@@ -509,6 +509,7 @@ function InitDevices() {
 }
 
 function InitDocs() {
+    var previousDocId = $('#ComboboxDocGUID').val();  // сохраняем текущий выбор
 
     $('#ComboboxDocGUID').empty();
     $('.FR').attr('src', '');
@@ -528,6 +529,11 @@ function InitDocs() {
                 data.forEach((item) => {
                     $('#ComboboxDocGUID').append('<option value=' + item.id + '>' + item.name + '</option>');
                 });
+
+                // Восстанавливаем выбор, если документ есть в новом списке
+                if (previousDocId && $(`#ComboboxDocGUID option[value="${previousDocId}"]`).length > 0) {
+                    $('#ComboboxDocGUID').val(previousDocId);
+                }
             },
         });
     updateSaveBtnText();
