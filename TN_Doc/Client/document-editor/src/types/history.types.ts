@@ -15,7 +15,9 @@ export enum DataSource {
   /** Автоматическое заполнение (без визуального индикатора) */
   Auto = 'Auto',
   /** Возврат к оригинальному значению ЕЛИС */
-  ReturnToELIS = 'ReturnToELIS'
+  ReturnToELIS = 'ReturnToELIS',
+  /** Метод по умолчанию (автоматически подставлен из конфигурации) */
+  DefaultMethod = 'DefaultMethod'
 }
 
 /**
@@ -91,5 +93,10 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     color: '#4CAF50',
     text: 'ЕЛИС',
     description: 'Возврат к значению из протокола ЕЛИС'
+  },
+  [DataSource.DefaultMethod]: {
+    icon: 'pi-user-edit',
+    color: '#2196F3',
+    description: 'Метод по умолчанию'
   }
 };

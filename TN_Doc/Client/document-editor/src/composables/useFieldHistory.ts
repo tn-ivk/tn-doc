@@ -73,6 +73,8 @@ export function useFieldHistory() {
       ? 'ELIS'
       : source === DataSource.ReturnToELIS
       ? MANUAL_AUTHOR  // Возврат к ELIS - это действие пользователя
+      : source === DataSource.DefaultMethod
+      ? 'Система'  // Метод по умолчанию - системное действие
       : MANUAL_AUTHOR;
 
     const entry = {
@@ -220,6 +222,20 @@ export function useFieldHistory() {
   };
 
   /**
+   * Отследить подстановку метода по умолчанию
+   * Используется при загрузке документа, если метод был автоматически подставлен из конфигурации
+   */
+  const trackDefaultMethod = (fieldKey: string, methodName: string) => {
+    const entry = createHistoryEntry(
+      DataSource.DefaultMethod,
+      methodName,
+      undefined,
+      'Метод по умолчанию'
+    );
+    addHistoryEntry(fieldKey, entry);
+  };
+
+  /**
    * Получить историю поля
    */
   const getFieldHistory = (fieldKey: string): FieldHistoryEntry[] => {
@@ -257,6 +273,7 @@ export function useFieldHistory() {
     trackIVKRounding,
     trackReturnToElis,
     trackAutoFill,
+    trackDefaultMethod,
     getFieldHistory,
     getLastSource,
     getLastModifiedBy
