@@ -749,13 +749,6 @@
     {
       "Id": 16,
       "Use": true,
-      "Key": "TankerName",
-      "Type": "text",
-      "Name": "Название танкера"
-    },
-    {
-      "Id": 17,
-      "Use": true,
       "Key": "ElisProtocolNumber",
       "Type": "text",
       "Name": "Номер протокола испытаний ЕЛИС",

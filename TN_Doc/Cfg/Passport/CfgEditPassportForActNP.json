@@ -703,13 +703,6 @@
       "ElisAlias": ["endPeriodTime"],
       "Type": "datetime-local",
       "Name": "Дата и время отбора пробы (окончание)"
-    },
-    {
-      "Id": 16,
-      "Use": false,
-      "Key": "TankerName",
-      "Type": "text",
-      "Name": "Название танкера"
     }
   ]
 }
