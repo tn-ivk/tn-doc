@@ -54,7 +54,6 @@ const displayConfig = computed(() => {
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  cursor: help;
 }
 
 .indicator-text {
