@@ -4,6 +4,7 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
+import Tooltip from 'primevue/tooltip';
 import { logger } from '@tn-doc/shared';
 import router from './router';
 import App from './App.vue';
@@ -93,5 +94,8 @@ app.use(PrimeVue, {
 // Toast и Confirmation сервисы
 app.use(ToastService);
 app.use(ConfirmationService);
+
+// Директивы
+app.directive('tooltip', Tooltip);
 
 app.mount('#app');

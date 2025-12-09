@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="source !== DataSource.Unknown && source !== DataSource.Auto"
+    v-tooltip.top="displayConfig.description"
     class="field-history-indicator"
     :style="{ right: `${rightOffset}px` }"
-    @click.stop="handleClick"
   >
     <!-- Текстовая метка (для ELIS и ИВК) -->
     <span
@@ -26,7 +26,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { DataSource, SOURCE_DISPLAY_CONFIG } from '@/types/history.types';
-import { logger } from '@tn-doc/shared';
 
 const props = withDefaults(defineProps<{
   /** Источник данных */
@@ -37,21 +36,9 @@ const props = withDefaults(defineProps<{
   rightOffset: 4
 });
 
-const emit = defineEmits<{
-  (e: 'click', event: MouseEvent): void;
-}>();
-
 const displayConfig = computed(() => {
   return SOURCE_DISPLAY_CONFIG[props.source];
 });
-
-/**
- * Обработчик клика по индикатору
- */
-const handleClick = (event: MouseEvent) => {
-  logger.debug(`[FieldHistoryIndicator] click - источник: ${props.source}`);
-  emit('click', event);
-};
 </script>
 
 <style scoped>
@@ -62,18 +49,11 @@ const handleClick = (event: MouseEvent) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   z-index: 10;
   padding: 2px 2px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.field-history-indicator:hover {
-  transform: scale(1.05);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .indicator-text {

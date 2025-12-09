@@ -16,28 +16,18 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
-      @click="onIndicatorClick"
-    />
-
-    <!-- Popup с историей -->
-    <FieldHistoryPopup
-      ref="historyPopup"
-      :history="fieldHistory"
-      :fieldLabel="field.label"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import FormField from '@/components/FormField.vue';
 import FieldHistoryIndicator from '@/components/history/FieldHistoryIndicator.vue';
-import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { useDocumentStore } from '@/stores/documentStore';
 import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
-import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
 import { normalizeValue, normalizeDateTimeForComparison } from '@/utils/passport-utils';
 
 const props = defineProps<{
@@ -56,22 +46,12 @@ const emit = defineEmits<{
 const store = useDocumentStore();
 
 const {
-  getFieldHistory,
   getLastSource,
   trackManualChange,
   trackReturnToElis
 } = useFieldHistory();
 
 const ELIS_HIGHLIGHT_COLOR = 'var(--md-elis-highlight, #e8f5e9)';
-
-const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
-
-/**
- * История поля
- */
-const fieldHistory = computed(() => {
-  return getFieldHistory(props.field.key);
-});
 
 /**
  * Последний источник изменений
@@ -138,15 +118,6 @@ const handleChange = (newValue: any) => {
 
   // Передаем изменение дальше (store.updateField обновит __elisFilled)
   emit('update:modelValue', newValue);
-};
-
-/**
- * Обработчик клика на индикатор - показываем popup
- */
-const onIndicatorClick = (event: MouseEvent) => {
-  // Закрыть все другие popup-ы истории перед открытием нового
-  closeAllHistoryPopups();
-  historyPopup.value?.show(event);
 };
 </script>
 

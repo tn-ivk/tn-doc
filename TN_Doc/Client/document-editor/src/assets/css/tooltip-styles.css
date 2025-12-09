@@ -1,4 +1,32 @@
-/* Глобальные стили для tooltip с ошибками */
+/* Глобальные стили для tooltip (по умолчанию) */
+.p-tooltip .p-tooltip-text {
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 0.875rem !important;
+  padding: 0.4rem 0.75rem !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  line-height: 1.3 !important;
+}
+
+/* Стрелка tooltip */
+.p-tooltip-top .p-tooltip-arrow {
+  border-top-color: #ffffff !important;
+}
+
+.p-tooltip-bottom .p-tooltip-arrow {
+  border-bottom-color: #ffffff !important;
+}
+
+.p-tooltip-left .p-tooltip-arrow {
+  border-left-color: #ffffff !important;
+}
+
+.p-tooltip-right .p-tooltip-arrow {
+  border-right-color: #ffffff !important;
+}
+
+/* Стили для tooltip с ошибками */
 .p-error-tooltip {
   background-color: #dc3545 !important;
   color: white !important;

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="09/30/2025 11:17:18" ReportInfo.CreatorVersion="2025.2.8.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/09/2025 01:10:58" ReportInfo.CreatorVersion="2026.1.2.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -9,7 +9,7 @@ using FastReport.Barcode;
 using FastReport.Table;  
 using FastReport.Utils;
 using Newtonsoft.Json.Linq;
-
+using System.Globalization;
 
 namespace FastReport
 {
@@ -176,20 +176,22 @@ namespace FastReport
 
     private static JToken GetMetod(JToken metods, string parameterKey) =&gt; metods.FirstOrDefault(x =&gt; x[&quot;ParameterKey&quot;].ToString() == parameterKey);
 
-    private static string GetResult(JToken metod, string result)
+    private static string GetResult(JToken method, string result)
     {
+      if (method == null || string.IsNullOrEmpty(result))
+        return result ?? string.Empty;
+         
+      var methodValue = method[&quot;Value&quot;]?.Value&lt;string&gt;();
+      if (!string.IsNullOrEmpty(methodValue) &amp;&amp; !CanParseToFloat(methodValue))
+        return methodValue.Replace('.', ',');
+      
       result = result.Replace('.', ',');
-
-      if ((bool)metod[&quot;Metod&quot;][&quot;LimitValueActivate&quot;])
-      {
-        if (!float.TryParse(result, out float value)) return result; //value = 0.0f;
-
-        float limitValue = (float)metod[&quot;Metod&quot;][&quot;LimitValue&quot;];
-
-        result = value &lt; limitValue ? $&quot;{metod[&quot;Metod&quot;][&quot;LimitValueString&quot;]}&quot; : result;
-      }
-
       return result;
+    }
+    
+    private static bool CanParseToFloat(string value)
+    {
+      return !string.IsNullOrWhiteSpace(value) &amp;&amp; float.TryParse(value.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out _);
     }
      
     public void  DrawTableSigners()
@@ -252,7 +254,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTablePassport" Top="146.42" Width="718.2" Height="349.65" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
+    <DataBand Name="DataBandTablePassport" Top="145.47" Width="718.2" Height="349.65" CanGrow="true" CanShrink="true" AfterPrintEvent="DataBandTableAct_AfterPrint" CanBreak="true">
       <TableObject Name="TablePassport" Top="9.45" Width="718.2" Height="340.2" Border.Lines="All" GrowToBottom="true" FixedRows="1">
         <TableColumn Name="Column22" Width="30.24"/>
         <TableColumn Name="Column8" Width="434.7"/>
@@ -356,7 +358,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="498.85" Width="718.2" Height="308.07" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="496.94" Width="718.2" Height="308.07" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="9.45" Width="718.2" Height="295.12">
         <TableColumn Name="Column29" Width="283.5"/>
         <TableColumn Name="Column31" Width="202.23"/>

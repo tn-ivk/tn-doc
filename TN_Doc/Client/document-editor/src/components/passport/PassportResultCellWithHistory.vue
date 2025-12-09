@@ -16,27 +16,17 @@
       v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
       :source="lastSource"
       :rightOffset="4"
-      @click="onIndicatorClick"
-    />
-
-    <!-- Popup с историей -->
-    <FieldHistoryPopup
-      ref="historyPopup"
-      :history="fieldHistory"
-      :fieldLabel="parameter.name"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import PassportResultCell from './PassportResultCell.vue';
 import FieldHistoryIndicator from '@/components/history/FieldHistoryIndicator.vue';
-import FieldHistoryPopup from '@/components/history/FieldHistoryPopup.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
 import type { PassportQualityParameter } from '@/types/passport.types';
-import { closeAllHistoryPopups } from '@/utils/historyPopupEvents';
 
 const props = defineProps<{
   parameter: PassportQualityParameter;
@@ -47,24 +37,12 @@ const emit = defineEmits<{
   'result-edit': [];
 }>();
 
-const {
-  getFieldHistory,
-  getLastSource
-} = useFieldHistory();
-
-const historyPopup = ref<InstanceType<typeof FieldHistoryPopup>>();
+const { getLastSource } = useFieldHistory();
 
 /**
  * Ключ для истории: result.{parameterKey}
  */
 const historyKey = computed(() => `result.${props.parameter.key}`);
-
-/**
- * История поля
- */
-const fieldHistory = computed(() => {
-  return getFieldHistory(historyKey.value);
-});
 
 /**
  * Последний источник изменений
@@ -95,15 +73,6 @@ const editDisabledReason = computed(() => {
  */
 const handleEditRequest = () => {
   emit('result-edit');
-};
-
-/**
- * Обработчик клика на индикатор - показываем popup
- */
-const onIndicatorClick = (event: MouseEvent) => {
-  // Закрыть все другие popup-ы истории перед открытием нового
-  closeAllHistoryPopups();
-  historyPopup.value?.show(event);
 };
 </script>
 
