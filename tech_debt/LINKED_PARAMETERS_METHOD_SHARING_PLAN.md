@@ -15,13 +15,13 @@
 | 2 | Бэкенд: логика построения схемы | ✅ Завершён |
 | 3 | Бэкенд: сохранение документа | ✅ Завершён |
 | 4 | Фронтенд: типы TypeScript | ✅ Завершён |
-| 5 | Фронтенд: логика usePassportEditor | ⬜ Не начат |
+| 5 | Фронтенд: логика usePassportEditor | ✅ Завершён |
 | 6 | Фронтенд: UI компоненты | ⬜ Не начат |
 | 7 | Конфигурации JSON | ⬜ Не начат |
 | 8 | Тестирование | ⬜ Не начат |
 | 9 | Документация | ⬜ Не начат |
 
-**Общий прогресс: 4/9 этапов**
+**Общий прогресс: 5/9 этапов**
 
 ---
 
@@ -217,9 +217,9 @@ export interface PassportQualityParameterSchema {
 
 ### Задачи
 
-- [ ] **5.1** Обновить `handleMethodUpdate` для синхронизации методов
-- [ ] **5.2** Добавить функцию `findParameterSchema`
-- [ ] **5.3** Обновить логику истории изменений для связанных параметров
+- [x] **5.1** Обновить `handleMethodUpdate` для синхронизации методов
+- [x] **5.2** Добавить функцию `findParameterSchema` — уже существовала
+- [x] **5.3** Обновить логику истории изменений для связанных параметров
 
 ### 5.1 Обновление handleMethodUpdate
 
@@ -519,13 +519,13 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 ## Связанные файлы
 
 ### Бэкенд (C#)
-- [ ] `tn.docgeneral/Passport/Models/Parameter.cs`
-- [ ] `tn.docgeneral/Passport/PassportEditModels.cs`
-- [ ] `tn.docgeneral/Passport/DocPassport.Editor.cs`
+- [x] `tn.docgeneral/Passport/Models/Parameter.cs`
+- [x] `tn.docgeneral/Passport/PassportEditModels.cs`
+- [x] `tn.docgeneral/Passport/DocPassport.Editor.cs`
 
 ### Фронтенд (TypeScript/Vue)
-- [ ] `TN_Doc/Client/document-editor/src/types/passport.types.ts`
-- [ ] `TN_Doc/Client/document-editor/src/composables/usePassportEditor.ts`
+- [x] `TN_Doc/Client/document-editor/src/types/passport.types.ts`
+- [x] `TN_Doc/Client/document-editor/src/composables/usePassportEditor.ts`
 - [ ] `TN_Doc/Client/document-editor/src/components/passport/PassportQualityTable.vue`
 - [ ] `TN_Doc/Client/document-editor/src/components/passport/PassportLinkedParameterGroup.vue` (новый)
 
@@ -554,3 +554,4 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 | 2025-12-11 | Этап 2 завершён: реализован метод ResolveLinkedParametersRoles, интеграция в BuildQualityParametersSchema, unit-тесты |
 | 2025-12-11 | Этап 3 завершён: синхронизация методов LinkedParameters в SaveDocument, метод GetQualityParameterByKey, unit-тесты |
 | 2025-12-11 | Этап 4 завершён: добавлены TypeScript типы linkedParameter, isLinkedFollower, linkedLeaderKey в PassportQualityParameterSchema |
+| 2025-12-11 | Этап 5 завершён: обновлён handleMethodUpdate для синхронизации методов в связанные параметры, добавлена история изменений для linked параметров |
