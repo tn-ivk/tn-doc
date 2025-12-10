@@ -14,14 +14,14 @@
 | 1 | Бэкенд: модели данных | ✅ Завершён |
 | 2 | Бэкенд: логика построения схемы | ✅ Завершён |
 | 3 | Бэкенд: сохранение документа | ✅ Завершён |
-| 4 | Фронтенд: типы TypeScript | ⬜ Не начат |
+| 4 | Фронтенд: типы TypeScript | ✅ Завершён |
 | 5 | Фронтенд: логика usePassportEditor | ⬜ Не начат |
 | 6 | Фронтенд: UI компоненты | ⬜ Не начат |
 | 7 | Конфигурации JSON | ⬜ Не начат |
 | 8 | Тестирование | ⬜ Не начат |
 | 9 | Документация | ⬜ Не начат |
 
-**Общий прогресс: 3/9 этапов**
+**Общий прогресс: 4/9 этапов**
 
 ---
 
@@ -180,9 +180,9 @@ foreach (var item in data.Values.Where(x => x.Tag == "Metod"))
 
 ### Задачи
 
-- [ ] **4.1** Добавить поля в `PassportQualityParameterSchema`
-- [ ] **4.2** Обновить `PassportQualityParameter` (если нужно)
-- [ ] **4.3** Запустить `npm run type-check`
+- [x] **4.1** Добавить поля в `PassportQualityParameterSchema`
+- [x] **4.2** Обновить `PassportQualityParameter` (если нужно) — наследуется от схемы, изменения не требуются
+- [x] **4.3** Запустить `npm run type-check`
 
 ### 4.1 Обновление типов
 
@@ -553,3 +553,4 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 | 2025-12-11 | Этап 1 завершён: добавлены поля LinkedParameters в модели данных |
 | 2025-12-11 | Этап 2 завершён: реализован метод ResolveLinkedParametersRoles, интеграция в BuildQualityParametersSchema, unit-тесты |
 | 2025-12-11 | Этап 3 завершён: синхронизация методов LinkedParameters в SaveDocument, метод GetQualityParameterByKey, unit-тесты |
+| 2025-12-11 | Этап 4 завершён: добавлены TypeScript типы linkedParameter, isLinkedFollower, linkedLeaderKey в PassportQualityParameterSchema |
