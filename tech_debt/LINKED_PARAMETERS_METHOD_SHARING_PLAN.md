@@ -11,7 +11,7 @@
 
 | Этап | Описание | Статус |
 |------|----------|--------|
-| 1 | Бэкенд: модели данных | ⬜ Не начат |
+| 1 | Бэкенд: модели данных | ✅ Завершён |
 | 2 | Бэкенд: логика построения схемы | ⬜ Не начат |
 | 3 | Бэкенд: сохранение документа | ⬜ Не начат |
 | 4 | Фронтенд: типы TypeScript | ⬜ Не начат |
@@ -21,7 +21,7 @@
 | 8 | Тестирование | ⬜ Не начат |
 | 9 | Документация | ⬜ Не начат |
 
-**Общий прогресс: 0/9 этапов**
+**Общий прогресс: 1/9 этапов**
 
 ---
 
@@ -50,9 +50,9 @@
 
 ### Задачи
 
-- [ ] **1.1** Добавить поле `LinkedParameters` в модель `Parameter`
-- [ ] **1.2** Добавить поля в модель `QualityParameterSchema`
-- [ ] **1.3** Проверить сериализацию/десериализацию JSON
+- [x] **1.1** Добавить поле `LinkedParameter` в модель `Parameter`
+- [x] **1.2** Добавить поля в модель `QualityParameterSchema`
+- [x] **1.3** Проверить сериализацию/десериализацию JSON
 
 ### 1.1 Модель Parameter (TN.Doc.Edit)
 
@@ -60,13 +60,13 @@
 
 ```csharp
 /// <summary>
-/// Список ключей связанных параметров, использующих общий метод испытаний.
+/// Ключ связанного параметра, использующего общий метод испытаний.
 /// Используется когда параметры НЕ связаны через SlaveKey, но должны
 /// использовать одинаковый метод испытаний.
-/// Пример: ["Chloride_Salts.MassFraction"] для параметра "Chloride_Salts.Concentration"
+/// Пример: "Chloride_Salts.MassFraction" для параметра "Chloride_Salts.Concentration"
 /// </summary>
 [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-public string[] LinkedParameters { get; set; }
+public string LinkedParameter { get; set; }
 ```
 
 ### 1.2 Модель QualityParameterSchema
@@ -75,11 +75,11 @@ public string[] LinkedParameters { get; set; }
 
 ```csharp
 /// <summary>
-/// Список ключей связанных параметров (для объединения методов испытаний).
-/// Null или пустой = независимый параметр.
+/// Ключ связанного параметра (для объединения методов испытаний).
+/// Указывается на ведущем параметре группы. Null = независимый параметр.
 /// </summary>
 [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-public List<string> LinkedParameters { get; set; }
+public string LinkedParameter { get; set; }
 
 /// <summary>
 /// Признак того, что параметр является "ведомым" в группе LinkedParameters.
@@ -119,7 +119,7 @@ private void ResolveLinkedParametersRoles(List<QualityParameterSchema> schemas, 
     // Построить карту: ключ параметра → его схема
     var keyToSchema = schemas.ToDictionary(s => s.Key, s => s, StringComparer.OrdinalIgnoreCase);
 
-    foreach (var param in editCfg.Parameters.Where(p => p.Use && p.LinkedParameters?.Length > 0))
+    foreach (var param in editCfg.Parameters.Where(p => p.Use && !string.IsNullOrEmpty(p.LinkedParameter)))
     {
         // Пропускаем, если есть SlaveKey (SlaveKey имеет приоритет)
         if (!string.IsNullOrEmpty(param.SlaveKey))
@@ -128,17 +128,14 @@ private void ResolveLinkedParametersRoles(List<QualityParameterSchema> schemas, 
         // Ведущий параметр
         if (keyToSchema.TryGetValue(param.Key, out var leaderSchema))
         {
-            leaderSchema.LinkedParameters = param.LinkedParameters.ToList();
+            leaderSchema.LinkedParameter = param.LinkedParameter;
         }
 
-        // Ведомые параметры
-        foreach (var followerKey in param.LinkedParameters)
+        // Ведомый параметр
+        if (keyToSchema.TryGetValue(param.LinkedParameter, out var followerSchema))
         {
-            if (keyToSchema.TryGetValue(followerKey, out var followerSchema))
-            {
-                followerSchema.IsLinkedFollower = true;
-                followerSchema.LinkedLeaderKey = param.Key;
-            }
+            followerSchema.IsLinkedFollower = true;
+            followerSchema.LinkedLeaderKey = param.Key;
         }
     }
 }
@@ -159,7 +156,7 @@ private void ResolveLinkedParametersRoles(List<QualityParameterSchema> schemas, 
 **Файл:** `tn.docgeneral/Passport/DocPassport.Editor.cs`
 
 ```csharp
-// При сохранении метода ведущего параметра → записать в ведомые
+// При сохранении метода ведущего параметра → записать в ведомый
 foreach (var item in data.Values.Where(x => x.Tag == "Metod"))
 {
     var paramKey = item.Key.Replace("method.", "");
@@ -168,14 +165,11 @@ foreach (var item in data.Values.Where(x => x.Tag == "Metod"))
     // Стандартная обработка метода для текущего параметра
     ProcessMethodSave(paramKey, item, dataArm, corr);
 
-    // Если есть LinkedParameters → скопировать метод в связанные параметры
-    if (paramConfig?.LinkedParameters?.Length > 0 && string.IsNullOrEmpty(paramConfig.SlaveKey))
+    // Если есть LinkedParameter → скопировать метод в связанный параметр
+    if (!string.IsNullOrEmpty(paramConfig?.LinkedParameter) && string.IsNullOrEmpty(paramConfig.SlaveKey))
     {
-        foreach (var linkedKey in paramConfig.LinkedParameters)
-        {
-            // Копируем тот же метод в связанный параметр
-            ProcessMethodSave(linkedKey, item, dataArm, corr);
-        }
+        // Копируем тот же метод в связанный параметр
+        ProcessMethodSave(paramConfig.LinkedParameter, item, dataArm, corr);
     }
 }
 ```
@@ -199,10 +193,10 @@ export interface PassportQualityParameterSchema {
   // ... существующие поля ...
 
   /**
-   * Список ключей связанных параметров (для объединения методов испытаний).
+   * Ключ связанного параметра (для объединения методов испытаний).
    * Указывается на ведущем параметре группы.
    */
-  linkedParameters?: string[];
+  linkedParameter?: string;
 
   /**
    * Признак того, что параметр является "ведомым" в группе LinkedParameters.
@@ -249,14 +243,12 @@ function handleMethodUpdate(event: MethodUpdateEvent) {
 
   trackMethodChange(methodKey, methodOption?.name);
 
-  // Если есть linkedParameters → записать метод во все связанные параметры
+  // Если есть linkedParameter → записать метод в связанный параметр
   const schema = findParameterSchema(event.paramKey);
-  if (schema?.linkedParameters?.length && !schema.slaveKey) {
-    for (const linkedKey of schema.linkedParameters) {
-      const linkedMethodKey = `method.${linkedKey}`;
-      updates[linkedMethodKey] = methodJson;
-      trackMethodChange(linkedMethodKey, methodOption?.name, 'Синхронизация метода');
-    }
+  if (schema?.linkedParameter && !schema.slaveKey) {
+    const linkedMethodKey = `method.${schema.linkedParameter}`;
+    updates[linkedMethodKey] = methodJson;
+    trackMethodChange(linkedMethodKey, methodOption?.name, 'Синхронизация метода');
   }
 
   store.bulkUpdateFields(updates);
@@ -368,14 +360,12 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
     processedKeys.add(param.key);
     currentIndex++;
 
-    if (param.linkedParameters?.length) {
-      for (const linkedKey of param.linkedParameters) {
-        const follower = props.parameters.find(p => p.key === linkedKey);
-        if (follower && !processedKeys.has(linkedKey)) {
-          group.followers.push(follower);
-          processedKeys.add(linkedKey);
-          currentIndex++;
-        }
+    if (param.linkedParameter) {
+      const follower = props.parameters.find(p => p.key === param.linkedParameter);
+      if (follower && !processedKeys.has(param.linkedParameter)) {
+        group.followers.push(follower);
+        processedKeys.add(param.linkedParameter);
+        currentIndex++;
       }
     }
 
@@ -408,7 +398,7 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
   "Id": 7,
   "Key": "Chloride_Salts.Concentration",
   "Name": "Массовая концентрация хлористых солей, мг/дм³",
-  "LinkedParameters": ["Chloride_Salts.MassFraction"],
+  "LinkedParameter": "Chloride_Salts.MassFraction",
   "Use": true,
   "Edit": true,
   "IsBallast": true
@@ -417,13 +407,13 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 
 ### Пары для добавления
 
-| Ведущий параметр | LinkedParameters |
-|------------------|------------------|
-| `Chloride_Salts.Concentration` | `["Chloride_Salts.MassFraction"]` |
-| `DNP.kPa` | `["DNP.mercury_mm"]` |
-| `Yield_fraction_200` | `["Yield_fraction_300"]` |
+| Ведущий параметр | LinkedParameter |
+|------------------|-----------------|
+| `Chloride_Salts.Concentration` | `"Chloride_Salts.MassFraction"` |
+| `DNP.kPa` | `"DNP.mercury_mm"` |
+| `Yield_fraction_200` | `"Yield_fraction_300"` |
 
-**Важно:** Для конфигураций с `SlaveKey` (GOSTR) `LinkedParameters` **не добавляется**.
+**Важно:** Для конфигураций с `SlaveKey` (GOSTR) `LinkedParameter` **не добавляется**.
 
 ---
 
@@ -560,3 +550,4 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 |------|-----------|
 | 2025-12-11 | Создание плана |
 | 2025-12-11 | Добавлены чекбоксы для отслеживания выполнения |
+| 2025-12-11 | Этап 1 завершён: добавлены поля LinkedParameters в модели данных |
