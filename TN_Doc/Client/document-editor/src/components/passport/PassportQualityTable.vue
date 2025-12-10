@@ -27,20 +27,35 @@
         </tr>
       </thead>
 
-      <!-- Тело таблицы -->
+      <!-- Тело таблицы с группировкой параметров -->
       <tbody>
-        <PassportParameterRow
-          v-for="(param, index) in parameters"
-          :key="param.key"
-          :parameter="param"
-          :index="index + 1"
-          :isElisUsed="isElisUsed"
-          @update:method="$emit('update:method', $event)"
-          @update:measurement="$emit('update:measurement', $event)"
-          @update:result="$emit('update:result', $event)"
-          @result-edit="handleResultEditRequest"
-          @manual-method="handleManualMethodRequest"
-        />
+        <template v-for="group in parameterGroups" :key="group.leader.key">
+          <!-- Связанная группа параметров (с rowspan) -->
+          <PassportLinkedParameterGroup
+            v-if="group.followers.length > 0"
+            :leader="group.leader"
+            :followers="group.followers"
+            :startIndex="group.startIndex"
+            :isElisUsed="isElisUsed"
+            @update:method="$emit('update:method', $event)"
+            @update:measurement="$emit('update:measurement', $event)"
+            @update:result="$emit('update:result', $event)"
+            @result-edit="handleResultEditRequest"
+            @manual-method="handleManualMethodRequest"
+          />
+          <!-- Одиночный параметр (без группы) -->
+          <PassportParameterRow
+            v-else
+            :parameter="group.leader"
+            :index="group.startIndex"
+            :isElisUsed="isElisUsed"
+            @update:method="$emit('update:method', $event)"
+            @update:measurement="$emit('update:measurement', $event)"
+            @update:result="$emit('update:result', $event)"
+            @result-edit="handleResultEditRequest"
+            @manual-method="handleManualMethodRequest"
+          />
+        </template>
       </tbody>
     </table>
   </div>
@@ -66,12 +81,25 @@
 
 <script setup lang="ts">
 import { logger } from '@tn-doc/shared';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import PassportParameterRow from './PassportParameterRow.vue';
+import PassportLinkedParameterGroup from './PassportLinkedParameterGroup.vue';
 import ResultEditDialog from './ResultEditDialog.vue';
 import ManualMethodDialog, { type ManualMethodPayload } from './ManualMethodDialog.vue';
 import { documentApi } from '@/services/api.service';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
+
+/**
+ * Группа параметров для отображения в таблице
+ */
+interface ParameterGroup {
+  /** Ведущий параметр группы */
+  leader: PassportQualityParameter;
+  /** Ведомые параметры (linkedParameter) */
+  followers: PassportQualityParameter[];
+  /** Начальный индекс (номер первой строки) */
+  startIndex: number;
+}
 
 interface Props {
   /** Список качественных параметров */
@@ -91,6 +119,52 @@ const emit = defineEmits<{
   'update:measurement': [event: { paramKey: string; value: string }];
   'update:result': [event: { paramKey: string; value: string }];
 }>();
+
+/**
+ * Группировка параметров по linkedParameter.
+ *
+ * Логика:
+ * - Параметры с role === 'Slave' пропускаются (они скрыты)
+ * - Параметры с linkedParameter становятся лидерами групп
+ * - Параметры, указанные в linkedParameter другого параметра, становятся followers
+ * - Остальные параметры отображаются как одиночные (followers = [])
+ */
+const parameterGroups = computed<ParameterGroup[]>(() => {
+  const groups: ParameterGroup[] = [];
+  const processedKeys = new Set<string>();
+  let currentIndex = 1;
+
+  for (const param of props.parameters) {
+    // Пропускаем уже обработанные параметры
+    if (processedKeys.has(param.key)) continue;
+
+    // Пропускаем Slave-параметры (они скрыты по SlaveKey механизму)
+    if (param.role === 'Slave') continue;
+
+    const group: ParameterGroup = {
+      leader: param,
+      followers: [],
+      startIndex: currentIndex
+    };
+
+    processedKeys.add(param.key);
+    currentIndex++;
+
+    // Если у параметра есть linkedParameter, найти ведомый параметр
+    if (param.linkedParameter) {
+      const follower = props.parameters.find(p => p.key === param.linkedParameter);
+      if (follower && !processedKeys.has(param.linkedParameter)) {
+        group.followers.push(follower);
+        processedKeys.add(param.linkedParameter);
+        currentIndex++;
+      }
+    }
+
+    groups.push(group);
+  }
+
+  return groups;
+});
 
 const resultDialogVisible = ref(false);
 const manualMethodDialogVisible = ref(false);
@@ -328,5 +402,33 @@ function getCurrentMethod(): MethodOption | undefined {
 
 .quality-table tbody tr:last-child td:last-child {
   border-bottom-right-radius: 8px;
+}
+
+/* ===== Стили для связанных групп параметров (LinkedParameters) ===== */
+
+/* Тонкая левая граница для визуализации группировки */
+.quality-table :deep(.linked-group-leader td:first-child),
+.quality-table :deep(.linked-group-follower td:first-child) {
+  border-left: 3px solid var(--md-primary-light, #64B5F6);
+}
+
+/* Ячейки с rowspan центрируются вертикально */
+.quality-table :deep(td[rowspan]) {
+  vertical-align: middle;
+}
+
+/* Визуальное разделение групп - усиленная верхняя граница у лидера */
+.quality-table :deep(.linked-group-leader td) {
+  border-top: 2px solid var(--md-outline, #DADCE0);
+}
+
+/* Более тонкие границы внутри группы */
+.quality-table :deep(.linked-group-follower td) {
+  border-top: 1px dashed var(--md-outline-light, #E0E0E0);
+}
+
+/* Последний follower в группе - усиленная нижняя граница */
+.quality-table :deep(.linked-group-follower:last-of-type td) {
+  border-bottom: 2px solid var(--md-outline, #DADCE0);
 }
 </style>

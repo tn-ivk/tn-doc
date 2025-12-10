@@ -16,12 +16,12 @@
 | 3 | Бэкенд: сохранение документа | ✅ Завершён |
 | 4 | Фронтенд: типы TypeScript | ✅ Завершён |
 | 5 | Фронтенд: логика usePassportEditor | ✅ Завершён |
-| 6 | Фронтенд: UI компоненты | ⬜ Не начат |
+| 6 | Фронтенд: UI компоненты | ✅ Завершён |
 | 7 | Конфигурации JSON | ⬜ Не начат |
 | 8 | Тестирование | ⬜ Не начат |
 | 9 | Документация | ⬜ Не начат |
 
-**Общий прогресс: 5/9 этапов**
+**Общий прогресс: 6/9 этапов**
 
 ---
 
@@ -261,10 +261,10 @@ function handleMethodUpdate(event: MethodUpdateEvent) {
 
 ### Задачи
 
-- [ ] **6.1** Создать компонент `PassportLinkedParameterGroup.vue`
-- [ ] **6.2** Обновить `PassportQualityTable.vue` с группировкой
-- [ ] **6.3** Добавить стили для объединённых ячеек
-- [ ] **6.4** Проверить отображение в браузере
+- [x] **6.1** Создать компонент `PassportLinkedParameterGroup.vue`
+- [x] **6.2** Обновить `PassportQualityTable.vue` с группировкой
+- [x] **6.3** Добавить стили для объединённых ячеек
+- [x] **6.4** Проверить отображение в браузере
 
 ### 6.1 Компонент PassportLinkedParameterGroup
 
@@ -526,8 +526,8 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 ### Фронтенд (TypeScript/Vue)
 - [x] `TN_Doc/Client/document-editor/src/types/passport.types.ts`
 - [x] `TN_Doc/Client/document-editor/src/composables/usePassportEditor.ts`
-- [ ] `TN_Doc/Client/document-editor/src/components/passport/PassportQualityTable.vue`
-- [ ] `TN_Doc/Client/document-editor/src/components/passport/PassportLinkedParameterGroup.vue` (новый)
+- [x] `TN_Doc/Client/document-editor/src/components/passport/PassportQualityTable.vue`
+- [x] `TN_Doc/Client/document-editor/src/components/passport/PassportLinkedParameterGroup.vue` (новый)
 
 ### Конфигурации
 - [ ] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(13).json`
@@ -555,3 +555,4 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 | 2025-12-11 | Этап 3 завершён: синхронизация методов LinkedParameters в SaveDocument, метод GetQualityParameterByKey, unit-тесты |
 | 2025-12-11 | Этап 4 завершён: добавлены TypeScript типы linkedParameter, isLinkedFollower, linkedLeaderKey в PassportQualityParameterSchema |
 | 2025-12-11 | Этап 5 завершён: обновлён handleMethodUpdate для синхронизации методов в связанные параметры, добавлена история изменений для linked параметров |
+| 2025-12-11 | Этап 6 завершён: создан PassportLinkedParameterGroup.vue с rowspan, обновлён PassportQualityTable.vue с группировкой параметров, добавлены стили для связанных групп, backward compatibility проверена |
