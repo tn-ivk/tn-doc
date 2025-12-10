@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/09/2025 01:03:38" ReportInfo.CreatorVersion="2026.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll" DoublePass="true" FinishReportEvent="_FinishReport" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/10/2025 23:34:33" ReportInfo.CreatorVersion="2026.1.2.0">
   <ScriptText>using System;
 using System.Linq;
 using FastReport;
@@ -160,7 +160,7 @@ namespace FastReport
         return result ?? string.Empty;
          
       var methodValue = method[&quot;Value&quot;]?.Value&lt;string&gt;();
-      if (!string.IsNullOrEmpty(methodValue) &amp;&amp; !CanParseToFloat(methodValue))
+      if (!string.IsNullOrEmpty(methodValue) &amp;&amp; !CanParseToFloat(methodValue) &amp;&amp; methodValue != &quot;-&quot;)
         return methodValue.Replace('.', ',');
       
       result = result.Replace('.', ',');
