@@ -417,18 +417,6 @@ function getCurrentMethod(): MethodOption | undefined {
   vertical-align: middle;
 }
 
-/* Визуальное разделение групп - усиленная верхняя граница у лидера */
-.quality-table :deep(.linked-group-leader td) {
-  border-top: 2px solid var(--md-outline, #DADCE0);
-}
-
-/* Более тонкие границы внутри группы */
-.quality-table :deep(.linked-group-follower td) {
-  border-top: 1px dashed var(--md-outline-light, #E0E0E0);
-}
-
-/* Последний follower в группе - усиленная нижняя граница */
-.quality-table :deep(.linked-group-follower:last-of-type td) {
-  border-bottom: 2px solid var(--md-outline, #DADCE0);
-}
+/* Границы групп - такие же как у обычных параметров (1px solid) */
+/* Группы визуально выделены только синей левой границей */
 </style>
