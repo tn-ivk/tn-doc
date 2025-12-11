@@ -431,6 +431,7 @@
       "ElisAlias": [
         "Массовая концентрация хлористых солей(мг/дм³)"
       ],
+      "LinkedParameter": "Chloride_Salts.MassFraction",
       "RequiredFill": true,
       "RoundValue": 1,
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
@@ -459,6 +460,7 @@
       "ElisAlias": [
         "Давление насыщенных паров(кПа)"
       ],
+      "LinkedParameter": "DNP.mercury_mm",
       "RequiredFill": true,
       "RoundValue": 1,
       "Name": "Давление насыщенных паров, кПа",
@@ -566,6 +568,7 @@
       "Id": 16,
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
+      "LinkedParameter": "Yield_fraction_300",
       "Use": true,
       "Edit": true,
       "IsBallast": false

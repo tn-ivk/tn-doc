@@ -49,6 +49,24 @@ export interface PassportQualityParameterSchema {
   methodSource?: MethodSource;
   /** Роль параметра в связке master-slave (Slave-параметры не заполняются из ELIS) */
   role?: ParameterRole;
+
+  /**
+   * Ключ связанного параметра (для объединения методов испытаний).
+   * Указывается на ведущем параметре группы. Null = независимый параметр.
+   * Пример: "Chloride_Salts.MassFraction" для параметра "Chloride_Salts.Concentration"
+   */
+  linkedParameter?: string;
+
+  /**
+   * Признак того, что параметр является "ведомым" в группе LinkedParameters.
+   * Если true, комбобокс метода скрывается (используется метод ведущего параметра).
+   */
+  isLinkedFollower?: boolean;
+
+  /**
+   * Ключ ведущего параметра, если текущий параметр является ведомым в группе.
+   */
+  linkedLeaderKey?: string;
 }
 
 /**
