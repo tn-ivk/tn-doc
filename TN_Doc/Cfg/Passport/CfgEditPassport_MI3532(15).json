@@ -434,6 +434,7 @@
       "Id": 7,
       "Key": "Chloride_Salts.Concentration",
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
+      "LinkedParameter": "Chloride_Salts.MassFraction",
       "Use": true,
       "Edit": true,
       "IsBallast": true
@@ -466,6 +467,7 @@
       "Id": 11,
       "Key": "DNP.kPa",
       "Name": "Давление насыщенных паров, кПа",
+      "LinkedParameter": "DNP.mercury_mm",
       "Use": true,
       "Edit": true,
       "IsBallast": false
@@ -482,6 +484,7 @@
       "Id": 13,
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
+      "LinkedParameter": "Yield_fraction_300",
       "Use": true,
       "Edit": true,
       "IsBallast": false

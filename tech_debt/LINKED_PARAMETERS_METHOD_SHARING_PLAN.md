@@ -17,11 +17,11 @@
 | 4 | Фронтенд: типы TypeScript | ✅ Завершён |
 | 5 | Фронтенд: логика usePassportEditor | ✅ Завершён |
 | 6 | Фронтенд: UI компоненты | ✅ Завершён |
-| 7 | Конфигурации JSON | ⬜ Не начат |
+| 7 | Конфигурации JSON | ✅ Завершён |
 | 8 | Тестирование | ⬜ Не начат |
 | 9 | Документация | ⬜ Не начат |
 
-**Общий прогресс: 6/9 этапов**
+**Общий прогресс: 7/9 этапов**
 
 ---
 
@@ -382,14 +382,14 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 
 ### Задачи
 
-- [ ] **7.1** Обновить `CfgEditPassport_MI3532(13).json`
-- [ ] **7.2** Обновить `CfgEditPassport_MI3532(14).json`
-- [ ] **7.3** Обновить `CfgEditPassport_MI3532(15).json`
-- [ ] **7.4** Обновить `CfgEditPassport_MI3532(15)_China.json`
-- [ ] **7.5** Обновить `CfgEditPassportExport.json`
-- [ ] **7.6** Обновить `CfgEditPassportForActNP.json`
-- [ ] **7.7** Обновить `CfgEditPassport_EAC.json`
-- [ ] **7.8** Валидация JSON через `jq`
+- [x] **7.1** Обновить `CfgEditPassport_MI3532(13).json`
+- [x] **7.2** Обновить `CfgEditPassport_MI3532(14).json`
+- [x] **7.3** Обновить `CfgEditPassport_MI3532(15).json`
+- [x] **7.4** Обновить `CfgEditPassport_MI3532(15)_China.json`
+- [x] **7.5** Обновить `CfgEditPassportExport.json`
+- [x] **7.6** Обновить `CfgEditPassportForActNP.json`
+- [x] **7.7** Обновить `CfgEditPassport_EAC.json`
+- [x] **7.8** Валидация JSON через PowerShell
 
 ### Пример изменений
 
@@ -530,13 +530,13 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 - [x] `TN_Doc/Client/document-editor/src/components/passport/PassportLinkedParameterGroup.vue` (новый)
 
 ### Конфигурации
-- [ ] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(13).json`
-- [ ] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(14).json`
-- [ ] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15).json`
-- [ ] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json`
-- [ ] `TN_Doc/Cfg/Passport/CfgEditPassportExport.json`
-- [ ] `TN_Doc/Cfg/Passport/CfgEditPassportForActNP.json`
-- [ ] `TN_Doc/Cfg/Passport/CfgEditPassport_EAC.json`
+- [x] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(13).json`
+- [x] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(14).json`
+- [x] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15).json`
+- [x] `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json`
+- [x] `TN_Doc/Cfg/Passport/CfgEditPassportExport.json`
+- [x] `TN_Doc/Cfg/Passport/CfgEditPassportForActNP.json`
+- [x] `TN_Doc/Cfg/Passport/CfgEditPassport_EAC.json`
 
 ### Документация
 - [ ] `docs/configs/passport.md`
@@ -556,3 +556,4 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 | 2025-12-11 | Этап 4 завершён: добавлены TypeScript типы linkedParameter, isLinkedFollower, linkedLeaderKey в PassportQualityParameterSchema |
 | 2025-12-11 | Этап 5 завершён: обновлён handleMethodUpdate для синхронизации методов в связанные параметры, добавлена история изменений для linked параметров |
 | 2025-12-11 | Этап 6 завершён: создан PassportLinkedParameterGroup.vue с rowspan, обновлён PassportQualityTable.vue с группировкой параметров, добавлены стили для связанных групп, backward compatibility проверена |
+| 2025-12-11 | Этап 7 завершён: добавлено LinkedParameter в 7 конфигурационных файлов (MI3532(13), MI3532(14), MI3532(15), MI3532(15)_China, Export, ForActNP, EAC), JSON валидация пройдена |
