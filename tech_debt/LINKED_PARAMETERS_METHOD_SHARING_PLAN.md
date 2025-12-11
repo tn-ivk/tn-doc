@@ -19,9 +19,9 @@
 | 6 | Фронтенд: UI компоненты | ✅ Завершён |
 | 7 | Конфигурации JSON | ✅ Завершён |
 | 8 | Тестирование | ✅ Завершён |
-| 9 | Документация | ⬜ Не начат |
+| 9 | Документация | ✅ Завершён |
 
-**Общий прогресс: 8/9 этапов**
+**Общий прогресс: 9/9 этапов ✅ ЗАВЕРШЕНО**
 
 ---
 
@@ -464,9 +464,9 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 
 ### Задачи
 
-- [ ] **9.1** Обновить `docs/configs/passport.md`
-- [ ] **9.2** Добавить раздел о LinkedParameters
-- [ ] **9.3** Обновить CHANGELOG.md
+- [x] **9.1** Обновить `docs/configs/passport.md`
+- [x] **9.2** Добавить раздел о LinkedParameters
+- [x] **9.3** Обновить CHANGELOG.md
 
 ---
 
@@ -547,8 +547,8 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 - [x] `TN_Doc/Cfg/Passport/CfgEditPassport_EAC.json`
 
 ### Документация
-- [ ] `docs/configs/passport.md`
-- [ ] `CHANGELOG.md`
+- [x] `docs/configs/passport.md`
+- [x] `CHANGELOG.md`
 
 ---
 
@@ -566,3 +566,4 @@ const parameterGroups = computed<ParameterGroup[]>(() => {
 | 2025-12-11 | Этап 6 завершён: создан PassportLinkedParameterGroup.vue с rowspan, обновлён PassportQualityTable.vue с группировкой параметров, добавлены стили для связанных групп, backward compatibility проверена |
 | 2025-12-11 | Этап 7 завершён: добавлено LinkedParameter в 7 конфигурационных файлов (MI3532(13), MI3532(14), MI3532(15), MI3532(15)_China, Export, ForActNP, EAC), JSON валидация пройдена |
 | 2025-12-11 | Этап 8 завершён: 10 unit-тестов пройдено, интеграционное тестирование через Playwright MCP выполнено успешно, LinkedParameters отображаются корректно в UI |
+| 2025-12-11 | Этап 9 завершён: обновлена документация passport.md (раздел LinkedParameters), обновлён CHANGELOG.md |
