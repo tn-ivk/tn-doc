@@ -208,7 +208,7 @@ function handleManualMethodRequest() {
 /* Визуальное выделение связанной группы */
 .linked-group-leader td,
 .linked-group-follower td {
-  background-color: var(--md-surface, #ffffff);
+  background-color: white;
 }
 
 /* Тонкая левая граница для визуализации группировки */
