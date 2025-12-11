@@ -273,16 +273,6 @@ export const useDocumentStore = defineStore('document', () => {
   function updateField(key: string, value: any): { isReturnToElis: boolean; wasElisField: boolean } {
     const previousValue = formData.value[key];
 
-    // DEBUG: Подробное логирование для полей подписантов
-    if (key.includes('_IOF') || key.includes('__label')) {
-      logger.debug('[documentStore.updateField] Обновление поля подписанта', {
-        key,
-        previousValue,
-        newValue: value,
-        stack: new Error().stack?.split('\n').slice(1, 5).join('\n')
-      });
-    }
-
     formData.value[key] = value;
     isDirty.value = true;
 
@@ -436,15 +426,6 @@ export const useDocumentStore = defineStore('document', () => {
         ...formData.value,
         __history: formHistory.value // Передаем историю
       };
-
-      // DEBUG: Логируем данные подписантов перед сохранением
-      const signerKeys = Object.keys(formData.value).filter(k => k.includes('_IOF') || k.includes('_Post') || k.includes('_Factory'));
-      const signerData: Record<string, any> = {};
-      for (const key of signerKeys) {
-        signerData[key] = formData.value[key];
-      }
-      logger.debug('[documentStore.saveDocument] Данные подписантов', signerData);
-
 
       const response = await documentApi.saveDocument(
         config.value.deviceId,

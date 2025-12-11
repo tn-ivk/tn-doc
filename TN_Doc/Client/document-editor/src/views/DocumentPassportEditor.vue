@@ -1,4 +1,3 @@
-import { logger } from '@tn-doc/shared';
 <template>
   <div class="passport-editor">
     <!-- Индикатор загрузки -->
@@ -85,8 +84,8 @@ import { logger } from '@tn-doc/shared';
                       :postValue="store.formData[row.group.post.key]"
                       :factoryValue="store.formData[row.group.factory.key]"
                       :invalidChars="store.config?.invalidChars || []"
-                      @update:iof="(value) => handleSignerIofUpdate(row.group.iof.key, value)"
-                      @update:iof-label="(label) => handleSignerIofLabelUpdate(row.group.iof.key, label)"
+                      @update:iof="(value) => store.updateField(row.group.iof.key, value)"
+                      @update:iof-label="(label) => store.updateField(`${row.group.iof.key}__label`, label)"
                       @update:post="(value) => store.updateField(row.group.post.key, value)"
                       @update:factory="(value) => store.updateField(row.group.factory.key, value)"
                     />
@@ -655,32 +654,6 @@ const handleElisData = (elisData: ElisPassportData) => {
 
 // Регистрируем обработчик ELIS данных
 useElisIntegration(handleElisData);
-
-/**
- * DEBUG: Обработчик обновления IOF подписанта с логированием
- */
-function handleSignerIofUpdate(key: string, value: any) {
-  logger.debug('[DocumentPassportEditor] handleSignerIofUpdate', {
-    key,
-    value,
-    currentStoreValue: store.formData[key]
-  });
-  store.updateField(key, value);
-}
-
-/**
- * DEBUG: Обработчик обновления label подписанта с логированием
- */
-function handleSignerIofLabelUpdate(key: string, label: string) {
-  const labelKey = `${key}__label`;
-  logger.debug('[DocumentPassportEditor] handleSignerIofLabelUpdate', {
-    key,
-    labelKey,
-    label,
-    currentStoreLabelValue: store.formData[labelKey]
-  });
-  store.updateField(labelKey, label);
-}
 
 // Загружаем документ при монтировании
 onMounted(async () => {

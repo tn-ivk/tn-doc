@@ -60,14 +60,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import FormFieldWithHistory from './FormFieldWithHistory.vue';
 import ManualSignerDialog from './ManualSignerDialog.vue';
 import type { ManualSignerPayload } from './ManualSignerDialog.vue';
 import type { FormField, SelectOption } from '@/types/document.types';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
-import { logger } from '@tn-doc/shared';
 
 const props = defineProps<{
   iof: FormField;
@@ -93,17 +92,6 @@ const emit = defineEmits<{
 const isDialogVisible = ref(false);
 
 const { getLastSource, trackManualChange } = useFieldHistory();
-
-// DEBUG: Отслеживание изменений iofValue извне
-watch(() => props.iofValue, (newVal, oldVal) => {
-  logger.debug('[SignerFieldGroup] iofValue изменился извне', {
-    fieldKey: props.iof.key,
-    oldVal,
-    newVal,
-    optionsCount: props.iof.options?.length,
-    selectedLabel: props.iof.options?.find(opt => opt.value === newVal)?.label
-  });
-}, { immediate: true });
 
 /**
  * Последний источник изменений для поля IOF
@@ -176,15 +164,6 @@ function handleIofChange(value: any) {
   const selectedOption = props.iof.options?.find(opt => opt.value === value);
   const label = selectedOption?.label || '';
 
-  logger.debug('[SignerFieldGroup] handleIofChange (выбор из списка)', {
-    fieldKey: props.iof.key,
-    previousValue: props.iofValue,
-    newValue: value,
-    selectedLabel: label,
-    optionsCount: props.iof.options?.length,
-    allOptions: props.iof.options?.map(o => ({ value: o.value, label: o.label }))
-  });
-
   emit('update:iof', value);
 
   // Передаём label для сохранения в БД
@@ -201,13 +180,6 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
     return;
   }
 
-  logger.debug('[SignerFieldGroup] handleManualSignerConfirm НАЧАЛО', {
-    fieldKey: props.iof.key,
-    inputName: name,
-    currentIofValue: props.iofValue,
-    optionsCountBefore: props.iof.options?.length
-  });
-
   // Сохраняем текущее значение для истории
   const previousValue = props.iofValue;
 
@@ -221,22 +193,11 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
   if (existingOption) {
     // Пользователь уже есть в списке - просто выбираем его
     newValue = existingOption.value;
-    logger.debug('[SignerFieldGroup] Найден существующий пользователь', {
-      fieldKey: props.iof.key,
-      existingValue: existingOption.value,
-      existingLabel: existingOption.label
-    });
   } else {
     // Создаём новую опцию с уникальным ID
     // ВАЖНО: Используем префикс 'manual_' чтобы ID точно не совпал с существующим
     // пользователем из ДРУГОЙ группы (ResolveSignerIoF ищет по всем группам)
     newValue = `manual_${Date.now()}`;
-
-    logger.debug('[SignerFieldGroup] Создаём новую опцию', {
-      fieldKey: props.iof.key,
-      newValue,
-      newLabel: name
-    });
 
     // Создаём новую опцию
     const newOption: SelectOption = {
@@ -249,10 +210,6 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
     // Добавляем опцию в список (мутация props.iof.options - допустима, т.к. это объект)
     if (props.iof.options) {
       props.iof.options.push(newOption);
-      logger.debug('[SignerFieldGroup] Опция добавлена в список', {
-        fieldKey: props.iof.key,
-        optionsCountAfter: props.iof.options.length
-      });
     }
 
     // Эмитим событие для родительского компонента (для возможной синхронизации)
@@ -261,12 +218,6 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
 
   // Записываем ручное изменение в историю (ввод через диалог - это Manual)
   trackManualChange(props.iof.key, newValue, previousValue);
-
-  logger.debug('[SignerFieldGroup] handleManualSignerConfirm EMIT', {
-    fieldKey: props.iof.key,
-    emittingValue: newValue,
-    emittingLabel: name
-  });
 
   // Выбираем опцию
   emit('update:iof', newValue);
@@ -277,11 +228,6 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
 
   // Закрываем диалог
   isDialogVisible.value = false;
-
-  logger.debug('[SignerFieldGroup] handleManualSignerConfirm КОНЕЦ', {
-    fieldKey: props.iof.key,
-    finalValue: newValue
-  });
 }
 </script>
 
