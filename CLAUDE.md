@@ -42,7 +42,8 @@ npm run clean                                   # Clean all node_modules
 # Testing
 dotnet test                                     # Run all tests
 dotnet test --filter "ClassName=YourTestClass"  # Run specific test class
-dotnet test --filter "FullyQualifiedName~KMH"   # Test document type libraries
+dotnet test --filter "FullyQualifiedName~KMH"   # Test KMH libraries
+dotnet test --filter "Namespace~Poverka"        # Test Poverka libraries
 dotnet test --logger:"console;verbosity=detailed" # Verbose test output
 dotnet test /p:CollectCoverage=true             # Run tests with coverage
 ```
@@ -184,24 +185,40 @@ Layered configuration (loaded in order):
 All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables, never hardcode HEX colors.
 
 ### Vue Component Guidelines
-- **UI Library**: PrimeVue for all UI components
-- **Overlays**: Use `appendTo="body"` for dropdowns to avoid clipping
-- **DateTime**: Use local time (not UTC) to prevent timezone shifts
-- **Styles**: PrimeVue overlay panels require global styles (not scoped)
-- **Naming**: PascalCase for component files, kebab-case for directories
-- **Workspaces**: Project uses npm workspaces (statusbar, configurator, document-editor, shared)
+- **UI Library**: PrimeVue для всех UI компонентов
+- **Overlays**: Используйте `appendTo="body"` для dropdown чтобы избежать обрезания
+- **DateTime**: Используйте локальное время (не UTC) для предотвращения сдвига часового пояса
+- **Styles**: PrimeVue overlay panels требуют global styles (не scoped)
+- **Naming**: PascalCase для файлов компонентов, kebab-case для директорий
+- **Workspaces**: Проект использует npm workspaces (statusbar, configurator, document-editor, shared)
+- **State**: Pinia для управления состоянием, composables для переиспользуемой логики
 
-## Current Development Focus (v1.4.4)
+## Vue Dev Server Proxy
 
-**Document Editor** - Vue 3 компонент для редактирования документов в браузере:
+При разработке Vue компонентов dev-серверы проксируют API на бэкенд:
+- StatusBar (5173) → `http://localhost:38509`
+- Configurator (5174) → `http://localhost:38509`
+- Document Editor (5175) → `http://localhost:38509`
+
+Запуск полной среды разработки:
+```bash
+# Терминал 1: бэкенд
+cd TN_Doc && dotnet run
+
+# Терминал 2: Vue dev server (выбрать один)
+cd TN_Doc/Client && npm run dev:editor
+```
+
+## Document Editor
+
+Vue 3 компонент для редактирования документов в браузере:
 - Расположение: `TN_Doc/Client/document-editor/`
-- Статус: **В активной разработке**
 - Ключевые файлы:
   - `src/components/DocumentPassportEditor.vue` - редактор паспорта качества
   - `src/stores/documentStore.ts` - Pinia store для состояния документа
   - `src/composables/usePassportEditor.ts` - логика редактирования паспорта
 
-**Завершённые миграции v1.4.4:**
+**Ключевые фичи v1.4.4:**
 - Все 41 библиотека используют `IDocumentEditor.SaveDocument`
 - Система истории изменений полей (Field History)
 - Механизм связанных параметров (master-slave) для паспорта
@@ -278,8 +295,19 @@ Deploy at the same level (share TN_Doc configuration):
 
 - **Language**: Всегда использовать русский язык для коммит-сообщений
 - **Format**: Одно предложение с заглавной буквы, область изменения в начале (например: `Poverka: исправление расчёта`)
-- **Submodules**: При выполнении /commit делать коммит в основном репозитории и в submodule tn.docgeneral
+- **Submodules**: При изменении файлов в `tn.docgeneral/` делать коммит сначала в submodule, затем в основном репозитории
 - **No AI Attribution**: НИКОГДА не упоминать AI, Claude, автоматическую генерацию в коммитах
+
+**Работа с submodule tn.docgeneral:**
+```bash
+# После изменений в tn.docgeneral/
+cd tn.docgeneral
+git add . && git commit -m "Описание изменений"
+git push
+cd ..
+git add tn.docgeneral
+git commit -m "Обновлён субмодуль tn.docgeneral"
+```
 
 **Примеры хороших коммитов:**
 ```

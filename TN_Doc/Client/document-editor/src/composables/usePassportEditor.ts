@@ -515,6 +515,8 @@ export function usePassportEditor() {
   /**
    * Обработчик обновления метода испытаний
    * Примечание: пересчёт результата при изменении метода отключён
+   *
+   * При наличии linkedParameter метод синхронизируется в связанный параметр
    */
   function handleMethodUpdate(event: MethodUpdateEvent) {
     const param = findParameter(event.paramKey);
@@ -553,6 +555,20 @@ export function usePassportEditor() {
       [methodKey]: methodJson
     };
 
+    // Проверяем, есть ли связанный параметр (LinkedParameters)
+    // Если есть linkedParameter - записываем метод и в связанный параметр
+    const schema = findParameterSchema(event.paramKey);
+    if (schema?.linkedParameter) {
+      const linkedMethodKey = `method.${schema.linkedParameter}`;
+      updates[linkedMethodKey] = methodJson;
+
+      logger.debug('[usePassportEditor] Синхронизация метода в связанный параметр', {
+        leaderKey: event.paramKey,
+        followerKey: schema.linkedParameter,
+        methodName: newMethodName
+      });
+    }
+
     store.bulkUpdateFields(updates);
 
     // Записать историю изменения метода (только name, а не весь объект)
@@ -563,6 +579,17 @@ export function usePassportEditor() {
       } else {
         // Обычное ручное изменение
         trackManualChange(methodKey, newMethodName, previousMethodName || undefined);
+      }
+
+      // Если есть связанный параметр - записываем историю и для него
+      if (schema?.linkedParameter) {
+        const linkedMethodKey = `method.${schema.linkedParameter}`;
+        const linkedPreviousJson = store.formData[linkedMethodKey] || '';
+        const linkedPreviousMethod = tryParseMethod(linkedPreviousJson);
+        const linkedPreviousName = linkedPreviousMethod?.name || '';
+
+        // Записываем историю для связанного параметра как "синхронизация"
+        trackAutoFill(linkedMethodKey, newMethodName, linkedPreviousName || undefined);
       }
     }
   }

@@ -83,6 +83,83 @@
 - `TN_Doc/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json`
 - `TN_Doc/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json`
 
+### Связанные параметры с общим методом (LinkedParameters)
+**Введено:** Декабрь 2025
+
+**Назначение:** Объединение выбора метода испытаний для связанных параметров качества, когда между ними **не** установлена Slave-связь.
+
+**Контекст:** В таблице показателей качества паспорта существуют пары параметров, представляющих одну и ту же величину в разных единицах измерения. Для таких пар логично использовать один и тот же метод испытаний.
+
+**Отличие от SlaveKey:**
+| Механизм | SlaveKey | LinkedParameter |
+|----------|----------|-----------------|
+| Видимость | Slave-параметр скрыт | Оба параметра видимы |
+| Редактирование | Только Master | Оба параметра редактируемы |
+| Комбобокс метода | Один (у Master) | Один объединённый |
+| Область применения | ГОСТ Р 50.2.040 | МИ 3532 и другие |
+
+**Механизм:** Используется поле `LinkedParameter` в конфигурации ведущего параметра для указания ведомого.
+
+**Правила:**
+1. Если у параметра есть `LinkedParameter` → параметр является **ведущим (leader)**
+2. Параметр, на который ссылается `LinkedParameter` → является **ведомым (follower)**
+3. `SlaveKey` имеет приоритет: если указаны оба поля, `LinkedParameter` игнорируется
+4. При выборе метода для ведущего параметра — метод автоматически записывается в оба параметра
+
+**Пары параметров с LinkedParameter:**
+
+| Ведущий параметр | Ведомый параметр |
+|------------------|------------------|
+| `Chloride_Salts.Concentration` (мг/дм³) | `Chloride_Salts.MassFraction` (%) |
+| `DNP.kPa` (кПа) | `DNP.mercury_mm` (мм рт. ст.) |
+| `Yield_fraction_200` (до 200°С) | `Yield_fraction_300` (до 300°С) |
+
+**Пример конфигурации:**
+```json
+{
+  "Id": 7,
+  "Key": "Chloride_Salts.Concentration",
+  "Name": "Массовая концентрация хлористых солей, мг/дм³",
+  "LinkedParameter": "Chloride_Salts.MassFraction",
+  "Use": true,
+  "Edit": true,
+  "IsBallast": true
+}
+```
+
+**Поведение в UI (Document Editor):**
+- Комбобокс метода отображается с `rowspan` объединяя строки связанных параметров
+- Колонка "Документ" также объединяется (для ELIS интеграции)
+- Ведомый параметр не имеет собственного комбобокса метода
+- Оба параметра сохраняют независимое редактирование Измерения и Результата
+
+**Пример визуализации:**
+```
+| № | Наименование                        | Метод      | Измер. | Результат |
+|----|-------------------------------------|------------|--------|-----------|
+| 7  | Хлористые соли, мг/дм³              | [Общий     | 100    | 100       |
+| 8  | Хлористые соли, %                   |  комбо]    | 0.01   | 0.01      |
+```
+
+**Поведение при сохранении (бэкенд):**
+- При сохранении метода ведущего параметра → метод копируется в ведомый
+- Оба параметра получают одинаковое значение метода в базе данных
+- `Legal` флаги устанавливаются независимо для каждого параметра
+
+**Файлы с LinkedParameter:**
+- `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(13).json`
+- `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(14).json`
+- `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15).json`
+- `TN_Doc/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json`
+- `TN_Doc/Cfg/Passport/CfgEditPassportExport.json`
+- `TN_Doc/Cfg/Passport/CfgEditPassportForActNP.json`
+- `TN_Doc/Cfg/Passport/CfgEditPassport_EAC.json`
+
+**Техническая реализация:**
+- Бэкенд: `tn.docgeneral/Passport/DocPassport.Editor.cs` — метод `ResolveLinkedParametersRoles()`
+- Фронтенд: `TN_Doc/Client/document-editor/src/components/passport/PassportLinkedParameterGroup.vue`
+- Типы: `PassportQualityParameterSchema.linkedParameter`, `isLinkedFollower`, `linkedLeaderKey`
+
 ### Поле `Edit` для параметров качества
 **Назначение:** Определяет, может ли оператор редактировать значение параметра в Document Editor.
 
