@@ -272,6 +272,7 @@ export const useDocumentStore = defineStore('document', () => {
    */
   function updateField(key: string, value: any): { isReturnToElis: boolean; wasElisField: boolean } {
     const previousValue = formData.value[key];
+
     formData.value[key] = value;
     isDirty.value = true;
 
@@ -425,7 +426,6 @@ export const useDocumentStore = defineStore('document', () => {
         ...formData.value,
         __history: formHistory.value // Передаем историю
       };
-
 
       const response = await documentApi.saveDocument(
         config.value.deviceId,

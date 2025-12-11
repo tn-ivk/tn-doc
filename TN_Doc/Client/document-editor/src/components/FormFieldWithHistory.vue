@@ -16,6 +16,7 @@
     <FieldHistoryIndicator
       v-if="lastSource !== DataSource.Unknown"
       :source="lastSource"
+      :rightOffset="props.historyIndicatorOffset"
     />
   </div>
 </template>
@@ -30,14 +31,18 @@ import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
 import { normalizeValue, normalizeDateTimeForComparison } from '@/utils/passport-utils';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   field: FormFieldType;
   modelValue: any;
   hideLabel?: boolean;
   invalidChars?: string[];
   highlightColor?: string;
   hideDropdownIcon?: boolean;
-}>();
+  /** Отступ справа для индикатора истории (в пикселях) */
+  historyIndicatorOffset?: number;
+}>(), {
+  historyIndicatorOffset: 4
+});
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: any): void;
