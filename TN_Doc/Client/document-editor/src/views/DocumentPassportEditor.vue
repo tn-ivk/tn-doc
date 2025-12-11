@@ -606,23 +606,6 @@ const handleElisData = (elisData: ElisPassportData) => {
 
             // Создать запись истории для ELIS (сохраняем только name, а не весь объект)
             trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
-
-            // Синхронизация метода в связанный параметр (LinkedParameters)
-            // Если текущий параметр является лидером группы - копируем метод в follower
-            if (param.linkedParameter) {
-              const linkedMethodKey = `method.${param.linkedParameter}`;
-              updates[linkedMethodKey] = methodJson;
-              updates[`${linkedMethodKey}__elisFilled`] = true;
-              updates[`${linkedMethodKey}__elisOriginal`] = matchingMethod.name;
-              updates[`${linkedMethodKey}__elisOption`] = matchingMethod;
-              trackElisLoad(linkedMethodKey, matchingMethod.name, elisData.protocolNumber);
-
-              logger.debug('[handleElisData] Синхронизация метода ELIS в связанный параметр', {
-                leaderKey: param.key,
-                followerKey: param.linkedParameter,
-                methodName: matchingMethod.name
-              });
-            }
           } else {
             // Метод не удалось создать
             updates[`${methodKey}__elisMissing`] = true;
