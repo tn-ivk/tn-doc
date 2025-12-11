@@ -10,7 +10,7 @@
           :invalidChars="invalidChars"
           :hideDropdownIcon="true"
           :historyIndicatorOffset="4"
-          @update:modelValue="(value) => emit('update:iof', value)"
+          @update:modelValue="handleIofChange"
         />
 
         <!-- Кнопка редактирования внутри комбобокса -->
@@ -80,6 +80,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:iof', value: any): void;
+  /** Событие для передачи label (ФИО) для сохранения в БД */
+  (e: 'update:iof-label', label: string): void;
   (e: 'update:post', value: any): void;
   (e: 'update:factory', value: any): void;
   /** Событие для добавления новой опции в список пользователей */
@@ -154,6 +156,21 @@ function handleEditClick() {
 }
 
 /**
+ * Обработчик изменения IOF через комбобокс (выбор из списка)
+ * Эмитит как value (ID), так и label (ФИО) для корректного сохранения в БД
+ */
+function handleIofChange(value: any) {
+  emit('update:iof', value);
+
+  // Ищем label выбранной опции
+  const selectedOption = props.iof.options?.find(opt => opt.value === value);
+  const label = selectedOption?.label || '';
+
+  // Передаём label для сохранения в БД
+  emit('update:iof-label', label);
+}
+
+/**
  * Обработчик подтверждения ручного ввода ФИО
  * Проверяет наличие дубликата, создаёт новую опцию и выбирает её
  */
@@ -212,6 +229,10 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
 
   // Выбираем опцию
   emit('update:iof', newValue);
+
+  // Передаём label (ФИО) для сохранения в БД
+  // Бэкенд использует {key}__label для разрешения ФИО, когда ID не найден в справочнике
+  emit('update:iof-label', name);
 
   // Закрываем диалог
   isDialogVisible.value = false;

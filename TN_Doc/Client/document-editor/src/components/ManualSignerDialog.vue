@@ -18,7 +18,7 @@
           ref="nameInput"
           v-model="form.name"
           type="text"
-          placeholder="Фамилия И.О. или полностью"
+          placeholder="И.О.Фамилия"
           @keyup.enter="handleConfirm"
         />
         <small v-if="validationError" class="validation-error">

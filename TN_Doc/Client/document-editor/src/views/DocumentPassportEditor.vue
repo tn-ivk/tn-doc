@@ -86,6 +86,7 @@ import { logger } from '@tn-doc/shared';
                       :factoryValue="store.formData[row.group.factory.key]"
                       :invalidChars="store.config?.invalidChars || []"
                       @update:iof="(value) => store.updateField(row.group.iof.key, value)"
+                      @update:iof-label="(label) => store.updateField(`${row.group.iof.key}__label`, label)"
                       @update:post="(value) => store.updateField(row.group.post.key, value)"
                       @update:factory="(value) => store.updateField(row.group.factory.key, value)"
                     />
