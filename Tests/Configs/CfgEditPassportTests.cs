@@ -15,7 +15,8 @@ public class CfgEditPassportTests
     [SetUp]
     public void SetUp()
     {
-        _repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", ".."));
+        // TestDirectory = Tests/bin/Debug/net8.0, нужно подняться на 4 уровня до корня репозитория
+        _repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", ".."));
     }
 
     [Test]
