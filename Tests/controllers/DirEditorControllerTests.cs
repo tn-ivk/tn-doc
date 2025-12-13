@@ -49,6 +49,13 @@ public class DirEditorControllerTests
         {
             Directory.Delete(_testBasePath, true);
         }
+
+        // Cleanup TestQp.json created in AppContext.BaseDirectory
+        var testQpPath = Path.Combine(AppContext.BaseDirectory, "TestQp.json");
+        if (File.Exists(testQpPath))
+        {
+            File.Delete(testQpPath);
+        }
     }
 
     [SetUp]
@@ -98,9 +105,10 @@ public class DirEditorControllerTests
         File.WriteAllText(_testCfgPath, JsonConvert.SerializeObject(testRoot, Formatting.Indented));
 
         // Prepare dummy edit config file for QP with Methods/Parameters
+        // Note: CombineSafe в сервисе обрезает начальные слэши, поэтому используем относительный путь без них
         var currentDir = AppContext.BaseDirectory;
-        var qpRelPath = "\\TestQp.json"; // will be appended to currentDir inside service
-        var qpFullPath = Path.Combine(currentDir + qpRelPath);
+        var qpRelPath = "TestQp.json"; // relative path without leading slashes (cross-platform)
+        var qpFullPath = Path.Combine(currentDir, qpRelPath);
         File.WriteAllText(qpFullPath, JsonConvert.SerializeObject(new { Methods = new object[] { }, Parameters = new object[] { } }, Formatting.Indented));
 
         // Create test CfgApp.json with a device that has a "Паспорта" document and a used template pointing to our dummy edit config
@@ -122,7 +130,7 @@ public class DirEditorControllerTests
                             Name = "Паспорта",
                             TemplateDocs = new List<TemplateDoc>
                             {
-                                new TemplateDoc { Use = true, Id = 1, Name = "Test Template", PathToDocEditConfigFile = qpRelPath }
+                                new TemplateDoc { Use = true, Id = 1, Name = "Test Template", PathToDocEditConfigFile = "TestQp.json" }
                             }
                         }
                     }
@@ -261,7 +269,7 @@ public class DirEditorControllerTests
     {
         // Arrange
         // Build JSON in the shape expected by SetQpConfigFromJsonAsync
-        var qpRelPath = "\\TestQp.json";
+        var qpRelPath = "TestQp.json"; // relative path without leading slashes (cross-platform)
         var qpsInfo = new JObject
         {
             ["QpsInfo"] = new JArray
