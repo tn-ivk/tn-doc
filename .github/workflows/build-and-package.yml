@@ -54,8 +54,8 @@ jobs:
         run: |
           dotnet nuget add source "https://nuget.pkg.github.com/tn-ivk/index.json" \
             --name github-packages \
-            --username "${{ github.actor }}" \
-            --password "${{ secrets.GITHUB_TOKEN }}" \
+            --username "x-access-token" \
+            --password "${{ secrets.GH_SUBMODULES_TOKEN }}" \
             --store-password-in-clear-text
           dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" \
             --name fr_nuget \
