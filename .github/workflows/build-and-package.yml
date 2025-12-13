@@ -52,7 +52,6 @@ jobs:
 
       - name: Add NuGet sources
         run: |
-          dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
           dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" \
             --name fr_nuget \
             --username "${{ secrets.FR_NUGET_USERNAME }}" \
