@@ -21,15 +21,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configure submodule URLs for GitHub
+      - name: Configure submodule URLs for GitHub (private repos)
         run: |
-          git config --global url."https://github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          # Замена URL субмодулей с внутреннего GitLab на GitHub с токеном для приватных репозиториев
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
 
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
+          token: ${{ secrets.GH_SUBMODULES_TOKEN }}
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
