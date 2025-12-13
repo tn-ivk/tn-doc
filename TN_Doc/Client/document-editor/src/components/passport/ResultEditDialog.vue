@@ -16,8 +16,8 @@
       <div class="dialog-field">
         <label>Префикс</label>
         <select v-model="operator">
-          <option value="less">менее</option>
-          <option value="greater">более</option>
+          <option value="less">Менее</option>
+          <option value="greater">Более</option>
         </select>
       </div>
 
@@ -77,7 +77,7 @@ const emit = defineEmits<{
 const operator = ref<ResultOperator>('less');
 const valueInput = ref('');
 
-const operatorLabel = computed(() => (operator.value === 'less' ? 'менее' : 'более'));
+const operatorLabel = computed(() => (operator.value === 'less' ? 'Менее' : 'Более'));
 
 const normalizedNumber = computed(() => {
   const normalized = valueInput.value.replace(',', '.').trim();
