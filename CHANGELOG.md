@@ -184,6 +184,12 @@
   - Потеря несохранённых данных при переключении режима - ожидаемое поведение
   - Компоненты: `DocumentEditor.vue`, `DocumentActEditor.vue`, `DocumentPassportEditor.vue`
 
+### CI/CD
+- GitHub Actions workflow: добавлен запуск тестов перед публикацией артефактов
+  - Тесты выполняются после сборки в конфигурации Release
+  - Результаты тестов сохраняются как артефакты в формате TRX
+  - При падении тестов сборка пакетов не выполняется
+
 ### Deprecated
 - ⚠️ **HTML формы редактирования помечены OBSOLETE**
   - DocEdit.html, DocEditAct.html, DocEditPassport.html
