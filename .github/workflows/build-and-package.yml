@@ -132,6 +132,9 @@ jobs:
             --password "${{ secrets.FR_NUGET_PASSWORD }}" \
             --store-password-in-clear-text
 
+      - name: Create directories
+        run: mkdir -p TN_Doc/Dll
+
       - name: Build solution
         run: dotnet build -c Release
 
