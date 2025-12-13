@@ -48,6 +48,12 @@ dotnet test --logger:"console;verbosity=detailed" # Verbose test output
 dotnet test /p:CollectCoverage=true             # Run tests with coverage
 ```
 
+## Branching Strategy
+
+- **master**: Stable releases, PR target
+- **developWork**: Active development (current default)
+- Feature branches: Create from `developWork`, merge back via PR
+
 ## Quick Start
 
 1. **Setup NuGet sources**:
@@ -77,9 +83,9 @@ tn_doc/
 │   ├── Cfg/                   # Document and app configuration
 │   ├── Doc/                   # FastReport templates (*.frx)
 │   └── Client/                # Vue 3 applications (npm workspaces)
-│       ├── statusbar/         # Real-time status monitoring - PRODUCTION
-│       ├── configurator/      # Configuration UI - PRODUCTION
-│       ├── document-editor/   # Document editing - IN DEVELOPMENT
+│       ├── statusbar/         # Real-time status monitoring
+│       ├── configurator/      # Configuration UI
+│       ├── document-editor/   # Document editing (active development v1.4.4)
 │       └── shared/            # Shared TypeScript utilities
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
@@ -99,7 +105,7 @@ Run `git submodule update --init --recursive` after initial clone.
 
 ### Document Module Pattern
 
-Each document type implements **IDocumentEditor** interface (defined in `TN.DocGeneral/Interfaces/IDocumentEditor.cs`):
+Each document type implements **IDocumentEditor** interface (defined in `tn.docgeneral/TN.DocGeneral/IDocumentEditor.cs`):
 
 1. **`GetViewDoc(id)`**: Returns JSON data for FastReport template
 2. **`GetPathTemplateFile()`**: Returns path to `.frx` template file
@@ -122,6 +128,16 @@ Each document type implements **IDocumentEditor** interface (defined in `TN.DocG
 - History stored in `__fieldHistory` object with field key prefix
 - Visual indicators in Document Editor (colored badges for data source)
 - Requires `IsUsedElis = true` in configuration
+
+**IDocumentEditor Quick Reference:**
+```csharp
+public interface IDocumentEditor
+{
+    DocumentEditConfig GetEditConfig(int id);  // Returns form config for Vue editor
+    bool SaveDocument(int id, Dictionary<string, object> values);  // Saves from Vue editor
+}
+```
+Key types: `DocumentEditConfig`, `FormField`, `SelectOption` (see `tn.docgeneral/TN.DocGeneral/IDocumentEditor.cs`)
 
 ### API Controllers
 
@@ -180,6 +196,25 @@ Layered configuration (loaded in order):
 - **Mocking**: Use mocks/fakes for external services and databases
 - **Coverage**: Run `dotnet test /p:CollectCoverage=true` before risky refactors
 - **Independent**: Tests must not depend on environment or execution order
+
+### Test Structure
+```
+Tests/
+├── controllers/           # Controller unit tests
+├── Services/              # Service layer tests
+├── Configs/               # Configuration validation tests
+└── Libraries/             # Document library tests
+    ├── Core/              # Act, Passport, Report, Jornal
+    ├── KMH/               # KMH library tests
+    ├── Common/            # Shared document tests
+    └── Integration/       # Cross-library compliance tests
+```
+
+Run specific library tests:
+```bash
+dotnet test --filter "Namespace~Libraries.KMH"     # All KMH tests
+dotnet test --filter "Namespace~Libraries.Core"    # Core document tests
+```
 
 ### UI Theme (v1.4.3+)
 All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables, never hardcode HEX colors.
