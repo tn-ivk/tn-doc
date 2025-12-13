@@ -73,6 +73,17 @@ jobs:
       - name: Build solution
         run: dotnet build -c Release
 
+      - name: Run tests
+        run: dotnet test -c Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: "**/TestResults/*.trx"
+          retention-days: 7
+
       - name: Publish application
         run: dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
 
