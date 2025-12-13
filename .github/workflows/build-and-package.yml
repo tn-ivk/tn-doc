@@ -21,6 +21,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Configure submodule URLs for GitHub
+        run: |
+          git config --global url."https://github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
