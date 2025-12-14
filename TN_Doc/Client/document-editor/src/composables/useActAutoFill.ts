@@ -44,34 +44,40 @@ export function useActAutoFill() {
     }
 
     const option = findFieldOption('Delive_IOF', newValue);
-    if (option?.data) {
-      const userData = option.data as UserData;
 
-      // Заполняем связанные поля из данных пользователя
-      store.updateField('Delive_Factory', userData.factory || '');
-      store.updateField('Delive_FIO', userData.fio || '');
+    // Автозаполнение только для пользователей из справочника (есть data)
+    // Для ручного ввода (ФИО как value) опция не имеет data - пропускаем
+    if (!option?.data) {
+      logger.debug('[ActAutoFill] Пропуск автозаполнения (сдающая сторона) - нет данных пользователя:', { value: newValue });
+      return;
+    }
 
-      // Находим и заполняем данные лицензии
-      if (userData.licId) {
-        const license = findLicense(userData.licId);
-        if (license) {
-          store.updateField('Delive_Lic_Date', license.licensesDate || '');
-          store.updateField('Delive_Lic_Number', license.licensesNumber || '');
-        } else {
-          store.updateField('Delive_Lic_Date', '');
-          store.updateField('Delive_Lic_Number', '');
-        }
+    const userData = option.data as UserData;
+
+    // Заполняем связанные поля из данных пользователя
+    store.updateField('Delive_Factory', userData.factory || '');
+    store.updateField('Delive_FIO', userData.fio || '');
+
+    // Находим и заполняем данные лицензии
+    if (userData.licId) {
+      const license = findLicense(userData.licId);
+      if (license) {
+        store.updateField('Delive_Lic_Date', license.licensesDate || '');
+        store.updateField('Delive_Lic_Number', license.licensesNumber || '');
       } else {
         store.updateField('Delive_Lic_Date', '');
         store.updateField('Delive_Lic_Number', '');
       }
-
-      logger.debug('[ActAutoFill] Автозаполнение полей сдающей стороны:', {
-        factory: userData.factory,
-        fio: userData.fio,
-        licId: userData.licId
-      });
+    } else {
+      store.updateField('Delive_Lic_Date', '');
+      store.updateField('Delive_Lic_Number', '');
     }
+
+    logger.debug('[ActAutoFill] Автозаполнение полей сдающей стороны:', {
+      factory: userData.factory,
+      fio: userData.fio,
+      licId: userData.licId
+    });
   };
 
   /**
@@ -88,34 +94,40 @@ export function useActAutoFill() {
     }
 
     const option = findFieldOption('Receive_IOF', newValue);
-    if (option?.data) {
-      const userData = option.data as UserData;
 
-      // Заполняем связанные поля из данных пользователя
-      store.updateField('Receive_Factory', userData.factory || '');
-      store.updateField('Receive_FIO', userData.fio || '');
+    // Автозаполнение только для пользователей из справочника (есть data)
+    // Для ручного ввода (ФИО как value) опция не имеет data - пропускаем
+    if (!option?.data) {
+      logger.debug('[ActAutoFill] Пропуск автозаполнения (принимающая сторона) - нет данных пользователя:', { value: newValue });
+      return;
+    }
 
-      // Находим и заполняем данные лицензии
-      if (userData.licId) {
-        const license = findLicense(userData.licId);
-        if (license) {
-          store.updateField('Receive_Lic_Date', license.licensesDate || '');
-          store.updateField('Receive_Lic_Number', license.licensesNumber || '');
-        } else {
-          store.updateField('Receive_Lic_Date', '');
-          store.updateField('Receive_Lic_Number', '');
-        }
+    const userData = option.data as UserData;
+
+    // Заполняем связанные поля из данных пользователя
+    store.updateField('Receive_Factory', userData.factory || '');
+    store.updateField('Receive_FIO', userData.fio || '');
+
+    // Находим и заполняем данные лицензии
+    if (userData.licId) {
+      const license = findLicense(userData.licId);
+      if (license) {
+        store.updateField('Receive_Lic_Date', license.licensesDate || '');
+        store.updateField('Receive_Lic_Number', license.licensesNumber || '');
       } else {
         store.updateField('Receive_Lic_Date', '');
         store.updateField('Receive_Lic_Number', '');
       }
-
-      logger.debug('[ActAutoFill] Автозаполнение полей принимающей стороны:', {
-        factory: userData.factory,
-        fio: userData.fio,
-        licId: userData.licId
-      });
+    } else {
+      store.updateField('Receive_Lic_Date', '');
+      store.updateField('Receive_Lic_Number', '');
     }
+
+    logger.debug('[ActAutoFill] Автозаполнение полей принимающей стороны:', {
+      factory: userData.factory,
+      fio: userData.fio,
+      licId: userData.licId
+    });
   };
 
   /**

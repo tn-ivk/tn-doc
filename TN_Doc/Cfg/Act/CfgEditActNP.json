@@ -45,17 +45,17 @@
       "Id": 6,
       "Use": true,
       "Edit": true,
-      "Key": "Delive_FIO",
-      "Type": "text",
-      "Name": "Фамилия И.О."
+      "Key": "Delive_IOF",
+      "Type": "list",
+      "Name": "И.О. Фамилия"
     },
     {
       "Id": 7,
       "Use": true,
       "Edit": true,
-      "Key": "Delive_IOF",
-      "Type": "list",
-      "Name": "И.О. Фамилия"
+      "Key": "Delive_FIO",
+      "Type": "text",
+      "Name": "Фамилия И.О."
     },
     {
       "Id": 8,
@@ -85,17 +85,17 @@
       "Id": 11,
       "Use": true,
       "Edit": true,
-      "Key": "Receive_FIO",
-      "Type": "text",
-      "Name": "Фамилия И.О."
+      "Key": "Receive_IOF",
+      "Type": "list",
+      "Name": "И.О. Фамилия"
     },
     {
       "Id": 12,
       "Use": true,
       "Edit": true,
-      "Key": "Receive_IOF",
-      "Type": "list",
-      "Name": "И.О. Фамилия"
+      "Key": "Receive_FIO",
+      "Type": "text",
+      "Name": "Фамилия И.О."
     },
     {
       "Id": 13,

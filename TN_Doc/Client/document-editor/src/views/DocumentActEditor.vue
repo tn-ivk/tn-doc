@@ -25,7 +25,20 @@
                   </div>
                 </td>
                 <td class="editor-input-cell">
+                  <!-- Поля IOF с кнопкой ручного ввода -->
+                  <ActSignerField
+                    v-if="isIofField(field)"
+                    :field="field"
+                    :modelValue="store.formData[field.key]"
+                    :invalidChars="store.config?.invalidChars || []"
+                    :allowManualInput="field.allowManualInput"
+                    @update:modelValue="(value) => store.updateField(field.key, value)"
+                    @update:label="(label) => store.updateField(`${field.key}__label`, label)"
+                  />
+
+                  <!-- Остальные поля -->
                   <FormField
+                    v-else
                     :field="field"
                     :modelValue="store.formData[field.key]"
                     :hide-label="true"
@@ -46,10 +59,19 @@
 import { onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FormField from '@/components/FormField.vue';
+import ActSignerField from '@/components/act/ActSignerField.vue';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentEditor } from '@/composables/useDocumentEditor';
 import { useActAutoFill } from '@/composables/useActAutoFill';
+import type { FormField as FormFieldType } from '@/types/document.types';
+
+/**
+ * Проверяет, является ли поле полем ФИО подписанта (IOF)
+ */
+const isIofField = (field: FormFieldType): boolean => {
+  return field.key === 'Delive_IOF' || field.key === 'Receive_IOF';
+};
 
 const route = useRoute();
 

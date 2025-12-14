@@ -43,19 +43,19 @@
     },
     {
       "Id": 6,
-      "Use": false,
-      "Edit": true,
-      "Key": "Delive_FIO",
-      "Type": "text",
-      "Name": "Фамилия И.О."
-    },
-    {
-      "Id": 7,
       "Use": true,
       "Edit": true,
       "Key": "Delive_IOF",
       "Type": "list",
       "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 7,
+      "Use": true,
+      "Edit": true,
+      "Key": "Delive_FIO",
+      "Type": "text",
+      "Name": "Фамилия И.О."
     },
     {
       "Id": 8,
@@ -83,19 +83,19 @@
     },
     {
       "Id": 11,
-      "Use": false,
-      "Edit": true,
-      "Key": "Receive_FIO",
-      "Type": "text",
-      "Name": "Фамилия И.О."
-    },
-    {
-      "Id": 12,
       "Use": true,
       "Edit": true,
       "Key": "Receive_IOF",
       "Type": "list",
       "Name": "И.О. Фамилия"
+    },
+    {
+      "Id": 12,
+      "Use": true,
+      "Edit": true,
+      "Key": "Receive_FIO",
+      "Type": "text",
+      "Name": "Фамилия И.О."
     },
     {
       "Id": 13,
