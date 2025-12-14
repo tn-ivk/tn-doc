@@ -21,7 +21,6 @@
                 <td class="editor-label-cell">
                   <div class="label-wrapper">
                     <span class="label-text">{{ field.label }}</span>
-                    <span v-if="field.required" class="required-mark">*</span>
                   </div>
                 </td>
                 <td class="editor-input-cell">
@@ -162,12 +161,6 @@ watch(() => store.canSave, (canSave) => {
 .label-text {
   display: inline-block;
   line-height: 1.3;
-}
-
-.required-mark {
-  margin-left: 4px;
-  color: var(--md-error);
-  font-weight: 600;
 }
 
 .editor-table tr:first-child td:first-child {
