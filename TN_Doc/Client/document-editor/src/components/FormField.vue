@@ -9,7 +9,6 @@
       class="field-label"
     >
       {{ field.label }}
-      <span v-if="field.required" class="required-mark">*</span>
     </label>
 
     <!-- Select (выпадающий список) -->
@@ -447,11 +446,6 @@ function handleDateTimeChange() {
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: var(--text-color);
-}
-
-.required-mark {
-  color: var(--red-500);
-  margin-left: 0.25rem;
 }
 
 .p-error {
