@@ -43,6 +43,12 @@ export function useActAutoFill() {
       return;
     }
 
+    // Пропускаем автозаполнение для ручного ввода
+    if (newValue.startsWith('manual_')) {
+      logger.debug('[ActAutoFill] Пропуск автозаполнения для ручного ввода (сдающая сторона):', { id: newValue });
+      return;
+    }
+
     const option = findFieldOption('Delive_IOF', newValue);
     if (option?.data) {
       const userData = option.data as UserData;
@@ -84,6 +90,12 @@ export function useActAutoFill() {
       store.updateField('Receive_FIO', '');
       store.updateField('Receive_Lic_Date', '');
       store.updateField('Receive_Lic_Number', '');
+      return;
+    }
+
+    // Пропускаем автозаполнение для ручного ввода
+    if (newValue.startsWith('manual_')) {
+      logger.debug('[ActAutoFill] Пропуск автозаполнения для ручного ввода (принимающая сторона):', { id: newValue });
       return;
     }
 
