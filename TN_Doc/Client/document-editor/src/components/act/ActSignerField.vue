@@ -10,8 +10,9 @@
         @update:modelValue="handleSelectChange"
       />
 
-      <!-- Кнопка редактирования внутри Select -->
+      <!-- Кнопка редактирования внутри Select (только при включённом ELIS) -->
       <button
+        v-if="allowManualInput"
         class="edit-signer-btn"
         type="button"
         @click="openDialog"
@@ -50,6 +51,7 @@ interface Props {
   field: FormFieldType;
   modelValue: any;
   invalidChars?: string[];
+  allowManualInput?: boolean;
 }
 
 const props = defineProps<Props>();

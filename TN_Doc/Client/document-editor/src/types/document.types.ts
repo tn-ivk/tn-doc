@@ -66,6 +66,8 @@ export interface FormField {
    * elisAlias: ["Массовая доля воды(%)", "Массовая концентрация воды(%)"]
    */
   elisAlias?: string[];
+  /** Разрешён ли ручной ввод (кнопка редактирования) */
+  allowManualInput?: boolean;
 }
 
 export interface SelectOption {

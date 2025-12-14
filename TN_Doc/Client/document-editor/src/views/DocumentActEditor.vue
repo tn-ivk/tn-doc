@@ -31,6 +31,7 @@
                     :field="field"
                     :modelValue="store.formData[field.key]"
                     :invalidChars="store.config?.invalidChars || []"
+                    :allowManualInput="field.allowManualInput"
                     @update:modelValue="(value) => store.updateField(field.key, value)"
                     @update:label="(label) => store.updateField(`${field.key}__label`, label)"
                   />
