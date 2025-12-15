@@ -434,7 +434,6 @@
       "ElisAlias": [
         "Массовая доля воды(%)"
       ],
-      "RequiredFill": true,
       "RoundValue": 2,
       "Name": "Массовая доля воды, %",
       "Use": true,
@@ -448,8 +447,6 @@
       "ElisAlias": [
         "Массовая концентрация хлористых солей(мг/дм³)"
       ],
-      "LinkedParameter": "Chloride_Salts.MassFraction",
-      "RequiredFill": true,
       "RoundValue": 1,
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": true,
@@ -464,7 +461,6 @@
         "Массовая концентрация хлористых солей(%)",
         "Массовая доля хлористых солей(%)"
       ],
-      "RequiredFill": false,
       "RoundValue": 4,
       "Name": "Массовая концентрация хлористых солей, %",
       "Use": true,
@@ -478,7 +474,6 @@
       "ElisAlias": [
         "Массовая доля механических примесей(%)"
       ],
-      "RequiredFill": true,
       "RoundValue": 4,
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
@@ -492,7 +487,6 @@
       "ElisAlias": [
         "Массовая доля серы(%)"
       ],
-      "RequiredFill": true,
       "RoundValue": 2,
       "Name": "Массовая доля серы, %",
       "Use": true,
@@ -507,7 +501,6 @@
         "Давление насыщенных паров(кПа)"
       ],
       "LinkedParameter": "DNP.mercury_mm",
-      "RequiredFill": true,
       "RoundValue": 1,
       "Name": "Давление насыщенных паров, кПа",
       "Use": true,
@@ -521,7 +514,6 @@
       "ElisAlias": [
         "Давление насыщенных паров(мм рт. ст.)"
       ],
-      "RequiredFill": false,
       "RoundValue": 0,
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
@@ -531,9 +523,12 @@
     {
       "Id": 13,
       "Key": "Yield_fraction_200",
+      "KeyELIS": "Фракционный состав: выход фракций до 200 °C(%)",
+      "ElisAlias": [
+        "Фракционный состав: выход фракций до 200 °C(%)"
+      ],
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "LinkedParameter": "Yield_fraction_300",
-      "RoundValue": 1,
       "Use": true,
       "Edit": true,
       "IsBallast": false
@@ -541,26 +536,22 @@
     {
       "Id": 14,
       "Key": "Yield_fraction_300",
+      "KeyELIS": "Фракционный состав: выход фракций до 300 °C(%)",
+      "ElisAlias": [
+        "Фракционный состав: выход фракций до 300 °C(%)"
+      ],
       "Name": "Выход фракций, %:    при температуре до 300 °С",
-      "RoundValue": 1,
       "Use": true,
       "Edit": true,
       "IsBallast": false
     },
     {
       "Id": 15,
-      "Key": "Yield_fraction_350",
-      "Name": "Выход фракций: при температуре до 350 °С, %",
-      "Use": true,
-      "Edit": true,
-      "IsBallast": false
-    },
-    {
-      "Id": 16,
       "Key": "Mass_fraction_of_paraffin",
       "KeyELIS": "Массовая доля парафина(%)",
       "ElisAlias": [
-        "Массовая доля парафина(%)"
+        "Массовая доля парафина(%)",
+        "Массовая доля парафинов(%)"
       ],
       "RoundValue": 1,
       "Name": "Массовая доля парафина, %",
@@ -569,14 +560,13 @@
       "IsBallast": false
     },
     {
-      "Id": 17,
+      "Id": 16,
       "Key": "Mass_fraction_of_hydrogen_sulfide",
       "KeyELIS": "Массовая доля сероводорода(млн⁻¹ (ppm))",
       "ElisAlias": [
         "Массовая доля сероводорода(млн⁻¹)",
         "Массовая доля сероводорода(млн⁻¹ (ppm))"
       ],
-      "RequiredFill": true,
       "RoundValue": 1,
       "Name": "Массовая доля сероводорода, млнˉ¹ (ppm)",
       "Use": true,
@@ -584,14 +574,13 @@
       "IsBallast": false
     },
     {
-      "Id": 18,
+      "Id": 17,
       "Key": "Mass_fraction_of_methyl_and_ethyl_mercaptan",
       "KeyELIS": "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹ (ppm))",
       "ElisAlias": [
         "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹ (ppm))",
         "Массовая доля метил- и этилмеркаптанов в сумме(млн⁻¹)"
       ],
-      "RequiredFill": false,
       "RoundValue": 1,
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "Use": true,
@@ -599,14 +588,13 @@
       "IsBallast": false
     },
     {
-      "Id": 19,
+      "Id": 18,
       "Key": "Mass_fraction_of_organic_chlorides",
       "KeyELIS": "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С, млн⁻¹ (ppm)",
       "ElisAlias": [
         "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹ (ppm))",
         "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С(млн⁻¹)"
       ],
-      "RequiredFill": false,
       "RoundValue": 1,
       "Name": "Массовая доля органических хлоридов во фракции, выкипающей до\nтемпературы 204 °С, млнˉ¹ (ppm)",
       "Use": true,
