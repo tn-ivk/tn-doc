@@ -447,6 +447,7 @@
       "ElisAlias": [
         "Массовая концентрация хлористых солей(мг/дм³)"
       ],
+      "LinkedParameter": "Chloride_Salts.MassFraction",
       "RoundValue": 1,
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": true,
@@ -500,7 +501,7 @@
       "ElisAlias": [
         "Давление насыщенных паров(кПа)"
       ],
-      "LinkedParameter": "DNP.mercury_mm",
+      "SlaveKey": "DNP.mercury_mm",
       "RoundValue": 1,
       "Name": "Давление насыщенных паров, кПа",
       "Use": true,
