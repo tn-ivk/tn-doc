@@ -1,0 +1,34 @@
+import type { FieldHistoryEntry } from '@/types/history.types';
+
+/**
+ * Возвращает только последнюю запись истории поля.
+ * Нас интересует только финальное состояние, а не промежуточные шаги ввода.
+ *
+ * @param history - массив записей истории поля
+ * @returns массив с одной записью (последней) или пустой массив
+ */
+export function compactFieldHistory(history: FieldHistoryEntry[]): FieldHistoryEntry[] {
+  if (!history || history.length === 0) return [];
+
+  // Возвращаем только последнюю запись
+  return [history[history.length - 1]];
+}
+
+/**
+ * Оставляет только последнюю запись истории для каждого поля.
+ * Используется перед сохранением документа на бэкенд.
+ *
+ * @param formHistory - объект с историей всех полей
+ * @returns новый объект с последней записью для каждого поля
+ */
+export function compactAllFieldsHistory(
+  formHistory: Record<string, FieldHistoryEntry[]>
+): Record<string, FieldHistoryEntry[]> {
+  const result: Record<string, FieldHistoryEntry[]> = {};
+
+  for (const [fieldKey, history] of Object.entries(formHistory)) {
+    result[fieldKey] = compactFieldHistory(history);
+  }
+
+  return result;
+}
