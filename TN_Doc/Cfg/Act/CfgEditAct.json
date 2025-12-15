@@ -6,8 +6,7 @@
       "Edit": true,
       "Key": "ActNumber",
       "Type": "text",
-      "Name": "Номер акта",
-      "RequiredFill": true
+      "Name": "Номер акта"
     },
     {
       "Id": 2,
