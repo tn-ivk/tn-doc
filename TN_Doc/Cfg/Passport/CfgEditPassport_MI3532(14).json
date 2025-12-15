@@ -388,7 +388,8 @@
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 2,
@@ -396,7 +397,8 @@
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 2
     },
     {
       "Id": 3,
@@ -404,7 +406,8 @@
       "Name": "Плотность нефти при температуре и  давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 4,
@@ -412,7 +415,8 @@
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 5,
@@ -420,7 +424,8 @@
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 6,
@@ -461,6 +466,7 @@
         "Массовая доля хлористых солей(%)"
       ],
       "RequiredFill": false,
+      "RoundValue": 4,
       "Use": true,
       "Edit": true,
       "IsBallast": true
@@ -517,6 +523,7 @@
         "Давление насыщенных паров(мм рт. ст.)"
       ],
       "RequiredFill": false,
+      "RoundValue": 0,
       "Use": true,
       "Edit": true,
       "IsBallast": false
@@ -526,6 +533,7 @@
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "LinkedParameter": "Yield_fraction_300",
+      "RoundValue": 1,
       "Use": false,
       "Edit": true,
       "IsBallast": false
@@ -534,6 +542,7 @@
       "Id": 14,
       "Key": "Yield_fraction_300",
       "Name": "Выход фракций, %:    при температуре до 300 °С",
+      "RoundValue": 1,
       "Use": false,
       "Edit": true,
       "IsBallast": false
@@ -551,6 +560,7 @@
       "Key": "Mass_fraction_of_paraffin",
       "KeyELIS": "Массовая доля парафина(%)",
       "Name": "Массовая доля парафина, %",
+      "RoundValue": 1,
       "Use": false,
       "Edit": true,
       "IsBallast": false

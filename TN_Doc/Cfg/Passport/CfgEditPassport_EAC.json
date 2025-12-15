@@ -448,6 +448,7 @@
         "Массовая доля хлористых солей(%)"
       ],
       "RequiredFill": false,
+      "RoundValue": 4,
       "Name": "Массовая доля хлористых солей, %",
       "Use": true,
       "Edit": true,
@@ -476,6 +477,7 @@
         "Давление насыщенных паров(мм рт. ст.)"
       ],
       "RequiredFill": false,
+      "RoundValue": 0,
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
       "Edit": true,
@@ -502,7 +504,8 @@
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 10,
@@ -510,7 +513,8 @@
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 2
     },
     {
       "Id": 11,
@@ -518,7 +522,8 @@
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 12,
@@ -526,7 +531,8 @@
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 13,
@@ -534,7 +540,8 @@
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 14,
@@ -569,6 +576,7 @@
       "Key": "Yield_fraction_200",
       "Name": "Выход фракций, %:    при температуре до 200 °С",
       "LinkedParameter": "Yield_fraction_300",
+      "RoundValue": 1,
       "Use": true,
       "Edit": true,
       "IsBallast": false
@@ -577,6 +585,7 @@
       "Id": 17,
       "Key": "Yield_fraction_300",
       "Name": "Выход фракций, %:    при температуре до 300 °С",
+      "RoundValue": 1,
       "Use": true,
       "Edit": true,
       "IsBallast": false
@@ -588,6 +597,7 @@
       "ElisAlias": [
         "Массовая доля парафина(%)"
       ],
+      "RoundValue": 1,
       "Name": "Массовая доля парафина, %",
       "Use": false,
       "Edit": true,

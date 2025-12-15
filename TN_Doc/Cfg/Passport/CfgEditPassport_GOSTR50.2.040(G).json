@@ -388,7 +388,8 @@
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 2,
@@ -396,7 +397,8 @@
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 2
     },
     {
       "Id": 3,
@@ -404,7 +406,8 @@
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 4,
@@ -412,7 +415,8 @@
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 5,
@@ -420,7 +424,8 @@
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 6,

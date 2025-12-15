@@ -388,7 +388,8 @@
       "Name": "Температура нефти при условиях измерений объема, °C",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 2,
@@ -396,7 +397,8 @@
       "Name": "Давление нефти при условиях измерений объема, МПа",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 2
     },
     {
       "Id": 3,
@@ -404,7 +406,8 @@
       "Name": "Плотность нефти при температуре и давлении\nв условиях измерений объема, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 4,
@@ -412,7 +415,8 @@
       "Name": "Плотность нефти при 20 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 5,
@@ -420,7 +424,8 @@
       "Name": "Плотность нефти при 15 °C, кг/м³",
       "Use": true,
       "Edit": false,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 6,
@@ -428,7 +433,8 @@
       "Name": "Массовая доля воды, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 2
     },
     {
       "Id": 7,
@@ -437,7 +443,8 @@
       "LinkedParameter": "Chloride_Salts.MassFraction",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 1
     },
     {
       "Id": 8,
@@ -445,7 +452,8 @@
       "Name": "Массовая концентрация хлористых солей, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 4
     },
     {
       "Id": 9,
@@ -453,7 +461,8 @@
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RoundValue": 4
     },
     {
       "Id": 10,
@@ -461,7 +470,8 @@
       "Name": "Массовая доля серы, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 2
     },
     {
       "Id": 11,
@@ -470,7 +480,8 @@
       "LinkedParameter": "DNP.mercury_mm",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 12,
@@ -478,7 +489,8 @@
       "Name": "Давление насыщенных паров, мм рт. ст.",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 0
     },
     {
       "Id": 13,
@@ -487,7 +499,8 @@
       "LinkedParameter": "Yield_fraction_300",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 14,
@@ -495,7 +508,8 @@
       "Name": "Выход фракций, %:    при температуре до 300 °С",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 15,
@@ -511,7 +525,8 @@
       "Name": "Массовая доля парафина, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 17,
@@ -519,7 +534,8 @@
       "Name": "Массовая доля сероводорода, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 18,
@@ -527,7 +543,8 @@
       "Name": "Массовая доля метил- и этилмеркаптанов в сумме, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     },
     {
       "Id": 19,
@@ -535,7 +552,8 @@
       "Name": "Массовая доля органических хлоридов во фракции, выкипающей до температуры 204 °С, млнˉ¹ (ppm)",
       "Use": true,
       "Edit": true,
-      "IsBallast": false
+      "IsBallast": false,
+      "RoundValue": 1
     }
   ],
   "AdditionalInfo": [
