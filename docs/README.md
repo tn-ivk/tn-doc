@@ -19,6 +19,7 @@
 - **[statusbar.md](architecture/statusbar.md)** - Архитектура компонента мониторинга состояния
 - **[configurator.md](architecture/configurator.md)** - Архитектура конфигуратора
 - **[document-editor.md](architecture/document-editor.md)** - Архитектура редактора документов (в разработке)
+- **[passport-editor.md](architecture/passport-editor.md)** - Логика отображения/редактирования/сохранения паспорта качества (Vue + DocPassport)
 
 ### 👨‍💻 Development (Разработка)
 
