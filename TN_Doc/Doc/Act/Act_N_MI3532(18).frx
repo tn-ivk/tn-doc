@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="04/08/2025 18:38:20" ReportInfo.CreatorVersion="2024.2.20.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_ToolsFastReport.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/17/2025 15:18:33" ReportInfo.CreatorVersion="2026.1.2.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -94,18 +94,32 @@ namespace FastReport
       bool ShowResultColumn = SettingsData.ShowResultColumn;
       int ColumnsCount = 0; 
       List&lt;TN.Doc.Act&gt; listShiftsData;
-      listShiftsData = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act.Where(i =&gt; ! i.Vol_LastShift.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i.Vol_LastShift) == false).ToList();
+      string usedShiftStrInit = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
+      int usedShiftInit;
+      var listActs = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act;
+      if (listActs == null || listActs.Count == 0)
+      {
+        return; // Нет данных для отображения
+      }
+      if (int.TryParse(usedShiftStrInit, out usedShiftInit) &amp;&amp; usedShiftInit &gt;= 1)
+        listShiftsData = listActs.Take(usedShiftInit).ToList();
+      else
+      listShiftsData = listActs.Where(i =&gt; !i.Vol_LastShift.Contains(&quot;-&quot;) &amp;&amp; !String.IsNullOrEmpty(i.Vol_LastShift)).ToList();
+      
+      int shiftCount = listShiftsData
+        .Where(act =&gt; !String.IsNullOrEmpty(act.Vol_LastShift) &amp;&amp; ! act.Vol_LastShift.Contains(&quot;-&quot;))
+        .Count();
          
       if (Engine.FinalPass == true)
       {
         if (ShowResultColumn)
         {
-          ColumnsCount = listShiftsData.Count + 1;
+          ColumnsCount = shiftCount + 1;
         }
         else
         {
           TableAct.Columns.Remove(ColumnResult);
-          ColumnsCount = listShiftsData.Count;
+          ColumnsCount = shiftCount;
         }           
                                                     
         // Calculate Dynamic Columns width
@@ -119,7 +133,7 @@ namespace FastReport
 
         // Insert Columns for Volumes  (V0) &amp; fill them headers with text
         int indexColTemplate = ColumnTemplate.Index;
-        for (int i=1; i&lt;listShiftsData.Count; i++)
+        for (int i=1; i&lt;shiftCount; i++)
         {
           TableAct.Columns.Insert(indexColTemplate+1, new TableColumn());
           
@@ -134,40 +148,43 @@ namespace FastReport
         }
             
         // Span Columns
-        TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
+        TableAct[indexColTemplate,0].ColSpan=shiftCount;
             
         // Fill TableAct with data
         string shiftCountStr = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
-        if (!int.TryParse(shiftCountStr, out int shiftCount) || shiftCount &lt; 1)
-          shiftCount = 1;
-        double hoursPerShift = 24.0 / shiftCount;
+        double hoursPerShift = 24.0 / listShiftsData.Count;
         
-        for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
+        for (int i = 0, j = 0; i &lt; (listShiftsData.Count); i++)                 
         {
+          if(String.IsNullOrEmpty(listShiftsData[i].Vol_LastShift) || listShiftsData[i].Vol_LastShift.Contains(&quot;-&quot;))
+            continue;
+          
           string begin = FormatTime(i * hoursPerShift);
           string end = FormatTime((i + 1) * hoursPerShift);
-          TableAct[(2+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
-          TableAct[(2+i),2].Text = $&quot;{begin}-{end}&quot;;            
-          TableAct[(2+i),3].Text = $&quot;Смена {i+1}&quot;;            
-          TableAct[(2+i),5].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
-          TableAct[(2+i),6].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
-          TableAct[(2+i),8].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
-          TableAct[(2+i),9].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
-          TableAct[(2+i),11].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
-          TableAct[(2+i),12].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
-          TableAct[(2+i),13].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
-          TableAct[(2+i),14].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
-          TableAct[(2+i),15].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
-          TableAct[(2+i),16].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
-          TableAct[(2+i),17].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
-          TableAct[(2+i),18].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
-          TableAct[(2+i),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
-          TableAct[(2+i),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
-          TableAct[(2+i),22].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
-          TableAct[(2+i),23].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
-          TableAct[(2+i),24].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
-          TableAct[(2+i),25].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
-          TableAct[(2+i),26].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
+          TableAct[(2+j),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
+          TableAct[(2+j),2].Text = $&quot;{begin}-{end}&quot;;            
+          TableAct[(2+j),3].Text = $&quot;Смена {i+1}&quot;;            
+          TableAct[(2+j),5].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_LastShift);
+          TableAct[(2+j),6].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_LastShift);         
+          TableAct[(2+j),8].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_CurrShift);           
+          TableAct[(2+j),9].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_CurrShift);     
+          TableAct[(2+j),11].Text = tools.GetNormalizedValue(listShiftsData[i].Vol_Gross);     
+          TableAct[(2+j),12].Text = tools.GetNormalizedValue(listShiftsData[i].Mass_Gross);     
+          TableAct[(2+j),13].Text = tools.GetNormalizedValue(listShiftsData[i].Temp);     
+          TableAct[(2+j),14].Text = tools.GetNormalizedValue(listShiftsData[i].Press);     
+          TableAct[(2+j),15].Text = tools.GetNormalizedValue(listShiftsData[i].Density);     
+          TableAct[(2+j),16].Text = tools.GetNormalizedValue(listShiftsData[i].Density_correction);     
+          TableAct[(2+j),17].Text = tools.GetNormalizedValue(listShiftsData[i].PassportID);     
+          TableAct[(2+j),18].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass_Frac);             
+          TableAct[(2+j),20].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Water);             
+          TableAct[(2+j),21].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Chlorides);             
+          TableAct[(2+j),22].Text = tools.GetNormalizedValue(listShiftsData[i].Balast.Impurity);             
+          TableAct[(2+j),23].Text = tools.GetNormalizedValue(listShiftsData[i].Sulfur);             
+          TableAct[(2+j),24].Text = tools.GetNormalizedValue(listShiftsData[i].Chloride_Salts);             
+          TableAct[(2+j),25].Text = tools.GetNormalizedValue(listShiftsData[i].Balast_Mass);             
+          TableAct[(2+j),26].Text = tools.GetNormalizedValue(listShiftsData[i].Net_Mass );     
+          
+          j++;
         }
       }
          
@@ -373,7 +390,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportTitleBand>
-    <DataBand Name="DataBandTableAct" Top="185.4" Width="718.2" Height="520.58" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandTableAct" Top="183.23" Width="718.2" Height="520.58" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAct" Top="9.45" Width="567" Height="506.41" Border.Lines="All" GrowToBottom="true" ManualBuildEvent="TableAct_ManualBuild">
         <TableColumn Name="Column22" Width="302.4"/>
         <TableColumn Name="Column8" Width="56.7"/>
@@ -543,7 +560,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandFootNote" Top="709.98" Width="718.2" Height="26.46" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandFootNote" Top="705.63" Width="718.2" Height="26.46" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableFootnote" Width="616.14" Height="26.46" GrowToBottom="true" ManualBuildEvent="TableFootnote_ManualBuild">
         <TableColumn Name="Column278" Width="11.34"/>
         <TableColumn Name="Column279" Width="75.6"/>
@@ -560,7 +577,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <DataBand Name="DataBandAdditionlInfo" Top="740.44" Width="718.2" Height="45.36" CanGrow="true" CanShrink="true" CanBreak="true">
+    <DataBand Name="DataBandAdditionlInfo" Top="733.92" Width="718.2" Height="45.36" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableAdditionlInfo" Width="336.42" Height="37.8" GrowToBottom="true" FixedRows="1" ManualBuildEvent="TableAdditionlInfo_ManualBuild">
         <TableColumn Name="Column281" Width="336.42"/>
         <TableRow Name="Row195">
@@ -571,7 +588,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </DataBand>
-    <ReportSummaryBand Name="ReportSummary" Top="789.8" Width="718.2" Height="64.26" CanGrow="true" CanShrink="true" CanBreak="true">
+    <ReportSummaryBand Name="ReportSummary" Top="781.11" Width="718.2" Height="64.26" CanGrow="true" CanShrink="true" CanBreak="true">
       <TableObject Name="TableSigners" Top="7.56" Width="718.2" Height="56.7" RepeatHeaders="false">
         <TableColumn Name="Column4" Width="37.8"/>
         <TableColumn Name="Column5" Width="124.74"/>
@@ -613,7 +630,7 @@ namespace FastReport
         </TableRow>
       </TableObject>
     </ReportSummaryBand>
-    <PageFooterBand Name="PageFooter" Top="858.06" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
+    <PageFooterBand Name="PageFooter" Top="847.19" Width="718.2" Height="22.68" PrintOn="FirstPage, LastPage, OddPages, EvenPages, RepeatedBand" BeforeLayoutEvent="PageFooter_BeforeLayout">
       <TextObject Name="PageNumeration" Width="217.35" Height="22.68" Anchor="Left" Text="Страница [Page#] из [TotalPages#]" Padding="0, 0, 0, 0" HorzAlign="Right" Font="Arial, 9pt, style=Italic" FontWidthRatio="0.85"/>
     </PageFooterBand>
   </ReportPage>
