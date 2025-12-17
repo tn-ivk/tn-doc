@@ -89,7 +89,7 @@ tn_doc/
 │       └── shared/            # Shared TypeScript utilities
 ├── TN.DocGeneral/             # Core business logic and shared utilities
 ├── Ivk.DataBase/              # Database library for IVK data access
-├── tn.docgeneral/             # ⚠️ Document module libraries (git submodule, 41+ библиотек)
+├── tn.docgeneral/             # ⚠️ Document module libraries (git submodule, ~48 библиотек)
 ├── tn_toolsfastreport/        # ⚠️ FastReport utilities (git submodule)
 ├── winprutil/                 # ⚠️ Windows printing utility (git submodule)
 └── Tests/                     # NUnit tests with Moq
@@ -97,7 +97,7 @@ tn_doc/
 
 **⚠️ Git Submodules:**
 Three directories are git submodules and must be initialized after cloning:
-- `tn.docgeneral/` - All document type implementations (Act, Passport, Report, Jornal, Poverka*, KMH*)
+- `tn.docgeneral/` - All document type implementations (~48 libraries: Act, Passport, Report, Jornal, Poverka* (21), KMH* (18), Common* (3))
 - `tn_toolsfastreport/` - FastReport helper utilities
 - `winprutil/` - Windows printing service
 
@@ -154,7 +154,7 @@ Key types: `DocumentEditConfig`, `FormField`, `SelectOption` (see `tn.docgeneral
 
 ### Key Services (Dependency Injection)
 
-Registered in `Startup.cs:ConfigureServices()`:
+Registered in `Startup.cs:ConfigureServices()` and `Extensions/IServiceCollectionExtensions.cs`:
 
 **Singleton:**
 - `IAppConfigService` - Configuration management and document class factory
@@ -169,6 +169,11 @@ Registered in `Startup.cs:ConfigureServices()`:
 **Background:**
 - `StatusMonitoringService` - Health checks every 60s
 
+**Adding new services:**
+- Register in `Startup.cs` or extension methods in `Extensions/IServiceCollectionExtensions.cs`
+- Bind configuration settings via `IOptions<T>` pattern
+- Inject through constructor (prefer constructor injection over property injection)
+
 ### Configuration System
 
 Layered configuration (loaded in order):
@@ -182,6 +187,14 @@ Layered configuration (loaded in order):
 
 ## Key Development Patterns
 
+### Adding New API Endpoints
+1. **Create action** in appropriate controller under `TN_Doc/Controllers/`
+2. **Inject services** via constructor (registered in `Startup.cs`)
+3. **Place business logic** in `TN_Doc/Models/Services/`, not in controller
+4. **Validate input** and return `IActionResult` or `ActionResult<T>`
+5. **Log errors** via NLog (`ILogger<T>`) - never suppress exceptions
+6. **Return meaningful errors** - use appropriate HTTP status codes
+
 ### Coding Conventions (C#)
 - **Naming**: `PascalCase` for types/methods, `camelCase` for private fields, `_camelCase` for private readonly
 - **Control Flow**: Prefer early returns, avoid deep nesting
@@ -192,10 +205,12 @@ Layered configuration (loaded in order):
 
 ### Test Guidelines
 - **Naming**: `MethodName_WhenCondition_ThenExpectedResult`
+  - Examples: `GetEditConfig_WhenDocumentNotFound_ThrowsException`, `SaveDocument_WhenValidData_ReturnsTrue`
 - **Pattern**: AAA (Arrange-Act-Assert)
-- **Mocking**: Use mocks/fakes for external services and databases
+- **Mocking**: Use Moq for external services and databases - never test infrastructure
 - **Coverage**: Run `dotnet test /p:CollectCoverage=true` before risky refactors
-- **Independent**: Tests must not depend on environment or execution order
+- **Independent**: Tests must not depend on environment, file system, or execution order
+- **Negative scenarios**: Always cover validation errors and edge cases
 
 ### Test Structure
 ```
@@ -216,8 +231,21 @@ dotnet test --filter "Namespace~Libraries.KMH"     # All KMH tests
 dotnet test --filter "Namespace~Libraries.Core"    # Core document tests
 ```
 
-### UI Theme (v1.4.3+)
-All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables, never hardcode HEX colors.
+### UI Theme and Static Files
+- **Colors**: All colors centralized in `/TN_Doc/wwwroot/css/material3.css`. Use CSS variables, never hardcode HEX colors.
+- **Static files**: Place in `/TN_Doc/wwwroot/` directory
+- **Caching**: Browser caching applies - consider versioning for CSS/JS files or use cache busting
+- **Development vs Production**: Use detailed logs in Development, minimal in Production (controlled via `appsettings.{Environment}.json`)
+
+### FastReport Templates
+- **Templates**: Located in `TN_Doc/Doc/` directory (*.frx files)
+- **Naming**: `{Number}_{DocumentType}.frx` (e.g., `01_Passport.frx`)
+- **Configuration**: `TN_Doc/Cfg/Cfg{DocumentType}.json` specifies template path
+- **Data source**: `GetViewDoc(id)` method returns JSON data for template
+- **Best practices**:
+  - Always backup template before modifications
+  - Maintain backwards compatibility with existing data structure
+  - Test template with real data before deployment
 
 ### Vue Component Guidelines
 - **UI Library**: PrimeVue для всех UI компонентов
@@ -254,7 +282,7 @@ Vue 3 компонент для редактирования документо�
   - `src/composables/usePassportEditor.ts` - логика редактирования паспорта
 
 **Ключевые фичи v1.4.4:**
-- Все 41 библиотека используют `IDocumentEditor.SaveDocument`
+- Все ~48 библиотек используют `IDocumentEditor.SaveDocument`
 - Система истории изменений полей (Field History)
 - Механизм связанных параметров (master-slave) для паспорта
 
@@ -291,6 +319,7 @@ Vue 3 компонент для редактирования документо�
 - Windows: `TN_Doc/logs/`
 - Linux: `/opt/TN_Doc/logs/`
 - Development: `TN_Doc/bin/Debug/net8.0/logs/`
+- Configuration: `/TN_Doc/nlog.config` controls log levels and targets
 
 ### Documentation
 - `/CHANGELOG.md` - Version history (⚠️ check for recent changes before major work)
@@ -306,12 +335,14 @@ Vue 3 компонент для редактирования документо�
 | Build errors | Ensure NuGet sources configured (ortpr, FastReport) |
 | Submodules empty | Run `git submodule update --init --recursive` |
 | Vue build fails | Run `npm install` in `TN_Doc/Client/` first |
-| Config changes ignored | Restart app - configuration files are cached |
-| PrimeVue overlay clipped | Use `appendTo="body"` and global styles |
+| Config changes ignored | Restart app - configuration files are cached (IConfigurationCacheService) |
+| PrimeVue overlay clipped | Use `appendTo="body"` and global styles (not scoped) |
 | Datetime timezone shift | Use local time conversion, not UTC |
 | Database connection | Verify credentials in CfgApp.json |
 | OPC DA tag errors | Pre-register tags in `opc.da.tags.json` |
 | Linux permission issues | Ensure `alphadaemon` user has `/opt/TN_Doc/` access |
+| Logs not appearing | Check `nlog.config` and verify write permissions to logs directory |
+| Template not found | Verify `GetPathTemplateFile()` path and check `TN_Doc/Doc/` directory |
 
 ## Multi-platform Support
 
