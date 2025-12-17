@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/09/2025 13:26:21" ReportInfo.CreatorVersion="2026.1.2.0">
+<Report ScriptLanguage="CSharp" ReferencedAssemblies="System.dll&#13;&#10;System.Drawing.dll&#13;&#10;System.Data.dll&#13;&#10;System.Xml.dll&#13;&#10;FastReport.Compat.dll&#13;&#10;System.Windows.Forms.dll&#13;&#10;FastReport.DataVisualization.dll&#13;&#10;Newtonsoft.Json.dll&#13;&#10;System.Core.dll&#13;&#10;TN_DocGeneral.dll&#13;&#10;Act.dll" DoublePass="true" ReportInfo.Created="03/25/2020 12:46:46" ReportInfo.Modified="12/17/2025 14:41:38" ReportInfo.CreatorVersion="2026.1.2.0">
   <ScriptText>using System;
 using System.Reflection;
 using System.Collections;
@@ -95,6 +95,10 @@ namespace FastReport
       string usedShiftStrInit = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.UsedShift;
       int usedShiftInit;
       var listActs = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act;
+      if (listActs == null || listActs.Count == 0)
+      {
+        return; // Нет данных для отображения
+      }
       if (int.TryParse(usedShiftStrInit, out usedShiftInit) &amp;&amp; usedShiftInit &gt;= 1)
         listShiftsData = listActs.Take(usedShiftInit).ToList();
       else
@@ -127,7 +131,7 @@ namespace FastReport
 
         // Insert Columns for Volumes  (V0) &amp; fill them headers with text
         int indexColTemplate = ColumnTemplate.Index;
-        for (int i=1; i&lt;listShiftsData.Count; i++)
+        for (int i=1; i&lt;shiftCount; i++)
         {
           TableAct.Columns.Insert(indexColTemplate+1, new TableColumn());
           
@@ -142,8 +146,8 @@ namespace FastReport
         }
             
         // Span Columns
-        TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
-      
+        TableAct[indexColTemplate,0].ColSpan=shiftCount;
+        
         for (int i = 0, j = 0; i &lt; (listShiftsData.Count); i++)
         {
           if(String.IsNullOrEmpty(listShiftsData[i].Vol_LastShift) || listShiftsData[i].Vol_LastShift.Contains(&quot;-&quot;))
