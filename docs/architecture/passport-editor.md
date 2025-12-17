@@ -273,6 +273,124 @@ Document (`document.*`):
      - `{controlId}__history` — возвращается только при включенном ELIS
      - `__elisProtocol` (если сохранён в DataARM)
 
+### Что считается «не заполненным» паспортом (IsFilled = 0)
+
+В контексте **редактора** “пустой/ещё не заполненный паспорт” — это документ, у которого в данных ИВК/БД выставлено:
+
+- `TablePassport.IsFilled == 0` (поле копируется в `GetViewDoc()` из списка документов: `TableActAndPassportList.IsFilled → TablePassport.IsFilled`).
+
+Этот флаг влияет на вычисление значений при первоначальной загрузке формы (см. ниже) и на служебную историю методов (DefaultMethod).
+
+### Диаграмма: открытие редактора и получение initialValues
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as Vue: DocumentPassportEditor
+    participant Store as Pinia: documentStore
+    participant API as ASP.NET: DocumentEditController
+    participant Mod as DLL: DocPassport.GetEditConfig
+    participant DB as БД: TableActAndPassport*
+
+    UI->>Store: loadDocument(deviceId,"Passport",id)
+    Store->>API: GET /api/documents/{deviceId}/Passport/edit/{id}
+    API->>Mod: editor.GetEditConfig(id)
+    Mod->>DB: GetViewDoc(id)\nLoad ActAndPassport/AdditionalData/PassportResult/DataARM\nSet TablePassport.IsFilled
+    Mod->>Mod: BuildQualityParametersSchema()
+    Mod->>Mod: ExtractInitialValues()\nFillQualityParametersInitialValues()
+    Mod-->>API: PassportEditConfig(fields, schema, initialValues)
+    API-->>Store: config + initialValues
+    Store->>Store: formData = initialValues\nformHistory = initialValues[...__history]
+    Store-->>UI: qualityParameters = schema + formData
+    UI-->>UI: render table\n(Измерение=value.*, Предпросмотр=result.*)
+    Note over Store: restoreElisOriginals() после loadConfig\nвосстанавливает __elisOriginal для __elisFilled=true
+```
+
+### Как заполняются «Измерение» и «Предпросмотр» при загрузке (initialValues)
+
+В таблице качественных показателей колонки привязаны к ключам:
+
+- **Измерение** → `value.{ParameterKey}`
+- **Предпросмотр** → `result.{ParameterKey}`
+
+Эти значения **первично** приходят с бэкенда в составе `initialValues` (формируются в `FillQualityParametersInitialValues()`).
+
+#### Алгоритм выбора значений из данных ИВК/БД (BuildParameterValues)
+
+Логика фактически реализована в `BasePassportQualityStrategy` и одинакова для режима ELIS/не‑ELIS (класс `PassportQualityStrategyElis` пока не переопределяет расчёты).
+
+```mermaid
+flowchart TD
+    A[BuildParameterValues(parameterKey)] --> B[Собрать значения из jsonDoc/DataARM]
+    B --> B1[resultValue = PassportResult.<...>]
+    B --> B2[correctionValue = Passport.<key>.Data.Value\n(если Legal>0)]
+    B --> B3[rawValue = Passport.<Raw>.Value\n(если Legal>0)]
+    B --> B4[labInfoValue = DataARM.LabInfo[parameterKey].Value]
+    B --> B5[isFilled = TablePassport.IsFilled]
+
+    B1 --> C{Измерение: value.*}
+    B2 --> C
+    B3 --> C
+    C -->|первое числовое значение| C1[resultValue]
+    C -->|если resultValue не число| C2[correctionValue]
+    C -->|если correctionValue не число| C3[rawValue]
+    C -->|ничего не подошло| C4[""]
+
+    B1 --> D{Предпросмотр: result.*}
+    B4 --> D
+    B5 --> D
+    D -->|isFilled==0 и resultValue не пуст| D1[resultValue]
+    D -->|isFilled==0 и resultValue пуст| D2[rawValue]
+    D -->|isFilled>0 и labInfoValue = текст\n(не число и без '-')| D3[labInfoValue]
+    D -->|иначе| D4[resultValue]
+
+    C1 --> E[Записать в initialValues\nvalue.<key>=measurement\nresult.<key>=preview]
+    C2 --> E
+    C3 --> E
+    C4 --> E
+    D1 --> E
+    D2 --> E
+    D3 --> E
+    D4 --> E
+```
+
+Примечания:
+
+- “числовое значение” определяется через `float.TryParse(..., InvariantCulture)` с заменой `',' → '.'`.
+- В конце значения приводятся к русской записи на фронтенд: `'.' → ','`.
+
+### Как «Измерение» и «Предпросмотр» переписываются из ELIS (после получения протокола)
+
+После загрузки формы значения могут быть обновлены сообщением ELIS (frontend `handleElisData()`).
+
+Ключевой момент: ELIS заполняет **те же** controlId (`value.*` и `result.*`) и выставляет служебные флаги `__elisFilled/__elisOriginal`, влияющие на подсветку и механику “возврата к ELIS”.
+
+```mermaid
+flowchart TD
+    A[ELIS postMessage] --> B{config/fields загружены?}
+    B -->|нет| B1[pendingElisData\nприменить после loadDocument]
+    B -->|да| C[handleElisData()]
+    C --> D[для каждого параметра schema]
+    D --> E{role == Slave?}
+    E -->|да| D
+    E -->|нет| F{elisAlias есть?}
+    F -->|нет| D
+    F -->|да| G{найден elisParam?}
+    G -->|нет| H[__elisMissing\nvalue/method/document]
+    G -->|да| I[value.<key>=elisParam.value\nvalue.__elisFilled=true\nvalue.__elisOriginal=value]
+    I --> J{valueString есть?}
+    J -->|нет| D
+    J -->|да| K{isBallast?}
+    K -->|да| L[result.<key>=valueString\nresult.__elisFilled=false\nhistory AutoFill]
+    K -->|нет| M{valueString != measurement?}
+    M -->|да| N[result.__elisFilled=true\nresult.__elisOriginal=valueString\nhistory ELIS]
+    M -->|нет| O[result.__elisFilled=false\nhistory AutoFill]
+    H --> D
+    L --> D
+    N --> D
+    O --> D
+```
+
 ## Backend: первичное сохранение (SaveDocument)
 
 Точка входа: `DocumentEditController.SaveDocument()` → `DocPassport.SaveDocument()` (`tn.docgeneral/Passport/DocPassport.Editor.cs`).
@@ -336,4 +454,3 @@ Document (`document.*`):
   - имеют `Legal=0`.
 - `LinkedParameter` работает только если у параметра нет `SlaveKey` (приоритет `SlaveKey`).
 - Поле документа ELIS (`document.*`) приходит/уходит как JSON; на бэкенде парсинг tolerant (объект/строка/число).
-
