@@ -7,6 +7,7 @@ import type { PassportEditConfig } from '@/types/passport.types';
 import type { FieldHistoryEntry } from '@/types/history.types';
 import { DataSource } from '@/types/history.types';
 import { normalizeValue } from '@/utils/passport-utils';
+import { compactAllFieldsHistory } from '@/utils/history-utils';
 
 const MANUAL_AUTHOR = 'Пользователь';
 
@@ -421,10 +422,11 @@ export const useDocumentStore = defineStore('document', () => {
 
     try {
       // Подготовить данные для сохранения (включая историю)
-
+      // Схлопываем историю: оставляем только последнюю запись для каждого поля
+      const compactedHistory = compactAllFieldsHistory(formHistory.value);
       const payload = {
         ...formData.value,
-        __history: formHistory.value // Передаем историю
+        __history: compactedHistory
       };
 
       const response = await documentApi.saveDocument(

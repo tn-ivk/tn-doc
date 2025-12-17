@@ -2,6 +2,7 @@ import { logger } from '@tn-doc/shared';
 import { useDocumentStore } from '@/stores/documentStore';
 import { documentApi } from '@/services/api.service';
 import { opcApi } from '@/services/opc.service';
+import { compactAllFieldsHistory } from '@/utils/history-utils';
 import type { PassportEditConfig } from '@/types/passport.types';
 import type { OpcDeviceParams } from './useOpcParams';
 
@@ -125,9 +126,11 @@ export function usePassportSave() {
       }
 
       // Добавляем историю изменений полей в mergedData
+      // Схлопываем историю: оставляем только последнюю запись для каждого поля
+      const compactedHistory = compactAllFieldsHistory(store.formHistory);
       const finalPayload = {
         ...mergedData,
-        __history: store.formHistory
+        __history: compactedHistory
       };
 
 
