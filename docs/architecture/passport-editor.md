@@ -347,17 +347,18 @@ flowchart TD
     C -->|Да| C1[Вернуть Correction.Value<br/>source = correction]
     C -->|Нет| D{Raw.Legal > 0?}
     D -->|Да| D1[Вернуть Raw.Value<br/>source = raw]
-    D -->|Нет| E{Result - число?<br/>CanParseToFloat}
+    D -->|Нет| F1[Вернуть пустую строку<br/>source = empty]
 
-    B -->|Нет<br/>Паспорт заполнен| E
+    B -->|Нет<br/>Паспорт заполнен| E{Result - число?<br/>CanParseToFloat}
 
     E -->|Да| E1[Вернуть Result<br/>source = result]
-    E -->|Нет| F[Вернуть пустую строку<br/>source = empty]
+    E -->|Нет| F2[Вернуть пустую строку<br/>source = empty]
 
     style C1 fill:#2e7d32,stroke:#1b5e20,color:#fff
     style D1 fill:#2e7d32,stroke:#1b5e20,color:#fff
     style E1 fill:#2e7d32,stroke:#1b5e20,color:#fff
-    style F fill:#c75b7a,stroke:#8b3a5a,color:#fff
+    style F1 fill:#c75b7a,stroke:#8b3a5a,color:#fff
+    style F2 fill:#c75b7a,stroke:#8b3a5a,color:#fff
 ```
 
 **Логика (приоритет сверху вниз):**
@@ -365,8 +366,7 @@ flowchart TD
 1. **Если паспорт НЕ заполнен** (`IsFilled = 0`):
    - `Correction.Value` (если `Legal > 0`) — подтверждённое ИВК значение с коррекцией
    - `Raw.Value` (если `Legal > 0`) — подтверждённое ИВК сырое значение
-   - `Result` (если является числом) — значение из PassportResult
-   - Пустая строка
+   - Пустая строка (Result НЕ проверяется для незаполненных паспортов)
 
 2. **Если паспорт заполнен** (`IsFilled > 0`):
    - `Result` (если является числом) — значение из PassportResult
@@ -379,22 +379,23 @@ flowchart TD
     A[ResolveResultValue] --> B{IsFilled == 0?<br/>Паспорт НЕ заполнен}
 
     B -->|Да| C{Correction.Legal > 0?}
-    C -->|Да| C1[Вернуть Correction.Value<br/>source = correction]
+    C -->|Да| C1[Вернуть Correction.Value<br/>source = correction<br/>RETURN]
     C -->|Нет| D{Raw.Legal > 0?}
-    D -->|Да| D1[Вернуть Raw.Value<br/>source = raw]
-    D -->|Нет| G{Result - число?}
+    D -->|Да| D1[Вернуть Raw.Value<br/>source = raw<br/>RETURN]
+    D -->|Нет| E1[Вернуть пустую строку<br/>source = empty<br/>RETURN]
 
-    B -->|Нет<br/>Паспорт заполнен| E{LabInfo.Value существует<br/>И НЕ число<br/>И НЕ содержит '-'?}
+    B -->|Нет<br/>Паспорт заполнен| F{LabInfo.Value существует<br/>И НЕ число<br/>И НЕ содержит '-'?}
 
-    E -->|Да| E1[Вернуть LabInfo.Value<br/>source = labInfo<br/>Текстовое значение<br/>из пользовательского ввода]
-    E -->|Нет| G
+    F -->|Да| F1[Вернуть LabInfo.Value<br/>source = labInfo<br/>Текстовое значение<br/>RETURN]
+    F -->|Нет| G{Result - число?<br/>CanParseToFloat}
 
-    G -->|Да| G1[Вернуть Result<br/>source = result]
-    G -->|Нет| H[Вернуть пустую строку<br/>source = empty]
+    G -->|Да| G1[Вернуть Result<br/>source = result<br/>RETURN]
+    G -->|Нет| H[Вернуть пустую строку<br/>source = empty<br/>RETURN]
 
     style C1 fill:#2e7d32,stroke:#1b5e20,color:#fff
     style D1 fill:#2e7d32,stroke:#1b5e20,color:#fff
-    style E1 fill:#1976d2,stroke:#0d47a1,color:#fff
+    style E1 fill:#c75b7a,stroke:#8b3a5a,color:#fff
+    style F1 fill:#1976d2,stroke:#0d47a1,color:#fff
     style G1 fill:#2e7d32,stroke:#1b5e20,color:#fff
     style H fill:#c75b7a,stroke:#8b3a5a,color:#fff
 ```
@@ -402,20 +403,20 @@ flowchart TD
 **Логика (приоритет сверху вниз):**
 
 1. **Если паспорт НЕ заполнен** (`IsFilled = 0`):
-   - `Correction.Value` (если `Legal > 0`) — подтверждённое ИВК значение с коррекцией
-   - `Raw.Value` (если `Legal > 0`) — подтверждённое ИВК сырое значение
-   - `Result` (если является числом) — значение из PassportResult
-   - Пустая строка
+   - `Correction.Value` (если `Legal > 0`) — подтверждённое ИВК значение с коррекцией → **RETURN**
+   - `Raw.Value` (если `Legal > 0`) — подтверждённое ИВК сырое значение → **RETURN**
+   - Пустая строка → **RETURN** (LabInfo и Result НЕ проверяются для незаполненных паспортов)
 
 2. **Если паспорт заполнен** (`IsFilled > 0`):
-   - `LabInfo.Value` (если текстовое значение без "-") — **пользовательский ввод** из прошлых редактирований
-   - `Result` (если является числом) — значение из PassportResult
-   - Пустая строка
+   - `LabInfo.Value` (если текстовое значение без "-") — **пользовательский ввод** из прошлых редактирований → **RETURN**
+   - `Result` (если является числом) — значение из PassportResult → **RETURN**
+   - Пустая строка → **RETURN**
 
 **Особенность LabInfo.Value:**
 - Это поле используется для хранения **текстовых** значений результата (например, "соответствует", "не соответствует")
-- Проверяется только для заполненных паспортов (`IsFilled > 0`)
+- Проверяется **только для заполненных паспортов** (`IsFilled > 0`)
 - Игнорируется, если значение является числом или содержит символ "-"
+- Имеет приоритет над `Result` при проверке
 
 ##### Вспомогательная функция CanParseToFloat
 
