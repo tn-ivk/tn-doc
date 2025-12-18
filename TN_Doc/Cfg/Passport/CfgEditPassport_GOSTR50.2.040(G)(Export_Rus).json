@@ -389,7 +389,8 @@
       "Use": true,
       "Edit": false,
       "IsBallast": true,
-      "RoundValue": 1
+      "RoundValue": 1,
+      "RequiredFill": true
     },
     {
       "Id": 2,
@@ -398,7 +399,8 @@
       "Use": true,
       "Edit": false,
       "IsBallast": true,
-      "RoundValue": 2
+      "RoundValue": 2,
+      "RequiredFill": true
     },
     {
       "Id": 3,
@@ -407,7 +409,8 @@
       "Use": true,
       "Edit": false,
       "IsBallast": true,
-      "RoundValue": 1
+      "RoundValue": 1,
+      "RequiredFill": true
     },
     {
       "Id": 4,
@@ -416,7 +419,8 @@
       "Use": true,
       "Edit": false,
       "IsBallast": true,
-      "RoundValue": 1
+      "RoundValue": 1,
+      "RequiredFill": true
     },
     {
       "Id": 5,
@@ -425,7 +429,8 @@
       "Use": true,
       "Edit": false,
       "IsBallast": true,
-      "RoundValue": 1
+      "RoundValue": 1,
+      "RequiredFill": true
     },
     {
       "Id": 6,
@@ -438,7 +443,8 @@
       "Name": "Массовая доля воды, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RequiredFill": true
     },
     {
       "Id": 7,
@@ -452,7 +458,8 @@
       "Name": "Массовая концентрация хлористых солей, мг/дм³",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RequiredFill": true
     },
     {
       "Id": 8,
@@ -466,7 +473,8 @@
       "Name": "Массовая концентрация хлористых солей, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RequiredFill": true
     },
     {
       "Id": 9,
@@ -479,7 +487,8 @@
       "Name": "Массовая доля механических примесей, %",
       "Use": true,
       "Edit": true,
-      "IsBallast": true
+      "IsBallast": true,
+      "RequiredFill": true
     },
     {
       "Id": 10,
