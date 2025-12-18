@@ -354,10 +354,10 @@ flowchart TD
     E -->|Да| E1[Вернуть Result<br/>source = result]
     E -->|Нет| F[Вернуть пустую строку<br/>source = empty]
 
-    style C1 fill:#90EE90
-    style D1 fill:#90EE90
-    style E1 fill:#90EE90
-    style F fill:#FFB6C1
+    style C1 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style D1 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style E1 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style F fill:#c75b7a,stroke:#8b3a5a,color:#fff
 ```
 
 **Логика (приоритет сверху вниз):**
@@ -392,11 +392,11 @@ flowchart TD
     G -->|Да| G1[Вернуть Result<br/>source = result]
     G -->|Нет| H[Вернуть пустую строку<br/>source = empty]
 
-    style C1 fill:#90EE90
-    style D1 fill:#90EE90
-    style E1 fill:#87CEEB
-    style G1 fill:#90EE90
-    style H fill:#FFB6C1
+    style C1 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style D1 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style E1 fill:#1976d2,stroke:#0d47a1,color:#fff
+    style G1 fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style H fill:#c75b7a,stroke:#8b3a5a,color:#fff
 ```
 
 **Логика (приоритет сверху вниз):**
