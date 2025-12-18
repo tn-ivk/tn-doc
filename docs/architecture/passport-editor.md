@@ -317,47 +317,141 @@ sequenceDiagram
 
 #### Алгоритм выбора значений из данных ИВК/БД (BuildParameterValues)
 
-Логика фактически реализована в `BasePassportQualityStrategy` и одинакова для режима ELIS/не‑ELIS (класс `PassportQualityStrategyElis` пока не переопределяет расчёты).
+Логика реализована в `BasePassportQualityStrategy.cs` (`tn.docgeneral/Passport/PassportQualityStrategy/`) и использует два метода:
+
+1. **ResolveMeasurementValue** - определяет значение для колонки "Измерение" (`value.*`)
+2. **ResolveResultValue** - определяет значение для колонки "Предпросмотр" (`result.*`)
+
+##### Структура входных данных (ParameterValuesContext)
+
+```csharp
+public record ParameterValuesContext(
+    string ParameterKey,           // Ключ параметра (например, "DensCorrection")
+    LegalValue Raw,                // Raw значение: { Value: double, Legal: int }
+    LegalValue Correction,         // Correction значение: { Value: double, Legal: int }
+    string Result,                 // Значение из PassportResult
+    LabInfo LabInfo,               // Данные из DataARM.LabInfo (пользовательский ввод)
+    long IsFilled                  // Флаг заполненности паспорта (0 или 1)
+);
+```
+
+**Важно**: `Legal > 0` означает, что значение было подтверждено ИВК (прошло валидацию). `Legal = 0` означает неподтверждённое значение.
+
+##### Алгоритм ResolveMeasurementValue (колонка "Измерение")
 
 ```mermaid
 flowchart TD
-    A[BuildParameterValues(parameterKey)] --> B[Собрать значения из jsonDoc/DataARM]
-    B --> B1[resultValue = PassportResult.<...>]
-    B --> B2[correctionValue = Passport.<key>.Data.Value\n(если Legal>0)]
-    B --> B3[rawValue = Passport.<Raw>.Value\n(если Legal>0)]
-    B --> B4[labInfoValue = DataARM.LabInfo[parameterKey].Value]
-    B --> B5[isFilled = TablePassport.IsFilled]
+    A[ResolveMeasurementValue] --> B{IsFilled == 0?<br/>Паспорт НЕ заполнен}
 
-    B1 --> C{Измерение: value.*}
-    B2 --> C
-    B3 --> C
-    C -->|первое числовое значение| C1[resultValue]
-    C -->|если resultValue не число| C2[correctionValue]
-    C -->|если correctionValue не число| C3[rawValue]
-    C -->|ничего не подошло| C4[""]
+    B -->|Да| C{Correction.Legal > 0?}
+    C -->|Да| C1[Вернуть Correction.Value<br/>source = correction]
+    C -->|Нет| D{Raw.Legal > 0?}
+    D -->|Да| D1[Вернуть Raw.Value<br/>source = raw]
+    D -->|Нет| E{Result - число?<br/>CanParseToFloat}
 
-    B1 --> D{Предпросмотр: result.*}
-    B4 --> D
-    B5 --> D
-    D -->|isFilled==0 и resultValue не пуст| D1[resultValue]
-    D -->|isFilled==0 и resultValue пуст| D2[rawValue]
-    D -->|isFilled>0 и labInfoValue = текст\n(не число и без '-')| D3[labInfoValue]
-    D -->|иначе| D4[resultValue]
+    B -->|Нет<br/>Паспорт заполнен| E
 
-    C1 --> E[Записать в initialValues\nvalue.<key>=measurement\nresult.<key>=preview]
-    C2 --> E
-    C3 --> E
-    C4 --> E
-    D1 --> E
-    D2 --> E
-    D3 --> E
-    D4 --> E
+    E -->|Да| E1[Вернуть Result<br/>source = result]
+    E -->|Нет| F[Вернуть пустую строку<br/>source = empty]
+
+    style C1 fill:#90EE90
+    style D1 fill:#90EE90
+    style E1 fill:#90EE90
+    style F fill:#FFB6C1
 ```
 
-Примечания:
+**Логика (приоритет сверху вниз):**
 
-- “числовое значение” определяется через `float.TryParse(..., InvariantCulture)` с заменой `',' → '.'`.
-- В конце значения приводятся к русской записи на фронтенд: `'.' → ','`.
+1. **Если паспорт НЕ заполнен** (`IsFilled = 0`):
+   - `Correction.Value` (если `Legal > 0`) — подтверждённое ИВК значение с коррекцией
+   - `Raw.Value` (если `Legal > 0`) — подтверждённое ИВК сырое значение
+   - `Result` (если является числом) — значение из PassportResult
+   - Пустая строка
+
+2. **Если паспорт заполнен** (`IsFilled > 0`):
+   - `Result` (если является числом) — значение из PassportResult
+   - Пустая строка
+
+##### Алгоритм ResolveResultValue (колонка "Предпросмотр")
+
+```mermaid
+flowchart TD
+    A[ResolveResultValue] --> B{IsFilled == 0?<br/>Паспорт НЕ заполнен}
+
+    B -->|Да| C{Correction.Legal > 0?}
+    C -->|Да| C1[Вернуть Correction.Value<br/>source = correction]
+    C -->|Нет| D{Raw.Legal > 0?}
+    D -->|Да| D1[Вернуть Raw.Value<br/>source = raw]
+    D -->|Нет| G{Result - число?}
+
+    B -->|Нет<br/>Паспорт заполнен| E{LabInfo.Value существует<br/>И НЕ число<br/>И НЕ содержит '-'?}
+
+    E -->|Да| E1[Вернуть LabInfo.Value<br/>source = labInfo<br/>Текстовое значение<br/>из пользовательского ввода]
+    E -->|Нет| G
+
+    G -->|Да| G1[Вернуть Result<br/>source = result]
+    G -->|Нет| H[Вернуть пустую строку<br/>source = empty]
+
+    style C1 fill:#90EE90
+    style D1 fill:#90EE90
+    style E1 fill:#87CEEB
+    style G1 fill:#90EE90
+    style H fill:#FFB6C1
+```
+
+**Логика (приоритет сверху вниз):**
+
+1. **Если паспорт НЕ заполнен** (`IsFilled = 0`):
+   - `Correction.Value` (если `Legal > 0`) — подтверждённое ИВК значение с коррекцией
+   - `Raw.Value` (если `Legal > 0`) — подтверждённое ИВК сырое значение
+   - `Result` (если является числом) — значение из PassportResult
+   - Пустая строка
+
+2. **Если паспорт заполнен** (`IsFilled > 0`):
+   - `LabInfo.Value` (если текстовое значение без "-") — **пользовательский ввод** из прошлых редактирований
+   - `Result` (если является числом) — значение из PassportResult
+   - Пустая строка
+
+**Особенность LabInfo.Value:**
+- Это поле используется для хранения **текстовых** значений результата (например, "соответствует", "не соответствует")
+- Проверяется только для заполненных паспортов (`IsFilled > 0`)
+- Игнорируется, если значение является числом или содержит символ "-"
+
+##### Вспомогательная функция CanParseToFloat
+
+```csharp
+protected static bool CanParseToFloat(string value)
+{
+    return !string.IsNullOrWhiteSpace(value)
+        && float.TryParse(value.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out _);
+}
+```
+
+Проверяет, является ли строка числом (с учётом замены запятой на точку для совместимости с русской локалью).
+
+##### Итоговая обработка значений
+
+```csharp
+public virtual ParameterValues BuildParameterValues(ParameterValuesContext context)
+{
+    var measurementValue = ResolveMeasurementValue(context, out var measurementSource);
+    var resultValue = ResolveResultValue(context, out var resultSource);
+
+    _logger.Trace($"BuildParameterValues [{context.ParameterKey}]: measurement={measurementValue} ({measurementSource}) | result={resultValue} ({resultSource})");
+
+    return new ParameterValues
+    {
+        Measurement = measurementValue?.Replace('.', ',') ?? string.Empty,  // Точка → запятая для русской локали
+        Result = resultValue?.Replace('.', ',') ?? string.Empty
+    };
+}
+```
+
+**Примечания:**
+
+- Значения извлекаются из разных источников (`jsonDoc`, `DataARM`) в методе `GetRawValue/GetCorrectionValue` (`DocPassport.Editor.cs`)
+- В конце значения приводятся к русской записи: `'.' → ','`
+- Источник значения логируется для диагностики (уровень Trace)
 
 ### Как «Измерение» и «Предпросмотр» переписываются из ELIS (после получения протокола)
 
