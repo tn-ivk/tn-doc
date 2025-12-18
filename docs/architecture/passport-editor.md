@@ -561,13 +561,13 @@ flowchart TD
 
     CheckRawFilled -->|Нет| SetLegalCheck4[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Новое/изменённое значение,<br/>требует подтверждения ИВК<br/>RETURN]
 
-    style SetLegal0A fill:#FFB6C1
-    style SetLegal0B fill:#90EE90
-    style SetLegal0C fill:#90EE90
-    style SetLegalCheck1 fill:#FFD700
-    style SetLegalCheck2 fill:#FFD700
-    style SetLegalCheck3 fill:#FFD700
-    style SetLegalCheck4 fill:#FFD700
+    style SetLegal0A fill:#c75b7a,stroke:#8b3a5a,color:#fff
+    style SetLegal0B fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style SetLegal0C fill:#2e7d32,stroke:#1b5e20,color:#fff
+    style SetLegalCheck1 fill:#f57c00,stroke:#e65100,color:#fff
+    style SetLegalCheck2 fill:#f57c00,stroke:#e65100,color:#fff
+    style SetLegalCheck3 fill:#f57c00,stroke:#e65100,color:#fff
+    style SetLegalCheck4 fill:#f57c00,stroke:#e65100,color:#fff
 ```
 
 #### Логика принятия решения
