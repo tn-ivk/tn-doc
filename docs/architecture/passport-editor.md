@@ -500,10 +500,144 @@ flowchart TD
 3) Обновляет:
    - `FillingTableActAndPassport` (Correction/AdditionalData, бинарные поля)
    - `TableActAndPassportData.DataARM` (JSON)
-4) Для параметров качества выставляет `Legal = 0` если:
-   - параметр является **Slave** (значение вычисляется от Master),
-   - или параметр нередактируемый (`Edit == false`).
+4) Для параметров качества определяет флаг достоверности `Legal` (см. алгоритм CorrectValue ниже)
 5) Синхронизирует метод по `LinkedParameter` на бэкенде (ведущий → ведомый), если у ведущего **нет** `SlaveKey`.
+
+### Алгоритм определения достоверности значений (CorrectValue)
+
+Метод `CorrectValue` отвечает за сохранение значения параметра качества и установку флага `Legal`, который определяет:
+- `Legal > 0` — значение **достоверно** (подтверждено ИВК, требует повторного подтверждения при изменении)
+- `Legal = 0` — значение **недостоверно** (не требует подтверждения ИВК, может быть изменено оператором)
+
+#### Входные данные
+
+```csharp
+private void CorrectValue(
+    IQualityParameter parameter,      // Параметр качества из Correction
+    string value,                      // Новое значение от пользователя
+    ParameterValuesContext context,    // Контекст текущих значений из БД
+    bool isNotEditable = false,        // Параметр нередактируемый (Edit=false)
+    bool isSlave = false,               // Параметр вычисляется от Master (Role=Slave)
+    string rounding = null              // Точность округления (RoundValue из конфигурации)
+)
+```
+
+**ParameterValuesContext** содержит:
+- `IsFilled` — состояние паспорта (0 = не заполнен, 1+ = заполнен)
+- `Raw` — сырое значение ИВК (`{ParameterKey}Raw.Value`, `Legal`)
+- `Correction` — скорректированное значение ИВК (`{ParameterKey}Correction.Data.Value`, `Legal`)
+- `Result` — итоговое значение из `PassportResult`
+- `LabInfo` — данные пользовательского ввода из `DataARM`
+
+#### Алгоритм (диаграмма)
+
+```mermaid
+flowchart TD
+    Start[CorrectValue вызван] --> CheckSlave{isSlave или<br/>isNotEditable?}
+
+    CheckSlave -->|Да| SetLegal0A[parameter.Data.Value = value<br/>parameter.Data.Legal = 0<br/>RETURN]
+
+    CheckSlave -->|Нет| CheckFilled{IsFilled == 0?<br/>Паспорт НЕ заполнен}
+
+    %% Ветка: паспорт НЕ заполнен
+    CheckFilled -->|Да| CheckCorrectionUnfilled{Correction.Legal > 0?<br/>Есть подтверждённая коррекция}
+
+    CheckCorrectionUnfilled -->|Да| SetLegalCheck1[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal]
+
+    CheckCorrectionUnfilled -->|Нет| CheckRawUnfilled{context.Raw != null<br/>И newValue == Raw.Value?}
+
+    CheckRawUnfilled -->|Да| SetLegal0B[parameter.Data.Value = value<br/>parameter.Data.Legal = 0<br/>Значение совпадает с ИВК,<br/>подтверждение не требуется<br/>RETURN]
+
+    CheckRawUnfilled -->|Нет| SetLegalCheck2[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Новое/изменённое значение,<br/>требует подтверждения ИВК<br/>RETURN]
+
+    %% Ветка: паспорт заполнен
+    CheckFilled -->|Нет<br/>Паспорт заполнен| CheckCorrectionFilled{Correction.Legal > 0?<br/>Есть подтверждённая коррекция}
+
+    CheckCorrectionFilled -->|Да| SetLegalCheck3[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Изменение подтверждённого,<br/>требует нового подтверждения<br/>RETURN]
+
+    CheckCorrectionFilled -->|Нет| CheckRawFilled{context.Raw != null<br/>И newValue == Raw.Value?}
+
+    CheckRawFilled -->|Да| SetLegal0C[parameter.Data.Value = value<br/>parameter.Data.Legal = 0<br/>Значение совпадает с ИВК,<br/>подтверждение не требуется<br/>RETURN]
+
+    CheckRawFilled -->|Нет| SetLegalCheck4[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Новое/изменённое значение,<br/>требует подтверждения ИВК<br/>RETURN]
+
+    style SetLegal0A fill:#FFB6C1
+    style SetLegal0B fill:#90EE90
+    style SetLegal0C fill:#90EE90
+    style SetLegalCheck1 fill:#FFD700
+    style SetLegalCheck2 fill:#FFD700
+    style SetLegalCheck3 fill:#FFD700
+    style SetLegalCheck4 fill:#FFD700
+```
+
+#### Логика принятия решения
+
+**1. Slave и нередактируемые параметры** → `Legal = 0` всегда
+   - Эти параметры не требуют подтверждения ИВК
+   - Значение может свободно изменяться
+
+**2. Паспорт НЕ заполнен (IsFilled = 0):**
+   - **Есть подтверждённая коррекция** (`Correction.Legal > 0`) → **Legal = CheckLegal(value)**
+     - Бессмысленно на пустом паспорте, но технически возможно
+     - Требует повторного подтверждения при изменении
+   - **Значение совпадает с Raw из ИВК** (с учётом округления) → **Legal = 0**
+     - ИВК уже "видел" это значение, подтверждение не требуется
+     - Сравнение через `IsEqualAsString(newValue, Raw.Value, roundValue)`
+   - **Новое/изменённое значение** → **Legal = CheckLegal(value)**
+     - Требует подтверждения ИВК
+
+**3. Паспорт заполнен (IsFilled > 0):**
+   - **Есть подтверждённая коррекция** (`Correction.Legal > 0`) → **Legal = CheckLegal(value)**
+     - Изменение подтверждённого значения требует нового подтверждения
+   - **Значение совпадает с Raw из ИВК** (с учётом округления) → **Legal = 0**
+     - Возврат к значению ИВК, подтверждение не требуется
+   - **Новое/изменённое значение** → **Legal = CheckLegal(value)**
+     - Требует подтверждения ИВК
+
+#### Вспомогательные функции
+
+**IsEqualAsString** — сравнение чисел с учётом точности округления:
+
+```csharp
+public static bool IsEqualAsString(this double a, double b, int decimals)
+{
+    return a.ToString($"F{decimals}", CultureInfo.InvariantCulture)
+           == b.ToString($"F{decimals}", CultureInfo.InvariantCulture);
+}
+```
+
+**CheckLegal** — проверка валидности значения:
+- Если значение валидно (не пустое, корректный формат) → возвращает `1`
+- Иначе → возвращает `0`
+
+#### Точность округления (RoundValue)
+
+- Параметр `rounding` берётся из конфигурации (`CfgEditPassport.Parameters[].RoundValue`)
+- По умолчанию используется `round = 4` знака после запятой
+- Влияет на сравнение значений при определении совпадения с Raw/Correction
+- **Важно**: в методе `SaveDocument` RoundValue теперь корректно извлекается:
+  ```csharp
+  var paramKey = item.Key.Replace("value.", "");  // Убираем префикс
+  var rounding = editCfg.Parameters.FirstOrDefault(x => x.Key == paramKey)?.RoundValue;
+  ```
+
+#### Примеры работы алгоритма
+
+**Пример 1: Новый паспорт, значение совпадает с ИВК**
+- `IsFilled = 0`, `Raw.Value = 17.2`, `newValue = 17.2`, `Correction.Legal = 0`
+- Результат: `Legal = 0` (не требует подтверждения)
+
+**Пример 2: Новый паспорт, оператор изменил значение**
+- `IsFilled = 0`, `Raw.Value = 17.2`, `newValue = 17.5`, `Correction.Legal = 0`
+- Результат: `Legal = 1` (требует подтверждения ИВК)
+
+**Пример 3: Заполненный паспорт, есть подтверждённая коррекция, оператор изменил**
+- `IsFilled = 1`, `Correction.Legal = 1`, `Correction.Value = 17.3`, `newValue = 17.5`
+- Результат: `Legal = 1` (изменение подтверждённого значения требует нового подтверждения)
+
+**Пример 4: Slave-параметр**
+- `isSlave = true`, любые другие условия
+- Результат: `Legal = 0` (Slave-параметры всегда недостоверны)
 
 ### Важное граничное условие: даты PassportPeriodDT
 
