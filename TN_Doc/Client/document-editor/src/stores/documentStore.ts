@@ -7,6 +7,7 @@ import type { PassportEditConfig } from '@/types/passport.types';
 import type { FieldHistoryEntry } from '@/types/history.types';
 import { DataSource } from '@/types/history.types';
 import { normalizeValue } from '@/utils/passport-utils';
+import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
 import { compactAllFieldsHistory } from '@/utils/history-utils';
 
 const MANUAL_AUTHOR = 'Пользователь';
@@ -171,6 +172,26 @@ export const useDocumentStore = defineStore('document', () => {
 
       // Инициализируем formData начальными значениями
       formData.value = { ...loadedConfig.initialValues };
+
+      if (loadedConfig.docType === 'Passport') {
+        const passportConfig = loadedConfig as PassportEditConfig;
+        const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+        for (const paramSchema of parametersSchema) {
+          const roundValue = paramSchema.roundValue ?? (paramSchema as any).RoundValue ?? 0;
+          const resultKey = `result.${paramSchema.key}`;
+          const resultValue = formData.value[resultKey];
+
+          if (resultValue === undefined || resultValue === null || resultValue === '') {
+            continue;
+          }
+
+          const normalizedResult = normalizeDecimalValue(resultValue, roundValue);
+          if (normalizedResult !== resultValue) {
+            formData.value[resultKey] = normalizedResult;
+          }
+        }
+      }
 
       // Загружаем историю изменений полей
       formHistory.value = {};

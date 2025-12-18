@@ -127,6 +127,7 @@ import { usePassportEditor } from '@/composables/usePassportEditor';
 import { usePassportAutoFill } from '@/composables/usePassportAutoFill';
 import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/composables/useElisIntegration';
 import { useFieldHistory } from '@/composables/useFieldHistory';
+import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
 import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
 import type { FormField, UserData } from '@/types/document.types';
@@ -491,25 +492,7 @@ const handleElisData = (elisData: ElisPassportData) => {
         if (elisParam.value !== undefined && elisParam.value !== null) {
           let valueStr = elisParam.value.toString();
 
-          // Нормализовать значение согласно roundValue
-          if (roundValue > 0) {
-            const numValue = parseFloat(valueStr.replace(',', '.'));
-            if (!isNaN(numValue)) {
-              // Получаем текущее количество знаков после запятой
-              const normalizedStr = valueStr.replace(',', '.');
-              const parts = normalizedStr.split('.');
-              const currentDecimalPlaces = parts.length > 1 ? parts[1].length : 0;
-
-              // Если знаков меньше - дополняем нулями
-              // Если знаков больше - оставляем как есть (для показа ошибки валидации)
-              if (currentDecimalPlaces < roundValue) {
-                valueStr = numValue.toFixed(roundValue).replace('.', ',');
-              } else {
-                // Оставляем оригинальное значение, но с запятой
-                valueStr = normalizedStr.replace('.', ',');
-              }
-            }
-          }
+          valueStr = normalizeDecimalValue(valueStr, roundValue);
 
           updates[valueKey] = valueStr;
           updates[`${valueKey}__elisFilled`] = true;
@@ -532,19 +515,8 @@ const handleElisData = (elisData: ElisPassportData) => {
           // Для ballast параметров нормализовать result так же как measurement
           // Это предотвращает ложное срабатывание watcher'а из-за разницы "1,6" vs "1,6000"
           const isBallast = param.isBallast ?? (param as any).IsBallast ?? false;
-          if (isBallast && roundValue > 0) {
-            const numValue = parseFloat(resultStr.replace(',', '.'));
-            if (!isNaN(numValue)) {
-              const normalizedStr = resultStr.replace(',', '.');
-              const parts = normalizedStr.split('.');
-              const currentDecimalPlaces = parts.length > 1 ? parts[1].length : 0;
-
-              if (currentDecimalPlaces < roundValue) {
-                resultStr = numValue.toFixed(roundValue).replace('.', ',');
-              } else {
-                resultStr = normalizedStr.replace('.', ',');
-              }
-            }
+          if (isBallast) {
+            resultStr = normalizeDecimalValue(resultStr, roundValue);
           }
 
           updates[resultKey] = resultStr;
