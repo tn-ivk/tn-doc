@@ -547,20 +547,20 @@ flowchart TD
 
     CheckCorrectionUnfilled -->|Нет| CheckRawUnfilled{context.Raw != null<br/>И newValue == Raw.Value?}
 
-    CheckRawUnfilled -->|Да| SetLegal0B[parameter.Data.Value = value<br/>parameter.Data.Legal = 0<br/>Значение совпадает с ИВК,<br/>подтверждение не требуется<br/>RETURN]
+    CheckRawUnfilled -->|Да| SetLegal0B[parameter.Data.Value = value<br/>parameter.Data.Legal = 0<br/>Значение совпадает с ИВК,<br/>сохранение не требуется<br/>RETURN]
 
-    CheckRawUnfilled -->|Нет| SetLegalCheck2[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Новое/изменённое значение,<br/>требует подтверждения ИВК<br/>RETURN]
+    CheckRawUnfilled -->|Нет| SetLegalCheck2[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Новое/изменённое значение,<br/>требуется сохранение в ИВК<br/>RETURN]
 
     %% Ветка: паспорт заполнен
     CheckFilled -->|Нет<br/>Паспорт заполнен| CheckCorrectionFilled{Correction.Legal > 0?<br/>Есть подтверждённая коррекция}
 
-    CheckCorrectionFilled -->|Да| SetLegalCheck3[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Изменение подтверждённого,<br/>требует нового подтверждения<br/>RETURN]
+    CheckCorrectionFilled -->|Да| SetLegalCheck3[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Значение было изменено,<br/>требуется новое пересохранение<br/>RETURN]
 
     CheckCorrectionFilled -->|Нет| CheckRawFilled{context.Raw != null<br/>И newValue == Raw.Value?}
 
-    CheckRawFilled -->|Да| SetLegal0C[parameter.Data.Value = value<br/>parameter.Data.Legal = 0<br/>Значение совпадает с ИВК,<br/>подтверждение не требуется<br/>RETURN]
+    CheckRawFilled -->|Да| SetLegal0C[parameter.Data.Value = value<br/>parameter.Data.Legal = 0<br/>Значение совпадает с ИВК,<br/>сохранение не требуется<br/>RETURN]
 
-    CheckRawFilled -->|Нет| SetLegalCheck4[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Новое/изменённое значение,<br/>требует подтверждения ИВК<br/>RETURN]
+    CheckRawFilled -->|Нет| SetLegalCheck4[parameter.Data.Value = value<br/>parameter.Data.Legal = CheckLegal<br/>Новое/изменённое значение,<br/>требуется сохранение в ИВК<br/>RETURN]
 
     style SetLegal0A fill:#c75b7a,stroke:#8b3a5a,color:#fff
     style SetLegal0B fill:#2e7d32,stroke:#1b5e20,color:#fff
