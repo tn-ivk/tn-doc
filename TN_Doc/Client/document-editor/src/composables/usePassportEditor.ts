@@ -196,9 +196,14 @@ export function usePassportEditor() {
     if (!param.editable) {
       return param.values.result; //|| param.values.measurement;
     }
-    
+
+    const measurementRaw = param.values.measurement ?? '';
+    const roundValue = param.roundValue ?? (param as any).RoundValue ?? 0;
     if (param.isBallast) {
-      return param.values.measurement;
+      if (measurementRaw.trim() === '') {
+        return normalizeDecimalValue('0', roundValue);
+      }
+      return normalizeDecimalValue(measurementRaw, roundValue);
     }
     
     // Если есть результат из ELIS и measurement заполнено из ELIS, используем его
@@ -206,8 +211,6 @@ export function usePassportEditor() {
       return param.values.result;
     }
 
-    const measurementRaw = param.values.measurement ?? '';
-    const roundValue = param.roundValue ?? (param as any).RoundValue ?? 0;
     if (measurementRaw.trim() === '') {
       return normalizeDecimalValue('0', roundValue);
     }
