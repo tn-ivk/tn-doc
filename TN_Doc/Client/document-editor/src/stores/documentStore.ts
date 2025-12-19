@@ -346,21 +346,30 @@ export const useDocumentStore = defineStore('document', () => {
     formHistory.value[fieldKey] = currentHistory;
   };
 
+  /**
+   * Получить roundValue из схемы параметра
+   */
+  const getRoundValue = (paramKey: string): number => {
+    if (config.value?.docType !== 'Passport') {
+      return 0;
+    }
+    const passportConfig = config.value as PassportEditConfig;
+    const schema = passportConfig.qualityParametersSchema?.find(p => p.key === paramKey);
+    return schema?.roundValue ?? (schema as any)?.RoundValue ?? 0;
+  };
+
   function syncBallastParameter(paramKey: string, value: string, options?: SyncBallastOptions) {
     const measurementKey = `value.${paramKey}`;
     const resultKey = `result.${paramKey}`;
     const normalizedNewValue = value ?? '';
-    let roundValue = 0;
-    if (config.value?.docType === 'Passport') {
-      const passportConfig = config.value as PassportEditConfig;
-      const schema = passportConfig.qualityParametersSchema?.find(p => p.key === paramKey);
-      if (schema) {
-        roundValue = schema.roundValue ?? (schema as any).RoundValue ?? 0;
-      }
-    }
-    const normalizedResultValue = normalizedNewValue.trim() === ''
-      ? normalizeDecimalValue('0', roundValue)
-      : normalizeDecimalValue(normalizedNewValue, roundValue);
+
+    // Получаем roundValue из схемы параметра
+    const roundValue = getRoundValue(paramKey);
+
+    // Нормализуем результат: пустое значение → "0", иначе нормализуем с учётом roundValue
+    const valueToNormalize = normalizedNewValue.trim() || '0';
+    const normalizedResultValue = normalizeDecimalValue(valueToNormalize, roundValue);
+
     const previousMeasurement = formData.value[measurementKey] ?? '';
     const previousResult = formData.value[resultKey] ?? '';
     const source = options?.source ?? DataSource.Unknown;
