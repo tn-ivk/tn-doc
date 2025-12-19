@@ -14,6 +14,7 @@ import type {
 } from '@/types/passport.types';
 import { DataSource } from '@/types/history.types';
 import { normalizeValue } from '@/utils/passport-utils';
+import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
 
 const measurementWatchers = new Map<string, WatchStopHandle>();
 const resultWatchers = new Map<string, WatchStopHandle>();
@@ -193,7 +194,7 @@ export function usePassportEditor() {
   function recalculateResult(param: PassportQualityParameter): string {
     // Нередактируемый параметр - не пересчитывать
     if (!param.editable) {
-      return param.values.result || param.values.measurement;
+      return param.values.result; //|| param.values.measurement;
     }
     
     if (param.isBallast) {
@@ -205,12 +206,18 @@ export function usePassportEditor() {
       return param.values.result;
     }
 
-    const measurementValue = parseFloat(param.values.measurement.replace(',', '.'));
+    const measurementRaw = param.values.measurement ?? '';
+    const roundValue = param.roundValue ?? (param as any).RoundValue ?? 0;
+    if (measurementRaw.trim() === '') {
+      return normalizeDecimalValue('0', roundValue);
+    }
+
+    const measurementValue = parseFloat(measurementRaw.replace(',', '.'));
     if (isNaN(measurementValue)) {
-      return '-';
+      return normalizeDecimalValue('0', roundValue);
     }
     
-    return param.values.measurement;
+    return normalizeDecimalValue(measurementRaw, roundValue);
   }
 
   /**
