@@ -481,6 +481,39 @@ export function usePassportEditor() {
       return;
     }
 
+    // НОВОЕ: Проверяем очистку measurement (используем normalizedNew из строки 403)
+    const isMeasurementCleared = normalizedNew === '';
+
+    if (isMeasurementCleared) {
+      // При очистке measurement восстанавливаем initial value для result
+      const initialResultValue = store.initialResultValues[resultKey];
+      const newResult = initialResultValue !== undefined && initialResultValue !== ''
+        ? initialResultValue
+        : '-';
+
+      const previousResult = store.formData[resultKey] ?? '';
+
+      if (previousResult !== newResult) {
+        resultGuard.add(resultKey);
+
+        store.bulkUpdateFields({
+          [resultKey]: newResult,
+          [`${resultKey}__elisFilled`]: false, // НЕ помечаем как ELIS
+          [`${resultKey}__manualOverride`]: false // НЕ помечаем как ручное
+        });
+
+        logger.debug('[handleMeasurementUpdate] Result восстановлен к initial value', {
+          paramKey: event.paramKey,
+          initialValue: initialResultValue,
+          newResult,
+          previousResult
+        });
+      }
+
+      return; // Early return
+    }
+
+    // Для непустых значений - обычная логика пересчета
     const tempParam = {
       ...param,
       values: { ...param.values, measurement: event.value },

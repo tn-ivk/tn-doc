@@ -74,6 +74,13 @@ export const useDocumentStore = defineStore('document', () => {
    */
   const formHistory = ref<Record<string, FieldHistoryEntry[]>>({});
 
+  /**
+   * Начальные значения Result параметров (на момент загрузки формы)
+   * Используется для восстановления при очистке Measurement
+   * Ключ - resultKey (например, "result.Density"), значение - строка
+   */
+  const initialResultValues = ref<Record<string, string>>({});
+
   // Getters
   const isReady = computed(() => config.value !== null && !isLoading.value);
   const hasUnsavedChanges = computed(() => isDirty.value);
@@ -191,6 +198,34 @@ export const useDocumentStore = defineStore('document', () => {
             formData.value[resultKey] = normalizedResult;
           }
         }
+      }
+
+      // Сохраняем initial result values для восстановления при очистке measurement
+      initialResultValues.value = {};
+
+      if (loadedConfig.docType === 'Passport') {
+        const passportConfig = loadedConfig as PassportEditConfig;
+        const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+        for (const paramSchema of parametersSchema) {
+          // Пропускаем Slave-параметры
+          if (paramSchema.role === 'Slave') {
+            continue;
+          }
+
+          const resultKey = `result.${paramSchema.key}`;
+          const initialResultValue = formData.value[resultKey];
+
+          if (initialResultValue !== undefined && initialResultValue !== null) {
+            initialResultValues.value[resultKey] = String(initialResultValue);
+          } else {
+            initialResultValues.value[resultKey] = '';
+          }
+        }
+
+        logger.info('[documentStore] Initial result values сохранены', {
+          count: Object.keys(initialResultValues.value).length
+        });
       }
 
       // Загружаем историю изменений полей
@@ -375,10 +410,32 @@ export const useDocumentStore = defineStore('document', () => {
     });
 
     formData.value[measurementKey] = normalizedNewValue;
-    formData.value[resultKey] = normalizedNewValue;
+
+    // При очистке measurement восстанавливаем initial value для result
+    const isMeasurementCleared = normalizedNewValue === '';
+    if (isMeasurementCleared) {
+      const initialResultValue = initialResultValues.value[resultKey];
+      const restoredResult = initialResultValue !== undefined && initialResultValue !== ''
+        ? initialResultValue
+        : '-';
+
+      formData.value[resultKey] = restoredResult;
+      formData.value[`${resultKey}__elisFilled`] = false;
+      formData.value[`${resultKey}__manualOverride`] = false;
+
+      logger.debug('[syncBallastParameter] Result восстановлен к initial value', {
+        paramKey,
+        initialValue: initialResultValue,
+        restoredResult
+      });
+    } else {
+      // Обычная синхронизация для непустых значений
+      formData.value[resultKey] = normalizedNewValue;
+      formData.value[`${resultKey}__elisFilled`] = false; // result балластного параметра не помечается как ELIS
+      formData.value[`${resultKey}__manualOverride`] = false;
+    }
+
     formData.value[`${measurementKey}__elisFilled`] = isMeasurementElisFilled;
-    formData.value[`${resultKey}__elisFilled`] = false; // result балластного параметра не помечается как ELIS
-    formData.value[`${resultKey}__manualOverride`] = false;
     isDirty.value = true;
 
     if (options?.trackMeasurementHistory !== false && previousMeasurement !== normalizedNewValue) {
@@ -388,11 +445,22 @@ export const useDocumentStore = defineStore('document', () => {
       );
     }
 
-    if (options?.trackResultHistory !== false && previousResult !== normalizedNewValue) {
-      pushHistoryEntry(
-        resultKey,
-        createHistoryEntry(DataSource.Auto, normalizedNewValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
-      );
+    if (options?.trackResultHistory !== false) {
+      const currentResult = formData.value[resultKey];
+
+      if (previousResult !== currentResult) {
+        let historyComment = options?.comment ?? 'Результат синхронизирован с измерением';
+
+        // Если восстановили initial value, уточняем комментарий
+        if (isMeasurementCleared) {
+          historyComment = 'Восстановлено исходное значение при очистке измерения';
+        }
+
+        pushHistoryEntry(
+          resultKey,
+          createHistoryEntry(DataSource.Auto, currentResult, previousResult, historyComment)
+        );
+      }
     }
   }
 
@@ -486,6 +554,7 @@ export const useDocumentStore = defineStore('document', () => {
     config.value = null;
     formData.value = {};
     formHistory.value = {};
+    initialResultValues.value = {};
     isDirty.value = false;
     isLoading.value = false;
     isSaving.value = false;
@@ -497,6 +566,7 @@ export const useDocumentStore = defineStore('document', () => {
     config,
     formData,
     formHistory,
+    initialResultValues,
     isDirty,
     isLoading,
     isSaving,
