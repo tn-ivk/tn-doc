@@ -25,6 +25,7 @@
     - `TN_Doc/Client/document-editor/src/composables/usePassportSave.ts` (сохранение паспорта с OPC polling и update)
     - `TN_Doc/Client/document-editor/src/composables/useElisIntegration.ts` (приём ELIS через `postMessage`)
     - `TN_Doc/Client/document-editor/src/composables/useFieldHistory.ts` (формирование истории на фронтенде)
+    - `TN_Doc/Client/document-editor/src/composables/usePassportNormalization.ts` (нормализация десятичных разрядов)
   - Компоненты:
     - `FormFieldWithHistory` / `SignerFieldGroup` / `DateRangeFieldGroup`
     - `PassportQualityTable` и его вложенные компоненты (ввод измерений, выбор метода, модалки)
@@ -450,6 +451,7 @@ public virtual ParameterValues BuildParameterValues(ParameterValuesContext conte
 - Значения извлекаются из разных источников (`jsonDoc`, `DataARM`) в методе `GetRawValue/GetCorrectionValue` (`DocPassport.Editor.cs`)
 - В конце значения приводятся к русской записи: `'.' → ','`
 - Источник значения логируется для диагностики (уровень Trace)
+- **Дополнительная нормализация на фронтенде**: после получения `initialValues` значения в колонке "Предпросмотр" (`result.*`) нормализуются согласно `RoundValue` из схемы параметров (см. раздел "Нормализация десятичных разрядов" ниже)
 
 ### Как «Измерение» и «Предпросмотр» переписываются из ELIS (после получения протокола)
 
@@ -482,6 +484,136 @@ flowchart TD
     N --> D
     O --> D
 ```
+
+### Нормализация десятичных разрядов при загрузке (Frontend)
+
+После получения `initialValues` от бэкенда, значения в колонке "Предпросмотр" (`result.*`) могут отображаться без правильного количества знаков после запятой. Например, если в БД хранится `"871"`, а `RoundValue=1`, то должно отображаться `"871,0"`.
+
+**Проблема**: Бэкенд возвращает raw данные "как есть" в БД (например, `"871"` вместо `"871,0"`), что приводит к визуальной несогласованности с данными, загруженными из ELIS или введёнными пользователем.
+
+**Решение**: Нормализация на фронтенде после загрузки конфигурации.
+
+#### Реализация (с v1.4.4)
+
+**1. Централизованная утилита нормализации**
+
+`TN_Doc/Client/document-editor/src/composables/usePassportNormalization.ts`:
+
+```typescript
+export function normalizeDecimalValue(
+  value: string | number | null | undefined,
+  roundValue: number | null | undefined
+): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  const stringValue = String(value);
+  const trimmedValue = stringValue.trim();
+  if (trimmedValue === '') {
+    return '';
+  }
+
+  // Проверка на числовое значение (с учётом +/- и десятичной части)
+  const numericPattern = /^[+-]?\d+(?:[.,]\d+)?$/;
+  if (!numericPattern.test(trimmedValue)) {
+    return stringValue; // Не числовое значение — возвращаем как есть
+  }
+
+  const normalized = trimmedValue.replace(',', '.');
+  const numValue = parseFloat(normalized);
+  if (isNaN(numValue)) {
+    return stringValue;
+  }
+
+  if (!roundValue || roundValue <= 0) {
+    return normalized.replace('.', ',');
+  }
+
+  const parts = normalized.split('.');
+  const currentDecimalPlaces = parts.length > 1 ? parts[1].length : 0;
+
+  // Если знаков меньше — дополняем нулями
+  // Если знаков больше — оставляем как есть (для показа ошибки валидации)
+  if (currentDecimalPlaces < roundValue) {
+    return numValue.toFixed(roundValue).replace('.', ',');
+  }
+
+  return normalized.replace('.', ',');
+}
+```
+
+**2. Нормализация initialValues при загрузке**
+
+`TN_Doc/Client/document-editor/src/stores/documentStore.ts` (метод `loadConfig()`):
+
+```typescript
+// Инициализируем formData начальными значениями
+formData.value = { ...loadedConfig.initialValues };
+
+// Нормализуем значения result.* для паспортов
+if (loadedConfig.docType === 'Passport') {
+  const passportConfig = loadedConfig as PassportEditConfig;
+  const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+  for (const paramSchema of parametersSchema) {
+    const roundValue = paramSchema.roundValue ?? (paramSchema as any).RoundValue ?? 0;
+    const resultKey = `result.${paramSchema.key}`;
+    const resultValue = formData.value[resultKey];
+
+    if (resultValue === undefined || resultValue === null || resultValue === '') {
+      continue;
+    }
+
+    const normalizedResult = normalizeDecimalValue(resultValue, roundValue);
+    if (normalizedResult !== resultValue) {
+      formData.value[resultKey] = normalizedResult;
+    }
+  }
+}
+```
+
+**3. Использование утилиты в других местах**
+
+Функция `normalizeDecimalValue()` также переиспользуется в:
+
+- **`PassportMeasurementInput.vue`** — нормализация при вводе пользователем (событие `handleValueChange`)
+- **`DocumentPassportEditor.vue`** — нормализация при обработке ELIS данных (`handleElisData`)
+
+Это обеспечивает единообразную логику нормализации во всех точках входа данных.
+
+#### Примеры работы
+
+**Пример 1: Загрузка из БД**
+- В БД: `result.Dens20Correction = "871"`
+- Конфигурация: `RoundValue = 1`
+- После нормализации: `"871,0"`
+- Отображение: `871,0` в колонке "Предпросмотр"
+
+**Пример 2: Загрузка ELIS**
+- ELIS передаёт: `value = 17.2`
+- Конфигурация: `RoundValue = 4`
+- После нормализации: `"17,2000"`
+- Отображение: `17,2000` в колонке "Измерение"
+
+**Пример 3: Пользовательский ввод**
+- Пользователь вводит: `875.5`
+- Конфигурация: `RoundValue = 1`
+- После нормализации: `"875,5"`
+- Отображение: `875,5`
+
+**Пример 4: Некорректное значение (валидация)**
+- В БД: `result.Value = "12.345678"`
+- Конфигурация: `RoundValue = 4`
+- После нормализации: `"12,345678"` (оставлено как есть)
+- Отображение: `12,345678` (валидация подсветит ошибку — слишком много знаков)
+
+#### Важные моменты
+
+- **Нормализация только `result.*`**: Поле `value.*` (измерение) обычно заполняется пользователем или ELIS и нормализуется в момент ввода/получения.
+- **Не влияет на бэкенд**: Бэкенд продолжает возвращать raw данные. Нормализация — чисто UI-логика.
+- **Совместимость с ELIS**: Нормализация применяется **до** обработки ELIS данных, поэтому ELIS может перезаписать значения своими (уже нормализованными).
+- **История изменений**: Нормализация не создаёт записей в истории, т.к. происходит **до** инициализации системы отслеживания изменений.
 
 ## Backend: первичное сохранение (SaveDocument)
 

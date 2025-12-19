@@ -24,6 +24,7 @@
 import { computed } from 'vue';
 import InputNumber from 'primevue/inputnumber';
 import type { PassportQualityParameter } from '@/types/passport.types';
+import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
 
 interface Props {
   parameter: PassportQualityParameter;
@@ -43,16 +44,6 @@ const emit = defineEmits<{
 const roundValue = computed(() => {
   return props.parameter.roundValue ?? 0;
 });
-
-/**
- * Получить количество знаков после запятой в строке
- */
-const getDecimalPlaces = (value: string): number => {
-  if (!value) return 0;
-  const normalized = value.replace(',', '.');
-  const parts = normalized.split('.');
-  return parts.length > 1 ? parts[1].length : 0;
-};
 
 const numericValue = computed(() => {
   if (!props.parameter.values.measurement) return null;
@@ -119,21 +110,8 @@ function handleValueChange(value: number | null) {
     return;
   }
 
-  // Преобразуем число в строку
-  let stringValue = value.toString();
-
-  // Получаем текущее количество знаков после запятой
-  const currentDecimalPlaces = getDecimalPlaces(stringValue);
-  const requiredDecimalPlaces = roundValue.value;
-
-  // Если знаков меньше, чем требуется - дополняем нулями
-  // Если знаков больше - оставляем как есть (для показа ошибки валидации)
-  if (currentDecimalPlaces < requiredDecimalPlaces && requiredDecimalPlaces > 0) {
-    stringValue = value.toFixed(requiredDecimalPlaces);
-  }
-
-  // Заменяем точку на запятую для русской локали
-  emit('update:measurement', stringValue.replace('.', ','));
+  const normalizedValue = normalizeDecimalValue(value.toString(), roundValue.value);
+  emit('update:measurement', normalizedValue);
 }
 </script>
 
