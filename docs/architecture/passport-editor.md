@@ -214,9 +214,122 @@ Document (`document.*`):
   - measurement и result синхронизируются
   - `result.__elisFilled` принудительно `false`
   - пишется история (Manual или ReturnToELIS) + автозаполнение результата
+  - **При очистке measurement** (пустое значение) → result восстанавливается к initial value из БД
 - Для **обычных** параметров:
   - measurement обновляется, пишется история Manual/ReturnToELIS
   - если параметр редактируемый — пересчитывается result, сбрасывается `result.__manualOverride`, пишется история AutoFill
+  - **При очистке measurement** (пустое значение) → result восстанавливается к initial value из БД
+
+### Восстановление initial value при очистке measurement (v1.4.4+)
+
+При очистке значения в колонке "Измерение" (measurement) колонка "Предпросмотр" (result) автоматически восстанавливается к значению, загруженному из БД при открытии формы.
+
+**Реализация:**
+
+**1. Хранилище initial values (`documentStore.ts`):**
+
+```typescript
+const initialResultValues = ref<Record<string, string>>({});
+```
+
+При загрузке формы (`loadConfig`) сохраняются исходные значения всех `result.*` полей:
+
+```typescript
+if (loadedConfig.docType === 'Passport') {
+  const passportConfig = loadedConfig as PassportEditConfig;
+  const parametersSchema = passportConfig.qualityParametersSchema || [];
+
+  for (const paramSchema of parametersSchema) {
+    if (paramSchema.role === 'Slave') continue; // Пропускаем Slave-параметры
+
+    const resultKey = `result.${paramSchema.key}`;
+    const initialResultValue = formData.value[resultKey];
+
+    if (initialResultValue !== undefined && initialResultValue !== null) {
+      initialResultValues.value[resultKey] = String(initialResultValue);
+    } else {
+      initialResultValues.value[resultKey] = '';
+    }
+  }
+}
+```
+
+**2. Логика для BALLAST параметров (`syncBallastParameter`):**
+
+```typescript
+const isMeasurementCleared = normalizedNewValue === '';
+if (isMeasurementCleared) {
+  const initialResultValue = initialResultValues.value[resultKey];
+  const restoredResult = initialResultValue !== undefined && initialResultValue !== ''
+    ? initialResultValue
+    : '-';
+
+  formData.value[resultKey] = restoredResult;
+  formData.value[`${resultKey}__elisFilled`] = false;
+  formData.value[`${resultKey}__manualOverride`] = false;
+
+  // История с комментарием "Восстановлено исходное значение при очистке измерения"
+  pushHistoryEntry(resultKey, createHistoryEntry(
+    DataSource.Auto,
+    restoredResult,
+    previousResult,
+    'Восстановлено исходное значение при очистке измерения'
+  ));
+}
+```
+
+**3. Логика для обычных параметров (`handleMeasurementUpdate`):**
+
+```typescript
+const normalizedNew = normalizeValue(event.value);
+const isMeasurementCleared = normalizedNew === '';
+
+if (isMeasurementCleared) {
+  const initialResultValue = store.initialResultValues[resultKey];
+  const newResult = initialResultValue !== undefined && initialResultValue !== ''
+    ? initialResultValue
+    : '-';
+
+  const previousResult = store.formData[resultKey] ?? '';
+
+  if (previousResult !== newResult) {
+    resultGuard.add(resultKey);
+
+    store.bulkUpdateFields({
+      [resultKey]: newResult,
+      [`${resultKey}__elisFilled`]: false,
+      [`${resultKey}__manualOverride`]: false
+    });
+  }
+
+  return; // Early return — обычная логика пересчёта не выполняется
+}
+```
+
+**Поведение:**
+
+- **При очистке measurement** (normalizedValue === '') → result восстанавливается к initial value
+- **Если initial value пустой** → result устанавливается в '-' (прочерк)
+- **Флаги сбрасываются**: `__elisFilled = false`, `__manualOverride = false`
+- **Работает для всех типов параметров**: обычные и BALLAST
+- **Trade-off для BALLAST**: разрыв синхронизации Measurement = Result при очистке
+
+**Примеры работы:**
+
+**Сценарий 1: Обычный параметр**
+- Initial: measurement=850.5, result=850.5
+- Пользователь изменяет measurement на 851.0 → result=851.0
+- Пользователь очищает measurement → result восстанавливается к 850.5
+
+**Сценарий 2: BALLAST параметр**
+- Initial: measurement=15.0, result=15.0
+- Пользователь изменяет measurement на 16.0 → result=16.0 (синхронизация)
+- Пользователь очищает measurement → result восстанавливается к 15.0
+
+**Сценарий 3: Пустой initial**
+- Initial: measurement='', result=''
+- Пользователь вводит measurement=850.0 → result=850.0
+- Пользователь очищает measurement → result='-'
 
 ### Изменение результата (`usePassportEditor.handleResultUpdate`)
 
