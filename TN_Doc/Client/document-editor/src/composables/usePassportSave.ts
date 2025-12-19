@@ -26,7 +26,7 @@ export function usePassportSave() {
    * Основная функция сохранения паспорта качества
    * @param opcParams OPC параметры устройства (из URL query params)
    * @returns true при успехе, false при ошибке
-   */
+  */
   async function savePassportWithOpc(opcParams: OpcDeviceParams | null): Promise<boolean> {
     if (!store.config) {
       throw new Error('Конфигурация документа не загружена');
@@ -68,6 +68,7 @@ export function usePassportSave() {
         store.isDirty = false;
         return true;
       }
+
       // Шаг 2: Записать в OPC тег ARM.ARM_FillActAndPassport = true
       logger.debug('[usePassportSave] Шаг 2: Запись в OPC тег ARM.ARM_FillActAndPassport...');
       const triggerTagName = opcApi.getFullTagName('ARM.ARM_FillActAndPassport', opcParams.tagPrefix);
@@ -127,7 +128,9 @@ export function usePassportSave() {
 
       // Добавляем историю изменений полей в mergedData
       // Схлопываем историю: оставляем только последнюю запись для каждого поля
+
       const compactedHistory = compactAllFieldsHistory(store.formHistory);
+
       const finalPayload = {
         ...mergedData,
         __history: compactedHistory

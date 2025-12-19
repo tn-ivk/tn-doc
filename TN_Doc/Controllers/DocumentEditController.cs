@@ -215,6 +215,14 @@ public class DocumentEditController : ControllerBase
 
             _logger.Trace($"Обновление паспорта через DocUpdate (после подтверждения от ИВК), количество полей: {values.Count}");
 
+            // ДИАГНОСТИКА: Логируем ключи value.* для проверки наличия SulfurCorrection
+            _logger.Debug($"[UpdateDocument ДИАГНОСТИКА] Ключи value.* в values: {string.Join(", ", values.Keys.Where(k => k.StartsWith("value.")))}");
+            _logger.Debug($"[UpdateDocument ДИАГНОСТИКА] values содержит 'value.SulfurCorrection' = {values.ContainsKey("value.SulfurCorrection")}");
+            if (values.ContainsKey("value.SulfurCorrection"))
+            {
+                _logger.Debug($"[UpdateDocument ДИАГНОСТИКА] value.SulfurCorrection = '{values["value.SulfurCorrection"]}'");
+            }
+
             // Логируем ключи method.* для диагностики
             foreach (var kvp in values.Where(k => k.Key.StartsWith("method.")))
             {

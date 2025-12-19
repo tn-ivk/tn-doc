@@ -364,16 +364,6 @@ export const useDocumentStore = defineStore('document', () => {
     // Для measurement: если source=ELIS, ReturnToELIS или вернулись к оригиналу
     const isMeasurementElisFilled = source === DataSource.ELIS || source === DataSource.ReturnToELIS || isBackToElisMeasurement;
 
-    console.log(`[syncBallastParameter] ${measurementKey}:`, {
-      value: normalizedNewValue,
-      normalizedNew,
-      source,
-      measurementElisOriginal,
-      normalizedElisOriginal,
-      isBackToElisMeasurement,
-      isMeasurementElisFilled
-    });
-
     formData.value[measurementKey] = normalizedNewValue;
     formData.value[resultKey] = normalizedNewValue;
     formData.value[`${measurementKey}__elisFilled`] = isMeasurementElisFilled;
