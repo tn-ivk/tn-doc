@@ -344,7 +344,7 @@ function getCurrentMethod(): MethodOption | undefined {
   padding: 6px 10px;
   border: 1px solid var(--md-outline-light, #E0E0E0);
   background-color: white;
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 /* Колонка "Документы" */
@@ -414,7 +414,7 @@ function getCurrentMethod(): MethodOption | undefined {
 
 /* Ячейки с rowspan центрируются вертикально */
 .quality-table :deep(td[rowspan]) {
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 /* Границы групп - такие же как у обычных параметров (1px solid) */

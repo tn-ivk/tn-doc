@@ -1,10 +1,14 @@
 <template>
   <tr class="parameter-row">
     <!-- №: Номер строки -->
-    <td class="cell-number">{{ index }}</td>
+    <td class="cell-number">
+      <div class="cell-number-inner">{{ index }}</div>
+    </td>
 
     <!-- Наименование показателя -->
-    <td class="cell-name">{{ parameter.name }}</td>
+    <td class="cell-name">
+      <div class="cell-name-inner">{{ parameter.name }}</div>
+    </td>
 
     <!-- Метод испытаний -->
     <td class="cell-method">
@@ -101,7 +105,7 @@ function handleManualMethodRequest() {
 
 <style scoped>
 .parameter-row td {
-  vertical-align: middle;
+  vertical-align: top;
   border: 1px solid var(--md-outline-light, #E0E0E0);
 }
 
@@ -115,10 +119,28 @@ function handleManualMethodRequest() {
   font-weight: 500;
 }
 
+.cell-number-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--md-control-height) + 6px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .cell-name {
   white-space: pre-wrap;
   word-wrap: break-word;
   padding-left: 5px;
+}
+
+.cell-name-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: calc(var(--md-control-height) + 6px);
+  box-sizing: border-box;
+  word-wrap: break-word;
 }
 
 .cell-method,

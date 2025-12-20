@@ -1,29 +1,35 @@
 <template>
   <div class="method-field">
     <div class="method-select-container">
-      <Select
-        :modelValue="selectedMethodOption"
-        :options="methodOptions"
-        optionLabel="name"
-        :class="[
-          { 'p-invalid': !isValid },
-          { 'elis-filled': isElisFilled },
-          { 'unknown-method': showDictionaryWarning },
-          'no-dropdown-icon',
-          paddingClass
-        ]"
-        placeholder="Метод не выбран"
-        class="method-select"
-        panelClass="method-select-panel"
-        @update:modelValue="handleMethodChange"
-      />
+      <div class="select-wrapper">
+        <Select
+          :modelValue="selectedMethodOption"
+          :options="methodOptions"
+          optionLabel="name"
+          :class="[
+            { 'p-invalid': !isValid },
+            { 'elis-filled': isElisFilled },
+            { 'unknown-method': showDictionaryWarning },
+            'no-dropdown-icon',
+            paddingClass
+          ]"
+          placeholder="Метод не выбран"
+          class="method-select"
+          panelClass="method-select-panel"
+          @update:modelValue="handleMethodChange"
+        />
 
-      <!-- Иконка редактирования внутри комбобокса -->
+        <!-- Контейнер для индикаторов -->
+        <div v-if="$slots['indicators']" class="indicators-container">
+          <slot name="indicators"></slot>
+        </div>
+      </div>
+
+      <!-- Кнопка редактирования справа от комбобокса -->
       <button
         v-if="!hideEditButton"
         class="edit-method-btn"
         :class="{ 'edit-method-btn--elis': isElisFilled }"
-        :style="{ right: editButtonPosition }"
         type="button"
         @click="handleEditClick"
         title="Редактирование..."
@@ -43,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
 import Select from 'primevue/select';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
@@ -54,11 +60,10 @@ interface Props {
   isElisFilled?: boolean;
   /** Скрыть кнопку редактирования */
   hideEditButton?: boolean;
-  /** Отображается ли индикатор истории (для расчета padding) */
-  hasHistoryIndicator?: boolean;
 }
 
 const props = defineProps<Props>();
+const slots = useSlots();
 
 const emit = defineEmits<{
   'update:method': [method: MethodOption | null];
@@ -104,20 +109,10 @@ const showDictionaryWarning = computed(() => {
 
 /**
  * Динамический класс для padding текста
- * Если есть индикатор истории - нужно больше места (две иконки)
- * Если нет - достаточно места для одной иконки карандаша
+ * Если есть индикаторы - нужно больше места для них
  */
 const paddingClass = computed(() => {
-  return props.hasHistoryIndicator ? 'with-two-icons' : 'with-one-icon';
-});
-
-/**
- * Динамическая позиция кнопки редактирования
- * Если есть индикатор истории - сдвигаем левее (30px)
- * Если нет - прижимаем к правому краю (2px)
- */
-const editButtonPosition = computed(() => {
-  return props.hasHistoryIndicator ? '30px' : '2px';
+  return slots['indicators'] ? 'with-indicators' : '';
 });
 
 /**
@@ -140,10 +135,17 @@ function handleEditClick() {
   width: 100%;
 }
 
-/* Контейнер для Select и иконки */
+/* Контейнер для Select и кнопки (input group) */
 .method-select-container {
   position: relative;
+  display: flex;
   width: 100%;
+}
+
+/* Обёртка для Select с индикаторами */
+.select-wrapper {
+  position: relative;
+  flex: 1;
 }
 
 .method-select {
@@ -151,15 +153,32 @@ function handleEditClick() {
   font-size: 15px;
 }
 
-/* Иконка редактирования внутри Select */
-.edit-method-btn {
+/* Контейнер для индикаторов */
+.indicators-container {
   position: absolute;
-  /* right управляется динамически через computed свойство editButtonPosition */
-  top: 50%;
-  transform: translateY(-50%);
+  top: 4px;
+  right: 4px;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: row-reverse; /* последний добавленный будет справа */
+  align-items: center;
+  gap: 4px; /* расстояние между индикаторами */
+}
+
+/* Переопределение стилей индикаторов внутри контейнера */
+.indicators-container :deep(.field-history-indicator) {
+  position: static; /* отключаем absolute positioning */
+  top: auto;
+  right: auto;
+}
+
+/* Кнопка редактирования справа от Select */
+.edit-method-btn {
   width: 28px;
-  height: 28px;
-  border: 1px solid transparent !important;
+  height: 38px;
+  border: 1px solid var(--md-outline) !important;
+  border-left: none !important;
   background-color: transparent !important;
   color: var(--md-text, #212121) !important;
   font-size: 14px;
@@ -167,22 +186,27 @@ function handleEditClick() {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  z-index: 1;
+  border-radius: 0 var(--md-radius) var(--md-radius) 0 !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
-/* Тёмная иконка для ELIS-заполненного поля (зелёный фон) */
+/* Кнопка для ELIS-заполненного поля */
 .edit-method-btn--elis {
-  color: var(--md-text, #212121) !important;
+  background-color: transparent !important;
+  border-color: var(--md-outline);
 }
 
 .edit-method-btn:hover {
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
   color: var(--md-primary, #2f6fed) !important;
 }
 
+.edit-method-btn--elis:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
 .edit-method-btn:active {
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.08) !important;
   color: var(--md-primary-active, #1e54d4) !important;
 }
 
@@ -190,7 +214,7 @@ function handleEditClick() {
 :deep(.method-select.p-select) {
   width: 100%;
   border: 1px solid var(--md-outline);
-  border-radius: var(--md-radius);
+  border-radius: var(--md-radius) 0 0 var(--md-radius) !important;
   background: #ffffff;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -251,13 +275,9 @@ function handleEditClick() {
   display: none !important;
 }
 
-/* Динамический padding в зависимости от наличия индикатора истории */
-:deep(.with-two-icons .p-select-label) {
-  padding-right: 75px !important; /* Две иконки: карандаш + индикатор истории */
-}
-
-:deep(.with-one-icon .p-select-label) {
-  padding-right: 40px !important; /* Одна иконка: только карандаш */
+/* Динамический padding в зависимости от наличия индикаторов */
+:deep(.with-indicators .p-select-label) {
+  padding-right: 35px !important; /* Место для индикаторов */
 }
 
 </style>

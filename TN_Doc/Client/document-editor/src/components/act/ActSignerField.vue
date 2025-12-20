@@ -1,16 +1,18 @@
 <template>
   <div class="act-signer-field">
-    <div class="select-container">
-      <FormField
-        :field="field"
-        :modelValue="modelValue"
-        :hide-label="true"
-        :invalidChars="invalidChars"
-        :hideDropdownIcon="true"
-        @update:modelValue="handleSelectChange"
-      />
+    <div class="signer-input-group">
+      <div class="select-wrapper">
+        <FormField
+          :field="field"
+          :modelValue="modelValue"
+          :hide-label="true"
+          :invalidChars="invalidChars"
+          :hideDropdownIcon="true"
+          @update:modelValue="handleSelectChange"
+        />
+      </div>
 
-      <!-- Кнопка редактирования внутри Select (только при включённом ELIS) -->
+      <!-- Кнопка редактирования справа от комбобокса -->
       <button
         v-if="allowManualInput"
         class="edit-signer-btn"
@@ -149,26 +151,25 @@ function handleManualConfirm(payload: ActManualSignerPayload) {
   width: 100%;
 }
 
-/* Контейнер для Select и кнопки редактирования */
-.select-container {
+/* Контейнер для Select и кнопки (input group) */
+.signer-input-group {
   position: relative;
+  display: flex;
   width: 100%;
 }
 
-/* Увеличиваем padding в Select для кнопки редактирования */
-.select-container :deep(.form-field .p-select .p-select-label) {
-  padding-right: 40px !important;
+/* Обёртка для Select */
+.select-wrapper {
+  position: relative;
+  flex: 1;
 }
 
-/* Кнопка редактирования внутри Select */
+/* Кнопка редактирования справа от Select */
 .edit-signer-btn {
-  position: absolute;
-  right: 2px;
-  top: 50%;
-  transform: translateY(-50%);
   width: 28px;
-  height: 28px;
-  border: 1px solid transparent !important;
+  height: 38px;
+  border: 1px solid var(--md-outline) !important;
+  border-left: none !important;
   background-color: transparent !important;
   color: var(--md-text, #212121) !important;
   font-size: 14px;
@@ -176,17 +177,22 @@ function handleManualConfirm(payload: ActManualSignerPayload) {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  z-index: 1;
+  border-radius: 0 var(--md-radius) var(--md-radius) 0 !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
 .edit-signer-btn:hover {
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
   color: var(--md-primary, #2f6fed) !important;
 }
 
 .edit-signer-btn:active {
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.08) !important;
   color: var(--md-primary-active, #1e54d4) !important;
+}
+
+/* Скругления Select для input-group */
+.act-signer-field :deep(.form-field .p-select) {
+  border-radius: var(--md-radius) 0 0 var(--md-radius) !important;
 }
 </style>

@@ -1,23 +1,20 @@
 <template>
-  <div
-    class="method-with-history"
+  <PassportMethodSelect
+    :parameter="parameter"
+    :isElisFilled="isElisFilled"
+    :hideEditButton="false"
+    @update:method="handleChange"
+    @manual-method="handleManualMethod"
   >
-    <PassportMethodSelect
-      :parameter="parameter"
-      :isElisFilled="isElisFilled"
-      :hideEditButton="false"
-      :hasHistoryIndicator="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
-      @update:method="handleChange"
-      @manual-method="handleManualMethod"
-    />
-
-    <!-- Индикатор истории -->
-    <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
-      :source="lastSource"
-      :rightOffset="4"
-    />
-  </div>
+    <!-- Передаём индикаторы через slot -->
+    <template #indicators>
+      <FieldHistoryIndicator
+        v-if="showHistoryIndicator"
+        :source="lastSource"
+        :rightOffset="0"
+      />
+    </template>
+  </PassportMethodSelect>
 </template>
 
 <script setup lang="ts">
@@ -52,6 +49,14 @@ const lastSource = computed(() => {
 });
 
 /**
+ * Показывать ли индикатор истории
+ */
+const showHistoryIndicator = computed(() => {
+  return lastSource.value !== DataSource.Unknown &&
+         lastSource.value !== DataSource.Auto;
+});
+
+/**
  * Флаг ELIS-заполненности: определяется по последнему источнику в истории
  * ELIS и ReturnToELIS отображаются одинаково (зелёная подсветка)
  */
@@ -72,10 +77,3 @@ const handleManualMethod = () => {
   emit('manual-method');
 };
 </script>
-
-<style scoped>
-.method-with-history {
-  position: relative;
-}
-
-</style>
