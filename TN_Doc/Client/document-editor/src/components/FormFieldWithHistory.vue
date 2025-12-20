@@ -1,6 +1,7 @@
 <template>
   <div
     class="form-field-with-history"
+    :class="paddingClass"
   >
     <FormField
       :field="field"
@@ -12,17 +13,21 @@
       @update:modelValue="handleChange"
     />
 
-    <!-- Индикатор истории (поверх поля) -->
-    <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown"
-      :source="lastSource"
-      :rightOffset="props.historyIndicatorOffset"
-    />
+    <!-- Контейнер для индикаторов -->
+    <div v-if="hasIndicatorsSlot || showHistoryIndicator" class="indicators-container">
+      <slot name="indicators">
+        <FieldHistoryIndicator
+          v-if="showHistoryIndicator"
+          :source="lastSource"
+          :rightOffset="0"
+        />
+      </slot>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
 import FormField from '@/components/FormField.vue';
 import FieldHistoryIndicator from '@/components/history/FieldHistoryIndicator.vue';
 import { useFieldHistory } from '@/composables/useFieldHistory';
@@ -31,24 +36,21 @@ import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
 import { normalizeValue, normalizeDateTimeForComparison } from '@/utils/passport-utils';
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   field: FormFieldType;
   modelValue: any;
   hideLabel?: boolean;
   invalidChars?: string[];
   highlightColor?: string;
   hideDropdownIcon?: boolean;
-  /** Отступ справа для индикатора истории (в пикселях) */
-  historyIndicatorOffset?: number;
-}>(), {
-  historyIndicatorOffset: 4
-});
+}>();
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: any): void;
 }>();
 
 const store = useDocumentStore();
+const slots = useSlots();
 
 const {
   getLastSource,
@@ -63,6 +65,20 @@ const ELIS_HIGHLIGHT_COLOR = 'var(--md-elis-highlight, #e8f5e9)';
  */
 const lastSource = computed(() => {
   return getLastSource(props.field.key);
+});
+
+const showHistoryIndicator = computed(() => {
+  return lastSource.value !== DataSource.Unknown && lastSource.value !== DataSource.Auto;
+});
+
+const hasIndicatorsSlot = computed(() => !!slots['indicators']);
+
+/**
+ * Динамический класс для padding текста
+ * Если есть индикаторы - нужно больше места для них
+ */
+const paddingClass = computed(() => {
+  return hasIndicatorsSlot.value ? 'with-indicators' : '';
 });
 
 const computedHighlightColor = computed(() => {
@@ -129,6 +145,31 @@ const handleChange = (newValue: any) => {
 <style scoped>
 .form-field-with-history {
   position: relative;
+}
+
+/* Контейнер для индикаторов */
+.indicators-container {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: row-reverse; /* последний добавленный будет справа */
+  align-items: center;
+  gap: 4px; /* расстояние между индикаторами */
+}
+
+/* Переопределение стилей индикаторов внутри контейнера */
+.indicators-container :deep(.field-history-indicator) {
+  position: static; /* отключаем absolute positioning */
+  top: auto;
+  right: auto;
+}
+
+/* Динамический padding в зависимости от наличия индикаторов */
+.form-field-with-history.with-indicators :deep(.p-select-label) {
+  padding-right: 35px !important; /* Место для индикаторов */
 }
 
 </style>

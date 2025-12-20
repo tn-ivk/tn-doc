@@ -2,22 +2,30 @@
   <div class="signer-group">
     <!-- ИОФ (ComboBox с кнопкой редактирования) -->
     <div class="signer-field signer-iof">
-      <div class="iof-select-container" :class="iofPaddingClass">
-        <FormFieldWithHistory
-          :field="iof"
-          :modelValue="iofValue"
-          :hide-label="true"
-          :invalidChars="invalidChars"
-          :hideDropdownIcon="true"
-          :historyIndicatorOffset="4"
-          @update:modelValue="handleIofChange"
-        />
+      <div class="iof-input-group">
+        <div class="select-wrapper">
+          <FormFieldWithHistory
+            :field="iof"
+            :modelValue="iofValue"
+            :hide-label="true"
+            :invalidChars="invalidChars"
+            :hideDropdownIcon="true"
+            @update:modelValue="handleIofChange"
+          >
+            <template #indicators>
+              <FieldHistoryIndicator
+                v-if="showHistoryIndicator"
+                :source="lastSource"
+                :rightOffset="0"
+              />
+            </template>
+          </FormFieldWithHistory>
+        </div>
 
-        <!-- Кнопка редактирования внутри комбобокса -->
+        <!-- Кнопка редактирования справа от комбобокса -->
         <button
           class="edit-signer-btn"
           type="button"
-          :style="{ right: editButtonPosition }"
           @click="handleEditClick"
           title="Ручной ввод..."
         >
@@ -64,6 +72,7 @@ import { ref, computed } from 'vue';
 import FormFieldWithHistory from './FormFieldWithHistory.vue';
 import ManualSignerDialog from './ManualSignerDialog.vue';
 import type { ManualSignerPayload } from './ManualSignerDialog.vue';
+import FieldHistoryIndicator from '@/components/history/FieldHistoryIndicator.vue';
 import type { FormField, SelectOption } from '@/types/document.types';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { DataSource } from '@/types/history.types';
@@ -101,27 +110,11 @@ const lastSource = computed(() => {
 });
 
 /**
- * Есть ли индикатор истории (для расчёта позиции кнопки редактирования)
+ * Показать индикатор истории
  */
-const hasHistoryIndicator = computed(() => {
+const showHistoryIndicator = computed(() => {
   const source = lastSource.value;
   return source !== DataSource.Unknown && source !== DataSource.Auto;
-});
-
-/**
- * Динамическая позиция кнопки редактирования
- * Если есть индикатор истории - сдвигаем левее (30px)
- * Если нет - прижимаем к правому краю (2px)
- */
-const editButtonPosition = computed(() => {
-  return hasHistoryIndicator.value ? '30px' : '2px';
-});
-
-/**
- * Динамический класс для padding текста в Select
- */
-const iofPaddingClass = computed(() => {
-  return hasHistoryIndicator.value ? 'iof-with-two-icons' : 'iof-with-one-icon';
 });
 
 /**
@@ -256,21 +249,25 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
   flex: 1.5; /* Предприятие */
 }
 
-/* Контейнер для Select и кнопки редактирования */
-.iof-select-container {
+/* Контейнер для Select и кнопки (input group) */
+.iof-input-group {
   position: relative;
+  display: flex;
   width: 100%;
 }
 
-/* Кнопка редактирования внутри Select */
+/* Обёртка для Select с индикаторами */
+.select-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+/* Кнопка редактирования справа от Select */
 .edit-signer-btn {
-  position: absolute;
-  /* right управляется динамически через computed свойство editButtonPosition */
-  top: 50%;
-  transform: translateY(-50%);
   width: 28px;
-  height: 28px;
-  border: 1px solid transparent !important;
+  height: 38px;
+  border: 1px solid var(--md-outline) !important;
+  border-left: none !important;
   background-color: transparent !important;
   color: var(--md-text, #212121) !important;
   font-size: 14px;
@@ -278,26 +275,22 @@ function handleManualSignerConfirm(payload: ManualSignerPayload) {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  z-index: 1;
+  border-radius: 0 var(--md-radius) var(--md-radius) 0 !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
 .edit-signer-btn:hover {
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
   color: var(--md-primary, #2f6fed) !important;
 }
 
 .edit-signer-btn:active {
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.08) !important;
   color: var(--md-primary-active, #1e54d4) !important;
 }
 
-/* Динамический padding в зависимости от наличия индикатора истории */
-.iof-with-two-icons :deep(.form-field-with-history .p-select .p-select-label) {
-  padding-right: 75px !important; /* Две иконки: карандаш + индикатор истории */
-}
-
-.iof-with-one-icon :deep(.form-field-with-history .p-select .p-select-label) {
-  padding-right: 40px !important; /* Одна иконка: только карандаш */
+/* Скругления Select для input-group */
+.signer-iof :deep(.form-field-with-history .p-select) {
+  border-radius: var(--md-radius) 0 0 var(--md-radius) !important;
 }
 </style>

@@ -1,23 +1,19 @@
 <template>
-  <div
-    class="result-with-history"
+  <PassportResultCell
+    :parameter="parameter"
+    :canEdit="canEdit"
+    :isElisFilled="isElisFilled"
+    :editDisabledReason="editDisabledReason"
+    @result-edit="handleEditRequest"
   >
-    <PassportResultCell
-      :parameter="parameter"
-      :canEdit="canEdit"
-      :isElisFilled="isElisFilled"
-      :editDisabledReason="editDisabledReason"
-      :hasHistoryIndicator="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
-      @result-edit="handleEditRequest"
-    />
-
-    <!-- Индикатор истории -->
-    <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
-      :source="lastSource"
-      :rightOffset="4"
-    />
-  </div>
+    <template #indicators>
+      <FieldHistoryIndicator
+        v-if="showHistoryIndicator"
+        :source="lastSource"
+        :rightOffset="0"
+      />
+    </template>
+  </PassportResultCell>
 </template>
 
 <script setup lang="ts">
@@ -51,6 +47,10 @@ const lastSource = computed(() => {
   return getLastSource(historyKey.value);
 });
 
+const showHistoryIndicator = computed(() => {
+  return lastSource.value !== DataSource.Unknown && lastSource.value !== DataSource.Auto;
+});
+
 /**
  * Флаг ELIS-заполненности: определяется по последнему источнику в истории
  * ELIS и ReturnToELIS отображаются одинаково (зелёная подсветка)
@@ -75,16 +75,3 @@ const handleEditRequest = () => {
   emit('result-edit');
 };
 </script>
-
-<style scoped>
-.result-with-history {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-</style>
