@@ -1,21 +1,20 @@
 <template>
-  <div
-    class="method-with-history"
-  >
+  <div class="method-with-history">
     <PassportMethodSelect
       :parameter="parameter"
       :isElisFilled="isElisFilled"
       :hideEditButton="false"
-      :hasHistoryIndicator="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
+      :hasHistoryIndicator="showHistoryIndicator"
       @update:method="handleChange"
       @manual-method="handleManualMethod"
     />
 
-    <!-- Индикатор истории -->
+    <!-- Индикатор истории внутри комбобокса -->
     <FieldHistoryIndicator
-      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
+      v-if="showHistoryIndicator"
       :source="lastSource"
-      :rightOffset="4"
+      :rightOffset="42"
+      class="method-history-indicator"
     />
   </div>
 </template>
@@ -52,6 +51,14 @@ const lastSource = computed(() => {
 });
 
 /**
+ * Показывать ли индикатор истории
+ */
+const showHistoryIndicator = computed(() => {
+  return lastSource.value !== DataSource.Unknown &&
+         lastSource.value !== DataSource.Auto;
+});
+
+/**
  * Флаг ELIS-заполненности: определяется по последнему источнику в истории
  * ELIS и ReturnToELIS отображаются одинаково (зелёная подсветка)
  */
@@ -76,6 +83,6 @@ const handleManualMethod = () => {
 <style scoped>
 .method-with-history {
   position: relative;
+  width: 100%;
 }
-
 </style>
