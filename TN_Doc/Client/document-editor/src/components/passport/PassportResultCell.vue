@@ -9,8 +9,7 @@
               'elis-filled': isElisFilled,
               'result-value--disabled': !canEdit,
               'result-value--full-radius': !canEdit
-            },
-            paddingClass
+            }
           ]"
         >
           <span>{{ displayValue }}</span>
@@ -38,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue';
+import { computed } from 'vue';
 import type { PassportQualityParameter } from '@/types/passport.types';
 
 interface Props {
@@ -49,7 +48,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const slots = useSlots();
 
 const emit = defineEmits<{
   'result-edit': [];
@@ -58,14 +56,6 @@ const emit = defineEmits<{
 const displayValue = computed(() => {
   if (!props.parameter.values.result) return '-';
   return props.parameter.values.result.replace('.', ',');
-});
-
-/**
- * Динамический класс для padding текста результата
- * Если есть индикаторы - нужно больше места для них
- */
-const paddingClass = computed(() => {
-  return slots['indicators'] ? 'with-indicators' : '';
 });
 
 function handleEditClick() {
@@ -182,8 +172,4 @@ function handleEditClick() {
   color: var(--md-primary-active, #1e54d4) !important;
 }
 
-/* Динамический padding в зависимости от наличия индикаторов */
-.result-value.with-indicators {
-  padding-right: 35px !important; /* Место для индикаторов */
-}
 </style>
