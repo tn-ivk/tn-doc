@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TN_Doc.Models.DTOs;
-using TN_DocGeneral.Extensions;
 using TN_DocGeneral.Services;
 
 namespace TN_Doc.Controllers;
@@ -119,9 +118,7 @@ public class DirEditorController : ControllerBase
         if (methodId < 0)
             return BadRequest("Failed to add method");
 
-        var fullConfigPath = AppContext.BaseDirectory.CombineSafe(dto.EditConfigFilePath);
-        _configCache.ClearCache(fullConfigPath);
-        _logger.LogTrace($"Очищен кэш конфигурации: {fullConfigPath}");
+        _configCache.ClearCache();
         return Ok(new { id = methodId });
     }
 }
