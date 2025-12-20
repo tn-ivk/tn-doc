@@ -498,8 +498,6 @@ const handleElisData = (elisData: ElisPassportData) => {
           updates[`${valueKey}__elisFilled`] = true;
           updates[`${valueKey}__elisOriginal`] = valueStr; // Сохраняем оригинал для восстановления флага
 
-          console.log(`[handleElisData] Сохранен elisOriginal для ${valueKey}:`, valueStr, 'normalized:', normalizeValue(valueStr));
-
           // Создать запись истории для ELIS
           trackElisLoad(valueKey, valueStr, elisData.protocolNumber);
         } else {

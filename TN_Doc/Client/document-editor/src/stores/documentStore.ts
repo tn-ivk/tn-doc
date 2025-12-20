@@ -346,10 +346,30 @@ export const useDocumentStore = defineStore('document', () => {
     formHistory.value[fieldKey] = currentHistory;
   };
 
+  /**
+   * Получить roundValue из схемы параметра
+   */
+  const getRoundValue = (paramKey: string): number => {
+    if (config.value?.docType !== 'Passport') {
+      return 0;
+    }
+    const passportConfig = config.value as PassportEditConfig;
+    const schema = passportConfig.qualityParametersSchema?.find(p => p.key === paramKey);
+    return schema?.roundValue ?? (schema as any)?.RoundValue ?? 0;
+  };
+
   function syncBallastParameter(paramKey: string, value: string, options?: SyncBallastOptions) {
     const measurementKey = `value.${paramKey}`;
     const resultKey = `result.${paramKey}`;
     const normalizedNewValue = value ?? '';
+
+    // Получаем roundValue из схемы параметра
+    const roundValue = getRoundValue(paramKey);
+
+    // Нормализуем результат: пустое значение → "0", иначе нормализуем с учётом roundValue
+    const valueToNormalize = normalizedNewValue.trim() || '0';
+    const normalizedResultValue = normalizeDecimalValue(valueToNormalize, roundValue);
+
     const previousMeasurement = formData.value[measurementKey] ?? '';
     const previousResult = formData.value[resultKey] ?? '';
     const source = options?.source ?? DataSource.Unknown;
@@ -364,18 +384,8 @@ export const useDocumentStore = defineStore('document', () => {
     // Для measurement: если source=ELIS, ReturnToELIS или вернулись к оригиналу
     const isMeasurementElisFilled = source === DataSource.ELIS || source === DataSource.ReturnToELIS || isBackToElisMeasurement;
 
-    console.log(`[syncBallastParameter] ${measurementKey}:`, {
-      value: normalizedNewValue,
-      normalizedNew,
-      source,
-      measurementElisOriginal,
-      normalizedElisOriginal,
-      isBackToElisMeasurement,
-      isMeasurementElisFilled
-    });
-
     formData.value[measurementKey] = normalizedNewValue;
-    formData.value[resultKey] = normalizedNewValue;
+    formData.value[resultKey] = normalizedResultValue;
     formData.value[`${measurementKey}__elisFilled`] = isMeasurementElisFilled;
     formData.value[`${resultKey}__elisFilled`] = false; // result балластного параметра не помечается как ELIS
     formData.value[`${resultKey}__manualOverride`] = false;
@@ -388,10 +398,10 @@ export const useDocumentStore = defineStore('document', () => {
       );
     }
 
-    if (options?.trackResultHistory !== false && previousResult !== normalizedNewValue) {
+    if (options?.trackResultHistory !== false && previousResult !== normalizedResultValue) {
       pushHistoryEntry(
         resultKey,
-        createHistoryEntry(DataSource.Auto, normalizedNewValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
+        createHistoryEntry(DataSource.Auto, normalizedResultValue, previousResult, options?.comment ?? 'Результат синхронизирован с измерением')
       );
     }
   }

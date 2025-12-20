@@ -214,7 +214,7 @@ public class DocumentEditController : ControllerBase
             }
 
             _logger.Trace($"Обновление паспорта через DocUpdate (после подтверждения от ИВК), количество полей: {values.Count}");
-
+            
             // Логируем ключи method.* для диагностики
             foreach (var kvp in values.Where(k => k.Key.StartsWith("method.")))
             {

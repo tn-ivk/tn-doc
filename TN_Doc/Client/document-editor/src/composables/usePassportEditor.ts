@@ -14,6 +14,7 @@ import type {
 } from '@/types/passport.types';
 import { DataSource } from '@/types/history.types';
 import { normalizeValue } from '@/utils/passport-utils';
+import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
 
 const measurementWatchers = new Map<string, WatchStopHandle>();
 const resultWatchers = new Map<string, WatchStopHandle>();
@@ -193,11 +194,16 @@ export function usePassportEditor() {
   function recalculateResult(param: PassportQualityParameter): string {
     // Нередактируемый параметр - не пересчитывать
     if (!param.editable) {
-      return param.values.result || param.values.measurement;
+      return param.values.result; //|| param.values.measurement;
     }
-    
+
+    const measurementRaw = param.values.measurement ?? '';
+    const roundValue = param.roundValue ?? (param as any).RoundValue ?? 0;
     if (param.isBallast) {
-      return param.values.measurement;
+      if (measurementRaw.trim() === '') {
+        return normalizeDecimalValue('0', roundValue);
+      }
+      return normalizeDecimalValue(measurementRaw, roundValue);
     }
     
     // Если есть результат из ELIS и measurement заполнено из ELIS, используем его
@@ -205,12 +211,16 @@ export function usePassportEditor() {
       return param.values.result;
     }
 
-    const measurementValue = parseFloat(param.values.measurement.replace(',', '.'));
+    if (measurementRaw.trim() === '') {
+      return normalizeDecimalValue('0', roundValue);
+    }
+
+    const measurementValue = parseFloat(measurementRaw.replace(',', '.'));
     if (isNaN(measurementValue)) {
-      return '-';
+      return normalizeDecimalValue('0', roundValue);
     }
     
-    return param.values.measurement;
+    return normalizeDecimalValue(measurementRaw, roundValue);
   }
 
   /**
@@ -273,7 +283,6 @@ export function usePassportEditor() {
   };
 
   const handleMeasurementFieldChange = (paramKey: string, newValue: unknown, oldValue: unknown) => {
-    console.log('handleMeasurementFieldChange');
     const measurementField = `value.${paramKey}`;
     if (measurementGuard.has(measurementField)) {
       measurementGuard.delete(measurementField);
@@ -388,7 +397,6 @@ export function usePassportEditor() {
    * Обработчик обновления measurement
    */
   function handleMeasurementUpdate(event: MeasurementUpdateEvent) {
-    console.log('handleMeasurementUpdate');
     const param = findParameter(event.paramKey);
     if (!param) {
       logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
@@ -403,12 +411,8 @@ export function usePassportEditor() {
     const normalizedNew = normalizeValue(event.value);
     const measurementChanged = normalizedCurrent !== normalizedNew;
 
-    if(!measurementChanged) {
-      console.log(`Значение параметра с ключом ${event.paramKey} не было изменено`);
+    if (!measurementChanged) {
       return;
-    }
-    else {
-      console.log(`Значение параметра с ключом ${event.paramKey} было изменено: ${normalizedCurrent} -> ${normalizedNew}`);
     }
       
       
@@ -419,14 +423,6 @@ export function usePassportEditor() {
       const normalizedElisOriginal = elisOriginal !== undefined ? normalizeValue(elisOriginal) : undefined;
       const isBackToElisValue = elisOriginal !== undefined &&
         normalizedNew === normalizedElisOriginal;
-
-      console.log(`[handleMeasurementUpdate] isBallast ${measurementKey}:`, {
-        newValue: event.value,
-        normalizedNew,
-        elisOriginal,
-        normalizedElisOriginal,
-        isBackToElisValue
-      });
 
       // handleMeasurementUpdate вызывается ТОЛЬКО при ручном изменении через UI
       // Поэтому результат всегда должен пересчитываться (флаги ELIS сбрасываются)
@@ -453,14 +449,6 @@ export function usePassportEditor() {
       const normalizedElisOriginal = elisOriginal !== undefined ? normalizeValue(elisOriginal) : undefined;
       const isBackToElisValue = elisOriginal !== undefined &&
         normalizedNew === normalizedElisOriginal;
-
-      console.log(`[handleMeasurementUpdate] ${measurementKey}:`, {
-        newValue: event.value,
-        normalizedNew,
-        elisOriginal,
-        normalizedElisOriginal,
-        isBackToElisValue
-      });
 
       // Записываем историю изменения measurement (для обычных параметров)
       if (isBackToElisValue) {
@@ -508,7 +496,6 @@ export function usePassportEditor() {
 
       // Записываем историю для результата (пересчитан из измерения)
       trackAutoFill(resultKey, newResult, previousResult);
-      console.log('trackAutoFill');
     }
   }
 
@@ -598,7 +585,6 @@ export function usePassportEditor() {
    * Обработчик обновления результата (ручное редактирование)
    */
   function handleResultUpdate(event: ResultUpdateEvent) {
-    console.log('handleResultUpdate');
     const param = findParameter(event.paramKey);
     if (!param) {
       logger.warn(`Параметр с ключом ${event.paramKey} не найден`);
