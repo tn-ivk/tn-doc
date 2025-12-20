@@ -7,7 +7,8 @@
           :class="[
             {
               'elis-filled': isElisFilled,
-              'result-value--disabled': !canEdit
+              'result-value--disabled': !canEdit,
+              'result-value--full-radius': !canEdit
             },
             paddingClass
           ]"
@@ -142,6 +143,11 @@ function handleEditClick() {
 .result-value--disabled {
   background-color: var(--md-surface-variant, #f1f3f4);
   color: var(--md-text-secondary, #5f6368);
+}
+
+/* Полное скругление, когда кнопки редактирования нет */
+.result-value--full-radius {
+  border-radius: var(--md-radius) !important;
 }
 
 /* Иконка редактирования внутри поля результата */
