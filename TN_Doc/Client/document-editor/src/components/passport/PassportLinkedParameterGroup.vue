@@ -2,10 +2,14 @@
   <!-- Строка ведущего параметра -->
   <tr class="parameter-row linked-group-leader">
     <!-- №: Номер строки -->
-    <td class="cell-number">{{ startIndex }}</td>
+    <td class="cell-number">
+      <div class="cell-number-inner">{{ startIndex }}</div>
+    </td>
 
     <!-- Наименование показателя -->
-    <td class="cell-name">{{ leader.name }}</td>
+    <td class="cell-name">
+      <div class="cell-name-inner">{{ leader.name }}</div>
+    </td>
 
     <!-- Метод испытаний с rowspan -->
     <td class="cell-method" :rowspan="totalRows">
@@ -46,10 +50,14 @@
     class="parameter-row linked-group-follower"
   >
     <!-- №: Номер строки -->
-    <td class="cell-number">{{ startIndex + idx + 1 }}</td>
+    <td class="cell-number">
+      <div class="cell-number-inner">{{ startIndex + idx + 1 }}</div>
+    </td>
 
     <!-- Наименование показателя -->
-    <td class="cell-name">{{ follower.name }}</td>
+    <td class="cell-name">
+      <div class="cell-name-inner">{{ follower.name }}</div>
+    </td>
 
     <!-- Метод и Документы НЕ отрисовываются - используется rowspan от leader -->
 
@@ -162,7 +170,7 @@ function handleManualMethodRequest() {
 
 <style scoped>
 .parameter-row td {
-  vertical-align: middle;
+  vertical-align: top;
   border: 1px solid var(--md-outline-light, #E0E0E0);
 }
 
@@ -176,10 +184,28 @@ function handleManualMethodRequest() {
   font-weight: 500;
 }
 
+.cell-number-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--md-control-height) + 6px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .cell-name {
   white-space: pre-wrap;
   word-wrap: break-word;
   padding-left: 5px;
+}
+
+.cell-name-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: calc(var(--md-control-height) + 6px);
+  box-sizing: border-box;
+  word-wrap: break-word;
 }
 
 .cell-method,
@@ -202,7 +228,7 @@ function handleManualMethodRequest() {
 /* Стили для связанной группы */
 .linked-group-leader td.cell-method,
 .linked-group-leader td.cell-documents {
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 /* Визуальное выделение связанной группы */
