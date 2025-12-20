@@ -1,22 +1,20 @@
 <template>
-  <div class="method-with-history">
-    <PassportMethodSelect
-      :parameter="parameter"
-      :isElisFilled="isElisFilled"
-      :hideEditButton="false"
-      :hasHistoryIndicator="showHistoryIndicator"
-      @update:method="handleChange"
-      @manual-method="handleManualMethod"
-    />
-
-    <!-- Индикатор истории внутри комбобокса -->
-    <FieldHistoryIndicator
-      v-if="showHistoryIndicator"
-      :source="lastSource"
-      :rightOffset="42"
-      class="method-history-indicator"
-    />
-  </div>
+  <PassportMethodSelect
+    :parameter="parameter"
+    :isElisFilled="isElisFilled"
+    :hideEditButton="false"
+    @update:method="handleChange"
+    @manual-method="handleManualMethod"
+  >
+    <!-- Передаём индикаторы через slot -->
+    <template #indicators>
+      <FieldHistoryIndicator
+        v-if="showHistoryIndicator"
+        :source="lastSource"
+        :rightOffset="0"
+      />
+    </template>
+  </PassportMethodSelect>
 </template>
 
 <script setup lang="ts">
@@ -79,10 +77,3 @@ const handleManualMethod = () => {
   emit('manual-method');
 };
 </script>
-
-<style scoped>
-.method-with-history {
-  position: relative;
-  width: 100%;
-}
-</style>

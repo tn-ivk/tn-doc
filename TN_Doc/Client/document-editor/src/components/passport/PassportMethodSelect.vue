@@ -1,22 +1,29 @@
 <template>
   <div class="method-field">
     <div class="method-select-container">
-      <Select
-        :modelValue="selectedMethodOption"
-        :options="methodOptions"
-        optionLabel="name"
-        :class="[
-          { 'p-invalid': !isValid },
-          { 'elis-filled': isElisFilled },
-          { 'unknown-method': showDictionaryWarning },
-          'no-dropdown-icon',
-          paddingClass
-        ]"
-        placeholder="Метод не выбран"
-        class="method-select"
-        panelClass="method-select-panel"
-        @update:modelValue="handleMethodChange"
-      />
+      <div class="select-wrapper">
+        <Select
+          :modelValue="selectedMethodOption"
+          :options="methodOptions"
+          optionLabel="name"
+          :class="[
+            { 'p-invalid': !isValid },
+            { 'elis-filled': isElisFilled },
+            { 'unknown-method': showDictionaryWarning },
+            'no-dropdown-icon',
+            paddingClass
+          ]"
+          placeholder="Метод не выбран"
+          class="method-select"
+          panelClass="method-select-panel"
+          @update:modelValue="handleMethodChange"
+        />
+
+        <!-- Контейнер для индикаторов -->
+        <div v-if="$slots['indicators']" class="indicators-container">
+          <slot name="indicators"></slot>
+        </div>
+      </div>
 
       <!-- Кнопка редактирования справа от комбобокса -->
       <button
@@ -42,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
 import Select from 'primevue/select';
 import type { PassportQualityParameter, MethodOption } from '@/types/passport.types';
 
@@ -53,11 +60,10 @@ interface Props {
   isElisFilled?: boolean;
   /** Скрыть кнопку редактирования */
   hideEditButton?: boolean;
-  /** Добавить padding справа для индикатора истории */
-  hasHistoryIndicator?: boolean;
 }
 
 const props = defineProps<Props>();
+const slots = useSlots();
 
 const emit = defineEmits<{
   'update:method': [method: MethodOption | null];
@@ -103,10 +109,10 @@ const showDictionaryWarning = computed(() => {
 
 /**
  * Динамический класс для padding текста
- * Если есть индикатор истории - нужно больше места для него
+ * Если есть индикаторы - нужно больше места для них
  */
 const paddingClass = computed(() => {
-  return props.hasHistoryIndicator ? 'with-history-indicator' : '';
+  return slots['indicators'] ? 'with-indicators' : '';
 });
 
 /**
@@ -136,9 +142,35 @@ function handleEditClick() {
   width: 100%;
 }
 
-.method-select {
+/* Обёртка для Select с индикаторами */
+.select-wrapper {
+  position: relative;
   flex: 1;
+}
+
+.method-select {
+  width: 100%;
   font-size: 15px;
+}
+
+/* Контейнер для индикаторов */
+.indicators-container {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: row-reverse; /* последний добавленный будет справа */
+  align-items: center;
+  gap: 4px; /* расстояние между индикаторами */
+}
+
+/* Переопределение стилей индикаторов внутри контейнера */
+.indicators-container :deep(.field-history-indicator) {
+  position: static; /* отключаем absolute positioning */
+  top: auto;
+  right: auto;
 }
 
 /* Кнопка редактирования справа от Select */
@@ -243,9 +275,9 @@ function handleEditClick() {
   display: none !important;
 }
 
-/* Динамический padding в зависимости от наличия индикатора истории */
-:deep(.with-history-indicator .p-select-label) {
-  padding-right: 35px !important; /* Место для индикатора истории */
+/* Динамический padding в зависимости от наличия индикаторов */
+:deep(.with-indicators .p-select-label) {
+  padding-right: 35px !important; /* Место для индикаторов */
 }
 
 </style>
