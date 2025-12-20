@@ -27,6 +27,7 @@ function InitDirEditorComponent() {
     _renderQpConfigs();
     _addSaveButtonHandler();
     _addCloseButtonWindowHandler();
+    _addDirEditorOpenHandler();
     _initTooltips();
     /*end*/
 }
@@ -36,14 +37,29 @@ function InitDirEditorComponent() {
  * */
 function _renderAppDictionaries() {
     _addDitctionariesHandler();
+    _renderAppDictionariesContent();
+    _addLicHandler();
+    _addUserHandler();
+}
+
+function _renderAppDictionariesContent() {
+    let selectedGroupId = null;
+    let selector = document.querySelector('#users-group-selector');
+    if (selector) selectedGroupId = Number(selector.value);
+
+    _clearRowTable('.user-group-table');
+    _clearRowTable('.licences-table');
+    _clearRowTable('.users-table');
     _renderUserGroupsRowTable();
     _renderAndAddHandlerLicencesTable();
     _renderUserGroupSelector();
-    let selector = document.querySelector('#users-group-selector');
-    let selectedGroupId = selector ? Number(selector.value) : (appDictionaries['UsersGroup'][0]?.Id || 1);
-    _renderAndAddHandlerUserTable(selectedGroupId);
-    _addLicHandler();
-    _addUserHandler();
+
+    selector = document.querySelector('#users-group-selector');
+    if (selector && selectedGroupId !== null && appDictionaries['UsersGroup'].some(g => g.Id === selectedGroupId)) {
+        selector.value = selectedGroupId;
+    }
+    let effectiveGroupId = selector ? Number(selector.value) : (appDictionaries['UsersGroup'][0]?.Id || 1);
+    _renderAndAddHandlerUserTable(effectiveGroupId);
 }
 
 
@@ -1562,6 +1578,14 @@ function _addCloseButtonWindowHandler() {
     });
 }
 
+function _addDirEditorOpenHandler() {
+    $('#modal-window')
+        .off('show.bs.modal.dir-editor')
+        .on('show.bs.modal.dir-editor', function () {
+            _refreshDirEditorData();
+        });
+}
+
 
 /**
  * Добавление обработчика события сохранения данных
@@ -1621,6 +1645,14 @@ function _loadQPConfigsDictionaries() {
         qpCfgsDictionaries = {};
         hashCodeLoadedQpConfigs = GetObjectHashCode(qpCfgsDictionaries);
     }
+}
+
+function _refreshDirEditorData() {
+    _loadAppDictionaries();
+    _loadQPConfigsDictionaries();
+    _renderAppDictionariesContent();
+    _clearQpsConfig();
+    _renderQpConfigs();
 }
 
 
