@@ -212,10 +212,11 @@ jobs:
   # ===========================================
   # Package Full (with .NET Runtime)
   # ===========================================
-  package-full:
-    name: Package Full
-    runs-on: ubuntu-latest
-    needs: [build, test, extract-version]
+package-full:
+  name: Package Full
+  if: ${{ false }} # temporarily disabled
+  runs-on: ubuntu-latest
+  needs: [build, test, extract-version]
 
     steps:
       - name: Checkout repository
@@ -758,10 +759,11 @@ jobs:
   # ===========================================
   # Package .NET Runtime
   # ===========================================
-  package-runtime:
-    name: Package .NET Runtime
-    runs-on: ubuntu-latest
-    needs: [extract-version]
+package-runtime:
+  name: Package .NET Runtime
+  if: ${{ false }} # temporarily disabled
+  runs-on: ubuntu-latest
+  needs: [extract-version]
 
     steps:
       - name: Checkout repository
@@ -871,10 +873,11 @@ jobs:
   # ===========================================
   # Package Fonts
   # ===========================================
-  package-fonts:
-    name: Package Fonts
-    runs-on: ubuntu-latest
-    needs: [extract-version]
+package-fonts:
+  name: Package Fonts
+  if: ${{ false }} # temporarily disabled
+  runs-on: ubuntu-latest
+  needs: [extract-version]
 
     steps:
       - name: Checkout repository
@@ -955,10 +958,10 @@ jobs:
   # ===========================================
   # Telegram Notification
   # ===========================================
-  notify-telegram:
-    name: Telegram Notification
-    runs-on: ubuntu-latest
-    needs: [extract-version, package-full, package-minimal, package-runtime, package-fonts]
+notify-telegram:
+  name: Telegram Notification
+  runs-on: ubuntu-latest
+  needs: [extract-version, package-minimal]
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
@@ -1051,10 +1054,10 @@ jobs:
   # ===========================================
   # Create GitHub Release (on tag)
   # ===========================================
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    needs: [extract-version, package-full, package-minimal, package-runtime, package-fonts]
+create-release:
+  name: Create Release
+  runs-on: ubuntu-latest
+  needs: [extract-version, package-minimal]
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
@@ -1079,19 +1082,10 @@ jobs:
             ## TN_Doc v${{ needs.extract-version.outputs.version }}
 
             ### Пакеты
-            - **tn.doc-full** - Полный пакет с .NET Runtime и шрифтами
-            - **tn.doc** - Минимальный пакет (требует .NET Runtime)
-            - **tn.dotnet-runtime** - .NET Runtime 8.0.13
-            - **tn.fonts** - Системные шрифты
+            - **tn.doc** - Минимальный пакет (требует .NET Runtime 8.0.13+ и системные шрифты)
 
             ### Установка
             ```bash
-            # Полная установка
-            sudo dpkg -i tn.doc-full-*.deb
-
-            # Или раздельная установка
-            sudo dpkg -i tn.dotnet-runtime-*.deb
-            sudo dpkg -i tn.fonts-*.deb
             sudo dpkg -i tn.doc-*.deb
             ```
           files: ./packages/*.deb
