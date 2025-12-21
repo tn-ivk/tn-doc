@@ -233,8 +233,11 @@ function handleEditClick() {
 :deep(.method-select.p-select .p-select-label) {
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.2;
+  max-height: 2.4em;
 }
 
 :deep(.method-select.p-select:not(.p-disabled):hover) {
