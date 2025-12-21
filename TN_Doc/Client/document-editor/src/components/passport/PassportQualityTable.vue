@@ -367,17 +367,17 @@ function getCurrentMethod(): MethodOption | undefined {
 }
 
 .col-documents {
-  width: 150px;
+  width: 140px;
   text-align: center;
 }
 
 .col-measurement {
-  width: 150px;
+  width: 140px;
   text-align: center;
 }
 
 .col-result {
-  width: 150px;
+  width: 170px;
   text-align: center;
 }
 
