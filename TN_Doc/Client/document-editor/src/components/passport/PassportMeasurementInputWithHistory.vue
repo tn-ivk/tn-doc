@@ -9,10 +9,14 @@
     />
 
     <!-- Индикатор истории -->
-    <FieldHistoryIndicator
+    <div
       v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
-      :source="lastSource"
-    />
+      class="indicators-container"
+    >
+      <FieldHistoryIndicator
+        :source="lastSource"
+      />
+    </div>
   </div>
 </template>
 
@@ -72,7 +76,20 @@ const handleChange = (newValue: string) => {
   gap: 2px;
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
+.indicators-container {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  --history-indicator-top: -4px;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 4px;
+}
+
+.indicators-container :deep(.field-history-indicator) {
+  position: relative;
+}
 </style>

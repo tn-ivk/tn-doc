@@ -211,7 +211,7 @@ function handleManualMethodRequest() {
 .cell-method,
 .cell-measurement {
   padding: 4px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cell-documents {
@@ -222,7 +222,7 @@ function handleManualMethodRequest() {
 .cell-result {
   text-align: center;
   padding: 4px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Стили для связанной группы */
