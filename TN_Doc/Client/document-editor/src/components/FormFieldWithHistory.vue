@@ -165,7 +165,6 @@ const handleChange = (newValue: any) => {
 /* Переопределение стилей индикаторов внутри контейнера */
 .indicators-container :deep(.field-history-indicator) {
   position: relative; /* оставляем в потоке для flex */
-  right: auto;
 }
 
 /* Динамический padding в зависимости от наличия индикаторов */

@@ -15,6 +15,7 @@
     >
       <FieldHistoryIndicator
         :source="lastSource"
+        :rightOffset="0"
       />
     </div>
   </div>

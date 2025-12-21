@@ -170,7 +170,6 @@ function handleEditClick() {
 /* Переопределение стилей индикаторов внутри контейнера */
 .indicators-container :deep(.field-history-indicator) {
   position: relative; /* оставляем в потоке для flex */
-  right: auto;
 }
 
 /* Кнопка редактирования справа от Select */
