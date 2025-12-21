@@ -6,7 +6,6 @@
           :modelValue="selectedMethodOption"
           :options="methodOptions"
           optionLabel="name"
-          v-tooltip.top="methodTooltip"
           :class="[
             { 'p-invalid': !isValid },
             { 'elis-filled': isElisFilled },
@@ -106,16 +105,6 @@ const showDictionaryWarning = computed(() => {
     return false;
   }
   return props.parameter.method.isInDictionary === false;
-});
-
-const methodTooltip = computed(() => {
-  const selected = props.parameter.method.selected?.trim();
-  return {
-    value: selected || '',
-    disabled: !selected,
-    class: 'method-select-tooltip',
-    fitContent: true
-  };
 });
 
 /**
