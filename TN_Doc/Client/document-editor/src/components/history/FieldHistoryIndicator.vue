@@ -14,7 +14,18 @@
       {{ displayConfig.text }}
     </span>
 
-    <!-- Иконка (для Manual и Unknown) -->
+    <!-- SVG иконка (кастомная) -->
+    <svg
+      v-else-if="displayConfig.svgPath"
+      class="indicator-svg"
+      :viewBox="displayConfig.svgViewBox || '0 0 24 24'"
+      :style="{ color: displayConfig.color }"
+      aria-hidden="true"
+    >
+      <path :d="displayConfig.svgPath" fill="currentColor" />
+    </svg>
+
+    <!-- Иконка PrimeVue -->
     <i
       v-else
       :class="['pi', displayConfig.icon, 'indicator-icon']"
@@ -66,5 +77,11 @@ const displayConfig = computed(() => {
 .indicator-icon {
   font-size: 14px;
   line-height: 1;
+}
+
+.indicator-svg {
+  width: 14px;
+  height: 14px;
+  display: block;
 }
 </style>

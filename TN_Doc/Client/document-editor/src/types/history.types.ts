@@ -43,7 +43,11 @@ export interface FieldHistoryEntry {
  */
 export interface SourceDisplayConfig {
   /** Иконка PrimeVue (например, 'pi-user-edit') */
-  icon: string;
+  icon?: string;
+  /** SVG path для кастомной иконки */
+  svgPath?: string;
+  /** SVG viewBox для кастомной иконки */
+  svgViewBox?: string;
   /** Цвет иконки */
   color: string;
   /** Текст для отображения вместо иконки (опционально) */
@@ -51,6 +55,12 @@ export interface SourceDisplayConfig {
   /** Описание для tooltip */
   description: string;
 }
+
+const FLASK_ICON = {
+  path:
+    'M384 64L224 64C206.3 64 192 78.3 192 96C192 113.7 206.3 128 224 128L224 279.5L103.5 490.3C98.6 499 96 508.7 96 518.7C96 550.4 121.6 576 153.3 576L486.7 576C518.3 576 544 550.4 544 518.7C544 508.7 541.4 498.9 536.5 490.3L416 279.5L416 128C433.7 128 448 113.7 448 96C448 78.3 433.7 64 416 64L384 64zM288 279.5L288 128L352 128L352 279.5C352 290.6 354.9 301.6 360.4 311.3L402 384L238 384L279.6 311.3C285.1 301.6 288 290.7 288 279.5z',
+  viewBox: '0 0 640 640'
+} as const;
 
 /**
  * Маппинг источников на конфигурацию отображения
@@ -62,9 +72,9 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     description: 'Источник неизвестен'
   },
   [DataSource.ELIS]: {
-    icon: 'pi-database',
+    svgPath: FLASK_ICON.path,
+    svgViewBox: FLASK_ICON.viewBox,
     color: '#4CAF50',
-    text: 'ЕЛИС',
     description: 'Из протокола ЕЛИС'
   },
   [DataSource.Manual]: {
@@ -89,9 +99,9 @@ export const SOURCE_DISPLAY_CONFIG: Record<DataSource, SourceDisplayConfig> = {
     description: 'Заполнено автоматически'
   },
   [DataSource.ReturnToELIS]: {
-    icon: 'pi-database',
+    svgPath: FLASK_ICON.path,
+    svgViewBox: FLASK_ICON.viewBox,
     color: '#4CAF50',
-    text: 'ЕЛИС',
     description: 'Из протокола ЕЛИС'
   },
   [DataSource.DefaultMethod]: {
