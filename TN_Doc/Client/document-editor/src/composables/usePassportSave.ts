@@ -39,6 +39,12 @@ export function usePassportSave() {
 
       // Проверяем, что это паспорт (DocGUID == 1)
       const isPassport = config.docType === 'Passport';
+      const compactedHistory = compactAllFieldsHistory(store.formHistory);
+      const payloadWithHistory = {
+        ...store.formData,
+        __history: compactedHistory
+      };
+
       if (!isPassport) {
         logger.warn('[usePassportSave] Документ не является паспортом, пропускаем OPC логику');
         // Для не-паспортов просто сохраняем
@@ -46,7 +52,7 @@ export function usePassportSave() {
           config.deviceId,
           config.docType,
           config.docId,
-          store.formData
+          payloadWithHistory
         );
         store.isDirty = false;
         return true;
@@ -58,7 +64,7 @@ export function usePassportSave() {
         config.deviceId,
         config.docType,
         config.docId,
-        store.formData
+        payloadWithHistory
       );
       logger.debug('[usePassportSave] Шаг 1: Паспорт успешно сохранен');
 
@@ -129,8 +135,6 @@ export function usePassportSave() {
       // Добавляем историю изменений полей в mergedData
       // Схлопываем историю: оставляем только последнюю запись для каждого поля
 
-      const compactedHistory = compactAllFieldsHistory(store.formHistory);
-
       const finalPayload = {
         ...mergedData,
         __history: compactedHistory
@@ -182,10 +186,10 @@ export function usePassportSave() {
     try {
       logger.debug(`[usePassportSave] Сохранение документа типа ${docType} без OPC логики`);
       await documentApi.saveDocument(
-        store.config.deviceId,
-        store.config.docType,
-        store.config.docId,
-        store.formData
+          store.config.deviceId,
+          store.config.docType,
+          store.config.docId, 
+          store.formData
       );
       store.isDirty = false;
       return true;
