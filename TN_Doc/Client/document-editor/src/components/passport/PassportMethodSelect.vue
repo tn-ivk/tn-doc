@@ -157,6 +157,7 @@ function handleEditClick() {
 .select-wrapper {
   position: relative;
   flex: 1;
+  min-width: 0;
 }
 
 .method-select {
@@ -227,6 +228,13 @@ function handleEditClick() {
   border-radius: var(--md-radius) 0 0 var(--md-radius) !important;
   background: #ffffff;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+:deep(.method-select.p-select .p-select-label) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 :deep(.method-select.p-select:not(.p-disabled):hover) {
