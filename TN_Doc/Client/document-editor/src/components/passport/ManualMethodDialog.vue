@@ -50,7 +50,7 @@
 
       <label class="checkbox-field">
         <input type="checkbox" v-model="form.isDefault" />
-        <span>Сделать основным методом</span>
+        <span>Применять по умолчанию</span>
       </label>
     </div>
 
