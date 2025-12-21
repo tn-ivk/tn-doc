@@ -145,14 +145,16 @@ const handleChange = (newValue: any) => {
 <style scoped>
 .form-field-with-history {
   position: relative;
+  overflow: visible;
 }
 
 /* Контейнер для индикаторов */
 .indicators-container {
   position: absolute;
-  top: 4px;
+  top: 0;
   right: 4px;
   z-index: 10;
+  --history-indicator-top: -4px;
 
   display: flex;
   flex-direction: row-reverse; /* последний добавленный будет справа */
@@ -162,9 +164,7 @@ const handleChange = (newValue: any) => {
 
 /* Переопределение стилей индикаторов внутри контейнера */
 .indicators-container :deep(.field-history-indicator) {
-  position: static; /* отключаем absolute positioning */
-  top: auto;
-  right: auto;
+  position: relative; /* оставляем в потоке для flex */
 }
 
 /* Динамический padding в зависимости от наличия индикаторов */

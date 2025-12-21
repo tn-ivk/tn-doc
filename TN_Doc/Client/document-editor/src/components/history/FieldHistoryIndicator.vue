@@ -55,7 +55,7 @@ const displayConfig = computed(() => {
 <style scoped>
 .field-history-indicator {
   position: absolute;
-  top: 4px;
+  top: var(--history-indicator-top, 4px);
   /* right управляется через проп rightOffset */
   display: flex;
   align-items: center;
