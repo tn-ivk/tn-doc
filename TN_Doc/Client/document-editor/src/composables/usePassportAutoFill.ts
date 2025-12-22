@@ -45,6 +45,17 @@ export function usePassportAutoFill() {
     // Проверяем наличие оригинального значения ЕЛИС
     const elisOriginal = store.formData[`${fieldKey}__elisOriginal`];
 
+    // Если идет загрузка из ELIS - не пишем историю, но возвращаем результат сравнения
+    // чтобы корректно проставить флаг elisFilled.
+    if (store.isLoadingFromElis) {
+      if (elisOriginal === undefined) {
+        return false;
+      }
+      const normalizedNew = normalizeValue(newValue);
+      const normalizedOriginal = normalizeValue(elisOriginal);
+      return normalizedNew === normalizedOriginal;
+    }
+
     if (elisOriginal === undefined) {
       // Поле никогда не заполнялось из ЕЛИС - обычное ручное изменение
       trackManualChange(fieldKey, newValue, previousValue);
