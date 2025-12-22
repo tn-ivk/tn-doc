@@ -618,7 +618,11 @@ const handleElisData = (elisData: ElisPassportData) => {
 
   // 3. Применить все обновления bulk операцией
   if (Object.keys(updates).length > 0) {
+    // Устанавливаем флаг загрузки из ELIS для пропуска создания записей истории
+    // в автозаполнении связанных полей (Laboratory_Post, Laboratory_Factory)
+    store.isLoadingFromElis = true;
     store.bulkUpdateFields(updates);
+    store.isLoadingFromElis = false;
   }
 };
 

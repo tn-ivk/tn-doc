@@ -42,6 +42,12 @@ export function usePassportAutoFill() {
     newValue: string,
     previousValue: string
   ): boolean => {
+    // Если идет загрузка из ELIS - пропускаем создание записей истории
+    // (автозаполнение связанных полей происходит автоматически, не является действием пользователя)
+    if (store.isLoadingFromElis) {
+      return false;
+    }
+
     // Проверяем наличие оригинального значения ЕЛИС
     const elisOriginal = store.formData[`${fieldKey}__elisOriginal`];
 

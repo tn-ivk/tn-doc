@@ -69,6 +69,12 @@ export const useDocumentStore = defineStore('document', () => {
   const error = ref<string | null>(null);
 
   /**
+   * Флаг загрузки данных из ELIS
+   * Используется для пропуска создания записей истории при автозаполнении связанных полей
+   */
+  const isLoadingFromElis = ref(false);
+
+  /**
    * История изменений полей
    * Ключ - название поля (controlId), значение - массив записей истории
    */
@@ -499,6 +505,7 @@ export const useDocumentStore = defineStore('document', () => {
     isDirty.value = false;
     isLoading.value = false;
     isSaving.value = false;
+    isLoadingFromElis.value = false;
     error.value = null;
   }
 
@@ -510,6 +517,7 @@ export const useDocumentStore = defineStore('document', () => {
     isDirty,
     isLoading,
     isSaving,
+    isLoadingFromElis,
     error,
 
     // Getters
