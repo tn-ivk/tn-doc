@@ -3,7 +3,7 @@ import { watch } from 'vue';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import type { UserData } from '@/types/document.types';
-import { normalizeValue } from '@/utils/passport-utils';
+import { normalizeForComparison, resolveFieldTypeForComparison } from '@/utils/field-compare-utils';
 
 /**
  * Композабл для автозаполнения связанных полей в документе "Паспорт качества"
@@ -42,6 +42,7 @@ export function usePassportAutoFill() {
     newValue: string,
     previousValue: string
   ): boolean => {
+    const fieldType = resolveFieldTypeForComparison(fieldKey, store.fields, store.config?.docType);
     // Проверяем наличие оригинального значения ЕЛИС
     const elisOriginal = store.formData[`${fieldKey}__elisOriginal`];
 
@@ -51,8 +52,8 @@ export function usePassportAutoFill() {
       if (elisOriginal === undefined) {
         return false;
       }
-      const normalizedNew = normalizeValue(newValue);
-      const normalizedOriginal = normalizeValue(elisOriginal);
+      const normalizedNew = normalizeForComparison(fieldType, newValue);
+      const normalizedOriginal = normalizeForComparison(fieldType, elisOriginal);
       return normalizedNew === normalizedOriginal;
     }
 
@@ -63,8 +64,8 @@ export function usePassportAutoFill() {
     }
 
     // Нормализуем значения для корректного сравнения
-    const normalizedNew = normalizeValue(newValue);
-    const normalizedOriginal = normalizeValue(elisOriginal);
+    const normalizedNew = normalizeForComparison(fieldType, newValue);
+    const normalizedOriginal = normalizeForComparison(fieldType, elisOriginal);
 
     const isReturnToElis = normalizedNew === normalizedOriginal;
 

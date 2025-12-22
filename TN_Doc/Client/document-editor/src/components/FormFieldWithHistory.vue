@@ -39,7 +39,7 @@ import { useFieldHistory } from '@/composables/useFieldHistory';
 import { useDocumentStore } from '@/stores/documentStore';
 import { DataSource } from '@/types/history.types';
 import type { FormField as FormFieldType } from '@/types/document.types';
-import { normalizeValue, normalizeDateTimeForComparison } from '@/utils/passport-utils';
+import { normalizeForComparison } from '@/utils/field-compare-utils';
 
 const props = defineProps<{
   field: FormFieldType;
@@ -121,32 +121,22 @@ const handleChange = (newValue: any) => {
 
   if (elisOriginal !== undefined) {
     // Поле было заполнено из ELIS - проверяем возврат к оригиналу
-    let normalizedNew: string;
-    let normalizedOriginal: string;
-
-    // Для полей даты/времени используем специальную нормализацию по timestamp
-    // Это позволяет корректно сравнивать "2025-12-02T00:00:00Z" (UTC) и "2025-12-02T03:00:00" (local)
-    if (props.field.type === 'datetime-local' || props.field.type === 'date') {
-      normalizedNew = normalizeDateTimeForComparison(newValue);
-      normalizedOriginal = normalizeDateTimeForComparison(elisOriginal);
-    } else {
-      // Для остальных полей используем стандартную нормализацию
-      normalizedNew = normalizeValue(newValue);
-      normalizedOriginal = normalizeValue(elisOriginal);
-    }
+    // Для дат используем сравнение по timestamp, для текста сохраняем пробелы по краям
+    const normalizedNew = normalizeForComparison(props.field.type, newValue);
+    const normalizedOriginal = normalizeForComparison(props.field.type, elisOriginal);
 
     const isReturnToElis = normalizedNew === normalizedOriginal;
 
     if (isReturnToElis) {
       // Возврат к значению ELIS - записываем ReturnToELIS в историю
-      trackReturnToElis(fieldKey, newValue, previousValue);
+      trackReturnToElis(fieldKey, newValue, previousValue, props.field.type);
     } else {
       // Ручное изменение
-      trackManualChange(fieldKey, newValue, previousValue);
+      trackManualChange(fieldKey, newValue, previousValue, props.field.type);
     }
   } else {
     // Обычное поле без ELIS - ручное изменение
-    trackManualChange(fieldKey, newValue, previousValue);
+    trackManualChange(fieldKey, newValue, previousValue, props.field.type);
   }
 
   // Передаем изменение дальше (store.updateField обновит __elisFilled)

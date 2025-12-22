@@ -7,6 +7,7 @@ import type { PassportEditConfig } from '@/types/passport.types';
 import type { FieldHistoryEntry } from '@/types/history.types';
 import { DataSource } from '@/types/history.types';
 import { normalizeValue } from '@/utils/passport-utils';
+import { normalizeForComparison, resolveFieldTypeForComparison } from '@/utils/field-compare-utils';
 import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
 import { compactAllFieldsHistory } from '@/utils/history-utils';
 
@@ -315,8 +316,9 @@ export const useDocumentStore = defineStore('document', () => {
     const wasElisField = elisOriginal !== undefined;
 
     if (wasElisField) {
-      const normalizedNew = normalizeValue(value);
-      const normalizedOriginal = normalizeValue(elisOriginal);
+      const fieldType = resolveFieldTypeForComparison(key, config.value?.fields ?? [], config.value?.docType);
+      const normalizedNew = normalizeForComparison(fieldType, value);
+      const normalizedOriginal = normalizeForComparison(fieldType, elisOriginal);
       const isReturnToElis = normalizedNew === normalizedOriginal;
 
       // Обновляем флаг elisFilled
