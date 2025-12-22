@@ -10,11 +10,17 @@
 
     <!-- Индикатор истории -->
     <div
-      v-if="lastSource !== DataSource.Unknown && lastSource !== DataSource.Auto"
+      v-if="showHistoryIndicator || showElisMissing"
       class="indicators-container"
     >
       <FieldHistoryIndicator
+        v-if="showHistoryIndicator"
         :source="lastSource"
+        :rightOffset="0"
+      />
+      <FieldHistoryIndicator
+        v-if="showElisMissing"
+        :source="DataSource.ElisMissing"
         :rightOffset="0"
       />
     </div>
@@ -37,7 +43,7 @@ const emit = defineEmits<{
   'update:measurement': [value: string];
 }>();
 
-const { getLastSource } = useFieldHistory();
+const { getLastSource, hasElisMissing } = useFieldHistory();
 
 /**
  * Ключ для истории: value.{parameterKey}
@@ -49,6 +55,14 @@ const historyKey = computed(() => `value.${props.parameter.key}`);
  */
 const lastSource = computed(() => {
   return getLastSource(historyKey.value);
+});
+
+const showHistoryIndicator = computed(() => {
+  return lastSource.value !== DataSource.Unknown && lastSource.value !== DataSource.Auto;
+});
+
+const showElisMissing = computed(() => {
+  return hasElisMissing(historyKey.value);
 });
 
 /**

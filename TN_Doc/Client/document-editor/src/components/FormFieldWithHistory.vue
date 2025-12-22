@@ -14,11 +14,16 @@
     />
 
     <!-- Контейнер для индикаторов -->
-    <div v-if="hasIndicatorsSlot || showHistoryIndicator" class="indicators-container">
+    <div v-if="hasIndicatorsSlot || showHistoryIndicator || showElisMissing" class="indicators-container">
       <slot name="indicators">
         <FieldHistoryIndicator
           v-if="showHistoryIndicator"
           :source="lastSource"
+          :rightOffset="0"
+        />
+        <FieldHistoryIndicator
+          v-if="showElisMissing"
+          :source="DataSource.ElisMissing"
           :rightOffset="0"
         />
       </slot>
@@ -55,7 +60,8 @@ const slots = useSlots();
 const {
   getLastSource,
   trackManualChange,
-  trackReturnToElis
+  trackReturnToElis,
+  hasElisMissing
 } = useFieldHistory();
 
 const ELIS_HIGHLIGHT_COLOR = 'var(--md-elis-highlight, #e8f5e9)';
@@ -71,6 +77,10 @@ const showHistoryIndicator = computed(() => {
   return lastSource.value !== DataSource.Unknown && lastSource.value !== DataSource.Auto;
 });
 
+const showElisMissing = computed(() => {
+  return hasElisMissing(props.field.key);
+});
+
 const hasIndicatorsSlot = computed(() => !!slots['indicators']);
 
 /**
@@ -78,7 +88,9 @@ const hasIndicatorsSlot = computed(() => !!slots['indicators']);
  * Если есть индикаторы - нужно больше места для них
  */
 const paddingClass = computed(() => {
-  return hasIndicatorsSlot.value ? 'with-indicators' : '';
+  return (hasIndicatorsSlot.value || showHistoryIndicator.value || showElisMissing.value)
+    ? 'with-indicators'
+    : '';
 });
 
 const computedHighlightColor = computed(() => {

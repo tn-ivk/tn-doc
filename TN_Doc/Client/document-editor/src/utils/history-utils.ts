@@ -1,4 +1,4 @@
-import type { FieldHistoryEntry } from '@/types/history.types';
+import { DataSource, type FieldHistoryEntry } from '@/types/history.types';
 
 /**
  * Возвращает только последнюю запись истории поля.
@@ -10,8 +10,15 @@ import type { FieldHistoryEntry } from '@/types/history.types';
 export function compactFieldHistory(history: FieldHistoryEntry[]): FieldHistoryEntry[] {
   if (!history || history.length === 0) return [];
 
+  // ElisMissing не сохраняем на бэкенд
+  const filteredHistory = history.filter(entry => entry.source !== DataSource.ElisMissing);
+
+  if (filteredHistory.length === 0) {
+    return [];
+  }
+
   // Возвращаем только последнюю запись
-  return [history[history.length - 1]];
+  return [filteredHistory[filteredHistory.length - 1]];
 }
 
 /**

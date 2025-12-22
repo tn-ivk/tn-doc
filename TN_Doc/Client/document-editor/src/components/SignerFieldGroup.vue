@@ -18,6 +18,11 @@
                 :source="lastSource"
                 :rightOffset="0"
               />
+              <FieldHistoryIndicator
+                v-if="showElisMissing"
+                :source="DataSource.ElisMissing"
+                :rightOffset="0"
+              />
             </template>
           </FormFieldWithHistory>
         </div>
@@ -100,7 +105,7 @@ const emit = defineEmits<{
 // Состояние диалога
 const isDialogVisible = ref(false);
 
-const { getLastSource, trackManualChange } = useFieldHistory();
+const { getLastSource, trackManualChange, hasElisMissing } = useFieldHistory();
 
 /**
  * Последний источник изменений для поля IOF
@@ -115,6 +120,10 @@ const lastSource = computed(() => {
 const showHistoryIndicator = computed(() => {
   const source = lastSource.value;
   return source !== DataSource.Unknown && source !== DataSource.Auto;
+});
+
+const showElisMissing = computed(() => {
+  return hasElisMissing(props.iof.key);
 });
 
 /**

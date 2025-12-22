@@ -80,6 +80,11 @@ export const useDocumentStore = defineStore('document', () => {
    */
   const formHistory = ref<Record<string, FieldHistoryEntry[]>>({});
 
+  /**
+   * Поля, отсутствующие в текущем протоколе ELIS (только для сессии)
+   */
+  const elisMissingFields = ref<Record<string, true>>({});
+
   // Getters
   const isReady = computed(() => config.value !== null && !isLoading.value);
   const hasUnsavedChanges = computed(() => isDirty.value);
@@ -201,6 +206,7 @@ export const useDocumentStore = defineStore('document', () => {
 
       // Загружаем историю изменений полей
       formHistory.value = {};
+      elisMissingFields.value = {};
 
       // НОВЫЙ ФОРМАТ: Извлекаем историю из initialValues
       // Бэкенд передает историю под ключами с постфиксом __history
@@ -502,6 +508,7 @@ export const useDocumentStore = defineStore('document', () => {
     config.value = null;
     formData.value = {};
     formHistory.value = {};
+    elisMissingFields.value = {};
     isDirty.value = false;
     isLoading.value = false;
     isSaving.value = false;
@@ -514,6 +521,7 @@ export const useDocumentStore = defineStore('document', () => {
     config,
     formData,
     formHistory,
+    elisMissingFields,
     isDirty,
     isLoading,
     isSaving,
