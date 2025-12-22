@@ -229,12 +229,14 @@ export function enrichElisData(elisData: ElisPassportData): ElisPassportData {
       enriched.labInfo.chiefLabShortSign = shortSign;
     }
 
-    if (lab.post) {
+    const hasPost = lab.post !== undefined && lab.post !== null;
+    if (hasPost && (lab.post !== '' || enriched.chiefLabPosition === undefined || enriched.chiefLabPosition === null)) {
       enriched.chiefLabPosition = lab.post;
       enriched.labInfo.chiefLabPosition = lab.post;
     }
 
-    if (lab.company) {
+    const hasCompany = lab.company !== undefined && lab.company !== null;
+    if (hasCompany && (lab.company !== '' || enriched.chiefLabOrganization === undefined || enriched.chiefLabOrganization === null)) {
       enriched.chiefLabOrganization = lab.company;
       enriched.labInfo.chiefLabOrganization = lab.company;
     }

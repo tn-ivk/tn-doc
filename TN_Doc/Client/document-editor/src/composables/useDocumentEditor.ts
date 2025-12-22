@@ -46,8 +46,8 @@ export function useDocumentEditor() {
 
       const currentValue = formData[baseKey];
 
-      // Пропускаем пустые значения
-      if (currentValue === undefined || currentValue === null || currentValue === '') {
+      // Пропускаем только отсутствующие значения
+      if (currentValue === undefined || currentValue === null) {
         continue;
       }
 

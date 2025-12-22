@@ -114,7 +114,7 @@
 
 <script setup lang="ts">
 import { logger } from '@tn-doc/shared';
-import { computed, onMounted, watch } from 'vue';
+import { computed, nextTick, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FormFieldWithHistory from '@/components/FormFieldWithHistory.vue';
 import SignerFieldGroup from '@/components/SignerFieldGroup.vue';
@@ -622,7 +622,9 @@ const handleElisData = (elisData: ElisPassportData) => {
     // в автозаполнении связанных полей (Laboratory_Post, Laboratory_Factory)
     store.isLoadingFromElis = true;
     store.bulkUpdateFields(updates);
-    store.isLoadingFromElis = false;
+    nextTick(() => {
+      store.isLoadingFromElis = false;
+    });
   }
 };
 
