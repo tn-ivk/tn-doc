@@ -13,6 +13,11 @@
         :source="lastSource"
         :rightOffset="0"
       />
+      <FieldHistoryIndicator
+        v-if="showElisMissing"
+        :source="DataSource.ElisMissing"
+        :rightOffset="0"
+      />
     </template>
   </PassportMethodSelect>
 </template>
@@ -34,7 +39,7 @@ const emit = defineEmits<{
   'manual-method': [];
 }>();
 
-const { getLastSource } = useFieldHistory();
+const { getLastSource, hasElisMissing } = useFieldHistory();
 
 /**
  * Ключ для истории: method.{parameterKey}
@@ -46,6 +51,10 @@ const historyKey = computed(() => `method.${props.parameter.key}`);
  */
 const lastSource = computed(() => {
   return getLastSource(historyKey.value);
+});
+
+const showElisMissing = computed(() => {
+  return hasElisMissing(historyKey.value);
 });
 
 /**

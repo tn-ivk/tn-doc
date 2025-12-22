@@ -84,6 +84,29 @@ export function useFieldHistory() {
   };
 
   /**
+   * Снять флаг ElisMissing для поля (только текущая сессия)
+   */
+  const clearElisMissing = (fieldKey: string) => {
+    if (!store.elisMissingFields[fieldKey]) {
+      return;
+    }
+
+    const next = { ...store.elisMissingFields };
+    delete next[fieldKey];
+    store.elisMissingFields = next;
+  };
+
+  /**
+   * Сбросить все флаги ElisMissing (только текущая сессия)
+   */
+  const resetElisMissing = () => {
+    if (Object.keys(store.elisMissingFields).length === 0) {
+      return;
+    }
+    store.elisMissingFields = {};
+  };
+
+  /**
    * Отследить ручное изменение поля
    */
   const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any) => {
@@ -110,6 +133,7 @@ export function useFieldHistory() {
    * Отследить загрузку из ELIS
    */
   const trackElisLoad = (fieldKey: string, value: any, protocolNumber?: string) => {
+    clearElisMissing(fieldKey);
 
     const comment = protocolNumber
       ? `Загружено из протокола ${protocolNumber}`
@@ -150,20 +174,15 @@ export function useFieldHistory() {
   /**
    * Отследить поле, которое ожидалось из ELIS, но не было загружено
    */
-  const trackElisMissing = (fieldKey: string, protocolNumber?: string) => {
+  const trackElisMissing = (fieldKey: string, _protocolNumber?: string) => {
+    if (store.elisMissingFields[fieldKey]) {
+      return;
+    }
 
-    const comment = protocolNumber
-      ? `Не найдено в протоколе ${protocolNumber}`
-      : 'Ожидалось из ЕЛИС, но не загружено';
-
-    const entry = createHistoryEntry(
-      DataSource.ElisMissing,
-      '', // пустое значение
-      undefined,
-      comment
-    );
-
-    addHistoryEntry(fieldKey, entry);
+    store.elisMissingFields = {
+      ...store.elisMissingFields,
+      [fieldKey]: true
+    };
   };
 
   /**
@@ -218,6 +237,13 @@ export function useFieldHistory() {
   };
 
   /**
+   * Проверить наличие ElisMissing для поля
+   */
+  const hasElisMissing = (fieldKey: string): boolean => {
+    return store.elisMissingFields[fieldKey] === true;
+  };
+
+  /**
    * Получить историю поля
    */
   const getFieldHistory = (fieldKey: string): FieldHistoryEntry[] => {
@@ -256,8 +282,10 @@ export function useFieldHistory() {
     trackReturnToElis,
     trackAutoFill,
     trackDefaultMethod,
+    resetElisMissing,
     getFieldHistory,
     getLastSource,
-    getLastModifiedBy
+    getLastModifiedBy,
+    hasElisMissing
   };
 }

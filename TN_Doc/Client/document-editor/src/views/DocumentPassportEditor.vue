@@ -136,7 +136,7 @@ import {normalizeValue} from "@/utils/passport-utils.ts";
 const route = useRoute();
 
 // Получаем функции для отслеживания загрузки из ELIS
-const { trackElisLoad, trackElisMissing, trackAutoFill } = useFieldHistory();
+const { trackElisLoad, trackElisMissing, trackAutoFill, resetElisMissing } = useFieldHistory();
 
 // Вспомогательные функции для работы с полями подписантов
 /**
@@ -360,6 +360,7 @@ const handleElisData = (elisData: ElisPassportData) => {
   // Используем ключ с __ (двойное подчеркивание), который пропускается при создании CorrectionData,
   // но извлекается напрямую в методе DocUpdate на бэкенде
   updates['__elisProtocol'] = JSON.stringify(elisData);
+  resetElisMissing();
 
   // 1. Заполнить поля AdditionalInfo
 
@@ -445,8 +446,6 @@ const handleElisData = (elisData: ElisPassportData) => {
       }
     } else {
       // Значение ожидалось из ELIS (есть elisAlias), но не было найдено
-      updates[`${field.key}__elisMissing`] = true;
-
       // Создать запись истории для ELIS Missing
       trackElisMissing(field.key, elisData.protocolNumber);
     }
@@ -502,7 +501,6 @@ const handleElisData = (elisData: ElisPassportData) => {
           trackElisLoad(valueKey, valueStr, elisData.protocolNumber);
         } else {
           // value ожидалось, но не пришло
-          updates[`${valueKey}__elisMissing`] = true;
           trackElisMissing(valueKey, elisData.protocolNumber);
         }
 
@@ -534,7 +532,6 @@ const handleElisData = (elisData: ElisPassportData) => {
           }
         } else {
           // result ожидалось, но не пришло
-          updates[`${resultKey}__elisMissing`] = false;
           trackElisMissing(resultKey, elisData.protocolNumber);
         }
 
@@ -578,12 +575,10 @@ const handleElisData = (elisData: ElisPassportData) => {
             trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
           } else {
             // Метод не удалось создать
-            updates[`${methodKey}__elisMissing`] = true;
             trackElisMissing(methodKey, elisData.protocolNumber);
           }
         } else {
           // method ожидалось, но не пришло
-          updates[`${methodKey}__elisMissing`] = true;
           trackElisMissing(methodKey, elisData.protocolNumber);
         }
 
@@ -599,16 +594,10 @@ const handleElisData = (elisData: ElisPassportData) => {
           trackElisLoad(documentKey, documentPayload, elisData.protocolNumber);
         } else {
           // document ожидалось, но не пришло
-          updates[`${documentKey}__elisMissing`] = true;
           trackElisMissing(documentKey, elisData.protocolNumber);
         }
       } else {
         // Параметр не найден в ELIS - все поля помечаем как missing
-        updates[`${valueKey}__elisMissing`] = true;
-        updates[`${methodKey}__elisMissing`] = true;
-        updates[`${resultKey}__elisMissing`] = false;
-        updates[`${documentKey}__elisMissing`] = true;
-
         trackElisMissing(valueKey, elisData.protocolNumber);
         trackElisMissing(methodKey, elisData.protocolNumber);
         trackElisMissing(documentKey, elisData.protocolNumber);

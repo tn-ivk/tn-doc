@@ -12,6 +12,11 @@
         :source="lastSource"
         :rightOffset="0"
       />
+      <FieldHistoryIndicator
+        v-if="showElisMissing"
+        :source="DataSource.ElisMissing"
+        :rightOffset="0"
+      />
     </template>
   </PassportResultCell>
 </template>
@@ -33,7 +38,7 @@ const emit = defineEmits<{
   'result-edit': [];
 }>();
 
-const { getLastSource } = useFieldHistory();
+const { getLastSource, hasElisMissing } = useFieldHistory();
 
 /**
  * Ключ для истории: result.{parameterKey}
@@ -45,6 +50,10 @@ const historyKey = computed(() => `result.${props.parameter.key}`);
  */
 const lastSource = computed(() => {
   return getLastSource(historyKey.value);
+});
+
+const showElisMissing = computed(() => {
+  return hasElisMissing(historyKey.value);
 });
 
 const showHistoryIndicator = computed(() => {
