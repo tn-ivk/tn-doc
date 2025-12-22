@@ -188,6 +188,23 @@ export function usePassportEditor() {
     return qualityParametersSchema.value.find(p => p.key === paramKey);
   }
 
+  function collectRelatedMethodKeys(schema?: PassportQualityParameterSchema): string[] {
+    if (!schema) {
+      return [];
+    }
+
+    const relatedKeys = new Set<string>();
+    if (schema.linkedParameter) {
+      relatedKeys.add(schema.linkedParameter);
+    }
+    if (schema.slaveKey) {
+      relatedKeys.add(schema.slaveKey);
+    }
+    relatedKeys.delete(schema.key);
+
+    return [...relatedKeys].filter(key => Boolean(findParameterSchema(key)));
+  }
+
   /**
    * Пересчитать результат на основе метода и значения measurement
    */
@@ -538,20 +555,23 @@ export function usePassportEditor() {
     const isBackToElisMethod = (elisMethodName !== undefined && newMethodName === elisMethodName) ||
       (methodElisOriginal !== undefined && newMethodName === methodElisOriginal);
 
+    const schema = findParameterSchema(event.paramKey);
+    const relatedKeys = collectRelatedMethodKeys(schema);
+
     const updates: Record<string, any> = {
       [methodKey]: methodJson
     };
 
-    // Проверяем, есть ли связанный параметр (LinkedParameters)
-    // Если есть linkedParameter - записываем метод и в связанный параметр
-    const schema = findParameterSchema(event.paramKey);
-    if (schema?.linkedParameter) {
-      const linkedMethodKey = `method.${schema.linkedParameter}`;
-      updates[linkedMethodKey] = methodJson;
+    // Синхронизируем метод в связанные параметры (linkedParameter + slaveKey)
+    for (const relatedKey of relatedKeys) {
+      const relatedMethodKey = `method.${relatedKey}`;
+      updates[relatedMethodKey] = methodJson;
+    }
 
-      logger.debug('[usePassportEditor] Синхронизация метода в связанный параметр', {
+    if (relatedKeys.length > 0) {
+      logger.debug('[usePassportEditor] Синхронизация метода в связанные параметры', {
         leaderKey: event.paramKey,
-        followerKey: schema.linkedParameter,
+        relatedKeys,
         methodName: newMethodName
       });
     }
@@ -568,15 +588,17 @@ export function usePassportEditor() {
         trackManualChange(methodKey, newMethodName, previousMethodName || undefined);
       }
 
-      // Если есть связанный параметр - записываем историю и для него
-      if (schema?.linkedParameter) {
-        const linkedMethodKey = `method.${schema.linkedParameter}`;
-        const linkedPreviousJson = store.formData[linkedMethodKey] || '';
-        const linkedPreviousMethod = tryParseMethod(linkedPreviousJson);
-        const linkedPreviousName = linkedPreviousMethod?.name || '';
+      // Если есть связанные параметры - записываем историю и для них
+      for (const relatedKey of relatedKeys) {
+        const relatedMethodKey = `method.${relatedKey}`;
+        const relatedPreviousJson = store.formData[relatedMethodKey] || '';
+        const relatedPreviousMethod = tryParseMethod(relatedPreviousJson);
+        const relatedPreviousName = relatedPreviousMethod?.name || '';
 
-        // Записываем историю для связанного параметра как "синхронизация"
-        trackAutoFill(linkedMethodKey, newMethodName, linkedPreviousName || undefined);
+        if (newMethodName !== relatedPreviousName) {
+          // Записываем историю для связанного параметра как "синхронизация"
+          trackAutoFill(relatedMethodKey, newMethodName, relatedPreviousName || undefined);
+        }
       }
     }
   }
