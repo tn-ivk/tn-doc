@@ -122,20 +122,6 @@
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
             "UseShortFullNameForm": true
-          },
-          {
-            "Use": true,
-            "Id": 10,
-            "IdGroup": 3,
-            "F": "王",
-            "I": "华丽",
-            "O": "",
-            "Factory": "ООО Китай",
-            "Post": "Инженер",
-            "UseFullNameSeparator": false,
-            "UseFullNameWhiteSpace": false,
-            "UseShortFullNameForm": false,
-            "LicId": 6
           }
         ],
         "UsersGroup": [
