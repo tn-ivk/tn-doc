@@ -359,7 +359,7 @@ function getCurrentMethod(): MethodOption | undefined {
 }
 
 .col-name {
-  width: 400px;
+  width: 405px;
 }
 
 .col-method {
@@ -377,7 +377,7 @@ function getCurrentMethod(): MethodOption | undefined {
 }
 
 .col-result {
-  width: 170px;
+  width: 165px;
   text-align: center;
 }
 
