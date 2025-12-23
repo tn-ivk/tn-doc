@@ -8,7 +8,7 @@
             {
               'elis-filled': isElisFilled,
               'result-value--disabled': !canEdit,
-              'result-value--full-radius': !canEdit
+              'result-value--full-radius': !showEditButton
             }
           ]"
         >
@@ -23,10 +23,14 @@
 
       <!-- Кнопка редактирования справа от результата -->
       <button
-        v-if="canEdit"
+        v-if="showEditButton"
         class="edit-result-btn"
-        :class="{ 'edit-result-btn--elis': isElisFilled }"
+        :class="{
+          'edit-result-btn--elis': isElisFilled,
+          'edit-result-btn--disabled': !canEdit
+        }"
         type="button"
+        :disabled="!canEdit"
         @click="handleEditClick"
         title="Редактирование..."
       >
@@ -43,11 +47,14 @@ import type { PassportQualityParameter } from '@/types/passport.types';
 interface Props {
   parameter: PassportQualityParameter;
   canEdit: boolean;
+  showEditButton?: boolean;
   isElisFilled?: boolean;
   editDisabledReason?: string;
 }
 
 const props = defineProps<Props>();
+
+const showEditButton = computed(() => props.showEditButton ?? true);
 
 const emit = defineEmits<{
   'result-edit': [];
@@ -164,6 +171,13 @@ function handleEditClick() {
 .edit-result-btn:hover {
   background-color: rgba(0, 0, 0, 0.04) !important;
   color: var(--md-primary, #2f6fed) !important;
+}
+
+.edit-result-btn:disabled,
+.edit-result-btn:disabled:hover {
+  background-color: var(--md-surface-variant, #f1f3f4) !important;
+  color: var(--md-text-secondary, #5f6368) !important;
+  cursor: not-allowed;
 }
 
 .edit-result-btn:active {

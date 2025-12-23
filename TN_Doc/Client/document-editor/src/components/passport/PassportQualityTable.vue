@@ -64,6 +64,7 @@
     :visible="resultDialogVisible"
     :parameter-name="activeResultParameter?.name"
     :initial-value="activeResultParameter?.values.result || ''"
+    :measurement-value="activeResultParameter?.values.measurement || ''"
     @update:visible="handleResultDialogVisibility"
     @confirm="handleResultDialogConfirm"
   />
@@ -174,6 +175,10 @@ const activeManualMethodParameter = ref<PassportQualityParameter | null>(null);
 function handleResultEditRequest(event: { paramKey: string }) {
   const target = props.parameters.find(param => param.key === event.paramKey) || null;
   if (!target) {
+    return;
+  }
+  const measurementValue = target.values.measurement;
+  if (measurementValue === null || measurementValue === undefined || measurementValue.toString().trim() === '') {
     return;
   }
   activeResultParameter.value = target;

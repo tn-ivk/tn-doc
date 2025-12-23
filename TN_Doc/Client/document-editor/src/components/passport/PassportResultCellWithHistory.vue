@@ -2,6 +2,7 @@
   <PassportResultCell
     :parameter="parameter"
     :canEdit="canEdit"
+    :showEditButton="showEditButton"
     :isElisFilled="isElisFilled"
     :editDisabledReason="editDisabledReason"
     @result-edit="handleEditRequest"
@@ -60,7 +61,12 @@ const showHistoryIndicator = computed(() => {
   return lastSource.value !== DataSource.Unknown && lastSource.value !== DataSource.Auto;
 });
 
-/**
+const hasMeasurement = computed(() => {
+  const value = props.parameter.values.measurement;
+  return value !== null && value !== undefined && value.toString().trim() !== '';
+});
+
+/** 
  * Флаг ELIS-заполненности: определяется по последнему источнику в истории
  * ELIS и ReturnToELIS отображаются одинаково (зелёная подсветка)
  */
@@ -68,11 +74,15 @@ const isElisFilled = computed(() => {
   return lastSource.value === DataSource.ELIS || lastSource.value === DataSource.ReturnToELIS;
 });
 
-const canEdit = computed(() => props.isEditable);
+const canEdit = computed(() => props.isEditable && hasMeasurement.value);
+const showEditButton = computed(() => props.isEditable);
 
 const editDisabledReason = computed(() => {
   if (!props.isEditable) {
     return 'Балластный параметр синхронизируется с измерением';
+  }
+  if (!hasMeasurement.value) {
+    return 'Заполните измерение перед редактированием результата';
   }
   return '';
 });
