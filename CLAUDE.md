@@ -18,14 +18,10 @@ TN_Doc is an ASP.NET Core 8.0 web application for generating technical documents
 - ⚠️ **НИКОГДА** не добавлять "Co-Authored-By: Claude" или любые AI co-author теги
 - ⚠️ **ВСЕГДА** использовать русский язык для коммит-сообщений
 
-**Unreleased Changes (v1.4.4 in development):**
-- ✅ **Field History System** - tracking data source (ELIS/Manual/IVK) with visual indicators, requires `IsUsedElis=true`
-- ✅ **Master-Slave Parameters** - `SlaveKey` mechanism, slave parameters hidden and have `Legal=0`
-- ✅ **Linked Parameters** - `LinkedParameter` for shared method selection (both parameters visible)
-- ✅ **Decimal Normalization** - auto-normalize measurement/result decimals on load from DB using `RoundValue`
-- ✅ **All 48 libraries migrated** - `IDocumentEditor.SaveDocument` only, old `SaveDoc/GetEditDoc` removed
-- ✅ **Method dictionary warnings** - yellow border for methods not in `MethodOptions`
-- ⚠️ **Breaking**: HTML edit forms (DocEdit.html, EditDoc.js) marked OBSOLETE, removal planned for v2.0.0
+**Unreleased Changes (v1.4.4):** See [CHANGELOG.md](CHANGELOG.md) for full details.
+- ⚠️ **Field History System** - requires `IsUsedElis=true` in device config
+- ⚠️ **All 48 libraries migrated** to `IDocumentEditor.SaveDocument`
+- ⚠️ **Breaking**: HTML edit forms marked OBSOLETE, removal planned for v2.0.0
 
 ## Essential Commands
 
@@ -48,6 +44,11 @@ npm run dev:editor                              # Document Editor dev server (po
 npm run type-check                              # TypeScript type checking for all workspaces
 npm run clean                                   # Clean all node_modules
 
+# Working with individual npm workspace
+npm run dev --workspace=document-editor         # Dev server for specific workspace
+npm run build --workspace=statusbar             # Build only StatusBar
+npm run type-check --workspace=shared           # TypeCheck for shared only
+
 # Testing
 dotnet test                                     # Run all tests
 dotnet test --filter "ClassName=YourTestClass"  # Run specific test class
@@ -56,6 +57,18 @@ dotnet test --filter "Namespace~Poverka"        # Test Poverka libraries
 dotnet test --logger:"console;verbosity=detailed" # Verbose test output
 dotnet test /p:CollectCoverage=true             # Run tests with coverage
 ```
+
+## Quick File Paths Reference
+
+| Purpose | Path |
+|---------|------|
+| Main app config | `TN_Doc/Cfg/CfgApp.json` |
+| Passport edit configs | `TN_Doc/Cfg/Passport/CfgEditPassport*.json` |
+| FastReport templates | `TN_Doc/Doc/*.frx` |
+| Vue Document Editor | `TN_Doc/Client/document-editor/` |
+| IDocumentEditor interface | `tn.docgeneral/TN.DocGeneral/IDocumentEditor.cs` |
+| DI configuration | `TN_Doc/Startup.cs`, `TN_Doc/Extensions/` |
+| Logging config | `TN_Doc/nlog.config` |
 
 ## Branching Strategy
 
@@ -554,9 +567,11 @@ Vue 3 компонент для редактирования документо�
 | Linux permission issues | Ensure `alphadaemon` user has `/opt/TN_Doc/` access |
 | Logs not appearing | Check `nlog.config` and verify write permissions to logs directory |
 | Template not found | Verify `GetPathTemplateFile()` path and check `TN_Doc/Doc/` directory |
-| Field history not showing | Ensure `IsUsedElis = true` in device configuration (CfgApp.json) |
+| Field history not showing | Ensure `IsUsedElis = true` in device configuration (CfgApp.json), restart app |
 | Slave parameters visible | Check `SlaveKey` configuration in CfgEditPassport.json |
 | Method not in dictionary warning | Add method to `MethodOptions` in CfgEditPassport.json or update via Configurator |
+| Field not editable | Check `Edit = true` in config, verify not a slave parameter |
+| ELIS integration not working | Verify ELIS connector running, check SSL certs in CfgApp.json, review ELIS logs |
 
 ## Debugging and Troubleshooting
 
@@ -642,28 +657,6 @@ while($true) { Get-Process TN_Doc | Select-Object WS; Start-Sleep 5 }
 - Use Vue DevTools Performance tab
 - Check for unnecessary re-renders in table components
 - Verify v-for keys are unique and stable
-
-### Document Editor Issues
-
-**Field not editable:**
-- Check `Edit = true` in parameter configuration
-- Verify parameter not marked as slave (`SlaveKey` present in another parameter)
-- Check if field has `editable: false` in schema
-
-**Method not saving:**
-- Verify method exists in dictionary (`MethodOptions` in config)
-- Check browser console for validation errors
-- Ensure `IsUsedElis` matches between device and parameter config
-
-**History indicators missing:**
-- Verify `IsUsedElis = true` in CfgApp.json for device
-- Restart TN_Doc after config change
-- Check `__history` in save payload (Network tab)
-
-**ELIS integration not working:**
-- Verify ELIS connector is running and accessible
-- Check SSL certificate configuration in CfgApp.json
-- Review logs for ELIS-related errors: `grep ELIS logs/tn_doc.log`
 
 ## Multi-platform Support
 

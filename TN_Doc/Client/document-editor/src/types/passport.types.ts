@@ -49,6 +49,8 @@ export interface PassportQualityParameterSchema {
   methodSource?: MethodSource;
   /** Роль параметра в связке master-slave (Slave-параметры не заполняются из ELIS) */
   role?: ParameterRole;
+  /** Ключ зависимого (slave) параметра, если текущий параметр является master */
+  slaveKey?: string;
 
   /**
    * Ключ связанного параметра (для объединения методов испытаний).

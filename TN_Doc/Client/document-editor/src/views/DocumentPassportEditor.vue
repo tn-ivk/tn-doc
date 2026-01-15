@@ -129,7 +129,7 @@ import { useElisIntegration, findElisValue, createMethodFromElisData } from '@/c
 import { useFieldHistory } from '@/composables/useFieldHistory';
 import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
 import type { ElisPassportData, ElisParameter } from '@/types/elis.types';
-import type { PassportEditConfig, MethodOption } from '@/types/passport.types';
+import type { PassportEditConfig, MethodOption, PassportQualityParameterSchema } from '@/types/passport.types';
 import type { FormField, UserData } from '@/types/document.types';
 import {normalizeValue} from "@/utils/passport-utils.ts";
 
@@ -345,6 +345,56 @@ const buildDocumentPayload = (elisParam?: ElisParameter): string => {
   return JSON.stringify(payload);
 };
 
+const getMethodNameFromValue = (value: unknown): string => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const payload = value as Record<string, any>;
+    const nameValue = payload.Name ?? payload.name;
+    return nameValue ? nameValue.toString() : '';
+  }
+
+  const raw = value.toString().trim();
+  if (!raw) {
+    return '';
+  }
+
+  if (raw.startsWith('{') && raw.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(raw);
+      return getMethodNameFromValue(parsed);
+    } catch (error) {
+      logger.warn('[DocumentPassportEditor] parse method name failed', {
+        raw,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return raw.replace(/^"|"$/g, '');
+    }
+  }
+
+  return raw.replace(/^"|"$/g, '');
+};
+
+const collectRelatedMethodKeys = (
+  param: PassportQualityParameterSchema,
+  schemaKeys: Set<string>
+): string[] => {
+  const relatedKeys = new Set<string>();
+
+  if (param.linkedParameter && schemaKeys.has(param.linkedParameter)) {
+    relatedKeys.add(param.linkedParameter);
+  }
+
+  if (param.slaveKey && schemaKeys.has(param.slaveKey)) {
+    relatedKeys.add(param.slaveKey);
+  }
+
+  relatedKeys.delete(param.key);
+  return [...relatedKeys];
+};
+
 // Функция обработки данных ELIS
 const handleElisData = (elisData: ElisPassportData) => {
   // Проверить, что конфигурация загружена
@@ -455,6 +505,7 @@ const handleElisData = (elisData: ElisPassportData) => {
   if (store.config && store.config.docType === 'Passport') {
     const passportConfig = store.config as PassportEditConfig;
     const parametersSchema = passportConfig.qualityParametersSchema || [];
+    const schemaKeys = new Set(parametersSchema.map(param => param.key));
 
     if (parametersSchema.length === 0) {
       return;
@@ -486,6 +537,7 @@ const handleElisData = (elisData: ElisPassportData) => {
 
         // Поддержка как camelCase (roundValue), так и PascalCase (RoundValue) для совместимости с бэкендом
         const roundValue = param.roundValue ?? (param as any).RoundValue ?? 0;
+        const skipMethodFromElis = param.isLinkedFollower === true;
 
         // Заполнить measurement (value)
         if (elisParam.value !== undefined && elisParam.value !== null) {
@@ -535,51 +587,68 @@ const handleElisData = (elisData: ElisPassportData) => {
           trackElisMissing(resultKey, elisData.protocolNumber);
         }
 
-        // Создать метод испытаний из ELIS данных
-        if (elisParam.testMethodName) {
-          const elisMethod = createMethodFromElisData(elisParam);
-          if (elisMethod) {
+        if (!skipMethodFromElis) {
+          // Создать метод испытаний из ELIS данных
+          if (elisParam.testMethodName) {
+            const elisMethod = createMethodFromElisData(elisParam);
+            if (elisMethod) {
 
-            // Найти метод в списке доступных методов параметра
-            // param.methodOptions содержит MethodOption[] с названиями методов
-            let matchingMethod = param.methodOptions.find(
-              (method) => method.name === elisMethod.name
-            );
+              // Найти метод в списке доступных методов параметра
+              // param.methodOptions содержит MethodOption[] с названиями методов
+              let matchingMethod = param.methodOptions.find(
+                (method) => method.name === elisMethod.name
+              );
 
-            if (!matchingMethod) {
-              // Метод не найден - создаём новый MethodOption из ElisMethodData
-              // ВАЖНО: не добавляем в param.methodOptions, т.к. это бесполезно
-              // usePassportEditor автоматически добавит выбранный метод в список опций (строки 68-71)
-              const maxId = Math.max(0, ...param.methodOptions.map(m => m.id));
-              matchingMethod = {
-                id: maxId + 1,
-                use: true,
-                idParameter: param.id,
-                name: elisMethod.name,
-                isDefault: false,
-                limitValueActivate: !!elisMethod.limitValue,
-                limitValue: elisMethod.limitValue,
-                limitValueString: elisMethod.limitValueString
-              };
+              if (!matchingMethod) {
+                // Метод не найден - создаём новый MethodOption из ElisMethodData
+                // ВАЖНО: не добавляем в param.methodOptions, т.к. это бесполезно
+                // usePassportEditor автоматически добавит выбранный метод в список опций (строки 68-71)
+                const maxId = Math.max(0, ...param.methodOptions.map(m => m.id));
+                matchingMethod = {
+                  id: maxId + 1,
+                  use: true,
+                  idParameter: param.id,
+                  name: elisMethod.name,
+                  isDefault: false,
+                  limitValueActivate: !!elisMethod.limitValue,
+                  limitValue: elisMethod.limitValue,
+                  limitValueString: elisMethod.limitValueString
+                };
 
+              }
+
+              // Сохранить метод как JSON string (теперь ВСЕГДА заполняем)
+              const methodJson = JSON.stringify(matchingMethod);
+              updates[methodKey] = methodJson;
+              updates[`${methodKey}__elisFilled`] = true;
+              updates[`${methodKey}__elisOriginal`] = matchingMethod.name; // Сохраняем оригинал (name) для восстановления флага
+              updates[`${methodKey}__elisOption`] = matchingMethod; // Сохраняем полный объект метода для возврата к нему после выбора другого
+
+              // Создать запись истории для ELIS (сохраняем только name, а не весь объект)
+              trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
+
+              const relatedKeys = collectRelatedMethodKeys(param, schemaKeys);
+              for (const relatedKey of relatedKeys) {
+                const relatedMethodKey = `method.${relatedKey}`;
+                const previousMethodName = getMethodNameFromValue(store.formData[relatedMethodKey]);
+
+                updates[relatedMethodKey] = methodJson;
+                updates[`${relatedMethodKey}__elisFilled`] = false;
+                updates[`${relatedMethodKey}__elisOriginal`] = undefined;
+                updates[`${relatedMethodKey}__elisOption`] = undefined;
+
+                if (previousMethodName !== matchingMethod.name) {
+                  trackAutoFill(relatedMethodKey, matchingMethod.name, previousMethodName || undefined);
+                }
+              }
+            } else {
+              // Метод не удалось создать
+              trackElisMissing(methodKey, elisData.protocolNumber);
             }
-
-            // Сохранить метод как JSON string (теперь ВСЕГДА заполняем)
-            const methodJson = JSON.stringify(matchingMethod);
-            updates[methodKey] = methodJson;
-            updates[`${methodKey}__elisFilled`] = true;
-            updates[`${methodKey}__elisOriginal`] = matchingMethod.name; // Сохраняем оригинал (name) для восстановления флага
-            updates[`${methodKey}__elisOption`] = matchingMethod; // Сохраняем полный объект метода для возврата к нему после выбора другого
-
-            // Создать запись истории для ELIS (сохраняем только name, а не весь объект)
-            trackElisLoad(methodKey, matchingMethod.name, elisData.protocolNumber);
           } else {
-            // Метод не удалось создать
+            // method ожидалось, но не пришло
             trackElisMissing(methodKey, elisData.protocolNumber);
           }
-        } else {
-          // method ожидалось, но не пришло
-          trackElisMissing(methodKey, elisData.protocolNumber);
         }
 
         // Заполнить документ (LabDocumentInfo)
@@ -599,7 +668,9 @@ const handleElisData = (elisData: ElisPassportData) => {
       } else {
         // Параметр не найден в ELIS - все поля помечаем как missing
         trackElisMissing(valueKey, elisData.protocolNumber);
-        trackElisMissing(methodKey, elisData.protocolNumber);
+        if (!param.isLinkedFollower) {
+          trackElisMissing(methodKey, elisData.protocolNumber);
+        }
         trackElisMissing(documentKey, elisData.protocolNumber);
       }
     });

@@ -65,6 +65,7 @@ interface Props {
   visible: boolean;
   parameterName?: string;
   initialValue?: string;
+  measurementValue?: string;
 }
 
 const props = defineProps<Props>();
@@ -88,12 +89,40 @@ const normalizedNumber = computed(() => {
   return Number.isNaN(num) ? null : num;
 });
 
+const measurementNumber = computed(() => {
+  const raw = props.measurementValue;
+  if (raw === null || raw === undefined) {
+    return null;
+  }
+  const normalized = raw.toString().replace(',', '.').trim();
+  if (!normalized) {
+    return null;
+  }
+  const num = Number(normalized);
+  return Number.isNaN(num) ? null : num;
+});
+
+const measurementDisplay = computed(() => {
+  if (props.measurementValue === null || props.measurementValue === undefined) {
+    return '';
+  }
+  return props.measurementValue.toString().trim().replace('.', ',');
+});
+
 const validationError = computed(() => {
   if (!valueInput.value.trim()) {
     return 'Введите числовое значение';
   }
   if (normalizedNumber.value === null) {
     return 'Неверный формат числа';
+  }
+  if (measurementNumber.value !== null) {
+    if (operator.value === 'less' && normalizedNumber.value < measurementNumber.value) {
+      return `Значение должно быть не меньше ${measurementDisplay.value}`;
+    }
+    if (operator.value === 'greater' && normalizedNumber.value > measurementNumber.value) {
+      return `Значение должно быть не больше ${measurementDisplay.value}`;
+    }
   }
   return '';
 });

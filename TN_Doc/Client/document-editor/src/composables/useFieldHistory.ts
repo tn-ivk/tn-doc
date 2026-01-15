@@ -1,36 +1,19 @@
 import { useDocumentStore } from '@/stores/documentStore';
+import type { FormField } from '@/types/document.types';
 import { DataSource, type FieldHistoryEntry } from '@/types/history.types';
-
-/**
- * Нормализовать значение для сравнения
- * Приводит числа к единому формату (точка вместо запятой, удаляет лишние пробелы)
- */
-const normalizeValue = (value: any): string => {
-  if (value === null || value === undefined || value === '') {
-    return '';
-  }
-
-  const strValue = String(value).trim();
-
-  // Заменяем запятую на точку для чисел
-  const normalized = strValue.replace(',', '.');
-
-  // Если это число, проверяем что преобразование корректно
-  const numValue = parseFloat(normalized);
-  if (!isNaN(numValue)) {
-    // Возвращаем нормализованную строку с точкой
-    return normalized;
-  }
-
-  // Для нечисловых значений возвращаем оригинальную строку (без замены запятой)
-  return strValue;
-};
+import { normalizeForComparison, resolveFieldTypeForComparison } from '@/utils/field-compare-utils';
 
 /**
  * Композабл для работы с историей изменений полей
  */
 export function useFieldHistory() {
   const store = useDocumentStore();
+  const resolveFieldType = (fieldKey: string, fieldType?: FormField['type']) => {
+    if (fieldType) {
+      return fieldType;
+    }
+    return resolveFieldTypeForComparison(fieldKey, store.fields, store.config?.docType);
+  };
 
   /**
    * Константа автора вручную внесённых изменений
@@ -109,10 +92,15 @@ export function useFieldHistory() {
   /**
    * Отследить ручное изменение поля
    */
-  const trackManualChange = (fieldKey: string, newValue: any, previousValue?: any) => {
-    // Нормализуем значения для корректного сравнения (точка/запятая в числах)
-    const newValueNormalized = normalizeValue(newValue);
-    const previousValueNormalized = normalizeValue(previousValue);
+  const trackManualChange = (
+    fieldKey: string,
+    newValue: any,
+    previousValue?: any,
+    fieldType?: FormField['type']
+  ) => {
+    const compareType = resolveFieldType(fieldKey, fieldType);
+    const newValueNormalized = normalizeForComparison(compareType, newValue);
+    const previousValueNormalized = normalizeForComparison(compareType, previousValue);
 
     // Если нормализованные значения совпадают, не создаем запись в истории
     if (newValueNormalized === previousValueNormalized) {
@@ -188,9 +176,15 @@ export function useFieldHistory() {
   /**
    * Отследить возврат к оригинальному значению ELIS
    */
-  const trackReturnToElis = (fieldKey: string, newValue: any, previousValue?: any) => {
-    const newValueNormalized = normalizeValue(newValue);
-    const previousValueNormalized = normalizeValue(previousValue);
+  const trackReturnToElis = (
+    fieldKey: string,
+    newValue: any,
+    previousValue?: any,
+    fieldType?: FormField['type']
+  ) => {
+    const compareType = resolveFieldType(fieldKey, fieldType);
+    const newValueNormalized = normalizeForComparison(compareType, newValue);
+    const previousValueNormalized = normalizeForComparison(compareType, previousValue);
 
     if (newValueNormalized === previousValueNormalized) {
       return;
