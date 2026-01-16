@@ -1,6 +1,12 @@
+@using TN_Doc.Services
+@inject IViteManifestService ViteManifest
 @{
     ViewData["Title"] = "Конфигуратор настроек";
     Layout = null;
+
+    // Получаем пути к файлам из Vite manifest (с хэшами для cache busting)
+    var entryFile = ViteManifest.GetEntryFile("configurator") ?? "configurator.js";
+    var cssFile = ViteManifest.GetCssFile("configurator") ?? "configurator.css";
 }
 
 <!DOCTYPE html>
@@ -10,8 +16,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
 
-    <!-- Configurator styles -->
-    <link rel="stylesheet" href="~/configurator/configurator.css" asp-append-version="true" />
+    <!-- Configurator styles (путь из manifest с хэшем) -->
+    <link rel="stylesheet" href="~/configurator/@cssFile" />
 
     <style>
         html, body {
@@ -32,7 +38,7 @@
 <body>
     <div id="app"></div>
 
-    <!-- Configurator script -->
-    <script type="module" src="~/configurator/configurator.js" asp-append-version="true"></script>
+    <!-- Configurator script (путь из manifest с хэшем, БЕЗ asp-append-version) -->
+    <script type="module" src="~/configurator/@entryFile"></script>
 </body>
 </html>

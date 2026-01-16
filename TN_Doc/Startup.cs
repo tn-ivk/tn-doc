@@ -55,6 +55,7 @@ public class Startup
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
 		services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
+		services.AddViteManifest();
 		services.AddScoped<IConfigurationService, ConfigurationService>();
 		services.AddSingleton<AppClientTracker>();
 		services.AddControllersWithViews()

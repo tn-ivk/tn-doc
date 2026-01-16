@@ -1,0 +1,53 @@
+{
+  "../node_modules/primeicons/fonts/primeicons.eot": {
+    "file": "configurator.DMOk5skT.eot",
+    "src": "../node_modules/primeicons/fonts/primeicons.eot"
+  },
+  "../node_modules/primeicons/fonts/primeicons.svg": {
+    "file": "configurator.Dr5RGzOO.svg",
+    "src": "../node_modules/primeicons/fonts/primeicons.svg"
+  },
+  "../node_modules/primeicons/fonts/primeicons.ttf": {
+    "file": "configurator.MpK4pl85.ttf",
+    "src": "../node_modules/primeicons/fonts/primeicons.ttf"
+  },
+  "../node_modules/primeicons/fonts/primeicons.woff": {
+    "file": "configurator.WjwUDZjB.woff",
+    "src": "../node_modules/primeicons/fonts/primeicons.woff"
+  },
+  "../node_modules/primeicons/fonts/primeicons.woff2": {
+    "file": "configurator.C6QP2o4f.woff2",
+    "src": "../node_modules/primeicons/fonts/primeicons.woff2"
+  },
+  "src/components/visual-editors/PassportConfigEditor.vue": {
+    "file": "configurator.DZmGJE46.js",
+    "name": "PassportConfigEditor",
+    "src": "src/components/visual-editors/PassportConfigEditor.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts"
+    ],
+    "css": [
+      "configurator.DkprbYcX.css"
+    ]
+  },
+  "src/main.ts": {
+    "file": "configurator.BJ7jPLOK.js",
+    "name": "main",
+    "src": "src/main.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "src/components/visual-editors/PassportConfigEditor.vue"
+    ],
+    "css": [
+      "configurator.CObmrcoR.css"
+    ],
+    "assets": [
+      "configurator.DMOk5skT.eot",
+      "configurator.C6QP2o4f.woff2",
+      "configurator.WjwUDZjB.woff",
+      "configurator.MpK4pl85.ttf",
+      "configurator.Dr5RGzOO.svg"
+    ]
+  }
+}

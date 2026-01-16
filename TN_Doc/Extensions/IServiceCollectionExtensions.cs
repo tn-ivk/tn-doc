@@ -68,6 +68,12 @@ public static class ServiceCollectionExtensions
 	public static void AddConfigurationCache(this IServiceCollection services) => services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
 
 	/// <summary>
+	/// Добавление сервиса для чтения Vite manifest (получение путей к собранным файлам с хэшами)
+	/// </summary>
+	/// <param name="services">Коллекция сервисов</param>
+	public static void AddViteManifest(this IServiceCollection services) => services.AddSingleton<IViteManifestService, ViteManifestService>();
+
+	/// <summary>
 	/// Сбор информации о приложение
 	/// </summary>
 	/// <param name="services">Коллекция сервисов</param>
