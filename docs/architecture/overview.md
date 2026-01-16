@@ -4,16 +4,15 @@
 
 TN_Doc построен на основе многослойной архитектуры с четким разделением ответственности между компонентами.
 
-**Текущая версия**: 1.4.4 (в разработке)
+**Текущая версия**: 1.4.3 (релиз), 1.4.4 (в разработке)
 **Основные компоненты**: ASP.NET Core 8.0 backend + Vue 3 frontend (StatusBar, Configurator, Document Editor)
 
-**Ключевые нововведения v1.4.4**:
-- ✅ **Рефакторинг архитектуры DocPassport** - разделение на partial классы для улучшения структуры кода
-- ✅ **Оптимизация обработки обновлений** - выделение сервисов DocUpdate в отдельные компоненты
-- ✅ **Разнесение сервисов Poverka** - улучшение архитектуры модулей поверки
-- ✅ **Рефакторинг HomeController** - переход на IDocModuleLoader для динамической загрузки модулей
-- 🚧 **Document Editor в production** - редактирование паспортов качества с модальными окнами
-- 🚧 **Система истории изменений полей** - визуальные индикаторы источника данных (ELIS, Manual, IVK)
+**Ключевые нововведения v1.4.4 (в разработке)**:
+- ✅ **Document Editor (Vue SPA)** для редактирования документов, HTML-формы помечены как устаревшие
+- ✅ **Система истории изменений полей** (при включенном ELIS)
+- ✅ **Master-Slave и LinkedParameter** в конфигурации паспорта качества
+- ✅ **Миграция библиотек на `IDocumentEditor.SaveDocument`**
+- ✅ **Рефакторинг DocPassport** (partial классы, переработка DocUpdate)
 
 **Завершено в v1.4.3**:
 - Централизация цветов через CSS переменные (material3.css)
@@ -106,11 +105,11 @@ graph TB
   - Dev server: port 5174
   - Build output: `wwwroot/configurator/`
   - Вкладки: General, Devices, Documents, OPC Connections, ELIS Connections
-- **Document Editor** (`TN_Doc/Client/document-editor/`) - редактирование паспортов качества
+- **Document Editor** (`TN_Doc/Client/document-editor/`) - редактирование паспортов качества и актов
   - Framework: Vue 3 + TypeScript + PrimeVue
-  - Dev server: port 5174
+  - Dev server: port 5174 (общий с Configurator)
   - Build output: `wwwroot/document-editor/`
-  - Функции: ELIS интеграция, OPC связь, автозаполнение параметров, история изменений полей
+  - Функции: ELIS автозаполнение (postMessage), история изменений полей, master/slave и linked параметры
 
 **Ответственность:**
 - Обработка HTTP запросов
@@ -418,60 +417,38 @@ sequenceDiagram
     participant DocModuleLoader
     participant DocModule as DocPassport (DLL)
     participant DB as MySQL DataARM
-    participant OPC as OPC Server
-    participant ELIS as ELIS System
+    participant Parent as Parent Window (ELIS)
 
     User->>Editor: Открыть документ для редактирования
-    Editor->>API: GET /api/documents/{deviceId}/Passport/edit/{id}
-    API->>DocModuleLoader: LoadDocsModule(options, deviceId, IdDoc.Passport, baseDir)
-    DocModuleLoader->>DocModuleLoader: Assembly.LoadFrom(dllPath)
-    DocModuleLoader-->>API: DocPassport Instance
-    API->>API: Проверить, что doc реализует IDocumentEditor
+    Editor->>API: GET /api/documents/{deviceId}/{docType}/edit/{id}
+    API->>DocModuleLoader: LoadDocsModule(options, deviceId, IdDoc, baseDir)
+    DocModuleLoader-->>API: DocGeneral Instance
     API->>DocModule: GetEditConfig(id)
-    DocModule->>DB: SELECT DataARM с FieldHistoryMap
-    DB-->>DocModule: JSON данные + история
-    DocModule-->>API: EditConfig (schema + initialValues + __history)
-    API-->>Editor: Конфигурация формы + история
+    DocModule->>DB: SELECT DataARM + FieldHistoryMap
+    DocModule-->>API: DocumentEditConfig (initialValues + __history)
+    API-->>Editor: Конфигурация формы
 
-    Editor->>Editor: Отобразить поля с индикаторами истории
+    Editor->>Editor: Отобразить поля и индикаторы истории
 
-    User->>Editor: Запрос данных ELIS
-    Editor->>API: POST /api/elis/fetch
-    API->>ELIS: HTTP запрос к ELIS API
-    ELIS-->>API: Лабораторные данные
-    API->>Editor: ELIS данные
-    Editor->>Editor: Автозаполнение полей (Source=ELIS)
-    Editor->>Editor: Обновить историю полей (trackElisChange)
+    Parent-->>Editor: postMessage { type: 'ELIS_DATA', payload }
+    Editor->>Editor: Автозаполнение полей и истории (trackElisLoad)
 
     User->>Editor: Изменить поле вручную
     Editor->>Editor: trackManualChange(fieldKey, value)
-    Editor->>Editor: Добавить запись в formHistory (Source=Manual)
-    Editor->>Editor: Обновить визуальный индикатор
-
-    User->>Editor: Автозаполнение зависимых параметров
-    Editor->>API: POST /api/opc/read
-    API->>OPC: Чтение тегов OPC
-    OPC-->>API: Значения тегов
-    API-->>Editor: Данные измерений
-    Editor->>Editor: Заполнить зависимые поля (Source=IVK)
-    Editor->>Editor: Обновить историю полей (trackIvkChange)
 
     User->>Editor: Сохранить документ
-    Editor->>API: POST /api/documents/{deviceId}/Passport/save/{id}
+    Editor->>API: POST /api/documents/{deviceId}/{docType}/save/{id}
     Note over Editor,API: payload включает __history
-    API->>DocModuleLoader: LoadDocsModule()
-    DocModuleLoader-->>API: DocPassport Instance
     API->>DocModule: SaveDocument(id, values)
-    DocModule->>DocModule: Преобразовать в CorrectionData
     DocModule->>DB: UPDATE DataARM.FieldHistoryMap
-    Note over DocModule,DB: FIFO: макс 10 записей на поле
-    DB-->>DocModule: Success
     DocModule-->>API: true
     API-->>Editor: {success: true}
 
-    User->>Editor: Наведение на индикатор истории
-    Editor->>Editor: Показать FieldHistoryPopup
-    Editor-->>User: История изменений (до 10 записей)
+    User->>Editor: Обновить паспорт после подтверждения от ИВК
+    Editor->>API: POST /api/documents/{deviceId}/Passport/update/{id}
+    API->>DocModule: DocUpdate(id, values)
+    DocModule->>DB: UPDATE DataARM
+    API-->>Editor: {success: true}
 ```
 
 ## Module Loading Architecture
@@ -654,7 +631,7 @@ graph TB
 Система отслеживания истории изменений полей паспорта качества для аудита источников данных.
 
 **Требования:**
-- ⚠️ **Требует включенного ELIS** в конфигурации (`CfgApp.json`: `IsUsedElis = true`)
+- ⚠️ **Требует включенного ELIS** в конфигурации (`CfgApp.json`: `Elis.Use = true`)
 - Работает с паспортами качества (Passport document type)
 - История хранится в поле `FieldHistoryMap` таблицы `DataARM` (JSON)
 - Максимум 10 записей на поле (FIFO очередь)
@@ -663,7 +640,6 @@ graph TB
 graph TB
     subgraph "Frontend - Vue Components"
         FieldIndicator[FieldHistoryIndicator.vue]
-        HistoryPopup[FieldHistoryPopup.vue]
         FieldWrapper[FormFieldWithHistory.vue]
         MeasurementInput[PassportMeasurementInputWithHistory.vue]
         MethodSelect[PassportMethodSelectWithHistory.vue]
@@ -687,7 +663,6 @@ graph TB
     end
 
     FieldWrapper --> FieldIndicator
-    FieldWrapper --> HistoryPopup
     MeasurementInput --> FieldIndicator
     MethodSelect --> FieldIndicator
     ResultCell --> FieldIndicator
@@ -715,6 +690,10 @@ classDiagram
         ELIS
         Manual
         IVK
+        ElisMissing
+        Auto
+        ReturnToELIS
+        DefaultMethod
     }
 
     class FieldHistoryEntry {
@@ -770,8 +749,8 @@ sequenceDiagram
     Store->>Vue: Отобразить индикаторы
 
     User->>Vue: Наводит на индикатор
-    Vue->>Vue: Показать FieldHistoryPopup
-    Vue-->>User: История изменений (до 10 записей)
+    Vue->>Vue: Показать tooltip с источником данных
+    Vue-->>User: Краткое описание источника
 ```
 
 ### Ключи истории для разных полей
@@ -816,13 +795,7 @@ graph TB
 - Отображает последний источник изменения
 - Цвета: ELIS (зелёный #4CAF50), Manual (синий #2196F3), IVK (оранжевый #FF9800)
 - Позиция: правый верхний угол поля (absolute, top: 4px, right: 4px)
-- Триггер popup: hover на индикаторе
-
-**FieldHistoryPopup (max 400px height):**
-- PrimeVue OverlayPanel с прокруткой
-- История изменений: последнее изменение сверху
-- Формат: Источник + Дата/время + Старое → Новое значение
-- Закрытие: клик вне области, ESC
+- Подсказка отображается через `v-tooltip` (краткое описание источника)
 
 ### Миграция из ElisFilled
 
@@ -881,20 +854,19 @@ if (labInfo.ElisFilled && !dataArm.FieldHistoryMap.ContainsKey($"value.{paramete
 - ✅ **Улучшение HomeController** - использование IDocModuleLoader для унифицированной загрузки модулей
 
 **Document Editor:**
-- 🚧 Полнофункциональный редактор паспортов качества (Vue 3 SPA)
+- ✅ Редактор паспортов качества и актов (Vue 3 SPA)
 - ✅ Модальные окна для редактирования результатов и методов (ResultEditDialog, ManualMethodDialog)
-- ✅ Компоненты с историей изменений (FieldHistoryIndicator, FieldHistoryPopup)
-- 🚧 ELIS интеграция для автоматического получения лабораторных данных
-- 🚧 OPC связь для чтения данных измерений в реальном времени
-- 🚧 Автозаполнение зависимых параметров на основе выбранных значений
+- ✅ Компоненты с историей изменений (FieldHistoryIndicator + tooltip)
+- ✅ ELIS автозаполнение через postMessage
+- ✅ Автозаполнение связанных параметров (LinkedParameter/SlaveKey)
 
 **Система истории изменений полей:**
 - Отслеживание источника данных (ELIS, ручное редактирование, округление ИВК)
 - Визуальные индикаторы источников в UI (цветные значки: зелёный/синий/оранжевый)
-- Детальная история изменений в popup окне (до 10 записей на поле)
+- История хранится в `FieldHistoryMap` (до 10 записей на поле)
 - Автоматическая миграция из старого флага `ElisFilled`
 - Раздельная история для value/method/result/document полей
-- ⚠️ Требует включенного ELIS в конфигурации (`IsUsedElis = true`)
+- ⚠️ Требует включенного ELIS в конфигурации (`Elis.Use = true`)
 
 **Configurator Enhancements:**
 - Добавлена вкладка Documents - управление конфигурацией типов документов

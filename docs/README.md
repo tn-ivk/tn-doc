@@ -7,6 +7,7 @@
 - **Начало работы**: [development/setup.md](development/setup.md)
 - **Сборка проекта**: [development/building.md](development/building.md)
 - **Архитектура системы**: [architecture/overview.md](architecture/overview.md)
+- **Основные правила проекта**: [../CLAUDE.md](../CLAUDE.md)
 
 ## Содержание по категориям
 
@@ -18,7 +19,7 @@
 - **[document-modules.md](architecture/document-modules.md)** - Система модулей документов
 - **[statusbar.md](architecture/statusbar.md)** - Архитектура компонента мониторинга состояния
 - **[configurator.md](architecture/configurator.md)** - Архитектура конфигуратора
-- **[document-editor.md](architecture/document-editor.md)** - Архитектура редактора документов (в разработке)
+- **[document-editor.md](architecture/document-editor.md)** - Архитектура редактора документов (Vue SPA)
 - **[passport-editor.md](architecture/passport-editor.md)** - Логика отображения/редактирования/сохранения паспорта качества (Vue + DocPassport)
 
 ### 👨‍💻 Development (Разработка)
@@ -150,5 +151,5 @@
 
 ---
 
-_Последнее обновление: 2025-01-21_
+_Последнее обновление: 2026-01-16_
 _Версия проекта: 1.4.3_

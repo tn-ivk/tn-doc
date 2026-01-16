@@ -330,9 +330,9 @@ code --install-extension dbaeumer.vscode-eslint
 ## Настройка Vue компонентов (npm workspaces)
 
 TN_Doc использует npm workspaces для управления тремя Vue 3 компонентами:
-- **statusbar** - мониторинг состояния системы в реальном времени (production)
-- **configurator** - веб-интерфейс управления конфигурацией (production)
-- **document-editor** - редактор документов в браузере (production с v1.4.4+)
+- **statusbar** - мониторинг состояния системы в реальном времени
+- **configurator** - веб-интерфейс управления конфигурацией
+- **document-editor** - редактор документов в браузере (активная разработка)
 
 ### Установка зависимостей
 
@@ -360,6 +360,9 @@ npm run dev:configurator
 
 # Или запустить Document Editor dev сервер (порт 5174)
 npm run dev:editor
+
+# Важно: Configurator и Document Editor используют один порт (5174).
+# Запускайте их по очереди или измените port в соответствующем vite.config.ts.
 
 # В другом терминале запустить основное приложение
 cd ..
@@ -564,6 +567,9 @@ npm run dev:configurator
 # Document Editor - порт 5174
 npm run dev:editor
 
+# Важно: Configurator и Document Editor используют один порт (5174).
+# Запускайте их по очереди или измените port в соответствующем vite.config.ts.
+
 # Проверьте, что ASP.NET Core app настроен на проксирование запросов к Vite dev server
 ```
 
@@ -600,8 +606,8 @@ import { logger } from '@/shared/logger';
 |---------|----------|
 | `npm install` | Установить зависимости для всех workspaces |
 | `npm run dev` | Запустить StatusBar dev server (порт 5173) |
-| `npm run dev:configurator` | Запустить Configurator dev server (порт 5174) |
-| `npm run dev:editor` | Запустить Document Editor dev server (порт 5174) |
+| `npm run dev:configurator` | Запустить Configurator dev server (порт 5174, общий с Document Editor) |
+| `npm run dev:editor` | Запустить Document Editor dev server (порт 5174, общий с Configurator) |
 | `npm run build:all` | Собрать все компоненты |
 | `npm run build` | Собрать только StatusBar |
 | `npm run build:configurator` | Собрать только Configurator |
@@ -627,9 +633,10 @@ import { logger } from '@/shared/logger';
 ## Следующие шаги
 
 - [Сборка проекта](building.md)
-- [Тестирование](testing.md)
-- [Coding Standards](coding-standards.md)
-- [Contributing Guide](contributing.md)
+- [Архитектура системы](../architecture/overview.md)
+- [Конфигурация паспорта](../configs/passport.md)
+- [История изменений полей](../features/field-history.md)
+- [Логи и эксплуатация](../operations/logging.md)
 
 ## См. также
 

@@ -4,10 +4,10 @@
 
 Система генерации документов построена на основе модульной архитектуры с использованием паттерна **Factory** и динамической загрузки модулей.
 
-**Версия документации:** v1.4.4 (в разработке)
-**Актуально на:** Ноябрь 2025
+**Версия документации:** v1.4.3 (релиз) / v1.4.4 (в разработке)
+**Актуально на:** 2026-01-16
 
-### Текущая версия (v1.4.4 - в разработке)
+### Текущая версия (v1.4.3 релиз, v1.4.4 в разработке)
 
 **Архитектурные улучшения:**
 - ✅ **Partial Classes для DocPassport** - улучшенная организация кода
@@ -16,7 +16,7 @@
 
 Система использует единый подход:
 - **IDocumentEditor** с `GetEditConfig()`/`SaveDocument()` для Vue Document Editor
-- ⚠️ **Устаревшие методы удалены в v1.4.4**: `GetEditDoc()`, `SaveDoc()`, `SetDocFromJson()`
+- ⚠️ **Legacy методы считаются устаревшими**: `GetEditDoc()`, `SaveDoc()`, `SetDocFromJson()`
 
 ### Архитектура partial классов (v1.4.4+)
 
@@ -80,7 +80,7 @@ graph TB
    - Визуальные индикаторы в UI (цветные badges)
    - Раздельная история для value/method/result/document полей
    - Автоматическая миграция из старого флага `ElisFilled`
-   - Требует включенного ELIS (`IsUsedElis = true`)
+   - Требует включенного ELIS (`Elis.Use = true`)
 
 5. **Исправление дублирования LabInfo** (см. [passport-labinfo-fix.md](../passport-labinfo-fix.md)):
    - Устранено тройное дублирование данных для каждого параметра качества
@@ -1223,7 +1223,7 @@ flowchart LR
 - `useFieldHistory.ts` композабл для работы с историей:
   - `trackManualChange(fieldKey, newValue, oldValue)` - запись ручного изменения
   - `trackElisLoad(fieldKey, elisValue, protocolNumber)` - запись загрузки из ELIS
-  - `trackIvkRounding(fieldKey, roundedValue, originalValue)` - запись округления ИВК
+  - `trackIVKRounding(fieldKey, roundedValue, originalValue)` - запись округления ИВК
   - `getFieldHistory(fieldKey)` - получение истории поля
   - `getLastSource(fieldKey)` - получение последнего источника
 - `FieldHistoryIndicator.vue` - индикатор источника (14-16px badge):
@@ -1231,17 +1231,13 @@ flowchart LR
   - 🔵 Manual - синий badge
   - 🟡 IVK - желтый badge
   - ⚪ Unknown - серый badge
-- `FieldHistoryPopup.vue` - popup с детальной историей (PrimeVue OverlayPanel):
-  - Показывает до 10 последних изменений
-  - Отображает дату/время, источник, пользователя
-  - Показывает старое → новое значение
-  - Включает комментарии к изменениям
+- Подсказка источника отображается через tooltip
 - `FormFieldWithHistory.vue` - обёртка для AdditionalInfo полей
 - Специальные компоненты для таблицы параметров качества:
   - `PassportMeasurementInputWithHistory.vue` (для value.*)
   - `PassportMethodSelectWithHistory.vue` (для method.*)
   - `PassportResultCellWithHistory.vue` (для result.*)
-  - `PassportDocumentCellWithHistory.vue` (для document.*)
+  - `PassportDocumentField.vue` (для document.*)
 
 **Раздельные ключи истории:**
 - **AdditionalInfo**: прямые ключи без префиксов

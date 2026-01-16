@@ -790,7 +790,7 @@ public static bool IsEqualAsString(this double a, double b, int decimals)
 `DocPassportUpdatePayloadService` (`tn.docgeneral/Passport/Service/DocPassportUpdatePayloadService.cs`):
 
 - извлекает `__elisProtocol` и десериализует в `QualityPassport`
-- извлекает `__history` (только если `IsUsedElis=true`)
+- извлекает `__history` (только если ELIS включен, `Elis.Use = true`)
 - строит `CorrectionData` через `BuildCorrectionData(id, values, historyFromFrontend)`
 
 ### Обработка DataARM и истории
@@ -809,7 +809,7 @@ public static bool IsEqualAsString(this double a, double b, int decimals)
 
 ## Граничные условия и наблюдения (как есть в коде)
 
-- История изменений работает только при `IsUsedElis=true` (на фронте индикаторы/загрузка истории, на бэке сохранение/мерж).
+- История изменений работает только при включенном ELIS (`Elis.Use = true`) на фронте и бэке.
 - Двухэтапное сохранение: без вызова `POST .../update/{id}` (нет OPC параметров или polling timeout) история и ELIS протокол могут не сохраниться/не обновиться.
 - Slave‑параметры:
   - не показываются в таблице,
