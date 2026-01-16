@@ -16,21 +16,11 @@ public class LinuxSystemJournalService : ISystemJournalService
     private const int TimeoutMs = 500;
 
     private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-    private readonly bool _loggerAvailable;
-
-    public LinuxSystemJournalService()
-    {
-        _loggerAvailable = CheckLoggerAvailability();
-        if (!_loggerAvailable)
-        {
-            _logger.Warn("Команда 'logger' недоступна в системе, запись в syslog отключена");
-        }
-    }
 
     /// <inheritdoc />
     public void WriteError(string message, string? source = null)
     {
-        if (string.IsNullOrEmpty(message) || !_loggerAvailable)
+        if (string.IsNullOrEmpty(message))
             return;
 
         var tag = string.IsNullOrEmpty(source) ? DefaultTag : $"{DefaultTag}:{source}";
@@ -79,41 +69,6 @@ public class LinuxSystemJournalService : ISystemJournalService
         catch (Exception ex)
         {
             _logger.Warn(ex, "Не удалось записать в syslog: {Message}", message);
-        }
-    }
-
-    private bool CheckLoggerAvailability()
-    {
-        try
-        {
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "logger",
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                }
-            };
-
-            process.StartInfo.ArgumentList.Add("--version");
-
-            process.Start();
-            var completed = process.WaitForExit(1000);
-
-            if (!completed)
-            {
-                try { process.Kill(); } catch { /* Игнорируем ошибки при завершении процесса */ }
-                return false;
-            }
-
-            return process.ExitCode == 0;
-        }
-        catch
-        {
-            // FileNotFoundException или Win32Exception если logger не найден
-            return false;
         }
     }
 }
