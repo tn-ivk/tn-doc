@@ -57,18 +57,18 @@ public class LinuxSystemJournalService : ISystemJournalService
 
             if (!completed)
             {
-                _logger.Warn("Таймаут записи в syslog для сообщения: {Message}", message);
+                _logger.Error("Таймаут записи в syslog для сообщения: {Message}", message);
                 try { process.Kill(); } catch { /* Игнорируем ошибки при завершении процесса */ }
             }
             else if (process.ExitCode != 0)
             {
                 var error = process.StandardError.ReadToEnd();
-                _logger.Warn("Ошибка записи в syslog (код {ExitCode}): {Error}", process.ExitCode, error);
+                _logger.Error("Ошибка записи в syslog (код {ExitCode}): {Error}", process.ExitCode, error);
             }
         }
         catch (Exception ex)
         {
-            _logger.Warn(ex, "Не удалось записать в syslog: {Message}", message);
+            _logger.Error(ex, "Не удалось записать в syslog: {Message}", message);
         }
     }
 }

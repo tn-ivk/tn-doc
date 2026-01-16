@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,13 +42,10 @@ public class ElisController : Controller
             ("ASN1 coorupted data", "Подпись была повреждена и является не читаемой"),
             ("CompCode", "Ошибки связанные с сетевыми настройками и подключения к очереди IBMMQ"),
         };
-        foreach (var item in errPatterns)
+        foreach (var item in errPatterns.Where(item => Regex.IsMatch(msg, item.pattern, RegexOptions.IgnoreCase)))
         {
-            if (Regex.IsMatch(msg, item.pattern, RegexOptions.IgnoreCase))
-            {
-                msg += ". " + item.description;
-                break;
-            }
+            msg += ". " + item.description;
+            break;
         }    
         _logger.LogError(msg);
         _systemJournal.WriteError(msg, "ELIS");
