@@ -122,7 +122,7 @@ namespace FastReport
 
         // Insert Columns for Volumes  (V0) &amp; fill them headers with text
         int indexColTemplate = ColumnTemplate.Index;
-        for (int i=1; i&lt;listShiftsData.Count; i++) 
+        for (int i=1; i&lt;shiftCount; i++)
         {
           TableAct.Columns.Insert(indexColTemplate+1, new TableColumn());
           
@@ -137,7 +137,7 @@ namespace FastReport
         }
             
         // Span Columns
-        TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
+        TableAct[indexColTemplate,0].ColSpan=shiftCount;
             
         // Fill TableAct with data
         for (int i = 0, j = 0; i &lt; (listShiftsData.Count); i++)
