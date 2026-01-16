@@ -33,15 +33,13 @@ public class LinuxSystemJournalService : ISystemJournalService
     {
         try
         {
-            using var process = new Process
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "logger",
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                }
+                FileName = "logger",
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                CreateNoWindow = true
             };
 
             // ArgumentList безопасно передаёт аргументы без shell-интерпретации
