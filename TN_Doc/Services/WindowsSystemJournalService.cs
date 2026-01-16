@@ -11,18 +11,11 @@ namespace TN_Doc.Services;
 [SupportedOSPlatform("windows")]
 public class WindowsSystemJournalService : ISystemJournalService
 {
-    private const string DefaultSource = "TN_Doc";
-    private const string FallbackSource = ".NET Runtime";
+    private const string Source = ".NET Runtime";
     private const int EventId = 1000;
     private const short Category = 1;
 
     private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-    private readonly string _effectiveSource;
-
-    public WindowsSystemJournalService()
-    {
-        _effectiveSource = DetermineEffectiveSource();
-    }
 
     /// <inheritdoc />
     public void WriteError(string message, string? source = null)
@@ -34,7 +27,7 @@ public class WindowsSystemJournalService : ISystemJournalService
 
         try
         {
-            EventLog.WriteEntry(_effectiveSource, formattedMessage, EventLogEntryType.Error, EventId, Category);
+            EventLog.WriteEntry(Source, formattedMessage, EventLogEntryType.Error, EventId, Category);
         }
         catch (Exception ex)
         {
@@ -47,26 +40,5 @@ public class WindowsSystemJournalService : ISystemJournalService
         return string.IsNullOrEmpty(source)
             ? message
             : $"[{source}] {message}";
-    }
-
-    private string DetermineEffectiveSource()
-    {
-        try
-        {
-            if (EventLog.SourceExists(DefaultSource))
-            {
-                return DefaultSource;
-            }
-
-            // Попытка создать источник (требует права администратора)
-            EventLog.CreateEventSource(DefaultSource, "Application");
-            return DefaultSource;
-        }
-        catch (Exception ex)
-        {
-            _logger.Debug(ex, "Не удалось создать источник '{Source}' в Event Log, используется fallback '{Fallback}'",
-                DefaultSource, FallbackSource);
-            return FallbackSource;
-        }
     }
 }
