@@ -34,6 +34,22 @@ public static class ServiceCollectionExtensions
 	}
 
 	/// <summary>
+	/// Добавление сервиса записи в системный журнал ОС
+	/// </summary>
+	/// <param name="services">Коллекция сервисов</param>
+	/// <remarks>
+	/// Windows: использует Windows Event Log
+	/// Linux: использует syslog через команду logger
+	/// </remarks>
+	public static void AddSystemJournal(this IServiceCollection services)
+	{
+		if (IsWindows)
+			services.AddSingleton<ISystemJournalService, WindowsSystemJournalService>();
+		else
+			services.AddSingleton<ISystemJournalService, LinuxSystemJournalService>();
+	}
+
+	/// <summary>
 	/// Добавления сервиса взаимодействия с принтерами печати
 	/// </summary>
 	/// <param name="services">Коллекция сервисов</param>

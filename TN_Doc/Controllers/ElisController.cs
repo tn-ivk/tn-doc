@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using TN_Doc.Services;
 
 namespace TN_Doc.Controllers;
 
@@ -13,10 +14,12 @@ namespace TN_Doc.Controllers;
 public class ElisController : Controller
 {
     private readonly ILogger<ElisController> _logger;
-    
-    public ElisController(ILogger<ElisController> logger)
+    private readonly ISystemJournalService _systemJournal;
+
+    public ElisController(ILogger<ElisController> logger, ISystemJournalService systemJournal)
     {
         _logger = logger;
+        _systemJournal = systemJournal;
     }
     
     /// <summary>
@@ -47,15 +50,15 @@ public class ElisController : Controller
                 break;
             }
         }    
-        _logger.LogError(msg);   
-        //EventLog.WriteEntry($".NET Runtime", msg, EventLogEntryType.Error, 1000, 1);
+        _logger.LogError(msg);
+        _systemJournal.WriteError(msg, "ELIS");
     }
-    
+
     public void WarnMessage(string msg)
     {
         if (string.IsNullOrEmpty(msg))
             return;
-        
+
         _logger.LogWarning(msg);
     }
 }
