@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using System.Threading;
 using System.Threading.Tasks;
 using NLog;
 
@@ -15,9 +14,6 @@ public class LinuxSystemJournalService : ISystemJournalService
 {
     private const string DefaultTag = "TN_Doc";
     private const int TimeoutMs = 500;
-    private const int MaxConcurrentWrites = 3;
-
-    private static readonly SemaphoreSlim WriteSemaphore = new(MaxConcurrentWrites);
 
     private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
     private readonly bool _loggerAvailable;
@@ -37,27 +33,10 @@ public class LinuxSystemJournalService : ISystemJournalService
         if (string.IsNullOrEmpty(message) || !_loggerAvailable)
             return;
 
-        // Не блокируем, если лимит одновременных операций исчерпан
-        if (!WriteSemaphore.Wait(0))
-        {
-            _logger.Debug("Пропущена запись в syslog: превышен лимит одновременных операций");
-            return;
-        }
-
         var tag = string.IsNullOrEmpty(source) ? DefaultTag : $"{DefaultTag}:{source}";
 
         // Fire-and-forget: не блокируем HTTP-запрос
-        Task.Run(() =>
-        {
-            try
-            {
-                WriteToSyslog(message, tag);
-            }
-            finally
-            {
-                WriteSemaphore.Release();
-            }
-        });
+        Task.Run(() => WriteToSyslog(message, tag));
     }
 
     private void WriteToSyslog(string message, string tag)
