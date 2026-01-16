@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using System.Text;
+using System.Threading.Tasks;
 using NLog;
 
 namespace TN_Doc.Services;
@@ -13,7 +13,7 @@ namespace TN_Doc.Services;
 public class LinuxSystemJournalService : ISystemJournalService
 {
     private const string DefaultTag = "TN_Doc";
-    private const int TimeoutMs = 5000;
+    private const int TimeoutMs = 500;
 
     private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
     private readonly bool _loggerAvailable;
@@ -34,8 +34,13 @@ public class LinuxSystemJournalService : ISystemJournalService
             return;
 
         var tag = string.IsNullOrEmpty(source) ? DefaultTag : $"{DefaultTag}:{source}";
-        var escapedMessage = EscapeShellArgument(message);
 
+        // Fire-and-forget: не блокируем HTTP-запрос
+        Task.Run(() => WriteToSyslogAsync(message, tag));
+    }
+
+    private void WriteToSyslogAsync(string message, string tag)
+    {
         try
         {
             using var process = new Process
@@ -43,13 +48,20 @@ public class LinuxSystemJournalService : ISystemJournalService
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "logger",
-                    Arguments = $"-p user.err -t {tag} {escapedMessage}",
+                    UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    UseShellExecute = false,
                     CreateNoWindow = true
                 }
             };
+
+            // ArgumentList безопасно передаёт аргументы без shell-интерпретации
+            process.StartInfo.ArgumentList.Add("-p");
+            process.StartInfo.ArgumentList.Add("user.err");
+            process.StartInfo.ArgumentList.Add("-t");
+            process.StartInfo.ArgumentList.Add(tag);
+            process.StartInfo.ArgumentList.Add("--");
+            process.StartInfo.ArgumentList.Add(message);
 
             process.Start();
             var completed = process.WaitForExit(TimeoutMs);
@@ -71,31 +83,6 @@ public class LinuxSystemJournalService : ISystemJournalService
         }
     }
 
-    private static string EscapeShellArgument(string argument)
-    {
-        if (string.IsNullOrEmpty(argument))
-            return "''";
-
-        var escaped = new StringBuilder(argument.Length + 10);
-        escaped.Append('\'');
-
-        foreach (var c in argument)
-        {
-            if (c == '\'')
-            {
-                // Закрываем одинарные кавычки, добавляем экранированную кавычку, открываем снова
-                escaped.Append("'\\''");
-            }
-            else
-            {
-                escaped.Append(c);
-            }
-        }
-
-        escaped.Append('\'');
-        return escaped.ToString();
-    }
-
     private bool CheckLoggerAvailability()
     {
         try
@@ -104,21 +91,23 @@ public class LinuxSystemJournalService : ISystemJournalService
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "which",
-                    Arguments = "logger",
+                    FileName = "logger",
+                    UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    UseShellExecute = false,
                     CreateNoWindow = true
                 }
             };
 
+            process.StartInfo.ArgumentList.Add("--version");
+
             process.Start();
-            process.WaitForExit(2000);
-            return process.ExitCode == 0;
+            process.WaitForExit(1000);
+            return true;
         }
         catch
         {
+            // FileNotFoundException или Win32Exception если logger не найден
             return false;
         }
     }
