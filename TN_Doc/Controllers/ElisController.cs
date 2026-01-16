@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using TN_Doc.Services;
 
 namespace TN_Doc.Controllers;
 
@@ -13,10 +14,12 @@ namespace TN_Doc.Controllers;
 public class ElisController : Controller
 {
     private readonly ILogger<ElisController> _logger;
-    
-    public ElisController(ILogger<ElisController> logger)
+    private readonly ISystemJournalService _systemJournal;
+
+    public ElisController(ILogger<ElisController> logger, ISystemJournalService systemJournal)
     {
         _logger = logger;
+        _systemJournal = systemJournal;
     }
     
     /// <summary>
@@ -39,23 +42,20 @@ public class ElisController : Controller
             ("ASN1 coorupted data", "Подпись была повреждена и является не читаемой"),
             ("CompCode", "Ошибки связанные с сетевыми настройками и подключения к очереди IBMMQ"),
         };
-        foreach (var item in errPatterns)
+        foreach (var item in errPatterns.Where(item => Regex.IsMatch(msg, item.pattern, RegexOptions.IgnoreCase)))
         {
-            if (Regex.IsMatch(msg, item.pattern, RegexOptions.IgnoreCase))
-            {
-                msg += ". " + item.description;
-                break;
-            }
+            msg += ". " + item.description;
+            break;
         }    
-        _logger.LogError(msg);   
-        //EventLog.WriteEntry($".NET Runtime", msg, EventLogEntryType.Error, 1000, 1);
+        _logger.LogError(msg);
+        _systemJournal.WriteError(msg, "ELIS");
     }
-    
+
     public void WarnMessage(string msg)
     {
         if (string.IsNullOrEmpty(msg))
             return;
-        
+
         _logger.LogWarning(msg);
     }
 }
