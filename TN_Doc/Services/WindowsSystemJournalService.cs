@@ -31,7 +31,7 @@ public class WindowsSystemJournalService : ISystemJournalService
         }
         catch (Exception ex)
         {
-            _logger.Warn(ex, "Не удалось записать в Windows Event Log: {Message}", formattedMessage);
+            _logger.Error(ex, "Не удалось записать в Windows Event Log: {Message}", formattedMessage);
         }
     }
 
