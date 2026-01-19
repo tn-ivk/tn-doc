@@ -6,8 +6,6 @@
 |-----------|------------|
 | ОС | Ubuntu 20.04+, Debian 11+, RHEL 8+ |
 | .NET Runtime | 8.0.13 или выше |
-| Node.js | 18.0 или выше (для сборки Vue компонентов) |
-| npm | 8.0 или выше |
 | Память | 1 GB минимум, 2 GB рекомендуется |
 | Дисковое пространство | 500 MB |
 | Пользователь | `alphadaemon` (создается автоматически) |
@@ -29,7 +27,6 @@ graph TB
 
     subgraph "Dependencies"
         Runtime[.NET Runtime 8.0.13]
-        Node[Node.js 18+]
         libgdiplus[libgdiplus]
         CUPS[CUPS]
     end
@@ -39,7 +36,6 @@ graph TB
     App --> Logs
     App --> Config
     App --> Runtime
-    App --> Node
     App --> libgdiplus
     App --> CUPS
 ```
@@ -50,10 +46,10 @@ graph TB
 
 ```bash
 # Скачать с сервера сборки
-wget http://build-server/tn-doc_1.4.3_amd64.deb
+wget http://build-server/tn-doc_1.3.8_amd64.deb
 
 # Или скопировать с локальной машины
-scp tn-doc_1.4.3_amd64.deb user@server:/tmp/
+scp tn-doc_1.3.8_amd64.deb user@server:/tmp/
 ```
 
 ### 2. Установить зависимости
@@ -65,14 +61,6 @@ sudo dpkg -i packages-microsoft-prod.deb
 sudo apt-get update
 sudo apt-get install -y aspnetcore-runtime-8.0
 
-# Установить Node.js 18+ и npm
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Проверить версии
-node --version  # должна быть 18.x или выше
-npm --version   # должна быть 8.x или выше
-
 # Установить системные библиотеки
 sudo apt-get install -y libgdiplus libc6-dev cups
 ```
@@ -80,29 +68,13 @@ sudo apt-get install -y libgdiplus libc6-dev cups
 ### 3. Установить пакет
 
 ```bash
-sudo dpkg -i tn-doc_1.4.3_amd64.deb
+sudo dpkg -i tn-doc_1.3.8_amd64.deb
 
 # Если есть зависимости, выполните
 sudo apt-get install -f
 ```
 
-### 4. Собрать Vue компоненты (опционально, если не включены в .deb)
-
-```bash
-# Перейти в директорию клиентских приложений
-cd /opt/TN_Doc/Client
-
-# Установить зависимости npm (для всех Vue компонентов)
-sudo -u alphadaemon npm install
-
-# Собрать все Vue компоненты (statusbar, configurator, document-editor)
-sudo -u alphadaemon npm run build:all
-
-# Вернуться в корень
-cd /opt/TN_Doc
-```
-
-**Примечание**: Если .deb пакет уже содержит собранные Vue компоненты в `wwwroot/{statusbar,configurator,document-editor}/`, этот шаг можно пропустить.
+> Примечание: в текущей версии TN_Doc нет отдельной сборки SPA‑клиента, Node.js на сервере не требуется.
 
 ## Процесс установки
 
@@ -144,14 +116,16 @@ sequenceDiagram
 ├── Cfg/
 │   ├── CfgApp.json            # Основная конфигурация
 │   ├── Cfg*.json              # Конфигурации документов
-│   ├── CfgEdit*.json          # Конфигурации форм редактирования (v1.4.2+)
+│   ├── CfgEdit*.json          # Конфигурации форм редактирования
 │   └── ...
 ├── Doc/                        # FastReport шаблоны
 ├── wwwroot/                    # Статические файлы
-│   ├── css/                   # Стили (включая material3.css с CSS переменными)
-│   ├── statusbar/             # Собранная строка состояния (v1.4.1+)
-│   ├── configurator/          # Собранный веб-конфигуратор (v1.4.2+)
-│   ├── document-editor/       # Собранный редактор документов (в разработке)
+│   ├── css/                   # Стили
+│   ├── js/                    # JS (jQuery, логика UI)
+│   ├── lib/                   # Библиотеки (DataTables, bootstrap и др.)
+│   ├── HTML/                  # HTML‑шаблоны редактирования
+│   ├── PDF/                   # Временные PDF‑файлы
+│   ├── Pictures/              # Изображения
 │   └── ...
 ├── logs/                       # Логи приложения
 └── ...
@@ -224,19 +198,32 @@ sudo journalctl -u tn-doc -f
     }
   ],
   "Elis": {
-    "UseElis": true,
-    "Url": "https://elis-server/api",
-    "CertificatePath": "/opt/TN_Doc/Cert/elis.crt"
+    "Use": false,
+    "OstKey": "ostKey",
+    "SiknKey": "siknKey",
+    "ClientName": "clientName",
+    "ClientToken": ""
   },
   "OpcConnectionSettings": {
-    "MessagingServiceUrl": "http://localhost:5000"
+    "Type": 1,
+    "DaSettings": {
+      "StartPrefix": "Root.PLC1.IVK_TN_01",
+      "Host": "localhost",
+      "ProgId": "psregulopcda_01",
+      "UpdateRate": 500
+    },
+    "UaSettings": {
+      "ConfigFilename": "Config.xml",
+      "UpdateRate": 500,
+      "StartPrefix": "IVK_TN_01"
+    }
   }
 }
 ```
 
 ### Конфигурации форм редактирования: /opt/TN_Doc/Cfg/CfgEdit*.json
 
-С версии 1.4.2+ добавлены отдельные конфигурационные файлы для форм редактирования документов:
+Конфигурационные файлы форм редактирования документов:
 
 - `CfgEditPassport.json` - настройки формы редактирования паспортов качества
 - `CfgEditAct.json` - настройки формы редактирования актов
@@ -252,7 +239,7 @@ sudo journalctl -u tn-doc -f
   <targets>
     <target name="logfile"
             xsi:type="File"
-            fileName="/opt/TN_Doc/logs/tn-doc-${shortdate}.log" />
+            fileName="/opt/TN_Doc/logs/${shortdate}.log" />
   </targets>
   <rules>
     <logger name="*" minlevel="Info" writeTo="logfile" />
@@ -281,10 +268,10 @@ sudo chmod 640 /opt/TN_Doc/Cfg/CfgApp.json
 
 ```bash
 # Открыть порт (если нужен внешний доступ)
-sudo ufw allow 38509/tcp
+sudo ufw allow 5000/tcp
 
-# Для HTTPS
-sudo ufw allow 44357/tcp
+# Для HTTPS (если включено)
+sudo ufw allow 5001/tcp
 ```
 
 ## Мониторинг
@@ -292,8 +279,8 @@ sudo ufw allow 44357/tcp
 ### Проверка здоровья
 
 ```bash
-# HTTP endpoint
-curl http://localhost:38509/api/status
+# Проверка HTTP ответа (порт зависит от конфигурации хоста)
+curl http://localhost:5000/
 
 # Проверка процесса
 ps aux | grep TN_Doc
@@ -306,7 +293,7 @@ systemctl status tn-doc | grep Memory
 
 ```bash
 # Логи приложения
-tail -f /opt/TN_Doc/logs/tn-doc-$(date +%Y-%m-%d).log
+tail -f /opt/TN_Doc/logs/$(date +%Y-%m-%d).log
 
 # Логи systemd
 sudo journalctl -u tn-doc -n 100 --no-pager
@@ -322,13 +309,7 @@ sudo journalctl -u tn-doc --since "1 hour ago"
 sudo systemctl stop tn-doc
 
 # Установить новый пакет
-sudo dpkg -i tn-doc_1.4.3_amd64.deb
-
-# Пересобрать Vue компоненты (если они не включены в .deb или были изменения)
-cd /opt/TN_Doc/Client
-sudo -u alphadaemon npm install
-sudo -u alphadaemon npm run build:all
-cd /opt/TN_Doc
+sudo dpkg -i tn-doc_1.3.8_amd64.deb
 
 # Запустить службу
 sudo systemctl start tn-doc
@@ -392,23 +373,14 @@ sudo apt-get install libgdiplus
 sudo systemctl restart tn-doc
 ```
 
-### Vue компоненты не загружаются
+### Статические файлы не загружаются
 
 ```bash
-# Проверить наличие собранных файлов
-ls -la /opt/TN_Doc/wwwroot/statusbar/
-ls -la /opt/TN_Doc/wwwroot/configurator/
-ls -la /opt/TN_Doc/wwwroot/document-editor/
-
-# Если директории пусты, пересобрать компоненты
-cd /opt/TN_Doc/Client
-sudo -u alphadaemon npm install
-sudo -u alphadaemon npm run build:all
+# Проверить наличие статики
+ls -la /opt/TN_Doc/wwwroot/
 
 # Проверить права доступа
-sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/statusbar/
-sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/configurator/
-sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/document-editor/
+sudo chown -R alphadaemon:alphadaemon /opt/TN_Doc/wwwroot/
 
 # Перезапустить службу
 sudo systemctl restart tn-doc

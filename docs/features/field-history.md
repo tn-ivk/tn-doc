@@ -74,7 +74,9 @@ public class FieldHistoryEntry
 - `method.{ParameterKey}` — метод испытаний
 - `document.{ParameterKey}` — ELIS-документ
 
-## Передача истории через API
+## Передача истории через API (планируемо)
+
+⚠️ В текущем коде таких эндпойнтов нет — ниже приведён **проектный формат**.
 
 ### GET edit config
 
@@ -132,17 +134,17 @@ public class FieldHistoryEntry
 }
 ```
 
-## UI индикация
+## UI индикация (планируемо)
 
-Компонент: `TN_Doc/Client/document-editor/src/components/history/FieldHistoryIndicator.vue`.
+Планировался компонент вида `FieldHistoryIndicator.vue` (SPA‑редактор). В текущей версии UI реализован через HTML‑формы и такой компонент отсутствует.
 
 - Индикатор скрывается для `Unknown` и `Auto`.
 - Tooltip берётся из `SOURCE_DISPLAY_CONFIG`.
 - История отображается только визуально (popup-окна нет).
 
-## Frontend API
+## Frontend API (планируемо)
 
-`useFieldHistory.ts` предоставляет функции:
+`useFieldHistory.ts` должен был предоставлять функции:
 
 - `trackManualChange`
 - `trackElisLoad`

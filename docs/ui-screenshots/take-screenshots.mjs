@@ -1,3 +1,5 @@
+// NOTE: Скрипт использует legacy‑селекторы (/configurator, statusbar).
+// В текущем UI (Razor + Bootstrap) эти элементы отсутствуют — при использовании обновите селекторы.
 import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
@@ -131,5 +133,4 @@ run().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-
 

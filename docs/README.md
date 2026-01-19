@@ -15,11 +15,11 @@
 
 Документация по архитектуре и дизайну системы:
 
-- **[overview.md](architecture/overview.md)** - Общий обзор архитектуры TN_Doc
-- **[document-modules.md](architecture/document-modules.md)** - Система модулей документов
-- **[configurator.md](architecture/configurator.md)** - Архитектура конфигуратора
-- **[document-editor.md](architecture/document-editor.md)** - Архитектура редактора документов (Vue SPA)
-- **[passport-editor.md](architecture/passport-editor.md)** - Логика отображения/редактирования/сохранения паспорта качества (Vue + DocPassport)
+- **[overview.md](architecture/overview.md)** - Общий обзор архитектуры TN_Doc (актуально для текущего кода)
+- **[document-modules.md](architecture/document-modules.md)** - Система модулей документов (актуально для текущего кода)
+- **[configurator.md](architecture/configurator.md)** - Редактор справочников/конфигураций (актуально для текущего UI)
+- **[document-editor.md](architecture/document-editor.md)** - Документация по механизму редактирования (HTML/JS)
+- **[passport-editor.md](architecture/passport-editor.md)** - Редактирование паспорта качества (текущий механизм)
 
 ### 👨‍💻 Development (Разработка)
 
@@ -63,7 +63,7 @@
 
 Документация по специфическим функциям:
 
-- **[field-history.md](features/field-history.md)** - Система истории изменений полей паспорта качества
+- **[field-history.md](features/field-history.md)** - Система истории изменений полей паспорта качества (планируется, в коде отсутствует)
 
 ### 📝 Additional Documents
 

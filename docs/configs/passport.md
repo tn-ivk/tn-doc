@@ -181,31 +181,20 @@
 - `TN_Doc/Cfg/Passport/CfgEditPassportForActNP.json`
 - `TN_Doc/Cfg/Passport/CfgEditPassport_EAC.json`
 
-**Планируемая техническая реализация:**
-- Бэкенд: `tn.docgeneral/Passport/DocPassport.Editor.cs` — метод `ResolveLinkedParametersRoles()`
-- Фронтенд: `TN_Doc/Client/document-editor/src/components/passport/PassportLinkedParameterGroup.vue`
-- Типы: `PassportQualityParameterSchema.linkedParameter`, `isLinkedFollower`, `linkedLeaderKey`
+**Планируемая техническая реализация (в коде отсутствует):**
+- Бэкенд: выделение логики связок параметров в модуле `Passport` (отдельные методы/классы)
+- UI: отдельный компонент редактора (SPA) либо расширение текущих HTML‑форм
 
-⚠️ **ВАЖНО:** Document Editor в настоящий момент отсутствует в проекте. Клиентская часть (`TN_Doc/Client/document-editor/`) существует, но не содержит описанных composables и компонентов.
+⚠️ **ВАЖНО:** SPA‑редактор документов в проекте отсутствует. Текущий механизм редактирования — HTML‑формы (`TN_Doc/wwwroot/HTML/`) и `DocPassport.GetEditDoc()`.
 
 ### Поле `Edit` для параметров качества
-**Назначение:** Определяет, может ли оператор редактировать значение параметра в Document Editor.
+**Назначение:** определяет, может ли оператор редактировать значение параметра в текущем HTML‑редакторе.
 
 **Значения:**
-- `true` — параметр доступен для редактирования, значение считается достоверным (Legal = 1 при сохранении)
-- `false` — параметр отображается как read-only, значение приходит из ИВК и не редактируется оператором
+- `true` — параметр доступен для редактирования
+- `false` — параметр отображается как read‑only (значение подставляется из данных, без возможности редактирования)
 
-**Влияние на флаг Legal (v1.4.4+):**
-- При сохранении паспорта качества метод `CorrectValue()` проверяет флаг `Edit`
-- Для нередактируемых параметров (`Edit = false`) устанавливается `Legal = 0`
-- Это означает, что значения таких параметров не влияют на легализацию документа
-
-**Техническая реализация:**
-```csharp
-// DocPassport.Editor.cs
-var skipLegal = slaveKeys.Contains(paramKey) || !editableKeys.Contains(paramKey);
-CorrectValue(corr.Parameter, item.Value, skipLegal);
-```
+**Примечание:** Логика обработки `Edit` реализована в `tn.docgeneral/Passport/DocPassport.cs` при построении HTML‑формы.
 
 ### Поле `IsDefault` для методов испытаний (ПЛАНИРУЕТСЯ)
 
@@ -313,4 +302,3 @@ CorrectValue(corr.Parameter, item.Value, skipLegal);
   dotnet test Tests/Tests.csproj --filter CfgEditPassport
   ```
 - Перед сдачей фазы 0 фиксируйте, какие файлы проходили валидацию `jq`, и прикладывайте результаты тестов в описании merge request.
-
