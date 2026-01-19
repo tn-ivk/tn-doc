@@ -80,6 +80,7 @@
 
 - **Начать разработку** → [development/setup.md](development/setup.md)
 - **Собрать проект** → [development/building.md](development/building.md)
+- **Запустить тесты** → [../Tests/README.md](../Tests/README.md)
 - **Развернуть на Linux** → [deployment/linux.md](deployment/linux.md)
 - **Посмотреть логи** → [operations/logging.md](operations/logging.md)
 - **Интегрировать с ELIS** → [integration/elis.md](integration/elis.md)
@@ -92,6 +93,7 @@
 **Разработчик:**
 - [development/setup.md](development/setup.md)
 - [development/building.md](development/building.md)
+- [../Tests/README.md](../Tests/README.md)
 - [architecture/overview.md](architecture/overview.md)
 - [architecture/document-modules.md](architecture/document-modules.md)
 - [api/endpoints.md](api/endpoints.md)
@@ -106,16 +108,26 @@
 - [operations/logging.md](operations/logging.md)
 
 **Аналитик/Тестировщик:**
+- [../Tests/README.md](../Tests/README.md)
 - [api/endpoints.md](api/endpoints.md)
 - [features/field-history.md](features/field-history.md)
 - [configs/passport.md](configs/passport.md)
+
+### Tests (Тестирование)
+
+Документация по тестам:
+
+- **[../Tests/README.md](../Tests/README.md)** - Обзор тестовой инфраструктуры
+  - Структура тестов (35 файлов по 5 категориям)
+  - Статус актуализации
+  - Инструкции по запуску
+  - Известные проблемы и roadmap
 
 ## Основные документы проекта
 
 Помимо этой документации, важные файлы в корне проекта:
 
 - **[CLAUDE.md](../CLAUDE.md)** - Главное руководство для работы с проектом
-- **[README.md](../README.md)** - Обзор проекта
 - **[AGENTS.md](../AGENTS.md)** - Правила работы с репозиторием
 - **[CHANGELOG.md](../CHANGELOG.md)** - История версий
 - **[TN_Doc/changes.md](../TN_Doc/changes.md)** - Детальный лог изменений
@@ -136,7 +148,7 @@
 - **Configuration Management** - Управление конфигурацией
 
 ### Development
-- **Testing Guide** - Руководство по написанию тестов
+- ~~**Testing Guide**~~ - Базовая документация: [../Tests/README.md](../Tests/README.md)
 - **Code Style Guide** - Руководство по стилю кода
 - **Contributing** - Как внести вклад в проект
 
@@ -152,3 +164,4 @@
 
 _Последнее обновление: 2026-01-19_
 _Версия проекта: 1.3.8_
+_Актуализирована документация для тестирования_
