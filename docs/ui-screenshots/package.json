@@ -1,0 +1,13 @@
+{
+  "name": "tn_doc-ui-screenshots",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "screenshots": "node take-screenshots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.0"
+  }
+}
+
