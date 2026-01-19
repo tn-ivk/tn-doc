@@ -205,6 +205,11 @@ PublishScripts/
 # NuGet v3's project.json files produces more ignorable files
 *.nuget.props
 *.nuget.targets
+*.nuget.g.props
+*.nuget.g.targets
+*.nuget.dgspec.json
+project.assets.json
+project.packagespec.json
 
 # Microsoft Azure Build Output
 csx/
@@ -422,6 +427,7 @@ FodyWeavers.xsd
 **/.idea/**/*.iml
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
+rider.project.*.info
 
 .idea/
 
