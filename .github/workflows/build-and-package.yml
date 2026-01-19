@@ -1,0 +1,1082 @@
+name: Build and Package TN_Doc
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  DOTNET_SDK_VERSION: '8.0'
+  DOTNET_RT_VERSION: '8.0.13'
+  PROJECT_NAME: 'TN_Doc'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_NOLOGO: 'true'
+
+jobs:
+  # ===========================================
+  # Build Job
+  # ===========================================
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Configure submodule URLs for GitHub (private repos)
+        run: |
+          # Замена URL субмодулей с внутреннего GitLab на GitHub с токеном для приватных репозиториев
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
+          # Вложенный субмодуль в tn.docgeneral
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-utils.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.utils.git"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GH_SUBMODULES_TOKEN }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+          source-url: https://nuget.pkg.github.com/tn-ivk/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Add FastReport NuGet source
+        run: |
+          dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" \
+            --name fr_nuget \
+            --username "${{ secrets.FR_NUGET_USERNAME }}" \
+            --password "${{ secrets.FR_NUGET_PASSWORD }}" \
+            --store-password-in-clear-text
+
+      - name: Create directories
+        run: mkdir -p ./publish TN_Doc/Dll
+
+      - name: List NuGet sources (debug)
+        run: dotnet nuget list source
+
+      - name: Build solution
+        run: dotnet build -c Release
+
+      - name: Publish application
+        run: dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish/
+          retention-days: 7
+
+  # ===========================================
+  # Test Job
+  # ===========================================
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Configure submodule URLs for GitHub (private repos)
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-utils.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.utils.git"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GH_SUBMODULES_TOKEN }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+          source-url: https://nuget.pkg.github.com/tn-ivk/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Add FastReport NuGet source
+        run: |
+          dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" \
+            --name fr_nuget \
+            --username "${{ secrets.FR_NUGET_USERNAME }}" \
+            --password "${{ secrets.FR_NUGET_PASSWORD }}" \
+            --store-password-in-clear-text
+
+      - name: Create directories
+        run: mkdir -p TN_Doc/Dll
+
+      - name: Build solution
+        run: dotnet build -c Release
+
+      - name: Run tests
+        run: dotnet test -c Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: "**/TestResults/*.trx"
+          retention-days: 7
+
+  # ===========================================
+  # Extract Version Job
+  # ===========================================
+  extract-version:
+    name: Extract Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      full_version: ${{ steps.version.outputs.FULL_VERSION }}
+      revision: ${{ steps.version.outputs.REVISION }}
+      build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from csproj
+        id: version
+        run: |
+          CSPROJ_FILE="TN_Doc/TN_Doc.csproj"
+
+          if [ ! -f "$CSPROJ_FILE" ]; then
+            echo "Error: $CSPROJ_FILE not found"
+            exit 1
+          fi
+
+          # Извлечение версии из .csproj
+          VERSION=$(grep -oP '<Version>\K[^<]+' $CSPROJ_FILE || echo "1.0.0")
+
+          # Если запущено по тегу, используем версию из тега
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+            TAG_CLEAN=$(echo "$TAG_NAME" | sed 's/^v//')
+            echo "Tag detected: $TAG_NAME -> $TAG_CLEAN"
+            VERSION=$TAG_CLEAN
+          fi
+
+          echo "Extracted version: $VERSION"
+
+          if [ -z "$VERSION" ]; then
+            echo "Error: Version not found"
+            exit 1
+          fi
+
+          # Build number из run number
+          BUILD_NUMBER=${{ github.run_number }}
+
+          # Формирование ревизии
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-8)
+          REVISION="b${BUILD_NUMBER}-${SHORT_SHA}"
+          FULL_VERSION="${VERSION}-${REVISION}"
+
+          echo "Full version: $FULL_VERSION"
+
+          # Записываем в outputs
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "FULL_VERSION=$FULL_VERSION" >> $GITHUB_OUTPUT
+          echo "REVISION=$REVISION" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+  # ===========================================
+  # Package Full (with .NET Runtime)
+  # ===========================================
+  package-full:
+    name: Package Full
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    needs: [build, test, extract-version]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish/
+
+      - name: Build full .deb package
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          FULL_VERSION: ${{ needs.extract-version.outputs.full_version }}
+        run: |
+          echo "Packaging the application into a .deb file..."
+          DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-full-${FULL_VERSION}"
+          echo "DEB_NAME=$DEB_NAME"
+
+          # Создание структуры пакета
+          mkdir -p deb/DEBIAN
+          mkdir -p deb/opt/TN_Doc
+          mkdir -p deb/var/log/TN_Doc
+          mkdir -p deb/etc/systemd/system
+          mkdir -p deb/usr/share/fonts
+          mkdir -p deb/usr/local/bin
+          mkdir -p deb/tmp/TN_Doc
+
+          # Копирование файлов приложения
+          cp -r ./publish/* deb/opt/TN_Doc/
+
+          # Копирование .NET Runtime если есть
+          if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+            cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tmp/TN_Doc/
+          fi
+
+          # Копирование шрифтов
+          if [ -d "fonts" ]; then
+            cp -r fonts/* deb/usr/share/fonts/
+          fi
+
+          # Генерация control
+          cat << EOF > deb/DEBIAN/control
+          Package: tn.doc-full
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Depends: systemd
+          Maintainer: DadonovAD <dadonovad@transneft.ru>
+          Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН (полная версия).
+           Включает .NET Runtime 8.0.13 и системные шрифты для автономной работы.
+          Homepage:
+
+          EOF
+
+          # Генерация preinst
+          cat << 'PREINST_EOF' > deb/DEBIAN/preinst
+          #!/bin/bash
+          set -e
+
+          echo "============================================"
+          echo "Starting pre-installation script for TN_Doc (full version)"
+          echo "============================================"
+
+          check_dotnet_runtime() {
+              if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+                  echo "Warning: .NET Runtime 8 is not installed. Will install from local archive."
+                  return 1
+              fi
+
+              REQUIRED_VERSION="8.0.13"
+              INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+
+              if [ -z "$INSTALLED_VERSION" ]; then
+                  echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
+                  return 1
+              fi
+
+              if [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
+                  echo "Warning: .NET Runtime version $INSTALLED_VERSION < $REQUIRED_VERSION. Will install from local archive."
+                  return 1
+              fi
+
+              echo "✓ .NET Runtime version $INSTALLED_VERSION is compatible (>= $REQUIRED_VERSION)"
+              return 0
+          }
+
+          check_dotnet_runtime || echo "Will install .NET Runtime in postinst"
+
+          echo "Cleaning /tmp/TN_Doc directory..."
+          rm -rf /tmp/TN_Doc
+          echo "✓ Temporary directory cleaned"
+
+          if systemctl is-active --quiet TN_Doc.service; then
+              echo "Stopping TN_Doc.service..."
+              systemctl stop TN_Doc.service
+          fi
+
+          echo "Removing old TN_Doc directories..."
+          OPT_DIR="/opt/TN_Doc"
+          LOG_DIR="/var/log/TN_Doc"
+          for dir in "$OPT_DIR" "$LOG_DIR"; do
+              if [ -d "$dir" ]; then
+                  echo "Removing directory: $dir"
+                  rm -rf "$dir"
+                  if [ $? -eq 0 ]; then
+                      echo "✓ Successfully removed $dir"
+                  else
+                      echo "! WARNING: Failed to remove $dir"
+                  fi
+              fi
+          done
+          echo "=== Old directories cleanup completed ==="
+
+          exit 0
+          PREINST_EOF
+          chmod +x deb/DEBIAN/preinst
+
+          # Генерация prerm
+          cat << 'PRERM_EOF' > deb/DEBIAN/prerm
+          #!/bin/bash
+          set -e
+
+          echo "============================================"
+          echo "Starting pre-removal script for TN_Doc (full version)"
+          echo "============================================"
+
+          if systemctl is-active --quiet TN_Doc.service; then
+              echo "Stopping TN_Doc.service..."
+              systemctl stop TN_Doc.service
+              if [ $? -eq 0 ]; then
+                  echo "✓ Service stopped successfully"
+              else
+                  echo "! WARNING: Failed to stop service"
+              fi
+          fi
+
+          exit 0
+          PRERM_EOF
+          chmod +x deb/DEBIAN/prerm
+
+          # Генерация postinst
+          cat << 'POSTINST_EOF' > deb/DEBIAN/postinst
+          #!/bin/bash
+          set -e
+
+          echo "============================================"
+          echo "Starting post-installation script for TN_Doc (full version)"
+          echo "============================================"
+          echo "Installing dependencies for TN_Doc..."
+
+          install_dotnet_runtime() {
+              echo "=== Starting .NET Runtime installation check ==="
+
+              REQUIRED_VERSION="8.0.13"
+
+              if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+                  INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+
+                  if [ -n "$INSTALLED_VERSION" ] && [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
+                      echo "✓ .NET Runtime version $INSTALLED_VERSION is already installed and compatible"
+                      echo "=== Skipping .NET Runtime installation ==="
+                      return 0
+                  else
+                      echo "! Installed version $INSTALLED_VERSION is not compatible with required $REQUIRED_VERSION"
+                  fi
+              else
+                  echo "! .NET Runtime directory not found, installation required"
+              fi
+
+              echo "=== Starting .NET Runtime installation ==="
+
+              if [ -f "/tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+                  echo "✓ Found .NET Runtime archive"
+
+                  echo "Creating .NET directory: /usr/bin/dotnet"
+                  mkdir -p /usr/bin/dotnet
+
+                  echo "Extracting .NET Runtime archive..."
+                  tar -xzf /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+                  if [ $? -eq 0 ]; then
+                      echo "✓ Archive extracted successfully"
+                  else
+                      echo "✗ ERROR: Failed to extract archive"
+                      exit 1
+                  fi
+
+                  rm -f /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+                  echo "✓ .NET Runtime 8.0.13 installed successfully"
+              else
+                  echo "✗ ERROR: .NET Runtime archive not found at /tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz"
+                  echo "Please ensure the archive is available before installing this package."
+                  exit 1
+              fi
+
+              echo "=== .NET Runtime installation completed ==="
+          }
+
+          setup_dotnet_environment() {
+              echo "=== Setting up .NET environment variables ==="
+
+              for user_profile in /home/administrator/.profile /home/operators/.profile /home/engineer/.profile; do
+                  if [ -f "$user_profile" ]; then
+                      if ! grep -q "DOTNET_ROOT=/usr/bin/dotnet" "$user_profile"; then
+                          echo 'DOTNET_ROOT=/usr/bin/dotnet' >> "$user_profile"
+                          echo "✓ Added DOTNET_ROOT to $user_profile"
+                      fi
+                      if ! grep -q "PATH.*:/usr/bin/dotnet" "$user_profile"; then
+                          echo 'PATH=$PATH:/usr/bin/dotnet' >> "$user_profile"
+                          echo "✓ Added /usr/bin/dotnet to PATH in $user_profile"
+                      fi
+                  fi
+              done
+
+              echo "=== Environment setup completed ==="
+          }
+
+          echo "=== Starting application dependencies installation ==="
+
+          echo "Step 1: Installing .NET Runtime..."
+          install_dotnet_runtime
+          echo "✓ .NET Runtime setup completed"
+
+          echo "Step 2: Setting up environment variables..."
+          setup_dotnet_environment
+          echo "✓ Environment variables setup completed"
+
+          echo "Step 3: Updating font cache..."
+          fc-cache -f || true
+          echo "✓ Font cache updated"
+
+          echo "Step 4: Setting up application permissions..."
+          chmod 755 /opt/TN_Doc/TN_Doc
+          chmod 644 /opt/TN_Doc/*.dll
+          chown -R alphadaemon:alphadaemon /opt/TN_Doc
+          chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+          chown alphadaemon:alphadaemon /var/log/TN_Doc
+          chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+          echo "✓ Application permissions setup completed"
+
+          echo "Step 5: Reloading systemd daemon..."
+          systemctl daemon-reload
+          echo "✓ Systemd daemon reloaded"
+
+          echo "Step 6: Enabling and starting application service..."
+
+          if [ -f "/usr/bin/dotnet/dotnet" ] && [ -f "/opt/TN_Doc/TN_Doc" ]; then
+              echo "✓ All required binaries found"
+          else
+              echo "! WARNING: Some binaries missing"
+              [ ! -f "/usr/bin/dotnet/dotnet" ] && echo "  - dotnet binary not found"
+              [ ! -f "/opt/TN_Doc/TN_Doc" ] && echo "  - application binary not found"
+          fi
+
+          systemctl enable TN_Doc.service
+          systemctl start TN_Doc.service
+
+          sleep 2
+          if systemctl is-active --quiet TN_Doc.service; then
+              echo "✓ Application service started successfully"
+          else
+              echo "! WARNING: Service failed to start. Checking logs..."
+              journalctl -u TN_Doc.service -n 10 --no-pager || echo "Cannot read journal logs"
+          fi
+
+          echo "Final cleanup: Removing /tmp/TN_Doc directory..."
+          rm -rf /tmp/TN_Doc
+          echo "✓ Temporary directory cleaned"
+
+          echo "=== TN_Doc installation completed successfully ==="
+          echo "============================================"
+          exit 0
+          POSTINST_EOF
+          chmod +x deb/DEBIAN/postinst
+
+          # Генерация postrm
+          cat << 'POSTRM_EOF' > deb/DEBIAN/postrm
+          #!/bin/bash
+          set -e
+
+          echo "============================================"
+          echo "Starting post-removal script for TN_Doc (full version)"
+          echo "============================================"
+
+          if [ "$1" = "purge" ]; then
+              echo "Purging TN_Doc directories..."
+              OPT_DIR="/opt/TN_Doc"
+              LOG_DIR="/var/log/TN_Doc"
+              for dir in "$OPT_DIR" "$LOG_DIR"; do
+                  if [ -d "$dir" ]; then
+                      echo "Removing directory: $dir"
+                      rm -rf "$dir"
+                      if [ $? -eq 0 ]; then
+                          echo "✓ Successfully removed $dir"
+                      else
+                          echo "! WARNING: Failed to remove $dir"
+                      fi
+                  fi
+              done
+
+              echo "Removing systemd service..."
+              systemctl disable TN_Doc.service 2>/dev/null || true
+              rm -f /etc/systemd/system/TN_Doc.service
+              systemctl daemon-reload
+              echo "✓ Systemd service removed"
+          fi
+
+          exit 0
+          POSTRM_EOF
+          chmod +x deb/DEBIAN/postrm
+
+          # Генерация systemd unit
+          cat << 'SERVICE_EOF' > deb/etc/systemd/system/TN_Doc.service
+          [Unit]
+          Description=Service TN_Doc (full version)
+
+          [Service]
+          WorkingDirectory=/opt/TN_Doc/
+          ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
+          Restart=always
+          RestartSec=10
+          SyslogIdentifier=dotnet-TN_Doc
+          User=alphadaemon
+          Environment=ASPNETCORE_ENVIRONMENT=Production
+
+          [Install]
+          WantedBy=multi-user.target
+          SERVICE_EOF
+
+          # Установка прав
+          chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst deb/DEBIAN/prerm deb/DEBIAN/postrm
+          chmod 644 deb/DEBIAN/control
+          chmod 755 deb/opt/TN_Doc/TN_Doc || true
+          chmod 644 deb/opt/TN_Doc/*.dll 2>/dev/null || true
+
+          # Создание .deb пакета
+          echo "Creating control.tar.xz..."
+          tar -cJf control.tar.xz -C deb/DEBIAN .
+          echo "Creating data.tar.xz..."
+          tar -cJf data.tar.xz -C deb --exclude=DEBIAN .
+          echo "Creating debian-binary..."
+          echo "2.0" > debian-binary
+          echo "Building .deb package..."
+          mkdir -p packages
+          ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+          rm -f debian-binary control.tar.xz data.tar.xz
+          ls -l ./packages/${DEB_NAME}_amd64.deb
+
+      - name: Upload full package
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-full
+          path: ./packages/*.deb
+          retention-days: 30
+
+  # ===========================================
+  # Package Minimal (without dependencies)
+  # ===========================================
+  package-minimal:
+    name: Package Minimal
+    runs-on: ubuntu-latest
+    needs: [build, test, extract-version]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish/
+
+      - name: Build minimal .deb package
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          FULL_VERSION: ${{ needs.extract-version.outputs.full_version }}
+        run: |
+          echo "Packaging the application into a minimal .deb file..."
+          DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
+          echo "DEB_NAME=$DEB_NAME"
+
+          mkdir -p deb-minimal/DEBIAN
+          mkdir -p deb-minimal/opt/TN_Doc
+          mkdir -p deb-minimal/var/log/TN_Doc
+          mkdir -p deb-minimal/etc/systemd/system
+
+          cp -r ./publish/* deb-minimal/opt/TN_Doc/
+
+          # Генерация control
+          cat << EOF > deb-minimal/DEBIAN/control
+          Package: tn.doc
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Depends: systemd, dotnet-runtime-8.0 (>= 8.0.13)
+          Maintainer: DadonovAD <dadonovad@transneft.ru>
+          Description: TN_Doc это приложение для работы с документами СОИ СИКН/ОСИКН.
+           Требует предустановленный .NET Runtime 8.0.13+ и системные шрифты.
+          Homepage:
+
+          EOF
+
+          # Генерация preinst (упрощённая версия)
+          cat << 'PREINST_EOF' > deb-minimal/DEBIAN/preinst
+          #!/bin/bash
+          set -e
+          echo "============================================"
+          echo "Starting pre-installation script for TN_Doc"
+          echo "============================================"
+
+          # Проверка .NET Runtime
+          if [ ! -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
+              echo "ERROR: .NET Runtime 8 is not installed."
+              echo "Please install .NET Runtime 8.0.13 or later before installing this package"
+              exit 1
+          fi
+
+          REQUIRED_VERSION="8.0.13"
+          INSTALLED_VERSION=$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+$' | sort -V | tail -n 1)
+
+          if [ -z "$INSTALLED_VERSION" ]; then
+              echo "ERROR: No compatible .NET Runtime 8 version found"
+              exit 1
+          fi
+
+          if [ "$(printf '%s\n' "$INSTALLED_VERSION" "$REQUIRED_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
+              echo "ERROR: .NET Runtime version $INSTALLED_VERSION < $REQUIRED_VERSION"
+              exit 1
+          fi
+
+          echo "✓ .NET Runtime version $INSTALLED_VERSION is compatible"
+
+          if systemctl is-active --quiet TN_Doc.service; then
+              echo "Stopping TN_Doc.service..."
+              systemctl stop TN_Doc.service
+          fi
+
+          for dir in "/opt/TN_Doc" "/var/log/TN_Doc"; do
+              if [ -d "$dir" ]; then
+                  rm -rf "$dir"
+              fi
+          done
+
+          exit 0
+          PREINST_EOF
+          chmod +x deb-minimal/DEBIAN/preinst
+
+          # Генерация prerm
+          cat << 'PRERM_EOF' > deb-minimal/DEBIAN/prerm
+          #!/bin/bash
+          set -e
+          if systemctl is-active --quiet TN_Doc.service; then
+              systemctl stop TN_Doc.service
+          fi
+          exit 0
+          PRERM_EOF
+          chmod +x deb-minimal/DEBIAN/prerm
+
+          # Генерация postinst
+          cat << 'POSTINST_EOF' > deb-minimal/DEBIAN/postinst
+          #!/bin/bash
+          set -e
+          echo "Setting up TN_Doc..."
+          chmod 755 /opt/TN_Doc/TN_Doc
+          chmod 644 /opt/TN_Doc/*.dll
+          chown -R alphadaemon:alphadaemon /opt/TN_Doc
+          chmod u=rwx,g=rx,o=rx /opt/TN_Doc
+          chown alphadaemon:alphadaemon /var/log/TN_Doc
+          chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+          systemctl daemon-reload
+          systemctl enable TN_Doc.service
+          systemctl start TN_Doc.service
+          sleep 2
+          if systemctl is-active --quiet TN_Doc.service; then
+              echo "✓ TN_Doc service started successfully"
+          else
+              echo "! WARNING: Service failed to start"
+          fi
+          exit 0
+          POSTINST_EOF
+          chmod +x deb-minimal/DEBIAN/postinst
+
+          # Генерация postrm
+          cat << 'POSTRM_EOF' > deb-minimal/DEBIAN/postrm
+          #!/bin/bash
+          set -e
+          if [ "$1" = "purge" ]; then
+              rm -rf /opt/TN_Doc /var/log/TN_Doc
+              systemctl disable TN_Doc.service 2>/dev/null || true
+              rm -f /etc/systemd/system/TN_Doc.service
+              systemctl daemon-reload
+          fi
+          exit 0
+          POSTRM_EOF
+          chmod +x deb-minimal/DEBIAN/postrm
+
+          # Генерация systemd unit
+          cat << 'SERVICE_EOF' > deb-minimal/etc/systemd/system/TN_Doc.service
+          [Unit]
+          Description=Service TN_Doc
+
+          [Service]
+          WorkingDirectory=/opt/TN_Doc/
+          ExecStart=/usr/bin/dotnet/dotnet /opt/TN_Doc/TN_Doc.dll
+          Restart=always
+          RestartSec=10
+          SyslogIdentifier=dotnet-TN_Doc
+          User=alphadaemon
+          Environment=ASPNETCORE_ENVIRONMENT=Production
+
+          [Install]
+          WantedBy=multi-user.target
+          SERVICE_EOF
+
+          # Сборка пакета
+          chmod 755 deb-minimal/DEBIAN/preinst deb-minimal/DEBIAN/postinst deb-minimal/DEBIAN/prerm deb-minimal/DEBIAN/postrm
+          chmod 644 deb-minimal/DEBIAN/control
+          chmod 755 deb-minimal/opt/TN_Doc/TN_Doc || true
+          chmod 644 deb-minimal/opt/TN_Doc/*.dll 2>/dev/null || true
+
+          tar -cJf control.tar.xz -C deb-minimal/DEBIAN .
+          tar -cJf data.tar.xz -C deb-minimal --exclude=DEBIAN .
+          echo "2.0" > debian-binary
+          mkdir -p packages
+          ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+          rm -f debian-binary control.tar.xz data.tar.xz
+          ls -l ./packages/${DEB_NAME}_amd64.deb
+
+      - name: Upload minimal package
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-minimal
+          path: ./packages/*.deb
+          retention-days: 30
+
+  # ===========================================
+  # Package .NET Runtime
+  # ===========================================
+  package-runtime:
+    name: Package .NET Runtime
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    needs: [extract-version]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build .NET Runtime .deb package
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+        run: |
+          echo "Creating .NET Runtime standalone package..."
+          DEB_NAME="tn.dotnet-runtime-8.0.13"
+
+          if [ ! -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+            echo "ERROR: .NET Runtime archive not found"
+            exit 1
+          fi
+
+          mkdir -p deb-runtime/DEBIAN
+          mkdir -p deb-runtime/usr/bin/dotnet
+          mkdir -p deb-runtime/tmp/dotnet-runtime
+
+          cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb-runtime/tmp/dotnet-runtime/
+
+          cat << EOF > deb-runtime/DEBIAN/control
+          Package: tn.dotnet-runtime
+          Version: 8.0.13-${VERSION}
+          Section: libs
+          Priority: optional
+          Architecture: amd64
+          Depends: libc6, libstdc++6
+          Provides: dotnet-runtime-8.0 (= 8.0.13)
+          Replaces: dotnet-runtime-8.0
+          Breaks: dotnet-runtime-8.0
+          Maintainer: DadonovAD <dadonovad@transneft.ru>
+          Description: Microsoft .NET Runtime 8.0.13 для TN приложений.
+           Автономная установка .NET Runtime 8.0.13 в /usr/bin/dotnet.
+          Homepage:
+
+          EOF
+
+          cat << 'PREINST_EOF' > deb-runtime/DEBIAN/preinst
+          #!/bin/bash
+          set -e
+          echo "Pre-installation for .NET Runtime 8.0.13"
+          if [ -d "/usr/bin/dotnet" ]; then
+              mv /usr/bin/dotnet "/usr/bin/dotnet.backup.$(date +%Y%m%d_%H%M%S)"
+          fi
+          rm -rf /tmp/dotnet-runtime
+          exit 0
+          PREINST_EOF
+          chmod +x deb-runtime/DEBIAN/preinst
+
+          cat << 'POSTINST_EOF' > deb-runtime/DEBIAN/postinst
+          #!/bin/bash
+          set -e
+          echo "Installing .NET Runtime 8.0.13..."
+          if [ -f "/tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
+              mkdir -p /usr/bin/dotnet
+              tar -xzf /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz -C /usr/bin/dotnet
+              rm -f /tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+              echo "✓ .NET Runtime 8.0.13 installed successfully"
+          else
+              echo "ERROR: Archive not found"
+              exit 1
+          fi
+          rm -rf /tmp/dotnet-runtime
+          exit 0
+          POSTINST_EOF
+          chmod +x deb-runtime/DEBIAN/postinst
+
+          cat << 'PRERM_EOF' > deb-runtime/DEBIAN/prerm
+          #!/bin/bash
+          set -e
+          if dpkg -l | grep -q "tn\.doc"; then
+              echo "WARNING: TN_Doc packages may depend on this runtime"
+          fi
+          exit 0
+          PRERM_EOF
+          chmod +x deb-runtime/DEBIAN/prerm
+
+          cat << 'POSTRM_EOF' > deb-runtime/DEBIAN/postrm
+          #!/bin/bash
+          set -e
+          if [ "$1" = "purge" ]; then
+              rm -rf /usr/bin/dotnet
+          fi
+          exit 0
+          POSTRM_EOF
+          chmod +x deb-runtime/DEBIAN/postrm
+
+          chmod 644 deb-runtime/DEBIAN/control
+          tar -cJf control.tar.xz -C deb-runtime/DEBIAN .
+          tar -cJf data.tar.xz -C deb-runtime --exclude=DEBIAN .
+          echo "2.0" > debian-binary
+          mkdir -p packages
+          ar r ./packages/${DEB_NAME}_amd64.deb debian-binary control.tar.xz data.tar.xz
+          rm -f debian-binary control.tar.xz data.tar.xz
+          ls -l ./packages/${DEB_NAME}_amd64.deb
+
+      - name: Upload runtime package
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-runtime
+          path: ./packages/*.deb
+          retention-days: 30
+
+  # ===========================================
+  # Package Fonts
+  # ===========================================
+  package-fonts:
+    name: Package Fonts
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    needs: [extract-version]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build fonts .deb package
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+        run: |
+          echo "Creating system fonts standalone package..."
+          DEB_NAME="tn.fonts-${VERSION}"
+
+          if [ ! -d "fonts" ]; then
+            echo "ERROR: fonts directory not found"
+            exit 1
+          fi
+
+          mkdir -p deb-fonts/DEBIAN
+          mkdir -p deb-fonts/usr/share/fonts
+
+          cp -r fonts/* deb-fonts/usr/share/fonts/
+
+          cat << EOF > deb-fonts/DEBIAN/control
+          Package: tn.fonts
+          Version: ${VERSION}
+          Section: fonts
+          Priority: optional
+          Architecture: all
+          Depends: fontconfig
+          Maintainer: DadonovAD <dadonovad@transneft.ru>
+          Description: Системные шрифты для TN приложений.
+           Набор шрифтов Arial, Segoe UI, Tahoma для корректного отображения документов.
+          Homepage:
+
+          EOF
+
+          cat << 'POSTINST_EOF' > deb-fonts/DEBIAN/postinst
+          #!/bin/bash
+          set -e
+          echo "Installing TN Fonts..."
+          find /usr/share/fonts -name "*.ttf" -exec chmod 644 {} \;
+          find /usr/share/fonts -name "*.TTF" -exec chmod 644 {} \;
+          fc-cache -f -v || true
+          echo "✓ Fonts installed successfully"
+          exit 0
+          POSTINST_EOF
+          chmod +x deb-fonts/DEBIAN/postinst
+
+          cat << 'POSTRM_EOF' > deb-fonts/DEBIAN/postrm
+          #!/bin/bash
+          set -e
+          if [ "$1" = "purge" ]; then
+              fc-cache -f || true
+          fi
+          exit 0
+          POSTRM_EOF
+          chmod +x deb-fonts/DEBIAN/postrm
+
+          chmod 644 deb-fonts/DEBIAN/control
+          find deb-fonts/usr/share/fonts -name "*.ttf" -exec chmod 644 {} \;
+          find deb-fonts/usr/share/fonts -name "*.TTF" -exec chmod 644 {} \;
+
+          tar -cJf control.tar.xz -C deb-fonts/DEBIAN .
+          tar -cJf data.tar.xz -C deb-fonts --exclude=DEBIAN .
+          echo "2.0" > debian-binary
+          mkdir -p packages
+          ar r ./packages/${DEB_NAME}.deb debian-binary control.tar.xz data.tar.xz
+          rm -f debian-binary control.tar.xz data.tar.xz
+          ls -l ./packages/${DEB_NAME}.deb
+
+      - name: Upload fonts package
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-fonts
+          path: ./packages/*.deb
+          retention-days: 30
+
+  # ===========================================
+  # Telegram Notification
+  # ===========================================
+  notify-telegram:
+    name: Telegram Notification
+    runs-on: ubuntu-latest
+    needs: [extract-version, package-minimal]
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all packages
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts/
+
+      - name: Prepare packages
+        run: |
+          mkdir -p ./packages
+          find ./artifacts -name "*.deb" -exec cp {} ./packages/ \;
+          ls -la ./packages/
+
+      - name: Send Telegram notification
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          FULL_VERSION: ${{ needs.extract-version.outputs.full_version }}
+        run: |
+          echo "Sending Telegram notifications..."
+
+          # Функция отправки сообщения
+          send_message() {
+              local message="$1"
+              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                  -d chat_id="${TELEGRAM_CHAT_ID}" \
+                  -d text="${message}" \
+                  -d parse_mode="Markdown"
+          }
+
+          # Функция отправки файла
+          send_file() {
+              local file_path="$1"
+              local caption="$2"
+              local file_size=$(stat -c%s "$file_path")
+
+              # Лимит Telegram: 50MB
+              if [ "$file_size" -lt 52428800 ]; then
+                  echo "Sending file: $(basename "$file_path")"
+                  curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+                      -F chat_id="${TELEGRAM_CHAT_ID}" \
+                      -F document="@${file_path}" \
+                      -F caption="${caption}"
+              else
+                  echo "File too large: $(basename "$file_path")"
+                  send_message "⚠️ Файл $(basename "$file_path") слишком большой для отправки"
+              fi
+          }
+
+          # Получение информации о пакетах
+          MINIMAL_PACKAGE=$(ls ./packages/tn.doc-[0-9]*.deb 2>/dev/null | head -n1 || echo "")
+
+          # Формирование сообщения
+          MESSAGE="🚀 *TN_Doc Build Completed*
+
+          📦 Version: \`${VERSION}\`
+          🔗 Commit: \`${GITHUB_SHA:0:8}\`
+          📋 [Pipeline](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})
+
+          *Packages:*"
+
+          [ -n "$MINIMAL_PACKAGE" ] && MESSAGE="$MESSAGE
+          • Minimal: $(basename "$MINIMAL_PACKAGE")"
+
+          send_message "$MESSAGE"
+
+          # Отправка файлов
+          sleep 1
+          [ -n "$MINIMAL_PACKAGE" ] && send_file "$MINIMAL_PACKAGE" "📦 TN_Doc Minimal v${VERSION}"
+
+          echo "Telegram notifications sent successfully"
+
+  # ===========================================
+  # Create GitHub Release (on tag)
+  # ===========================================
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [extract-version, package-minimal]
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all packages
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts/
+
+      - name: Prepare packages
+        run: |
+          mkdir -p ./packages
+          find ./artifacts -name "*.deb" -exec cp {} ./packages/ \;
+          ls -la ./packages/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: TN_Doc v${{ needs.extract-version.outputs.version }}
+          body: |
+            ## TN_Doc v${{ needs.extract-version.outputs.version }}
+
+            ### Пакеты
+            - **tn.doc** - Минимальный пакет (требует .NET Runtime)
+
+            ### Установка
+            ```bash
+
+            # Или раздельная установка
+            sudo dpkg -i tn.doc-*.deb
+            ```
+          files: ./packages/*.deb
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
