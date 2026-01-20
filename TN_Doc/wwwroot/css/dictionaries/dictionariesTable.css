@@ -22,14 +22,17 @@
 .licences-table th,
 .users-table th,
 .qp-method-table th {
-    background: #F1F3F4; /* Прямое указание цвета */
+    background: #E8EAF6; /* Легкий синеватый оттенок для лучшей иерархии */
     color: #212121; /* Прямое указание цвета */
-    font-weight: 600; /* Прямое указание веса */
+    font-weight: 700; /* Увеличен для лучшей читаемости */
     text-align: center;
-    padding: 16px; /* Увеличено согласно M3 spacing */
+    padding: 14px 16px; /* Немного уменьшен vertical для компактности */
     border: none;
+    border-bottom: 2px solid #1E88E5; /* Акцентная линия отделяет заголовок от данных */
     font-size: 15px; /* Прямое указание размера */
     font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.5px; /* Улучшает читаемость */
+    text-transform: uppercase; /* Визуальное отличие заголовков */
 }
 
 .dictionaries-table thead tr th:first-child,
