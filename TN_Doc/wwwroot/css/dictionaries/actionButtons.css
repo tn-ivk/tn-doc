@@ -1,0 +1,89 @@
+/* Универсальные стили для action-кнопок - Material Design 3 */
+
+.action-buttons-cell {
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 0;
+    padding-right: 0;
+    width: 1%;
+}
+
+/* Заголовок колонки действий */
+.action-buttons-header {
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 0;
+    padding-right: 0;
+    width: 1%;
+}
+
+.action-buttons-cell div {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 2px; /* Уменьшенный отступ между div-контейнерами */
+    vertical-align: middle;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0; /* Margin убран - отступ контролируется родительским div */
+    border: 1px solid;
+    border-radius: 8px; /* Прямое указание радиуса */
+    padding: 8px 12px; /* Увеличено согласно M3 spacing */
+    font-size: 15px; /* Прямое указание размера */
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600; /* Прямое указание веса */
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: 40px; /* Фиксированная ширина */
+    height: 37px; /* Соответствует высоте кнопок главного окна */
+}
+
+.action-btn.btn-outline-primary {
+    color: #1E88E5; /* Прямое указание цвета */
+    border-color: #1E88E5; /* Прямое указание цвета */
+}
+
+.action-btn.btn-outline-primary:hover {
+    color: white;
+    background-color: #1E88E5; /* Прямое указание цвета */
+    border-color: #1E88E5; /* Прямое указание цвета */
+}
+
+.action-btn.btn-outline-danger {
+    color: white !important; /* Белая иконка */
+    border-color: var(--md-gray-600) !important; /* Серая граница */
+    background-color: var(--md-gray-600) !important; /* Серый фон */
+}
+
+.action-btn.btn-outline-danger:hover {
+    color: white !important; /* Белая иконка */
+    background-color: var(--md-gray-700) !important; /* Более темный серый фон при hover */
+    border-color: var(--md-gray-700) !important; /* Более темная граница при hover */
+}
+
+/* Более специфичный селектор для иконок в action-кнопках */
+/* Повышенный приоритет, чтобы не перебивался правилами из dictionariesTable.css */
+.action-buttons-cell .action-btn i,
+.users-table .action-buttons-cell .action-btn i,
+.qp-method-table .action-buttons-cell .action-btn i,
+.action-btn i {
+    font-size: 1.5em !important; /* Увеличен до 1.5em для соответствия кнопкам на вкладке Персонал */
+    vertical-align: middle !important;
+}
+
+/* Убираем влияние класса .disabled-item на action-кнопки */
+/* Кнопки действий должны оставаться видимыми и не становиться полупрозрачными */
+.disabled-item .action-buttons-cell,
+.disabled-item .action-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
