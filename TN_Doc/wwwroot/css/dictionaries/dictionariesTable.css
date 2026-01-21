@@ -72,7 +72,6 @@
 .users-table tr.data-row:hover,
 .qp-method-table tr.data-row:hover {
     background: #F1F3F4; /* Прямое указание цвета */
-    transition: background 0.2s;
 }
 
 .dictionaries-table tr.data-row,
@@ -80,7 +79,7 @@
 .licences-table tr.data-row,
 .users-table tr.data-row,
 .qp-method-table tr.data-row {
-    transition: background 0.2s;
+    transition: background 0.15s ease-out; /* Плавный easing */
 }
 
 .dictionaries-table thead tr,
