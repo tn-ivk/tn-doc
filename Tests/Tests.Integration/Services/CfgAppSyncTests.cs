@@ -14,7 +14,7 @@ public class CfgAppSyncTests
     public void CfgApp_DevicesConfigs_AreSynchronized()
     {
         // Arrange
-        var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", ".."));
+        var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".."));
         var cfgPath = Path.Combine(repoRoot, "TN_Doc", "Cfg", "CfgApp.json");
         Assert.That(File.Exists(cfgPath), Is.True, $"Файл конфигурации не найден: {cfgPath}");
 
