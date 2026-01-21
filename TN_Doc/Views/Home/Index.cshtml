@@ -77,10 +77,10 @@
                 <td class="rightPanel">
                     <table class="docTable">
                         <tr>
-                            <td height="37" width="250">
+                            <td height="37" width="250" class="pb-1">
                                 <input id="viewModeButton" type="button" value="Редактирование" width="100" hidden="hidden" onclick="ToggleMode()">
                             </td>
-                            <td id="viewPanel">
+                            <td id="viewPanel" class="pb-1">
                                 <table width="100%" height="100%" style="border: 1px none rgb(248, 2, 2)">
                                     <td align="left" style="border: 1px none rgb(248, 2, 2)">
                                         <select id="ComboboxTemplateDoc">Форма документа</select>
@@ -95,7 +95,7 @@
                                     </td>
                                 </table>
                             </td>
-                            <td id="editPanel" align="right" hidden>
+                            <td id="editPanel" align="right" hidden class="pb-1">
                                 <input id="ButtonElis" type="button" value="Запросить данные из ЕЛИС" data-toggle="modal" data-target="#elis" onclick="OpenElisDialog()" hidden>
                                 <input id="ButtonSave" type="button" value="Сохранить" onclick="SaveDoc()">
                             </td>
@@ -119,8 +119,8 @@
      id="modal-window"
      tabindex="-1" role="dialog">
 
-    <div class="modal-dialog modal-dialog-centered modal-dir-editor-width" role="document">
-        <div class="modal-content modal-dir-editor-height">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 100%; width: 100vw; height: 100vh; margin: 0;">
+        <div class="modal-content" style="height: 100vh; border-radius: 0;">
             <div class="modal-header">
 
                 <ul class="nav nav-pills nav-fill tabs-selector">
@@ -148,10 +148,10 @@
                 <div class="container-fluid">
                     <div class="row tab-item" id="main-dir-page">
                         <div class="col-3">
-                            <ul class="list-group" id="dictionaries-list">
-                                <li class="list-group-item active" data-type="#user-group"> Группы пользователей</li>
-                                <li class="list-group-item" data-type="#licences"> Доверенности</li>
-                                <li class="list-group-item" data-type="#users"> Пользователи</li>
+                            <ul class="list-group side-menu-list" id="dictionaries-list">
+                                <li class="list-group-item side-menu-item active" data-type="#user-group"> Группы пользователей</li>
+                                <li class="list-group-item side-menu-item" data-type="#licences"> Доверенности</li>
+                                <li class="list-group-item side-menu-item" data-type="#users"> Пользователи</li>
                             </ul>
                         </div>
                         <div class="col-9">
@@ -176,12 +176,14 @@
 
                                 <div class="dir-item  d-none" id="users">
                                     <div class="table-container">
+                                        <div class="parameter-navigation" id="users-group-selector-container">
+                                            @* Сюда JS вставит .parameter-selector с комбобоксом группы пользователей *@
+                                        </div>
                                         <div class="table-content">
                                             <table class="users-table table table-bordered inner-item-center">
                                                 <thead>
                                                 <tr class="table-primary">
                                                     <th scope="col">Активен</th>
-                                                    <th scope="col">Группа</th>
                                                     <th scope="col">Фамилия</th>
                                                     <th scope="col">Имя</th>
                                                     <th scope="col">Отчество</th>
@@ -242,7 +244,7 @@
                     </div>
                     <div class="tab-item row d-none" id="qp-dir-page">
                         <div class="col-3">
-                            <ul class="list-group" id="qp-list">
+                            <ul class="list-group side-menu-list" id="qp-list">
                             </ul>
                         </div>
                         <div class="col-9">

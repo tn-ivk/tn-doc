@@ -1,0 +1,41 @@
+/* Стили для навигации по параметрам методов испытаний - Material Design 3 */
+
+.parameter-navigation {
+    margin-bottom: 16px; /* Увеличено согласно M3 spacing */
+    padding: 8px; /* Увеличено согласно M3 spacing */
+}
+
+.parameter-selector {
+    display: flex;
+    align-items: center;
+}
+
+.parameter-selector label {
+    font-weight: 600; /* Прямое указание веса */
+    font-size: 15px; /* Прямое указание размера */
+    font-family: 'Roboto', sans-serif;
+    color: #212121; /* Прямое указание цвета */
+    white-space: nowrap;
+    margin: 0 16px 0 0; /* Увеличено согласно M3 spacing */
+}
+
+.parameter-select {
+    flex: 1;
+    font-size: 15px; /* Прямое указание размера */
+    font-family: 'Roboto', sans-serif;
+    padding: 6px 10px; /* Выровнять с глобальной темой */
+    border: 1px solid #CFD8DC; /* Прямое указание цвета */
+    border-radius: 8px; /* Прямое указание радиуса */
+    background-color: #FAFAFA; /* Прямое указание цвета */
+    color: #212121; /* Прямое указание цвета */
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.parameter-select:focus {
+    border-color: #1E88E5; /* Прямое указание цвета */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2); /* Focus ring с M3 primary цветом */
+}

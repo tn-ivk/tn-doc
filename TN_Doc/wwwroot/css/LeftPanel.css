@@ -34,7 +34,7 @@ input[type=number] {
 }
 
 .topPanel {
-    height: 30px;
+    height: var(--md-control-height-sm, 30px);
 }
 
 .leftPanel {
@@ -146,7 +146,7 @@ select.filterSelect {
 .qp-dir-item,
 .dir-item {
     font-size: 14px;
-    height: 750px;
+    /* height управляется через dictionariesCommon.css (flex layout) */
 }
 
 #not-selected {
@@ -308,7 +308,42 @@ select.invalid-cell-content {
 
 .close-menu {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Одинаковая ширина для обеих кнопок */
+.modal-header .close-menu .save-btn,
+.modal-header .close-menu .close-modal-wnd-btn {
+    min-width: 40px;
+}
+
+/* Увеличенная иконка дискеты в кнопке "Сохранить" */
+.modal-header .close-menu .save-btn .fa-floppy-o {
+    font-size: 1.25rem;
+}
+
+/* Увеличенная иконка крестика в кнопке "Отмена" */
+.modal-header .close-menu .close-modal-wnd-btn .fa-times {
+    font-size: 1.25rem;
+}
+
+/* Серая кнопка "Отмена" с крестиком */
+.modal-header .close-menu .close-modal-wnd-btn {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+    border-color: #6c757d !important;
+}
+
+.modal-header .close-menu .close-modal-wnd-btn:hover {
+    background-color: #5a6268 !important;
+    border-color: #545b62 !important;
+}
+
+.modal-header .close-menu .close-modal-wnd-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .padding-one-px-top {

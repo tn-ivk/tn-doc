@@ -1,0 +1,686 @@
+/* Material Design 3 tokens and Bootstrap/jQuery UI overrides for TN_Doc */
+
+/*
+  Токены для светлой темы Material Design 3.
+  Не меняем разметку, только визуальные стили. Все селекторы подобраны для переопределения существующих.
+*/
+
+:root {
+  /* Primary colors */
+  --md-primary: #1E88E5;               /* Blue 600 */
+  --md-primary-hover: #1565C0;         /* Blue 700 */
+  --md-primary-active: #0D47A1;        /* Blue 800 - для active состояния */
+
+  /* Secondary colors */
+  --md-secondary: #43A047;             /* M3 green-ish secondary */
+
+  /* Status colors */
+  --md-error: #E53935;
+  --md-error-bootstrap: #DC3545;       /* Bootstrap danger color */
+  --md-error-light: #FFF8F8;           /* Light error background */
+  --md-warning: #F9A825;
+
+  /* Surfaces and backgrounds */
+  --md-surface: #FAFAFA;               /* Background */
+  --md-surface-variant: #F1F3F4;       /* Cards, table headers */
+  --md-white: #FFFFFF;                 /* Pure white */
+  --md-primary-light: #E7F1FF;         /* Light primary background */
+  --md-gray-light: #CCCCCC;            /* Light gray */
+
+  /* Borders and outlines */
+  --md-outline: #CFD8DC;               /* Borders */
+  --md-outline-light: #E0E0E0;         /* Lighter borders */
+  --md-border: #CED4DA;                /* Input borders */
+  --md-border-light: #E5E5E5;          /* Very light borders */
+
+  /* Text colors */
+  --md-text: #212121;                  /* Primary text */
+  --md-text-secondary: #5F6368;        /* Secondary text */
+  --md-text-tertiary: #333333;         /* Tertiary text */
+  --md-text-muted: #495057;            /* Muted text */
+  --md-text-light: #666666;            /* Light gray text */
+
+  /* Gray scale for secondary buttons */
+  --md-gray-600: #6C757D;              /* Gray buttons */
+  --md-gray-700: #5A6268;              /* Gray hover */
+  --md-gray-800: #545B62;              /* Gray active */
+
+  /* ELIS integration colors */
+  --md-elis-highlight: #8FD19E;        /* ELIS data highlight */
+
+  /* Disabled state */
+  --md-disabled-bg: #EDEFF2;           /* Disabled background (cool gray) */
+  --md-disabled-text: #6B7280;         /* Disabled text (slate 500) */
+  --md-disabled-border: #BFCAD6;       /* Disabled border (cool gray) */
+
+  /* Layout tokens */
+  --md-radius: 8px;
+  --md-spacing-1: 8px;
+  --md-spacing-2: 16px;
+  --md-shadow-1: 0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.10);
+  --md-shadow-2: 0 2px 6px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08);
+
+  /* Size tokens */
+  --md-control-height: 35px;           /* Standard height for buttons, inputs, selects */
+  --md-control-height-sm: 30px;        /* Small controls (topPanel, etc) */
+  --md-control-height-lg: 40px;        /* Large buttons */
+  --md-status-bar-height: 28px;        /* Status bar height */
+
+  /* Typography tokens */
+  --md-font-family: 'Segoe UI', 'PT Astra Sans', 'Helvetica Neue', Arial, sans-serif;
+  --md-font-size-base: 15px;
+  --md-font-size-button: 15px;
+  --md-font-weight-normal: 400;
+  --md-font-weight-medium: 500;
+  --md-font-weight-semibold: 600;
+
+  /* Mapping for StatusBar (Prime-like tokens used by compiled CSS) */
+  --p-surface-0: var(--md-surface);
+  --p-surface-100: var(--md-surface-variant);
+  --p-surface-200: var(--md-outline);
+  --p-surface-300: color-mix(in srgb, var(--md-outline) 60%, #fff);
+  --p-surface-700: var(--md-text-secondary);
+
+  --p-green-100: #E8F5E9;  /* online bg */
+  --p-green-200: #C8E6C9;
+  --p-green-700: #2E7D32;  /* online text */
+
+  --p-red-100: #FFEBEE;    /* offline bg */
+  --p-red-200: #FFCDD2;
+  --p-red-700: #C62828;    /* offline text */
+
+  --p-yellow-100: #FFF8E1; /* warning bg */
+  --p-yellow-200: #FFECB3;
+  --p-yellow-700: #F9A825; /* warning text */
+}
+
+
+
+
+/* Base */
+html, body {
+  background: var(--md-surface);
+  color: var(--md-text);
+  font-family: var(--md-font-family);
+  font-size: var(--md-font-size-base);
+  font-weight: var(--md-font-weight-normal);
+}
+
+/* Typography - Global font settings */
+body, input, select, textarea, label, td, th, span, div, p {
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+  font-weight: var(--md-font-weight-normal) !important;
+}
+
+/* Links */
+a { color: var(--md-primary); }
+a:hover { color: var(--md-primary-hover); text-decoration: none; }
+
+/* Generic surfaces (cards, panels) */
+.card, .modal-content, .dropdown-menu, .list-group-item, .table, .navbar, .nav, .popover, .toast {
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface);
+}
+
+/* Elevation */
+.modal-content { box-shadow: var(--md-shadow-2); }
+.dropdown-menu, .popover, .toast { box-shadow: var(--md-shadow-2); }
+.card, .list-group-item { box-shadow: var(--md-shadow-1); }
+
+/* Borders */
+.table, .table-bordered, .modal-content, .dropdown-menu, .list-group-item, .form-control, select, input, textarea {
+  border-color: var(--md-outline) !important;
+}
+
+/* Forms */
+input[type="text"], input[type="date"], input[type="number"], input[type="search"],
+select, textarea, .form-control, .filterDatepicker, select.filterSelect,
+.p-inputtext, .p-inputnumber-input, .p-calendar .p-inputtext,
+.p-dropdown, .p-dropdown .p-dropdown-label, .p-dropdown .p-dropdown-trigger {
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+  font-weight: var(--md-font-weight-normal) !important;
+}
+
+input[type="text"], input[type="date"], input[type="number"], input[type="search"],
+select, textarea, .form-control, .filterDatepicker, select.filterSelect,
+.p-inputtext, .p-inputnumber-input, .p-calendar .p-inputtext {
+  background: var(--md-surface);
+  color: var(--md-text);
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  padding: 6px 10px !important; /* Reduced vertical padding to match button height */
+  height: var(--md-control-height) !important;
+  box-shadow: none !important;
+}
+
+.p-dropdown {
+  width: 100%;
+  min-height: var(--md-control-height);
+  height: var(--md-control-height);
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  background: #ffffff !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.p-dropdown:not(.p-disabled):hover {
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
+}
+
+.p-dropdown.p-focus,
+.p-dropdown:not(.p-disabled):focus-within {
+  border-color: var(--md-primary) !important;
+  background: var(--md-primary-light) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+.p-dropdown .p-dropdown-label {
+  display: flex !important;
+  align-items: center !important;
+  height: var(--md-control-height);
+  padding: 0 10px !important;
+  color: var(--md-text) !important;
+  line-height: 1.2 !important;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  width: 32px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--md-text-secondary) !important;
+}
+
+.p-dropdown .p-dropdown-trigger-icon {
+  font-size: 0.85rem !important;
+}
+
+.p-dropdown .p-dropdown-label.p-placeholder {
+  color: var(--md-text-secondary) !important;
+}
+
+.p-dropdown.p-disabled,
+.p-inputtext:disabled,
+.p-inputnumber-input:disabled,
+.p-calendar .p-inputtext:disabled {
+  background: var(--md-disabled-bg) !important;
+  border-color: var(--md-disabled-border) !important;
+  color: var(--md-disabled-text) !important;
+}
+
+.p-dropdown.p-disabled .p-dropdown-label {
+  color: var(--md-disabled-text) !important;
+}
+
+.p-dropdown-panel {
+  margin-top: 2px;
+  border: 1px solid var(--md-outline) !important;
+  border-radius: var(--md-radius) !important;
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12) !important;
+  background: #ffffff !important;
+  overflow: hidden;
+}
+
+.p-dropdown-items {
+  padding: 4px 0 !important;
+  font-size: var(--md-font-size-base) !important;
+}
+
+.p-dropdown-item {
+  padding: 6px 12px !important;
+  color: var(--md-text) !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.p-dropdown-item:not(.p-disabled):hover {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-dropdown-item.p-highlight {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-dropdown-item.p-highlight:not(.p-disabled):hover {
+  background: var(--md-primary) !important;
+  color: #ffffff !important;
+}
+
+/* PrimeVue Select (new API) */
+.p-select,
+.p-select.p-component {
+  width: 100%;
+  min-height: var(--md-control-height);
+  height: var(--md-control-height);
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  background: #ffffff !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.p-select:not(.p-disabled):hover {
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
+}
+
+.p-select.p-focus,
+.p-select:not(.p-disabled):focus-within {
+  border-color: var(--md-primary) !important;
+  background: var(--md-primary-light) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+.p-select .p-select-label {
+  display: flex !important;
+  align-items: center !important;
+  height: var(--md-control-height);
+  padding: 0 10px !important;
+  color: var(--md-text) !important;
+  line-height: 1.2 !important;
+}
+
+.p-select .p-select-trigger {
+  width: 32px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--md-text-secondary) !important;
+}
+
+.p-select .p-select-trigger-icon {
+  font-size: 0.85rem !important;
+}
+
+.p-select .p-select-label.p-placeholder {
+  color: var(--md-text-secondary) !important;
+}
+
+.p-select.p-disabled {
+  background: var(--md-disabled-bg) !important;
+  border-color: var(--md-disabled-border) !important;
+  color: var(--md-disabled-text) !important;
+}
+
+.p-select.p-disabled .p-select-label {
+  color: var(--md-disabled-text) !important;
+}
+
+/* Select panel */
+.p-focusable-list[role="listbox"] {
+  padding: 4px 0 !important;
+  font-size: var(--md-font-size-base) !important;
+}
+
+.p-focusable-list[role="listbox"] .p-select-option {
+  padding: 6px 12px !important;
+  color: var(--md-text) !important;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.p-focusable-list[role="listbox"] .p-select-option:not(.p-disabled):hover {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-focusable-list[role="listbox"] .p-select-option.p-focus,
+.p-focusable-list[role="listbox"] .p-select-option.p-active {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.p-select-list,
+.p-select-option {
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+}
+
+/* Explicit overrides for document editor (PrimeVue components) */
+.document-editor .p-dropdown,
+.document-editor .p-dropdown.p-component,
+.document-editor .p-select,
+.document-editor .p-select.p-component,
+.document-editor [data-pc-name="dropdown"],
+.document-editor [data-pc-name="select"],
+.document-editor .p-inputtext,
+.document-editor .p-inputnumber-input,
+.document-editor .p-calendar .p-inputtext {
+  min-height: var(--md-control-height) !important;
+  height: var(--md-control-height) !important;
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-base) !important;
+  color: var(--md-text) !important;
+  box-shadow: none !important;
+}
+
+.document-editor .p-dropdown:not(.p-disabled):hover,
+.document-editor .p-select:not(.p-disabled):hover,
+.document-editor [data-pc-name="dropdown"]:not(.p-disabled):hover,
+.document-editor [data-pc-name="select"]:not(.p-disabled):hover,
+.document-editor .p-inputtext:hover,
+.document-editor .p-inputnumber-input:hover,
+.document-editor .p-calendar .p-inputtext:hover {
+  border-color: color-mix(in srgb, var(--md-outline) 60%, var(--md-primary)) !important;
+}
+
+.document-editor .p-dropdown.p-focus,
+.document-editor .p-dropdown:not(.p-disabled):focus-within,
+.document-editor .p-select.p-focus,
+.document-editor .p-select:not(.p-disabled):focus-within,
+.document-editor [data-pc-name="dropdown"].p-focus,
+.document-editor [data-pc-name="dropdown"]:not(.p-disabled):focus-within,
+.document-editor [data-pc-name="select"].p-focus,
+.document-editor [data-pc-name="select"]:not(.p-disabled):focus-within,
+.document-editor .p-inputtext:focus,
+.document-editor .p-inputnumber-input:focus,
+.document-editor .p-calendar .p-inputtext:focus {
+  border-color: var(--md-primary) !important;
+  background: var(--md-primary-light) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+.document-editor .p-dropdown .p-dropdown-label,
+.document-editor .p-select .p-select-label,
+.document-editor [data-pc-name="dropdown"] .p-dropdown-label,
+.document-editor [data-pc-name="select"] .p-select-label {
+  padding: 0 10px !important;
+}
+
+.document-editor .p-dropdown .p-dropdown-trigger,
+.document-editor .p-select .p-select-trigger,
+.document-editor [data-pc-name="dropdown"] .p-dropdown-trigger,
+.document-editor [data-pc-name="select"] .p-select-trigger {
+  width: 32px !important;
+  color: var(--md-text-secondary) !important;
+}
+
+.document-editor .p-dropdown .p-dropdown-label.p-placeholder,
+.document-editor .p-select .p-select-label.p-placeholder,
+.document-editor [data-pc-name="dropdown"] .p-dropdown-label.p-placeholder,
+.document-editor [data-pc-name="select"] .p-select-label.p-placeholder {
+  color: var(--md-text-secondary) !important;
+}
+
+.document-editor .p-dropdown.p-disabled,
+.document-editor .p-select.p-disabled,
+.document-editor [data-pc-name="dropdown"].p-disabled,
+.document-editor [data-pc-name="select"].p-disabled,
+.document-editor .p-inputtext:disabled,
+.document-editor .p-inputnumber-input:disabled,
+.document-editor .p-calendar .p-inputtext:disabled {
+  background: var(--md-disabled-bg) !important;
+  border-color: var(--md-disabled-border) !important;
+  color: var(--md-disabled-text) !important;
+}
+
+.document-editor .p-dropdown-panel {
+  border-radius: var(--md-radius) !important;
+  border: 1px solid var(--md-outline) !important;
+  box-shadow: 0 6px 18px rgba(33, 33, 33, 0.12) !important;
+}
+
+.document-editor .p-dropdown-item:not(.p-disabled):hover {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+/* Selected item in PrimeVue Dropdown within the document editor */
+.document-editor .p-dropdown-item.p-highlight {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.document-editor .p-dropdown-item.p-highlight:not(.p-disabled):hover {
+  background: var(--md-primary-hover) !important;
+}
+
+/* PrimeVue Select (new API) selected states in the document editor */
+.document-editor .p-select-option.p-selected,
+.document-editor .p-select-option.p-highlight,
+.document-editor .p-select-option[aria-selected="true"] {
+  background: var(--md-primary-light) !important;
+  color: var(--md-text) !important;
+}
+
+.document-editor .p-select-option.p-selected:not(.p-disabled):hover,
+.document-editor .p-select-option.p-highlight:not(.p-disabled):hover,
+.document-editor .p-select-option[aria-selected="true"]:not(.p-disabled):hover {
+  background: var(--md-primary) !important;
+  color: #ffffff !important;
+}
+
+input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicker:focus, select.filterSelect:focus,
+.p-inputtext:focus, .p-inputnumber-input:focus, .p-calendar .p-inputtext:focus {
+  outline: none;
+  border-color: var(--md-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 35%, transparent) !important;
+}
+
+/* Align selects with buttons - reverted */
+
+/* Buttons */
+.btn, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
+  border-radius: var(--md-radius) !important;
+  padding: 6px 12px !important; /* Reduced padding to fit height */
+  font-family: var(--md-font-family) !important;
+  font-size: var(--md-font-size-button) !important;
+  font-weight: var(--md-font-weight-semibold) !important;
+  letter-spacing: .01em;
+  height: var(--md-control-height) !important;
+  line-height: 1.2 !important;
+  vertical-align: middle !important; /* Align with comboboxes */
+}
+
+/* Default icon size in all buttons (was previously set via inline style in JS) */
+/* Размер иконок для обычных кнопок - 1.5em */
+/* Для action-кнопок в справочниках размер управляется через actionButtons.css */
+button i.fa {
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+/* Specific alignment for filter button */
+.filterButton {
+  /* keep default alignment */
+}
+
+.btn-primary, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
+  background: var(--md-primary) !important;
+  color: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--md-primary) 80%, #000) !important;
+}
+.btn-primary:hover, table.mainTable input[type=button]:hover, table.mainTable button:hover, .filterButton:hover, button:hover {
+  background: var(--md-primary-hover) !important;
+}
+.btn-outline-primary {
+  color: var(--md-primary) !important;
+  border: 1px solid var(--md-primary) !important;
+  background: transparent !important;
+}
+.btn-outline-primary:hover {
+  color: #fff !important;
+  background: var(--md-primary) !important;
+}
+.btn-secondary { background: var(--md-secondary) !important; color: #fff !important; }
+.btn-danger { background: var(--md-error) !important; color: #fff !important; }
+.btn-warning { background: var(--md-warning) !important; color: #212121 !important; }
+
+/* Disabled states (centralized) */
+.btn:disabled,
+.btn.disabled,
+button:disabled,
+input[type="button"]:disabled,
+.filterButton:disabled,
+table.mainTable input[type=button]:disabled,
+table.mainTable button:disabled,
+.icon-btn.save-btn:disabled {
+  background: var(--md-disabled-bg) !important;
+  color: var(--md-disabled-text) !important;
+  border-color: var(--md-disabled-border) !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+/* Dropdowns (custom menu) */
+.custom-dropdown-menu {
+  background: var(--md-surface-variant) !important;
+  border: 1px solid var(--md-outline) !important;
+  border-radius: var(--md-radius) !important;
+  box-shadow: var(--md-shadow-2) !important;
+}
+.custom-dropdown-item {
+  color: var(--md-text) !important;
+  border-radius: calc(var(--md-radius) - 2px) !important;
+}
+.custom-dropdown-item:hover, .custom-dropdown-item:focus {
+  background: var(--md-primary) !important;
+  color: #fff !important;
+}
+
+/* Standard dropdown items */
+.dropdown-item {
+  color: var(--md-text) !important;
+  padding: 8px 16px !important;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+  background: var(--md-surface-variant) !important;
+  color: var(--md-text) !important;
+}
+.dropdown-item.active, .dropdown-item:active, .dropdown-item.selected {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+
+/* Select options */
+select option {
+  background: var(--md-surface) !important;
+  color: var(--md-text) !important;
+  padding: 8px 12px !important;
+}
+select option:checked, select option[selected] {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+select option:hover {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+
+/* Nav pills / Tabs */
+.nav-pills .nav-link {
+  color: var(--md-text-secondary);
+  border-radius: var(--md-radius) !important;
+}
+.nav-pills .nav-link:hover { background: color-mix(in srgb, var(--md-primary) 10%, transparent); color: var(--md-text); }
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff !important;
+  background: var(--md-primary) !important;
+  border: 1px solid color-mix(in srgb, var(--md-primary) 80%, #000) !important;
+}
+
+/* Tables */
+table, .table { color: var(--md-text); }
+.table thead th { background: var(--md-surface-variant); color: var(--md-text); border-bottom-color: var(--md-outline) !important; }
+.table td, .table th { border-color: var(--md-outline) !important; }
+.table tbody tr:hover { background: color-mix(in srgb, var(--md-primary) 7%, var(--md-surface)); }
+
+/* Selected table rows - match button primary color */
+.table tbody tr.selected,
+.table tbody tr.active,
+.table tbody tr[class*="selected"],
+.table tbody tr[class*="active"],
+table tbody tr.selected,
+table tbody tr.active,
+table tbody tr[class*="selected"],
+table tbody tr[class*="active"] {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+.table tbody tr.selected td,
+.table tbody tr.active td,
+.table tbody tr[class*="selected"] td,
+.table tbody tr[class*="active"] td,
+table tbody tr.selected td,
+table tbody tr.active td,
+table tbody tr[class*="selected"] td,
+table tbody tr[class*="active"] td {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+
+/* Additional rules for any selected row with inline styles */
+table tbody tr[style*="background"] {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+table tbody tr[style*="background"] td {
+  background: var(--md-primary) !important;
+  color: white !important;
+}
+
+/* DataTables specific */
+#DataTable_wrapper .dataTables_filter input[type="search"] {
+  border-radius: var(--md-radius) !important;
+}
+
+/* Spinners - ensure Bootstrap spinner renders as a ring, not a line */
+.filterButton .spinner-border {
+  display: inline-block !important;
+  width: 1rem;           /* match spinner-border-sm */
+  height: 1rem;
+  vertical-align: text-bottom;
+  border: 0.18em solid currentColor !important;
+  border-right-color: transparent !important;
+  border-radius: 50% !important;
+  /* prevent ellipse distortion inside flex button */
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  box-sizing: content-box;
+}
+
+/* Respect [hidden] attribute to fully hide spinner */
+.filterButton .spinner-border[hidden] {
+  display: none !important;
+}
+
+/* Modal tweaks */
+.modal-header, .modal-body, .modal-footer {
+  background: var(--md-surface);
+  color: var(--md-text);
+}
+
+/* Status bar overrides to match scheme */
+.status-bar {
+  background: var(--md-surface-variant) !important;
+  border-top: 1px solid var(--md-outline) !important;
+}
+
+/* Utilities */
+.surface {
+  background: var(--md-surface) !important;
+}
+.surface-variant {
+  background: var(--md-surface-variant) !important;
+}
+.text-secondary { color: var(--md-text-secondary) !important; }
+
+/* Fix legacy borders in layout tables */
+table.mainTable > tbody > tr > td,
+table.filterTable td,
+.searched-table {
+  border-color: var(--md-outline) !important;
+}
