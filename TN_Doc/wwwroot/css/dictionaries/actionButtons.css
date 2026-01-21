@@ -31,7 +31,7 @@
     margin: 0; /* Margin убран - отступ контролируется родительским div */
     border: 1px solid;
     border-radius: 8px; /* Прямое указание радиуса */
-    padding: 8px 12px; /* Увеличено согласно M3 spacing */
+    padding: 0; /* Центрирование через flex */
     font-size: 15px; /* Прямое указание размера */
     font-family: 'Roboto', sans-serif;
     font-weight: 600; /* Прямое указание веса */
@@ -42,9 +42,18 @@
     cursor: pointer;
     user-select: none;
     background-color: transparent;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    width: 40px; /* Фиксированная ширина */
-    height: 37px; /* Соответствует высоте кнопок главного окна */
+    transition: all 0.15s ease-out;
+    width: 38px; /* Унифицированный квадрат */
+    height: 38px; /* Унифицированный квадрат */
+}
+
+.action-btn:hover {
+    transform: scale(1.08);
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+    transition: transform 0.05s ease-out;
 }
 
 .action-btn.btn-outline-primary {
