@@ -49,10 +49,17 @@ public class DirEditorControllerTests
         }
 
         // Cleanup TestQp.json created in AppContext.BaseDirectory
-        var testQpPath = Path.Combine(AppContext.BaseDirectory, "TestQp.json");
-        if (File.Exists(testQpPath))
+        var testQpPathAppBase = Path.Combine(AppContext.BaseDirectory, "TestQp.json");
+        if (File.Exists(testQpPathAppBase))
         {
-            File.Delete(testQpPath);
+            File.Delete(testQpPathAppBase);
+        }
+
+        // Cleanup TestQp.json created in Directory.GetCurrentDirectory() (используется для QP тестов)
+        var testQpPathCurrentDir = Path.Combine(Directory.GetCurrentDirectory(), "TestQp.json");
+        if (File.Exists(testQpPathCurrentDir))
+        {
+            File.Delete(testQpPathCurrentDir);
         }
     }
 
@@ -127,7 +134,7 @@ public class DirEditorControllerTests
                             Name = "Паспорта",
                             TemplateDocs = new List<TemplateDoc>
                             {
-                                new TemplateDoc { Use = true, Id = 1, Name = "Test Template", PathToDocEditConfigFile = "TestQp.json" }
+                                new TemplateDoc { Use = true, Id = 1, Name = "Test Template", PathToDocEditConfigFile = Path.DirectorySeparatorChar + "TestQp.json" }
                             }
                         }
                     }
@@ -229,9 +236,6 @@ public class DirEditorControllerTests
         Assert.That(getDirEditDto.DirJsonRaw, Contains.Substring("Updated Direction"));
     }
 
-    // NOTE: Тесты GetQpConfigsAsync и SetQpConfigsAsync удалены как неактуальные.
-    // Они требуют файла TestQp.json, который AppConfigService ищет по другому пути.
-
     /// <summary>
     /// Не должен падать при некорректном JSON словарей (поведение сервиса — логирует ошибку).
     /// </summary>
@@ -247,5 +251,285 @@ public class DirEditorControllerTests
         // This test verifies that the controller doesn't crash with invalid JSON
         Assert.DoesNotThrowAsync(async () => await _controller.SetDirAsync(dirEditDto));
     }
+
+    #region GetQpConfigsAsync Tests
+
+    /// <summary>
+    /// Возвращает 200 и QpEditDto с непустым JSON при успешном получении конфигурации паспортов качества.
+    /// </summary>
+    [Test]
+    public async Task GetQpConfigsAsync_WhenConfigExists_ReturnsOkWithQpConfig()
+    {
+        // Arrange
+        // Файл TestQp.json уже создан в CreateTestConfigFiles()
+        // AppConfigService ищет файлы относительно Directory.GetCurrentDirectory()
+        EnsureQpConfigFileExists();
+
+        // Act
+        var result = await _controller.GetQpConfigsAsync();
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        var okResult = result as OkObjectResult;
+        Assert.That(okResult.Value, Is.InstanceOf<QpEditDto>());
+
+        var qpEditDto = okResult.Value as QpEditDto;
+        Assert.That(qpEditDto.QpCfgJsonRaw, Is.Not.Null);
+        Assert.That(qpEditDto.QpCfgJsonRaw, Is.Not.Empty);
+
+        // Проверяем логирование
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Trace,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Получения конфигурации используемых паспортов качества")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
+    }
+
+    /// <summary>
+    /// Возвращаемый JSON содержит структуру QpsInfo с информацией о паспортах.
+    /// </summary>
+    [Test]
+    public async Task GetQpConfigsAsync_WhenConfigExists_ReturnsValidQpsInfoStructure()
+    {
+        // Arrange
+        EnsureQpConfigFileExists();
+
+        // Act
+        var result = await _controller.GetQpConfigsAsync();
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        var okResult = result as OkObjectResult;
+        var qpEditDto = okResult.Value as QpEditDto;
+
+        // Проверяем, что JSON содержит ключ QpsInfo
+        Assert.That(qpEditDto.QpCfgJsonRaw, Contains.Substring("QpsInfo"));
+
+        // Парсим JSON и проверяем структуру
+        var jsonObj = Newtonsoft.Json.Linq.JObject.Parse(qpEditDto.QpCfgJsonRaw);
+        Assert.That(jsonObj["QpsInfo"], Is.Not.Null);
+        Assert.That(jsonObj["QpsInfo"].Type, Is.EqualTo(Newtonsoft.Json.Linq.JTokenType.Array));
+    }
+
+    /// <summary>
+    /// Конфигурация паспортов содержит секции Methods и Parameters из файла редактирования.
+    /// </summary>
+    [Test]
+    public async Task GetQpConfigsAsync_WhenConfigExists_ReturnsMethodsAndParameters()
+    {
+        // Arrange
+        EnsureQpConfigFileExists();
+
+        // Act
+        var result = await _controller.GetQpConfigsAsync();
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<OkObjectResult>());
+        var okResult = result as OkObjectResult;
+        var qpEditDto = okResult.Value as QpEditDto;
+
+        var jsonObj = Newtonsoft.Json.Linq.JObject.Parse(qpEditDto.QpCfgJsonRaw);
+        var qpsInfo = jsonObj["QpsInfo"] as Newtonsoft.Json.Linq.JArray;
+
+        // Должен быть хотя бы один элемент (Test Template)
+        Assert.That(qpsInfo.Count, Is.GreaterThan(0));
+
+        // Первый элемент должен содержать Methods и Parameters
+        var firstQp = qpsInfo[0];
+        Assert.That(firstQp["Methods"], Is.Not.Null, "Должен содержать секцию Methods");
+        Assert.That(firstQp["Parameters"], Is.Not.Null, "Должен содержать секцию Parameters");
+    }
+
+    #endregion
+
+    #region SetQpConfigsAsync Tests
+
+    /// <summary>
+    /// Возвращает 200 при успешной установке конфигурации паспортов качества.
+    /// </summary>
+    [Test]
+    public async Task SetQpConfigsAsync_WithValidConfig_ReturnsOk()
+    {
+        // Arrange
+        EnsureQpConfigFileExists();
+
+        // Получаем текущую конфигурацию
+        var getResult = await _controller.GetQpConfigsAsync();
+        var okGetResult = getResult as OkObjectResult;
+        var currentConfig = okGetResult.Value as QpEditDto;
+
+        // Модифицируем конфигурацию - добавляем новый метод
+        var jsonObj = Newtonsoft.Json.Linq.JObject.Parse(currentConfig.QpCfgJsonRaw);
+        var qpsInfo = jsonObj["QpsInfo"] as Newtonsoft.Json.Linq.JArray;
+        if (qpsInfo.Count > 0)
+        {
+            var methods = qpsInfo[0]["Methods"] as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+            methods.Add(new Newtonsoft.Json.Linq.JObject(
+                new Newtonsoft.Json.Linq.JProperty("Id", 999),
+                new Newtonsoft.Json.Linq.JProperty("Name", "Test Method")
+            ));
+            qpsInfo[0]["Methods"] = methods;
+        }
+
+        var modifiedConfig = new QpEditDto { QpCfgJsonRaw = jsonObj.ToString() };
+
+        // Act
+        var result = await _controller.SetQpConfigsAsync(modifiedConfig);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<OkResult>());
+
+        // Проверяем логирование
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Trace,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Установка новой конфигурации проекта")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.Once);
+    }
+
+    /// <summary>
+    /// После SetQpConfigsAsync последующий GetQpConfigsAsync возвращает обновлённые данные.
+    /// </summary>
+    [Test]
+    public async Task SetQpConfigsAsync_WithValidConfig_UpdatesConfigurationPersistently()
+    {
+        // Arrange
+        EnsureQpConfigFileExists();
+
+        // Получаем текущую конфигурацию
+        var getResult = await _controller.GetQpConfigsAsync();
+        var okGetResult = getResult as OkObjectResult;
+        var currentConfig = okGetResult.Value as QpEditDto;
+
+        // Модифицируем конфигурацию - добавляем уникальный параметр
+        var uniqueParamName = $"UniqueTestParam_{Guid.NewGuid():N}";
+        var jsonObj = Newtonsoft.Json.Linq.JObject.Parse(currentConfig.QpCfgJsonRaw);
+        var qpsInfo = jsonObj["QpsInfo"] as Newtonsoft.Json.Linq.JArray;
+        if (qpsInfo.Count > 0)
+        {
+            var parameters = qpsInfo[0]["Parameters"] as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+            parameters.Add(new Newtonsoft.Json.Linq.JObject(
+                new Newtonsoft.Json.Linq.JProperty("Id", 888),
+                new Newtonsoft.Json.Linq.JProperty("Name", uniqueParamName)
+            ));
+            qpsInfo[0]["Parameters"] = parameters;
+        }
+
+        var modifiedConfig = new QpEditDto { QpCfgJsonRaw = jsonObj.ToString() };
+
+        // Act
+        await _controller.SetQpConfigsAsync(modifiedConfig);
+
+        // Получаем конфигурацию снова
+        var verifyResult = await _controller.GetQpConfigsAsync();
+        var okVerifyResult = verifyResult as OkObjectResult;
+        var verifyConfig = okVerifyResult.Value as QpEditDto;
+
+        // Assert
+        Assert.That(verifyConfig.QpCfgJsonRaw, Contains.Substring(uniqueParamName),
+            "Обновлённая конфигурация должна содержать добавленный параметр");
+    }
+
+    /// <summary>
+    /// SetQpConfigsAsync корректно обрабатывает конфигурацию с пустыми массивами Methods и Parameters.
+    /// </summary>
+    [Test]
+    public async Task SetQpConfigsAsync_WithEmptyMethodsAndParameters_ReturnsOk()
+    {
+        // Arrange
+        EnsureQpConfigFileExists();
+
+        // Получаем текущую конфигурацию
+        var getResult = await _controller.GetQpConfigsAsync();
+        var okGetResult = getResult as OkObjectResult;
+        var currentConfig = okGetResult.Value as QpEditDto;
+
+        // Очищаем Methods и Parameters
+        var jsonObj = Newtonsoft.Json.Linq.JObject.Parse(currentConfig.QpCfgJsonRaw);
+        var qpsInfo = jsonObj["QpsInfo"] as Newtonsoft.Json.Linq.JArray;
+        if (qpsInfo.Count > 0)
+        {
+            qpsInfo[0]["Methods"] = new Newtonsoft.Json.Linq.JArray();
+            qpsInfo[0]["Parameters"] = new Newtonsoft.Json.Linq.JArray();
+        }
+
+        var modifiedConfig = new QpEditDto { QpCfgJsonRaw = jsonObj.ToString() };
+
+        // Act
+        var result = await _controller.SetQpConfigsAsync(modifiedConfig);
+
+        // Assert
+        Assert.That(result, Is.InstanceOf<OkResult>());
+    }
+
+    /// <summary>
+    /// SetQpConfigsAsync выбрасывает исключение при отсутствии файла конфигурации редактирования.
+    /// </summary>
+    [Test]
+    public void SetQpConfigsAsync_WhenEditConfigFileNotExists_ThrowsFileNotFoundException()
+    {
+        // Arrange
+        // Создаём конфигурацию с несуществующим путём к файлу редактирования
+        var invalidConfig = new QpEditDto
+        {
+            QpCfgJsonRaw = JsonConvert.SerializeObject(new
+            {
+                QpsInfo = new[]
+                {
+                    new
+                    {
+                        EditConfigFilePath = "/NonExistent/Path/Config.json",
+                        Name = "Invalid Config",
+                        Methods = new object[] { },
+                        Parameters = new object[] { }
+                    }
+                }
+            })
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<FileNotFoundException>(async () =>
+            await _controller.SetQpConfigsAsync(invalidConfig));
+    }
+
+    #endregion
+
+    #region Helper Methods
+
+    /// <summary>
+    /// Создаёт файл конфигурации паспортов качества в Directory.GetCurrentDirectory(),
+    /// так как AppConfigService ищет файлы относительно этой директории.
+    /// </summary>
+    private void EnsureQpConfigFileExists()
+    {
+        // AppConfigService использует Directory.GetCurrentDirectory() для поиска файлов QP
+        var qpFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestQp.json");
+
+        if (!File.Exists(qpFilePath))
+        {
+            var qpConfig = new
+            {
+                Methods = new[]
+                {
+                    new { Id = 1, Name = "ГОСТ Р 51858-2002", Description = "Метод определения качества" }
+                },
+                Parameters = new[]
+                {
+                    new { Id = 1, Name = "Плотность", Unit = "кг/м³" },
+                    new { Id = 2, Name = "Вязкость", Unit = "мм²/с" }
+                }
+            };
+
+            File.WriteAllText(qpFilePath, JsonConvert.SerializeObject(qpConfig, Formatting.Indented));
+        }
+    }
+
+    #endregion
 
 }
