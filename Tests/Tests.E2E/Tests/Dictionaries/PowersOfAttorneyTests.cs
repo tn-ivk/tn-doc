@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using Tests.E2E.Base;
 using Tests.E2E.Pages;
 
@@ -40,10 +41,14 @@ public class PowersOfAttorneyTests : PlaywrightTestBase
         await _dictionaries.NavigateToPersonnelAsync();
         await _dictionaries.NavigateToPowersOfAttorneyAsync();
 
-        // Assert - проверяем наличие колонок
-        await AssertTextVisibleAsync("Активен");
-        await AssertTextVisibleAsync("Номер");
-        await AssertTextVisibleAsync("Дата");
+        // Assert - проверяем наличие колонок в видимой таблице
+        var table = Page.Locator("[role='dialog'] table:visible").First;
+        await Expect(table.GetByRole(AriaRole.Columnheader, new() { Name = "Активен" }).First)
+            .ToBeVisibleAsync();
+        await Expect(table.GetByRole(AriaRole.Columnheader, new() { Name = "Номер" }).First)
+            .ToBeVisibleAsync();
+        await Expect(table.GetByRole(AriaRole.Columnheader, new() { Name = "Дата" }).First)
+            .ToBeVisibleAsync();
 
         // Скриншот
         await TakeScreenshotAsync("2.1-powers-of-attorney-view");

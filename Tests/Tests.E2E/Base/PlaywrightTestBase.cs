@@ -196,10 +196,40 @@ public abstract class PlaywrightTestBase : PageTest
     /// </summary>
     protected async Task AssertTextVisibleAsync(string text, int timeout = DefaultTimeout)
     {
-        await Expect(Page.GetByText(text)).ToBeVisibleAsync(new LocatorAssertionsToBeVisibleOptions
+        await Expect(Page.GetByText(text).First).ToBeVisibleAsync(new LocatorAssertionsToBeVisibleOptions
         {
             Timeout = timeout
         });
+    }
+
+    /// <summary>
+    /// Проверяет наличие текста в конкретном контейнере
+    /// </summary>
+    protected async Task AssertTextVisibleInContainerAsync(string containerSelector, string text, int timeout = DefaultTimeout)
+    {
+        var container = Page.Locator(containerSelector);
+        await Expect(container.GetByText(text, new() { Exact = false }).First).ToBeVisibleAsync(
+            new LocatorAssertionsToBeVisibleOptions { Timeout = timeout });
+    }
+
+    /// <summary>
+    /// Проверяет наличие ячейки с текстом в таблице
+    /// </summary>
+    protected async Task AssertCellVisibleInTableAsync(string tableSelector, string text, int timeout = DefaultTimeout)
+    {
+        var table = Page.Locator(tableSelector);
+        await Expect(table.GetByRole(AriaRole.Cell, new() { Name = text }).First).ToBeVisibleAsync(
+            new LocatorAssertionsToBeVisibleOptions { Timeout = timeout });
+    }
+
+    /// <summary>
+    /// Проверяет наличие заголовка колонки в таблице
+    /// </summary>
+    protected async Task AssertColumnHeaderVisibleAsync(string tableSelector, string headerText, int timeout = DefaultTimeout)
+    {
+        var table = Page.Locator(tableSelector);
+        await Expect(table.GetByRole(AriaRole.Columnheader, new() { Name = headerText }).First).ToBeVisibleAsync(
+            new LocatorAssertionsToBeVisibleOptions { Timeout = timeout });
     }
 
     /// <summary>

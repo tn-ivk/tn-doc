@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using Tests.E2E.Base;
 using Tests.E2E.Pages;
 
@@ -63,8 +64,10 @@ public class UserGroupsTests : PlaywrightTestBase
         await _dictionaries.NavigateToPersonnelAsync();
         await _dictionaries.NavigateToUserGroupsAsync();
 
-        // Assert
-        await AssertTextVisibleAsync("Представители испытательной лаборатории");
+        // Assert - ищем в таблице, не в select
+        var table = Page.Locator("[role='dialog'] table");
+        await Expect(table.GetByRole(AriaRole.Cell, new() { Name = "Представители испытательной лаборатории" }).First)
+            .ToBeVisibleAsync();
     }
 
     /// <summary>
@@ -79,8 +82,10 @@ public class UserGroupsTests : PlaywrightTestBase
         await _dictionaries.NavigateToPersonnelAsync();
         await _dictionaries.NavigateToUserGroupsAsync();
 
-        // Assert
-        await AssertTextVisibleAsync("Представители сдающей стороны");
+        // Assert - ищем в таблице, не в select
+        var table = Page.Locator("[role='dialog'] table");
+        await Expect(table.GetByRole(AriaRole.Cell, new() { Name = "Представители сдающей стороны" }).First)
+            .ToBeVisibleAsync();
     }
 
     /// <summary>
@@ -95,8 +100,10 @@ public class UserGroupsTests : PlaywrightTestBase
         await _dictionaries.NavigateToPersonnelAsync();
         await _dictionaries.NavigateToUserGroupsAsync();
 
-        // Assert
-        await AssertTextVisibleAsync("Представители принимающей стороны");
+        // Assert - ищем в таблице, не в select
+        var table = Page.Locator("[role='dialog'] table");
+        await Expect(table.GetByRole(AriaRole.Cell, new() { Name = "Представители принимающей стороны" }).First)
+            .ToBeVisibleAsync();
     }
 
     /// <summary>
@@ -111,8 +118,10 @@ public class UserGroupsTests : PlaywrightTestBase
         await _dictionaries.NavigateToPersonnelAsync();
         await _dictionaries.NavigateToUserGroupsAsync();
 
-        // Assert
-        await AssertTextVisibleAsync("Представители ТНМ");
+        // Assert - ищем в таблице, не в select
+        var table = Page.Locator("[role='dialog'] table");
+        await Expect(table.GetByRole(AriaRole.Cell, new() { Name = "Представители ТНМ" }).First)
+            .ToBeVisibleAsync();
     }
 
     /// <summary>
