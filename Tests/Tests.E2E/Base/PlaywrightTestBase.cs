@@ -6,6 +6,7 @@ namespace Tests.E2E.Base;
 /// <summary>
 /// Базовый класс для всех E2E тестов с поддержкой Playwright.
 /// Наследует от PageTest, который автоматически управляет жизненным циклом браузера.
+/// Для запуска в видимом режиме используйте: set HEADED=1 && dotnet test
 /// </summary>
 [TestFixture]
 [Category("E2E")]

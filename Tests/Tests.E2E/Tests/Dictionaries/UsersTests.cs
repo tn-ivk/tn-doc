@@ -200,8 +200,11 @@ public class UsersTests : PlaywrightTestBase
 
         // Act
         await _dictionaries.ClickAddAsync();
-        await _dictionaries.FillFieldByLabelAsync("Фамилия", ""); // Пустое поле
+        await _dictionaries.FillFieldByLabelAsync("Фамилия", ""); // Пустое поле - тестируемое
         await _dictionaries.FillFieldByLabelAsync("Имя", TestUserFirstName);
+        await _dictionaries.FillFieldByLabelAsync("Отчество", TestUserMiddleName);
+        await _dictionaries.FillFieldByLabelAsync("Организация", TestUserOrganization);
+        await _dictionaries.FillFieldByLabelAsync("Должность", TestUserPosition);
         await _dictionaries.ClickConfirmAsync();
 
         // Assert - должна быть ошибка валидации
@@ -235,7 +238,10 @@ public class UsersTests : PlaywrightTestBase
         // Act
         await _dictionaries.ClickAddAsync();
         await _dictionaries.FillFieldByLabelAsync("Фамилия", TestUserLastName);
-        await _dictionaries.FillFieldByLabelAsync("Имя", ""); // Пустое поле
+        await _dictionaries.FillFieldByLabelAsync("Имя", ""); // Пустое поле - тестируемое
+        await _dictionaries.FillFieldByLabelAsync("Отчество", TestUserMiddleName);
+        await _dictionaries.FillFieldByLabelAsync("Организация", TestUserOrganization);
+        await _dictionaries.FillFieldByLabelAsync("Должность", TestUserPosition);
         await _dictionaries.ClickConfirmAsync();
 
         // Assert
@@ -275,6 +281,9 @@ public class UsersTests : PlaywrightTestBase
         await _dictionaries.SetCheckboxByLabelAsync("Активен", true);
         await _dictionaries.FillFieldByLabelAsync("Фамилия", TestUserLastName);
         await _dictionaries.FillFieldByLabelAsync("Имя", TestUserFirstName);
+        await _dictionaries.FillFieldByLabelAsync("Отчество", TestUserMiddleName);
+        await _dictionaries.FillFieldByLabelAsync("Организация", TestUserOrganization);
+        await _dictionaries.FillFieldByLabelAsync("Должность", TestUserPosition);
         await _dictionaries.ClickConfirmAsync();
     }
 
@@ -287,6 +296,9 @@ public class UsersTests : PlaywrightTestBase
         await _dictionaries.SetCheckboxByLabelAsync("Активен", true);
         await _dictionaries.FillFieldByLabelAsync("Фамилия", lastName);
         await _dictionaries.FillFieldByLabelAsync("Имя", firstName);
+        await _dictionaries.FillFieldByLabelAsync("Отчество", "Тестович");
+        await _dictionaries.FillFieldByLabelAsync("Организация", "ТестОрг");
+        await _dictionaries.FillFieldByLabelAsync("Должность", "Тестер");
         await _dictionaries.ClickConfirmAsync();
     }
 
