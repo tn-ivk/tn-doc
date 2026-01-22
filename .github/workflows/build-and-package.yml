@@ -140,7 +140,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          dotnet test Tests/Tests.csproj -c Release --no-build \
+          dotnet test Tests/Tests.Unit/Tests.Unit.csproj -c Release --no-build \
             --filter "Namespace~Tests.Controllers|Namespace~Tests.Services|Namespace~Tests.Configs" \
             --verbosity normal \
             --logger "trx;LogFileName=unit-test-results.trx"
@@ -210,7 +210,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          dotnet test Tests/Tests.csproj -c Release --no-build \
+          dotnet test Tests/Tests.Integration/Tests.Integration.csproj -c Release --no-build \
             --filter "Namespace~Tests.Libraries.Integration|Namespace~Tests.Libraries.KMH|Namespace~Tests.Libraries.Common|Namespace~Tests.Libraries.Core" \
             --verbosity normal \
             --logger "trx;LogFileName=integration-test-results.trx"
