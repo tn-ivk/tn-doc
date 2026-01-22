@@ -164,7 +164,7 @@ jobs:
       - name: Configure submodule URLs for GitHub (private repos)
         run: |
           git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
-          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreprint.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
           git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
           git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-utils.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.utils.git"
 
