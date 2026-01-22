@@ -2040,7 +2040,8 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
     
     // Создание строк для методов данного параметра
     for (let method of methods) {
-        if (typeof method.IsDefault === 'undefined') method.IsDefault = false;
+        // Не модифицируем исходный объект - используем ?? для получения дефолтного значения при рендеринге
+        let isDefaultValue = method.IsDefault ?? false;
         let row = document.createElement('tr');
         row.classList.add('data-row');
         row.dataset.id = method['Id'];
@@ -2082,7 +2083,7 @@ function _createParameterMethodsTable(qpId, parameter, methods, container) {
         let defaultCell = document.createElement('td');
         let defaultIcon = document.createElement('i');
         defaultIcon.classList.add('fa');
-        defaultIcon.classList.add(method.IsDefault ? 'fa-check-square-o' : 'fa-square-o');
+        defaultIcon.classList.add(isDefaultValue ? 'fa-check-square-o' : 'fa-square-o');
         defaultIcon.ariaHidden = true;
         defaultCell.appendChild(defaultIcon);
         _addCellStyle(defaultCell);
