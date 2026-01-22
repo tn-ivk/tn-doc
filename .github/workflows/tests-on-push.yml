@@ -1,0 +1,260 @@
+name: Tests on Push
+
+on:
+  push:
+    branches:
+      - 'develop*'
+
+env:
+  DOTNET_SDK_VERSION: '8.0'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_NOLOGO: 'true'
+
+jobs:
+  # ===========================================
+  # Build Job
+  # ===========================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Configure submodule URLs for GitHub (private repos)
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-utils.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.utils.git"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GH_SUBMODULES_TOKEN }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+          source-url: https://nuget.pkg.github.com/tn-ivk/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Add FastReport NuGet source
+        run: |
+          dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" \
+            --name fr_nuget \
+            --username "${{ secrets.FR_NUGET_USERNAME }}" \
+            --password "${{ secrets.FR_NUGET_PASSWORD }}" \
+            --store-password-in-clear-text
+
+      - name: Create directories
+        run: mkdir -p TN_Doc/Dll
+
+      - name: Build solution
+        run: dotnet build -c Release
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            **/bin/Release/
+            **/obj/Release/
+          retention-days: 1
+
+  # ===========================================
+  # Unit Test Job
+  # ===========================================
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Configure submodule URLs for GitHub (private repos)
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-utils.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.utils.git"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GH_SUBMODULES_TOKEN }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+          source-url: https://nuget.pkg.github.com/tn-ivk/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Add FastReport NuGet source
+        run: |
+          dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" \
+            --name fr_nuget \
+            --username "${{ secrets.FR_NUGET_USERNAME }}" \
+            --password "${{ secrets.FR_NUGET_PASSWORD }}" \
+            --store-password-in-clear-text
+
+      - name: Create directories
+        run: mkdir -p TN_Doc/Dll
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+
+      - name: Run unit tests
+        run: |
+          dotnet test Tests/Tests.Unit/Tests.Unit.csproj -c Release --no-build \
+            --filter "Namespace~Tests.Controllers|Namespace~Tests.Services|Namespace~Tests.Configs" \
+            --verbosity normal \
+            --logger "trx;LogFileName=unit-test-results.trx" \
+            --logger "console;verbosity=detailed"
+
+      - name: Upload unit test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-unit
+          path: "**/TestResults/*.trx"
+          retention-days: 7
+
+  # ===========================================
+  # Integration Test Job
+  # ===========================================
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Configure submodule URLs for GitHub (private repos)
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-utils.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.utils.git"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GH_SUBMODULES_TOKEN }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+          source-url: https://nuget.pkg.github.com/tn-ivk/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Add FastReport NuGet source
+        run: |
+          dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" \
+            --name fr_nuget \
+            --username "${{ secrets.FR_NUGET_USERNAME }}" \
+            --password "${{ secrets.FR_NUGET_PASSWORD }}" \
+            --store-password-in-clear-text
+
+      - name: Create directories
+        run: mkdir -p TN_Doc/Dll
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+
+      - name: Run integration tests
+        run: |
+          dotnet test Tests/Tests.Integration/Tests.Integration.csproj -c Release --no-build \
+            --filter "Namespace~Tests.Libraries.Integration|Namespace~Tests.Libraries.KMH|Namespace~Tests.Libraries.Common|Namespace~Tests.Libraries.Core" \
+            --verbosity normal \
+            --logger "trx;LogFileName=integration-test-results.trx" \
+            --logger "console;verbosity=detailed"
+
+      - name: Upload integration test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-integration
+          path: "**/TestResults/*.trx"
+          retention-days: 7
+
+  # ===========================================
+  # Test Summary Job
+  # ===========================================
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-test, integration-test]
+    if: always()
+
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          merge-multiple: true
+
+      - name: Test Results Summary
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.unit-test.result }}" == "success" ]; then
+            echo "- Unit Tests: **Passed**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Unit Tests: **Failed**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.integration-test.result }}" == "success" ]; then
+            echo "- Integration Tests: **Passed**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Integration Tests: **Failed**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See artifacts for detailed test results." >> $GITHUB_STEP_SUMMARY

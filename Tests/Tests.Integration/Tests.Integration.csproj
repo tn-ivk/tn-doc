@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Tests</RootNamespace>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <NoWarn>$(NoWarn);NUnit1032;NUnit1001;NUnit1033</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+        <PackageReference Include="Moq" Version="4.20.72" />
+        <PackageReference Include="NUnit" Version="4.3.2" />
+        <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+        <PackageReference Include="NUnit.Analyzers" Version="4.7.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="6.0.4" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.20" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
+        <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="NUnit.Framework" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Shared Fixtures and Helpers -->
+        <ProjectReference Include="..\Tests.Shared\Tests.Shared.csproj" />
+
+        <!-- Main Application -->
+        <ProjectReference Include="..\..\TN_Doc\TN_Doc.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\TN.DocGeneral\TN.DocGeneral.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\tn.utils\TN.Utils\TN.Utils.csproj" />
+
+        <!-- Common Libraries -->
+        <ProjectReference Include="..\..\tn.docgeneral\CommonPoverka1974\CommonPoverka1974.csproj">
+            <Aliases>CommonPoverka1974Lib</Aliases>
+        </ProjectReference>
+        <ProjectReference Include="..\..\tn.docgeneral\CommonSikn425\CommonSikn425.csproj">
+            <Aliases>CommonSikn425Lib</Aliases>
+        </ProjectReference>
+
+        <!-- Core Documents -->
+        <ProjectReference Include="..\..\tn.docgeneral\Act\Act.csproj">
+            <Aliases>ActLib</Aliases>
+        </ProjectReference>
+        <ProjectReference Include="..\..\tn.docgeneral\Passport\Passport.csproj">
+            <Aliases>PassportLib</Aliases>
+        </ProjectReference>
+        <ProjectReference Include="..\..\tn.docgeneral\Jornal\Jornal.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\Report\Report.csproj" />
+
+        <!-- KMH Documents -->
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_MPR_MPR\KMH_MPR_MPR.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_MPR_PU\KMH_MPR_PU.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_MPR_TPR\KMH_MPR_TPR.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_PP\KMH_PP.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_PP_Areom\KMH_PP_Areom.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_PR_PR\KMH_PR_PR.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_PR_PU\KMH_PR_PU.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_PV\KMH_PV.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_PW\KMH_PW.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH_MI2816\KMH_MI2816.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH3265_PR_PU\KMH3265_PR_PU.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH3265_UPR_PR\KMH3265_UPR_PR.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH3288_MPR_TPR\KMH3288_MPR_TPR.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH3312_PR_PU\KMH3312_PR_PU.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMH3312_UPR_PR\KMH3312_UPR_PR.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMX_Sikn425_PR_PR\KMX_Sikn425_PR_PR.csproj" />
+        <ProjectReference Include="..\..\tn.docgeneral\KMX_Sikn425_PR_PU\KMX_Sikn425_PR_PU.csproj" />
+    </ItemGroup>
+
+</Project>

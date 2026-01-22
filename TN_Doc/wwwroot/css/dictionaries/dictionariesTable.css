@@ -1,0 +1,139 @@
+/* Универсальные стили для таблиц справочников - Material Design 3 */
+
+.dictionaries-table,
+.user-group-table,
+.licences-table,
+.users-table,
+.qp-method-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px; /* Прямое указание размера */
+    background: #FAFAFA; /* Прямое указание цвета */
+    border-radius: 8px; /* Прямое указание радиуса */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: 1px solid #CFD8DC; /* Прямое указание цвета */
+}
+
+.dictionaries-table th,
+.user-group-table th,
+.licences-table th,
+.users-table th,
+.qp-method-table th {
+    background: #E8EAF6; /* Легкий синеватый оттенок для лучшей иерархии */
+    color: #212121; /* Прямое указание цвета */
+    font-weight: 700; /* Увеличен для лучшей читаемости */
+    text-align: center;
+    padding: 14px 16px; /* Немного уменьшен vertical для компактности */
+    border: none;
+    border-bottom: 2px solid #1E88E5; /* Акцентная линия отделяет заголовок от данных */
+    font-size: 15px; /* Прямое указание размера */
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.5px; /* Улучшает читаемость */
+    text-transform: uppercase; /* Визуальное отличие заголовков */
+}
+
+.dictionaries-table thead tr th:first-child,
+.user-group-table thead tr th:first-child,
+.licences-table thead tr th:first-child,
+.users-table thead tr th:first-child,
+.qp-method-table thead tr th:first-child {
+    border-top-left-radius: 8px; /* Прямое указание радиуса */
+}
+.dictionaries-table thead tr th:last-child,
+.user-group-table thead tr th:last-child,
+.licences-table thead tr th:last-child,
+.users-table thead tr th:last-child,
+.qp-method-table thead tr th:last-child {
+    border-top-right-radius: 8px; /* Прямое указание радиуса */
+}
+
+.dictionaries-table td,
+.user-group-table td,
+.licences-table td,
+.users-table td,
+.qp-method-table td {
+    border: none;
+    border-bottom: 1px solid #CFD8DC; /* Прямое указание цвета */
+    padding: 12px 16px; /* Увеличено согласно M3 spacing */
+    text-align: center;
+    vertical-align: middle;
+    font-size: 15px; /* Прямое указание размера */
+    font-family: 'Roboto', sans-serif;
+    background: #FAFAFA; /* Прямое указание цвета */
+    transition: background 0.2s;
+}
+
+.dictionaries-table tr.data-row:hover,
+.user-group-table tr.data-row:hover,
+.licences-table tr.data-row:hover,
+.users-table tr.data-row:hover,
+.qp-method-table tr.data-row:hover {
+    background: #F1F3F4; /* Прямое указание цвета */
+}
+
+.dictionaries-table tr.data-row,
+.user-group-table tr.data-row,
+.licences-table tr.data-row,
+.users-table tr.data-row,
+.qp-method-table tr.data-row {
+    transition: background 0.15s ease-out; /* Плавный easing */
+}
+
+.dictionaries-table thead tr,
+.user-group-table thead tr,
+.licences-table thead tr,
+.users-table thead tr,
+.qp-method-table thead tr {
+    background: #F1F3F4; /* Прямое указание цвета */
+}
+
+/* Центрирование чекбоксов и иконок */
+/* Убрано общее правило для всех иконок - стили теперь централизованы в actionButtons.css */
+/* Это правило конфликтовало с action-кнопками из-за большей специфичности селектора */
+
+/* Стили для пустых ячеек */
+.dictionaries-table td:empty,
+.user-group-table td:empty,
+.licences-table td:empty,
+.users-table td:empty,
+.qp-method-table td:empty {
+    background: #F1F3F4; /* Прямое указание цвета */
+}
+
+/* Убираем нижнюю границу у последней строки */
+.dictionaries-table tr:last-child td,
+.user-group-table tr:last-child td,
+.licences-table tr:last-child td,
+.users-table tr:last-child td,
+.qp-method-table tr:last-child td {
+    border-bottom: none;
+}
+
+.group-selector-wrapper {
+    flex: 0 0 auto;
+    margin-bottom: 16px; /* Увеличено согласно M3 spacing */
+}
+.table-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+.table-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+.table-bottom-menu {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px; /* Увеличено согласно M3 spacing */
+    position: sticky;
+    bottom: 0;
+    background: #FAFAFA; /* фон как у таблицы, чтобы перекрывать контент прилипанием */
+    padding-top: 8px;
+}
