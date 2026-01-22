@@ -201,11 +201,16 @@ public class DocPassportTests
         const int invalidId = -1;
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
+        try
         {
-            var result = TryExecuteDbOperation(() => passport.GetViewDoc(invalidId));
+            var result = passport.GetViewDoc(invalidId);
             TestContext.WriteLine($"GetViewDoc с невалидным ID вернул: {result ?? "null"}");
-        }, "GetViewDoc должен корректно обрабатывать невалидный ID");
+            Assert.Pass("GetViewDoc корректно обработал невалидный ID");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -219,11 +224,16 @@ public class DocPassportTests
         const int zeroId = 0;
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
+        try
         {
-            var result = TryExecuteDbOperation(() => passport.GetViewDoc(zeroId));
+            var result = passport.GetViewDoc(zeroId);
             TestContext.WriteLine($"GetViewDoc с нулевым ID вернул: {result ?? "null"}");
-        }, "GetViewDoc должен корректно обрабатывать нулевой ID");
+            Assert.Pass("GetViewDoc корректно обработал нулевой ID");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -237,11 +247,16 @@ public class DocPassportTests
         const int maxId = int.MaxValue;
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
+        try
         {
-            var result = TryExecuteDbOperation(() => passport.GetViewDoc(maxId));
+            var result = passport.GetViewDoc(maxId);
             TestContext.WriteLine($"GetViewDoc с максимальным ID вернул: {result ?? "null"}");
-        }, "GetViewDoc должен корректно обрабатывать максимальный ID");
+            Assert.Pass("GetViewDoc корректно обработал максимальный ID");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     #endregion
@@ -262,24 +277,30 @@ public class DocPassportTests
         // Создаем тестовый HTML шаблон
         CreateDocEditPassportTemplate();
 
-        // Act
-        var result = TryExecuteDbOperation(() => passport.GetEditDoc(testId));
-
-        // Assert
-        // Метод может вернуть пустую строку, если шаблон не найден или данные отсутствуют
-        Assert.That(result, Is.Not.Null, "GetEditDoc не должен возвращать null");
-
-        if (!string.IsNullOrEmpty(result))
+        // Act & Assert
+        try
         {
-            TestContext.WriteLine($"GetEditDoc вернул HTML ({result.Length} символов)");
-            // Проверяем, что возвращенный результат содержит HTML элементы
-            Assert.That(result, Does.Contain("<").Or.EqualTo(string.Empty),
-                "Результат должен содержать HTML или быть пустым");
+            var result = passport.GetEditDoc(testId);
+
+            // Метод может вернуть пустую строку, если шаблон не найден или данные отсутствуют
+            Assert.That(result, Is.Not.Null, "GetEditDoc не должен возвращать null");
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                TestContext.WriteLine($"GetEditDoc вернул HTML ({result.Length} символов)");
+                // Проверяем, что возвращенный результат содержит HTML элементы
+                Assert.That(result, Does.Contain("<").Or.EqualTo(string.Empty),
+                    "Результат должен содержать HTML или быть пустым");
+            }
+            else
+            {
+                TestContext.WriteLine("GetEditDoc вернул пустую строку (шаблон не найден или нет данных)");
+                Assert.Pass("GetEditDoc вернул пустую строку (корректно при отсутствии данных)");
+            }
         }
-        else
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
         {
-            TestContext.WriteLine("GetEditDoc вернул пустую строку (шаблон не найден или нет данных)");
-            Assert.Pass("GetEditDoc вернул пустую строку (корректно при отсутствии данных)");
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
         }
     }
 
@@ -472,12 +493,17 @@ public class DocPassportTests
         long utBegin = 0;
         long utEnd = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        // Act
-        var result = TryExecuteDbOperation(() => passport.GetList(utBegin, utEnd));
-
-        // Assert
-        Assert.That(result, Is.Not.Null, "GetList не должен возвращать null");
-        TestContext.WriteLine($"GetList вернул {result?.Count ?? 0} записей");
+        // Act & Assert
+        try
+        {
+            var result = passport.GetList(utBegin, utEnd);
+            Assert.That(result, Is.Not.Null, "GetList не должен возвращать null");
+            TestContext.WriteLine($"GetList вернул {result?.Count ?? 0} записей");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -491,13 +517,18 @@ public class DocPassportTests
         long utBegin = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         long utEnd = 0;
 
-        // Act
-        var result = TryExecuteDbOperation(() => passport.GetList(utBegin, utEnd));
-
-        // Assert
-        Assert.That(result, Is.Not.Null, "GetList не должен возвращать null");
-        Assert.That(result.Count, Is.EqualTo(0),
-            "GetList с обратным диапазоном должен вернуть пустой список");
+        // Act & Assert
+        try
+        {
+            var result = passport.GetList(utBegin, utEnd);
+            Assert.That(result, Is.Not.Null, "GetList не должен возвращать null");
+            Assert.That(result.Count, Is.EqualTo(0),
+                "GetList с обратным диапазоном должен вернуть пустой список");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     #endregion
@@ -664,6 +695,26 @@ public class DocPassportTests
 
         File.WriteAllText(templatePath, templateContent);
         TestContext.WriteLine($"Создан тестовый HTML шаблон: {templatePath}");
+    }
+
+    /// <summary>
+    /// Проверяет, является ли исключение ошибкой подключения к базе данных MySQL.
+    /// </summary>
+    /// <param name="ex">Исключение для проверки</param>
+    /// <returns>true если это ошибка подключения к MySQL БД</returns>
+    private static bool IsDatabaseConnectionError(Exception ex)
+    {
+        var message = ex.Message.ToLowerInvariant();
+        var innerMessage = ex.InnerException?.Message?.ToLowerInvariant() ?? "";
+
+        return message.Contains("access denied") ||
+               message.Contains("unable to connect") ||
+               message.Contains("connection refused") ||
+               message.Contains("mysql") ||
+               message.Contains("authentication") ||
+               innerMessage.Contains("access denied") ||
+               innerMessage.Contains("unable to connect") ||
+               innerMessage.Contains("mysql");
     }
 
     /// <summary>

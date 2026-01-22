@@ -162,28 +162,34 @@ public class DocJornalTests
         var document = CreateDocJornalInstance();
         const int testId = 1;
 
-        // Act - Выполняем безопасный вызов БД
-        var result = TryExecuteDbOperation(() => document.GetViewDoc(testId));
-
-        // Assert
-        // GetViewDoc может вернуть null если запись не найдена в БД
-        if (result != null)
+        // Act & Assert
+        try
         {
-            var jsonString = result.ToString();
-            Assert.That(jsonString, Is.Not.Null, "JSON не должен быть null");
-            Assert.That(jsonString, Is.Not.Empty, "JSON не должен быть пустым");
+            var result = document.GetViewDoc(testId);
 
-            // Проверка валидности JSON
-            Assert.DoesNotThrow(
-                () => Newtonsoft.Json.JsonConvert.DeserializeObject(jsonString),
-                "JSON должен быть валидным и десериализуемым"
-            );
+            // GetViewDoc может вернуть null если запись не найдена в БД
+            if (result != null)
+            {
+                var jsonString = result.ToString();
+                Assert.That(jsonString, Is.Not.Null, "JSON не должен быть null");
+                Assert.That(jsonString, Is.Not.Empty, "JSON не должен быть пустым");
 
-            TestContext.WriteLine($"GetViewDoc вернул валидный JSON ({jsonString.Length} символов)");
+                // Проверка валидности JSON
+                Assert.DoesNotThrow(
+                    () => Newtonsoft.Json.JsonConvert.DeserializeObject(jsonString),
+                    "JSON должен быть валидным и десериализуемым"
+                );
+
+                TestContext.WriteLine($"GetViewDoc вернул валидный JSON ({jsonString.Length} символов)");
+            }
+            else
+            {
+                Assert.Pass("GetViewDoc вернул null (допустимо для несуществующих записей)");
+            }
         }
-        else
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
         {
-            Assert.Pass("GetViewDoc вернул null (допустимо для несуществующих записей)");
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
         }
     }
 
@@ -194,12 +200,17 @@ public class DocJornalTests
         var document = CreateDocJornalInstance();
         const int invalidId = -1;
 
-        // Act & Assert - Метод не должен выбрасывать исключение
-        Assert.DoesNotThrow(() =>
+        // Act & Assert
+        try
         {
-            var result = TryExecuteDbOperation(() => document.GetViewDoc(invalidId));
+            var result = document.GetViewDoc(invalidId);
             TestContext.WriteLine($"GetViewDoc с невалидным ID вернул: {result ?? "null"}");
-        }, "GetViewDoc должен корректно обрабатывать невалидный ID");
+            Assert.Pass("GetViewDoc корректно обработал невалидный ID");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     [Test]
@@ -210,11 +221,16 @@ public class DocJornalTests
         const int zeroId = 0;
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
+        try
         {
-            var result = TryExecuteDbOperation(() => document.GetViewDoc(zeroId));
+            var result = document.GetViewDoc(zeroId);
             TestContext.WriteLine($"GetViewDoc с нулевым ID вернул: {result ?? "null"}");
-        }, "GetViewDoc должен корректно обрабатывать нулевой ID");
+            Assert.Pass("GetViewDoc корректно обработал нулевой ID");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     [Test]
@@ -224,13 +240,18 @@ public class DocJornalTests
         var document = CreateDocJornalInstance();
         const int nonExistentId = 999999;
 
-        // Act
-        var result = TryExecuteDbOperation(() => document.GetViewDoc(nonExistentId));
-
-        // Assert
-        // Для несуществующей записи метод должен вернуть null
-        Assert.That(result, Is.Null,
-            "GetViewDoc должен вернуть null для несуществующего ID");
+        // Act & Assert
+        try
+        {
+            var result = document.GetViewDoc(nonExistentId);
+            // Для несуществующей записи метод должен вернуть null
+            Assert.That(result, Is.Null,
+                "GetViewDoc должен вернуть null для несуществующего ID");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     #endregion
@@ -490,13 +511,18 @@ public class DocJornalTests
         var utBegin = startDate.ToUnixTimeSeconds();
         var utEnd = endDate.ToUnixTimeSeconds();
 
-        // Act
-        var result = TryExecuteDbOperation(() => document.GetList(utBegin, utEnd));
-
-        // Assert
-        Assert.That(result, Is.Not.Null, "GetList не должен возвращать null");
-        // Список может быть пустым, если в БД нет данных
-        TestContext.WriteLine($"GetList вернул {result?.Count ?? 0} записей");
+        // Act & Assert
+        try
+        {
+            var result = document.GetList(utBegin, utEnd);
+            Assert.That(result, Is.Not.Null, "GetList не должен возвращать null");
+            // Список может быть пустым, если в БД нет данных
+            TestContext.WriteLine($"GetList вернул {result?.Count ?? 0} записей");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     [Test]
@@ -512,11 +538,16 @@ public class DocJornalTests
         var utEnd = endDate.ToUnixTimeSeconds();
 
         // Act & Assert - Метод не должен выбрасывать исключение
-        Assert.DoesNotThrow(() =>
+        try
         {
-            var result = TryExecuteDbOperation(() => document.GetList(utBegin, utEnd));
+            var result = document.GetList(utBegin, utEnd);
             TestContext.WriteLine($"GetList с инвертированным диапазоном вернул {result?.Count ?? 0} записей");
-        }, "GetList должен корректно обрабатывать инвертированный диапазон дат");
+            Assert.Pass("GetList корректно обработал инвертированный диапазон дат");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     [Test]
@@ -526,11 +557,16 @@ public class DocJornalTests
         var document = CreateDocJornalInstance();
 
         // Act & Assert
-        Assert.DoesNotThrow(() =>
+        try
         {
-            var result = TryExecuteDbOperation(() => document.GetList(0, 0));
+            var result = document.GetList(0, 0);
             TestContext.WriteLine($"GetList с нулевыми timestamp вернул {result?.Count ?? 0} записей");
-        }, "GetList должен корректно обрабатывать нулевые timestamp");
+            Assert.Pass("GetList корректно обработал нулевые timestamp");
+        }
+        catch (Exception ex) when (IsDatabaseConnectionError(ex))
+        {
+            Assert.Inconclusive($"Требуется подключение к MySQL БД: {ex.Message}");
+        }
     }
 
     #endregion
@@ -578,6 +614,26 @@ public class DocJornalTests
             TestContext.WriteLine($"Ожидаемое исключение БД (inner): {ex.InnerException?.Message}");
             return default;
         }
+    }
+
+    /// <summary>
+    /// Проверяет, является ли исключение ошибкой подключения к базе данных MySQL.
+    /// </summary>
+    /// <param name="ex">Исключение для проверки</param>
+    /// <returns>true если это ошибка подключения к MySQL БД</returns>
+    private static bool IsDatabaseConnectionError(Exception ex)
+    {
+        var message = ex.Message.ToLowerInvariant();
+        var innerMessage = ex.InnerException?.Message?.ToLowerInvariant() ?? "";
+
+        return message.Contains("access denied") ||
+               message.Contains("unable to connect") ||
+               message.Contains("connection refused") ||
+               message.Contains("mysql") ||
+               message.Contains("authentication") ||
+               innerMessage.Contains("access denied") ||
+               innerMessage.Contains("unable to connect") ||
+               innerMessage.Contains("mysql");
     }
 
     #endregion
