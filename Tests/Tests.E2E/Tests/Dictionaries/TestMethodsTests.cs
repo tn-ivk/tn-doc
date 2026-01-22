@@ -77,6 +77,10 @@ public class TestMethodsTests : PlaywrightTestBase
         await _dictionaries.OpenAsync();
         await _dictionaries.NavigateToTestMethodsAsync();
 
+        // Ожидаем стабилизации UI после загрузки раздела
+        await Page.WaitForLoadStateAsync(Microsoft.Playwright.LoadState.NetworkIdle);
+        await Page.WaitForTimeoutAsync(300);
+
         // Act & Assert - выбираем первый паспорт
         await _dictionaries.SelectPassportTypeAsync("Паспорт для нефтепродукта");
         await AssertTextVisibleAsync("Паспорт для нефтепродукта");
