@@ -120,6 +120,7 @@ ipch/
 
 # Visual Studio Trace Files
 *.e2e
+!Tests/Tests.E2E/
 
 # TFS 2012 Local Workspace
 $tf/
@@ -205,6 +206,11 @@ PublishScripts/
 # NuGet v3's project.json files produces more ignorable files
 *.nuget.props
 *.nuget.targets
+*.nuget.g.props
+*.nuget.g.targets
+*.nuget.dgspec.json
+project.assets.json
+project.packagespec.json
 
 # Microsoft Azure Build Output
 csx/
@@ -422,6 +428,7 @@ FodyWeavers.xsd
 **/.idea/**/*.iml
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
+rider.project.*.info
 
 .idea/
 
@@ -441,9 +448,3 @@ Desktop.ini
 /TN_Doc/Dll/*
 /TN_Doc/wwwroot/PDF/*
 /TN_Doc/wwwroot/HTML/*
-
-CLAUDE.md
-.claude/*
-/TN_Doc/.claude/*
-
-/Tests/
