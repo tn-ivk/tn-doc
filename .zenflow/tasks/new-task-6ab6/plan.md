@@ -18,47 +18,76 @@ Do not make assumptions on important decisions — get clarification first.
 
 ## Workflow Steps
 
-### [ ] Step: Technical Specification
+### [x] Step: Technical Specification
+<!-- chat-id: e7a4ad74-7207-412d-8709-8fdd4def2cfa -->
 
-Assess the task's difficulty, as underestimating it leads to poor outcomes.
-- easy: Straightforward implementation, trivial bug fix or feature
-- medium: Moderate complexity, some edge cases or caveats to consider
-- hard: Complex logic, many caveats, architectural considerations, or high-risk changes
+**Результат:** Создана спецификация в `spec.md`
 
-Create a technical specification for the task that is appropriate for the complexity level:
-- Review the existing codebase architecture and identify reusable components.
-- Define the implementation approach based on established patterns in the project.
-- Identify all source code files that will be created or modified.
-- Define any necessary data model, API, or interface changes.
-- Describe verification steps using the project's test and lint commands.
+**Сложность:** medium
 
-Save the output to `{@artifacts_path}/spec.md` with:
-- Technical context (language, dependencies)
-- Implementation approach
-- Source code structure changes
-- Data model / API / interface changes
-- Verification approach
-
-If the task is complex enough, create a detailed implementation plan based on `{@artifacts_path}/spec.md`:
-- Break down the work into concrete tasks (incrementable, testable milestones)
-- Each task should reference relevant contracts and include verification steps
-- Replace the Implementation step below with the planned tasks
-
-Rule of thumb for step size: each step should represent a coherent unit of work (e.g., implement a component, add an API endpoint, write tests for a module). Avoid steps that are too granular (single function).
-
-Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warrant this breakdown, keep the Implementation step below as is.
+**Выявленные проблемы:**
+1. `docs/configs/passport.md` - поле `IsDefault` помечено как "ПЛАНИРУЕТСЯ", но уже реализовано
+2. Отсутствует документация по CI/CD (GitHub Actions workflows)
+3. Отсутствует документация по E2E тестам (Playwright)
+4. `docs/README.md` не содержит ссылок на CI/CD и тестирование
 
 ---
 
-### [ ] Step: Implementation
+### [ ] Step 1: Обновление docs/configs/passport.md
 
-Implement the task according to the technical specification and general engineering best practices.
+**Задача:** Актуализировать документацию по конфигурации паспортов качества
 
-1. Break the task into steps where possible.
-2. Implement the required changes in the codebase.
-3. Add and run relevant tests and linters.
-4. Perform basic manual verification if applicable.
-5. After completion, write a report to `{@artifacts_path}/report.md` describing:
-   - What was implemented
-   - How the solution was tested
-   - The biggest issues or challenges encountered
+**Изменения:**
+- Убрать статус "ПЛАНИРУЕТСЯ" для поля `IsDefault`
+- Добавить описание реализованного функционала автоподстановки методов испытаний
+- Обновить примеры конфигурации
+
+**Верификация:** Проверить соответствие документации реальным конфигурационным файлам
+
+---
+
+### [ ] Step 2: Создание docs/development/testing.md
+
+**Задача:** Создать документацию по тестированию проекта
+
+**Содержание:**
+- Структура тестовых проектов (Tests.Unit, Tests.Integration, Tests.E2E, Tests.Shared)
+- Команды запуска тестов
+- E2E тесты на Playwright (справочники, UI)
+- Интеграционные тесты (КМХ, документы)
+- Руководство по написанию тестов
+
+---
+
+### [ ] Step 3: Создание docs/development/ci-cd.md
+
+**Задача:** Создать документацию по CI/CD
+
+**Содержание:**
+- GitHub Actions workflows:
+  - `tests-on-push.yml` - запуск тестов при push в develop*
+  - `build-and-package.yml` - сборка и упаковка
+- Необходимые secrets (GH_SUBMODULES_TOKEN, FR_NUGET_USERNAME, FR_NUGET_PASSWORD)
+- Порядок работы pipelines
+
+---
+
+### [ ] Step 4: Обновление docs/README.md
+
+**Задача:** Добавить ссылки на новую документацию
+
+**Изменения:**
+- Добавить раздел "CI/CD" с ссылкой на `ci-cd.md`
+- Добавить раздел "Тестирование" с ссылкой на `testing.md`
+- Обновить дату и версию документации
+
+---
+
+### [ ] Step 5: Проверка и финализация
+
+**Задача:** Проверить согласованность документации
+
+**Действия:**
+- Проверить все ссылки в документах
+- Убедиться в согласованности версии 1.3.8
+- Написать отчёт в `report.md`
