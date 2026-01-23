@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using NUnit.Framework;
-using TN_Doc.Models.Services;
+using TN_DocGeneral.Services;
 
 namespace Tests.Services;
 
@@ -11,6 +11,8 @@ namespace Tests.Services;
 [TestFixture]
 public class LoggingPathServiceTests
 {
+    private const string ApplicationName = "TN_Doc";
+
     #region GetLogDirectory Tests
 
     /// <summary>
@@ -20,7 +22,7 @@ public class LoggingPathServiceTests
     public void GetLogDirectory_WhenCalled_ReturnsNonEmptyString()
     {
         // Act
-        var result = LoggingPathService.GetLogDirectory();
+        var result = LoggingPathService.GetLogDirectory(ApplicationName);
 
         // Assert
         Assert.That(result, Is.Not.Null.And.Not.Empty);
@@ -40,18 +42,18 @@ public class LoggingPathServiceTests
         }
 
         // Act
-        var result = LoggingPathService.GetLogDirectory();
+        var result = LoggingPathService.GetLogDirectory(ApplicationName);
 
         // Assert
         Assert.That(result, Does.Contain("logs"));
     }
 
     /// <summary>
-    /// Проверяет, что на Linux возвращается путь /opt/TN_Doc/logs.
+    /// Проверяет, что на Linux возвращается путь /var/log/TN_Doc.
     /// </summary>
     [Test]
     [Platform("Linux,Unix,MacOsX")]
-    public void GetLogDirectory_OnLinux_ReturnsOptTnDocLogsPath()
+    public void GetLogDirectory_OnLinux_ReturnsVarLogPath()
     {
         // Arrange
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -60,10 +62,30 @@ public class LoggingPathServiceTests
         }
 
         // Act
-        var result = LoggingPathService.GetLogDirectory();
+        var result = LoggingPathService.GetLogDirectory(ApplicationName);
 
         // Assert
-        Assert.That(result, Is.EqualTo("/opt/TN_Doc/logs"));
+        Assert.That(result, Is.EqualTo("/var/log/TN_Doc"));
+    }
+
+    /// <summary>
+    /// Проверяет, что GetLogDirectory выбрасывает исключение при пустом имени приложения.
+    /// </summary>
+    [Test]
+    public void GetLogDirectory_WhenApplicationNameIsEmpty_ThrowsArgumentException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => LoggingPathService.GetLogDirectory(""));
+    }
+
+    /// <summary>
+    /// Проверяет, что GetLogDirectory выбрасывает исключение при null имени приложения.
+    /// </summary>
+    [Test]
+    public void GetLogDirectory_WhenApplicationNameIsNull_ThrowsArgumentException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => LoggingPathService.GetLogDirectory(null!));
     }
 
     #endregion
@@ -77,7 +99,7 @@ public class LoggingPathServiceTests
     public void GetInternalLogPath_WhenCalled_ReturnsPathWithInternalNlogLogTxt()
     {
         // Act
-        var result = LoggingPathService.GetInternalLogPath();
+        var result = LoggingPathService.GetInternalLogPath(ApplicationName);
 
         // Assert
         Assert.That(result, Does.EndWith("internal-nlog-log.txt"));
@@ -90,10 +112,10 @@ public class LoggingPathServiceTests
     public void GetInternalLogPath_WhenCalled_ContainsLogDirectory()
     {
         // Arrange
-        var logDirectory = LoggingPathService.GetLogDirectory();
+        var logDirectory = LoggingPathService.GetLogDirectory(ApplicationName);
 
         // Act
-        var result = LoggingPathService.GetInternalLogPath();
+        var result = LoggingPathService.GetInternalLogPath(ApplicationName);
 
         // Assert
         Assert.That(result, Does.StartWith(logDirectory));
@@ -106,7 +128,7 @@ public class LoggingPathServiceTests
     public void GetInternalLogPath_WhenCalled_ReturnsNonEmptyString()
     {
         // Act
-        var result = LoggingPathService.GetInternalLogPath();
+        var result = LoggingPathService.GetInternalLogPath(ApplicationName);
 
         // Assert
         Assert.That(result, Is.Not.Null.And.Not.Empty);
@@ -123,7 +145,7 @@ public class LoggingPathServiceTests
     public void EnsureLogDirectoryExists_WhenDirectoryExists_ReturnsTrue()
     {
         // Arrange
-        var logDirectory = LoggingPathService.GetLogDirectory();
+        var logDirectory = LoggingPathService.GetLogDirectory(ApplicationName);
 
         // Создаём директорию, если она не существует (для гарантии теста)
         if (!Directory.Exists(logDirectory))
@@ -134,13 +156,13 @@ public class LoggingPathServiceTests
             }
             catch
             {
-                // На некоторых системах может не быть прав на создание /opt/TN_Doc/logs
+                // На некоторых системах может не быть прав на создание /var/log/TN_Doc
                 Assert.Ignore("Невозможно создать тестовую директорию");
             }
         }
 
         // Act
-        var result = LoggingPathService.EnsureLogDirectoryExists();
+        var result = LoggingPathService.EnsureLogDirectoryExists(ApplicationName);
 
         // Assert
         Assert.That(result, Is.True);
@@ -153,7 +175,7 @@ public class LoggingPathServiceTests
     public void EnsureLogDirectoryExists_WhenCalled_ReturnsBoolean()
     {
         // Act
-        var result = LoggingPathService.EnsureLogDirectoryExists();
+        var result = LoggingPathService.EnsureLogDirectoryExists(ApplicationName);
 
         // Assert
         Assert.That(result, Is.TypeOf<bool>());
@@ -166,12 +188,12 @@ public class LoggingPathServiceTests
     public void EnsureLogDirectoryExists_WhenReturnsTrue_DirectoryExists()
     {
         // Act
-        var result = LoggingPathService.EnsureLogDirectoryExists();
+        var result = LoggingPathService.EnsureLogDirectoryExists(ApplicationName);
 
         // Assert
         if (result)
         {
-            var logDirectory = LoggingPathService.GetLogDirectory();
+            var logDirectory = LoggingPathService.GetLogDirectory(ApplicationName);
             Assert.That(Directory.Exists(logDirectory), Is.True);
         }
         else

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
 using TN_Doc.Extensions;
-using TN_Doc.Models.Services;
+using TN_DocGeneral.Services;
 using TN.Doc;
 
 namespace TN_Doc;
@@ -28,7 +28,7 @@ public class Startup
 		{
 			var logLevel = Configuration.GetValue<string>("Logging:LogLevel:Default");
 			LogManager.Configuration.Variables["logLevel"] = logLevel;
-			LogManager.Configuration.Variables["logDirectory"] = LoggingPathService.GetLogDirectory();
+			LogManager.Configuration.Variables["logDirectory"] = LoggingPathService.GetLogDirectory("TN_Doc");
 
 			builder.ClearProviders();
 			builder.AddNLog();
