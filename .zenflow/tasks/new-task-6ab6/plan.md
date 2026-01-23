@@ -33,7 +33,7 @@ Do not make assumptions on important decisions — get clarification first.
 
 ---
 
-### [ ] Step 1: Обновление docs/configs/passport.md
+### [x] Step 1: Обновление docs/configs/passport.md
 
 **Задача:** Актуализировать документацию по конфигурации паспортов качества
 
@@ -46,7 +46,7 @@ Do not make assumptions on important decisions — get clarification first.
 
 ---
 
-### [ ] Step 2: Создание docs/development/testing.md
+### [x] Step 2: Создание docs/development/testing.md
 
 **Задача:** Создать документацию по тестированию проекта
 
@@ -59,7 +59,7 @@ Do not make assumptions on important decisions — get clarification first.
 
 ---
 
-### [ ] Step 3: Создание docs/development/ci-cd.md
+### [x] Step 3: Создание docs/development/ci-cd.md
 
 **Задача:** Создать документацию по CI/CD
 
@@ -72,7 +72,7 @@ Do not make assumptions on important decisions — get clarification first.
 
 ---
 
-### [ ] Step 4: Обновление docs/README.md
+### [x] Step 4: Обновление docs/README.md
 
 **Задача:** Добавить ссылки на новую документацию
 
@@ -83,7 +83,7 @@ Do not make assumptions on important decisions — get clarification first.
 
 ---
 
-### [ ] Step 5: Проверка и финализация
+### [x] Step 5: Проверка и финализация
 
 **Задача:** Проверить согласованность документации
 

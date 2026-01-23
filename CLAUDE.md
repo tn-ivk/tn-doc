@@ -174,6 +174,7 @@ git commit -m "Обновлён субмодуль tn.docgeneral"
 - [Редактор справочников](docs/architecture/configurator.md)
 - [Конфигурация паспорта](docs/configs/passport.md)
 - [Интеграция ELIS](docs/integration/elis.md)
+- [Тестирование](docs/development/testing.md)
 - [Развёртывание на Linux](docs/deployment/linux.md)
 - [CHANGELOG](CHANGELOG.md)
 

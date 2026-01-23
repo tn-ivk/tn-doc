@@ -27,6 +27,8 @@
 
 - **[setup.md](development/setup.md)** - Настройка окружения разработки
 - **[building.md](development/building.md)** - Инструкции по сборке проекта
+- **[testing.md](development/testing.md)** - Тестирование (Unit, Integration, E2E)
+- **[ci-cd.md](development/ci-cd.md)** - CI/CD (GitHub Actions workflows)
 
 ### 🚀 Deployment (Развертывание)
 
@@ -80,7 +82,7 @@
 
 - **Начать разработку** → [development/setup.md](development/setup.md)
 - **Собрать проект** → [development/building.md](development/building.md)
-- **Запустить тесты** → [../Tests/README.md](../Tests/README.md)
+- **Запустить тесты** → [development/testing.md](development/testing.md)
 - **Развернуть на Linux** → [deployment/linux.md](deployment/linux.md)
 - **Посмотреть логи** → [operations/logging.md](operations/logging.md)
 - **Интегрировать с ELIS** → [integration/elis.md](integration/elis.md)
@@ -93,7 +95,8 @@
 **Разработчик:**
 - [development/setup.md](development/setup.md)
 - [development/building.md](development/building.md)
-- [../Tests/README.md](../Tests/README.md)
+- [development/testing.md](development/testing.md)
+- [development/ci-cd.md](development/ci-cd.md)
 - [architecture/overview.md](architecture/overview.md)
 - [architecture/document-modules.md](architecture/document-modules.md)
 - [api/endpoints.md](api/endpoints.md)
@@ -106,22 +109,13 @@
 **DevOps инженер:**
 - [deployment/linux.md](deployment/linux.md)
 - [operations/logging.md](operations/logging.md)
+- [development/ci-cd.md](development/ci-cd.md)
 
 **Аналитик/Тестировщик:**
-- [../Tests/README.md](../Tests/README.md)
+- [development/testing.md](development/testing.md)
 - [api/endpoints.md](api/endpoints.md)
 - [features/field-history.md](features/field-history.md)
 - [configs/passport.md](configs/passport.md)
-
-### Tests (Тестирование)
-
-Документация по тестам:
-
-- **[../Tests/README.md](../Tests/README.md)** - Обзор тестовой инфраструктуры
-  - Структура тестов (35 файлов по 5 категориям)
-  - Статус актуализации
-  - Инструкции по запуску
-  - Известные проблемы и roadmap
 
 ## Основные документы проекта
 
@@ -148,7 +142,8 @@
 - **Configuration Management** - Управление конфигурацией
 
 ### Development
-- ~~**Testing Guide**~~ - Базовая документация: [../Tests/README.md](../Tests/README.md)
+- ~~**Testing Guide**~~ - Документация создана: [development/testing.md](development/testing.md)
+- ~~**CI/CD Guide**~~ - Документация создана: [development/ci-cd.md](development/ci-cd.md)
 - **Code Style Guide** - Руководство по стилю кода
 - **Contributing** - Как внести вклад в проект
 
@@ -162,6 +157,6 @@
 
 ---
 
-_Последнее обновление: 2026-01-19_
+_Последнее обновление: 2026-01-23_
 _Версия проекта: 1.3.8_
-_Актуализирована документация для тестирования_
+_Добавлена документация по тестированию и CI/CD_
