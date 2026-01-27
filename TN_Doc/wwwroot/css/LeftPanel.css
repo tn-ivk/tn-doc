@@ -94,7 +94,7 @@ select.filterSelect {
 }
 
 .filterButton {
-    width: 40%;
+    width: 45%;
     display: inline-flex;
     background-color: #1b6ec2;
     color: #ffffff;
@@ -104,6 +104,7 @@ select.filterSelect {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    white-space: nowrap;
 }
 
 .filterButton:disabled {
