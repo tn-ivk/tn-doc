@@ -167,64 +167,56 @@
             {
               "Use": false,
               "Id": 0,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
+              "Name": "Акт для валовых объемов нефти МИ 3532-2015. Приложение 18",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015. Приложение 18",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_MI3532(18).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 1,
-              "Name": "Акт для партий нефти",
-              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
+              "Name": "Акт для партий нефти МИ 3532-2015. Приложение 17",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015. Приложение 17",
               "PathToDocTemplateFile": "/Doc/Act/ActParty.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
             },
             {
               "Use": false,
               "Id": 2,
-              "Name": "Акт для нефтепродукта",
-              "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
+              "Name": "Акт для валовых объемов нефтепродукта МИ 3532-2015. Приложение 17",
+              "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015. Приложение 17",
               "PathToDocTemplateFile": "/Doc/Act/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActNP.json"
             },
             {
               "Use": false,
               "Id": 3,
-              "Name": "Акт приема - сдачи нефти ",
-              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "Name": "Акт для партий нефти МИ 3532-2015. Приложение 19",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015. Приложение 19",
               "PathToDocTemplateFile": "/Doc/Act/ActParty_MI3532(19).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
             },
             {
               "Use": true,
               "Id": 4,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G).frx",
-              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
-            },
-            {
-              "Use": true,
-              "Id": 5,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 6,
-              "Name": "Акт для валовых объемов нефти (Китай)",
-              "Description": "(Китай) Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г (Китай)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г (Китай) ",
+              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_China.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 7,
-              "Name": "Акт для валовых объемов нефти (Экспорт)",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)(Экспорт)",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г (Экспорт)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г (Экспорт)",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             }
@@ -1329,64 +1321,56 @@
             {
               "Use": false,
               "Id": 0,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
+              "Name": "Акт для валовых объемов нефти МИ 3532-2015. Приложение 18",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015. Приложение 18",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_MI3532(18).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 1,
-              "Name": "Акт для партий нефти",
-              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
+              "Name": "Акт для партий нефти МИ 3532-2015. Приложение 17",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015. Приложение 17",
               "PathToDocTemplateFile": "/Doc/Act/ActParty.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
             },
             {
               "Use": false,
               "Id": 2,
-              "Name": "Акт для нефтепродукта",
-              "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
+              "Name": "Акт для валовых объемов нефтепродукта МИ 3532-2015. Приложение 17",
+              "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015. Приложение 17",
               "PathToDocTemplateFile": "/Doc/Act/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActNP.json"
             },
             {
               "Use": false,
               "Id": 3,
-              "Name": "Акт приема - сдачи нефти ",
-              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "Name": "Акт для партий нефти МИ 3532-2015. Приложение 19",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015. Приложение 19",
               "PathToDocTemplateFile": "/Doc/Act/ActParty_MI3532(19).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
             },
             {
               "Use": true,
               "Id": 4,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G).frx",
-              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
-            },
-            {
-              "Use": true,
-              "Id": 5,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 6,
-              "Name": "Акт для валовых объемов нефти (Китай)",
-              "Description": "(Китай) Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г (Китай)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г (Китай) ",
+              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_China.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 7,
-              "Name": "Акт для валовых объемов нефти (Экспорт)",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)(Экспорт)",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г (Экспорт)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г (Экспорт)",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             }
@@ -2491,64 +2475,56 @@
             {
               "Use": false,
               "Id": 0,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015 (Приложение 18)",
+              "Name": "Акт для валовых объемов нефти МИ 3532-2015. Приложение 18",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. МИ 3532-2015. Приложение 18",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_MI3532(18).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 1,
-              "Name": "Акт для партий нефти",
-              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 17)",
+              "Name": "Акт для партий нефти МИ 3532-2015. Приложение 17",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015. Приложение 17",
               "PathToDocTemplateFile": "/Doc/Act/ActParty.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
             },
             {
               "Use": false,
               "Id": 2,
-              "Name": "Акт для нефтепродукта",
-              "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015 (Приложение 17)",
+              "Name": "Акт для валовых объемов нефтепродукта МИ 3532-2015. Приложение 17",
+              "Description": "Акт приема-сдачи для оформления для оформления валовых объемов нефтепродукта. МИ 3532-2015. Приложение 17",
               "PathToDocTemplateFile": "/Doc/Act/Act_NP_MI3275-2016(B).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActNP.json"
             },
             {
               "Use": false,
               "Id": 3,
-              "Name": "Акт приема - сдачи нефти ",
-              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015 (Приложение 19)",
+              "Name": "Акт для партий нефти МИ 3532-2015. Приложение 19",
+              "Description": "Акт приема-сдачи для оформления партий нефти. МИ 3532-2015. Приложение 19",
               "PathToDocTemplateFile": "/Doc/Act/ActParty_MI3532(19).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditActParty.json"
             },
             {
               "Use": true,
               "Id": 4,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G).frx",
-              "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
-            },
-            {
-              "Use": true,
-              "Id": 5,
-              "Name": "Акт для валовых объемов нефти",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 6,
-              "Name": "Акт для валовых объемов нефти (Китай)",
-              "Description": "(Китай) Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г) (ShiftTime)",
-              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_ShiftTime_China.frx",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г (Китай)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г (Китай) ",
+              "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)_China.frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             },
             {
               "Use": false,
               "Id": 7,
-              "Name": "Акт для валовых объемов нефти (Экспорт)",
-              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004 (Приложение Г)(Экспорт)",
+              "Name": "Акт для валовых объемов нефти ГОСТ Р 50.2.040-2004. Приложение Г (Экспорт)",
+              "Description": "Акт приема-сдачи для оформления валовых объемов нефти. ГОСТ Р 50.2.040-2004. Приложение Г (Экспорт)",
               "PathToDocTemplateFile": "/Doc/Act/Act_N_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json"
             }
