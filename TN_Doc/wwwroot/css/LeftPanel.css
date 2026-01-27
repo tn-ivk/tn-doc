@@ -19,6 +19,7 @@ input[type=number] {
     left: 0;
     height: 98%;
     width: 98%;
+    overflow: hidden;
 }
 
 .mainTable {
