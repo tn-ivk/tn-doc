@@ -602,22 +602,43 @@ function InitExportFormat() {
 function InitProtocolNumber() {
     $('#ComboboxProtocolNumber').empty();
 
-    $.ajax(
-        {
-            async: false,
-            url: 'Home/GetListProtocolNumber',
-            type: 'GET',
-            data:
-                {
-                    IdDevice: $('#ComboboxDevice').val(),
-                    IdDoc: $('#ComboboxDocGUID').val(),
-                },
-            success: function (data) {
-                data.forEach((item) => {
-                    $('#ComboboxProtocolNumber').append('<option value=' + item.id + '>' + item.name + '</option>');
-                });
+    // Проверяем на сервере, использует ли документ номер протокола
+    $.ajax({
+        async: false,
+        url: 'Home/IsProtocolNumberUsed',
+        type: 'GET',
+        data: {
+            idDoc: $('#ComboboxDocGUID').val()
+        },
+        success: function (isUsed) {
+            if (!isUsed) {
+                $('#ComboboxProtocolNumber').hide();
+                return;
             }
-        });
+
+            $('#ComboboxProtocolNumber').show();
+
+            // Загружаем список протоколов
+            $.ajax({
+                async: false,
+                url: 'Home/GetListProtocolNumber',
+                type: 'GET',
+                data: {
+                    IdDevice: $('#ComboboxDevice').val(),
+                    IdDoc: $('#ComboboxDocGUID').val()
+                },
+                success: function (data) {
+                    data.forEach((item) => {
+                        $('#ComboboxProtocolNumber').append('<option value=' + item.id + '>' + item.name + '</option>');
+                    });
+                }
+            });
+        },
+        error: function() {
+            // В случае ошибки скрываем комбобокс
+            $('#ComboboxProtocolNumber').hide();
+        }
+    });
 }
 
 function InitDatepickerBegin() {
