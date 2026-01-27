@@ -25,25 +25,25 @@ git submodule update --init --recursive
 # Build & Run
 dotnet restore
 dotnet build
-dotnet run --project TN_Doc                       # http://localhost:38509
+dotnet run --project TN_Doc                       # http://localhost:5000 (Kestrel) или :38509 (IIS Express)
 
 # Release
 dotnet build -c Release
 dotnet publish -c Release -r linux-x64 --self-contained false
 
-# Vue Client (если используется)
-cd TN_Doc/Client && npm install && npm run build:all
-
 # Testing (NUnit)
 dotnet test                                       # Все тесты
 dotnet test Tests/Tests.Unit                      # Unit-тесты
-dotnet test Tests/Tests.Integration               # Интеграционные
+dotnet test Tests/Tests.Integration               # Интеграционные (~168 тестов КМХ)
+dotnet test Tests/Tests.E2E                       # E2E (Playwright)
 dotnet test --filter "FullyQualifiedName~TestClass.TestMethod"  # Конкретный тест
 dotnet test --filter "Namespace~KMH"              # По namespace
+dotnet test --filter "Category=Dictionaries"     # По категории
 
 # E2E тесты (Playwright)
-dotnet test Tests/Tests.E2E
 set HEADED=1 && dotnet test Tests/Tests.E2E       # В видимом режиме (Windows)
+HEADED=1 dotnet test Tests/Tests.E2E              # Linux/macOS
+set PWDEBUG=1 && dotnet test Tests/Tests.E2E      # Debug режим
 ```
 
 **NuGet Sources (required):**
@@ -58,16 +58,21 @@ dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name
 ```
 tn_doc/
 ├── TN_Doc/                    # ASP.NET Core MVC приложение
-│   ├── Controllers/           # API endpoints
+│   ├── Controllers/           # API endpoints (Home, DirEditor, Print, Export, Elis)
 │   ├── Models/Services/       # Бизнес-логика (PrinterService, DirectoryService)
 │   ├── Extensions/            # DI расширения (ServiceCollectionExtensions)
 │   ├── Views/                 # Razor представления
 │   ├── wwwroot/               # Статика (JS/CSS/HTML)
-│   ├── Cfg/                   # Конфигурации документов (JSON)
+│   ├── Cfg/                   # Конфигурации документов (JSON) ~85 файлов
 │   └── Doc/                   # FastReport шаблоны (*.frx)
 ├── tn.docgeneral/             # Git submodule: ~48 модулей документов
-├── tn_toolsfastreport/        # Git submodule: утилиты FastReport
-└── Tests/                     # NUnit тесты
+│   ├── TN.DocGeneral/         # Базовая библиотека (v1.1.1)
+│   ├── tn.utils/              # Вложенный submodule: TN.Utils
+│   ├── Passport, Act, Jornal, Report  # Базовые документы
+│   ├── Poverka*               # 21 модуль протоколов поверки
+│   └── KMH*, KMX*             # 18 модулей КМХ
+├── tn_toolsfastreport/        # Git submodule: TN_Tools (утилиты FastReport)
+└── Tests/                     # NUnit тесты (~650 тестов, ~48% активны)
     ├── Tests.Unit/            # Модульные тесты
     ├── Tests.Integration/     # Интеграционные (КМХ ~168 тестов)
     ├── Tests.E2E/             # End-to-end (Playwright)
@@ -121,6 +126,7 @@ User Request → HomeController → DLL загрузка (Reflection) → FastRe
 | HTML редакторы | `TN_Doc/wwwroot/HTML/` |
 | DI конфигурация | `TN_Doc/Startup.cs` |
 | Точка входа | `TN_Doc/Program.cs` |
+| Логирование | `TN_Doc/nlog.config` |
 
 ## Development Patterns
 
@@ -130,6 +136,7 @@ User Request → HomeController → DLL загрузка (Reflection) → FastRe
 - Логи через NLog, не подавлять исключения
 - **Test Naming**: `MethodName_WhenCondition_ThenExpectedResult`
 - **Mocking**: Moq для внешних сервисов
+- **In-Memory DB**: для изоляции интеграционных тестов
 
 ## Submodule Workflow
 
@@ -142,6 +149,17 @@ git add tn.docgeneral
 git commit -m "Обновлён субмодуль tn.docgeneral"
 ```
 
+## Testing Structure
+
+| Проект | Описание | Ключевые тесты |
+|--------|----------|----------------|
+| `Tests.Unit` | Изолированные тесты компонентов | Controllers, Services, Models, Extensions |
+| `Tests.Integration` | Взаимодействие компонентов | КМХ модули (~168), базовые документы, AppConfigService |
+| `Tests.E2E` | UI тесты (Playwright) | Справочники: Users, UserGroups, PowersOfAttorney, TestMethods |
+| `Tests.Shared` | Общие helpers | `MockConfigHelper`, `BaseDocumentTest`, `DocumentTestHelpers` |
+
+**Playwright конфигурация:** локаль `ru-RU`, viewport 1920x1080, скриншоты в `tests/dictionaries/results/`
+
 ## Common Issues
 
 | Проблема | Решение |
@@ -150,6 +168,7 @@ git commit -m "Обновлён субмодуль tn.docgeneral"
 | Submodules пустые | `git submodule update --init --recursive` |
 | Изменения конфига не применяются | Перезапустить приложение (кэш) |
 | libgdiplus (Linux) | `sudo apt-get install libgdiplus` |
+| Playwright браузеры | `pwsh Tests/Tests.E2E/bin/Debug/net8.0/playwright.ps1 install` |
 
 **Known Issues (v1.3.8):**
 - `ConfigurationCacheService`, `DbSchemaCache` — не реализованы
@@ -165,6 +184,7 @@ git commit -m "Обновлён субмодуль tn.docgeneral"
 - [Конфигурация паспорта](docs/configs/passport.md)
 - [Интеграция ELIS](docs/integration/elis.md)
 - [Тестирование](docs/development/testing.md)
+- [Настройка окружения](docs/development/setup.md)
 - [Развёртывание на Linux](docs/deployment/linux.md)
 
 ## Related Projects
