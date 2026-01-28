@@ -5,7 +5,8 @@
   "workspaces": [
     "statusbar",
     "configurator",
-    "shared"
+    "shared",
+    "e2e"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=statusbar",
@@ -14,7 +15,10 @@
     "build:configurator": "npm run build --workspace=configurator",
     "build:all": "npm run build --workspaces --if-present",
     "type-check": "npm run type-check --workspaces --if-present",
-    "clean": "rm -rf statusbar/node_modules configurator/node_modules shared/node_modules node_modules"
+    "clean": "rm -rf statusbar/node_modules configurator/node_modules shared/node_modules e2e/node_modules node_modules",
+    "test:e2e": "npm run test --workspace=e2e",
+    "test:e2e:headed": "npm run test:headed --workspace=e2e",
+    "test:e2e:ui": "npm run test:ui --workspace=e2e"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

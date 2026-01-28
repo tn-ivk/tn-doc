@@ -57,13 +57,20 @@ TN_Doc.sln
 ├── TN_Doc/                    # Основное веб-приложение
 │   ├── Controllers/           # API и MVC контроллеры
 │   ├── Models/                # Сервисы и бизнес-логика
-│   ├── Client/                # Vue 3 monorepo (statusbar/, configurator/, shared/)
+│   ├── Client/                # Vue 3 monorepo
+│   │   ├── statusbar/         # StatusBar компонент
+│   │   ├── configurator/      # Configurator компонент
+│   │   ├── shared/            # Общие утилиты
+│   │   └── e2e/               # E2E тесты (Playwright)
 │   ├── Cfg/                   # JSON конфигурации документов
 │   └── Doc/                   # FastReport шаблоны (.frx)
 ├── TN.DocGeneral/             # Общие утилиты и сервисы
 ├── Ivk.DataBase/              # EF Core контекст для MySQL
 ├── tn.docgeneral/             # Модули документов (~42 DLL)
-├── Tests/                     # NUnit тесты
+├── Tests/                     # Тестовые проекты
+│   ├── Tests.Shared/          # Общая инфраструктура тестов
+│   ├── Tests.Unit/            # Модульные тесты (NUnit)
+│   └── Tests.Integration/     # Интеграционные тесты (WebApplicationFactory)
 └── tn_toolsfastreport/        # FastReport утилиты
 ```
 
@@ -163,15 +170,53 @@ Linux требует `libgdiplus`.
 
 ## Testing
 
-```bash
-# Структура тестов
-Tests/
-├── controllers/    # Тесты контроллеров
-└── Services/       # Тесты сервисов
+### Структура тестовых проектов
 
-# Naming convention: MethodName_WhenCondition_ThenExpectedResult
-# Framework: NUnit + Moq
 ```
+Tests/
+├── Tests.Shared/              # Общая инфраструктура для тестов
+│   ├── BaseTestClass.cs       # Базовые классы для всех тестов
+│   ├── TestHelpers.cs         # Статические helper методы
+│   └── Fixtures/              # Генераторы тестовых данных
+│       ├── MockConfigHelper.cs
+│       └── TestDataFixture.cs
+│
+├── Tests.Unit/                # Модульные тесты
+│   ├── Controllers/           # Тесты контроллеров
+│   ├── Services/              # Тесты сервисов
+│   └── UsersTests.cs
+│
+├── Tests.Integration/         # Интеграционные тесты (WebApplicationFactory)
+│   ├── Controllers/           # Интеграционные тесты API
+│   ├── Services/              # Тесты взаимодействия сервисов
+│   └── Data/                  # Тесты работы с БД (InMemory)
+│
+TN_Doc/Client/e2e/             # E2E тесты (Playwright + TypeScript)
+├── pages/                     # Page Object Model
+├── tests/                     # Тестовые сценарии
+└── playwright.config.ts
+```
+
+### Команды тестирования
+
+```bash
+# Модульные тесты
+dotnet test Tests/Tests.Unit/Tests.Unit.csproj
+dotnet test Tests/Tests.Unit/Tests.Unit.csproj --filter "ClassName=AppConfigServiceTests"
+
+# Интеграционные тесты
+dotnet test Tests/Tests.Integration/Tests.Integration.csproj
+
+# E2E тесты (Playwright)
+cd TN_Doc/Client
+npm run test:e2e           # Запуск всех E2E тестов
+npm run test:e2e:headed    # С видимым браузером
+npm run test:e2e:ui        # Playwright UI mode
+```
+
+### Naming convention
+- Методы: `MethodName_WhenCondition_ThenExpectedResult`
+- Framework: NUnit + Moq (backend), Playwright (frontend)
 
 ## Git Conventions
 
