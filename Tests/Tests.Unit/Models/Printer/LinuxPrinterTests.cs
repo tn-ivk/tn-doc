@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using NUnit.Framework;
 using TN_Doc.Models.Printer;
 
@@ -38,6 +39,20 @@ public class LinuxPrinterTests
         Assert.That(printer, Is.InstanceOf<AbsPrinter>());
     }
 
+    /// <summary>
+    /// Проверяет, что можно создать несколько экземпляров LinuxPrinter.
+    /// </summary>
+    [Test]
+    public void Constructor_MultipleInstances_AllAreIndependent()
+    {
+        // Act
+        var printer1 = new LinuxPrinter();
+        var printer2 = new LinuxPrinter();
+
+        // Assert
+        Assert.That(printer1, Is.Not.SameAs(printer2));
+    }
+
     #endregion
 
     #region GetAvailablePrinters Tests
@@ -75,6 +90,50 @@ public class LinuxPrinterTests
 
         // Act
         var result = printer.GetAvailablePrinters();
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+    }
+
+    #endregion
+
+    #region GetAvailablePrinters Negative Tests
+
+    /// <summary>
+    /// Проверяет, что GetAvailablePrinters выбрасывает Win32Exception на Windows,
+    /// так как команда lpstat недоступна.
+    /// </summary>
+    [Test]
+    [Platform("Win")]
+    public void GetAvailablePrinters_OnWindows_ThrowsWin32Exception()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+
+        // Act & Assert
+        Assert.Throws<Win32Exception>(() =>
+        {
+            // Перечисление yield return требует материализации
+            var result = printer.GetAvailablePrinters().ToList();
+        });
+    }
+
+    /// <summary>
+    /// Проверяет, что GetAvailablePrinters возвращает IEnumerable (ленивая коллекция).
+    /// Исключение произойдёт только при перечислении.
+    /// </summary>
+    [Test]
+    public void GetAvailablePrinters_ReturnsLazyEnumerable()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+
+        // Act - вызов метода НЕ должен выбросить исключение (yield return)
+        IEnumerable<string>? result = null;
+        Assert.DoesNotThrow(() =>
+        {
+            result = printer.GetAvailablePrinters();
+        });
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -198,6 +257,148 @@ public class LinuxPrinterTests
         // Act & Assert
         await printer.PrintDocAsync(firstPrinter);
         // Успешное завершение означает корректную работу
+    }
+
+    #endregion
+
+    #region PrintDocAsync Negative Tests
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с null именем принтера выбрасывает исключение на Linux.
+    /// Текущая реализация вызывает Contains(null), что выбросит ArgumentNullException при перечислении.
+    /// </summary>
+    [Test]
+    [Platform("Linux,Unix")]
+    public void PrintDocAsync_WithNullPrinterName_ThrowsException()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+
+        // Act & Assert
+        // На Linux lpstat вернёт коллекцию, Contains(null) выбросит ArgumentNullException
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+        {
+            await printer.PrintDocAsync(null!);
+        });
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync на Windows выбрасывает Win32Exception,
+    /// так как команда lpstat недоступна.
+    /// </summary>
+    [Test]
+    [Platform("Win")]
+    public void PrintDocAsync_OnWindows_ThrowsWin32Exception()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+
+        // Act & Assert
+        Assert.ThrowsAsync<Win32Exception>(async () =>
+        {
+            await printer.PrintDocAsync("TestPrinter");
+        });
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync возвращает Task даже для несуществующего принтера на Windows.
+    /// Task выбросит исключение при await.
+    /// </summary>
+    [Test]
+    [Platform("Win")]
+    public void PrintDocAsync_OnWindows_ReturnsTaskThatThrows()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+
+        // Act
+        var task = printer.PrintDocAsync("NonExistentPrinter");
+
+        // Assert
+        Assert.That(task, Is.Not.Null);
+        Assert.That(task, Is.InstanceOf<Task>());
+        Assert.ThrowsAsync<Win32Exception>(async () => await task);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync можно вызвать с пустым именем принтера.
+    /// Принтер не будет найден в списке, метод завершится без печати.
+    /// </summary>
+    [Test]
+    [Platform("Linux,Unix")]
+    public async Task PrintDocAsync_WithEmptyPrinterName_CompletesWithoutPrinting()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+
+        // Act & Assert - пустое имя не будет найдено в списке принтеров
+        await printer.PrintDocAsync(string.Empty);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с очень длинным именем принтера обрабатывается корректно.
+    /// </summary>
+    [Test]
+    [Platform("Linux,Unix")]
+    public async Task PrintDocAsync_WithVeryLongPrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+        var longName = new string('A', 1000);
+
+        // Act & Assert - длинное имя не будет найдено в списке принтеров
+        await printer.PrintDocAsync(longName);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с Unicode символами в имени принтера работает корректно.
+    /// </summary>
+    [Test]
+    [Platform("Linux,Unix")]
+    public async Task PrintDocAsync_WithUnicodePrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+        const string unicodeName = "Принтер_Офис_中文";
+
+        // Act & Assert - Unicode имя не будет найдено в списке принтеров
+        await printer.PrintDocAsync(unicodeName);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с пробелами в имени принтера работает корректно.
+    /// </summary>
+    [Test]
+    [Platform("Linux,Unix")]
+    public async Task PrintDocAsync_WithSpacesInPrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+        const string nameWithSpaces = "Printer With Spaces";
+
+        // Act & Assert
+        await printer.PrintDocAsync(nameWithSpaces);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync можно вызвать несколько раз параллельно на Linux.
+    /// </summary>
+    [Test]
+    [Platform("Linux,Unix")]
+    public async Task PrintDocAsync_WhenCalledConcurrently_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new LinuxPrinter();
+        var tasks = new List<Task>();
+
+        // Act
+        for (int i = 0; i < 5; i++)
+        {
+            tasks.Add(printer.PrintDocAsync($"NonExistentPrinter_{i}"));
+        }
+
+        // Assert - все задачи должны завершиться без исключений
+        await Task.WhenAll(tasks);
     }
 
     #endregion

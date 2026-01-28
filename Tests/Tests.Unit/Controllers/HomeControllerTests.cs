@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,14 +17,15 @@ namespace Tests.Controllers;
 /// <summary>
 /// Unit-тесты для <see cref="HomeController"/>.
 /// Тестируют методы работы с конфигурацией и обработку данных.
+/// Используется Reflection для тестирования реального HomeController без дублирования логики.
 /// </summary>
 [TestFixture(TestName = "HomeController: набор тестов главного контроллера")]
 public class HomeControllerTests
 {
     private Mock<ILogger<HomeController>> _loggerMock = null!;
     private Mock<IAppConfigService> _appConfigMock = null!;
-    private DbContextOptions<DocGeneral> _dbOptions = null!;
     private CfgApp _testCfgApp = null!;
+    private HomeController _controller = null!;
 
     [SetUp]
     public void SetUp()
@@ -36,10 +39,43 @@ public class HomeControllerTests
         // Настраиваем mock
         _appConfigMock.Setup(a => a.GetAppCfg()).Returns(_testCfgApp);
 
-        // Создаем DbContextOptions (не подключаемся к реальной БД)
-        _dbOptions = new DbContextOptionsBuilder<DocGeneral>()
-            .UseInMemoryDatabase(databaseName: $"TestDb_{Guid.NewGuid()}")
-            .Options;
+        // Создаем экземпляр HomeController через Reflection без вызова конструктора
+        // (обходим статический вызов AppConfigService.GetInstance в конструкторе)
+        _controller = CreateHomeControllerWithMocks();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _controller?.Dispose();
+    }
+
+    /// <summary>
+    /// Создаёт экземпляр HomeController без вызова конструктора и устанавливает
+    /// приватные поля через Reflection для возможности мокирования.
+    /// </summary>
+    private HomeController CreateHomeControllerWithMocks()
+    {
+        // Создаём экземпляр без вызова конструктора (обходим статический вызов AppConfigService.GetInstance)
+        var controller = (HomeController)RuntimeHelpers.GetUninitializedObject(typeof(HomeController));
+
+        // Устанавливаем приватные поля через Reflection
+        SetPrivateField(controller, "_cfgApp", _testCfgApp);
+        SetPrivateField(controller, "_appConfig", _appConfigMock.Object);
+        SetPrivateField(controller, "_logger", _loggerMock.Object);
+
+        return controller;
+    }
+
+    /// <summary>
+    /// Устанавливает значение приватного поля объекта через Reflection.
+    /// </summary>
+    private static void SetPrivateField(object target, string fieldName, object? value)
+    {
+        var field = target.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+        if (field == null)
+            throw new InvalidOperationException($"Поле '{fieldName}' не найдено в типе {target.GetType().Name}");
+        field.SetValue(target, value);
     }
 
     private static CfgApp CreateTestCfgApp()
@@ -130,140 +166,6 @@ public class HomeControllerTests
         };
     }
 
-    #region Вспомогательный класс для тестирования методов HomeController
-
-    /// <summary>
-    /// Тестовый класс, наследующий HomeController для доступа к protected методам
-    /// и переопределения зависимостей
-    /// </summary>
-    private class TestableHomeController
-    {
-        private readonly CfgApp _cfgApp;
-        private readonly IAppConfigService _appConfig;
-        private readonly ILogger<HomeController> _logger;
-
-        public TestableHomeController(
-            ILogger<HomeController> logger,
-            IAppConfigService appConfig)
-        {
-            _logger = logger;
-            _appConfig = appConfig;
-            _cfgApp = appConfig.GetAppCfg();
-        }
-
-        public List<ListItem> GetListDevices()
-        {
-            var usedDevices = _cfgApp.Devices.Where(x => x.Use).ToList();
-            if (!usedDevices.Any())
-                return new List<ListItem>();
-
-            return usedDevices.Select(u => new ListItem { Id = u.IdDevice, Name = u.Name }).ToList();
-        }
-
-        public string GetNameDBForDevice(int idDevice)
-        {
-            var device = _cfgApp.Devices.FirstOrDefault(x => x.IdDevice == idDevice);
-            if (device is null)
-                return string.Empty;
-
-            var dbName = device.DBConnectionStrings?.FirstOrDefault(x => x.Use)?.Database;
-            return string.IsNullOrEmpty(dbName) ? string.Empty : dbName;
-        }
-
-        public List<ListItem> GetListDocs(int idDevice)
-        {
-            var device = _cfgApp.Devices.FirstOrDefault(x => x.IdDevice == idDevice);
-            if (device is null)
-                return new List<ListItem>();
-
-            var usedDocs = device.Docs.Where(x => x.Use).ToList();
-            if (!usedDocs.Any())
-                return new List<ListItem>();
-
-            return usedDocs.Select(u => new ListItem { Id = (int)u.IdDoc, Name = u.Name }).ToList();
-        }
-
-        public List<ListItem> GetTemplatesDoc(int idDevice, IdDoc idDoc)
-        {
-            var device = _cfgApp.Devices.FirstOrDefault(x => x.IdDevice == idDevice);
-            if (device is null)
-                return new List<ListItem>();
-
-            var doc = device.Docs.FirstOrDefault(x => x.IdDoc == idDoc);
-            if (doc is null)
-                return new List<ListItem>();
-
-            var usedTemplates = doc.TemplateDocs.Where(x => x.Use).ToList();
-            if (!usedTemplates.Any())
-                return new List<ListItem>();
-
-            return usedTemplates.Select(x => new ListItem { Id = x.Id, Name = x.Name }).ToList();
-        }
-
-        public bool IsUsedSecurity() => _cfgApp.UseSecurityFeatures;
-
-        public bool IsUsedElis(int idDevice) => _appConfig.IsUsedElis(idDevice);
-
-        public Dictionary<string, string> GetDataForRegistrationDeviceInELIS(int idDevice)
-        {
-            var device = _cfgApp.Devices.Single(x => x.IdDevice == idDevice);
-
-            if (device.Elis == null)
-            {
-                if (_cfgApp.Elis == null)
-                    return null;
-                return new Dictionary<string, string>
-                {
-                    { "ostKey", _cfgApp.Elis.OstKey },
-                    { "siknKey", _cfgApp.Elis.SiknKey },
-                    { "clientName", _cfgApp.Elis.ClientName }
-                };
-            }
-
-            return new Dictionary<string, string>
-            {
-                { "ostKey", device.Elis.OstKey },
-                { "siknKey", device.Elis.SiknKey },
-                { "clientName", device.Elis.ClientName }
-            };
-        }
-
-        public Dictionary<string, string> GetClientToken(int idDevice)
-        {
-            var device = _cfgApp.Devices.Single(x => x.IdDevice == idDevice);
-            string clientToken;
-
-            if (device.Elis == null)
-                clientToken = _cfgApp.Elis?.ClientToken ?? string.Empty;
-            else
-                clientToken = device.Elis.ClientToken;
-
-            return string.IsNullOrEmpty(clientToken)
-                ? new Dictionary<string, string> { { "clientToken", null } }
-                : new Dictionary<string, string> { { "clientToken", clientToken } };
-        }
-
-        public string GetSaveBtnText(int idDevice, IdDoc idDoc)
-        {
-            if (!_appConfig.IsUsedElis(idDevice))
-                return "Сохранить";
-
-            if (idDoc is IdDoc.Act or IdDoc.Passport)
-                return "Завершить редактирование и отправить";
-
-            return "Сохранить";
-        }
-
-        public string GetPathTemplateDoc(int idDevice, IdDoc idDoc, int idTemplateDoc)
-        {
-            return _cfgApp.Devices.Single(x => x.IdDevice == idDevice)
-                .Docs.Single(x => x.IdDoc == idDoc)
-                .TemplateDocs.Single(x => x.Id == idTemplateDoc).PathToDocTemplateFile;
-        }
-    }
-
-    #endregion
-
     #region GetListDevices Tests
 
     /// <summary>
@@ -272,11 +174,8 @@ public class HomeControllerTests
     [Test]
     public void GetListDevices_WhenDevicesExist_ReturnsOnlyUsedDevices()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetListDevices();
+        var result = _controller.GetListDevices();
 
         // Assert
         Assert.Multiple(() =>
@@ -302,11 +201,10 @@ public class HomeControllerTests
                 new Device { Use = false, IdDevice = 1, Name = "Unused" }
             }
         };
-        _appConfigMock.Setup(a => a.GetAppCfg()).Returns(emptyConfig);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
+        SetPrivateField(_controller, "_cfgApp", emptyConfig);
 
         // Act
-        var result = controller.GetListDevices();
+        var result = _controller.GetListDevices();
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -318,11 +216,8 @@ public class HomeControllerTests
     [Test]
     public void GetListDevices_WhenCalled_ReturnsCorrectIdAndName()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetListDevices();
+        var result = _controller.GetListDevices();
         var device1 = result.FirstOrDefault(x => x.Id == 1);
 
         // Assert
@@ -344,11 +239,8 @@ public class HomeControllerTests
     [Test]
     public void GetNameDBForDevice_WhenValidDevice_ReturnsDbName()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetNameDBForDevice(1);
+        var result = _controller.GetNameDBForDevice(1);
 
         // Assert
         Assert.That(result, Is.EqualTo("test_db_1"));
@@ -360,11 +252,8 @@ public class HomeControllerTests
     [Test]
     public void GetNameDBForDevice_WhenDeviceNotFound_ReturnsEmpty()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetNameDBForDevice(999);
+        var result = _controller.GetNameDBForDevice(999);
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -393,11 +282,10 @@ public class HomeControllerTests
                 }
             }
         };
-        _appConfigMock.Setup(a => a.GetAppCfg()).Returns(configNoDb);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
+        SetPrivateField(_controller, "_cfgApp", configNoDb);
 
         // Act
-        var result = controller.GetNameDBForDevice(1);
+        var result = _controller.GetNameDBForDevice(1);
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -413,11 +301,8 @@ public class HomeControllerTests
     [Test]
     public void GetListDocs_WhenValidDevice_ReturnsDocs()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetListDocs(1);
+        var result = _controller.GetListDocs(1);
 
         // Assert
         Assert.Multiple(() =>
@@ -435,11 +320,8 @@ public class HomeControllerTests
     [Test]
     public void GetListDocs_WhenDeviceNotFound_ReturnsEmptyList()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetListDocs(999);
+        var result = _controller.GetListDocs(999);
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -451,11 +333,8 @@ public class HomeControllerTests
     [Test]
     public void GetListDocs_WhenCalled_ReturnsOnlyUsedDocs()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetListDocs(1);
+        var result = _controller.GetListDocs(1);
 
         // Assert
         Assert.That(result.All(x => x.Name != "Акты"), Is.True);
@@ -471,11 +350,8 @@ public class HomeControllerTests
     [Test]
     public void GetTemplatesDoc_WhenValidDoc_ReturnsTemplates()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetTemplatesDoc(1, IdDoc.Passport);
+        var result = _controller.GetTemplatesDoc(1, IdDoc.Passport);
 
         // Assert
         Assert.Multiple(() =>
@@ -492,11 +368,8 @@ public class HomeControllerTests
     [Test]
     public void GetTemplatesDoc_WhenDeviceNotFound_ReturnsEmptyList()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetTemplatesDoc(999, IdDoc.Passport);
+        var result = _controller.GetTemplatesDoc(999, IdDoc.Passport);
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -508,11 +381,8 @@ public class HomeControllerTests
     [Test]
     public void GetTemplatesDoc_WhenDocNotFound_ReturnsEmptyList()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetTemplatesDoc(1, IdDoc.Jornal);
+        var result = _controller.GetTemplatesDoc(1, IdDoc.Jornal);
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -528,11 +398,8 @@ public class HomeControllerTests
     [Test]
     public void IsUsedSecurity_WhenEnabled_ReturnsTrue()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.IsUsedSecurity();
+        var result = _controller.IsUsedSecurity();
 
         // Assert
         Assert.That(result, Is.True);
@@ -546,11 +413,10 @@ public class HomeControllerTests
     {
         // Arrange
         var configNoSecurity = new CfgApp { UseSecurityFeatures = false };
-        _appConfigMock.Setup(a => a.GetAppCfg()).Returns(configNoSecurity);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
+        SetPrivateField(_controller, "_cfgApp", configNoSecurity);
 
         // Act
-        var result = controller.IsUsedSecurity();
+        var result = _controller.IsUsedSecurity();
 
         // Assert
         Assert.That(result, Is.False);
@@ -561,17 +427,16 @@ public class HomeControllerTests
     #region IsUsedElis Tests
 
     /// <summary>
-    /// Проверяет, что IsUsedElis делегирует вызов в appConfig.
+    /// Проверяет, что IsUsedElis делегирует вызов в appConfig и возвращает true.
     /// </summary>
     [Test]
-    public void IsUsedElis_WhenCalled_DelegatesToAppConfig()
+    public void IsUsedElis_WhenElisEnabled_ReturnsTrue()
     {
         // Arrange
         _appConfigMock.Setup(a => a.IsUsedElis(1)).Returns(true);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
 
         // Act
-        var result = controller.IsUsedElis(1);
+        var result = _controller.IsUsedElis(1);
 
         // Assert
         Assert.That(result, Is.True);
@@ -586,13 +451,13 @@ public class HomeControllerTests
     {
         // Arrange
         _appConfigMock.Setup(a => a.IsUsedElis(2)).Returns(false);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
 
         // Act
-        var result = controller.IsUsedElis(2);
+        var result = _controller.IsUsedElis(2);
 
         // Assert
         Assert.That(result, Is.False);
+        _appConfigMock.Verify(a => a.IsUsedElis(2), Times.Once);
     }
 
     #endregion
@@ -605,11 +470,8 @@ public class HomeControllerTests
     [Test]
     public void GetDataForRegistrationDeviceInELIS_WhenDeviceHasElis_ReturnsDeviceData()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetDataForRegistrationDeviceInELIS(1);
+        var result = _controller.GetDataForRegistrationDeviceInELIS(1);
 
         // Assert
         Assert.Multiple(() =>
@@ -628,11 +490,8 @@ public class HomeControllerTests
     [Test]
     public void GetDataForRegistrationDeviceInELIS_WhenDeviceNoElis_ReturnsGlobalData()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetDataForRegistrationDeviceInELIS(2);
+        var result = _controller.GetDataForRegistrationDeviceInELIS(2);
 
         // Assert
         Assert.Multiple(() =>
@@ -654,11 +513,8 @@ public class HomeControllerTests
     [Test]
     public void GetClientToken_WhenDeviceHasToken_ReturnsDeviceToken()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetClientToken(1);
+        var result = _controller.GetClientToken(1);
 
         // Assert
         Assert.That(result["clientToken"], Is.EqualTo("device_token"));
@@ -670,11 +526,8 @@ public class HomeControllerTests
     [Test]
     public void GetClientToken_WhenDeviceNoElis_ReturnsGlobalToken()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetClientToken(2);
+        var result = _controller.GetClientToken(2);
 
         // Assert
         Assert.That(result["clientToken"], Is.EqualTo("global_token"));
@@ -692,13 +545,13 @@ public class HomeControllerTests
     {
         // Arrange
         _appConfigMock.Setup(a => a.IsUsedElis(1)).Returns(true);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
 
         // Act
-        var result = controller.GetSaveBtnText(1, IdDoc.Passport);
+        var result = _controller.GetSaveBtnText(1, IdDoc.Passport);
 
         // Assert
         Assert.That(result, Is.EqualTo("Завершить редактирование и отправить"));
+        _appConfigMock.Verify(a => a.IsUsedElis(1), Times.Once);
     }
 
     /// <summary>
@@ -709,13 +562,13 @@ public class HomeControllerTests
     {
         // Arrange
         _appConfigMock.Setup(a => a.IsUsedElis(1)).Returns(true);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
 
         // Act
-        var result = controller.GetSaveBtnText(1, IdDoc.Act);
+        var result = _controller.GetSaveBtnText(1, IdDoc.Act);
 
         // Assert
         Assert.That(result, Is.EqualTo("Завершить редактирование и отправить"));
+        _appConfigMock.Verify(a => a.IsUsedElis(1), Times.Once);
     }
 
     /// <summary>
@@ -726,13 +579,13 @@ public class HomeControllerTests
     {
         // Arrange
         _appConfigMock.Setup(a => a.IsUsedElis(1)).Returns(true);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
 
         // Act
-        var result = controller.GetSaveBtnText(1, IdDoc.Report);
+        var result = _controller.GetSaveBtnText(1, IdDoc.Report);
 
         // Assert
         Assert.That(result, Is.EqualTo("Сохранить"));
+        _appConfigMock.Verify(a => a.IsUsedElis(1), Times.Once);
     }
 
     /// <summary>
@@ -743,13 +596,13 @@ public class HomeControllerTests
     {
         // Arrange
         _appConfigMock.Setup(a => a.IsUsedElis(2)).Returns(false);
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
 
         // Act
-        var result = controller.GetSaveBtnText(2, IdDoc.Passport);
+        var result = _controller.GetSaveBtnText(2, IdDoc.Passport);
 
         // Assert
         Assert.That(result, Is.EqualTo("Сохранить"));
+        _appConfigMock.Verify(a => a.IsUsedElis(2), Times.Once);
     }
 
     #endregion
@@ -762,11 +615,8 @@ public class HomeControllerTests
     [Test]
     public void GetPathTemplateDoc_WhenValidParams_ReturnsPath()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act
-        var result = controller.GetPathTemplateDoc(1, IdDoc.Passport, 1);
+        var result = _controller.GetPathTemplateDoc(1, IdDoc.Passport, 1);
 
         // Assert
         Assert.That(result, Is.EqualTo("/Doc/Passport.frx"));
@@ -778,12 +628,56 @@ public class HomeControllerTests
     [Test]
     public void GetPathTemplateDoc_WhenDeviceNotFound_ThrowsException()
     {
-        // Arrange
-        var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() =>
-            controller.GetPathTemplateDoc(999, IdDoc.Passport, 1));
+            _controller.GetPathTemplateDoc(999, IdDoc.Passport, 1));
+    }
+
+    #endregion
+
+    #region IsProtocolNumberUsed Tests
+
+    /// <summary>
+    /// Проверяет, что IsProtocolNumberUsed возвращает true для документов, использующих номер протокола.
+    /// </summary>
+    [Test]
+    [TestCase(IdDoc.KMH_PP_Areom, true)]
+    [TestCase(IdDoc.KMH_PV, true)]
+    [TestCase(IdDoc.KMH_PW, true)]
+    [TestCase(IdDoc.Poverka2816, true)]
+    [TestCase(IdDoc.KMH_MI2816, true)]
+    [TestCase(IdDoc.Passport, false)]
+    [TestCase(IdDoc.Report, false)]
+    [TestCase(IdDoc.Act, false)]
+    public void IsProtocolNumberUsed_WhenCalled_ReturnsExpectedResult(IdDoc idDoc, bool expected)
+    {
+        // Act
+        var result = _controller.IsProtocolNumberUsed(idDoc);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expected));
+    }
+
+    #endregion
+
+    #region GetListProtocolNumber Tests
+
+    /// <summary>
+    /// Проверяет, что GetListProtocolNumber возвращает список протоколов.
+    /// </summary>
+    [Test]
+    public void GetListProtocolNumber_WhenCalled_ReturnsProtocolList()
+    {
+        // Act
+        var result = _controller.GetListProtocolNumber(1, IdDoc.KMH_PV);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result.Any(x => x.Name == "Протокол 1"), Is.True);
+            Assert.That(result.Any(x => x.Name == "Протокол 2"), Is.True);
+        });
     }
 
     #endregion

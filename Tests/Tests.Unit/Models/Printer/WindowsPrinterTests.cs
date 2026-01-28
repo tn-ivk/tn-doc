@@ -56,6 +56,46 @@ public class WindowsPrinterTests
 
     #endregion
 
+    #region Constructor Negative Tests
+
+    /// <summary>
+    /// Проверяет, что конструктор с null логгером создаёт экземпляр.
+    /// Примечание: NullReferenceException произойдёт только при попытке логирования ошибки.
+    /// </summary>
+    [Test]
+    public void Constructor_WithNullLogger_CreatesInstance()
+    {
+        // Arrange
+        ILogger<WindowsPrinter>? nullLogger = null;
+
+        // Act
+        var printer = new WindowsPrinter(nullLogger!);
+
+        // Assert - конструктор не выбрасывает исключение
+        Assert.That(printer, Is.Not.Null);
+        Assert.That(printer, Is.InstanceOf<AbsPrinter>());
+    }
+
+    /// <summary>
+    /// Проверяет, что GetAvailablePrinters с null логгером работает при успешном вызове.
+    /// На Windows возвращает реальные принтеры или пустой список.
+    /// </summary>
+    [Test]
+    [Platform("Win")]
+    public void GetAvailablePrinters_WithNullLogger_WhenNoException_ReturnsCollection()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(null!);
+
+        // Act
+        var result = printer.GetAvailablePrinters();
+
+        // Assert - не должно быть NullReferenceException, если нет ошибки системы
+        Assert.That(result, Is.Not.Null);
+    }
+
+    #endregion
+
     #region GetAvailablePrinters Tests
 
     /// <summary>
@@ -115,6 +155,70 @@ public class WindowsPrinterTests
 
         // Assert - может быть пустым или нет в зависимости от системы
         Assert.That(result, Is.Not.Null);
+    }
+
+    #endregion
+
+    #region GetAvailablePrinters Negative Tests
+
+    /// <summary>
+    /// Проверяет, что GetAvailablePrinters возвращает не-null коллекцию даже при проблемах.
+    /// Текущая реализация ловит исключения и возвращает пустую коллекцию.
+    /// </summary>
+    [Test]
+    public void GetAvailablePrinters_ReturnsNonNullCollection()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+
+        // Act
+        var result = printer.GetAvailablePrinters();
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.InstanceOf<IEnumerable<string>>());
+    }
+
+    /// <summary>
+    /// Проверяет, что GetAvailablePrinters можно вызвать несколько раз подряд.
+    /// </summary>
+    [Test]
+    public void GetAvailablePrinters_WhenCalledMultipleTimes_DoesNotThrow()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+
+        // Act & Assert
+        Assert.DoesNotThrow(() =>
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                var result = printer.GetAvailablePrinters();
+                Assert.That(result, Is.Not.Null);
+            }
+        });
+    }
+
+    /// <summary>
+    /// Проверяет, что GetAvailablePrinters возвращает IEnumerable, который можно перечислить.
+    /// </summary>
+    [Test]
+    public void GetAvailablePrinters_ResultCanBeEnumerated()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+
+        // Act
+        var result = printer.GetAvailablePrinters();
+
+        // Assert - перечисление не должно выбросить исключение
+        Assert.DoesNotThrow(() =>
+        {
+            foreach (var _ in result)
+            {
+                // Просто перечисляем
+            }
+        });
     }
 
     #endregion
@@ -204,6 +308,100 @@ public class WindowsPrinterTests
         await printer.PrintDocAsync(printerNameWithSpecialChars);
 
         // Assert - не выбросило исключение
+    }
+
+    #endregion
+
+    #region PrintDocAsync Negative Tests
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync корректно обрабатывает null имя принтера.
+    /// Текущая реализация проверяет Contains(), который вернёт false.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithNullPrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+
+        // Act & Assert - не должно выбросить исключение
+        await printer.PrintDocAsync(null!);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync можно вызвать несколько раз параллельно.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WhenCalledConcurrently_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+        var tasks = new List<Task>();
+
+        // Act
+        for (int i = 0; i < 5; i++)
+        {
+            tasks.Add(printer.PrintDocAsync($"NonExistentPrinter_{i}"));
+        }
+
+        // Assert - все задачи должны завершиться без исключений
+        await Task.WhenAll(tasks);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с очень длинным именем принтера не выбрасывает исключение.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithVeryLongPrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+        var longName = new string('A', 1000);
+
+        // Act & Assert
+        await printer.PrintDocAsync(longName);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с Unicode символами в имени принтера работает корректно.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithUnicodePrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+        const string unicodeName = "Принтер_Офис_中文_العربية";
+
+        // Act & Assert
+        await printer.PrintDocAsync(unicodeName);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с символами новой строки в имени принтера работает корректно.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithNewlineInPrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+        const string nameWithNewline = "Printer\nWith\r\nNewlines";
+
+        // Act & Assert
+        await printer.PrintDocAsync(nameWithNewline);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync с кавычками в имени принтера работает корректно.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithQuotesInPrinterName_HandlesGracefully()
+    {
+        // Arrange
+        var printer = new WindowsPrinter(_mockLogger.Object);
+        const string nameWithQuotes = "Printer \"Test\" Name";
+
+        // Act & Assert
+        await printer.PrintDocAsync(nameWithQuotes);
     }
 
     #endregion
