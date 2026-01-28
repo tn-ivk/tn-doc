@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc — ASP.NET Core 8.0 веб-приложение для генерации технических документов ИВК (Измерительно-вычислительный комплекс) нефтегазовой отрасли. Генерирует паспорта качества, протоколы поверки, акты приёма-сдачи через FastReport.
 
-**Version**: 1.4.2 | **Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Branch**: develop
+**Version**: 1.4.3 | **Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Branch**: develop
 
 ## Quick Start
 
@@ -82,8 +82,9 @@ HTTP Request → HomeController → IAppConfigService.GetDocumentClass(idDevice,
 | Service | Scope | Назначение |
 |---------|-------|------------|
 | `IAppConfigService` | Singleton | Конфигурация + фабрика документов |
+| `IConfigurationCacheService` | Singleton | Кэш JSON-конфигов (LRU, макс. 50 записей) |
 | `IReportBuffer` | Singleton | In-memory PDF хранилище |
-| `IDocModuleLoader` | Singleton | Динамическая загрузка DLL модулей |
+| `IDocModuleLoader` | Singleton | Динамическая загрузка DLL модулей (LRU, макс. 5) |
 | `IStatusProvider` | Scoped | Мониторинг здоровья системы |
 | `PrinterService` | Singleton | Платформо-зависимая печать |
 
@@ -91,7 +92,24 @@ HTTP Request → HomeController → IAppConfigService.GetDocumentClass(idDevice,
 
 - **StatusBar** (`/TN_Doc/Client/statusbar/`): Vue 3 + PrimeVue + SignalR, real-time мониторинг статуса устройств/OPC/ELIS
 - **Configurator** (`/TN_Doc/Client/configurator/`): Управление конфигурацией через `/configurator` endpoint
+  - **Вкладка "Общие"**: настройки экспорта, безопасности, локального OPC-клиента (ARM), настройки ELIS
+  - **Вкладка "Устройства"**: список устройств с поиском, множественный выбор для пакетного редактирования
+  - **Редактор устройства**: включение/выключение, шаблоны документов, подключение к БД, настройки OPC, используемые СИ
 - Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
+
+### Configurator: Используемые СИ (v1.4.3)
+
+Настройка средств измерения для каждого устройства:
+
+| Параметр | Описание |
+|----------|----------|
+| `UsedPR` | Задействовать ПР (преобразователь расхода) |
+| `UsedPP` | Задействовать ПП (преобразователь плотности) |
+| `UsedPVL` | Задействовать ПВл (преобразователь влагосодержания) |
+| `UsedPVS` | Задействовать ПВз (преобразователь вязкости) |
+| `UsedSecondSI_*` | Задействовать второй экземпляр СИ (PP, PVL, PVS) |
+
+Логика зависимостей: вторичное СИ доступно только при включённом основном.
 
 ## Configuration
 

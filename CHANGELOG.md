@@ -5,6 +5,29 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [1.4.3] - 2025-01-XX
+
+### Added
+- 🚀 **Configurator: Настройки OPC-клиента** — возможность настроить OPC DA/UA для ARM и per-device
+- 🚀 **Configurator: Настройки ELIS** — управление параметрами интеграции с ELIS (OstKey, SiknKey, ClientName)
+- 🚀 **Configurator: Используемые СИ** — настройка средств измерения для устройств (UsedPR, UsedPP, UsedPVL, UsedPVS, SecondSI)
+- Тесты для сервисов кэширования конфигураций
+
+### Changed
+- ⚠️ Рефакторинг системы кэширования конфигураций (`IConfigurationCacheService`)
+  - JSON-based storage с LRU eviction (макс. 50 записей)
+  - Автоматическая инвалидация кэша при сохранении через `CfgFileRW`
+  - API endpoint `/api/config-cache/` для управления кэшем
+- Доработка окна настройки OPC-клиента в Конфигураторе (модальное окно с деталями)
+- Улучшено управление индикаторами статус-бара
+- Обновлён docgeneral до версии 1.2.2
+
+### Fixed
+- Починена верстка таблицы редактирования паспорта качества
+- Исправления тестов
+- Сброс кэша конфигурационных файлов при изменениях в справочнике
+- Баг с чек-боксом "Применять по умолчанию" в справочнике
+
 ## [1.4.2] - 2025-10-02
 
 ### Removed
@@ -141,7 +164,8 @@
 - 📝 **Documentation** - Обновление документации
 - 🔧 **Maintenance** - Техническое обслуживание кода
 
-[Unreleased]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.2...HEAD
+[Unreleased]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/orpovy/ivk/tn_doc/compare/v1.3.7...v1.4.0

@@ -270,6 +270,159 @@ POST /Dictionaries/AddItem
 }
 ```
 
+### Configurator API
+
+API для управления конфигурацией приложения через веб-интерфейс.
+
+#### Получить текущую конфигурацию
+
+```http
+GET /api/configurator/config
+```
+
+**Response:**
+```json
+{
+  "general": {
+    "exportPath": "/opt/TN_Doc/Export",
+    "useSecurityFeatures": true,
+    "armOpcConnectionSettings": {
+      "type": "UA",
+      "configFilename": "opc.ua.config.xml",
+      "startPrefix": "ns=2;s=",
+      "updateRate": 1000
+    },
+    "elis": {
+      "use": true,
+      "ostKey": "OST-001",
+      "siknKey": "SIKN-001",
+      "clientName": "TN_Doc_Client",
+      "clientToken": "***"
+    }
+  },
+  "devices": [
+    {
+      "idDevice": "IVK-1",
+      "name": "ИВК №1",
+      "use": true,
+      "docs": ["Passport", "Act", "Poverka1974"],
+      "usedSI": {
+        "usedPR": true,
+        "usedPP": true,
+        "usedPVL": true,
+        "usedPVS": false,
+        "usedSecondSI_PP": false,
+        "usedSecondSI_PVL": false,
+        "usedSecondSI_PVS": false
+      },
+      "opcConnectionSettings": {
+        "type": "DA",
+        "host": "192.168.1.100",
+        "progId": "OPC.DA.Server",
+        "updateRate": 500
+      }
+    }
+  ]
+}
+```
+
+#### Сохранить конфигурацию
+
+```http
+POST /api/configurator/config
+```
+
+**Request Body:** (полная структура конфигурации, как в GET)
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Конфигурация сохранена"
+}
+```
+
+#### Валидация конфигурации
+
+```http
+POST /api/configurator/validate
+```
+
+**Request Body:** (структура конфигурации)
+
+**Response:**
+```json
+{
+  "isValid": true,
+  "errors": [],
+  "warnings": [
+    {
+      "field": "devices[0].opcConnectionSettings",
+      "message": "OPC сервер недоступен"
+    }
+  ]
+}
+```
+
+### Config Cache API
+
+API для управления кэшем конфигурационных файлов.
+
+#### Получить статистику кэша
+
+```http
+GET /api/config-cache/statistics
+```
+
+**Response:**
+```json
+{
+  "totalEntries": 12,
+  "maxEntries": 50,
+  "cacheHits": 156,
+  "cacheMisses": 24,
+  "evictions": 0,
+  "entries": [
+    {
+      "filePath": "Cfg/CfgPassport.json",
+      "configType": "CfgPassport",
+      "loadedAt": "2025-01-29T10:00:00Z",
+      "lastAccessTime": "2025-01-29T14:30:00Z",
+      "accessCount": 42
+    }
+  ]
+}
+```
+
+#### Очистить кэш
+
+```http
+POST /api/config-cache/clear
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Кэш очищен (12 записей удалено)"
+}
+```
+
+#### Проверить здоровье сервиса
+
+```http
+GET /api/config-cache/health
+```
+
+**Response:**
+```json
+{
+  "status": "Healthy",
+  "totalEntries": 12,
+  "maxEntries": 50
+}
+```
+
 ### Printing API
 
 #### Печать документа

@@ -64,8 +64,12 @@ graph TB
 ```json
 {
   "Elis": {
-    "UseElis": true,
+    "Use": true,
     "Url": "https://labhub.company.com/api",
+    "OstKey": "OST-001",
+    "SiknKey": "SIKN-001",
+    "ClientName": "TN_Doc_Client",
+    "ClientToken": "***",
     "Timeout": 5000,
     "Certificate": {
       "Path": "Cert/elis-client.crt",
@@ -91,13 +95,19 @@ graph TB
 
 ### Параметры конфигурации
 
-| Параметр | Описание | По умолчанию |
-|----------|----------|--------------|
-| `UseElis` | Включить интеграцию | `false` |
-| `Url` | URL LabHub API | - |
-| `Timeout` | Таймаут запроса (мс) | `5000` |
-| `Certificate.Path` | Путь к сертификату SSL | - |
-| `RetryPolicy.MaxRetries` | Макс. повторов | `3` |
+| Параметр | Описание | По умолчанию | Configurator |
+|----------|----------|--------------|--------------|
+| `Use` | Включить интеграцию | `false` | ✅ |
+| `Url` | URL LabHub API | - | - |
+| `OstKey` | Ключ ОСТ (операционная станция) | - | ✅ |
+| `SiknKey` | Ключ СИКН | - | ✅ |
+| `ClientName` | Имя клиента для идентификации | - | ✅ |
+| `ClientToken` | Токен авторизации (read-only) | - | 👁️ |
+| `Timeout` | Таймаут запроса (мс) | `5000` | - |
+| `Certificate.Path` | Путь к сертификату SSL | - | - |
+| `RetryPolicy.MaxRetries` | Макс. повторов | `3` | - |
+
+> **Примечание**: Параметры с ✅ настраиваются через веб-интерфейс Configurator (`/configurator`). Параметр с 👁️ отображается, но не редактируется.
 
 ## Формат данных
 

@@ -392,10 +392,12 @@ graph TB
 | Метрика | Значение | Цель |
 |---------|----------|------|
 | Initial Load | ~300KB | Bundle size |
-| Update Interval | 30s | Background check |
+| Update Interval | 60s | Background check (StatusMonitoringService) |
 | Response Time | <100ms | UI update |
 | Timeout (MS) | 2s | MessagingService |
 | Timeout (ELIS) | 5s | ELIS Lab System |
+
+> **Примечание (v1.4.2+)**: Удалена кнопка ручного обновления статусов, удалён индикатор SignalR соединения, убрано отображение времени последнего обновления.
 
 ## Error Handling
 
