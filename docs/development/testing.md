@@ -5,8 +5,8 @@
 TN_Doc использует комплексную стратегию тестирования на базе **NUnit 4.3.2** и **.NET 8.0**. Тестовая инфраструктура организована в 4 проекта, которые покрывают разные уровни тестирования: от модульных тестов отдельных компонентов до end-to-end тестов пользовательского интерфейса.
 
 **Текущий статус (v1.3.8):**
-- **~315 работающих тестов (~48%)**
-- **~335 отключенных тестов (~52%)**
+- **Количество тестов и доля отключённых регулярно меняются — ориентируйтесь на вывод `dotnet test`/CI.**
+- **Отключённые тесты помечаются `[Ignore]` с причиной.**
 
 Тесты используют:
 - **NUnit 4.3.2** — фреймворк тестирования
@@ -29,37 +29,48 @@ TN_Doc использует комплексную стратегию тести
 - **Models:** DTOs (`DirEditDTO`, `QpEditDto`), доменные модели (`ClientLogMessage`, `Data`, `ListItem`)
 - **Extensions:** `ServiceCollectionExtensions`
 - **Платформо-зависимые компоненты:** `LinuxPrinter`, `WindowsPrinter`
+- **Конфигурации:** `ConfigEncodingTests` — проверка UTF-8, отсутствия U+FFFD и валидности JSON в `TN_Doc/Cfg`
+
+**Отдельные проверки конфигураций:**
+- `ConfigEncodingTests` проходит по всем JSON в `TN_Doc/Cfg` и ловит ошибки кодировки (U+FFFD), невалидный UTF-8 и синтаксис JSON.
 
 **Примеры тестов:**
 ```csharp
 // Tests/Tests.Unit/Controllers/HomeControllerTests.cs
+[SetUp]
+public void SetUp()
+{
+    _controller = CreateHomeControllerWithMocks(); // Reflection, без вызова конструктора
+}
+
 [Test]
 public void GetListDevices_WhenDevicesExist_ReturnsOnlyUsedDevices()
 {
-    var controller = new TestableHomeController(_loggerMock.Object, _appConfigMock.Object);
-    var result = controller.GetListDevices();
+    var result = _controller.GetListDevices();
 
     Assert.That(result, Has.Count.EqualTo(2));
-    Assert.That(result.Any(x => x.Name == "TestDevice1"), Is.True);
 }
 
 // Tests/Tests.Unit/Services/PrinterServiceTests.cs
 [Test]
-public void PrintPdf_WhenValidPath_CallsPrinterPrint()
+public void GetPrinters_WhenCalled_ReturnsListFromAbsPrinter()
 {
-    _mockPrinter.Setup(p => p.Print(It.IsAny<string>())).Returns(true);
-    var service = new PrinterService(_mockPrinter.Object);
+    var expectedPrinters = new List<string> { "Printer1" };
+    _mockPrinter.Setup(p => p.GetAvailablePrinters()).Returns(expectedPrinters);
 
-    var result = service.PrintPdf("/path/to/file.pdf");
+    var result = _sut.GetPrinters();
 
-    Assert.That(result, Is.True);
-    _mockPrinter.Verify(p => p.Print(It.IsAny<string>()), Times.Once);
+    Assert.That(result, Is.EqualTo(expectedPrinters));
+    _mockPrinter.Verify(p => p.GetAvailablePrinters(), Times.Once);
 }
 ```
 
 **Зависимости:**
 - `Tests.Shared` — общие helpers и fixtures
 - `TN_Doc` — основное приложение
+
+**Особенность:** `HomeControllerTests` создаёт контроллер через Reflection
+(`RuntimeHelpers.GetUninitializedObject` + установка приватных полей), чтобы обойти статический `AppConfigService.GetInstance`.
 
 ---
 
@@ -265,6 +276,7 @@ dotnet test Tests/Tests.E2E
 ```bash
 dotnet test --filter "ClassName=HomeControllerTests"
 dotnet test --filter "ClassName=KmhMeasurementTests"
+dotnet test --filter "ClassName=ConfigEncodingTests"
 ```
 
 ### По namespace
@@ -557,7 +569,7 @@ public void PrintLastPdf_WhenCalled_CallsPrinterService()
 
 ## Текущий статус
 
-### Работающие тесты (~315, ~48%)
+### Работающие тесты (основные группы)
 
 **Tests.Unit:**
 - Controllers: `HomeController`, `ExportController`
@@ -577,7 +589,7 @@ public void PrintLastPdf_WhenCalled_CallsPrinterService()
 - Справочники: Users, User Groups, Powers of Attorney, Test Methods
 - CRUD операции, валидация, навигация
 
-### Отключенные тесты (~335, ~52%)
+### Отключенные тесты (основные причины)
 
 **Причины отключения:**
 
@@ -641,4 +653,4 @@ public void PrintLastPdf_WhenCalled_CallsPrinterService()
 
 ---
 
-**Дата актуализации:** 2026-01-23
+**Дата актуализации:** 2026-01-28

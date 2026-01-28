@@ -100,6 +100,7 @@
 4. **Проверки**
    - Минимум три файла прогнать через `jq '.'` (пример: MI3532(15), EAC, Export).
    - Запустить `dotnet test Tests/Tests.csproj --filter CfgEditPassport` (см. раздел о тестах).
+   - Запустить `dotnet test Tests/Tests.Unit --filter "ClassName=ConfigEncodingTests"` — проверка UTF-8, U+FFFD и валидности JSON для всех `TN_Doc/Cfg`.
    - Ручной smoke: открыть паспорт на устройстве с `UseElis=true` и на устройстве с `UseElis=false`, убедиться что редактор грузится без ошибок.
 
 5. **Согласование**
@@ -124,4 +125,4 @@
 
 ---
 
-**Последнее обновление:** 2026-01-23
+**Последнее обновление:** 2026-01-28
