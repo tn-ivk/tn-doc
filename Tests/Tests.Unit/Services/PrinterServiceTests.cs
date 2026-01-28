@@ -21,6 +21,31 @@ public class PrinterServiceTests
         _sut = new PrinterService(_mockPrinter.Object);
     }
 
+    #region Constructor Negative Tests
+
+    /// <summary>
+    /// Проверяет, что конструктор с null принтером создаёт экземпляр,
+    /// но при последующем использовании выбрасывается NullReferenceException.
+    /// Примечание: текущая реализация не валидирует параметр конструктора.
+    /// </summary>
+    [Test]
+    public void Constructor_WithNullPrinter_CreatesInstanceButFailsOnUse()
+    {
+        // Arrange
+        AbsPrinter? nullPrinter = null;
+
+        // Act
+        var service = new PrinterService(nullPrinter!);
+
+        // Assert - конструктор не выбрасывает исключение
+        Assert.That(service, Is.Not.Null);
+
+        // При попытке использования - NullReferenceException
+        Assert.Throws<NullReferenceException>(() => service.GetPrinters());
+    }
+
+    #endregion
+
     #region GetPrinters Tests
 
     /// <summary>
@@ -91,6 +116,57 @@ public class PrinterServiceTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Проверяет, что GetPrinters пробрасывает исключение от AbsPrinter.
+    /// </summary>
+    [Test]
+    public void GetPrinters_WhenAbsPrinterThrowsException_PropagatesException()
+    {
+        // Arrange
+        var expectedException = new InvalidOperationException("Ошибка получения принтеров");
+        _mockPrinter
+            .Setup(p => p.GetAvailablePrinters())
+            .Throws(expectedException);
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() => _sut.GetPrinters());
+        Assert.That(ex.Message, Is.EqualTo("Ошибка получения принтеров"));
+    }
+
+    /// <summary>
+    /// Проверяет, что GetPrinters возвращает null, если AbsPrinter вернул null.
+    /// Примечание: текущая реализация не обрабатывает этот случай.
+    /// </summary>
+    [Test]
+    public void GetPrinters_WhenAbsPrinterReturnsNull_ReturnsNull()
+    {
+        // Arrange
+        _mockPrinter
+            .Setup(p => p.GetAvailablePrinters())
+            .Returns((IEnumerable<string>)null!);
+
+        // Act
+        var result = _sut.GetPrinters();
+
+        // Assert
+        Assert.That(result, Is.Null);
+    }
+
+    /// <summary>
+    /// Проверяет, что GetPrinters пробрасывает ArgumentException от AbsPrinter.
+    /// </summary>
+    [Test]
+    public void GetPrinters_WhenAbsPrinterThrowsArgumentException_PropagatesException()
+    {
+        // Arrange
+        _mockPrinter
+            .Setup(p => p.GetAvailablePrinters())
+            .Throws<ArgumentException>();
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _sut.GetPrinters());
+    }
+
     #endregion
 
     #region PrintDocAsync Tests
@@ -134,6 +210,161 @@ public class PrinterServiceTests
 
         // Assert
         Assert.That(actualPrinterName, Is.EqualTo(expectedPrinterName));
+    }
+
+    #endregion
+
+    #region PrintDocAsync Negative Tests
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync передаёт null имя принтера в AbsPrinter без валидации.
+    /// Примечание: текущая реализация не валидирует параметры.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithNullPrinterName_PassesToAbsPrinter()
+    {
+        // Arrange
+        string? capturedPrinterName = "not-null";
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .Callback<string>(name => capturedPrinterName = name)
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.PrintDocAsync(null!);
+
+        // Assert - null передаётся в AbsPrinter
+        Assert.That(capturedPrinterName, Is.Null);
+        _mockPrinter.Verify(p => p.PrintDocAsync(null!), Times.Once);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync передаёт пустое имя принтера в AbsPrinter без валидации.
+    /// Примечание: текущая реализация не валидирует параметры.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithEmptyPrinterName_PassesToAbsPrinter()
+    {
+        // Arrange
+        string? capturedPrinterName = null;
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .Callback<string>(name => capturedPrinterName = name)
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.PrintDocAsync(string.Empty);
+
+        // Assert
+        Assert.That(capturedPrinterName, Is.Empty);
+        _mockPrinter.Verify(p => p.PrintDocAsync(string.Empty), Times.Once);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync передаёт имя с пробелами в AbsPrinter без валидации.
+    /// Примечание: текущая реализация не валидирует параметры.
+    /// </summary>
+    [Test]
+    public async Task PrintDocAsync_WithWhitespacePrinterName_PassesToAbsPrinter()
+    {
+        // Arrange
+        const string whitespaceName = "   ";
+        string? capturedPrinterName = null;
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .Callback<string>(name => capturedPrinterName = name)
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _sut.PrintDocAsync(whitespaceName);
+
+        // Assert
+        Assert.That(capturedPrinterName, Is.EqualTo(whitespaceName));
+        _mockPrinter.Verify(p => p.PrintDocAsync(whitespaceName), Times.Once);
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync пробрасывает исключение от AbsPrinter.
+    /// </summary>
+    [Test]
+    public void PrintDocAsync_WhenAbsPrinterThrowsException_PropagatesException()
+    {
+        // Arrange
+        var expectedException = new InvalidOperationException("Ошибка печати");
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .ThrowsAsync(expectedException);
+
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await _sut.PrintDocAsync("TestPrinter"));
+        Assert.That(ex!.Message, Is.EqualTo("Ошибка печати"));
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync пробрасывает IOException от AbsPrinter.
+    /// </summary>
+    [Test]
+    public void PrintDocAsync_WhenAbsPrinterThrowsIOException_PropagatesException()
+    {
+        // Arrange
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .ThrowsAsync(new IOException("Файл не найден"));
+
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<IOException>(
+            async () => await _sut.PrintDocAsync("TestPrinter"));
+        Assert.That(ex!.Message, Is.EqualTo("Файл не найден"));
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync пробрасывает OperationCanceledException при отмене.
+    /// </summary>
+    [Test]
+    public void PrintDocAsync_WhenCancelled_ThrowsOperationCanceledException()
+    {
+        // Arrange
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .ThrowsAsync(new OperationCanceledException("Операция отменена"));
+
+        // Act & Assert
+        Assert.ThrowsAsync<OperationCanceledException>(
+            async () => await _sut.PrintDocAsync("TestPrinter"));
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync пробрасывает TaskCanceledException при отмене задачи.
+    /// </summary>
+    [Test]
+    public void PrintDocAsync_WhenTaskCancelled_ThrowsTaskCanceledException()
+    {
+        // Arrange
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .ThrowsAsync(new TaskCanceledException("Задача отменена"));
+
+        // Act & Assert
+        Assert.ThrowsAsync<TaskCanceledException>(
+            async () => await _sut.PrintDocAsync("TestPrinter"));
+    }
+
+    /// <summary>
+    /// Проверяет, что PrintDocAsync пробрасывает UnauthorizedAccessException от AbsPrinter.
+    /// </summary>
+    [Test]
+    public void PrintDocAsync_WhenUnauthorizedAccess_PropagatesException()
+    {
+        // Arrange
+        _mockPrinter
+            .Setup(p => p.PrintDocAsync(It.IsAny<string>()))
+            .ThrowsAsync(new UnauthorizedAccessException("Доступ запрещён"));
+
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<UnauthorizedAccessException>(
+            async () => await _sut.PrintDocAsync("TestPrinter"));
+        Assert.That(ex!.Message, Is.EqualTo("Доступ запрещён"));
     }
 
     #endregion
