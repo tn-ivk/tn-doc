@@ -283,48 +283,71 @@ GET /api/configurator/config
 **Response:**
 ```json
 {
-  "general": {
-    "exportPath": "/opt/TN_Doc/Export",
-    "useSecurityFeatures": true,
-    "armOpcConnectionSettings": {
-      "type": "UA",
-      "configFilename": "opc.ua.config.xml",
-      "startPrefix": "ns=2;s=",
-      "updateRate": 1000
-    },
-    "elis": {
-      "use": true,
-      "ostKey": "OST-001",
-      "siknKey": "SIKN-001",
-      "clientName": "TN_Doc_Client",
-      "clientToken": "***"
-    }
-  },
   "devices": [
     {
-      "idDevice": "IVK-1",
-      "name": "ИВК №1",
       "use": true,
-      "docs": ["Passport", "Act", "Poverka1974"],
-      "usedSI": {
-        "usedPR": true,
-        "usedPP": true,
-        "usedPVL": true,
-        "usedPVS": false,
-        "usedSecondSI_PP": false,
-        "usedSecondSI_PVL": false,
-        "usedSecondSI_PVS": false
-      },
+      "idDevice": 1,
+      "name": "ИВК №1",
+      "description": "",
+      "dbConnectionStrings": [
+        {
+          "use": true,
+          "guidDevice": 1,
+          "server": "localhost",
+          "userid": "ivk_user",
+          "password": "***",
+          "database": "ivk1",
+          "connectionTimeout": 30
+        }
+      ],
       "opcConnectionSettings": {
-        "type": "DA",
-        "host": "192.168.1.100",
-        "progId": "OPC.DA.Server",
-        "updateRate": 500
+        "type": 1,
+        "daSettings": {
+          "startPrefix": "Root.PLC1.IVK_TN_01",
+          "host": "localhost",
+          "progId": "psregulopcda_01",
+          "updateRate": 500
+        },
+        "uaSettings": {
+          "configFilename": "Config.xml",
+          "updateRate": 500,
+          "startPrefix": "IVK_TN_01"
+        }
       }
     }
-  ]
+  ],
+  "printSettings": {
+    "lastSelectedPrinter": ""
+  },
+  "exportDoc": {
+    "path": "/opt/TN_Doc/Export"
+  },
+  "elis": {
+    "use": true,
+    "ostKey": "OST-001",
+    "siknKey": "SIKN-001",
+    "clientName": "TN_Doc_Client",
+    "clientToken": ""
+  },
+  "useSecurityFeatures": false,
+  "armOpcConnectionSettings": {
+    "type": 1,
+    "daSettings": {
+      "startPrefix": "Root.ARM.Reports",
+      "host": "localhost",
+      "progId": "psregulopcda_01",
+      "updateRate": 500
+    },
+    "uaSettings": {
+      "configFilename": "Config.xml",
+      "updateRate": 500,
+      "startPrefix": "root.ARM.Reports"
+    }
+  }
 }
 ```
+
+`type`: `0` — OPC DA, `1` — OPC UA.
 
 #### Сохранить конфигурацию
 
@@ -337,8 +360,7 @@ POST /api/configurator/config
 **Response:**
 ```json
 {
-  "success": true,
-  "message": "Конфигурация сохранена"
+  "message": "Конфигурация успешно сохранена"
 }
 ```
 
@@ -356,10 +378,7 @@ POST /api/configurator/validate
   "isValid": true,
   "errors": [],
   "warnings": [
-    {
-      "field": "devices[0].opcConnectionSettings",
-      "message": "OPC сервер недоступен"
-    }
+    "OPC сервер недоступен"
   ]
 }
 ```
@@ -377,15 +396,18 @@ GET /api/config-cache/statistics
 **Response:**
 ```json
 {
-  "totalEntries": 12,
-  "maxEntries": 50,
+  "cachedConfigsCount": 12,
+  "maxCacheSize": 50,
   "cacheHits": 156,
   "cacheMisses": 24,
-  "evictions": 0,
-  "entries": [
+  "cacheEvictions": 0,
+  "totalRequests": 180,
+  "hitRate": 86.67,
+  "cachedConfigs": [
     {
       "filePath": "Cfg/CfgPassport.json",
-      "configType": "CfgPassport",
+      "fileName": "CfgPassport.json",
+      "typeName": "CfgPassport",
       "loadedAt": "2025-01-29T10:00:00Z",
       "lastAccessTime": "2025-01-29T14:30:00Z",
       "accessCount": 42
@@ -404,7 +426,8 @@ POST /api/config-cache/clear
 ```json
 {
   "success": true,
-  "message": "Кэш очищен (12 записей удалено)"
+  "message": "Кэш конфигураций успешно очищен. Все конфигурации будут перезагружены с диска при следующем обращении.",
+  "timestamp": "2025-01-29T14:35:00Z"
 }
 ```
 
@@ -417,9 +440,12 @@ GET /api/config-cache/health
 **Response:**
 ```json
 {
-  "status": "Healthy",
-  "totalEntries": 12,
-  "maxEntries": 50
+  "status": "healthy",
+  "service": "ConfigurationCacheService",
+  "cachedConfigs": 12,
+  "totalRequests": 180,
+  "hitRate": "86.67%",
+  "timestamp": "2025-01-29T14:35:00Z"
 }
 ```
 

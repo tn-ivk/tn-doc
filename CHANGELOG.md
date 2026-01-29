@@ -5,7 +5,15 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
-## [1.4.3] - 2025-01-XX
+## [Unreleased]
+
+### Changed
+- Обновлена структура тестовых проектов и исправлены пути в CfgAppSyncTests
+- Удалены неиспользуемые solution folders для submodules
+- Обновлён адрес сервера БД в конфигурации разработки
+- 📝 Актуализирована документация (README, deployment/building, ELIS, API)
+
+## [1.4.3] - 2025-10-17
 
 ### Added
 - 🚀 **Configurator: Настройки OPC-клиента** — возможность настроить OPC DA/UA для ARM и per-device
@@ -164,12 +172,12 @@
 - 📝 **Documentation** - Обновление документации
 - 🔧 **Maintenance** - Техническое обслуживание кода
 
-[Unreleased]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.3...HEAD
-[1.4.3]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.2...v1.4.3
-[1.4.2]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.1...v1.4.2
-[1.4.1]: https://github.com/orpovy/ivk/tn_doc/compare/v1.4.0...v1.4.1
-[1.4.0]: https://github.com/orpovy/ivk/tn_doc/compare/v1.3.7...v1.4.0
-[1.3.7]: https://github.com/orpovy/ivk/tn_doc/compare/v1.3.6...v1.3.7
-[1.3.6]: https://github.com/orpovy/ivk/tn_doc/compare/v1.3.5...v1.3.6
-[1.3.5]: https://github.com/orpovy/ivk/tn_doc/compare/v1.3.4...v1.3.5
-[1.3.4]: https://github.com/orpovy/ivk/tn_doc/releases/tag/v1.3.4
+[Unreleased]: https://github.com/tn-ivk/tn-doc/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/tn-ivk/tn-doc/compare/v1.4.2...v1.4.3
+[1.4.2]: https://github.com/tn-ivk/tn-doc/compare/v1.4.1...v1.4.2
+[1.4.1]: https://github.com/tn-ivk/tn-doc/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/tn-ivk/tn-doc/compare/v1.3.7...v1.4.0
+[1.3.7]: https://github.com/tn-ivk/tn-doc/compare/v1.3.6...v1.3.7
+[1.3.6]: https://github.com/tn-ivk/tn-doc/compare/v1.3.5...v1.3.6
+[1.3.5]: https://github.com/tn-ivk/tn-doc/compare/v1.3.4...v1.3.5
+[1.3.4]: https://github.com/tn-ivk/tn-doc/releases/tag/v1.3.4
