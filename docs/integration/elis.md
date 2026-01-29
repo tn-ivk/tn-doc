@@ -65,28 +65,20 @@ graph TB
 {
   "Elis": {
     "Use": true,
-    "Url": "https://labhub.company.com/api",
     "OstKey": "OST-001",
     "SiknKey": "SIKN-001",
     "ClientName": "TN_Doc_Client",
-    "ClientToken": "***",
-    "Timeout": 5000,
-    "Certificate": {
-      "Path": "Cert/elis-client.crt",
-      "Password": "***"
-    },
-    "RetryPolicy": {
-      "MaxRetries": 3,
-      "BackoffMs": 1000
-    }
+    "ClientToken": ""
   },
   "Devices": [
     {
-      "IdDevice": "IVK-1",
-      "ElisConfig": {
-        "Override": true,
-        "Url": "https://labhub-alt.company.com/api",
-        "LabId": "LAB-001"
+      "IdDevice": 1,
+      "Elis": {
+        "Use": true,
+        "OstKey": "OST-001",
+        "SiknKey": "SIKN-001",
+        "ClientName": "IVK-1",
+        "ClientToken": ""
       }
     }
   ]
@@ -98,16 +90,14 @@ graph TB
 | Параметр | Описание | По умолчанию | Configurator |
 |----------|----------|--------------|--------------|
 | `Use` | Включить интеграцию | `false` | ✅ |
-| `Url` | URL LabHub API | - | - |
 | `OstKey` | Ключ ОСТ (операционная станция) | - | ✅ |
 | `SiknKey` | Ключ СИКН | - | ✅ |
 | `ClientName` | Имя клиента для идентификации | - | ✅ |
-| `ClientToken` | Токен авторизации (read-only) | - | 👁️ |
-| `Timeout` | Таймаут запроса (мс) | `5000` | - |
-| `Certificate.Path` | Путь к сертификату SSL | - | - |
-| `RetryPolicy.MaxRetries` | Макс. повторов | `3` | - |
+| `ClientToken` | Ключ, выдаваемый TN.ElisConnector | - | 👁️ |
 
 > **Примечание**: Параметры с ✅ настраиваются через веб-интерфейс Configurator (`/configurator`). Параметр с 👁️ отображается, но не редактируется.
+
+Параметры подключения к LabHub (URL, сертификаты, таймауты) настраиваются в сервисе TN.ElisConnector.
 
 ## Формат данных
 
@@ -203,7 +193,7 @@ public class PassportModule : IDocClass
 
         // Получить данные качества из ELIS
         ElisQualityData qualityData = null;
-        if (_config.UseElis && !string.IsNullOrEmpty(measurements.SampleId))
+        if (_config.Elis?.Use == true && !string.IsNullOrEmpty(measurements.SampleId))
         {
             try
             {
@@ -237,6 +227,8 @@ public class PassportModule : IDocClass
 
 ## SSL/TLS Сертификаты
 
+Ниже приведён пример для сервиса TN.ElisConnector (пути и параметры берите из его конфигурации).
+
 ### Установка сертификатов
 
 ```bash
@@ -255,18 +247,18 @@ sudo chmod 600 /opt/TN_Doc/Cert/*
 ```csharp
 services.AddHttpClient("ELIS", client =>
 {
-    client.BaseAddress = new Uri(config.Elis.Url);
-    client.Timeout = TimeSpan.FromMilliseconds(config.Elis.Timeout);
+    client.BaseAddress = new Uri(connectorConfig.Url);
+    client.Timeout = TimeSpan.FromMilliseconds(connectorConfig.Timeout);
 })
 .ConfigurePrimaryHttpMessageHandler(() =>
 {
     var handler = new HttpClientHandler();
 
-    if (!string.IsNullOrEmpty(config.Elis.Certificate?.Path))
+    if (!string.IsNullOrEmpty(connectorConfig.Certificate?.Path))
     {
         var cert = new X509Certificate2(
-            config.Elis.Certificate.Path,
-            config.Elis.Certificate.Password
+            connectorConfig.Certificate.Path,
+            connectorConfig.Certificate.Password
         );
         handler.ClientCertificates.Add(cert);
     }
@@ -327,10 +319,10 @@ var retryPolicy = Policy
     .Handle<HttpRequestException>()
     .Or<TimeoutException>()
     .WaitAndRetryAsync(
-        retryCount: _config.Elis.RetryPolicy.MaxRetries,
+        retryCount: _connectorConfig.RetryPolicy.MaxRetries,
         sleepDurationProvider: retryAttempt =>
             TimeSpan.FromMilliseconds(
-                _config.Elis.RetryPolicy.BackoffMs * Math.Pow(2, retryAttempt)
+                _connectorConfig.RetryPolicy.BackoffMs * Math.Pow(2, retryAttempt)
             ),
         onRetry: (exception, timeSpan, retryCount, context) =>
         {

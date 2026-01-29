@@ -2,7 +2,7 @@
 
 **Система генерации технических документов и отчетов для измерительно-вычислительных комплексов (ИВК)**
 
-[![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)](https://github.com/orpovy/ivk/tn_doc)
+[![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)](https://github.com/tn-ivk/tn-doc)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
 
@@ -62,8 +62,12 @@ npm run build
 ## 📖 Документация
 
 - [Архитектура проекта](docs/architecture/overview.md)
+- [Модули документов](docs/architecture/document-modules.md)
+- [Статус-бар](docs/architecture/statusbar.md)
 - [Руководство разработчика](docs/development/setup.md)
+- [Сборка проекта](docs/development/building.md)
 - [Развертывание](docs/deployment/linux.md)
+- [Интеграция с ELIS](docs/integration/elis.md)
 - [API Reference](docs/api/endpoints.md)
 - [История изменений](CHANGELOG.md)
 
@@ -71,12 +75,14 @@ npm run build
 
 ```
 docs/
+├── api/              # API документация
 ├── architecture/     # Архитектурные решения
-├── development/      # Разработка
+├── assets/           # Диаграммы и материалы
 ├── deployment/       # Развертывание и эксплуатация
-├── modules/          # Документация модулей документов
+├── development/      # Разработка
 ├── integration/      # Интеграция с внешними системами
-└── api/              # API документация
+├── ui-design.md      # Гайд по UI
+└── ui-screenshots/   # Скриншоты UI
 ```
 
 ## 🏗️ Архитектура
@@ -167,7 +173,7 @@ dotnet test --filter "ClassName=AppConfigServiceTests"
 
 ```bash
 # Установка из пакета
-sudo dpkg -i tn-doc_1.4.2_amd64.deb
+sudo dpkg -i tn.doc-full-<FULL_VERSION>_amd64.deb
 
 # Управление службой
 sudo systemctl start tn-doc

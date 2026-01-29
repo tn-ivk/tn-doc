@@ -171,11 +171,21 @@ FLUSH PRIVILEGES;
 {
   "Devices": [
     {
-      "IdDevice": "TEST-IVK-1",
+      "Use": true,
+      "IdDevice": 1,
       "Name": "Тестовое устройство",
-      "TypeDevice": 7,
-      "ConnectionString": "Server=localhost;Database=tn_doc_test;User=tn_doc_user;Password=password;",
-      "UseSecurityFeatures": false
+      "Description": "",
+      "DBConnectionStrings": [
+        {
+          "Use": true,
+          "GuidDevice": 1,
+          "Server": "localhost",
+          "Userid": "tn_doc_user",
+          "Password": "password",
+          "Database": "tn_doc_test",
+          "ConnectionTimeout": 30
+        }
+      ]
     }
   ],
   "UseSecurityFeatures": false

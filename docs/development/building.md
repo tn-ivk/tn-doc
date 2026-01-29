@@ -151,8 +151,10 @@ flowchart LR
     Structure --> Control[Создать DEBIAN/control]
     Control --> Scripts[Добавить скрипты]
     Scripts --> Build[dpkg-deb --build]
-    Build --> DEB[tn-doc_1.4.2_amd64.deb]
+    Build --> DEB[tn.doc-full-<FULL_VERSION>_amd64.deb]
 ```
+
+`<FULL_VERSION>` формируется в CI на основе тега версии и номера сборки (см. `.gitlab-ci.yml`).
 
 См. `.gitlab-ci.yml` для полного процесса.
 

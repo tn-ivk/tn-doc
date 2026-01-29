@@ -45,12 +45,17 @@ graph TB
 ### 1. Скачать пакет
 
 ```bash
-# Скачать с сервера сборки
-wget http://build-server/tn-doc_1.4.2_amd64.deb
+# Скачать с сервера сборки (полный пакет с runtime)
+wget http://build-server/tn.doc-full-<FULL_VERSION>_amd64.deb
+
+# Минимальный пакет (нужен установленный .NET Runtime и шрифты)
+# wget http://build-server/tn.doc-<FULL_VERSION>_amd64.deb
 
 # Или скопировать с локальной машины
-scp tn-doc_1.4.2_amd64.deb user@server:/tmp/
+scp tn.doc-full-<FULL_VERSION>_amd64.deb user@server:/tmp/
 ```
+
+`<FULL_VERSION>` формируется в CI на основе тега версии и номера сборки (см. `.gitlab-ci.yml`).
 
 ### 2. Установить зависимости
 
@@ -68,7 +73,7 @@ sudo apt-get install -y libgdiplus libc6-dev cups
 ### 3. Установить пакет
 
 ```bash
-sudo dpkg -i tn-doc_1.4.2_amd64.deb
+sudo dpkg -i tn.doc-full-<FULL_VERSION>_amd64.deb
 
 # Если есть зависимости, выполните
 sudo apt-get install -f
@@ -85,7 +90,7 @@ sequenceDiagram
     participant postinst
     participant systemd
 
-    Admin->>dpkg: dpkg -i tn-doc.deb
+    Admin->>dpkg: dpkg -i tn.doc-full-<FULL_VERSION>_amd64.deb
     dpkg->>preinst: Запуск preinst скрипта
     preinst->>preinst: Проверка .NET Runtime
     preinst->>preinst: Создание пользователя alphadaemon
@@ -180,20 +185,58 @@ sudo journalctl -u tn-doc -f
 {
   "Devices": [
     {
-      "IdDevice": "IVK-1",
+      "Use": true,
+      "IdDevice": 1,
       "Name": "ИВК №1 - Узел учета",
-      "TypeDevice": 7,
-      "ConnectionString": "Server=localhost;Database=ivk1;User=ivk_user;Password=***;",
-      "UseSecurityFeatures": true
+      "Description": "",
+      "DBConnectionStrings": [
+        {
+          "Use": true,
+          "GuidDevice": 1,
+          "Server": "localhost",
+          "Userid": "ivk_user",
+          "Password": "***",
+          "Database": "ivk1",
+          "ConnectionTimeout": 30
+        }
+      ],
+      "OpcConnectionSettings": {
+        "Type": 1,
+        "DaSettings": {
+          "StartPrefix": "Root.PLC1.IVK_TN_01",
+          "Host": "localhost",
+          "ProgId": "psregulopcda_01",
+          "UpdateRate": 500
+        },
+        "UaSettings": {
+          "ConfigFilename": "Config.xml",
+          "UpdateRate": 500,
+          "StartPrefix": "IVK_TN_01"
+        }
+      }
     }
   ],
   "Elis": {
-    "UseElis": true,
-    "Url": "https://elis-server/api",
-    "CertificatePath": "/opt/TN_Doc/Cert/elis.crt"
+    "Use": true,
+    "OstKey": "ostKey",
+    "SiknKey": "siknKey",
+    "ClientName": "clientName",
+    "ClientToken": ""
   },
-  "OpcConnectionSettings": {
-    "MessagingServiceUrl": "http://localhost:5000"
+  "UseSecurityFeatures": false,
+  "ArmOpcConnectionSettings": {
+    "Type": 1,
+    "DaSettings": {
+      "StartPrefix": "Root.ARM.Reports",
+      "Host": "localhost",
+      "ProgId": "psregulopcda_01",
+      "UpdateRate": 500
+    },
+    "UaSettings": {
+      "ConfigFilename": "Config.xml",
+      "UpdateRate": 500,
+      "StartPrefix": "root.ARM.Reports"
+    }
   }
 }
 ```
@@ -275,7 +318,7 @@ sudo journalctl -u tn-doc --since "1 hour ago"
 sudo systemctl stop tn-doc
 
 # Установить новый пакет
-sudo dpkg -i tn-doc_1.4.3_amd64.deb
+sudo dpkg -i tn.doc-full-<FULL_VERSION>_amd64.deb
 
 # Запустить службу
 sudo systemctl start tn-doc
@@ -319,7 +362,7 @@ ls -la /opt/TN_Doc
 sudo -u alphadaemon mysql -h localhost -u ivk_user -p
 
 # Проверить настройки в CfgApp.json
-cat /opt/TN_Doc/Cfg/CfgApp.json | grep ConnectionString
+grep -nE '"Server"|"Database"|"Userid"' /opt/TN_Doc/Cfg/CfgApp.json
 ```
 
 ### Ошибка "libgdiplus not found"

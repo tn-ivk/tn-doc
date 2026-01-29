@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Playwright
+playwright-report/
+test-results/
+playwright/.cache/
+
+# Screenshots
+screenshots/
+
+# Videos
+videos/
+
+# State files
+*.state.json
