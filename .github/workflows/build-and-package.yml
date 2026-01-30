@@ -333,6 +333,53 @@ jobs:
             cp -r fonts/* deb/usr/share/fonts/
           fi
 
+          # Генерация скрипта восстановления
+          cat << 'RESTORE_EOF' > deb/usr/local/bin/tn-doc-restore.sh
+          #!/bin/bash
+          set -e
+
+          BACKUP_DIR="/var/backups/TN_Doc"
+          OPT_DIR="/opt/TN_Doc"
+          SERVICE="TN_Doc.service"
+
+          usage() {
+              echo "Usage: sudo $0 [--list | --latest | <backup_file>]"
+              echo "  --list    Show available backups"
+              echo "  --latest  Restore latest backup"
+          }
+
+          list_backups() {
+              echo "=== Available backups ==="
+              ls -lh "$BACKUP_DIR"/*.tar.gz 2>/dev/null || echo "No backups found"
+          }
+
+          restore() {
+              local FILE="$1"
+              [ ! -f "$FILE" ] && echo "File not found: $FILE" && exit 1
+
+              echo "=== Restoring from: $FILE ==="
+              systemctl stop "$SERVICE" 2>/dev/null || true
+              rm -rf "$OPT_DIR"
+              tar -xzf "$FILE" -C /opt
+              chown -R alphadaemon:alphadaemon "$OPT_DIR"
+              chmod 755 "$OPT_DIR/TN_Doc" 2>/dev/null || true
+              systemctl start "$SERVICE"
+
+              sleep 2
+              systemctl is-active --quiet "$SERVICE" && echo "✓ Restored successfully" || echo "! Service may have failed"
+          }
+
+          [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
+
+          case "${1:-}" in
+              --list) list_backups ;;
+              --latest) restore "$(ls -t "$BACKUP_DIR"/*.tar.gz 2>/dev/null | head -1)" ;;
+              "") usage ;;
+              *) [[ "$1" != /* ]] && restore "$BACKUP_DIR/$1" || restore "$1" ;;
+          esac
+          RESTORE_EOF
+          chmod 755 deb/usr/local/bin/tn-doc-restore.sh
+
           # Генерация control
           cat << EOF > deb/DEBIAN/control
           Package: tn.doc-full
@@ -352,6 +399,9 @@ jobs:
           cat << 'PREINST_EOF' > deb/DEBIAN/preinst
           #!/bin/bash
           set -e
+
+          # Версия пакета (будет заменена при сборке)
+          NEW_VERSION="__VERSION_PLACEHOLDER__"
 
           echo "============================================"
           echo "Starting pre-installation script for TN_Doc (full version)"
@@ -391,6 +441,54 @@ jobs:
               systemctl stop TN_Doc.service
           fi
 
+          # === Backup section ===
+          create_backup() {
+              local OPT_DIR="/opt/TN_Doc"
+              local BACKUP_DIR="/var/backups/TN_Doc"
+
+              # Первая установка — бэкап не нужен
+              if [ ! -d "$OPT_DIR" ]; then
+                  echo "First installation detected, no backup needed"
+                  return 0
+              fi
+
+              # Создание директории для бэкапов
+              echo "=== Creating backup before update to v${NEW_VERSION} ==="
+              mkdir -p "$BACKUP_DIR"
+              if [ $? -ne 0 ]; then
+                  echo "✗ ERROR: Cannot create backup directory $BACKUP_DIR"
+                  exit 1
+              fi
+
+              # Формирование имени файла
+              local TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+              local BACKUP_FILE="${BACKUP_DIR}/${TIMESTAMP}_TN_Doc_before-update-to_v${NEW_VERSION}.tar.gz"
+
+              echo "Source: $OPT_DIR"
+              echo "Destination: $BACKUP_FILE"
+
+              # Создание бэкапа (исключая логи)
+              tar -czf "$BACKUP_FILE" -C /opt TN_Doc --exclude='logs' --exclude='*.log' 2>&1
+              if [ $? -ne 0 ]; then
+                  echo "✗ ERROR: Failed to create backup"
+                  echo "Check available disk space and permissions"
+                  rm -f "$BACKUP_FILE"
+                  exit 1
+              fi
+
+              # Проверка файла
+              if [ ! -s "$BACKUP_FILE" ]; then
+                  echo "✗ ERROR: Backup file is empty"
+                  exit 1
+              fi
+
+              local BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
+              echo "✓ Backup created: $BACKUP_FILE ($BACKUP_SIZE)"
+          }
+
+          create_backup
+          # === End backup section ===
+
           echo "Removing old TN_Doc directories..."
           OPT_DIR="/opt/TN_Doc"
           LOG_DIR="/var/log/TN_Doc"
@@ -409,6 +507,8 @@ jobs:
 
           exit 0
           PREINST_EOF
+          # Замена placeholder на реальную версию
+          sed -i "s/__VERSION_PLACEHOLDER__/${VERSION}/g" deb/DEBIAN/preinst
           chmod +x deb/DEBIAN/preinst
 
           # Генерация prerm
@@ -679,8 +779,56 @@ jobs:
           mkdir -p deb-minimal/opt/TN_Doc
           mkdir -p deb-minimal/var/log/TN_Doc
           mkdir -p deb-minimal/etc/systemd/system
+          mkdir -p deb-minimal/usr/local/bin
 
           cp -r ./publish/* deb-minimal/opt/TN_Doc/
+
+          # Генерация скрипта восстановления
+          cat << 'RESTORE_EOF' > deb-minimal/usr/local/bin/tn-doc-restore.sh
+          #!/bin/bash
+          set -e
+
+          BACKUP_DIR="/var/backups/TN_Doc"
+          OPT_DIR="/opt/TN_Doc"
+          SERVICE="TN_Doc.service"
+
+          usage() {
+              echo "Usage: sudo $0 [--list | --latest | <backup_file>]"
+              echo "  --list    Show available backups"
+              echo "  --latest  Restore latest backup"
+          }
+
+          list_backups() {
+              echo "=== Available backups ==="
+              ls -lh "$BACKUP_DIR"/*.tar.gz 2>/dev/null || echo "No backups found"
+          }
+
+          restore() {
+              local FILE="$1"
+              [ ! -f "$FILE" ] && echo "File not found: $FILE" && exit 1
+
+              echo "=== Restoring from: $FILE ==="
+              systemctl stop "$SERVICE" 2>/dev/null || true
+              rm -rf "$OPT_DIR"
+              tar -xzf "$FILE" -C /opt
+              chown -R alphadaemon:alphadaemon "$OPT_DIR"
+              chmod 755 "$OPT_DIR/TN_Doc" 2>/dev/null || true
+              systemctl start "$SERVICE"
+
+              sleep 2
+              systemctl is-active --quiet "$SERVICE" && echo "✓ Restored successfully" || echo "! Service may have failed"
+          }
+
+          [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
+
+          case "${1:-}" in
+              --list) list_backups ;;
+              --latest) restore "$(ls -t "$BACKUP_DIR"/*.tar.gz 2>/dev/null | head -1)" ;;
+              "") usage ;;
+              *) [[ "$1" != /* ]] && restore "$BACKUP_DIR/$1" || restore "$1" ;;
+          esac
+          RESTORE_EOF
+          chmod 755 deb-minimal/usr/local/bin/tn-doc-restore.sh
 
           # Генерация control
           cat << EOF > deb-minimal/DEBIAN/control
@@ -701,6 +849,10 @@ jobs:
           cat << 'PREINST_EOF' > deb-minimal/DEBIAN/preinst
           #!/bin/bash
           set -e
+
+          # Версия пакета (будет заменена при сборке)
+          NEW_VERSION="__VERSION_PLACEHOLDER__"
+
           echo "============================================"
           echo "Starting pre-installation script for TN_Doc"
           echo "============================================"
@@ -732,6 +884,54 @@ jobs:
               systemctl stop TN_Doc.service
           fi
 
+          # === Backup section ===
+          create_backup() {
+              local OPT_DIR="/opt/TN_Doc"
+              local BACKUP_DIR="/var/backups/TN_Doc"
+
+              # Первая установка — бэкап не нужен
+              if [ ! -d "$OPT_DIR" ]; then
+                  echo "First installation detected, no backup needed"
+                  return 0
+              fi
+
+              # Создание директории для бэкапов
+              echo "=== Creating backup before update to v${NEW_VERSION} ==="
+              mkdir -p "$BACKUP_DIR"
+              if [ $? -ne 0 ]; then
+                  echo "✗ ERROR: Cannot create backup directory $BACKUP_DIR"
+                  exit 1
+              fi
+
+              # Формирование имени файла
+              local TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+              local BACKUP_FILE="${BACKUP_DIR}/${TIMESTAMP}_TN_Doc_before-update-to_v${NEW_VERSION}.tar.gz"
+
+              echo "Source: $OPT_DIR"
+              echo "Destination: $BACKUP_FILE"
+
+              # Создание бэкапа (исключая логи)
+              tar -czf "$BACKUP_FILE" -C /opt TN_Doc --exclude='logs' --exclude='*.log' 2>&1
+              if [ $? -ne 0 ]; then
+                  echo "✗ ERROR: Failed to create backup"
+                  echo "Check available disk space and permissions"
+                  rm -f "$BACKUP_FILE"
+                  exit 1
+              fi
+
+              # Проверка файла
+              if [ ! -s "$BACKUP_FILE" ]; then
+                  echo "✗ ERROR: Backup file is empty"
+                  exit 1
+              fi
+
+              local BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
+              echo "✓ Backup created: $BACKUP_FILE ($BACKUP_SIZE)"
+          }
+
+          create_backup
+          # === End backup section ===
+
           for dir in "/opt/TN_Doc" "/var/log/TN_Doc"; do
               if [ -d "$dir" ]; then
                   rm -rf "$dir"
@@ -740,6 +940,8 @@ jobs:
 
           exit 0
           PREINST_EOF
+          # Замена placeholder на реальную версию
+          sed -i "s/__VERSION_PLACEHOLDER__/${VERSION}/g" deb-minimal/DEBIAN/preinst
           chmod +x deb-minimal/DEBIAN/preinst
 
           # Генерация prerm
