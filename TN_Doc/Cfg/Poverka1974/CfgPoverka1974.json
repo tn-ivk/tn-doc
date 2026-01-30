@@ -26,15 +26,9 @@
       "Data": {
         "ManualViscCorrect": false
       },
-      "Footer": {
-
-      },
-      "Dictionarys": {
-
-      }
+      "Footer": {},
+      "Dictionarys": {}
     },
-    "DataIVK": {
-
-    }
+    "DataIVK": {}
   }
 }

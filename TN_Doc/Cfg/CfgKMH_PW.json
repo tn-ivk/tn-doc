@@ -24,9 +24,7 @@
         "FieldSIKN": "СИКН",
         "FieldPSP": ""
       },
-      "Data": {
-
-      },
+      "Data": {},
       "Footer": {
         "FieldSIKN": "СИКН"
       },
@@ -47,7 +45,6 @@
           "1": "Условие контроля: | <i>W<sub>ПМ</sub> - W <sub>ЛМ</sub></i> | ≤ |Δ<i><sub> ПМ</sub></i>| + | Δ<i> <sub>ЛМ</sub></i> | = ",
           "0": "Условие контроля: | <i>φ <sub>ПО</sub> - φ <sub>ЛО</sub></i> | ≤ |Δ<i><sub> ПО</sub></i>| + | Δ<i> <sub>ЛО</sub></i> | = "
         },
-
         "FlowMeterUnitMeasurement": {
           "1": "<i>W</i><sub> ПМ</sub>,<br>%",
           "0": "<i>φ</i><sub> ПО</sub>,<br>%"
@@ -66,8 +63,6 @@
         }
       }
     },
-    "DataIVK": {
-
-    }
+    "DataIVK": {}
   }
 }

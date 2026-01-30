@@ -67,7 +67,6 @@
             "SI": "%",
             "KeyPassportResult": "MassWaterFracResult"
           },
-
           {
             "Use": true,
             "Edit": true,
@@ -82,7 +81,6 @@
             "SI": "%",
             "KeyPassportResult": "MassFraction"
           },
-
           {
             "Use": true,
             "Edit": true,
@@ -90,7 +88,6 @@
             "SI": "%",
             "KeyPassportResult": "Impurity"
           },
-
           {
             "Use": true,
             "Edit": true,
@@ -98,7 +95,6 @@
             "SI": "%",
             "KeyPassportResult": "SulfurResult"
           },
-
           {
             "Use": true,
             "Edit": true,
@@ -113,7 +109,6 @@
             "SI": "мм рт. ст.",
             "KeyPassportResult": "mercury_mm"
           },
-
           {
             "Use": true,
             "Edit": true,
@@ -135,7 +130,6 @@
             "SI": "",
             "KeyPassportResult": "Yield_fraction_350"
           },
-
           {
             "Use": true,
             "Edit": true,
@@ -166,9 +160,7 @@
           }
         ]
       },
-      "Footer": {
-
-      },
+      "Footer": {},
       "Dictionarys": {
         "Users": [
           {
@@ -241,7 +233,6 @@
             "Factory": "АО «АО «Казтрансойл»",
             "Post": ""
           },
-
           {
             "Use": true,
             "Id": 8,
@@ -429,8 +420,6 @@
         ]
       }
     },
-    "DataIVK": {
-
-    }
+    "DataIVK": {}
   }
 }
