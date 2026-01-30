@@ -611,18 +611,19 @@ sequenceDiagram
     participant Client
     participant API
     participant Controller
-    participant Service
+    participant DocModuleLoader
+    participant DocModule
     participant FastReport
 
     Client->>API: POST /Document/ViewDoc
     API->>Controller: Route request
-    Controller->>Service: GetDocumentClass()
-    Service->>Service: Load module
-    Service-->>Controller: IDocClass instance
+    Controller->>DocModuleLoader: LoadDocsModule(...)
+    DocModuleLoader->>DocModuleLoader: Load module
+    DocModuleLoader-->>Controller: DocGeneral instance
 
-    Controller->>Service: GetViewDoc(id)
-    Service->>Service: Query database
-    Service-->>Controller: JSON data
+    Controller->>DocModule: GetViewDoc(id)
+    DocModule->>DocModule: Query database
+    DocModule-->>Controller: JSON data
 
     Controller->>FastReport: Load template
     Controller->>FastReport: SetData(json)
@@ -635,6 +636,6 @@ sequenceDiagram
 
 ## См. также
 
-- [SignalR Documentation](signalr.md)
 - [Architecture Overview](../architecture/overview.md)
+- [StatusBar](../architecture/statusbar.md)
 - [Integration Guide](../integration/elis.md)

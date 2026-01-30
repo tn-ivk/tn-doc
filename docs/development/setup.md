@@ -8,7 +8,7 @@
 |-----------|------------|
 | ОС | Windows 10/11, Ubuntu 20.04+, macOS 12+ |
 | .NET SDK | 8.0 или выше |
-| .NET Runtime | 8.0.13 или выше |
+| .NET Runtime | 8.0.x (LTS) или выше |
 | RAM | 4 GB (рекомендуется 8 GB) |
 | Дисковое пространство | 2 GB |
 | IDE | Visual Studio 2022, VS Code, Rider |
@@ -58,14 +58,14 @@ dotnet --list-sdks
 dotnet --list-runtimes
 ```
 
-Ожидаемый вывод:
+Пример вывода (версии могут отличаться):
 ```
 $ dotnet --version
-8.0.100
+8.0.xxx
 
 $ dotnet --list-runtimes
-Microsoft.AspNetCore.App 8.0.13 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
-Microsoft.NETCore.App 8.0.13 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+Microsoft.AspNetCore.App 8.0.x [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+Microsoft.NETCore.App 8.0.x [/usr/share/dotnet/shared/Microsoft.NETCore.App]
 ```
 
 ## Клонирование репозитория
@@ -251,43 +251,45 @@ code --install-extension dbaeumer.vscode-eslint
    ASPNETCORE_ENVIRONMENT=Development
    ```
 
-## Настройка StatusBar (Vue.js)
+## Настройка клиентских приложений (Vue.js)
 
 ```bash
-cd TN_Doc/Client/statusbar
+cd TN_Doc/Client
 
 # Установить зависимости
 npm install
 
-# Запустить dev сервер с hot reload
+# Запустить dev сервер для StatusBar
 npm run dev
+
+# В другом терминале запустить dev сервер для Configurator
+npm run dev:configurator
 
 # В другом терминале запустить основное приложение
 cd ../..
 dotnet run
 ```
 
+Dev-сервера по умолчанию:
+- StatusBar: `http://localhost:5173`
+- Configurator: `http://localhost:5174`
+
 ### Структура Vue проекта
 
 ```mermaid
 graph TB
-    subgraph "StatusBar Project"
-        Root[statusbar/]
-        Src[src/]
-        Comp[components/]
-        Store[stores/]
-        Types[types/]
+    subgraph "Client Workspaces"
+        Root[Client/]
+        Statusbar[statusbar/]
+        Configurator[configurator/]
+        Shared[shared/]
+        E2E[e2e/]
     end
 
-    Root --> Src
-    Src --> Comp
-    Src --> Store
-    Src --> Types
-
-    Comp --> StatusBar[StatusBar.vue]
-    Comp --> Indicator[StatusIndicator.vue]
-    Store --> StatusStore[statusStore.ts]
-    Types --> StatusTypes[status.types.ts]
+    Root --> Statusbar
+    Root --> Configurator
+    Root --> Shared
+    Root --> E2E
 ```
 
 ## Проверка установки
@@ -313,7 +315,7 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run
 - [ ] Проект клонирован
 - [ ] `dotnet restore` выполнен успешно
 - [ ] `dotnet build` проходит без ошибок
-- [ ] StatusBar собран (`npm run build`)
+- [ ] Клиентские приложения собраны (`npm run build:all`)
 - [ ] Приложение запускается и открывается в браузере
 - [ ] Тесты проходят (`dotnet test`)
 
@@ -352,9 +354,8 @@ npm run build
 ## Следующие шаги
 
 - [Сборка проекта](building.md)
-- [Тестирование](testing.md)
-- [Coding Standards](coding-standards.md)
-- [Contributing Guide](contributing.md)
+- [Архитектура](../architecture/overview.md)
+- [API Reference](../api/endpoints.md)
 
 ## См. также
 

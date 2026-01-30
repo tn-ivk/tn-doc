@@ -5,7 +5,7 @@
 | Компонент | Требование |
 |-----------|------------|
 | ОС | Ubuntu 20.04+, Debian 11+, RHEL 8+ |
-| .NET Runtime | 8.0.13 или выше |
+| .NET Runtime | 8.0.x (LTS) или выше |
 | Память | 1 GB минимум, 2 GB рекомендуется |
 | Дисковое пространство | 500 MB |
 | Пользователь | `alphadaemon` (создается автоматически) |
@@ -26,7 +26,7 @@ graph TB
     end
 
     subgraph "Dependencies"
-        Runtime[.NET Runtime 8.0.13]
+        Runtime[.NET Runtime 8.0.x]
         libgdiplus[libgdiplus]
         CUPS[CUPS]
     end
@@ -55,7 +55,7 @@ wget http://build-server/tn.doc-full-<FULL_VERSION>_amd64.deb
 scp tn.doc-full-<FULL_VERSION>_amd64.deb user@server:/tmp/
 ```
 
-`<FULL_VERSION>` формируется в CI на основе тега версии и номера сборки (см. `.gitlab-ci.yml`).
+`<FULL_VERSION>` задается при сборке пакета (например, `1.4.3`). Если используется CI, версия может формироваться в пайплайне вашей инфраструктуры.
 
 ### 2. Установить зависимости
 
@@ -348,9 +348,6 @@ sudo rm -rf /opt/TN_Doc
 # Проверить логи systemd
 sudo journalctl -u tn-doc -n 50
 
-# Проверить конфигурацию
-sudo /opt/TN_Doc/TN_Doc --check-config
-
 # Проверить права
 ls -la /opt/TN_Doc
 ```
@@ -374,6 +371,6 @@ sudo systemctl restart tn-doc
 
 ## См. также
 
-- [Windows Deployment](windows.md)
 - [Configuration Guide](configuration.md)
-- [Troubleshooting](../troubleshooting.md)
+- [Сборка проекта](../development/building.md)
+- [Руководство разработчика](../development/setup.md)

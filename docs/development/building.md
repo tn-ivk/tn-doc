@@ -19,8 +19,8 @@ flowchart TB
 # Полная сборка с нуля
 dotnet clean && dotnet restore && dotnet build
 
-# Сборка Vue компонента
-cd TN_Doc/Client/statusbar && npm run build && cd ../../..
+# Сборка клиентских приложений (StatusBar + Configurator)
+cd TN_Doc/Client && npm install && npm run build:all && cd ../..
 
 # Сборка и запуск
 cd TN_Doc && dotnet run
@@ -64,10 +64,10 @@ dotnet build -v detailed
 dotnet build TN_Doc/TN_Doc.csproj
 ```
 
-### 4. Сборка StatusBar
+### 4. Сборка клиентских приложений
 
 ```bash
-cd TN_Doc/Client/statusbar
+cd TN_Doc/Client
 
 # Установка зависимостей (первый раз)
 npm install
@@ -75,8 +75,17 @@ npm install
 # Development сборка с watch
 npm run dev
 
+# Development сборка configurator
+npm run dev:configurator
+
 # Production сборка
 npm run build
+
+# Production сборка конфигуратора
+npm run build:configurator
+
+# Production сборка всех приложений
+npm run build:all
 ```
 
 ## Конфигурации сборки
@@ -154,9 +163,7 @@ flowchart LR
     Build --> DEB[tn.doc-full-<FULL_VERSION>_amd64.deb]
 ```
 
-`<FULL_VERSION>` формируется в CI на основе тега версии и номера сборки (см. `.gitlab-ci.yml`).
-
-См. `.gitlab-ci.yml` для полного процесса.
+`<FULL_VERSION>` задается при сборке пакета (например, `1.4.3`). Если используется CI, версия может формироваться в пайплайне вашей инфраструктуры.
 
 ## Автоматическая сборка (CI/CD)
 
@@ -174,7 +181,7 @@ build:
   script:
     - dotnet restore
     - dotnet build -c Release
-    - cd TN_Doc/Client/statusbar && npm ci && npm run build
+    - cd TN_Doc/Client && npm ci && npm run build:all
 
 test:
   stage: test
@@ -267,5 +274,4 @@ publish/
 ## См. также
 
 - [Setup Guide](setup.md)
-- [Testing](testing.md)
 - [Deployment](../deployment/linux.md)

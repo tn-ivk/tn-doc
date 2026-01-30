@@ -11,6 +11,7 @@ graph TB
     subgraph "Клиент"
         Browser[Web Browser]
         StatusBar[StatusBar Vue.js]
+        Configurator[Configurator Vue.js]
     end
 
     subgraph "Web Layer - ASP.NET Core"
@@ -47,6 +48,7 @@ graph TB
 
     Browser --> Controllers
     StatusBar --> SignalR
+    Configurator --> Controllers
     Controllers --> Services
     Services --> AppConfig
     Services --> DocFactory
@@ -72,7 +74,7 @@ graph TB
 **Компоненты:**
 - ASP.NET Core MVC Controllers
 - Razor Views
-- Vue.js StatusBar (SPA)
+- Vue.js StatusBar и Configurator (SPA)
 - SignalR Hubs для real-time обновлений
 
 **Ответственность:**
@@ -98,7 +100,8 @@ graph LR
 ### 2. Business Logic Layer (Бизнес-логика)
 
 **Компоненты:**
-- `IAppConfigService` - управление конфигурацией и фабрика документов
+- `IAppConfigService` - управление конфигурацией
+- `IDocModuleLoader` - динамическая загрузка модулей документов
 - `PrinterService` - управление печатью
 - `DirectoryService` - работа с файловой системой
 - `StatusProvider` - мониторинг статусов
@@ -114,28 +117,30 @@ graph LR
 classDiagram
     class IAppConfigService {
         <<interface>>
-        +GetDocumentClass(idDevice, idDoc) IDocClass
-        +GetConfig() CfgApp
-        +GetDeviceConfig(idDevice) DeviceConfig
+        +GetAppCfg() CfgApp
+        +GetDeviceCfg(idDevice) Device
+        +GetPathToDocDll(idDevice, idDoc) string
+        +GetPathTemplateFile(idDevice, idDoc) string
     }
 
-    class AppConfigService {
-        -CfgApp _config
-        -Dictionary~string, Type~ _documentTypes
-        +GetDocumentClass(idDevice, idDoc) IDocClass
-        +LoadConfiguration() void
-    }
-
-    class IDocClass {
+    class IDocModuleLoader {
         <<interface>>
-        +GetViewDoc(id) string
+        +LoadDocsModule(options, idDevice, idDoc, baseDirectory) DocGeneral
+    }
+
+    class AppConfigService
+    class DocModuleLoader
+
+    class DocGeneral {
+        +GetViewDoc(id) object
+        +GetViewDoc(id, protocolNumber) object
         +GetPathTemplateFile() string
         +GetEditDoc(id) string
-        +SetDocFromJson(json) void
     }
 
     IAppConfigService <|.. AppConfigService
-    AppConfigService ..> IDocClass : creates
+    IDocModuleLoader <|.. DocModuleLoader
+    DocModuleLoader ..> DocGeneral : creates
 ```
 
 ### 3. Data Access Layer (Доступ к данным)
@@ -158,14 +163,16 @@ classDiagram
 sequenceDiagram
     participant User
     participant Controller
+    participant DocLoader
     participant AppConfig
     participant DocModule
     participant FastReport
     participant ReportBuffer
 
     User->>Controller: Запрос документа (deviceId, docId, recordId)
-    Controller->>AppConfig: GetDocumentClass(deviceId, docId)
-    AppConfig->>DocModule: Создать экземпляр модуля
+    Controller->>DocLoader: LoadDocsModule(options, deviceId, docId, baseDir)
+    DocLoader->>AppConfig: GetPathToDocDll(deviceId, docId)
+    DocLoader->>DocModule: Создать экземпляр модуля
     DocModule-->>Controller: Instance
 
     Controller->>DocModule: GetViewDoc(recordId)
@@ -313,31 +320,17 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    subgraph "Module Discovery"
-        Scanner[Assembly Scanner]
-        Dll[Dll/ Directory]
-        Compiled[Compiled Assemblies]
-    end
-
-    subgraph "Module Registry"
-        Registry[Document Type Registry]
-        Cache[Type Cache]
-    end
-
-    subgraph "Module Instantiation"
-        Factory[Document Factory]
+    subgraph "Module Loading"
+        AppConfig[AppConfigService]
+        Loader[DocModuleLoader]
+        Dll[Doc DLL]
         Activator[Activator.CreateInstance]
     end
 
-    Scanner --> Dll
-    Scanner --> Compiled
-    Dll --> Registry
-    Compiled --> Registry
-    Registry --> Cache
-
-    Factory --> Cache
-    Factory --> Activator
-    Activator --> Instance[IDocClass Instance]
+    AppConfig --> Loader
+    Loader --> Dll
+    Loader --> Activator
+    Activator --> Instance[DocGeneral Instance]
 ```
 
 ## Security & Error Handling

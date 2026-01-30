@@ -51,12 +51,12 @@ dotnet run
 
 Приложение будет доступно по адресу: `http://localhost:38509`
 
-### Сборка статус-бара (Vue.js)
+### Сборка клиентских приложений (Vue.js)
 
 ```bash
-cd TN_Doc/Client/statusbar
+cd TN_Doc/Client
 npm install
-npm run build
+npm run build:all   # statusbar + configurator
 ```
 
 ## 📖 Документация
@@ -64,9 +64,13 @@ npm run build
 - [Архитектура проекта](docs/architecture/overview.md)
 - [Модули документов](docs/architecture/document-modules.md)
 - [Статус-бар](docs/architecture/statusbar.md)
+- [Клиентские приложения](TN_Doc/Client/README.md)
 - [Руководство разработчика](docs/development/setup.md)
 - [Сборка проекта](docs/development/building.md)
+- [Конфигурация](docs/deployment/configuration.md)
 - [Развертывание](docs/deployment/linux.md)
+- [Шаблоны FastReport](docs/development/fastreport-templates.md)
+- [Добавление нового модуля](docs/development/new-module-tutorial.md)
 - [Интеграция с ELIS](docs/integration/elis.md)
 - [API Reference](docs/api/endpoints.md)
 - [История изменений](CHANGELOG.md)
@@ -123,7 +127,7 @@ graph TB
 ## 🔧 Основные технологии
 
 - **Backend**: ASP.NET Core 8.0, C#
-- **Frontend**: Vue 3 + TypeScript + PrimeVue (StatusBar)
+- **Frontend**: Vue 3 + TypeScript + PrimeVue (StatusBar, Configurator)
 - **Генерация отчетов**: FastReport.Web.Skia
 - **База данных**: MySQL/MariaDB (Pomelo.EntityFrameworkCore.MySql)
 - **Real-time**: SignalR
@@ -140,16 +144,17 @@ tn_doc/
 │   ├── Models/                  # Модели и сервисы
 │   ├── Views/                   # Razor views
 │   ├── wwwroot/                 # Статические файлы
-│   ├── Client/statusbar/        # Vue.js статус-бар
+│   ├── Client/                  # Vue.js workspaces (statusbar, configurator, shared, e2e)
 │   ├── Cfg/                     # Конфигурация документов
 │   └── Doc/                     # Шаблоны FastReport
-├── TN.DocGeneral/               # Общая бизнес-логика
-├── Ivk.DataBase/                # Библиотека работы с БД
-├── tn.docgeneral/               # Модули документов
+├── tn.docgeneral/               # Модули документов и общие библиотеки
+│   ├── TN.DocGeneral/           # Общая бизнес-логика
+│   ├── tn.utils/                # Общие утилиты
 │   ├── Passport/
 │   ├── Poverka*/
 │   ├── KMH*/
 │   └── ...
+├── tn_toolsfastreport/          # Утилиты FastReport
 ├── Tests/                       # Unit-тесты (NUnit)
 └── docs/                        # Документация
 ```

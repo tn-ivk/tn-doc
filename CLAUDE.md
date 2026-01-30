@@ -64,9 +64,9 @@ TN_Doc.sln
 │   │   └── e2e/               # E2E тесты (Playwright)
 │   ├── Cfg/                   # JSON конфигурации документов
 │   └── Doc/                   # FastReport шаблоны (.frx)
-├── TN.DocGeneral/             # Общие утилиты и сервисы
-├── Ivk.DataBase/              # EF Core контекст для MySQL
 ├── tn.docgeneral/             # Модули документов (~42 DLL)
+│   ├── TN.DocGeneral/         # Общая бизнес-логика
+│   ├── tn.utils/              # Общие утилиты
 ├── Tests/                     # Тестовые проекты
 │   ├── Tests.Shared/          # Общая инфраструктура тестов
 │   ├── Tests.Unit/            # Модульные тесты (NUnit)
@@ -77,8 +77,8 @@ TN_Doc.sln
 ### Document Generation Flow
 
 ```
-HTTP Request → HomeController → IAppConfigService.GetDocumentClass(idDevice, idDoc)
-    → Document Module (DLL) → GetViewDoc(id) → JSON данные
+HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idDevice, idDoc, baseDir)
+    → Document Module (DLL, DocGeneral) → GetViewDoc(id) → JSON данные
     → FastReport Template (.frx) + "JsonDoc" parameter → PDF/Excel/ODS
 ```
 
@@ -131,13 +131,13 @@ HTTP Request → HomeController → IAppConfigService.GetDocumentClass(idDevice,
 
 ## Document Module Interface
 
-Все модули документов реализуют:
+Базовый класс `DocGeneral` и переопределяемые методы:
 
 ```csharp
-GetViewDoc(id)           // JSON данные для отчёта
-GetPathTemplateFile()    // Путь к .frx шаблону
-GetEditDoc(id)           // HTML форма редактирования
-SetDocFromJson(json)     // Сохранение данных из JSON
+GetViewDoc(id)                       // JSON данные для отчёта
+GetViewDoc(id, protocolNumber)       // Для документов с несколькими протоколами
+GetPathTemplateFile()                // Путь к .frx шаблону
+GetEditDoc(id)                       // HTML форма редактирования (если используется)
 ```
 
 **Важно** в `GetEditDoc`: использовать `Path.Combine()` для кросс-платформенности.

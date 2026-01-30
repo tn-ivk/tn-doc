@@ -180,16 +180,16 @@ graph LR
 ### Получение данных из ELIS
 
 ```csharp
-public class PassportModule : IDocClass
+public class PassportModule : DocGeneral
 {
     private readonly IElisService _elisService;
 
-    public async Task<string> GetViewDoc(int id)
+    public override object GetViewDoc(int id)
     {
         // Получить данные измерений из БД
-        var measurements = await _dbContext.Measurements
+        var measurements = _dbContext.Measurements
             .Where(m => m.Id == id)
-            .FirstOrDefaultAsync();
+            .FirstOrDefault();
 
         // Получить данные качества из ELIS
         ElisQualityData qualityData = null;
@@ -197,9 +197,9 @@ public class PassportModule : IDocClass
         {
             try
             {
-                qualityData = await _elisService.GetQualityData(
+                qualityData = _elisService.GetQualityData(
                     measurements.SampleId
-                );
+                ).GetAwaiter().GetResult();
             }
             catch (ElisException ex)
             {
@@ -431,6 +431,4 @@ grep "ELIS" /opt/TN_Doc/logs/tn-doc-$(date +%Y-%m-%d).log
 
 ## См. также
 
-- [OPC Integration](opc.md)
-- [MessagingService Integration](messaging-service.md)
 - [Configuration Guide](../deployment/configuration.md)

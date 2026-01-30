@@ -19,52 +19,26 @@ stateDiagram-v2
     Storage --> [*]: Return to User
 ```
 
-## Интерфейс модуля документа
+## Базовый класс модуля документа
 
-Все модули документов реализуют стандартный интерфейс `IDocClass`:
+Все модули документов наследуются от базового класса `DocGeneral` (namespace `TN.Doc`) и переопределяют ключевые методы доступа к данным и шаблону:
 
 ```mermaid
 classDiagram
-    class IDocClass {
-        <<interface>>
-        +GetViewDoc(int id) string
+    class DocGeneral {
+        +GetViewDoc(int id) object
+        +GetViewDoc(int id, int protocolNumber) object
         +GetPathTemplateFile() string
         +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
-        +GetNameDoc() string
-        +GetDocTypeId() string
     }
 
-    class PassportModule {
-        -DbContext _context
-        -string _templatePath
-        +GetViewDoc(int id) string
-        +GetPathTemplateFile() string
-        +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
-    }
+    class PassportModule
+    class PoverkaModule
+    class KMHModule
 
-    class PoverkaModule {
-        -DbContext _context
-        -VerificationConfig _config
-        +GetViewDoc(int id) string
-        +GetPathTemplateFile() string
-        +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
-    }
-
-    class KMHModule {
-        -DbContext _context
-        -QualityConfig _config
-        +GetViewDoc(int id) string
-        +GetPathTemplateFile() string
-        +GetEditDoc(int id) string
-        +SetDocFromJson(string json) void
-    }
-
-    IDocClass <|.. PassportModule
-    IDocClass <|.. PoverkaModule
-    IDocClass <|.. KMHModule
+    DocGeneral <|-- PassportModule
+    DocGeneral <|-- PoverkaModule
+    DocGeneral <|-- KMHModule
 ```
 
 ## Фабрика документов
@@ -72,23 +46,22 @@ classDiagram
 ```mermaid
 sequenceDiagram
     participant Controller
+    participant DocModuleLoader
     participant AppConfigService
-    participant Registry
     participant Activator
     participant Module
 
-    Controller->>AppConfigService: GetDocumentClass(deviceId, docId)
-    AppConfigService->>AppConfigService: Resolve document type
-    AppConfigService->>Registry: Lookup Type by key
-    Registry-->>AppConfigService: Type info
+    Controller->>DocModuleLoader: LoadDocsModule(options, deviceId, docId, baseDir)
+    DocModuleLoader->>AppConfigService: GetPathToDocDll(deviceId, docId)
+    DocModuleLoader->>DocModuleLoader: Load assembly by path
 
-    alt Module found in registry
-        AppConfigService->>Activator: CreateInstance(type, args)
-        Activator->>Module: new()
-        Module-->>AppConfigService: Instance
-        AppConfigService-->>Controller: IDocClass instance
+    alt Module found in DLL
+        DocModuleLoader->>Activator: CreateInstance(type, args)
+        Activator->>Module: new DocGeneral(...)
+        Module-->>DocModuleLoader: Instance
+        DocModuleLoader-->>Controller: DocGeneral instance
     else Module not found
-        AppConfigService-->>Controller: throw Exception
+        DocModuleLoader-->>Controller: null/exception
     end
 ```
 
@@ -259,51 +232,43 @@ flowchart TD
 
 ```mermaid
 graph TB
-    subgraph "Startup"
-        Scan[Assembly Scanner]
-        Discovery[Module Discovery]
+    subgraph "Config"
+        Cfg[CfgApp.json]
     end
 
-    subgraph "Sources"
-        DLL[Dll/ Directory]
-        Compiled[Compiled Assemblies]
-        Runtime[Runtime Compilation]
+    subgraph "Loader"
+        Loader[DocModuleLoader]
+        Dll[PathToDocDll]
+        Assembly[Assembly.LoadFrom]
     end
 
-    subgraph "Registry"
-        Cache[Type Cache]
-        Mapping[Device→Doc→Type Mapping]
+    subgraph "Module"
+        Instance[DocGeneral instance]
     end
 
-    Scan --> DLL
-    Scan --> Compiled
-    Scan --> Runtime
-
-    DLL --> Discovery
-    Compiled --> Discovery
-    Runtime --> Discovery
-
-    Discovery --> Cache
-    Cache --> Mapping
+    Cfg --> Loader
+    Loader --> Dll
+    Dll --> Assembly
+    Assembly --> Instance
 ```
 
 ### Регистрация модулей
 
-**Автоматическая регистрация:**
+**Создание экземпляра модуля:**
 ```csharp
-// При старте приложения
-foreach (var assembly in LoadedAssemblies)
-{
-    var documentTypes = assembly.GetTypes()
-        .Where(t => typeof(IDocClass).IsAssignableFrom(t))
-        .Where(t => !t.IsInterface && !t.IsAbstract);
+// Упрощенно (логика DocModuleLoader)
+var assembly = Assembly.LoadFrom(pathToDll);
+var docType = assembly.GetTypes()
+    .Single(t => t.BaseType?.Name == nameof(DocGeneral));
 
-    foreach (var type in documentTypes)
-    {
-        var attribute = type.GetCustomAttribute<DocumentTypeAttribute>();
-        _registry[attribute.TypeId] = type;
-    }
-}
+var instance = (DocGeneral)assembly.CreateInstance(
+    docType.FullName,
+    false,
+    BindingFlags.Default,
+    null,
+    new object[] { options, appConfig, configCache, deviceId, docId, baseDirectory },
+    null,
+    null);
 ```
 
 ## Работа с данными
@@ -399,13 +364,18 @@ graph TB
 
 1. **Создать класс модуля:**
 ```csharp
-[DocumentType("NewDoc")]
-public class NewDocModule : IDocClass
+public class NewDocModule : DocGeneral
 {
-    public string GetViewDoc(int id) { /* ... */ }
-    public string GetPathTemplateFile() { /* ... */ }
-    public string GetEditDoc(int id) { /* ... */ }
-    public void SetDocFromJson(string json) { /* ... */ }
+    public NewDocModule(DbContextOptions<DocGeneral> options,
+        IAppConfigService appConfig,
+        IConfigurationCacheService configCache,
+        int idDevice,
+        IdDoc idDoc,
+        string path)
+        : base(options, appConfig, configCache, idDevice, idDoc, path) { }
+
+    public override object GetViewDoc(int id) { /* ... */ }
+    public override string GetEditDoc(int id) { /* ... */ }
 }
 ```
 
@@ -436,7 +406,7 @@ public class NewDocModule : IDocClass
 
 ```mermaid
 flowchart LR
-    A[1. Create Module Class] --> B[2. Implement IDocClass]
+    A[1. Create Module Class] --> B[2. Inherit DocGeneral]
     B --> C[3. Create Configurations]
     C --> D[4. Design FastReport Template]
     D --> E[5. Register in CfgApp.json]
