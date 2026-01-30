@@ -172,7 +172,7 @@
       "Id": 22,
       "Use": true,
       "Edit": true,
-        "Key": "ViscForEndMeas",
+      "Key": "ViscForEndMeas",
       "Type": "text",
       "Name": "Вязкость нефти для последнего измерения"
     }
