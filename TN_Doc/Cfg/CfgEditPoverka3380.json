@@ -120,8 +120,6 @@
       "Type": "text",
       "Name": "ПУ: Дата поверки"
     },
-
-
     {
       "Id": 16,
       "Use": true,
@@ -174,10 +172,9 @@
       "Id": 22,
       "Use": true,
       "Edit": true,
-        "Key": "ViscForEndMeas",
+      "Key": "ViscForEndMeas",
       "Type": "text",
       "Name": "Вязкость нефти для последнего измерения"
     }
   ]
 }
-
