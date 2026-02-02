@@ -50,6 +50,7 @@ public class Startup
 		services.AddAppInfoProvider();
 		services.AddPrinters();
 		services.AddPrinterService();
+		services.AddSystemJournal();
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
