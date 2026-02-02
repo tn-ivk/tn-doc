@@ -70,7 +70,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 5,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": false,
@@ -162,7 +162,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 7,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": false,
@@ -286,7 +286,7 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -322,7 +322,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PU.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -358,7 +358,7 @@
           "PathToDocDll": "/Dll/KMH_PW.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PW.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -394,7 +394,7 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -430,7 +430,7 @@
           "PathToDocDll": "/Dll/KMH_PP.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -466,7 +466,7 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -522,7 +522,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PR.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -550,7 +550,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_MPR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_MPR.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -866,7 +866,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_PU.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -1152,7 +1152,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     },
     {
       "Use": false,
@@ -1224,7 +1228,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": false,
@@ -1316,7 +1320,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": false,
@@ -1384,7 +1388,7 @@
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
-          "LastUsedTemplateId": 1,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -1676,7 +1680,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PR.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -1704,7 +1708,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_MPR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_MPR.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2020,7 +2024,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_PU.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2306,7 +2310,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     },
     {
       "Use": false,
@@ -2378,7 +2386,7 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2470,7 +2478,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 5,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2830,7 +2838,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PR.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2858,7 +2866,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_MPR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_MPR.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -3174,7 +3182,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_PU.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -3460,7 +3468,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     }
   ],
   "PrintSettings": {
