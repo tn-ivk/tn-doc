@@ -132,4 +132,118 @@ public class ConfiguratorController : ControllerBase
             });
         }
     }
+
+    /// <summary>
+    /// Загрузить конфигурационный файл документа
+    /// </summary>
+    /// <param name="configPath">Путь к файлу конфигурации (относительный от корня приложения)</param>
+    /// <returns>Содержимое файла в формате JSON</returns>
+    [HttpGet("document-config")]
+    [ProducesResponseType(typeof(string), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> LoadDocumentConfig([FromQuery] string configPath)
+    {
+        if (string.IsNullOrWhiteSpace(configPath))
+        {
+            return BadRequest(new { error = "Путь к файлу не может быть пустым" });
+        }
+
+        try
+        {
+            _logger.LogInformation("Запрос на загрузку конфигурации документа: {Path}", configPath);
+            var content = await _configurationService.LoadDocumentConfigAsync(configPath);
+            return Ok(content);
+        }
+        catch (System.IO.FileNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Файл конфигурации не найден: {Path}", configPath);
+            return NotFound(new
+            {
+                error = "Файл конфигурации не найден",
+                path = configPath
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при загрузке конфигурации документа: {ErrorMessage}", ex.Message);
+            return StatusCode(500, new
+            {
+                error = "Не удалось загрузить конфигурацию документа",
+                details = ex.Message
+            });
+        }
+    }
+
+    /// <summary>
+    /// Сохранить конфигурационный файл документа
+    /// </summary>
+    /// <param name="request">Запрос на сохранение (путь и содержимое)</param>
+    /// <returns>Результат сохранения</returns>
+    [HttpPost("document-config")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> SaveDocumentConfig([FromBody] DocumentConfigRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.ConfigPath) || string.IsNullOrWhiteSpace(request.Content))
+        {
+            return BadRequest(new { error = "Путь и содержимое файла обязательны" });
+        }
+
+        try
+        {
+            _logger.LogInformation("Запрос на сохранение конфигурации документа: {Path}", request.ConfigPath);
+
+            // Валидация JSON
+            try
+            {
+                Newtonsoft.Json.JsonConvert.DeserializeObject(request.Content);
+            }
+            catch (Newtonsoft.Json.JsonException ex)
+            {
+                _logger.LogWarning("Невалидный JSON в запросе: {Error}", ex.Message);
+                return BadRequest(new
+                {
+                    error = "Невалидный JSON",
+                    details = ex.Message
+                });
+            }
+
+            var success = await _configurationService.SaveDocumentConfigAsync(request.ConfigPath, request.Content);
+            if (!success)
+            {
+                return StatusCode(500, new { error = "Не удалось сохранить конфигурацию документа" });
+            }
+
+            _logger.LogInformation("Конфигурация документа успешно сохранена: {Path}", request.ConfigPath);
+            return Ok(new { message = "Конфигурация документа успешно сохранена" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при сохранении конфигурации документа: {ErrorMessage}", ex.Message);
+            return StatusCode(500, new
+            {
+                error = "Не удалось сохранить конфигурацию документа",
+                details = ex.Message
+            });
+        }
+    }
+}
+
+/// <summary>
+/// Модель запроса на сохранение конфигурации документа
+/// </summary>
+public class DocumentConfigRequest
+{
+    /// <summary>
+    /// Путь к файлу конфигурации (относительный от корня приложения)
+    /// </summary>
+    public string ConfigPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Содержимое файла в формате JSON
+    /// </summary>
+    public string Content { get; set; } = string.Empty;
 }

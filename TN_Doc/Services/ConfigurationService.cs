@@ -1,6 +1,9 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using TN.DocData;
 using TN_Doc.Services.Validators;
@@ -14,13 +17,21 @@ namespace TN_Doc.Services;
 public class ConfigurationService : IConfigurationService
 {
     private readonly IAppConfigService _appConfigService;
+    private readonly IConfigurationCacheService _configCacheService;
+    private readonly IWebHostEnvironment _environment;
     private readonly OpcConfigValidator _opcValidator;
     private readonly DbConfigValidator _dbValidator;
     private readonly ILogger<ConfigurationService> _logger;
 
-    public ConfigurationService(IAppConfigService appConfigService, ILogger<ConfigurationService> logger)
+    public ConfigurationService(
+        IAppConfigService appConfigService,
+        IConfigurationCacheService configCacheService,
+        IWebHostEnvironment environment,
+        ILogger<ConfigurationService> logger)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
+        _configCacheService = configCacheService ?? throw new ArgumentNullException(nameof(configCacheService));
+        _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _opcValidator = new OpcConfigValidator();
         _dbValidator = new DbConfigValidator();
@@ -253,5 +264,95 @@ public class ConfigurationService : IConfigurationService
 
         // Обновляем устройства
         current.Devices = updated.Devices;
+    }
+
+    /// <summary>
+    /// Загрузить содержимое конфигурационного файла документа
+    /// </summary>
+    public async Task<string> LoadDocumentConfigAsync(string configPath)
+    {
+        if (string.IsNullOrWhiteSpace(configPath))
+        {
+            throw new ArgumentException("Путь к конфигурационному файлу не может быть пустым", nameof(configPath));
+        }
+
+        try
+        {
+            // Нормализуем путь (удаляем начальный слеш, если есть)
+            var normalizedPath = configPath.TrimStart('/');
+
+            // Получаем полный путь к файлу относительно корня приложения
+            var fullPath = Path.Combine(_environment.ContentRootPath, normalizedPath);
+
+            _logger.LogDebug("Загрузка конфигурации документа: {FilePath}", fullPath);
+
+            if (!File.Exists(fullPath))
+            {
+                _logger.LogWarning("Файл конфигурации не найден: {FilePath}", fullPath);
+                throw new FileNotFoundException($"Файл конфигурации не найден: {configPath}");
+            }
+
+            // Читаем файл
+            var content = await File.ReadAllTextAsync(fullPath, Encoding.UTF8);
+            _logger.LogDebug("Конфигурация документа успешно загружена: {FilePath}", fullPath);
+
+            return content;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при загрузке конфигурации документа: {FilePath}", configPath);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Сохранить содержимое конфигурационного файла документа.
+    /// Сохраняет в AppContext.BaseDirectory для немедленного применения и корректной инвалидации кэша.
+    /// </summary>
+    public async Task<bool> SaveDocumentConfigAsync(string configPath, string content)
+    {
+        if (string.IsNullOrWhiteSpace(configPath))
+        {
+            throw new ArgumentException("Путь к конфигурационному файлу не может быть пустым", nameof(configPath));
+        }
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            throw new ArgumentException("Содержимое файла не может быть пустым", nameof(content));
+        }
+
+        try
+        {
+            // Нормализуем путь (удаляем начальный слеш, если есть)
+            var normalizedPath = configPath.TrimStart('/', '\\');
+
+            // Сохраняем в AppContext.BaseDirectory - где реально читаются файлы
+            var fullPath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
+
+            _logger.LogInformation("Сохранение конфигурации документа: {FilePath}", fullPath);
+
+            // Проверяем, существует ли директория
+            var directory = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+                _logger.LogDebug("Создана директория: {Directory}", directory);
+            }
+
+            // Сохраняем файл
+            await File.WriteAllTextAsync(fullPath, content, Encoding.UTF8);
+
+            // Очищаем кэш для этого файла
+            _configCacheService.ClearCache(fullPath);
+            _logger.LogDebug("Кэш конфигурации очищен для файла: {FilePath}", fullPath);
+
+            _logger.LogInformation("Конфигурация документа успешно сохранена: {FilePath}", fullPath);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при сохранении конфигурации документа: {FilePath}", configPath);
+            return false;
+        }
     }
 }

@@ -13,9 +13,11 @@ export const useConfigStore = defineStore('config', () => {
   const isSaving = ref(false);
   const error = ref<string | null>(null);
   const validationErrors = ref<Map<string, string>>(new Map());
+  const dirtyDocumentConfigs = ref<Map<string, string>>(new Map());
 
   // Computed
   const isDirty = computed(() => {
+    if (dirtyDocumentConfigs.value.size > 0) return true;
     if (!originalConfig.value || !currentConfig.value) return false;
     return !_.isEqual(originalConfig.value, currentConfig.value);
   });
@@ -166,6 +168,24 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
+  // Document config methods
+  async function loadDocumentConfig(configPath: string): Promise<string> {
+    return await apiService.loadDocumentConfig(configPath);
+  }
+
+  async function saveDocumentConfig(configPath: string, content: string): Promise<void> {
+    await apiService.saveDocumentConfig(configPath, content);
+    dirtyDocumentConfigs.value.delete(configPath);
+  }
+
+  function markDocumentConfigDirty(configPath: string, content: string) {
+    dirtyDocumentConfigs.value.set(configPath, content);
+  }
+
+  function clearDocumentConfigDirty(configPath: string) {
+    dirtyDocumentConfigs.value.delete(configPath);
+  }
+
   return {
     // State
     originalConfig,
@@ -190,6 +210,12 @@ export const useConfigStore = defineStore('config', () => {
     updateDocumentTemplate,
     selectDevices,
     validateConfig,
-    resetConfig
+    resetConfig,
+
+    // Document config actions
+    loadDocumentConfig,
+    saveDocumentConfig,
+    markDocumentConfigDirty,
+    clearDocumentConfigDirty
   };
 });
