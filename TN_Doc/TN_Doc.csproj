@@ -10,6 +10,11 @@
     <FileVersion>$(Version)</FileVersion>
   </PropertyGroup>
 
+  <!-- Разрешить доступ к internal членам из тестов -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Tests.Unit" />
+  </ItemGroup>
+
   <!-- Исключение ненужных файлов -->
   <ItemGroup>
     <Compile Remove="wwwroot\lib\jquery-ui\**" />

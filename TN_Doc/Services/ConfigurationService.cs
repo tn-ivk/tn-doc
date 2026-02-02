@@ -267,22 +267,72 @@ public class ConfigurationService : IConfigurationService
     }
 
     /// <summary>
+    /// Валидирует и нормализует путь к файлу конфигурации.
+    /// Защищает от path traversal атак (CWE-22).
+    /// </summary>
+    /// <param name="configPath">Относительный путь к файлу</param>
+    /// <param name="baseDirectory">Базовая директория</param>
+    /// <returns>Безопасный полный путь</returns>
+    /// <exception cref="ArgumentException">Если путь небезопасен</exception>
+    internal static string GetSafeConfigPath(string configPath, string baseDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(configPath))
+        {
+            throw new ArgumentException("Путь к файлу не может быть пустым", nameof(configPath));
+        }
+
+        // Запрещаем UNC пути (\\server\share, //server/share) - проверяем первыми
+        if (configPath.StartsWith("\\\\") || configPath.StartsWith("//"))
+        {
+            throw new ArgumentException("UNC пути запрещены", nameof(configPath));
+        }
+
+        // Запрещаем абсолютные пути с буквой диска (C:\..., D:\...)
+        // Path.IsPathRooted на Windows возвращает true для /path, поэтому проверяем явно
+        if (configPath.Length >= 2 && configPath[1] == ':')
+        {
+            throw new ArgumentException("Абсолютные пути запрещены", nameof(configPath));
+        }
+
+        // Нормализуем разделители и удаляем начальные слеши
+        var normalizedPath = configPath
+            .Replace('\\', '/')
+            .TrimStart('/');
+
+        // Запрещаем выход за пределы директории (..)
+        var segments = normalizedPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Any(s => s == ".."))
+        {
+            throw new ArgumentException("Путь содержит недопустимые сегменты", nameof(configPath));
+        }
+
+        // Разрешаем только директорию Cfg/
+        if (!normalizedPath.StartsWith("Cfg/", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Доступ разрешён только к директории Cfg/", nameof(configPath));
+        }
+
+        // Формируем полный путь
+        var fullPath = Path.GetFullPath(Path.Combine(baseDirectory, normalizedPath));
+
+        // Финальная проверка - путь должен быть внутри базовой директории
+        var normalizedBase = Path.GetFullPath(baseDirectory);
+        if (!fullPath.StartsWith(normalizedBase, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Путь выходит за пределы разрешённой директории", nameof(configPath));
+        }
+
+        return fullPath;
+    }
+
+    /// <summary>
     /// Загрузить содержимое конфигурационного файла документа
     /// </summary>
     public async Task<string> LoadDocumentConfigAsync(string configPath)
     {
-        if (string.IsNullOrWhiteSpace(configPath))
-        {
-            throw new ArgumentException("Путь к конфигурационному файлу не может быть пустым", nameof(configPath));
-        }
-
         try
         {
-            // Нормализуем путь (удаляем начальный слеш, если есть)
-            var normalizedPath = configPath.TrimStart('/');
-
-            // Получаем полный путь к файлу относительно корня приложения
-            var fullPath = Path.Combine(_environment.ContentRootPath, normalizedPath);
+            var fullPath = GetSafeConfigPath(configPath, _environment.ContentRootPath);
 
             _logger.LogDebug("Загрузка конфигурации документа: {FilePath}", fullPath);
 
@@ -292,11 +342,15 @@ public class ConfigurationService : IConfigurationService
                 throw new FileNotFoundException($"Файл конфигурации не найден: {configPath}");
             }
 
-            // Читаем файл
             var content = await File.ReadAllTextAsync(fullPath, Encoding.UTF8);
             _logger.LogDebug("Конфигурация документа успешно загружена: {FilePath}", fullPath);
 
             return content;
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Небезопасный путь к конфигурации: {FilePath}", configPath);
+            throw;
         }
         catch (Exception ex)
         {
@@ -311,11 +365,6 @@ public class ConfigurationService : IConfigurationService
     /// </summary>
     public async Task<bool> SaveDocumentConfigAsync(string configPath, string content)
     {
-        if (string.IsNullOrWhiteSpace(configPath))
-        {
-            throw new ArgumentException("Путь к конфигурационному файлу не может быть пустым", nameof(configPath));
-        }
-
         if (string.IsNullOrWhiteSpace(content))
         {
             throw new ArgumentException("Содержимое файла не может быть пустым", nameof(content));
@@ -323,23 +372,11 @@ public class ConfigurationService : IConfigurationService
 
         try
         {
-            // Нормализуем путь (удаляем начальный слеш, если есть)
-            var normalizedPath = configPath.TrimStart('/', '\\');
-
-            // Сохраняем в AppContext.BaseDirectory - где реально читаются файлы
-            var fullPath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
+            var fullPath = GetSafeConfigPath(configPath, AppContext.BaseDirectory);
 
             _logger.LogInformation("Сохранение конфигурации документа: {FilePath}", fullPath);
 
-            // Проверяем, существует ли директория
-            var directory = Path.GetDirectoryName(fullPath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-                _logger.LogDebug("Создана директория: {Directory}", directory);
-            }
-
-            // Сохраняем файл
+            // Сохраняем файл (директория Cfg/ уже должна существовать)
             await File.WriteAllTextAsync(fullPath, content, Encoding.UTF8);
 
             // Очищаем кэш для этого файла
@@ -348,6 +385,11 @@ public class ConfigurationService : IConfigurationService
 
             _logger.LogInformation("Конфигурация документа успешно сохранена: {FilePath}", fullPath);
             return true;
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Небезопасный путь к конфигурации: {FilePath}", configPath);
+            throw;
         }
         catch (Exception ex)
         {
