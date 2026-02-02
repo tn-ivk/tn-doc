@@ -1291,7 +1291,7 @@ jobs:
 
           # Получение информации о пакетах
           MINIMAL_PACKAGE=$(ls ./packages/tn.doc-[0-9]*.deb 2>/dev/null | head -n1 || echo "")
-          
+
           # Формирование сообщения
           MESSAGE="🚀 *TN_Doc Build Completed*
 
@@ -1309,7 +1309,7 @@ jobs:
           # Отправка файлов
           sleep 1
           [ -n "$MINIMAL_PACKAGE" ] && send_file "$MINIMAL_PACKAGE" "📦 TN_Doc Minimal v${VERSION}"
-          
+
           echo "Telegram notifications sent successfully"
 
   # ===========================================
@@ -1344,10 +1344,10 @@ jobs:
 
             ### Пакеты
             - **tn.doc** - Минимальный пакет (требует .NET Runtime)
-            
+
             ### Установка
             ```bash
-            
+
             # Или раздельная установка
             sudo dpkg -i tn.doc-*.deb
             ```

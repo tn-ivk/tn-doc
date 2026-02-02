@@ -219,7 +219,7 @@
             Настройки средств измерения не заданы
           </Message>
         </Panel>
-        
+
         <!-- База данных -->
         <Panel header="Подключение к БД" class="mt-3">
           <div v-if="hasDBConnections">
@@ -389,7 +389,7 @@
           </div>
           <MixedStateWarning v-if="isMixed('InvalidChars')" class="mt-2" />
         </Panel>
-        
+
       </div>
     </div>
   </div>
