@@ -50,12 +50,18 @@ function handleInput() {
 }
 
 function validateJson(content: string) {
+  const trimmed = content.trim();
+
+  if (!trimmed) {
+    validationError.value = 'JSON не может быть пустым';
+    emit('validation-error', validationError.value);
+    return;
+  }
+
   try {
-    if (content.trim()) {
-      JSON.parse(content);
-      validationError.value = null;
-      emit('validation-error', null);
-    }
+    JSON.parse(content);
+    validationError.value = null;
+    emit('validation-error', null);
   } catch (e: any) {
     validationError.value = e.message;
     emit('validation-error', e.message);
