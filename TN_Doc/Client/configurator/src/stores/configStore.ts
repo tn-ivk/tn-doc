@@ -67,8 +67,14 @@ export const useConfigStore = defineStore('config', () => {
         throw new Error(errorMessage);
       }
 
-      // Сохранение
+      // Сохранение основной конфигурации
       await apiService.saveConfig(currentConfig.value);
+
+      // Сохранение грязных конфигураций документов
+      for (const [configPath, content] of dirtyDocumentConfigs.value.entries()) {
+        await apiService.saveDocumentConfig(configPath, content);
+      }
+      dirtyDocumentConfigs.value.clear();
 
       // Обновляем оригинальную конфигурацию
       originalConfig.value = _.cloneDeep(currentConfig.value);
