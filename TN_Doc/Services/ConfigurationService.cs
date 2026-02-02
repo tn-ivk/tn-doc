@@ -372,7 +372,7 @@ public class ConfigurationService : IConfigurationService
 
         try
         {
-            var fullPath = GetSafeConfigPath(configPath, AppContext.BaseDirectory);
+            var fullPath = GetSafeConfigPath(configPath, _environment.ContentRootPath);
 
             _logger.LogInformation("Сохранение конфигурации документа: {FilePath}", fullPath);
 
