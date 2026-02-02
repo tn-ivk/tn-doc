@@ -102,74 +102,118 @@ public class StatusProvider : IStatusProvider
     }
 
     /// <summary>
-    /// Проверяет доступность устройства через подключение к его базе данных
+    /// Проверяет доступность устройства через подключение ко всем его базам данных
     /// </summary>
-    /// <param name="device">Устройство для проверки</param>
-    /// <param name="ct">Токен отмены операции</param>
-    /// <returns>Статус устройства с информацией о подключении и задержке</returns>
+    /// <param name="device">Конфигурация устройства</param>
+    /// <param name="ct">Токен отмены</param>
+    /// <returns>Статус устройства с информацией о подключении по всем каналам</returns>
     private async Task<DeviceStatus> CheckDeviceAsync(Device device, CancellationToken ct)
     {
-        var deviceStopwatch = Stopwatch.StartNew();
         var status = new DeviceStatus
         {
             Id = device.IdDevice.ToString(),
-            Name = device.Name ?? "Unknown",
+            Name = device.Name ?? $"Device {device.IdDevice}",
             Type = "database",
+            IsConnected = false,
+            IsFullyConnected = false
+        };
+
+        // Получаем все активные строки подключения
+        var activeConnectionStrings = device.DBConnectionStrings?
+            .Where(cs => cs.Use)
+            .ToList() ?? new List<DBConnectionString>();
+
+        if (activeConnectionStrings.Count == 0)
+        {
+            status.Error = "Отсутствуют активные строки подключения";
+            status.LastChecked = DateTime.Now;
+            return status;
+        }
+
+        // Проверяем все каналы параллельно
+        var channelTasks = activeConnectionStrings
+            .Select((cs, index) => CheckConnectionChannelAsync(cs, index + 1, ct));
+
+        var channels = await Task.WhenAll(channelTasks);
+        status.Channels = channels.ToList();
+        status.LastChecked = DateTime.Now;
+
+        // Вычисляем общий статус
+        var connectedChannels = channels.Where(c => c.IsConnected).ToList();
+        var totalChannels = channels.Length;
+
+        status.IsConnected = connectedChannels.Count > 0;
+        status.IsFullyConnected = connectedChannels.Count == totalChannels;
+
+        // Минимальная задержка среди работающих каналов
+        if (connectedChannels.Count > 0)
+        {
+            status.LatencyMs = connectedChannels
+                .Where(c => c.LatencyMs.HasValue)
+                .Min(c => c.LatencyMs);
+        }
+
+        // Формируем сообщение об ошибке если есть проблемы
+        var failedChannels = channels.Where(c => !c.IsConnected).ToList();
+        if (failedChannels.Count > 0)
+        {
+            status.Error = $"Нет связи: {string.Join(", ", failedChannels.Select(c => c.Name))}";
+        }
+
+        _logger.LogDebug(
+            "Устройство {DeviceName}: {ConnectedCount}/{TotalCount} каналов",
+            device.Name, connectedChannels.Count, totalChannels);
+
+        return status;
+    }
+
+    /// <summary>
+    /// Проверяет отдельный канал связи (строку подключения)
+    /// </summary>
+    private async Task<ConnectionChannel> CheckConnectionChannelAsync(
+        DBConnectionString dbConnectionString,
+        int channelIndex,
+        CancellationToken ct)
+    {
+        var channelStopwatch = Stopwatch.StartNew();
+        var channel = new ConnectionChannel
+        {
+            Name = !string.IsNullOrEmpty(dbConnectionString.Server)
+                ? dbConnectionString.Server
+                : $"Канал {channelIndex}",
             IsConnected = false
         };
 
-        _logger.LogDebug("Проверка устройства {DeviceName} (ID: {DeviceId})", device.Name, device.IdDevice);
-
         try
         {
-            // Получаем строку подключения из первого активного подключения
-            var dbConnectionString = device.DBConnectionStrings?
-                .FirstOrDefault(cs => cs.Use);
-
-            if (dbConnectionString == null)
-            {
-                throw new InvalidOperationException($"Отсутствует активная строка подключения для устройства {device.Name}");
-            }
-
-            // Получаем строку подключения с расшифрованным паролем через extension метод
+            // Получаем строку подключения с расшифрованным паролем
             var connectionString = dbConnectionString.GetConnectionString();
-
-            // Устанавливаем таймауты для проверки статуса
-            var csb = new MySqlConnectionStringBuilder(connectionString)
+            var builder = new MySqlConnectionStringBuilder(connectionString)
             {
-                ConnectionTimeout = 2,
-                DefaultCommandTimeout = 2
+                ConnectionTimeout = 2
             };
 
-            using var connection = new MySqlConnection(csb.ConnectionString);
+            await using var connection = new MySqlConnection(builder.ConnectionString);
             await connection.OpenAsync(ct);
+            await connection.PingAsync(ct);
 
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT 1";
-            command.CommandTimeout = 2;
-            await command.ExecuteScalarAsync(ct);
-
-            status.IsConnected = true;
-            status.LatencyMs = (int)deviceStopwatch.ElapsedMilliseconds;
-
-            _logger.LogDebug("Устройство {DeviceName} успешно подключено за {LatencyMs}мс",
-                device.Name, status.LatencyMs);
+            channel.IsConnected = true;
+            channel.LatencyMs = (int)channelStopwatch.ElapsedMilliseconds;
         }
         catch (OperationCanceledException)
         {
-            _logger.LogWarning("Проверка устройства {DeviceName} была отменена", device.Name);
-            status.Error = "Операция отменена";
+            channel.Error = "Операция отменена";
         }
         catch (Exception ex)
         {
-            _logger.LogWarning("Не удалось подключиться к устройству {DeviceName} за {ElapsedMs}мс", device.Name, deviceStopwatch.ElapsedMilliseconds);
-            status.Error = ex.Message;
+            channel.Error = ex.Message;
         }
         finally
         {
-            status.LastChecked = DateTime.Now;
+            channel.LastChecked = DateTime.Now;
         }
-        return status;
+
+        return channel;
     }
 
     /// <summary>

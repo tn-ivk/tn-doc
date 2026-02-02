@@ -63,7 +63,13 @@ export const useStatusStore = defineStore('status', () => {
       devices.value = devices.value.map(d => ({
         ...d,
         isConnected: false,
-        error: 'Нет связи с сервером'
+        isFullyConnected: false,
+        error: 'Нет связи с сервером',
+        channels: d.channels?.map(ch => ({
+          ...ch,
+          isConnected: false,
+          error: 'Нет связи с сервером'
+        })) || []
       }));
 
       services.value = {

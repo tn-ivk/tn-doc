@@ -1,6 +1,9 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using TN.DocData;
 using TN_Doc.Services.Validators;
@@ -14,13 +17,21 @@ namespace TN_Doc.Services;
 public class ConfigurationService : IConfigurationService
 {
     private readonly IAppConfigService _appConfigService;
+    private readonly IConfigurationCacheService _configCacheService;
+    private readonly IWebHostEnvironment _environment;
     private readonly OpcConfigValidator _opcValidator;
     private readonly DbConfigValidator _dbValidator;
     private readonly ILogger<ConfigurationService> _logger;
 
-    public ConfigurationService(IAppConfigService appConfigService, ILogger<ConfigurationService> logger)
+    public ConfigurationService(
+        IAppConfigService appConfigService,
+        IConfigurationCacheService configCacheService,
+        IWebHostEnvironment environment,
+        ILogger<ConfigurationService> logger)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
+        _configCacheService = configCacheService ?? throw new ArgumentNullException(nameof(configCacheService));
+        _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _opcValidator = new OpcConfigValidator();
         _dbValidator = new DbConfigValidator();
@@ -253,5 +264,137 @@ public class ConfigurationService : IConfigurationService
 
         // Обновляем устройства
         current.Devices = updated.Devices;
+    }
+
+    /// <summary>
+    /// Валидирует и нормализует путь к файлу конфигурации.
+    /// Защищает от path traversal атак (CWE-22).
+    /// </summary>
+    /// <param name="configPath">Относительный путь к файлу</param>
+    /// <param name="baseDirectory">Базовая директория</param>
+    /// <returns>Безопасный полный путь</returns>
+    /// <exception cref="ArgumentException">Если путь небезопасен</exception>
+    internal static string GetSafeConfigPath(string configPath, string baseDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(configPath))
+        {
+            throw new ArgumentException("Путь к файлу не может быть пустым", nameof(configPath));
+        }
+
+        // Запрещаем UNC пути (\\server\share, //server/share) - проверяем первыми
+        if (configPath.StartsWith("\\\\") || configPath.StartsWith("//"))
+        {
+            throw new ArgumentException("UNC пути запрещены", nameof(configPath));
+        }
+
+        // Запрещаем абсолютные пути с буквой диска (C:\..., D:\...)
+        // Path.IsPathRooted на Windows возвращает true для /path, поэтому проверяем явно
+        if (configPath.Length >= 2 && configPath[1] == ':')
+        {
+            throw new ArgumentException("Абсолютные пути запрещены", nameof(configPath));
+        }
+
+        // Нормализуем разделители и удаляем начальные слеши
+        var normalizedPath = configPath
+            .Replace('\\', '/')
+            .TrimStart('/');
+
+        // Запрещаем выход за пределы директории (..)
+        var segments = normalizedPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Any(s => s == ".."))
+        {
+            throw new ArgumentException("Путь содержит недопустимые сегменты", nameof(configPath));
+        }
+
+        // Разрешаем только директорию Cfg/
+        if (!normalizedPath.StartsWith("Cfg/", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Доступ разрешён только к директории Cfg/", nameof(configPath));
+        }
+
+        // Формируем полный путь
+        var fullPath = Path.GetFullPath(Path.Combine(baseDirectory, normalizedPath));
+
+        // Финальная проверка - путь должен быть внутри базовой директории
+        var normalizedBase = Path.GetFullPath(baseDirectory);
+        if (!fullPath.StartsWith(normalizedBase, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Путь выходит за пределы разрешённой директории", nameof(configPath));
+        }
+
+        return fullPath;
+    }
+
+    /// <summary>
+    /// Загрузить содержимое конфигурационного файла документа
+    /// </summary>
+    public async Task<string> LoadDocumentConfigAsync(string configPath)
+    {
+        try
+        {
+            var fullPath = GetSafeConfigPath(configPath, _environment.ContentRootPath);
+
+            _logger.LogDebug("Загрузка конфигурации документа: {FilePath}", fullPath);
+
+            if (!File.Exists(fullPath))
+            {
+                _logger.LogWarning("Файл конфигурации не найден: {FilePath}", fullPath);
+                throw new FileNotFoundException($"Файл конфигурации не найден: {configPath}");
+            }
+
+            var content = await File.ReadAllTextAsync(fullPath, Encoding.UTF8);
+            _logger.LogDebug("Конфигурация документа успешно загружена: {FilePath}", fullPath);
+
+            return content;
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Небезопасный путь к конфигурации: {FilePath}", configPath);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при загрузке конфигурации документа: {FilePath}", configPath);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Сохранить содержимое конфигурационного файла документа.
+    /// Сохраняет в AppContext.BaseDirectory для немедленного применения и корректной инвалидации кэша.
+    /// </summary>
+    public async Task<bool> SaveDocumentConfigAsync(string configPath, string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            throw new ArgumentException("Содержимое файла не может быть пустым", nameof(content));
+        }
+
+        try
+        {
+            var fullPath = GetSafeConfigPath(configPath, _environment.ContentRootPath);
+
+            _logger.LogInformation("Сохранение конфигурации документа: {FilePath}", fullPath);
+
+            // Сохраняем файл (директория Cfg/ уже должна существовать)
+            await File.WriteAllTextAsync(fullPath, content, Encoding.UTF8);
+
+            // Очищаем кэш для этого файла
+            _configCacheService.ClearCache(fullPath);
+            _logger.LogDebug("Кэш конфигурации очищен для файла: {FilePath}", fullPath);
+
+            _logger.LogInformation("Конфигурация документа успешно сохранена: {FilePath}", fullPath);
+            return true;
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Небезопасный путь к конфигурации: {FilePath}", configPath);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при сохранении конфигурации документа: {FilePath}", configPath);
+            return false;
+        }
     }
 }
