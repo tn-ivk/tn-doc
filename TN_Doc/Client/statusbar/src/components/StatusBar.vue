@@ -9,8 +9,7 @@
           :key="device.id"
           :label="device.name"
           :status="getDeviceStatus(device)"
-          :tooltip="`${device.name}: ${device.isConnected ? 'Подключено' : 'Отключено'}${device.error ? ` - ${device.error}` : ''}`"
-          @click="handleDeviceClick(device)"
+          :tooltip="getDeviceTooltip(device)"
         />
       </div>
 
@@ -19,13 +18,13 @@
         <StatusIndicator
           label="MS"
           :status="getServiceStatus(store.services.messagingService.isConnected, store.services.messagingService.error)"
-          tooltip="Messaging Service"
+          :tooltip="`Messaging Service: ${store.services.messagingService.isConnected ? 'Подключено' : 'Отключено'}`"
         />
         <StatusIndicator
           v-if="store.services.elis"
           label="ELIS"
           :status="getServiceStatus(store.services.elis.isConnected, store.services.elis.error)"
-          tooltip="Лабораторная система"
+          :tooltip="`ELIS: ${store.services.elis.isConnected ? 'Подключено' : 'Отключено'}`"
         />
       </div>
     </div>
@@ -43,12 +42,12 @@ import type { DeviceStatus, StatusResponse, IndicatorStatus } from '../types/sta
 const store = useStatusStore();
 const { connectionState, on } = useSignalR('/statusHub');
 
-// Автообновление каждые 10 секунд если SignalR не подключен
+// Автообновление каждые 60 секунд если SignalR не подключен
 const { pause, resume } = useIntervalFn(() => {
   if (connectionState.value !== 'connected') {
     store.fetchStatus();
   }
-}, 10000);
+}, 60000);
 
 // SignalR real-time обновления
 on('statusUpdated', (data: StatusResponse) => {
@@ -60,21 +59,62 @@ onMounted(() => {
   store.fetchStatus();
 });
 
-function handleDeviceClick(device: DeviceStatus) {
-  console.log('Device clicked:', device);
-  // Будущее: показать модальное окно с деталями устройства
-}
-
 function getDeviceStatus(device: DeviceStatus): IndicatorStatus {
-  if (device.isConnected) {
-    return 'online';
-  }
   // Если есть ошибка "Нет связи с сервером", то это ndv (недостоверно)
   if (device.error?.includes('Нет связи с сервером')) {
     return 'ndv';
   }
-  // Иначе устройство просто не на связи
+
+  // Все каналы работают — зелёный
+  if (device.isFullyConnected) {
+    return 'online';
+  }
+
+  // Хотя бы один канал работает, но не все — жёлтый
+  if (device.isConnected) {
+    return 'warning';
+  }
+
+  // Ни один канал не работает — красный
   return 'offline';
+}
+
+function getDeviceTooltip(device: DeviceStatus): string {
+  const channels = device.channels || [];
+  const totalChannels = channels.length;
+  const connectedChannels = channels.filter(c => c.isConnected).length;
+
+  // Если нет связи с сервером
+  if (device.error?.includes('Нет связи с сервером')) {
+    return `${device.name}: Нет связи с сервером (статус неизвестен)`;
+  }
+
+  // Заголовок с общим статусом
+  let statusText: string;
+  if (device.isFullyConnected) {
+    statusText = 'Подключено';
+  } else if (device.isConnected) {
+    statusText = 'Частичное подключение';
+  } else {
+    statusText = 'Отключено';
+  }
+
+  const header = `${device.name}: ${statusText} (${connectedChannels}/${totalChannels})`;
+
+  // Если нет каналов — возвращаем только заголовок
+  if (totalChannels === 0) {
+    return `${device.name}: Нет настроенных каналов`;
+  }
+
+  // Формируем детальную информацию по каналам
+  const channelLines = channels.map(channel => {
+    const icon = channel.isConnected ? '\u2713' : '\u2717';
+    const latency = channel.isConnected && channel.latencyMs ? ` ${channel.latencyMs}ms` : '';
+    const error = !channel.isConnected && channel.error ? ` - ${channel.error}` : '';
+    return `${icon} ${channel.name}${latency}${error}`;
+  });
+
+  return `${header}\n${channelLines.join('\n')}`;
 }
 
 function getServiceStatus(isConnected: boolean, error?: string): IndicatorStatus {
