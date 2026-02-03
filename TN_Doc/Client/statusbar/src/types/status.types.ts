@@ -2,6 +2,17 @@
  * Типы для статус-бара TN_Doc
  */
 
+export interface CircuitBreakerInfo {
+  isBlocked: boolean;
+  state: 'Closed' | 'Open' | 'HalfOpen';
+  errorCategory?: 'Authentication' | 'Network' | 'Other';
+  lastError?: string;
+  failureCount: number;
+  maxRetryReached: boolean;
+  currentBackoffSeconds: number;
+  secondsUntilNextAttempt?: number;
+}
+
 export interface ConnectionChannel {
   name: string;
   isConnected: boolean;
@@ -23,6 +34,8 @@ export interface DeviceStatus {
   error?: string;
   /** Информация по каждому каналу связи */
   channels: ConnectionChannel[];
+  /** Circuit Breaker информация для диагностики */
+  circuitBreaker?: CircuitBreakerInfo;
 }
 
 export interface ConnectionStatus {

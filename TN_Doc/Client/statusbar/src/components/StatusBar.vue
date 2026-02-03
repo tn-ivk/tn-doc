@@ -10,6 +10,7 @@
           :label="device.name"
           :status="getDeviceStatus(device)"
           :tooltip="getDeviceTooltip(device)"
+          @click="store.openDeviceDiagnostics(device.id)"
         />
       </div>
 
@@ -19,15 +20,20 @@
           label="MS"
           :status="getServiceStatus(store.services.messagingService.isConnected, store.services.messagingService.error)"
           :tooltip="`Messaging Service: ${store.services.messagingService.isConnected ? 'Подключено' : 'Отключено'}`"
+          :clickable="false"
         />
         <StatusIndicator
           v-if="store.services.elis"
           label="ELIS"
           :status="getServiceStatus(store.services.elis.isConnected, store.services.elis.error)"
           :tooltip="`ELIS: ${store.services.elis.isConnected ? 'Подключено' : 'Отключено'}`"
+          :clickable="false"
         />
       </div>
     </div>
+
+    <!-- Диагностическое окно -->
+    <DeviceDiagnosticsDialog />
   </div>
 </template>
 
@@ -37,6 +43,7 @@ import { useStatusStore } from '../stores/statusStore';
 import { useSignalR } from '../composables/useSignalR';
 import { useIntervalFn } from '@vueuse/core';
 import StatusIndicator from './StatusIndicator.vue';
+import DeviceDiagnosticsDialog from './DeviceDiagnosticsDialog.vue';
 import type { DeviceStatus, StatusResponse, IndicatorStatus } from '../types/status.types';
 
 const store = useStatusStore();

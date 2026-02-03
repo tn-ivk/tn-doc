@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -12,10 +13,12 @@ namespace TN_Doc.Hubs
     public class StatusHub : Hub
     {
         private readonly ILogger<StatusHub> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
-        public StatusHub(ILogger<StatusHub> logger)
+        public StatusHub(ILogger<StatusHub> logger, IServiceProvider serviceProvider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public override async Task OnConnectedAsync()
@@ -24,6 +27,26 @@ namespace TN_Doc.Hubs
             _logger.LogInformation(
                 "StatusHub: Client connected - ConnectionId: {ConnectionId}, IP: {ClientIP}",
                 Context.ConnectionId, clientIp);
+
+            // Внеочередной опрос всех устройств при подключении клиента
+            // Это позволяет восстановить заблокированные устройства при переоткрытии браузера
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var statusProvider = scope.ServiceProvider.GetRequiredService<IStatusProvider>();
+                var status = await statusProvider.GetStatusAsync();
+                await Clients.Caller.SendAsync("statusUpdated", status);
+
+                _logger.LogDebug(
+                    "StatusHub: Sent initial status to {ConnectionId} - {DeviceCount} devices",
+                    Context.ConnectionId, status.Devices.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "StatusHub: Failed to send initial status to {ConnectionId}",
+                    Context.ConnectionId);
+            }
 
             await base.OnConnectedAsync();
         }

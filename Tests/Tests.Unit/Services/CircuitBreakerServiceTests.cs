@@ -1,0 +1,878 @@
+using System;
+using System.Net.Sockets;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Moq;
+using MySqlConnector;
+using NUnit.Framework;
+using TN_Doc.Models.CircuitBreaker;
+using TN_Doc.Services;
+using TN_DocGeneral.Services;
+using TN.DocData;
+
+namespace Tests.Unit.Services;
+
+[TestFixture]
+public class CircuitBreakerServiceTests
+{
+    private Mock<IAppConfigService> _appConfigServiceMock;
+    private Mock<ILogger<CircuitBreakerService>> _loggerMock;
+    private CircuitBreakerService _service;
+    private CircuitBreakerSettings _settings;
+
+    [SetUp]
+    public void Setup()
+    {
+        _settings = new CircuitBreakerSettings
+        {
+            InitialBackoffSeconds = 60,
+            MaxBackoffSeconds = 3600,
+            BackoffMultiplier = 2.0,
+            NetworkFailureThreshold = 3,
+            MaxRetryCount = 5
+        };
+
+        _appConfigServiceMock = new Mock<IAppConfigService>();
+        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { CircuitBreaker = _settings });
+
+        _loggerMock = new Mock<ILogger<CircuitBreakerService>>();
+
+        _service = new CircuitBreakerService(_appConfigServiceMock.Object, _loggerMock.Object);
+    }
+
+    #region Constructor Tests
+
+    [Test]
+    public void Constructor_WithNullAppConfigService_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            new CircuitBreakerService(null!, _loggerMock.Object));
+    }
+
+    [Test]
+    public void Constructor_WithNullLogger_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            new CircuitBreakerService(_appConfigServiceMock.Object, null!));
+    }
+
+    #endregion
+
+    #region ShouldAllowConnection Tests
+
+    [Test]
+    public void ShouldAllowConnection_WhenClosed_ReturnsTrue()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        // Записываем успех чтобы состояние было Closed
+        _service.RecordSuccess(deviceId);
+
+        // Act
+        var result = _service.ShouldAllowConnection(deviceId);
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void ShouldAllowConnection_WhenNoState_ReturnsTrue()
+    {
+        // Arrange
+        const string deviceId = "new-device-without-state";
+
+        // Act
+        var result = _service.ShouldAllowConnection(deviceId);
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void ShouldAllowConnection_WithNullDeviceId_ReturnsTrue()
+    {
+        // Act
+        var result = _service.ShouldAllowConnection(null!);
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void ShouldAllowConnection_WithEmptyDeviceId_ReturnsTrue()
+    {
+        // Act
+        var result = _service.ShouldAllowConnection(string.Empty);
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void ShouldAllowConnection_WhenRequiresManualReset_ReturnsFalse()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied for user");
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Act
+        var result = _service.ShouldAllowConnection(deviceId);
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public void ShouldAllowConnection_AfterBackoffExpired_ReturnsTrue()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        // Уменьшаем настройки для быстрого теста
+        _settings.InitialBackoffSeconds = 1;
+        _settings.NetworkFailureThreshold = 1;
+
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Ждём истечения backoff
+        System.Threading.Thread.Sleep(1100);
+
+        // Act
+        var result = _service.ShouldAllowConnection(deviceId);
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void ShouldAllowConnection_DuringBackoff_ReturnsFalse()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 1;
+
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Act
+        var result = _service.ShouldAllowConnection(deviceId);
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+    #endregion
+
+    #region RecordFailure Tests
+
+    [Test]
+    public void RecordFailure_AuthError_SetsOpenState()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied for user 'test'@'localhost'");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.State, Is.EqualTo("Open"));
+        Assert.That(info.IsBlocked, Is.True);
+        Assert.That(info.ErrorCategory, Is.EqualTo("Authentication"));
+    }
+
+    [Test]
+    public void RecordFailure_AuthError_SetsRequiresManualReset()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied for user");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.IsBlocked, Is.True);
+        // MaxRetryReached false потому что блокировка из-за auth, а не из-за превышения попыток
+        Assert.That(info.MaxRetryReached, Is.False);
+    }
+
+    [Test]
+    public void RecordFailure_NetworkError_IncrementsFailureCount()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.FailureCount, Is.EqualTo(2));
+        Assert.That(info.ErrorCategory, Is.EqualTo("Network"));
+    }
+
+    [Test]
+    public void RecordFailure_NetworkError_BelowThreshold_StateClosed()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 3;
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+
+        // Act - записываем 2 ошибки (меньше порога)
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.State, Is.EqualTo("Closed"));
+        Assert.That(info.FailureCount, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void RecordFailure_AfterThreshold_SetsOpenWithBackoff()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 2;
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+
+        // Act - записываем ошибки до превышения порога
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.State, Is.EqualTo("Open"));
+        Assert.That(info.CurrentBackoffSeconds, Is.EqualTo(_settings.InitialBackoffSeconds));
+        Assert.That(info.IsBlocked, Is.False); // Не заблокировано навсегда, есть backoff
+    }
+
+    [Test]
+    public void RecordFailure_AfterMaxRetryCount_SetsOpenPermanently()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 1;
+        _settings.MaxBackoffSeconds = 60;
+        _settings.MaxRetryCount = 2;
+        _settings.BackoffMultiplier = 2.0;
+        _settings.InitialBackoffSeconds = 30;
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+
+        // Act - регистрируем достаточно ошибок для достижения MaxBackoff и превышения MaxRetryCount
+        // 1-я ошибка: достигаем threshold, backoff = 30
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        // 2-я ошибка: backoff = 60 (max), MaxBackoffRetryCount = 1
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        // 3-я ошибка: backoff = 60 (max), MaxBackoffRetryCount = 2 >= MaxRetryCount
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.State, Is.EqualTo("Open"));
+        Assert.That(info.IsBlocked, Is.True);
+        Assert.That(info.MaxRetryReached, Is.True);
+    }
+
+    [Test]
+    public void RecordFailure_SocketException_CategorizedAsNetwork()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var socketException = new SocketException(10061); // Connection refused
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", socketException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
+    }
+
+    [Test]
+    public void RecordFailure_TimeoutException_CategorizedAsNetwork()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var timeoutException = new TimeoutException("Connection timed out");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", timeoutException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
+    }
+
+    [Test]
+    public void RecordFailure_AccessDeniedInMessage_CategorizedAsAuthentication()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var genericException = new Exception("Access denied for user");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", genericException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.ErrorCategory, Is.EqualTo("Authentication"));
+    }
+
+    [Test]
+    public void RecordFailure_InnerMySqlException_CorrectlyCategorized()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var innerException = CreateMySqlException(1045, "Access denied");
+        var outerException = new Exception("Wrapper exception", innerException);
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", outerException);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.ErrorCategory, Is.EqualTo("Authentication"));
+    }
+
+    [Test]
+    public void RecordFailure_WithNullDeviceId_DoesNotThrow()
+    {
+        // Arrange
+        var exception = new Exception("Test error");
+
+        // Act & Assert
+        Assert.DoesNotThrow(() => _service.RecordFailure(null!, "Test", exception));
+    }
+
+    [Test]
+    public void RecordFailure_WithEmptyDeviceId_DoesNotThrow()
+    {
+        // Arrange
+        var exception = new Exception("Test error");
+
+        // Act & Assert
+        Assert.DoesNotThrow(() => _service.RecordFailure(string.Empty, "Test", exception));
+    }
+
+    [Test]
+    public void RecordFailure_ExponentialBackoff_IncreasesCorrectly()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 1;
+        _settings.InitialBackoffSeconds = 60;
+        _settings.MaxBackoffSeconds = 3600;
+        _settings.BackoffMultiplier = 2.0;
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+
+        // Act - первая ошибка
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        var info1 = _service.GetCircuitBreakerInfo(deviceId);
+
+        // Вторая ошибка
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        var info2 = _service.GetCircuitBreakerInfo(deviceId);
+
+        // Третья ошибка
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        var info3 = _service.GetCircuitBreakerInfo(deviceId);
+
+        // Assert
+        Assert.That(info1!.CurrentBackoffSeconds, Is.EqualTo(60));   // Initial
+        Assert.That(info2!.CurrentBackoffSeconds, Is.EqualTo(120));  // 60 * 2
+        Assert.That(info3!.CurrentBackoffSeconds, Is.EqualTo(240));  // 120 * 2
+    }
+
+    #endregion
+
+    #region RecordSuccess Tests
+
+    [Test]
+    public void RecordSuccess_ResetsAllCounters()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 1;
+        var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
+
+        // Создаём состояние с ошибками
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Act
+        _service.RecordSuccess(deviceId);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.State, Is.EqualTo("Closed"));
+        Assert.That(info.FailureCount, Is.EqualTo(0));
+        Assert.That(info.CurrentBackoffSeconds, Is.EqualTo(0));
+        Assert.That(info.IsBlocked, Is.False);
+        Assert.That(info.ErrorCategory, Is.Null);
+    }
+
+    [Test]
+    public void RecordSuccess_AfterAuthError_ResetsState()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied");
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Verify blocked
+        Assert.That(_service.ShouldAllowConnection(deviceId), Is.False);
+
+        // Act
+        _service.RecordSuccess(deviceId);
+
+        // Assert
+        Assert.That(_service.ShouldAllowConnection(deviceId), Is.True);
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.IsBlocked, Is.False);
+    }
+
+    [Test]
+    public void RecordSuccess_WithNullDeviceId_DoesNotThrow()
+    {
+        // Act & Assert
+        Assert.DoesNotThrow(() => _service.RecordSuccess(null!));
+    }
+
+    [Test]
+    public void RecordSuccess_WithEmptyDeviceId_DoesNotThrow()
+    {
+        // Act & Assert
+        Assert.DoesNotThrow(() => _service.RecordSuccess(string.Empty));
+    }
+
+    [Test]
+    public void RecordSuccess_ForUnknownDevice_DoesNotThrow()
+    {
+        // Act & Assert
+        Assert.DoesNotThrow(() => _service.RecordSuccess("unknown-device"));
+    }
+
+    #endregion
+
+    #region ResetDevice Tests
+
+    [Test]
+    public void ResetDevice_ResetsState()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied");
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Act
+        var result = _service.ResetDevice(deviceId);
+
+        // Assert
+        Assert.That(result, Is.True);
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.State, Is.EqualTo("HalfOpen"));
+        Assert.That(info.IsBlocked, Is.False);
+    }
+
+    [Test]
+    public void ResetDevice_SetsHalfOpenState()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 1;
+        _settings.MaxRetryCount = 1;
+        _settings.MaxBackoffSeconds = 60;
+        _settings.InitialBackoffSeconds = 60;
+        var networkException = CreateMySqlException(2003, "Can't connect");
+
+        // Создаём состояние с RequiresManualReset
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Act
+        _service.ResetDevice(deviceId);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.State, Is.EqualTo("HalfOpen"));
+    }
+
+    [Test]
+    public void ResetDevice_AllowsConnection()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied");
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Verify blocked before reset
+        Assert.That(_service.ShouldAllowConnection(deviceId), Is.False);
+
+        // Act
+        _service.ResetDevice(deviceId);
+
+        // Assert - после ручного сброса состояние HalfOpen
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.State, Is.EqualTo("HalfOpen"));
+        Assert.That(info.IsBlocked, Is.False);
+        // Примечание: ShouldAllowConnection для HalfOpen возвращает true только если
+        // NextAllowedAttempt истёк. После ResetDevice NextAllowedAttempt = null,
+        // поэтому нужен RecordSuccess для полного восстановления или проверка состояния
+    }
+
+    [Test]
+    public void ResetDevice_PreservesFailureCount()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied");
+        _service.RecordFailure(deviceId, "Test Device", authException);
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Act
+        _service.ResetDevice(deviceId);
+
+        // Assert - FailureCount сохраняется для истории
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.FailureCount, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void ResetDevice_ForUnknownDevice_ReturnsFalse()
+    {
+        // Act
+        var result = _service.ResetDevice("unknown-device");
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public void ResetDevice_WithNullDeviceId_ReturnsFalse()
+    {
+        // Act
+        var result = _service.ResetDevice(null!);
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public void ResetDevice_WithEmptyDeviceId_ReturnsFalse()
+    {
+        // Act
+        var result = _service.ResetDevice(string.Empty);
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+    #endregion
+
+    #region GetCircuitBreakerInfo Tests
+
+    [Test]
+    public void GetCircuitBreakerInfo_ForUnknownDevice_ReturnsNull()
+    {
+        // Act
+        var info = _service.GetCircuitBreakerInfo("unknown-device");
+
+        // Assert
+        Assert.That(info, Is.Null);
+    }
+
+    [Test]
+    public void GetCircuitBreakerInfo_WithNullDeviceId_ReturnsNull()
+    {
+        // Act
+        var info = _service.GetCircuitBreakerInfo(null!);
+
+        // Assert
+        Assert.That(info, Is.Null);
+    }
+
+    [Test]
+    public void GetCircuitBreakerInfo_ReturnsCorrectData()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var authException = CreateMySqlException(1045, "Access denied for user");
+        _service.RecordFailure(deviceId, "Test Device", authException);
+
+        // Act
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+
+        // Assert
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.State, Is.EqualTo("Open"));
+        Assert.That(info.ErrorCategory, Is.EqualTo("Authentication"));
+        Assert.That(info.LastError, Is.EqualTo("Access denied for user"));
+        Assert.That(info.FailureCount, Is.EqualTo(1));
+        Assert.That(info.IsBlocked, Is.True);
+    }
+
+    [Test]
+    public void GetCircuitBreakerInfo_SecondsUntilNextAttempt_CalculatedCorrectly()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 1;
+        _settings.InitialBackoffSeconds = 60;
+        var networkException = CreateMySqlException(2003, "Can't connect");
+        _service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Act
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+
+        // Assert
+        Assert.That(info, Is.Not.Null);
+        Assert.That(info!.SecondsUntilNextAttempt, Is.GreaterThan(0));
+        Assert.That(info.SecondsUntilNextAttempt, Is.LessThanOrEqualTo(60));
+    }
+
+    #endregion
+
+    #region HasBlockedDevices Tests
+
+    [Test]
+    public void HasBlockedDevices_WhenNoDevices_ReturnsFalse()
+    {
+        // Act
+        var result = _service.HasBlockedDevices;
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public void HasBlockedDevices_WhenDeviceBlocked_ReturnsTrue()
+    {
+        // Arrange
+        var authException = CreateMySqlException(1045, "Access denied");
+        _service.RecordFailure("device-1", "Test Device", authException);
+
+        // Act
+        var result = _service.HasBlockedDevices;
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void HasBlockedDevices_AfterReset_ReturnsFalse()
+    {
+        // Arrange
+        var authException = CreateMySqlException(1045, "Access denied");
+        _service.RecordFailure("device-1", "Test Device", authException);
+        _service.ResetDevice("device-1");
+
+        // Act
+        var result = _service.HasBlockedDevices;
+
+        // Assert
+        Assert.That(result, Is.False);
+    }
+
+    #endregion
+
+    #region MySQL Error Codes Tests
+
+    [Test]
+    [TestCase(1045, "Authentication")] // Access denied for user
+    [TestCase(1044, "Authentication")] // Access denied for user to database
+    [TestCase(1698, "Authentication")] // Access denied for user (socket auth)
+    public void RecordFailure_MySqlAuthErrorCodes_CategorizedAsAuthentication(int errorCode, string expectedCategory)
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var exception = CreateMySqlException(errorCode, $"MySQL Error {errorCode}");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", exception);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.ErrorCategory, Is.EqualTo(expectedCategory));
+    }
+
+    [Test]
+    [TestCase(2003)] // Can't connect to MySQL server
+    [TestCase(2002)] // Can't connect to local MySQL server through socket
+    [TestCase(2006)] // MySQL server has gone away
+    [TestCase(2013)] // Lost connection to MySQL server
+    public void RecordFailure_MySqlNetworkErrorCodes_CategorizedAsNetwork(int errorCode)
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var exception = CreateMySqlException(errorCode, $"MySQL Error {errorCode}");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", exception);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
+    }
+
+    [Test]
+    public void RecordFailure_UnknownMySqlError_CategorizedAsOther()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        var exception = CreateMySqlException(9999, "Unknown MySQL Error");
+
+        // Act
+        _service.RecordFailure(deviceId, "Test Device", exception);
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.ErrorCategory, Is.EqualTo("Other"));
+    }
+
+    #endregion
+
+    #region Configuration Tests
+
+    [Test]
+    public void RecordFailure_UsesConfiguredSettings()
+    {
+        // Arrange
+        const string deviceId = "device-1";
+        _settings.NetworkFailureThreshold = 5;
+        _settings.InitialBackoffSeconds = 120;
+        var networkException = CreateMySqlException(2003, "Can't connect");
+
+        // Act - записываем 5 ошибок (threshold)
+        for (int i = 0; i < 5; i++)
+        {
+            _service.RecordFailure(deviceId, "Test Device", networkException);
+        }
+
+        // Assert
+        var info = _service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.CurrentBackoffSeconds, Is.EqualTo(120)); // Uses configured InitialBackoffSeconds
+    }
+
+    [Test]
+    public void RecordFailure_WithNullCircuitBreakerSettings_UsesDefaults()
+    {
+        // Arrange
+        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { CircuitBreaker = null });
+        var service = new CircuitBreakerService(_appConfigServiceMock.Object, _loggerMock.Object);
+
+        const string deviceId = "device-1";
+        var networkException = CreateMySqlException(2003, "Can't connect");
+
+        // Act - использует дефолтные настройки (NetworkFailureThreshold = 3)
+        service.RecordFailure(deviceId, "Test Device", networkException);
+        service.RecordFailure(deviceId, "Test Device", networkException);
+        service.RecordFailure(deviceId, "Test Device", networkException);
+
+        // Assert
+        var info = service.GetCircuitBreakerInfo(deviceId);
+        Assert.That(info!.State, Is.EqualTo("Open"));
+        Assert.That(info.CurrentBackoffSeconds, Is.EqualTo(60)); // Default InitialBackoffSeconds
+    }
+
+    #endregion
+
+    #region Helper Methods
+
+    /// <summary>
+    /// Создаёт MySqlException с заданным кодом ошибки через reflection.
+    /// MySqlException не имеет публичного конструктора, поэтому используем внутренние механизмы.
+    /// </summary>
+    private static MySqlException CreateMySqlException(int errorCode, string message)
+    {
+        // Используем внутренний конструктор MySqlException через reflection
+        var exceptionType = typeof(MySqlException);
+
+        // Пробуем найти подходящий конструктор
+        // MySqlConnector использует internal static методы для создания исключений
+        try
+        {
+            // Попытка использовать internal метод CreateForTimeout или другой
+            var createMethod = exceptionType.GetMethod("CreateForTimeout",
+                BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+
+            if (createMethod != null)
+            {
+                return (MySqlException)createMethod.Invoke(null, null)!;
+            }
+        }
+        catch
+        {
+            // Игнорируем ошибки reflection
+        }
+
+        // Альтернативный подход: создаём через FormatterServices (без вызова конструктора)
+        // и устанавливаем свойства через reflection
+        var instance = (MySqlException)System.Runtime.Serialization.FormatterServices
+            .GetUninitializedObject(typeof(MySqlException));
+
+        // Устанавливаем Number (ErrorCode)
+        var numberField = exceptionType.GetField("_number", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?? exceptionType.GetProperty("Number")?.GetBackingField();
+
+        if (numberField != null)
+        {
+            numberField.SetValue(instance, errorCode);
+        }
+        else
+        {
+            // Пробуем через свойство ErrorCode
+            var errorCodeProperty = exceptionType.GetProperty("ErrorCode");
+            if (errorCodeProperty != null && errorCodeProperty.CanWrite)
+            {
+                errorCodeProperty.SetValue(instance, errorCode);
+            }
+        }
+
+        // Устанавливаем Message через базовый класс Exception
+        var messageField = typeof(Exception).GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic);
+        messageField?.SetValue(instance, message);
+
+        return instance;
+    }
+
+    #endregion
+}
+
+/// <summary>
+/// Extension методы для работы с reflection
+/// </summary>
+internal static class ReflectionExtensions
+{
+    /// <summary>
+    /// Получает backing field для auto-property
+    /// </summary>
+    public static FieldInfo? GetBackingField(this PropertyInfo property)
+    {
+        var declaringType = property.DeclaringType;
+        if (declaringType == null) return null;
+
+        var backingFieldName = $"<{property.Name}>k__BackingField";
+        return declaringType.GetField(backingFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+    }
+}

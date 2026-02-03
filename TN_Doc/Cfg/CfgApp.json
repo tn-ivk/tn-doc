@@ -3502,5 +3502,12 @@
       "UpdateRate": 500,
       "StartPrefix": "root.ARM.Reports"
     }
+  },
+  "CircuitBreaker": {
+    "InitialBackoffSeconds": 60,
+    "MaxBackoffSeconds": 3600,
+    "BackoffMultiplier": 2.0,
+    "NetworkFailureThreshold": 3,
+    "MaxRetryCount": 24
   }
 }

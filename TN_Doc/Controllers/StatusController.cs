@@ -17,6 +17,7 @@ namespace TN_Doc.Controllers;
 public class StatusController : ControllerBase
 {
     private readonly IStatusProvider _statusProvider;
+    private readonly ICircuitBreakerService _circuitBreaker;
     private readonly IMemoryCache _cache;
     private readonly ILogger<StatusController> _logger;
 
@@ -25,10 +26,12 @@ public class StatusController : ControllerBase
 
     public StatusController(
         IStatusProvider statusProvider,
+        ICircuitBreakerService circuitBreaker,
         IMemoryCache cache,
         ILogger<StatusController> logger)
     {
         _statusProvider = statusProvider ?? throw new ArgumentNullException(nameof(statusProvider));
+        _circuitBreaker = circuitBreaker ?? throw new ArgumentNullException(nameof(circuitBreaker));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -141,6 +144,55 @@ public class StatusController : ControllerBase
             return StatusCode(500, new
             {
                 error = "Failed to refresh status",
+                details = ex.Message
+            });
+        }
+    }
+
+    /// <summary>
+    /// Принудительная проверка устройства (сброс Circuit Breaker и повторная попытка)
+    /// </summary>
+    /// <param name="deviceId">ID устройства</param>
+    /// <returns>Статус устройства после проверки</returns>
+    [HttpPost("device/{deviceId}/retry")]
+    [ProducesResponseType(typeof(DeviceStatus), 200)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> RetryDevice(string deviceId)
+    {
+        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        _logger.LogInformation("Device retry requested for {DeviceId} by {ClientIP}", deviceId, clientIp);
+
+        try
+        {
+            // Выполняем проверку устройства (с автоматическим сбросом Circuit Breaker)
+            var deviceStatus = await _statusProvider.CheckDeviceAsync(deviceId, HttpContext.RequestAborted);
+
+            if (deviceStatus == null)
+            {
+                _logger.LogWarning("Device {DeviceId} not found for retry request from {ClientIP}",
+                    deviceId, clientIp);
+                return NotFound(new { error = $"Device {deviceId} not found" });
+            }
+
+            // Инвалидируем кэш статуса
+            _cache.Remove(CacheKey);
+
+            _logger.LogInformation(
+                "Device {DeviceId} retry completed by {ClientIP}. Connected: {IsConnected}, FullyConnected: {IsFullyConnected}",
+                deviceId, clientIp, deviceStatus.IsConnected, deviceStatus.IsFullyConnected);
+
+            return Ok(deviceStatus);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to retry device {DeviceId} for {ClientIP}: {ErrorMessage}",
+                deviceId, clientIp, ex.Message);
+
+            return StatusCode(500, new
+            {
+                error = "Failed to retry device",
                 details = ex.Message
             });
         }
