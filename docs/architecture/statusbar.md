@@ -103,13 +103,23 @@ classDiagram
         +overallHealth: HealthStatus
     }
 
+    class ConnectionChannel {
+        +name: string
+        +isConnected: boolean
+        +latencyMs: number
+        +error: string
+        +lastChecked: Date
+    }
+
     class DeviceStatus {
         +id: string
         +name: string
         +type: string
         +isConnected: boolean
+        +isFullyConnected: boolean
         +latencyMs: number
         +error: string
+        +channels: ConnectionChannel[]
     }
 
     class ServiceStatus {
@@ -119,6 +129,7 @@ classDiagram
 
     StatusStore --> DeviceStatus
     StatusStore --> ServiceStatus
+    DeviceStatus --> ConnectionChannel
 ```
 
 ## Indicator Status States
@@ -146,6 +157,36 @@ stateDiagram-v2
 | **offline** | Красный (мигание) | `pi-times-circle` | Устройство/сервис не на связи |
 | **ndv** | Серый | `pi-question-circle` | Недостоверно (нет связи с сервером) |
 | **warning** | Желтый | `pi-exclamation-triangle` | Предаварийная ситуация |
+
+## Многоканальная проверка статуса (v1.4.4+)
+
+### Модель данных
+
+- **ConnectionChannel** — информация о канале связи (строке подключения)
+  - `name`: имя канала
+  - `isConnected`: статус подключения
+  - `latencyMs`: задержка
+  - `error`: сообщение об ошибке
+
+- **DeviceStatus** расширен полями:
+  - `isFullyConnected`: все каналы связи работают
+  - `channels`: список каналов связи
+
+### Трёхцветная индикация
+
+| Состояние | Цвет | Условие |
+|-----------|------|---------|
+| Полное подключение | Зелёный | Все каналы работают (isFullyConnected = true) |
+| Частичное подключение | Жёлтый | Хотя бы один канал работает (isConnected = true, isFullyConnected = false) |
+| Нет подключения | Красный | Нет работающих каналов (isConnected = false) |
+
+### Tooltip
+
+При наведении на индикатор показывается детальная информация по каждому каналу:
+- Имя канала
+- Статус (подключен/не подключен)
+- Задержка в мс
+- Сообщение об ошибке (если есть)
 
 ### Visual States Animation
 

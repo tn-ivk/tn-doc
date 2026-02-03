@@ -20,6 +20,12 @@
     - OPC настроек
     - Недопустимых символов
 
+- **Вкладка "Документы"**:
+  - Древовидная структура типов документов
+  - JSON-редактор с подсветкой синтаксиса (Monaco Editor)
+  - Панель редактирования конфигураций с предпросмотром
+  - Валидация JSON перед сохранением
+
 ## Технологический стек
 
 ### Frontend
@@ -74,6 +80,8 @@ npm run build:all
 - `GET /api/configurator/config` - получить конфигурацию
 - `POST /api/configurator/config` - сохранить конфигурацию
 - `POST /api/configurator/validate` - валидировать конфигурацию
+- `GET /api/configurator/document-config?configPath=...` - загрузить конфигурацию документа
+- `POST /api/configurator/document-config` - сохранить конфигурацию документа
 
 ## Структура проекта
 
@@ -87,7 +95,11 @@ configurator/
 │   │   ├── DeviceList.vue       # Список устройств
 │   │   ├── DeviceEditor.vue     # Редактор устройств
 │   │   ├── OpcSettings.vue      # Компонент OPC настроек
-│   │   └── MixedStateWarning.vue # Индикатор смешанного состояния
+│   │   ├── MixedStateWarning.vue # Индикатор смешанного состояния
+│   │   ├── DocumentsTab.vue     # Вкладка документов
+│   │   ├── DocumentTree.vue     # Древовидная структура документов
+│   │   ├── DocumentConfigEditor.vue # Редактор конфигурации документа
+│   │   └── JsonConfigEditor.vue # JSON редактор с подсветкой
 │   ├── stores/
 │   │   └── configStore.ts       # Pinia store
 │   ├── services/

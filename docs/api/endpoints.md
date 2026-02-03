@@ -383,6 +383,60 @@ POST /api/configurator/validate
 }
 ```
 
+#### Загрузить конфигурацию документа
+
+```http
+GET /api/configurator/document-config
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| configPath | string | Yes | Относительный путь к файлу конфигурации (например: Cfg/CfgPassport.json) |
+
+**Response:**
+```
+Content-Type: application/json
+
+{содержимое JSON-файла}
+```
+
+**Error Responses:**
+- 400: Путь к файлу не может быть пустым / Небезопасный путь
+- 404: Файл конфигурации не найден
+- 500: Внутренняя ошибка сервера
+
+#### Сохранить конфигурацию документа
+
+```http
+POST /api/configurator/document-config
+```
+
+**Request Body:**
+```json
+{
+  "configPath": "Cfg/CfgPassport.json",
+  "content": "{...JSON содержимое...}"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Конфигурация документа успешно сохранена"
+}
+```
+
+**Error Responses:**
+- 400: Путь и содержимое файла обязательны / Невалидный JSON / Небезопасный путь
+- 500: Не удалось сохранить конфигурацию документа
+
+**Безопасность:**
+- Доступ ограничен только директорией Cfg/
+- Защита от path traversal атак (CWE-22)
+- Валидация JSON перед сохранением
+
 ### Config Cache API
 
 API для управления кэшем конфигурационных файлов.

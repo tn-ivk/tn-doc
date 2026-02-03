@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc — ASP.NET Core 8.0 веб-приложение для генерации технических документов ИВК (Измерительно-вычислительный комплекс) нефтегазовой отрасли. Генерирует паспорта качества, протоколы поверки, акты приёма-сдачи через FastReport.
 
-**Version**: 1.4.3 | **Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Branch**: develop
+**Version**: 1.4.4 | **Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Branch**: develop
 
 ## Quick Start
 
@@ -92,7 +92,8 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 | `IConfigurationCacheService` | Singleton | Кэш JSON-конфигов (LRU, макс. 50 записей) |
 | `IReportBuffer` | Singleton | In-memory PDF хранилище |
 | `IDocModuleLoader` | Singleton | Динамическая загрузка DLL модулей (LRU, макс. 5) |
-| `IStatusProvider` | Scoped | Мониторинг здоровья системы |
+| `IStatusProvider` | Scoped | Мониторинг здоровья системы (многоканальный) |
+| `IConfigurationService` | Scoped | Управление конфигурацией приложения и документов |
 | `PrinterService` | Singleton | Платформо-зависимая печать |
 
 ### Vue Frontend
@@ -101,8 +102,21 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 - **Configurator** (`/TN_Doc/Client/configurator/`): Управление конфигурацией через `/configurator` endpoint
   - **Вкладка "Общие"**: настройки экспорта, безопасности, локального OPC-клиента (ARM), настройки ELIS
   - **Вкладка "Устройства"**: список устройств с поиском, множественный выбор для пакетного редактирования
+  - **Вкладка "Документы"**: редактирование JSON-конфигураций документов (Cfg*.json) с Monaco Editor
   - **Редактор устройства**: включение/выключение, шаблоны документов, подключение к БД, настройки OPC, используемые СИ
 - Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
+
+### StatusBar: Многоканальная проверка статуса (v1.4.4)
+
+Поддержка нескольких строк подключения (DBConnectionStrings) для устройств:
+
+| Поле | Описание |
+|------|----------|
+| `isConnected` | Хотя бы один канал связи работает |
+| `isFullyConnected` | Все каналы связи работают |
+| `channels` | Список каналов с детальной информацией (ConnectionChannel) |
+
+Трёхцветная индикация: зелёный (все каналы), жёлтый (частичное подключение), красный (нет связи).
 
 ### Configurator: Используемые СИ (v1.4.3)
 
