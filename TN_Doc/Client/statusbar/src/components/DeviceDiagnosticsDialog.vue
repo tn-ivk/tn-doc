@@ -1,120 +1,111 @@
 <template>
   <Teleport to="body">
-    <Transition name="dialog">
+    <Transition name="glass-dialog">
       <div
         v-if="store.selectedDevice"
-        class="diagnostics-overlay"
+        class="glass-container"
         @click.self="store.closeDeviceDiagnostics"
       >
-        <div class="diagnostics-dialog" @click.stop>
-          <!-- Header -->
-          <header class="diagnostics-header">
-            <div class="diagnostics-header__title-block">
-              <div class="diagnostics-header__icon" :class="statusClass">
-                <i :class="statusIcon"></i>
-              </div>
-              <div class="diagnostics-header__text">
-                <h2 class="diagnostics-header__title">{{ store.selectedDevice.name }}</h2>
-                <span class="diagnostics-header__subtitle">Диагностика</span>
-              </div>
+        <div
+          ref="dialogRef"
+          class="glass-dialog"
+          :style="dialogStyle"
+        >
+          <!-- Draggable Header -->
+          <header
+            class="glass-header"
+            @mousedown="startDrag"
+            @touchstart.passive="startDrag"
+          >
+            <div class="glass-header__title-row">
+              <span class="glass-header__device-name">{{ store.selectedDevice.name }}</span>
+              <span class="glass-header__separator">:</span>
+              <span class="glass-header__status" :class="headerStatusClass">
+                {{ headerStatusText }}
+              </span>
             </div>
-            <button
-              class="diagnostics-header__close"
-              @click="store.closeDeviceDiagnostics"
-              aria-label="Закрыть"
-            >
-              <i class="pi pi-times"></i>
-            </button>
+            <span class="glass-header__channels">
+              {{ connectedChannelsCount }}/{{ totalChannelsCount }}
+            </span>
           </header>
 
-          <!-- Status Summary -->
-          <section class="diagnostics-status">
-            <div class="diagnostics-status__indicator" :class="statusClass">
-              <span class="diagnostics-status__dot"></span>
-              <span class="diagnostics-status__text">{{ statusText }}</span>
-            </div>
-            <div class="diagnostics-status__meta">
-              <span v-if="store.selectedDevice.latencyMs" class="diagnostics-status__latency">
-                <i class="pi pi-clock"></i>
-                {{ store.selectedDevice.latencyMs }}ms
-              </span>
-              <span v-if="store.selectedDevice.lastChecked" class="diagnostics-status__time">
-                <i class="pi pi-calendar"></i>
-                {{ formatTime(store.selectedDevice.lastChecked) }}
-              </span>
-            </div>
-          </section>
-
-          <!-- Circuit Breaker Alert -->
-          <section
-            v-if="hasCircuitBreakerIssue"
-            class="diagnostics-alert"
-            :class="alertClass"
-          >
-            <div class="diagnostics-alert__header">
-              <i class="pi pi-shield diagnostics-alert__icon"></i>
-              <span class="diagnostics-alert__title">Circuit Breaker</span>
-              <span class="diagnostics-alert__badge">{{ circuitBreakerBadge }}</span>
-            </div>
-            <div class="diagnostics-alert__body">
-              <p class="diagnostics-alert__message">{{ circuitBreakerMessage }}</p>
-              <div class="diagnostics-alert__details">
-                <span v-if="circuitBreaker?.failureCount">
-                  <strong>Попыток:</strong> {{ circuitBreaker.failureCount }}
+          <!-- Content Area -->
+          <div class="glass-content">
+            <!-- Status Badge -->
+            <div class="status-badge">
+              <span class="status-badge__text">{{ statusText }}</span>
+              <div class="status-badge__meta">
+                <span v-if="store.selectedDevice.latencyMs" class="status-badge__latency">
+                  <i class="pi pi-clock"></i>
+                  {{ store.selectedDevice.latencyMs }}ms
                 </span>
-                <span v-if="circuitBreaker?.currentBackoffSeconds">
-                  <strong>Backoff:</strong> {{ circuitBreaker.currentBackoffSeconds }}с
+                <span v-if="store.selectedDevice.lastChecked" class="status-badge__time">
+                  {{ formatTime(store.selectedDevice.lastChecked) }}
                 </span>
-                <span v-if="circuitBreaker?.secondsUntilNextAttempt">
-                  <strong>Следующая попытка:</strong> {{ circuitBreaker.secondsUntilNextAttempt }}с
+                <span v-if="store.selectedDevice.lastChecked" class="status-badge__date">
+                  {{ formatDate(store.selectedDevice.lastChecked) }}
                 </span>
               </div>
             </div>
-          </section>
 
-          <!-- Channels List -->
-          <section class="diagnostics-channels">
-            <h3 class="diagnostics-channels__title">
-              <i class="pi pi-sitemap"></i>
-              Каналы связи
-              <span class="diagnostics-channels__count">
-                {{ connectedChannelsCount }}/{{ totalChannelsCount }}
-              </span>
-            </h3>
-            <div class="diagnostics-channels__grid">
-              <div
-                v-for="(channel, index) in store.selectedDevice.channels"
-                :key="index"
-                class="channel-card"
-                :class="{ 'channel-card--connected': channel.isConnected }"
-              >
-                <div class="channel-card__header">
-                  <span class="channel-card__indicator" :class="channel.isConnected ? 'channel-card__indicator--ok' : 'channel-card__indicator--error'">
-                    <i :class="channel.isConnected ? 'pi pi-check' : 'pi pi-times'"></i>
+            <!-- Circuit Breaker Alert -->
+            <div
+              v-if="hasCircuitBreakerIssue"
+              class="cb-alert"
+              :class="alertClass"
+            >
+              <div class="cb-alert__header">
+                <i class="pi pi-shield"></i>
+                <span class="cb-alert__title">Circuit Breaker</span>
+                <span class="cb-alert__badge">{{ circuitBreakerBadge }}</span>
+              </div>
+              <p class="cb-alert__message">{{ circuitBreakerMessage }}</p>
+              <div class="cb-alert__stats">
+                <span v-if="circuitBreaker?.failureCount">
+                  Попыток: <strong>{{ circuitBreaker.failureCount }}</strong>
+                </span>
+                <span v-if="circuitBreaker?.currentBackoffSeconds">
+                  Backoff: <strong>{{ circuitBreaker.currentBackoffSeconds }}с</strong>
+                </span>
+                <span v-if="circuitBreaker?.secondsUntilNextAttempt">
+                  Retry: <strong>{{ circuitBreaker.secondsUntilNextAttempt }}с</strong>
+                </span>
+              </div>
+            </div>
+
+            <!-- Channels Section -->
+            <div class="channels-section">
+              <h3 class="channels-section__title">
+                <i class="pi pi-sitemap"></i>
+                Каналы связи
+              </h3>
+              <div class="channels-list">
+                <div
+                  v-for="(channel, index) in store.selectedDevice.channels"
+                  :key="index"
+                  class="channel-item"
+                  :class="{ 'channel-item--ok': channel.isConnected }"
+                >
+                  <span class="channel-item__name">{{ channel.name }}</span>
+                  <span v-if="channel.isConnected && channel.latencyMs" class="channel-item__latency">
+                    {{ channel.latencyMs }} мс
                   </span>
-                  <span class="channel-card__name">{{ channel.name }}</span>
-                </div>
-                <div class="channel-card__details">
-                  <span v-if="channel.isConnected && channel.latencyMs" class="channel-card__latency">
-                    {{ channel.latencyMs }}ms
-                  </span>
-                  <span v-if="!channel.isConnected && channel.error" class="channel-card__error">
+                  <span v-if="!channel.isConnected && channel.error" class="channel-item__error">
                     {{ truncateError(channel.error) }}
                   </span>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
 
-          <!-- Actions -->
-          <footer class="diagnostics-actions">
+          <!-- Footer -->
+          <footer class="glass-footer">
             <button
-              class="retry-button"
+              class="action-btn"
               :disabled="isRetrying"
               @click="handleRetry"
             >
-              <i v-if="!isRetrying" class="pi pi-refresh"></i>
-              <i v-else class="pi pi-spin pi-spinner"></i>
+              <i v-if="isRetrying" class="pi pi-spin pi-spinner"></i>
               <span>{{ isRetrying ? 'Проверка...' : 'Проверить' }}</span>
             </button>
           </footer>
@@ -125,11 +116,76 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, reactive, onMounted, onUnmounted } from 'vue';
 import { useStatusStore } from '../stores/statusStore';
 
 const store = useStatusStore();
 const isRetrying = ref(false);
+const dialogRef = ref<HTMLElement | null>(null);
+
+// Drag state
+const dragState = reactive({
+  isDragging: false,
+  startX: 0,
+  startY: 0,
+  offsetX: 0,
+  offsetY: 0
+});
+
+const dialogStyle = computed(() => {
+  if (dragState.offsetX === 0 && dragState.offsetY === 0) {
+    return {};
+  }
+  return {
+    transform: `translate(${dragState.offsetX}px, ${dragState.offsetY}px)`,
+    transition: dragState.isDragging ? 'none' : 'transform 0.1s ease-out'
+  };
+});
+
+function startDrag(e: MouseEvent | TouchEvent) {
+  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+  const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+  dragState.isDragging = true;
+  dragState.startX = clientX - dragState.offsetX;
+  dragState.startY = clientY - dragState.offsetY;
+
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup', stopDrag);
+  document.addEventListener('touchmove', onDrag);
+  document.addEventListener('touchend', stopDrag);
+}
+
+function onDrag(e: MouseEvent | TouchEvent) {
+  if (!dragState.isDragging) return;
+
+  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+  const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+  dragState.offsetX = clientX - dragState.startX;
+  dragState.offsetY = clientY - dragState.startY;
+}
+
+function stopDrag() {
+  dragState.isDragging = false;
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup', stopDrag);
+  document.removeEventListener('touchmove', onDrag);
+  document.removeEventListener('touchend', stopDrag);
+}
+
+// Reset position when dialog opens
+onMounted(() => {
+  dragState.offsetX = 0;
+  dragState.offsetY = 0;
+});
+
+onUnmounted(() => {
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup', stopDrag);
+  document.removeEventListener('touchmove', onDrag);
+  document.removeEventListener('touchend', stopDrag);
+});
 
 const circuitBreaker = computed(() => store.selectedDevice?.circuitBreaker);
 
@@ -139,29 +195,29 @@ const hasCircuitBreakerIssue = computed(() => {
   return cb.isBlocked || cb.state !== 'Closed' || cb.failureCount > 0;
 });
 
-const statusClass = computed(() => {
+const headerStatusClass = computed(() => {
   const device = store.selectedDevice;
   if (!device) return '';
 
-  if (device.isFullyConnected) return 'status--ok';
-  if (device.isConnected) return 'status--warning';
-  return 'status--error';
+  if (device.isFullyConnected) return 'header-status--ok';
+  if (device.isConnected) return 'header-status--warning';
+  return 'header-status--error';
 });
 
-const statusIcon = computed(() => {
+const headerStatusText = computed(() => {
   const device = store.selectedDevice;
-  if (!device) return 'pi pi-question';
+  if (!device) return '';
 
-  if (device.isFullyConnected) return 'pi pi-check-circle';
-  if (device.isConnected) return 'pi pi-exclamation-triangle';
-  return 'pi pi-times-circle';
+  if (device.isFullyConnected) return 'ПОДКЛЮЧЕНО';
+  if (device.isConnected) return 'ЧАСТИЧНО';
+  return 'ОТКЛЮЧЕНО';
 });
 
 const statusText = computed(() => {
   const device = store.selectedDevice;
   if (!device) return '';
 
-  if (device.isFullyConnected) return 'Все каналы работают';
+  if (device.isFullyConnected) return 'Все каналы подключены';
   if (device.isConnected) return 'Частичное подключение';
   return 'Нет подключения';
 });
@@ -170,9 +226,9 @@ const alertClass = computed(() => {
   const cb = circuitBreaker.value;
   if (!cb) return '';
 
-  if (cb.errorCategory === 'Authentication') return 'alert--auth';
-  if (cb.isBlocked || cb.maxRetryReached) return 'alert--blocked';
-  return 'alert--warning';
+  if (cb.errorCategory === 'Authentication') return 'cb-alert--auth';
+  if (cb.isBlocked || cb.maxRetryReached) return 'cb-alert--blocked';
+  return 'cb-alert--warning';
 });
 
 const circuitBreakerBadge = computed(() => {
@@ -189,13 +245,13 @@ const circuitBreakerMessage = computed(() => {
   if (!cb) return '';
 
   if (cb.errorCategory === 'Authentication') {
-    return 'Ошибка аутентификации. Проверьте учётные данные в конфигурации.';
+    return 'Ошибка аутентификации. Проверьте учётные данные.';
   }
   if (cb.maxRetryReached) {
-    return 'Превышено максимальное количество попыток подключения.';
+    return 'Превышено максимальное количество попыток.';
   }
   if (cb.isBlocked) {
-    return 'Устройство заблокировано. Требуется ручная проверка.';
+    return 'Устройство заблокировано. Требуется проверка.';
   }
   if (cb.lastError) {
     return cb.lastError;
@@ -211,6 +267,15 @@ const totalChannelsCount = computed(() => {
   return store.selectedDevice?.channels?.length ?? 0;
 });
 
+function formatDate(date: Date | string | undefined): string {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const year = d.getFullYear().toString().slice(-2);
+  return `${day}.${month}.${year}`;
+}
+
 function formatTime(date: Date | string | undefined): string {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -221,7 +286,7 @@ function formatTime(date: Date | string | undefined): string {
   });
 }
 
-function truncateError(error: string, maxLength = 50): string {
+function truncateError(error: string, maxLength = 40): string {
   if (error.length <= maxLength) return error;
   return error.slice(0, maxLength) + '...';
 }
@@ -241,453 +306,394 @@ async function handleRetry() {
 </script>
 
 <style lang="scss" scoped>
-// Design tokens
-$glass-bg: rgba(255, 255, 255, 0.12);
-$glass-border: rgba(255, 255, 255, 0.18);
-$glass-blur: 16px;
-$shadow-heavy: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+// ═══════════════════════════════════════════════════════════════
+// GLASSMORPHISM DESIGN TOKENS
+// ═══════════════════════════════════════════════════════════════
 
-$color-ok: rgba(34, 197, 94, 0.9);
-$color-ok-bg: rgba(34, 197, 94, 0.15);
-$color-warning: rgba(234, 179, 8, 0.9);
-$color-warning-bg: rgba(234, 179, 8, 0.15);
-$color-error: rgba(239, 68, 68, 0.9);
-$color-error-bg: rgba(239, 68, 68, 0.15);
-$color-auth: rgba(168, 85, 247, 0.9);
-$color-auth-bg: rgba(168, 85, 247, 0.15);
+// Light gray glass (#F1F3F4 based)
+$glass-bg: rgba(225, 228, 230, 0.82);
+$glass-border: rgba(0, 0, 0, 0.08);
+$glass-border-light: rgba(0, 0, 0, 0.05);
+$glass-blur: 20px;
+$glass-shadow:
+  0 8px 32px rgba(0, 0, 0, 0.12),
+  0 2px 8px rgba(0, 0, 0, 0.08);
 
-$text-primary: rgba(255, 255, 255, 0.95);
-$text-secondary: rgba(255, 255, 255, 0.7);
-$text-muted: rgba(255, 255, 255, 0.5);
+// Status colors
+$color-ok: #22c55e;
+$color-ok-soft: rgba(34, 197, 94, 0.12);
+$color-warning: #eab308;
+$color-warning-soft: rgba(234, 179, 8, 0.12);
+$color-error: #ef4444;
+$color-error-soft: rgba(239, 68, 68, 0.12);
+$color-auth: #a855f7;
+$color-auth-soft: rgba(168, 85, 247, 0.12);
 
-// Overlay
-.diagnostics-overlay {
+// Typography (dark text for light background)
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.6);
+$text-muted: rgba(0, 0, 0, 0.4);
+
+// ═══════════════════════════════════════════════════════════════
+// CONTAINER (no darkening overlay)
+// ═══════════════════════════════════════════════════════════════
+
+.glass-container {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: 1rem;
+  pointer-events: auto;
+  background: transparent;
 }
 
-// Dialog
-.diagnostics-dialog {
+// ═══════════════════════════════════════════════════════════════
+// GLASS DIALOG
+// ═══════════════════════════════════════════════════════════════
+
+.glass-dialog {
+  pointer-events: auto;
   width: 100%;
-  max-width: 480px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: linear-gradient(135deg,
-    rgba(30, 41, 59, 0.95) 0%,
-    rgba(15, 23, 42, 0.98) 100%
-  );
-  backdrop-filter: blur($glass-blur);
-  -webkit-backdrop-filter: blur($glass-blur);
+  max-width: 420px;
+  max-height: 85vh;
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+
+  // Glassmorphism effect - light gray
+  background: $glass-bg;
+  backdrop-filter: blur($glass-blur) saturate(1.1);
+  -webkit-backdrop-filter: blur($glass-blur) saturate(1.1);
+
+  // Borders and radius
   border: 1px solid $glass-border;
-  border-radius: 20px;
-  box-shadow: $shadow-heavy;
+  border-radius: 14px;
+
+  // Shadow for depth
+  box-shadow: $glass-shadow;
+
+  // Text
   color: $text-primary;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
-  // Custom scrollbar
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-  }
+  overflow: hidden;
 }
 
-// Header
-.diagnostics-header {
+// ═══════════════════════════════════════════════════════════════
+// HEADER (Draggable, no background color)
+// ═══════════════════════════════════════════════════════════════
+
+.glass-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid $glass-border;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid $glass-border-light;
+  cursor: grab;
+  user-select: none;
 
-  &__title-block {
+  &:active {
+    cursor: grabbing;
+  }
+
+  &__title-row {
     display: flex;
     align-items: center;
-    gap: 0.875rem;
-  }
-
-  &__icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-
-    &.status--ok {
-      background: $color-ok-bg;
-      color: $color-ok;
-    }
-
-    &.status--warning {
-      background: $color-warning-bg;
-      color: $color-warning;
-    }
-
-    &.status--error {
-      background: $color-error-bg;
-      color: $color-error;
-    }
-  }
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
-
-  &__title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin: 0;
+    gap: 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
     letter-spacing: -0.01em;
   }
 
-  &__subtitle {
-    font-size: 0.75rem;
-    color: $text-muted;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
+  &__device-name {
+    color: $text-primary;
+    font-weight: 600;
   }
 
-  &__close {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid transparent;
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-secondary;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &__separator {
+    color: $text-muted;
+  }
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: $text-primary;
-      border-color: $glass-border;
+  &__status {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+
+    &.header-status--ok {
+      color: var(--p-green-700);
     }
 
-    &:active {
-      transform: scale(0.95);
+    &.header-status--warning {
+      color: var(--p-yellow-700);
+    }
+
+    &.header-status--error {
+      color: var(--p-red-700);
+    }
+  }
+
+  &__channels {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: $text-secondary;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTENT AREA
+// ═══════════════════════════════════════════════════════════════
+
+.glass-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+
+  // Subtle scrollbar
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.2);
     }
   }
 }
 
-// Status Summary
-.diagnostics-status {
-  padding: 1rem 1.5rem;
+// ═══════════════════════════════════════════════════════════════
+// STATUS BADGE
+// ═══════════════════════════════════════════════════════════════
+
+.status-badge {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: $text-primary;
 
-  &__indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.375rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8125rem;
-    font-weight: 500;
-
-    &.status--ok {
-      background: $color-ok-bg;
-      color: $color-ok;
-    }
-
-    &.status--warning {
-      background: $color-warning-bg;
-      color: $color-warning;
-    }
-
-    &.status--error {
-      background: $color-error-bg;
-      color: $color-error;
-    }
-  }
-
-  &__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: currentColor;
-    animation: pulse 2s ease-in-out infinite;
+  &__text {
+    flex: 1;
   }
 
   &__meta {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+    font-size: 0.6875rem;
+    color: $text-primary;
   }
 
   &__latency,
-  &__time {
+  &__time,
+  &__date {
     display: flex;
     align-items: center;
-    gap: 0.375rem;
-    font-size: 0.75rem;
-    color: $text-muted;
+    gap: 0.25rem;
 
     i {
-      font-size: 0.7rem;
+      font-size: 0.625rem;
     }
   }
 }
 
-// Alert Section
-.diagnostics-alert {
-  margin: 1rem 1.5rem;
-  border-radius: 12px;
+// ═══════════════════════════════════════════════════════════════
+// CIRCUIT BREAKER ALERT
+// ═══════════════════════════════════════════════════════════════
+
+.cb-alert {
+  border-radius: 10px;
   overflow: hidden;
+  font-size: 0.8125rem;
 
-  &.alert--auth {
-    background: $color-auth-bg;
-    border: 1px solid rgba(168, 85, 247, 0.3);
+  &--warning {
+    background: $color-warning-soft;
+    border: 1px solid rgba($color-warning, 0.25);
+    color: darken($color-warning, 15%);
   }
 
-  &.alert--blocked {
-    background: $color-error-bg;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+  &--blocked {
+    background: $color-error-soft;
+    border: 1px solid rgba($color-error, 0.25);
+    color: darken($color-error, 10%);
   }
 
-  &.alert--warning {
-    background: $color-warning-bg;
-    border: 1px solid rgba(234, 179, 8, 0.3);
+  &--auth {
+    background: $color-auth-soft;
+    border: 1px solid rgba($color-auth, 0.25);
+    color: darken($color-auth, 10%);
   }
 
   &__header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background: rgba(0, 0, 0, 0.15);
-  }
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 
-  &__icon {
-    font-size: 0.875rem;
-    opacity: 0.9;
+    i {
+      font-size: 0.75rem;
+    }
   }
 
   &__title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     flex: 1;
   }
 
   &__badge {
-    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    font-size: 0.5625rem;
     font-weight: 700;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    background: rgba(0, 0, 0, 0.25);
-    letter-spacing: 0.03em;
-  }
-
-  &__body {
-    padding: 0.875rem 1rem;
   }
 
   &__message {
-    margin: 0 0 0.625rem;
-    font-size: 0.8125rem;
-    line-height: 1.5;
+    margin: 0;
+    padding: 0.625rem 0.75rem 0.5rem;
+    line-height: 1.45;
     opacity: 0.9;
   }
 
-  &__details {
+  &__stats {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    font-size: 0.75rem;
-    opacity: 0.8;
+    gap: 0.625rem;
+    padding: 0 0.75rem 0.625rem;
+    font-size: 0.6875rem;
+    opacity: 0.75;
 
     strong {
-      opacity: 0.7;
+      font-weight: 600;
+      opacity: 1;
     }
   }
 }
 
-// Channels Section
-.diagnostics-channels {
-  padding: 1rem 1.5rem 1.25rem;
+// ═══════════════════════════════════════════════════════════════
+// CHANNELS SECTION
+// ═══════════════════════════════════════════════════════════════
 
+.channels-section {
   &__title {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 0 0 0.875rem;
-    font-size: 0.8125rem;
+    margin: 0 0 0.625rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: $text-secondary;
+    color: $text-primary;
     text-transform: uppercase;
     letter-spacing: 0.04em;
 
     i {
       font-size: 0.875rem;
-      opacity: 0.7;
     }
-  }
-
-  &__count {
-    margin-left: auto;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: $text-muted;
-    background: rgba(255, 255, 255, 0.08);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-
-  &__grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
   }
 }
 
-// Channel Card
-.channel-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  transition: all 0.2s ease;
+.channels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
-  }
+.channel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  background: transparent;
+  border: 1px solid $glass-border-light;
+  border-radius: 8px;
+  border-left: 3px solid var(--p-red-700);
 
-  &--connected {
-    border-left: 3px solid $color-ok;
-  }
-
-  &:not(&--connected) {
-    border-left: 3px solid $color-error;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-  }
-
-  &__indicator {
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.625rem;
-
-    &--ok {
-      background: $color-ok-bg;
-      color: $color-ok;
-    }
-
-    &--error {
-      background: $color-error-bg;
-      color: $color-error;
-    }
+  &--ok {
+    border-left-color: var(--p-green-700);
   }
 
   &__name {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
-    flex: 1;
-  }
-
-  &__details {
-    margin-top: 0.375rem;
-    padding-left: calc(22px + 0.625rem);
+    color: $text-primary;
   }
 
   &__latency {
     font-size: 0.75rem;
-    color: $color-ok;
+    color: $text-primary;
     font-weight: 500;
+    flex-shrink: 0;
   }
 
   &__error {
-    font-size: 0.75rem;
-    color: $color-error;
-    line-height: 1.4;
+    font-size: 0.6875rem;
+    color: var(--p-red-700);
+    line-height: 1.35;
+    text-align: right;
+    flex-shrink: 0;
   }
 }
 
-// Actions Footer
-.diagnostics-actions {
-  padding: 1rem 1.5rem 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(0, 0, 0, 0.1);
+// ═══════════════════════════════════════════════════════════════
+// FOOTER (no background color)
+// ═══════════════════════════════════════════════════════════════
+
+.glass-footer {
+  padding: 0.875rem 1rem;
+  border-top: 1px solid $glass-border-light;
 }
 
-.retry-button {
+.action-btn {
   width: 100%;
+  height: var(--md-control-height);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg,
-    rgba(59, 130, 246, 0.85) 0%,
-    rgba(37, 99, 235, 0.9) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding: 0 1.25rem;
+
+  background: var(--md-primary);
+  border: 1px solid color-mix(in srgb, var(--md-primary) 80%, #000);
+  border-radius: var(--md-radius);
+
+  color: #fff;
+  font-family: var(--md-font-family);
+  font-size: var(--md-font-size-button);
+  font-weight: var(--md-font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  transition: background 0.15s ease;
 
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-    background: linear-gradient(135deg,
-      rgba(59, 130, 246, 0.95) 0%,
-      rgba(37, 99, 235, 1) 100%
-    );
+    background: var(--md-primary-hover);
   }
 
   &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+    background: var(--md-primary-active);
   }
 
   &:disabled {
-    opacity: 0.6;
+    background: var(--md-disabled-bg);
+    color: var(--md-disabled-text);
+    border-color: var(--md-disabled-border);
     cursor: not-allowed;
   }
 
@@ -696,47 +702,22 @@ $text-muted: rgba(255, 255, 255, 0.5);
   }
 }
 
-// Animations
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+// ═══════════════════════════════════════════════════════════════
+// TRANSITIONS
+// ═══════════════════════════════════════════════════════════════
+
+.glass-dialog-enter-active {
+  animation: dialog-appear 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-// Dialog transition
-.dialog-enter-active {
-  animation: overlay-in 0.3s ease-out;
-
-  .diagnostics-dialog {
-    animation: dialog-in 0.3s ease-out;
-  }
+.glass-dialog-leave-active {
+  animation: dialog-disappear 0.2s cubic-bezier(0.4, 0, 1, 1);
 }
 
-.dialog-leave-active {
-  animation: overlay-out 0.2s ease-in;
-
-  .diagnostics-dialog {
-    animation: dialog-out 0.2s ease-in;
-  }
-}
-
-@keyframes overlay-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes overlay-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-@keyframes dialog-in {
+@keyframes dialog-appear {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
+    transform: scale(0.92) translateY(12px);
   }
   to {
     opacity: 1;
@@ -744,36 +725,42 @@ $text-muted: rgba(255, 255, 255, 0.5);
   }
 }
 
-@keyframes dialog-out {
+@keyframes dialog-disappear {
   from {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
   to {
     opacity: 0;
-    transform: scale(0.98) translateY(5px);
+    transform: scale(0.96) translateY(8px);
   }
 }
 
-// Responsive
+// ═══════════════════════════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════════════════════════
+
 @media (max-width: 480px) {
-  .diagnostics-dialog {
-    max-width: 100%;
+  .glass-dialog {
+    max-width: calc(100% - 1rem);
     margin: 0.5rem;
-    border-radius: 16px;
+    border-radius: 12px;
   }
 
-  .diagnostics-header,
-  .diagnostics-status,
-  .diagnostics-channels,
-  .diagnostics-actions {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .glass-header {
+    padding: 0.75rem;
+
+    &__title-row {
+      font-size: 0.875rem;
+    }
   }
 
-  .diagnostics-alert {
-    margin-left: 1rem;
-    margin-right: 1rem;
+  .glass-content {
+    padding: 0.875rem;
+  }
+
+  .glass-footer {
+    padding: 0.75rem;
   }
 }
 </style>
