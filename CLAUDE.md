@@ -21,6 +21,7 @@ dotnet restore && dotnet build
 cd TN_Doc && dotnet run  # http://localhost:38509
 
 # 3. Vue components (StatusBar + Configurator)
+# Требуется Node.js >=18.0.0, npm >=8.0.0
 cd TN_Doc/Client && npm install && npm run build:all
 ```
 
@@ -93,6 +94,7 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 | `IReportBuffer` | Singleton | In-memory PDF хранилище |
 | `IDocModuleLoader` | Singleton | Динамическая загрузка DLL модулей (LRU, макс. 5) |
 | `IStatusProvider` | Scoped | Мониторинг здоровья системы (многоканальный) |
+| `ICircuitBreakerService` | Singleton | Circuit Breaker для устройств (backoff, retry) |
 | `IConfigurationService` | Scoped | Управление конфигурацией приложения и документов |
 | `PrinterService` | Singleton | Платформо-зависимая печать |
 
@@ -118,6 +120,23 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 
 Трёхцветная индикация: зелёный (все каналы), жёлтый (частичное подключение), красный (нет связи).
 
+### StatusBar: DeviceDiagnosticsDialog + Circuit Breaker
+
+Диалог диагностики подключения устройств (`DeviceDiagnosticsDialog.vue`):
+- Детальный статус всех каналов связи с latency
+- Визуализация состояния Circuit Breaker (Closed/Open/HalfOpen)
+- Отображение категорий ошибок (Authentication, MaxRetry, Blocked)
+- Кнопка ручного retry для проверки подключения
+
+Circuit Breaker состояния:
+| Состояние | Описание |
+|-----------|----------|
+| `Closed` | Нормальная работа |
+| `Open` | Подключение заблокировано после N неудач |
+| `HalfOpen` | Тестовая попытка подключения |
+| `AUTH` | Ошибка аутентификации (требует проверки учётных данных) |
+| `MAX RETRY` | Превышено максимальное количество попыток |
+
 ### Configurator: Используемые СИ (v1.4.3)
 
 Настройка средств измерения для каждого устройства:
@@ -131,6 +150,30 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 | `UsedSecondSI_*` | Задействовать второй экземпляр СИ (PP, PVL, PVS) |
 
 Логика зависимостей: вторичное СИ доступно только при включённом основном.
+
+## API Endpoints
+
+### Status API (`/api/status`)
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/api/status` | Статус всех устройств и сервисов (кэш 5 сек) |
+| POST | `/api/status/refresh` | Принудительное обновление статусов |
+| POST | `/api/status/device/{deviceId}/retry` | Retry устройства (сброс Circuit Breaker) |
+
+### Configurator API (`/api/configurator`)
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/api/configurator/config` | Получить CfgApp.json |
+| POST | `/api/configurator/config` | Сохранить CfgApp.json |
+| POST | `/api/configurator/validate` | Валидация конфигурации |
+| GET | `/api/configurator/document-config?configPath=` | Загрузить Cfg*.json документа |
+| POST | `/api/configurator/document-config` | Сохранить Cfg*.json документа |
+
+### Cache API (`/api/config-cache`)
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/api/config-cache` | Статистика кэша конфигураций |
+| DELETE | `/api/config-cache` | Очистить кэш |
 
 ## Configuration
 
