@@ -306,6 +306,8 @@ async function handleRetry() {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
+
 // ═══════════════════════════════════════════════════════════════
 // GLASSMORPHISM DESIGN TOKENS
 // ═══════════════════════════════════════════════════════════════
@@ -523,19 +525,19 @@ $text-muted: rgba(0, 0, 0, 0.4);
   &--warning {
     background: $color-warning-soft;
     border: 1px solid rgba($color-warning, 0.25);
-    color: darken($color-warning, 15%);
+    color: color.adjust($color-warning, $lightness: -15%);
   }
 
   &--blocked {
     background: $color-error-soft;
     border: 1px solid rgba($color-error, 0.25);
-    color: darken($color-error, 10%);
+    color: color.adjust($color-error, $lightness: -10%);
   }
 
   &--auth {
     background: $color-auth-soft;
     border: 1px solid rgba($color-auth, 0.25);
-    color: darken($color-auth, 10%);
+    color: color.adjust($color-auth, $lightness: -10%);
   }
 
   &__header {
