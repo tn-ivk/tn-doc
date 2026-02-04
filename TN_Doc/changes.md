@@ -1,4 +1,15 @@
 # Список изменений:
+## Версия 1.4.4:
+    - StatusBar: glassmorphism редизайн диалога диагностики устройств
+        - Светлая тема с эффектом размытия фона (backdrop-filter: blur)
+        - Поддержка drag-and-drop для перемещения диалога
+        - Компактный header: название + статус + счётчик каналов
+        - Адаптивный responsive дизайн для мобильных устройств
+    - StatusBar: glassmorphism стили для tooltip
+    - StatusBar: удалена зависимость от PrimeVue Dialog, используется нативный Vue Teleport
+    - Рефакторинг CSS: переход на BEM-нотацию (glass-* классы)
+    - up docgeneral 1.2.2
+
 ## Версия 1.4.3:
     - up docgeneral 1.2.2
 
