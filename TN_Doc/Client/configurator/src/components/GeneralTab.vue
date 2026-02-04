@@ -40,60 +40,124 @@
     </div>
 
     <!-- Настройки ЕЛИС -->
-    <div class="field field-horizontal">
-      <label for="use-elis">Использовать ЕЛИС:</label>
-      <ToggleSwitch
-        id="use-elis"
-        v-model="elisEnabled"
-      />
-    </div>
+    <Panel header="Настройки ЕЛИС" class="settings-panel">
+      <div class="settings-container">
+        <div class="field field-horizontal">
+          <label for="use-elis">Использовать ЕЛИС:</label>
+          <ToggleSwitch
+            id="use-elis"
+            v-model="elisEnabled"
+          />
+        </div>
 
-    <!-- Поля настроек ЕЛИС (отображаются только когда ЕЛИС включен) -->
-    <template v-if="elisEnabled">
-      <div class="field field-horizontal">
-        <label for="elis-ost-key">OstKey:</label>
-        <InputText
-          id="elis-ost-key"
-          v-model="elisOstKey"
-          placeholder="Ключ ОСТ"
-          class="field-input-flex"
-        />
+        <!-- Поля настроек ЕЛИС (отображаются только когда ЕЛИС включен) -->
+        <template v-if="elisEnabled">
+          <div class="field field-horizontal">
+            <label for="elis-ost-key">OstKey:</label>
+            <InputText
+              id="elis-ost-key"
+              v-model="elisOstKey"
+              placeholder="Ключ ОСТ"
+              class="field-input-flex"
+            />
+          </div>
+
+          <div class="field field-horizontal">
+            <label for="elis-sikn-key">SiknKey:</label>
+            <InputText
+              id="elis-sikn-key"
+              v-model="elisSiknKey"
+              placeholder="Ключ СИКН"
+              class="field-input-flex"
+            />
+          </div>
+
+          <div class="field field-horizontal">
+            <label for="elis-client-name">ClientName:</label>
+            <InputText
+              id="elis-client-name"
+              v-model="elisClientName"
+              placeholder="Имя клиента"
+              class="field-input-flex"
+            />
+          </div>
+
+          <div class="field field-horizontal">
+            <label for="elis-client-token">ClientToken:</label>
+            <InputText
+              id="elis-client-token"
+              v-model="elisClientToken"
+              placeholder="Токен клиента"
+              class="field-input-flex"
+              disabled
+            />
+          </div>
+        </template>
       </div>
+    </Panel>
 
-      <div class="field field-horizontal">
-        <label for="elis-sikn-key">SiknKey:</label>
-        <InputText
-          id="elis-sikn-key"
-          v-model="elisSiknKey"
-          placeholder="Ключ СИКН"
-          class="field-input-flex"
-        />
+    <!-- Настройки диагностики связи с ИВК -->
+    <Panel header="Диагностика связи с ИВК" class="settings-panel">
+      <div class="settings-container">
+        <div class="field field-horizontal">
+          <label for="diag-initial-poll">Начальный интервал опроса (сек):</label>
+          <InputNumber
+            id="diag-initial-poll"
+            v-model="diagInitialPollSeconds"
+            :min="1"
+            :max="3600"
+            class="field-input-flex"
+          />
+        </div>
+
+        <div class="field field-horizontal">
+          <label for="diag-max-poll">Максимальный интервал опроса (сек):</label>
+          <InputNumber
+            id="diag-max-poll"
+            v-model="diagMaxPollSeconds"
+            :min="60"
+            :max="86400"
+            class="field-input-flex"
+          />
+        </div>
+
+        <div class="field field-horizontal">
+          <label for="diag-poll-multiplier">Множитель интервала:</label>
+          <InputNumber
+            id="diag-poll-multiplier"
+            v-model="diagPollMultiplier"
+            :min="1.1"
+            :max="10"
+            :step="0.1"
+            :minFractionDigits="1"
+            :maxFractionDigits="1"
+            class="field-input-flex"
+          />
+        </div>
+
+        <div class="field field-horizontal">
+          <label for="diag-failure-threshold">Порог сетевых ошибок:</label>
+          <InputNumber
+            id="diag-failure-threshold"
+            v-model="diagNetworkFailureThreshold"
+            :min="1"
+            :max="100"
+            class="field-input-flex"
+          />
+        </div>
+
+        <div class="field field-horizontal">
+          <label for="diag-max-retry">Максимум попыток до блокировки:</label>
+          <InputNumber
+            id="diag-max-retry"
+            v-model="diagMaxRetryCount"
+            :min="1"
+            :max="1000"
+            class="field-input-flex"
+          />
+        </div>
       </div>
-
-      <div class="field field-horizontal">
-        <label for="elis-client-name">ClientName:</label>
-        <InputText
-          id="elis-client-name"
-          v-model="elisClientName"
-          placeholder="Имя клиента"
-          class="field-input-flex"
-        />
-      </div>
-
-      <div class="field field-horizontal">
-        <label for="elis-client-token">ClientToken:</label>
-        <InputText
-          id="elis-client-token"
-          v-model="elisClientToken"
-          placeholder="Токен клиента"
-          class="field-input-flex"
-          disabled
-        />
-      </div>
-    </template>
-
-    <!-- Заполнитель для растягивания по высоте -->
-    <div class="spacer"></div>
+    </Panel>
 
     <!-- Модальное окно настроек OPC -->
     <Dialog
@@ -126,6 +190,7 @@ import type { OpcConnectionSettings } from '../types/config.types';
 
 import Panel from 'primevue/panel';
 import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import ToggleSwitch from 'primevue/toggleswitch';
 import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
@@ -293,31 +358,99 @@ const elisClientToken = computed({
     // Но оставляем его для соответствия интерфейсу v-model
   }
 });
+
+// Настройки диагностики подключений
+const getDefaultDiagnosticSettings = () => ({
+  InitialPollSeconds: 60,
+  MaxPollSeconds: 3600,
+  PollMultiplier: 2.0,
+  NetworkFailureThreshold: 3,
+  MaxRetryCount: 24
+});
+
+const diagInitialPollSeconds = computed({
+  get: () => currentConfig.value?.DeviceConnectionDiagnostic?.InitialPollSeconds ?? 60,
+  set: (value: number) => {
+    const current = currentConfig.value?.DeviceConnectionDiagnostic ?? getDefaultDiagnosticSettings();
+    configStore.updateGeneralSettings({
+      DeviceConnectionDiagnostic: { ...current, InitialPollSeconds: value }
+    });
+  }
+});
+
+const diagMaxPollSeconds = computed({
+  get: () => currentConfig.value?.DeviceConnectionDiagnostic?.MaxPollSeconds ?? 3600,
+  set: (value: number) => {
+    const current = currentConfig.value?.DeviceConnectionDiagnostic ?? getDefaultDiagnosticSettings();
+    configStore.updateGeneralSettings({
+      DeviceConnectionDiagnostic: { ...current, MaxPollSeconds: value }
+    });
+  }
+});
+
+const diagPollMultiplier = computed({
+  get: () => currentConfig.value?.DeviceConnectionDiagnostic?.PollMultiplier ?? 2.0,
+  set: (value: number) => {
+    const current = currentConfig.value?.DeviceConnectionDiagnostic ?? getDefaultDiagnosticSettings();
+    configStore.updateGeneralSettings({
+      DeviceConnectionDiagnostic: { ...current, PollMultiplier: value }
+    });
+  }
+});
+
+const diagNetworkFailureThreshold = computed({
+  get: () => currentConfig.value?.DeviceConnectionDiagnostic?.NetworkFailureThreshold ?? 3,
+  set: (value: number) => {
+    const current = currentConfig.value?.DeviceConnectionDiagnostic ?? getDefaultDiagnosticSettings();
+    configStore.updateGeneralSettings({
+      DeviceConnectionDiagnostic: { ...current, NetworkFailureThreshold: value }
+    });
+  }
+});
+
+const diagMaxRetryCount = computed({
+  get: () => currentConfig.value?.DeviceConnectionDiagnostic?.MaxRetryCount ?? 24,
+  set: (value: number) => {
+    const current = currentConfig.value?.DeviceConnectionDiagnostic ?? getDefaultDiagnosticSettings();
+    configStore.updateGeneralSettings({
+      DeviceConnectionDiagnostic: { ...current, MaxRetryCount: value }
+    });
+  }
+});
 </script>
 
 <style scoped>
+/* Унифицированные spacing переменные */
 .general-tab {
-  padding: 0.25rem 0.5rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+}
+
+.general-tab {
+  padding: var(--space-2);
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow-y: auto;
 }
 
 .field {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   flex-shrink: 0;
 }
 
 .field-horizontal {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
 .field-horizontal label {
   flex-shrink: 0;
-  min-width: 180px;
+  min-width: 280px;
   font-weight: 600;
   color: var(--text-color);
   font-size: 0.9rem;
@@ -356,11 +489,6 @@ const elisClientToken = computed({
   margin-top: 0.5rem;
 }
 
-.spacer {
-  flex: 1;
-  min-height: 0;
-}
-
 /* Компактные панели */
 :deep(.p-panel) {
   font-size: 0.9rem;
@@ -395,6 +523,98 @@ const elisClientToken = computed({
 
 :deep(.p-inputtext#export-path:hover) {
   border-color: #B0BEC5 !important;
+}
+
+/* Стили для панелей настроек */
+:deep(.settings-panel.p-panel) {
+  margin-top: var(--space-2);
+  background: transparent !important;
+  border: 1px solid var(--md-outline, #CFD8DC);
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+:deep(.settings-panel.p-panel:hover) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+:deep(.settings-panel .p-panel-header) {
+  padding: var(--space-3);
+  font-size: 0.9rem;
+  background: transparent !important;
+  border-bottom: 1px solid var(--md-outline, #CFD8DC);
+}
+
+:deep(.settings-panel .p-panel-content) {
+  padding: var(--space-3);
+  background: transparent !important;
+}
+
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.settings-container .field-horizontal {
+  margin-bottom: 0;
+}
+
+/* Стили для InputNumber с классом field-input-flex */
+:deep(.field-input-flex.p-inputnumber) {
+  flex: 1;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-input) {
+  width: 100%;
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-input:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-input:hover) {
+  border-color: #B0BEC5 !important;
+}
+
+/* Стили для InputNumber с кнопками */
+:deep(.field-input-flex.p-inputnumber.p-inputnumber-buttons-stacked .p-inputnumber-input) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button-group) {
+  border: 1px solid #CFD8DC !important;
+  border-left: none !important;
+  border-radius: 0 8px 8px 0 !important;
+  overflow: hidden;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button) {
+  background-color: #ffffff !important;
+  border: none !important;
+  color: #616161 !important;
+  transition: all 0.15s ease-in-out !important;
+  width: 2rem !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button:hover) {
+  background-color: #F5F5F5 !important;
+  color: #212121 !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button:active) {
+  background-color: #BDBDBD !important;
 }
 
 /* Стили для полей ЕЛИС */

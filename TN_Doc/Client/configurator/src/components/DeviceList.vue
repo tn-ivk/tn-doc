@@ -110,11 +110,18 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
 </script>
 
 <style scoped>
+/* Унифицированные spacing переменные */
+.device-list {
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+}
+
 .device-list {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0.5rem;
+  padding: var(--space-3);
   box-sizing: border-box;
 }
 
@@ -168,6 +175,7 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
 :deep(.p-listbox) {
   background-color: transparent;
   border: 1px solid var(--md-outline, #CFD8DC);
+  border-radius: 8px;
 }
 
 :deep(.p-listbox-list-container) {
@@ -176,5 +184,27 @@ function getDeviceIconClass(device: { Use?: boolean } | undefined) {
 
 :deep(.p-listbox-list) {
   background-color: transparent;
+  padding: 0.25rem;
+}
+
+/* Hover-эффекты для элементов списка */
+:deep(.p-listbox-option) {
+  border-radius: 6px;
+  margin-bottom: 2px;
+  transition: background-color 0.15s ease, padding-left 0.15s ease, transform 0.15s ease;
+}
+
+:deep(.p-listbox-option:hover) {
+  background-color: rgba(30, 136, 229, 0.06) !important;
+  padding-left: calc(0.75rem + 3px);
+}
+
+:deep(.p-listbox-option.p-listbox-option-selected) {
+  background-color: rgba(30, 136, 229, 0.12) !important;
+  border-left: 3px solid var(--md-primary, #1E88E5);
+}
+
+:deep(.p-listbox-option.p-listbox-option-selected:hover) {
+  background-color: rgba(30, 136, 229, 0.18) !important;
 }
 </style>

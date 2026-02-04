@@ -19,8 +19,13 @@ import DeviceEditor from './DeviceEditor.vue';
 </script>
 
 <style scoped>
+/* Унифицированные spacing переменные */
 .devices-tab {
-  padding: 0.5rem;
+  --space-3: 0.75rem;
+}
+
+.devices-tab {
+  padding: var(--space-3);
   box-sizing: border-box;
   height: 100%;
   display: flex;

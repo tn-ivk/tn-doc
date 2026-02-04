@@ -95,6 +95,14 @@ export interface Elis {
   ClientToken: string;
 }
 
+export interface DeviceConnectionDiagnosticSettings {
+  InitialPollSeconds: number;
+  MaxPollSeconds: number;
+  PollMultiplier: number;
+  NetworkFailureThreshold: number;
+  MaxRetryCount: number;
+}
+
 export interface CfgApp {
   Devices: Device[];
   PrintSettings: PrintSettings;
@@ -102,6 +110,7 @@ export interface CfgApp {
   Elis: Elis;
   UseSecurityFeatures: boolean;
   ArmOpcConnectionSettings?: OpcConnectionSettings;
+  DeviceConnectionDiagnostic?: DeviceConnectionDiagnosticSettings;
 }
 
 export interface ValidationError {
