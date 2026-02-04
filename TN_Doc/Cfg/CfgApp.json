@@ -3502,5 +3502,12 @@
       "UpdateRate": 500,
       "StartPrefix": "root.ARM.Reports"
     }
+  },
+  "DeviceConnectionDiagnostic": {
+    "InitialPollSeconds": 60,
+    "MaxPollSeconds": 3600,
+    "PollMultiplier": 2.0,
+    "NetworkFailureThreshold": 3,
+    "MaxRetryCount": 24
   }
 }

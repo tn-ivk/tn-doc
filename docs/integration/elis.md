@@ -282,8 +282,8 @@ flowchart TD
     Success -->|Да| UpdateCache[Обновить кэш]
     Success -->|Нет| RetryPolicy{Повтор?}
 
-    RetryPolicy -->|Да| Backoff[Экспоненциальная задержка]
-    Backoff --> FetchELIS
+    RetryPolicy -->|Да| Poll[Экспоненциальная задержка]
+    Poll --> FetchELIS
     RetryPolicy -->|Нет| Error[Вернуть ошибку]
 
     UpdateCache --> ReturnData[Вернуть данные]
@@ -322,7 +322,7 @@ var retryPolicy = Policy
         retryCount: _connectorConfig.RetryPolicy.MaxRetries,
         sleepDurationProvider: retryAttempt =>
             TimeSpan.FromMilliseconds(
-                _connectorConfig.RetryPolicy.BackoffMs * Math.Pow(2, retryAttempt)
+                _connectorConfig.RetryPolicy.PollMs * Math.Pow(2, retryAttempt)
             ),
         onRetry: (exception, timeSpan, retryCount, context) =>
         {

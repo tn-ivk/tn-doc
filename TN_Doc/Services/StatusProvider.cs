@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
+using TN_Doc.Models.DeviceConnectionDiagnostic;
 using TN_Doc.Models.Status;
 using TN_DocGeneral.Services;
 using TN_DocGeneral.Extensions;
@@ -24,13 +25,20 @@ public class StatusProvider : IStatusProvider
     private readonly ILogger<StatusProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly AppClientTracker _clientTracker;
+    private readonly IDeviceConnectionDiagnosticService _connectionDiagnostic;
 
-    public StatusProvider(IAppConfigService appConfigService, ILogger<StatusProvider> logger, IHttpClientFactory httpClientFactory, AppClientTracker clientTracker)
+    public StatusProvider(
+        IAppConfigService appConfigService,
+        ILogger<StatusProvider> logger,
+        IHttpClientFactory httpClientFactory,
+        AppClientTracker clientTracker,
+        IDeviceConnectionDiagnosticService connectionDiagnostic)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         _clientTracker = clientTracker ?? throw new ArgumentNullException(nameof(clientTracker));
+        _connectionDiagnostic = connectionDiagnostic ?? throw new ArgumentNullException(nameof(connectionDiagnostic));
     }
 
     /// <summary>
@@ -62,7 +70,7 @@ public class StatusProvider : IStatusProvider
             {
                 var deviceTasks = appConfig.Devices
                     .Where(d => d.Use)
-                    .Select(device => CheckDeviceAsync(device, ct));
+                    .Select(device => CheckDeviceInternalAsync(device, ct));
 
                 var deviceResults = await Task.WhenAll(deviceTasks);
                 devices.AddRange(deviceResults);
@@ -102,21 +110,66 @@ public class StatusProvider : IStatusProvider
     }
 
     /// <summary>
+    /// Проверяет статус конкретного устройства по ID (с принудительной проверкой)
+    /// </summary>
+    /// <param name="deviceId">ID устройства</param>
+    /// <param name="ct">Токен отмены</param>
+    /// <returns>Статус устройства или null если устройство не найдено</returns>
+    public async Task<DeviceStatus?> CheckDeviceAsync(string deviceId, CancellationToken ct = default)
+    {
+        var appConfig = _appConfigService.GetAppCfg();
+        if (appConfig?.Devices == null)
+            return null;
+
+        var device = appConfig.Devices.FirstOrDefault(d => d.IdDevice.ToString() == deviceId && d.Use);
+        if (device == null)
+            return null;
+
+        _logger.LogInformation("Принудительная проверка устройства {DeviceId} ({DeviceName})",
+            deviceId, device.Name);
+
+        // Сбрасываем диагностику соединения перед принудительной проверкой
+        _connectionDiagnostic.ResetDevice(deviceId);
+
+        return await CheckDeviceInternalAsync(device, ct, forceCheck: true);
+    }
+
+    /// <summary>
     /// Проверяет доступность устройства через подключение ко всем его базам данных
     /// </summary>
     /// <param name="device">Конфигурация устройства</param>
     /// <param name="ct">Токен отмены</param>
+    /// <param name="forceCheck">Принудительная проверка (игнорировать диагностику соединения)</param>
     /// <returns>Статус устройства с информацией о подключении по всем каналам</returns>
-    private async Task<DeviceStatus> CheckDeviceAsync(Device device, CancellationToken ct)
+    private async Task<DeviceStatus> CheckDeviceInternalAsync(Device device, CancellationToken ct, bool forceCheck = false)
     {
+        var deviceId = device.IdDevice.ToString();
+        var deviceName = device.Name ?? $"Device {device.IdDevice}";
+
         var status = new DeviceStatus
         {
-            Id = device.IdDevice.ToString(),
-            Name = device.Name ?? $"Device {device.IdDevice}",
+            Id = deviceId,
+            Name = deviceName,
             Type = "database",
             IsConnected = false,
             IsFullyConnected = false
         };
+
+        // Проверяем диагностику соединения (если не принудительная проверка)
+        if (!forceCheck && !_connectionDiagnostic.ShouldAllowConnection(deviceId))
+        {
+            // Устройство заблокировано - возвращаем кэшированное состояние ошибки
+            var diagInfo = _connectionDiagnostic.GetDeviceConnectionDiagnosticInfo(deviceId);
+            status.DeviceConnectionDiagnostic = diagInfo;
+            status.Error = diagInfo?.LastError ?? "Устройство заблокировано диагностикой соединения";
+            status.LastChecked = DateTime.Now;
+
+            _logger.LogDebug(
+                "Устройство {DeviceName} заблокировано диагностикой соединения (категория: {Category})",
+                deviceName, diagInfo?.ErrorCategory);
+
+            return status;
+        }
 
         // Получаем все активные строки подключения
         var activeConnectionStrings = device.DBConnectionStrings?
@@ -132,7 +185,7 @@ public class StatusProvider : IStatusProvider
 
         // Проверяем все каналы параллельно
         var channelTasks = activeConnectionStrings
-            .Select((cs, index) => CheckConnectionChannelAsync(cs, index + 1, ct));
+            .Select((cs, index) => CheckConnectionChannelAsync(deviceId, deviceName, cs, index + 1, ct));
 
         var channels = await Task.WhenAll(channelTasks);
         status.Channels = channels.ToList();
@@ -151,6 +204,9 @@ public class StatusProvider : IStatusProvider
             status.LatencyMs = connectedChannels
                 .Where(c => c.LatencyMs.HasValue)
                 .Min(c => c.LatencyMs);
+
+            // Успешное подключение - сбрасываем диагностику соединения
+            _connectionDiagnostic.RecordSuccess(deviceId);
         }
 
         // Формируем сообщение об ошибке если есть проблемы
@@ -160,9 +216,12 @@ public class StatusProvider : IStatusProvider
             status.Error = $"Нет связи: {string.Join(", ", failedChannels.Select(c => c.Name))}";
         }
 
+        // Добавляем информацию о диагностике соединения (если есть)
+        status.DeviceConnectionDiagnostic = _connectionDiagnostic.GetDeviceConnectionDiagnosticInfo(deviceId);
+
         _logger.LogDebug(
             "Устройство {DeviceName}: {ConnectedCount}/{TotalCount} каналов",
-            device.Name, connectedChannels.Count, totalChannels);
+            deviceName, connectedChannels.Count, totalChannels);
 
         return status;
     }
@@ -171,6 +230,8 @@ public class StatusProvider : IStatusProvider
     /// Проверяет отдельный канал связи (строку подключения)
     /// </summary>
     private async Task<ConnectionChannel> CheckConnectionChannelAsync(
+        string deviceId,
+        string deviceName,
         DBConnectionString dbConnectionString,
         int channelIndex,
         CancellationToken ct)
@@ -207,6 +268,8 @@ public class StatusProvider : IStatusProvider
         catch (Exception ex)
         {
             channel.Error = ex.Message;
+            // Регистрируем ошибку в диагностике соединения
+            _connectionDiagnostic.RecordFailure(deviceId, deviceName, ex);
         }
         finally
         {

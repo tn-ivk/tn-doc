@@ -2,6 +2,17 @@
  * Типы для статус-бара TN_Doc
  */
 
+export interface DeviceConnectionDiagnosticInfo {
+  isBlocked: boolean;
+  state: 'Active' | 'Blocked' | 'Recovering';
+  errorCategory?: 'Authentication' | 'Network' | 'Other';
+  lastError?: string;
+  failureCount: number;
+  maxRetryReached: boolean;
+  currentPollSeconds: number;
+  secondsUntilNextAttempt?: number;
+}
+
 export interface ConnectionChannel {
   name: string;
   isConnected: boolean;
@@ -23,6 +34,8 @@ export interface DeviceStatus {
   error?: string;
   /** Информация по каждому каналу связи */
   channels: ConnectionChannel[];
+  /** Информация о диагностике соединения */
+  deviceConnectionDiagnostic?: DeviceConnectionDiagnosticInfo;
 }
 
 export interface ConnectionStatus {
@@ -46,5 +59,6 @@ export interface StatusResponse {
 }
 
 export type HealthStatus = 'healthy' | 'warning' | 'critical';
-export type ConnectionState = 'disconnected' | 'connecting' | 'connected';
+/** Состояние SignalR соединения */
+export type SignalRConnectionState = 'disconnected' | 'connecting' | 'connected';
 export type IndicatorStatus = 'online' | 'offline' | 'ndv' | 'warning';

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TN_Doc.Models.DeviceConnectionDiagnostic;
 
 namespace TN_Doc.Models.Status;
 
@@ -34,4 +35,9 @@ public class DeviceStatus
     /// Информация по каждому каналу связи (строке подключения)
     /// </summary>
     public List<ConnectionChannel> Channels { get; set; } = new();
+
+    /// <summary>
+    /// Информация о диагностике соединения (защита от блокировки БД)
+    /// </summary>
+    public DeviceConnectionDiagnosticInfo? DeviceConnectionDiagnostic { get; set; }
 }
