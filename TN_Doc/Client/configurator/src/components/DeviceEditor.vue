@@ -98,6 +98,7 @@
                       :binary="true"
                   />
                 </div>
+                <div class="used-si-cell used-si-spacer" />
                 <div class="used-si-cell used-si-secondary-label used-si-cell-placeholder" />
                 <div class="used-si-cell used-si-secondary-control used-si-cell-placeholder" />
               </div>
@@ -113,6 +114,7 @@
                       :binary="true"
                   />
                 </div>
+                <div class="used-si-cell used-si-spacer" />
                 <div
                   v-if="usedPP"
                   class="used-si-cell used-si-secondary-label"
@@ -150,6 +152,7 @@
                       :binary="true"
                   />
                 </div>
+                <div class="used-si-cell used-si-spacer" />
                 <div
                   v-if="usedPVL"
                   class="used-si-cell used-si-secondary-label"
@@ -187,6 +190,7 @@
                       :binary="true"
                   />
                 </div>
+                <div class="used-si-cell used-si-spacer" />
                 <div
                   v-if="usedPVS"
                   class="used-si-cell used-si-secondary-label"
@@ -1498,20 +1502,14 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .used-si-table {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 200px 40px 40px 200px 40px;
+  gap: 0.5rem 0.75rem;
+  width: fit-content;
 }
 
 .used-si-row {
-  display: grid;
-  grid-template-columns: minmax(100px, auto) auto minmax(100px, auto) auto auto;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--surface-200);
-  border-radius: 0.5rem;
-  background-color: var(--surface-0);
+  display: contents;
 }
 
 .used-si-cell {
@@ -1528,7 +1526,17 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 .used-si-control,
 .used-si-secondary-control {
+  display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.used-si-control :deep(.p-checkbox),
+.used-si-secondary-control :deep(.p-checkbox) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .used-si-control :deep(.p-checkbox-box),
@@ -1545,7 +1553,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .used-si-secondary-control {
-  justify-content: flex-start;
+  /* Стили уже определены выше вместе с .used-si-control */
 }
 
 .used-si-secondary-label label {
@@ -1558,7 +1566,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .used-si-cell-placeholder {
-  width: 100%;
-  height: 1px;
+  min-width: 0;
+  visibility: hidden;
 }
 </style>
