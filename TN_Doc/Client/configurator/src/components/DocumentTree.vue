@@ -187,7 +187,7 @@ watch(currentConfig, () => {
 }
 
 :deep(.p-tree-node-content) {
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: background-color 0.2s;
 }
