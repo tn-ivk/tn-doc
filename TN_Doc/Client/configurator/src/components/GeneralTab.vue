@@ -296,23 +296,31 @@ const elisClientToken = computed({
 </script>
 
 <style scoped>
+/* Унифицированные spacing переменные */
 .general-tab {
-  padding: 0.25rem 0.5rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+}
+
+.general-tab {
+  padding: var(--space-2) var(--space-3);
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
 .field {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   flex-shrink: 0;
 }
 
 .field-horizontal {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .field-horizontal label {

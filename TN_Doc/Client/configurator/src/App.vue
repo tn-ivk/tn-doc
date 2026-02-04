@@ -153,6 +153,20 @@ function handleCancel() {
 </script>
 
 <style scoped>
+/* ===== Design Tokens: Spacing System (base: 4px) ===== */
+.configurator-container {
+  --space-1: 0.25rem;   /* 4px - микро-отступы */
+  --space-2: 0.5rem;    /* 8px - между элементами в строке */
+  --space-3: 0.75rem;   /* 12px - padding компонентов */
+  --space-4: 1rem;      /* 16px - gap между секциями */
+  --space-5: 1.25rem;   /* 20px - между Panel блоками */
+  --space-6: 1.5rem;    /* 24px - крупные разделители */
+
+  /* Transition tokens */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+}
+
 .configurator-container {
   display: flex;
   flex-direction: column;

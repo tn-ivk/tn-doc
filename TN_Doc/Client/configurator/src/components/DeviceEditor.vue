@@ -896,10 +896,19 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 </script>
 
 <style scoped>
+/* ===== Унифицированные spacing переменные ===== */
+.device-editor {
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+}
+
 .device-editor {
   height: 100%;
-  overflow: auto; /* и вертикальный, и горизонтальный при необходимости внутри правой панели */
-  padding: 0.5rem;
+  overflow: auto;
+  padding: var(--space-3);
   box-sizing: border-box;
 }
 
@@ -913,14 +922,14 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .no-selection p {
-  margin-top: 1rem;
+  margin-top: var(--space-4);
   font-size: 1.1rem;
 }
 
 .editor-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-3);
 }
 
 .editor-header h3 {
@@ -931,15 +940,16 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .editor-sections {
   display: flex;
   flex-direction: column;
+  gap: var(--space-4); /* Унифицированный gap между секциями */
 }
 
 .field {
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .field label {
   display: block;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
   font-weight: 600;
   color: var(--text-color);
   font-size: 0.9rem;
@@ -948,8 +958,8 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .field-checkbox {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .field-checkbox label {
@@ -959,7 +969,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 .invalid-chars-section {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--space-5);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -967,12 +977,16 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .field-horizontal {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
   margin-bottom: 0;
 }
 
+/* Секция "Использовать устройство" с разделителем */
 .compact-section {
-  padding: 0.25rem 0.25rem; /* компактнее, чем panel-content */
+  padding: var(--space-2) var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--md-outline-light, #ECEFF1);
+  margin-bottom: var(--space-2);
 }
 
 .field-horizontal label {
@@ -986,7 +1000,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 .templates-section {
   border-top: 1px solid var(--surface-200);
-  padding-top: 0.5rem;
+  padding-top: var(--space-2);
 }
 
 .w-full {
@@ -994,28 +1008,35 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 }
 
 .mt-2 {
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
 }
 
 .mt-3 {
-  margin-top: 0.75rem;
+  margin-top: 0; /* Убираем, т.к. используем gap в editor-sections */
 }
 
-/* Компактные панели */
+/* Компактные панели с унифицированным spacing */
 :deep(.p-panel) {
-  background-color: transparent;
+  background-color: rgba(250, 250, 250, 0.5);
   border: 1px solid var(--md-outline, #CFD8DC);
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+:deep(.p-panel:hover) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 :deep(.p-panel-header) {
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-3);
   font-size: 0.9rem;
   background-color: transparent;
   border-bottom: 1px solid var(--md-outline, #CFD8DC);
+  border-radius: 8px 8px 0 0;
 }
 
 :deep(.p-panel-content) {
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-3);
   background-color: transparent;
 }
 
@@ -1213,9 +1234,15 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   display: none;
 }
 
-/* Компактная высота строк таблицы документов */
+/* Компактная высота строк таблицы документов с hover-эффектом */
 .docs-table :deep(.p-datatable-tbody > tr) {
   line-height: 1.1;
+  transition: background-color 0.15s ease;
+  border-radius: 4px;
+}
+
+.docs-table :deep(.p-datatable-tbody > tr:hover) {
+  background-color: rgba(30, 136, 229, 0.04);
 }
 
 .docs-table :deep(.p-datatable-tbody > tr > td) {
@@ -1256,17 +1283,23 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   color: var(--md-text, #212121) !important;
 }
 
-/* Кнопка "Изменить…" в строке — компактнее */
+/* Кнопка "Изменить…" в строке — с hover-эффектом */
 .docs-table :deep(.p-button.p-button-text.p-button-sm) {
-  padding: 0.2rem 0.35rem !important;
+  padding: 0.25rem 0.5rem !important;
   line-height: 1.1 !important;
+  border-radius: 4px !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.docs-table :deep(.p-button.p-button-text.p-button-sm:hover) {
+  background-color: rgba(30, 136, 229, 0.08) !important;
 }
 
 /* Текст кнопки "Изменить…" — синий (--md-primary) */
 .docs-table :deep(.p-button.p-button-text.p-button-sm),
 .docs-table :deep(.p-button.p-button-text.p-button-sm .p-button-label) {
   color: var(--md-primary, #1E88E5) !important;
-  font-weight: 400 !important; /* обычный */
+  font-weight: 500 !important;
 }
 
 /* Фиксация узкой ширины второго столбца (переключатель) */
@@ -1306,10 +1339,15 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 
 .db-connection-card {
   border: 2px solid var(--surface-200);
-  border-radius: 0.5rem;
+  border-radius: 8px;
   background-color: var(--surface-0);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   overflow: hidden;
+}
+
+.db-connection-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .db-connection-card.connection-active {
@@ -1317,10 +1355,19 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
 }
 
+.db-connection-card.connection-active:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
 .db-connection-card.connection-inactive {
   border-color: #ef4444;
   box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
   opacity: 0.7;
+}
+
+.db-connection-card.connection-inactive:hover {
+  opacity: 0.85;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
 }
 
 .card-header {
@@ -1477,6 +1524,11 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   margin: 0;
   font-weight: 600;
   color: var(--text-color);
+}
+
+.used-si-control,
+.used-si-secondary-control {
+  justify-content: center;
 }
 
 .used-si-control :deep(.p-checkbox-box),
