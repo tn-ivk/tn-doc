@@ -40,57 +40,61 @@
     </div>
 
     <!-- Настройки ЕЛИС -->
-    <div class="field field-horizontal">
-      <label for="use-elis">Использовать ЕЛИС:</label>
-      <ToggleSwitch
-        id="use-elis"
-        v-model="elisEnabled"
-      />
-    </div>
+    <Panel header="Настройки ЕЛИС" class="elis-panel">
+      <div class="elis-settings-container">
+        <div class="field field-horizontal">
+          <label for="use-elis">Использовать ЕЛИС:</label>
+          <ToggleSwitch
+            id="use-elis"
+            v-model="elisEnabled"
+          />
+        </div>
 
-    <!-- Поля настроек ЕЛИС (отображаются только когда ЕЛИС включен) -->
-    <template v-if="elisEnabled">
-      <div class="field field-horizontal">
-        <label for="elis-ost-key">OstKey:</label>
-        <InputText
-          id="elis-ost-key"
-          v-model="elisOstKey"
-          placeholder="Ключ ОСТ"
-          class="field-input-flex"
-        />
-      </div>
+        <!-- Поля настроек ЕЛИС (отображаются только когда ЕЛИС включен) -->
+        <template v-if="elisEnabled">
+          <div class="field field-horizontal">
+            <label for="elis-ost-key">OstKey:</label>
+            <InputText
+              id="elis-ost-key"
+              v-model="elisOstKey"
+              placeholder="Ключ ОСТ"
+              class="field-input-flex"
+            />
+          </div>
 
-      <div class="field field-horizontal">
-        <label for="elis-sikn-key">SiknKey:</label>
-        <InputText
-          id="elis-sikn-key"
-          v-model="elisSiknKey"
-          placeholder="Ключ СИКН"
-          class="field-input-flex"
-        />
-      </div>
+          <div class="field field-horizontal">
+            <label for="elis-sikn-key">SiknKey:</label>
+            <InputText
+              id="elis-sikn-key"
+              v-model="elisSiknKey"
+              placeholder="Ключ СИКН"
+              class="field-input-flex"
+            />
+          </div>
 
-      <div class="field field-horizontal">
-        <label for="elis-client-name">ClientName:</label>
-        <InputText
-          id="elis-client-name"
-          v-model="elisClientName"
-          placeholder="Имя клиента"
-          class="field-input-flex"
-        />
-      </div>
+          <div class="field field-horizontal">
+            <label for="elis-client-name">ClientName:</label>
+            <InputText
+              id="elis-client-name"
+              v-model="elisClientName"
+              placeholder="Имя клиента"
+              class="field-input-flex"
+            />
+          </div>
 
-      <div class="field field-horizontal">
-        <label for="elis-client-token">ClientToken:</label>
-        <InputText
-          id="elis-client-token"
-          v-model="elisClientToken"
-          placeholder="Токен клиента"
-          class="field-input-flex"
-          disabled
-        />
+          <div class="field field-horizontal">
+            <label for="elis-client-token">ClientToken:</label>
+            <InputText
+              id="elis-client-token"
+              v-model="elisClientToken"
+              placeholder="Токен клиента"
+              class="field-input-flex"
+              disabled
+            />
+          </div>
+        </template>
       </div>
-    </template>
+    </Panel>
 
     <!-- Заполнитель для растягивания по высоте -->
     <div class="spacer"></div>
@@ -403,6 +407,45 @@ const elisClientToken = computed({
 
 :deep(.p-inputtext#export-path:hover) {
   border-color: #B0BEC5 !important;
+}
+
+/* Стили для панели ЕЛИС */
+:deep(.elis-panel.p-panel) {
+  margin-top: var(--space-3);
+  background: transparent !important;
+  border: 1px solid var(--md-outline, #CFD8DC);
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+:deep(.elis-panel.p-panel:hover) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+:deep(.elis-panel .p-panel-header) {
+  padding: var(--space-3);
+  font-size: 0.9rem;
+  background: transparent !important;
+  border-bottom: 1px solid var(--md-outline, #CFD8DC);
+}
+
+:deep(.elis-panel .p-panel-content) {
+  padding: var(--space-3);
+  background: transparent !important;
+}
+
+.elis-settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.elis-settings-container .field-horizontal {
+  margin-bottom: var(--space-2);
+}
+
+.elis-settings-container .field-horizontal:last-child {
+  margin-bottom: 0;
 }
 
 /* Стили для полей ЕЛИС */
