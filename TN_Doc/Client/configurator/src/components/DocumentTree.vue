@@ -183,7 +183,7 @@ watch(currentConfig, () => {
 }
 
 :deep(.p-tree-node) {
-  padding: 0.25rem 0;
+  padding: 0.125rem 0;
 }
 
 :deep(.p-tree-node-content) {

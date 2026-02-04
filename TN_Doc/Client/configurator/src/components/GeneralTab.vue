@@ -106,6 +106,7 @@
             v-model="diagInitialPollSeconds"
             :min="1"
             :max="3600"
+            showButtons
             class="field-input-flex"
           />
         </div>
@@ -117,6 +118,7 @@
             v-model="diagMaxPollSeconds"
             :min="60"
             :max="86400"
+            showButtons
             class="field-input-flex"
           />
         </div>
@@ -128,8 +130,10 @@
             v-model="diagPollMultiplier"
             :min="1.1"
             :max="10"
+            :step="0.1"
             :minFractionDigits="1"
             :maxFractionDigits="1"
+            showButtons
             class="field-input-flex"
           />
         </div>
@@ -141,6 +145,7 @@
             v-model="diagNetworkFailureThreshold"
             :min="1"
             :max="100"
+            showButtons
             class="field-input-flex"
           />
         </div>
@@ -152,14 +157,12 @@
             v-model="diagMaxRetryCount"
             :min="1"
             :max="1000"
+            showButtons
             class="field-input-flex"
           />
         </div>
       </div>
     </Panel>
-
-    <!-- Заполнитель для растягивания по высоте -->
-    <div class="spacer"></div>
 
     <!-- Модальное окно настроек OPC -->
     <Dialog
@@ -435,6 +438,7 @@ const diagMaxRetryCount = computed({
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow-y: auto;
 }
 
 .field {
@@ -488,11 +492,6 @@ const diagMaxRetryCount = computed({
 
 .mt-2 {
   margin-top: 0.5rem;
-}
-
-.spacer {
-  flex: 1;
-  min-height: 0;
 }
 
 /* Компактные панели */
@@ -591,6 +590,36 @@ const diagMaxRetryCount = computed({
 
 :deep(.field-input-flex.p-inputnumber .p-inputnumber-input:hover) {
   border-color: #B0BEC5 !important;
+}
+
+/* Стили для InputNumber с кнопками */
+:deep(.field-input-flex.p-inputnumber.p-inputnumber-buttons-stacked .p-inputnumber-input) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button-group) {
+  border: 1px solid #CFD8DC !important;
+  border-left: none !important;
+  border-radius: 0 8px 8px 0 !important;
+  overflow: hidden;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button) {
+  background-color: #ffffff !important;
+  border: none !important;
+  color: #616161 !important;
+  transition: all 0.15s ease-in-out !important;
+  width: 2rem !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button:hover) {
+  background-color: #F5F5F5 !important;
+  color: #212121 !important;
+}
+
+:deep(.field-input-flex.p-inputnumber .p-inputnumber-button:active) {
+  background-color: #BDBDBD !important;
 }
 
 /* Стили для полей ЕЛИС */
