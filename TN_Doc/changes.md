@@ -1,5 +1,8 @@
 # Список изменений:
 ## Версия 1.4.4:
+    - Рефакторинг: ConnectionDiagnostic -> DeviceConnectionDiagnostic
+        - Переименованы классы, интерфейсы и namespace для улучшения читаемости
+        - Обновлены JSON-конфигурации (CfgApp.json)
     - StatusBar: glassmorphism редизайн диалога диагностики устройств
         - Светлая тема с эффектом размытия фона (backdrop-filter: blur)
         - Поддержка drag-and-drop для перемещения диалога
