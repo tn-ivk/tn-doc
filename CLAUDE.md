@@ -67,7 +67,7 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 | Service | Назначение |
 |---------|------------|
 | `IStatusProvider` | Мониторинг здоровья системы (многоканальный) |
-| `ICircuitBreakerService` | Circuit Breaker для устройств |
+| `IConnectionDiagnosticService` | Диагностика подключений устройств |
 | `IConfigurationService` | Управление конфигурацией и документами |
 | `PrinterService` | Платформо-зависимая печать |
 
@@ -87,11 +87,11 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 - **e2e/** — Playwright тесты
 - Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
 
-### StatusBar: Circuit Breaker + Многоканальная диагностика
+### StatusBar: Диагностика подключений
 
 Диалог диагностики `DeviceDiagnosticsDialog.vue` показывает:
 - Статус всех каналов связи (DBConnectionStrings) с latency
-- Состояние Circuit Breaker: `Closed` → `Open` → `HalfOpen`
+- Состояние подключения: `Closed` → `Open` → `HalfOpen`
 - Категории ошибок: Authentication, MaxRetry, Blocked
 
 Трёхцветная индикация: зелёный (все каналы), жёлтый (частичное), красный (нет связи).
@@ -101,7 +101,7 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 ### Status API (`/api/status`)
 - `GET /api/status` — статус всех устройств и сервисов (кэш 5 сек)
 - `POST /api/status/refresh` — принудительное обновление
-- `POST /api/status/device/{deviceId}/retry` — сброс Circuit Breaker
+- `POST /api/status/device/{deviceId}/retry` — сброс диагностики подключения
 
 ### Configurator API (`/api/configurator`)
 - `GET/POST /api/configurator/config` — CfgApp.json
