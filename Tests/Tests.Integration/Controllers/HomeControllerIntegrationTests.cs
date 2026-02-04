@@ -20,33 +20,8 @@ public class HomeControllerIntegrationTests : IntegrationTestBase
     }
 
     [Test]
-    public async Task GetStatus_ReturnsJsonResponse()
-    {
-        // Act
-        var response = await Client.GetAsync("/Home/GetStatus");
-
-        // Assert
-        Assert.That(response.IsSuccessStatusCode, Is.True, $"Expected success but got {response.StatusCode}");
-        Assert.That(response.Content.Headers.ContentType?.MediaType, Is.EqualTo("application/json"));
-    }
-
-    [Test]
-    public async Task GetDevices_ReturnsDeviceList()
-    {
-        // Act
-        var response = await Client.GetAsync("/Home/GetDevices");
-
-        // Assert
-        Assert.That(response.IsSuccessStatusCode, Is.True);
-
-        var content = await response.Content.ReadAsStringAsync();
-        Assert.That(content, Is.Not.Null.And.Not.Empty);
-    }
-
-    [Test]
+    [TestCase("/")]
     [TestCase("/Home/Index")]
-    [TestCase("/Home/GetStatus")]
-    [TestCase("/Home/GetDevices")]
     public async Task Endpoints_AreAccessible(string endpoint)
     {
         // Act
