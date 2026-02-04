@@ -441,10 +441,6 @@ const elisClientToken = computed({
 }
 
 .elis-settings-container .field-horizontal {
-  margin-bottom: var(--space-2);
-}
-
-.elis-settings-container .field-horizontal:last-child {
   margin-bottom: 0;
 }
 
