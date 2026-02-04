@@ -1539,12 +1539,6 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
   align-items: center;
 }
 
-.used-si-control :deep(.p-checkbox-box),
-.used-si-secondary-control :deep(.p-checkbox-box) {
-  width: 1.05rem;
-  height: 1.05rem;
-}
-
 
 .used-si-secondary-label {
   justify-content: flex-start;
