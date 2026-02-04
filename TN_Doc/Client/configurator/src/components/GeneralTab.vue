@@ -106,7 +106,6 @@
             v-model="diagInitialPollSeconds"
             :min="1"
             :max="3600"
-            showButtons
             class="field-input-flex"
           />
         </div>
@@ -118,7 +117,6 @@
             v-model="diagMaxPollSeconds"
             :min="60"
             :max="86400"
-            showButtons
             class="field-input-flex"
           />
         </div>
@@ -133,7 +131,6 @@
             :step="0.1"
             :minFractionDigits="1"
             :maxFractionDigits="1"
-            showButtons
             class="field-input-flex"
           />
         </div>
@@ -145,7 +142,6 @@
             v-model="diagNetworkFailureThreshold"
             :min="1"
             :max="100"
-            showButtons
             class="field-input-flex"
           />
         </div>
@@ -157,7 +153,6 @@
             v-model="diagMaxRetryCount"
             :min="1"
             :max="1000"
-            showButtons
             class="field-input-flex"
           />
         </div>
