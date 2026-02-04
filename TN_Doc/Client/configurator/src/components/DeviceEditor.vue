@@ -1504,7 +1504,7 @@ function updateConnectionField(connectionIndex: number, field: string, value: an
 .used-si-table {
   display: grid;
   grid-template-columns: 200px 40px 40px 200px 40px;
-  gap: 0.5rem 0.75rem;
+  gap: 0.75rem 0.75rem;
   width: fit-content;
 }
 
