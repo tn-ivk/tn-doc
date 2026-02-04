@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using TN_Doc.Models.CircuitBreaker;
+using TN_Doc.Models.ConnectionDiagnostic;
 using TN_Doc.Models.Status;
 using TN_DocGeneral.Services;
 using TN_DocGeneral.Extensions;
@@ -25,20 +25,20 @@ public class StatusProvider : IStatusProvider
     private readonly ILogger<StatusProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly AppClientTracker _clientTracker;
-    private readonly ICircuitBreakerService _circuitBreaker;
+    private readonly IConnectionDiagnosticService _connectionDiagnostic;
 
     public StatusProvider(
         IAppConfigService appConfigService,
         ILogger<StatusProvider> logger,
         IHttpClientFactory httpClientFactory,
         AppClientTracker clientTracker,
-        ICircuitBreakerService circuitBreaker)
+        IConnectionDiagnosticService connectionDiagnostic)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         _clientTracker = clientTracker ?? throw new ArgumentNullException(nameof(clientTracker));
-        _circuitBreaker = circuitBreaker ?? throw new ArgumentNullException(nameof(circuitBreaker));
+        _connectionDiagnostic = connectionDiagnostic ?? throw new ArgumentNullException(nameof(connectionDiagnostic));
     }
 
     /// <summary>
@@ -128,8 +128,8 @@ public class StatusProvider : IStatusProvider
         _logger.LogInformation("Принудительная проверка устройства {DeviceId} ({DeviceName})",
             deviceId, device.Name);
 
-        // Сбрасываем Circuit Breaker перед принудительной проверкой
-        _circuitBreaker.ResetDevice(deviceId);
+        // Сбрасываем диагностику соединения перед принудительной проверкой
+        _connectionDiagnostic.ResetDevice(deviceId);
 
         return await CheckDeviceInternalAsync(device, ct, forceCheck: true);
     }
@@ -139,7 +139,7 @@ public class StatusProvider : IStatusProvider
     /// </summary>
     /// <param name="device">Конфигурация устройства</param>
     /// <param name="ct">Токен отмены</param>
-    /// <param name="forceCheck">Принудительная проверка (игнорировать Circuit Breaker)</param>
+    /// <param name="forceCheck">Принудительная проверка (игнорировать диагностику соединения)</param>
     /// <returns>Статус устройства с информацией о подключении по всем каналам</returns>
     private async Task<DeviceStatus> CheckDeviceInternalAsync(Device device, CancellationToken ct, bool forceCheck = false)
     {
@@ -155,18 +155,18 @@ public class StatusProvider : IStatusProvider
             IsFullyConnected = false
         };
 
-        // Проверяем Circuit Breaker (если не принудительная проверка)
-        if (!forceCheck && !_circuitBreaker.ShouldAllowConnection(deviceId))
+        // Проверяем диагностику соединения (если не принудительная проверка)
+        if (!forceCheck && !_connectionDiagnostic.ShouldAllowConnection(deviceId))
         {
             // Устройство заблокировано - возвращаем кэшированное состояние ошибки
-            var cbInfo = _circuitBreaker.GetCircuitBreakerInfo(deviceId);
-            status.CircuitBreaker = cbInfo;
-            status.Error = cbInfo?.LastError ?? "Устройство заблокировано Circuit Breaker";
+            var diagInfo = _connectionDiagnostic.GetConnectionDiagnosticInfo(deviceId);
+            status.ConnectionDiagnostic = diagInfo;
+            status.Error = diagInfo?.LastError ?? "Устройство заблокировано диагностикой соединения";
             status.LastChecked = DateTime.Now;
 
             _logger.LogDebug(
-                "Устройство {DeviceName} заблокировано Circuit Breaker (категория: {Category})",
-                deviceName, cbInfo?.ErrorCategory);
+                "Устройство {DeviceName} заблокировано диагностикой соединения (категория: {Category})",
+                deviceName, diagInfo?.ErrorCategory);
 
             return status;
         }
@@ -205,8 +205,8 @@ public class StatusProvider : IStatusProvider
                 .Where(c => c.LatencyMs.HasValue)
                 .Min(c => c.LatencyMs);
 
-            // Успешное подключение - сбрасываем Circuit Breaker
-            _circuitBreaker.RecordSuccess(deviceId);
+            // Успешное подключение - сбрасываем диагностику соединения
+            _connectionDiagnostic.RecordSuccess(deviceId);
         }
 
         // Формируем сообщение об ошибке если есть проблемы
@@ -216,8 +216,8 @@ public class StatusProvider : IStatusProvider
             status.Error = $"Нет связи: {string.Join(", ", failedChannels.Select(c => c.Name))}";
         }
 
-        // Добавляем информацию о Circuit Breaker (если есть)
-        status.CircuitBreaker = _circuitBreaker.GetCircuitBreakerInfo(deviceId);
+        // Добавляем информацию о диагностике соединения (если есть)
+        status.ConnectionDiagnostic = _connectionDiagnostic.GetConnectionDiagnosticInfo(deviceId);
 
         _logger.LogDebug(
             "Устройство {DeviceName}: {ConnectedCount}/{TotalCount} каналов",
@@ -268,8 +268,8 @@ public class StatusProvider : IStatusProvider
         catch (Exception ex)
         {
             channel.Error = ex.Message;
-            // Регистрируем ошибку в Circuit Breaker
-            _circuitBreaker.RecordFailure(deviceId, deviceName, ex);
+            // Регистрируем ошибку в диагностике соединения
+            _connectionDiagnostic.RecordFailure(deviceId, deviceName, ex);
         }
         finally
         {

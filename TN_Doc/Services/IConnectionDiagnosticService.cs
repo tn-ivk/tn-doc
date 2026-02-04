@@ -1,13 +1,13 @@
 using System;
-using TN_Doc.Models.CircuitBreaker;
+using TN_Doc.Models.ConnectionDiagnostic;
 
 namespace TN_Doc.Services;
 
 /// <summary>
-/// Сервис Circuit Breaker для защиты БД от блокировки при неудачных попытках подключения.
+/// Сервис диагностики соединения для защиты БД от блокировки при неудачных попытках подключения.
 /// При неправильном пароле MySQL блокирует хост после 100 неудачных попыток (max_connect_errors).
 /// </summary>
-public interface ICircuitBreakerService
+public interface IConnectionDiagnosticService
 {
     /// <summary>
     /// Проверяет, разрешено ли сейчас подключение к устройству
@@ -31,18 +31,18 @@ public interface ICircuitBreakerService
     void RecordFailure(string deviceId, string deviceName, Exception exception);
 
     /// <summary>
-    /// Сбрасывает Circuit Breaker для устройства (ручной сброс)
+    /// Сбрасывает состояние диагностики для устройства (ручной сброс)
     /// </summary>
     /// <param name="deviceId">ID устройства</param>
     /// <returns>true если сброс выполнен успешно</returns>
     bool ResetDevice(string deviceId);
 
     /// <summary>
-    /// Получает информацию о состоянии Circuit Breaker для устройства
+    /// Получает информацию о состоянии диагностики соединения для устройства
     /// </summary>
     /// <param name="deviceId">ID устройства</param>
-    /// <returns>Информация о Circuit Breaker или null если устройство не отслеживается</returns>
-    CircuitBreakerInfo? GetCircuitBreakerInfo(string deviceId);
+    /// <returns>Информация о диагностике или null если устройство не отслеживается</returns>
+    ConnectionDiagnosticInfo? GetConnectionDiagnosticInfo(string deviceId);
 
     /// <summary>
     /// Проверяет, есть ли заблокированные устройства

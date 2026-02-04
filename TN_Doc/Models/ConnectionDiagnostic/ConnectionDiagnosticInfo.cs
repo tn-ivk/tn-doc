@@ -1,9 +1,9 @@
-namespace TN_Doc.Models.CircuitBreaker;
+namespace TN_Doc.Models.ConnectionDiagnostic;
 
 /// <summary>
-/// DTO с информацией о Circuit Breaker для API ответа
+/// DTO с информацией о диагностике соединения для API ответа
 /// </summary>
-public class CircuitBreakerInfo
+public class ConnectionDiagnosticInfo
 {
     /// <summary>
     /// Устройство заблокировано (Open state с RequiresManualReset)
@@ -11,7 +11,7 @@ public class CircuitBreakerInfo
     public bool IsBlocked { get; set; }
 
     /// <summary>
-    /// Текущее состояние Circuit Breaker
+    /// Текущее состояние диагностики соединения
     /// </summary>
     public string State { get; set; } = "Closed";
 
@@ -36,9 +36,9 @@ public class CircuitBreakerInfo
     public bool MaxRetryReached { get; set; }
 
     /// <summary>
-    /// Текущий интервал backoff в секундах (0 если нет backoff)
+    /// Текущий интервал опроса в секундах (0 если нет задержки)
     /// </summary>
-    public int CurrentBackoffSeconds { get; set; }
+    public int CurrentPollSeconds { get; set; }
 
     /// <summary>
     /// Секунд до следующей автоматической попытки (null если блокировка)

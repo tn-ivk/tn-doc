@@ -1,4 +1,4 @@
-namespace TN_Doc.Models.CircuitBreaker;
+namespace TN_Doc.Models.ConnectionDiagnostic;
 
 /// <summary>
 /// Категория ошибки подключения к БД

@@ -1,11 +1,11 @@
 using System;
 
-namespace TN_Doc.Models.CircuitBreaker;
+namespace TN_Doc.Models.ConnectionDiagnostic;
 
 /// <summary>
-/// Внутреннее состояние Circuit Breaker для устройства
+/// Внутреннее состояние диагностики соединения для устройства
 /// </summary>
-public class DeviceCircuitState
+public class DeviceConnectionState
 {
     /// <summary>
     /// ID устройства
@@ -18,9 +18,9 @@ public class DeviceCircuitState
     public string DeviceName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Текущее состояние Circuit Breaker
+    /// Текущее состояние соединения
     /// </summary>
-    public CircuitState State { get; set; } = CircuitState.Closed;
+    public ConnectionState State { get; set; } = ConnectionState.Closed;
 
     /// <summary>
     /// Категория последней ошибки
@@ -38,14 +38,14 @@ public class DeviceCircuitState
     public int FailureCount { get; set; }
 
     /// <summary>
-    /// Количество попыток с максимальным backoff
+    /// Количество попыток с максимальным интервалом опроса
     /// </summary>
-    public int MaxBackoffRetryCount { get; set; }
+    public int MaxPollRetryCount { get; set; }
 
     /// <summary>
-    /// Текущий интервал backoff в секундах
+    /// Текущий интервал опроса в секундах
     /// </summary>
-    public int CurrentBackoffSeconds { get; set; }
+    public int CurrentPollSeconds { get; set; }
 
     /// <summary>
     /// Время следующей разрешённой попытки подключения

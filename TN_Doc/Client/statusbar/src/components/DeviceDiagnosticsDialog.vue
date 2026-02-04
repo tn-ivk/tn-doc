@@ -48,27 +48,27 @@
               </div>
             </div>
 
-            <!-- Circuit Breaker Alert -->
+            <!-- Connection Diagnostic Alert -->
             <div
-              v-if="hasCircuitBreakerIssue"
+              v-if="hasConnectionDiagnosticIssue"
               class="cb-alert"
               :class="alertClass"
             >
               <div class="cb-alert__header">
                 <i class="pi pi-shield"></i>
-                <span class="cb-alert__title">Circuit Breaker</span>
-                <span class="cb-alert__badge">{{ circuitBreakerBadge }}</span>
+                <span class="cb-alert__title">Диагностика</span>
+                <span class="cb-alert__badge">{{ connectionDiagnosticBadge }}</span>
               </div>
-              <p class="cb-alert__message">{{ circuitBreakerMessage }}</p>
+              <p class="cb-alert__message">{{ connectionDiagnosticMessage }}</p>
               <div class="cb-alert__stats">
-                <span v-if="circuitBreaker?.failureCount">
-                  Попыток: <strong>{{ circuitBreaker.failureCount }}</strong>
+                <span v-if="connectionDiagnostic?.failureCount">
+                  Попыток: <strong>{{ connectionDiagnostic.failureCount }}</strong>
                 </span>
-                <span v-if="circuitBreaker?.currentBackoffSeconds">
-                  Backoff: <strong>{{ circuitBreaker.currentBackoffSeconds }}с</strong>
+                <span v-if="connectionDiagnostic?.currentPollSeconds">
+                  Интервал: <strong>{{ connectionDiagnostic.currentPollSeconds }}с</strong>
                 </span>
-                <span v-if="circuitBreaker?.secondsUntilNextAttempt">
-                  Retry: <strong>{{ circuitBreaker.secondsUntilNextAttempt }}с</strong>
+                <span v-if="connectionDiagnostic?.secondsUntilNextAttempt">
+                  Retry: <strong>{{ connectionDiagnostic.secondsUntilNextAttempt }}с</strong>
                 </span>
               </div>
             </div>
@@ -187,12 +187,12 @@ onUnmounted(() => {
   document.removeEventListener('touchend', stopDrag);
 });
 
-const circuitBreaker = computed(() => store.selectedDevice?.circuitBreaker);
+const connectionDiagnostic = computed(() => store.selectedDevice?.connectionDiagnostic);
 
-const hasCircuitBreakerIssue = computed(() => {
-  const cb = circuitBreaker.value;
-  if (!cb) return false;
-  return cb.isBlocked || cb.state !== 'Closed' || cb.failureCount > 0;
+const hasConnectionDiagnosticIssue = computed(() => {
+  const cd = connectionDiagnostic.value;
+  if (!cd) return false;
+  return cd.isBlocked || cd.state !== 'Closed' || cd.failureCount > 0;
 });
 
 const headerStatusClass = computed(() => {
@@ -223,38 +223,38 @@ const statusText = computed(() => {
 });
 
 const alertClass = computed(() => {
-  const cb = circuitBreaker.value;
-  if (!cb) return '';
+  const cd = connectionDiagnostic.value;
+  if (!cd) return '';
 
-  if (cb.errorCategory === 'Authentication') return 'cb-alert--auth';
-  if (cb.isBlocked || cb.maxRetryReached) return 'cb-alert--blocked';
+  if (cd.errorCategory === 'Authentication') return 'cb-alert--auth';
+  if (cd.isBlocked || cd.maxRetryReached) return 'cb-alert--blocked';
   return 'cb-alert--warning';
 });
 
-const circuitBreakerBadge = computed(() => {
-  const cb = circuitBreaker.value;
-  if (!cb) return '';
+const connectionDiagnosticBadge = computed(() => {
+  const cd = connectionDiagnostic.value;
+  if (!cd) return '';
 
-  if (cb.errorCategory === 'Authentication') return 'AUTH';
-  if (cb.maxRetryReached) return 'MAX RETRY';
-  return cb.state;
+  if (cd.errorCategory === 'Authentication') return 'AUTH';
+  if (cd.maxRetryReached) return 'MAX RETRY';
+  return cd.state;
 });
 
-const circuitBreakerMessage = computed(() => {
-  const cb = circuitBreaker.value;
-  if (!cb) return '';
+const connectionDiagnosticMessage = computed(() => {
+  const cd = connectionDiagnostic.value;
+  if (!cd) return '';
 
-  if (cb.errorCategory === 'Authentication') {
+  if (cd.errorCategory === 'Authentication') {
     return 'Ошибка аутентификации. Проверьте учётные данные.';
   }
-  if (cb.maxRetryReached) {
+  if (cd.maxRetryReached) {
     return 'Превышено максимальное количество попыток.';
   }
-  if (cb.isBlocked) {
+  if (cd.isBlocked) {
     return 'Устройство заблокировано. Требуется проверка.';
   }
-  if (cb.lastError) {
-    return cb.lastError;
+  if (cd.lastError) {
+    return cd.lastError;
   }
   return 'Обнаружены проблемы с подключением.';
 });
@@ -514,7 +514,7 @@ $text-muted: rgba(0, 0, 0, 0.4);
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CIRCUIT BREAKER ALERT
+// CONNECTION DIAGNOSTIC ALERT
 // ═══════════════════════════════════════════════════════════════
 
 .cb-alert {

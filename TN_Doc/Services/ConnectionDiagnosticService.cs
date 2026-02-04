@@ -4,24 +4,24 @@ using System.Linq;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using TN_Doc.Models.CircuitBreaker;
+using TN_Doc.Models.ConnectionDiagnostic;
 using TN_DocGeneral.Services;
 
 namespace TN_Doc.Services;
 
 /// <summary>
-/// Реализация Circuit Breaker для защиты БД от блокировки.
+/// Реализация сервиса диагностики соединения для защиты БД от блокировки.
 ///
 /// Логика работы:
 /// - Auth ошибки (1045, 1044, 1698) → немедленная блокировка до ручного сброса
-/// - Network ошибки → exponential backoff (60с → 1ч), после MaxRetryCount → блокировка
+/// - Network ошибки → exponential polling (60с → 1ч), после MaxRetryCount → блокировка
 /// - При успешном подключении → полный сброс всех счётчиков
 /// </summary>
-public class CircuitBreakerService : ICircuitBreakerService
+public class ConnectionDiagnosticService : IConnectionDiagnosticService
 {
     private readonly IAppConfigService _appConfigService;
-    private readonly ILogger<CircuitBreakerService> _logger;
-    private readonly ConcurrentDictionary<string, DeviceCircuitState> _deviceStates = new();
+    private readonly ILogger<ConnectionDiagnosticService> _logger;
+    private readonly ConcurrentDictionary<string, DeviceConnectionState> _deviceStates = new();
 
     // MySQL коды ошибок аутентификации
     private static readonly int[] AuthErrorCodes = { 1045, 1044, 1698 };
@@ -29,7 +29,7 @@ public class CircuitBreakerService : ICircuitBreakerService
     // MySQL коды сетевых ошибок
     private static readonly int[] NetworkErrorCodes = { 2003, 2002, 2006, 2013 };
 
-    public CircuitBreakerService(IAppConfigService appConfigService, ILogger<CircuitBreakerService> logger)
+    public ConnectionDiagnosticService(IAppConfigService appConfigService, ILogger<ConnectionDiagnosticService> logger)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -48,7 +48,7 @@ public class CircuitBreakerService : ICircuitBreakerService
             return true;
 
         // Если состояние Closed - всегда разрешаем
-        if (state.State == CircuitState.Closed)
+        if (state.State == ConnectionState.Closed)
             return true;
 
         // Если требуется ручной сброс - запрещаем
@@ -59,16 +59,16 @@ public class CircuitBreakerService : ICircuitBreakerService
             return false;
         }
 
-        // Проверяем, истёк ли backoff
+        // Проверяем, истёк ли интервал опроса
         if (state.NextAllowedAttempt.HasValue && DateTime.Now >= state.NextAllowedAttempt.Value)
         {
             // Переводим в HalfOpen для пробного подключения
-            state.State = CircuitState.HalfOpen;
+            state.State = ConnectionState.HalfOpen;
             _logger.LogDebug("Device {DeviceId} transitioning to HalfOpen state", deviceId);
             return true;
         }
 
-        _logger.LogDebug("Device {DeviceId} blocked: backoff active until {NextAttempt}",
+        _logger.LogDebug("Device {DeviceId} blocked: poll interval active until {NextAttempt}",
             deviceId, state.NextAllowedAttempt);
         return false;
     }
@@ -85,12 +85,12 @@ public class CircuitBreakerService : ICircuitBreakerService
             var previousFailures = state.FailureCount;
 
             // Полный сброс состояния
-            state.State = CircuitState.Closed;
+            state.State = ConnectionState.Closed;
             state.ErrorCategory = ErrorCategory.None;
             state.LastError = null;
             state.FailureCount = 0;
-            state.MaxBackoffRetryCount = 0;
-            state.CurrentBackoffSeconds = 0;
+            state.MaxPollRetryCount = 0;
+            state.CurrentPollSeconds = 0;
             state.NextAllowedAttempt = null;
             state.LastFailureTime = null;
             state.RequiresManualReset = false;
@@ -110,7 +110,7 @@ public class CircuitBreakerService : ICircuitBreakerService
         var settings = GetSettings();
         var category = CategorizeError(exception);
 
-        var state = _deviceStates.GetOrAdd(deviceId, _ => new DeviceCircuitState
+        var state = _deviceStates.GetOrAdd(deviceId, _ => new DeviceConnectionState
         {
             DeviceId = deviceId,
             DeviceName = deviceName
@@ -135,9 +135,9 @@ public class CircuitBreakerService : ICircuitBreakerService
         }
 
         _logger.LogWarning(
-            "Device {DeviceId} ({DeviceName}) failure #{Count}: {Category} - {Error}. State: {State}, Backoff: {Backoff}s",
+            "Device {DeviceId} ({DeviceName}) failure #{Count}: {Category} - {Error}. State: {State}, Poll: {Poll}s",
             deviceId, deviceName, state.FailureCount, category, exception.Message,
-            state.State, state.CurrentBackoffSeconds);
+            state.State, state.CurrentPollSeconds);
     }
 
     /// <inheritdoc/>
@@ -152,11 +152,11 @@ public class CircuitBreakerService : ICircuitBreakerService
             var previousCategory = state.ErrorCategory;
 
             // Сброс для новой попытки (но сохраняем историю ошибки)
-            state.State = CircuitState.HalfOpen;
+            state.State = ConnectionState.HalfOpen;
             state.RequiresManualReset = false;
             state.NextAllowedAttempt = null;
-            state.CurrentBackoffSeconds = 0;
-            state.MaxBackoffRetryCount = 0;
+            state.CurrentPollSeconds = 0;
+            state.MaxPollRetryCount = 0;
             // FailureCount не сбрасываем - покажет историю
 
             _logger.LogInformation(
@@ -170,7 +170,7 @@ public class CircuitBreakerService : ICircuitBreakerService
     }
 
     /// <inheritdoc/>
-    public CircuitBreakerInfo? GetCircuitBreakerInfo(string deviceId)
+    public ConnectionDiagnosticInfo? GetConnectionDiagnosticInfo(string deviceId)
     {
         if (string.IsNullOrEmpty(deviceId))
             return null;
@@ -178,7 +178,7 @@ public class CircuitBreakerService : ICircuitBreakerService
         if (!_deviceStates.TryGetValue(deviceId, out var state))
             return null;
 
-        var info = new CircuitBreakerInfo
+        var info = new ConnectionDiagnosticInfo
         {
             IsBlocked = state.RequiresManualReset,
             State = state.State.ToString(),
@@ -186,7 +186,7 @@ public class CircuitBreakerService : ICircuitBreakerService
             LastError = state.LastError,
             FailureCount = state.FailureCount,
             MaxRetryReached = state.RequiresManualReset && state.ErrorCategory != ErrorCategory.Authentication,
-            CurrentBackoffSeconds = state.CurrentBackoffSeconds
+            CurrentPollSeconds = state.CurrentPollSeconds
         };
 
         // Вычисляем время до следующей попытки
@@ -249,9 +249,9 @@ public class CircuitBreakerService : ICircuitBreakerService
     /// <summary>
     /// Обрабатывает ошибку аутентификации - немедленная блокировка
     /// </summary>
-    private void HandleAuthenticationError(DeviceCircuitState state, TN.DocData.CircuitBreakerSettings settings)
+    private void HandleAuthenticationError(DeviceConnectionState state, TN.DocData.ConnectionDiagnosticSettings settings)
     {
-        state.State = CircuitState.Open;
+        state.State = ConnectionState.Open;
         state.RequiresManualReset = true;
         state.NextAllowedAttempt = null; // Нет автоматических попыток
 
@@ -261,60 +261,60 @@ public class CircuitBreakerService : ICircuitBreakerService
     }
 
     /// <summary>
-    /// Обрабатывает сетевую или другую ошибку - exponential backoff
+    /// Обрабатывает сетевую или другую ошибку - exponential polling
     /// </summary>
-    private void HandleNetworkOrOtherError(DeviceCircuitState state, TN.DocData.CircuitBreakerSettings settings)
+    private void HandleNetworkOrOtherError(DeviceConnectionState state, TN.DocData.ConnectionDiagnosticSettings settings)
     {
-        // Проверяем порог включения backoff
+        // Проверяем порог включения защиты
         if (state.FailureCount < settings.NetworkFailureThreshold)
         {
             // Ещё не достигли порога - остаёмся в Closed
-            state.State = CircuitState.Closed;
+            state.State = ConnectionState.Closed;
             return;
         }
 
-        // Включаем backoff
-        state.State = CircuitState.Open;
+        // Включаем защиту
+        state.State = ConnectionState.Open;
 
-        // Вычисляем новый backoff
-        if (state.CurrentBackoffSeconds == 0)
+        // Вычисляем новый интервал опроса
+        if (state.CurrentPollSeconds == 0)
         {
-            state.CurrentBackoffSeconds = settings.InitialBackoffSeconds;
+            state.CurrentPollSeconds = settings.InitialPollSeconds;
         }
-        else if (state.CurrentBackoffSeconds < settings.MaxBackoffSeconds)
+        else if (state.CurrentPollSeconds < settings.MaxPollSeconds)
         {
-            state.CurrentBackoffSeconds = Math.Min(
-                (int)(state.CurrentBackoffSeconds * settings.BackoffMultiplier),
-                settings.MaxBackoffSeconds);
+            state.CurrentPollSeconds = Math.Min(
+                (int)(state.CurrentPollSeconds * settings.PollMultiplier),
+                settings.MaxPollSeconds);
         }
 
-        // Проверяем достижение максимального backoff
-        if (state.CurrentBackoffSeconds >= settings.MaxBackoffSeconds)
+        // Проверяем достижение максимального интервала
+        if (state.CurrentPollSeconds >= settings.MaxPollSeconds)
         {
-            state.MaxBackoffRetryCount++;
+            state.MaxPollRetryCount++;
 
-            // Проверяем лимит попыток с максимальным backoff
-            if (state.MaxBackoffRetryCount >= settings.MaxRetryCount)
+            // Проверяем лимит попыток с максимальным интервалом
+            if (state.MaxPollRetryCount >= settings.MaxRetryCount)
             {
                 state.RequiresManualReset = true;
                 state.NextAllowedAttempt = null;
 
                 _logger.LogError(
-                    "Device {DeviceId} ({DeviceName}) BLOCKED: exceeded {MaxRetry} retries at max backoff",
+                    "Device {DeviceId} ({DeviceName}) BLOCKED: exceeded {MaxRetry} retries at max poll interval",
                     state.DeviceId, state.DeviceName, settings.MaxRetryCount);
                 return;
             }
         }
 
-        state.NextAllowedAttempt = DateTime.Now.AddSeconds(state.CurrentBackoffSeconds);
+        state.NextAllowedAttempt = DateTime.Now.AddSeconds(state.CurrentPollSeconds);
     }
 
     /// <summary>
-    /// Получает настройки Circuit Breaker из конфигурации
+    /// Получает настройки диагностики соединения из конфигурации
     /// </summary>
-    private TN.DocData.CircuitBreakerSettings GetSettings()
+    private TN.DocData.ConnectionDiagnosticSettings GetSettings()
     {
         var appConfig = _appConfigService.GetAppCfg();
-        return appConfig?.CircuitBreaker ?? new TN.DocData.CircuitBreakerSettings();
+        return appConfig?.ConnectionDiagnostic ?? new TN.DocData.ConnectionDiagnosticSettings();
     }
 }

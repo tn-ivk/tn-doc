@@ -17,7 +17,7 @@ namespace TN_Doc.Controllers;
 public class StatusController : ControllerBase
 {
     private readonly IStatusProvider _statusProvider;
-    private readonly ICircuitBreakerService _circuitBreaker;
+    private readonly IConnectionDiagnosticService _connectionDiagnostic;
     private readonly IMemoryCache _cache;
     private readonly ILogger<StatusController> _logger;
 
@@ -26,12 +26,12 @@ public class StatusController : ControllerBase
 
     public StatusController(
         IStatusProvider statusProvider,
-        ICircuitBreakerService circuitBreaker,
+        IConnectionDiagnosticService connectionDiagnostic,
         IMemoryCache cache,
         ILogger<StatusController> logger)
     {
         _statusProvider = statusProvider ?? throw new ArgumentNullException(nameof(statusProvider));
-        _circuitBreaker = circuitBreaker ?? throw new ArgumentNullException(nameof(circuitBreaker));
+        _connectionDiagnostic = connectionDiagnostic ?? throw new ArgumentNullException(nameof(connectionDiagnostic));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -150,7 +150,7 @@ public class StatusController : ControllerBase
     }
 
     /// <summary>
-    /// Принудительная проверка устройства (сброс Circuit Breaker и повторная попытка)
+    /// Принудительная проверка устройства (сброс диагностики соединения и повторная попытка)
     /// </summary>
     /// <param name="deviceId">ID устройства</param>
     /// <returns>Статус устройства после проверки</returns>
@@ -165,7 +165,7 @@ public class StatusController : ControllerBase
 
         try
         {
-            // Выполняем проверку устройства (с автоматическим сбросом Circuit Breaker)
+            // Выполняем проверку устройства (с автоматическим сбросом диагностики соединения)
             var deviceStatus = await _statusProvider.CheckDeviceAsync(deviceId, HttpContext.RequestAborted);
 
             if (deviceStatus == null)

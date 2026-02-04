@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using MySqlConnector;
 using NUnit.Framework;
-using TN_Doc.Models.CircuitBreaker;
+using TN_Doc.Models.ConnectionDiagnostic;
 using TN_Doc.Services;
 using TN_DocGeneral.Services;
 using TN.DocData;
@@ -13,31 +13,31 @@ using TN.DocData;
 namespace Tests.Unit.Services;
 
 [TestFixture]
-public class CircuitBreakerServiceTests
+public class ConnectionDiagnosticServiceTests
 {
     private Mock<IAppConfigService> _appConfigServiceMock;
-    private Mock<ILogger<CircuitBreakerService>> _loggerMock;
-    private CircuitBreakerService _service;
-    private CircuitBreakerSettings _settings;
+    private Mock<ILogger<ConnectionDiagnosticService>> _loggerMock;
+    private ConnectionDiagnosticService _service;
+    private ConnectionDiagnosticSettings _settings;
 
     [SetUp]
     public void Setup()
     {
-        _settings = new CircuitBreakerSettings
+        _settings = new ConnectionDiagnosticSettings
         {
-            InitialBackoffSeconds = 60,
-            MaxBackoffSeconds = 3600,
-            BackoffMultiplier = 2.0,
+            InitialPollSeconds = 60,
+            MaxPollSeconds = 3600,
+            PollMultiplier = 2.0,
             NetworkFailureThreshold = 3,
             MaxRetryCount = 5
         };
 
         _appConfigServiceMock = new Mock<IAppConfigService>();
-        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { CircuitBreaker = _settings });
+        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { ConnectionDiagnostic = _settings });
 
-        _loggerMock = new Mock<ILogger<CircuitBreakerService>>();
+        _loggerMock = new Mock<ILogger<ConnectionDiagnosticService>>();
 
-        _service = new CircuitBreakerService(_appConfigServiceMock.Object, _loggerMock.Object);
+        _service = new ConnectionDiagnosticService(_appConfigServiceMock.Object, _loggerMock.Object);
     }
 
     #region Constructor Tests
@@ -47,7 +47,7 @@ public class CircuitBreakerServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new CircuitBreakerService(null!, _loggerMock.Object));
+            new ConnectionDiagnosticService(null!, _loggerMock.Object));
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class CircuitBreakerServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new CircuitBreakerService(_appConfigServiceMock.Object, null!));
+            new ConnectionDiagnosticService(_appConfigServiceMock.Object, null!));
     }
 
     #endregion
@@ -126,18 +126,18 @@ public class CircuitBreakerServiceTests
     }
 
     [Test]
-    public void ShouldAllowConnection_AfterBackoffExpired_ReturnsTrue()
+    public void ShouldAllowConnection_AfterPollExpired_ReturnsTrue()
     {
         // Arrange
         const string deviceId = "device-1";
         // Уменьшаем настройки для быстрого теста
-        _settings.InitialBackoffSeconds = 1;
+        _settings.InitialPollSeconds = 1;
         _settings.NetworkFailureThreshold = 1;
 
         var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
-        // Ждём истечения backoff
+        // Ждём истечения интервала опроса
         System.Threading.Thread.Sleep(1100);
 
         // Act
@@ -148,7 +148,7 @@ public class CircuitBreakerServiceTests
     }
 
     [Test]
-    public void ShouldAllowConnection_DuringBackoff_ReturnsFalse()
+    public void ShouldAllowConnection_DuringPoll_ReturnsFalse()
     {
         // Arrange
         const string deviceId = "device-1";
@@ -179,7 +179,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", authException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Open"));
         Assert.That(info.IsBlocked, Is.True);
@@ -197,7 +197,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", authException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.IsBlocked, Is.True);
         // MaxRetryReached false потому что блокировка из-за auth, а не из-за превышения попыток
@@ -216,7 +216,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.FailureCount, Is.EqualTo(2));
         Assert.That(info.ErrorCategory, Is.EqualTo("Network"));
@@ -235,14 +235,14 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Closed"));
         Assert.That(info.FailureCount, Is.EqualTo(2));
     }
 
     [Test]
-    public void RecordFailure_AfterThreshold_SetsOpenWithBackoff()
+    public void RecordFailure_AfterThreshold_SetsOpenWithPoll()
     {
         // Arrange
         const string deviceId = "device-1";
@@ -254,11 +254,11 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Open"));
-        Assert.That(info.CurrentBackoffSeconds, Is.EqualTo(_settings.InitialBackoffSeconds));
-        Assert.That(info.IsBlocked, Is.False); // Не заблокировано навсегда, есть backoff
+        Assert.That(info.CurrentPollSeconds, Is.EqualTo(_settings.InitialPollSeconds));
+        Assert.That(info.IsBlocked, Is.False); // Не заблокировано навсегда, есть интервал опроса
     }
 
     [Test]
@@ -267,22 +267,22 @@ public class CircuitBreakerServiceTests
         // Arrange
         const string deviceId = "device-1";
         _settings.NetworkFailureThreshold = 1;
-        _settings.MaxBackoffSeconds = 60;
+        _settings.MaxPollSeconds = 60;
         _settings.MaxRetryCount = 2;
-        _settings.BackoffMultiplier = 2.0;
-        _settings.InitialBackoffSeconds = 30;
+        _settings.PollMultiplier = 2.0;
+        _settings.InitialPollSeconds = 30;
         var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
 
-        // Act - регистрируем достаточно ошибок для достижения MaxBackoff и превышения MaxRetryCount
-        // 1-я ошибка: достигаем threshold, backoff = 30
+        // Act - регистрируем достаточно ошибок для достижения MaxPoll и превышения MaxRetryCount
+        // 1-я ошибка: достигаем threshold, poll = 30
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        // 2-я ошибка: backoff = 60 (max), MaxBackoffRetryCount = 1
+        // 2-я ошибка: poll = 60 (max), MaxPollRetryCount = 1
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        // 3-я ошибка: backoff = 60 (max), MaxBackoffRetryCount = 2 >= MaxRetryCount
+        // 3-я ошибка: poll = 60 (max), MaxPollRetryCount = 2 >= MaxRetryCount
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Open"));
         Assert.That(info.IsBlocked, Is.True);
@@ -300,7 +300,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", socketException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
     }
@@ -316,7 +316,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", timeoutException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
     }
@@ -332,7 +332,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", genericException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Authentication"));
     }
@@ -349,7 +349,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", outerException);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Authentication"));
     }
@@ -375,32 +375,32 @@ public class CircuitBreakerServiceTests
     }
 
     [Test]
-    public void RecordFailure_ExponentialBackoff_IncreasesCorrectly()
+    public void RecordFailure_ExponentialPoll_IncreasesCorrectly()
     {
         // Arrange
         const string deviceId = "device-1";
         _settings.NetworkFailureThreshold = 1;
-        _settings.InitialBackoffSeconds = 60;
-        _settings.MaxBackoffSeconds = 3600;
-        _settings.BackoffMultiplier = 2.0;
+        _settings.InitialPollSeconds = 60;
+        _settings.MaxPollSeconds = 3600;
+        _settings.PollMultiplier = 2.0;
         var networkException = CreateMySqlException(2003, "Can't connect to MySQL server");
 
         // Act - первая ошибка
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        var info1 = _service.GetCircuitBreakerInfo(deviceId);
+        var info1 = _service.GetConnectionDiagnosticInfo(deviceId);
 
         // Вторая ошибка
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        var info2 = _service.GetCircuitBreakerInfo(deviceId);
+        var info2 = _service.GetConnectionDiagnosticInfo(deviceId);
 
         // Третья ошибка
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        var info3 = _service.GetCircuitBreakerInfo(deviceId);
+        var info3 = _service.GetConnectionDiagnosticInfo(deviceId);
 
         // Assert
-        Assert.That(info1!.CurrentBackoffSeconds, Is.EqualTo(60));   // Initial
-        Assert.That(info2!.CurrentBackoffSeconds, Is.EqualTo(120));  // 60 * 2
-        Assert.That(info3!.CurrentBackoffSeconds, Is.EqualTo(240));  // 120 * 2
+        Assert.That(info1!.CurrentPollSeconds, Is.EqualTo(60));   // Initial
+        Assert.That(info2!.CurrentPollSeconds, Is.EqualTo(120));  // 60 * 2
+        Assert.That(info3!.CurrentPollSeconds, Is.EqualTo(240));  // 120 * 2
     }
 
     #endregion
@@ -423,11 +423,11 @@ public class CircuitBreakerServiceTests
         _service.RecordSuccess(deviceId);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Closed"));
         Assert.That(info.FailureCount, Is.EqualTo(0));
-        Assert.That(info.CurrentBackoffSeconds, Is.EqualTo(0));
+        Assert.That(info.CurrentPollSeconds, Is.EqualTo(0));
         Assert.That(info.IsBlocked, Is.False);
         Assert.That(info.ErrorCategory, Is.Null);
     }
@@ -448,7 +448,7 @@ public class CircuitBreakerServiceTests
 
         // Assert
         Assert.That(_service.ShouldAllowConnection(deviceId), Is.True);
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.IsBlocked, Is.False);
     }
 
@@ -490,7 +490,7 @@ public class CircuitBreakerServiceTests
 
         // Assert
         Assert.That(result, Is.True);
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("HalfOpen"));
         Assert.That(info.IsBlocked, Is.False);
     }
@@ -502,8 +502,8 @@ public class CircuitBreakerServiceTests
         const string deviceId = "device-1";
         _settings.NetworkFailureThreshold = 1;
         _settings.MaxRetryCount = 1;
-        _settings.MaxBackoffSeconds = 60;
-        _settings.InitialBackoffSeconds = 60;
+        _settings.MaxPollSeconds = 60;
+        _settings.InitialPollSeconds = 60;
         var networkException = CreateMySqlException(2003, "Can't connect");
 
         // Создаём состояние с RequiresManualReset
@@ -514,7 +514,7 @@ public class CircuitBreakerServiceTests
         _service.ResetDevice(deviceId);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("HalfOpen"));
     }
 
@@ -533,7 +533,7 @@ public class CircuitBreakerServiceTests
         _service.ResetDevice(deviceId);
 
         // Assert - после ручного сброса состояние HalfOpen
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("HalfOpen"));
         Assert.That(info.IsBlocked, Is.False);
         // Примечание: ShouldAllowConnection для HalfOpen возвращает true только если
@@ -554,7 +554,7 @@ public class CircuitBreakerServiceTests
         _service.ResetDevice(deviceId);
 
         // Assert - FailureCount сохраняется для истории
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.FailureCount, Is.EqualTo(2));
     }
 
@@ -590,30 +590,30 @@ public class CircuitBreakerServiceTests
 
     #endregion
 
-    #region GetCircuitBreakerInfo Tests
+    #region GetConnectionDiagnosticInfo Tests
 
     [Test]
-    public void GetCircuitBreakerInfo_ForUnknownDevice_ReturnsNull()
+    public void GetConnectionDiagnosticInfo_ForUnknownDevice_ReturnsNull()
     {
         // Act
-        var info = _service.GetCircuitBreakerInfo("unknown-device");
+        var info = _service.GetConnectionDiagnosticInfo("unknown-device");
 
         // Assert
         Assert.That(info, Is.Null);
     }
 
     [Test]
-    public void GetCircuitBreakerInfo_WithNullDeviceId_ReturnsNull()
+    public void GetConnectionDiagnosticInfo_WithNullDeviceId_ReturnsNull()
     {
         // Act
-        var info = _service.GetCircuitBreakerInfo(null!);
+        var info = _service.GetConnectionDiagnosticInfo(null!);
 
         // Assert
         Assert.That(info, Is.Null);
     }
 
     [Test]
-    public void GetCircuitBreakerInfo_ReturnsCorrectData()
+    public void GetConnectionDiagnosticInfo_ReturnsCorrectData()
     {
         // Arrange
         const string deviceId = "device-1";
@@ -621,7 +621,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", authException);
 
         // Act
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
 
         // Assert
         Assert.That(info, Is.Not.Null);
@@ -633,17 +633,17 @@ public class CircuitBreakerServiceTests
     }
 
     [Test]
-    public void GetCircuitBreakerInfo_SecondsUntilNextAttempt_CalculatedCorrectly()
+    public void GetConnectionDiagnosticInfo_SecondsUntilNextAttempt_CalculatedCorrectly()
     {
         // Arrange
         const string deviceId = "device-1";
         _settings.NetworkFailureThreshold = 1;
-        _settings.InitialBackoffSeconds = 60;
+        _settings.InitialPollSeconds = 60;
         var networkException = CreateMySqlException(2003, "Can't connect");
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Act
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
 
         // Assert
         Assert.That(info, Is.Not.Null);
@@ -712,7 +712,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", exception);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.ErrorCategory, Is.EqualTo(expectedCategory));
     }
 
@@ -731,7 +731,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", exception);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
     }
 
@@ -746,7 +746,7 @@ public class CircuitBreakerServiceTests
         _service.RecordFailure(deviceId, "Test Device", exception);
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Other"));
     }
 
@@ -760,7 +760,7 @@ public class CircuitBreakerServiceTests
         // Arrange
         const string deviceId = "device-1";
         _settings.NetworkFailureThreshold = 5;
-        _settings.InitialBackoffSeconds = 120;
+        _settings.InitialPollSeconds = 120;
         var networkException = CreateMySqlException(2003, "Can't connect");
 
         // Act - записываем 5 ошибок (threshold)
@@ -770,16 +770,16 @@ public class CircuitBreakerServiceTests
         }
 
         // Assert
-        var info = _service.GetCircuitBreakerInfo(deviceId);
-        Assert.That(info!.CurrentBackoffSeconds, Is.EqualTo(120)); // Uses configured InitialBackoffSeconds
+        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        Assert.That(info!.CurrentPollSeconds, Is.EqualTo(120)); // Uses configured InitialPollSeconds
     }
 
     [Test]
-    public void RecordFailure_WithNullCircuitBreakerSettings_UsesDefaults()
+    public void RecordFailure_WithNullConnectionDiagnosticSettings_UsesDefaults()
     {
         // Arrange
-        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { CircuitBreaker = null });
-        var service = new CircuitBreakerService(_appConfigServiceMock.Object, _loggerMock.Object);
+        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { ConnectionDiagnostic = null });
+        var service = new ConnectionDiagnosticService(_appConfigServiceMock.Object, _loggerMock.Object);
 
         const string deviceId = "device-1";
         var networkException = CreateMySqlException(2003, "Can't connect");
@@ -790,9 +790,9 @@ public class CircuitBreakerServiceTests
         service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = service.GetCircuitBreakerInfo(deviceId);
+        var info = service.GetConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("Open"));
-        Assert.That(info.CurrentBackoffSeconds, Is.EqualTo(60)); // Default InitialBackoffSeconds
+        Assert.That(info.CurrentPollSeconds, Is.EqualTo(60)); // Default InitialPollSeconds
     }
 
     #endregion

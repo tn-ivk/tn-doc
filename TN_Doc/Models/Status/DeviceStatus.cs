@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using TN_Doc.Models.CircuitBreaker;
+using TN_Doc.Models.ConnectionDiagnostic;
 
 namespace TN_Doc.Models.Status;
 
@@ -37,7 +37,7 @@ public class DeviceStatus
     public List<ConnectionChannel> Channels { get; set; } = new();
 
     /// <summary>
-    /// Информация о Circuit Breaker (защита от блокировки БД)
+    /// Информация о диагностике соединения (защита от блокировки БД)
     /// </summary>
-    public CircuitBreakerInfo? CircuitBreaker { get; set; }
+    public ConnectionDiagnosticInfo? ConnectionDiagnostic { get; set; }
 }
