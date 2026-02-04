@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using TN_Doc.Models.ConnectionDiagnostic;
+using TN_Doc.Models.DeviceConnectionDiagnostic;
 using TN_Doc.Models.Status;
 using TN_DocGeneral.Services;
 using TN_DocGeneral.Extensions;
@@ -25,14 +25,14 @@ public class StatusProvider : IStatusProvider
     private readonly ILogger<StatusProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly AppClientTracker _clientTracker;
-    private readonly IConnectionDiagnosticService _connectionDiagnostic;
+    private readonly IDeviceConnectionDiagnosticService _connectionDiagnostic;
 
     public StatusProvider(
         IAppConfigService appConfigService,
         ILogger<StatusProvider> logger,
         IHttpClientFactory httpClientFactory,
         AppClientTracker clientTracker,
-        IConnectionDiagnosticService connectionDiagnostic)
+        IDeviceConnectionDiagnosticService connectionDiagnostic)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -159,8 +159,8 @@ public class StatusProvider : IStatusProvider
         if (!forceCheck && !_connectionDiagnostic.ShouldAllowConnection(deviceId))
         {
             // Устройство заблокировано - возвращаем кэшированное состояние ошибки
-            var diagInfo = _connectionDiagnostic.GetConnectionDiagnosticInfo(deviceId);
-            status.ConnectionDiagnostic = diagInfo;
+            var diagInfo = _connectionDiagnostic.GetDeviceConnectionDiagnosticInfo(deviceId);
+            status.DeviceConnectionDiagnostic = diagInfo;
             status.Error = diagInfo?.LastError ?? "Устройство заблокировано диагностикой соединения";
             status.LastChecked = DateTime.Now;
 
@@ -217,7 +217,7 @@ public class StatusProvider : IStatusProvider
         }
 
         // Добавляем информацию о диагностике соединения (если есть)
-        status.ConnectionDiagnostic = _connectionDiagnostic.GetConnectionDiagnosticInfo(deviceId);
+        status.DeviceConnectionDiagnostic = _connectionDiagnostic.GetDeviceConnectionDiagnosticInfo(deviceId);
 
         _logger.LogDebug(
             "Устройство {DeviceName}: {ConnectedCount}/{TotalCount} каналов",

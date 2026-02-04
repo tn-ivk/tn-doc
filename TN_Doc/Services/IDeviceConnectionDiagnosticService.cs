@@ -1,5 +1,5 @@
 using System;
-using TN_Doc.Models.ConnectionDiagnostic;
+using TN_Doc.Models.DeviceConnectionDiagnostic;
 
 namespace TN_Doc.Services;
 
@@ -7,7 +7,7 @@ namespace TN_Doc.Services;
 /// Сервис диагностики соединения для защиты БД от блокировки при неудачных попытках подключения.
 /// При неправильном пароле MySQL блокирует хост после 100 неудачных попыток (max_connect_errors).
 /// </summary>
-public interface IConnectionDiagnosticService
+public interface IDeviceConnectionDiagnosticService
 {
     /// <summary>
     /// Проверяет, разрешено ли сейчас подключение к устройству
@@ -42,7 +42,7 @@ public interface IConnectionDiagnosticService
     /// </summary>
     /// <param name="deviceId">ID устройства</param>
     /// <returns>Информация о диагностике или null если устройство не отслеживается</returns>
-    ConnectionDiagnosticInfo? GetConnectionDiagnosticInfo(string deviceId);
+    DeviceConnectionDiagnosticInfo? GetDeviceConnectionDiagnosticInfo(string deviceId);
 
     /// <summary>
     /// Проверяет, есть ли заблокированные устройства

@@ -3503,7 +3503,7 @@
       "StartPrefix": "root.ARM.Reports"
     }
   },
-  "ConnectionDiagnostic": {
+  "DeviceConnectionDiagnostic": {
     "InitialPollSeconds": 60,
     "MaxPollSeconds": 3600,
     "PollMultiplier": 2.0,

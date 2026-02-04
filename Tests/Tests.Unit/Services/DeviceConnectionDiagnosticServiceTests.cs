@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using MySqlConnector;
 using NUnit.Framework;
-using TN_Doc.Models.ConnectionDiagnostic;
+using TN_Doc.Models.DeviceConnectionDiagnostic;
 using TN_Doc.Services;
 using TN_DocGeneral.Services;
 using TN.DocData;
@@ -13,17 +13,17 @@ using TN.DocData;
 namespace Tests.Unit.Services;
 
 [TestFixture]
-public class ConnectionDiagnosticServiceTests
+public class DeviceConnectionDiagnosticServiceTests
 {
     private Mock<IAppConfigService> _appConfigServiceMock;
-    private Mock<ILogger<ConnectionDiagnosticService>> _loggerMock;
-    private ConnectionDiagnosticService _service;
-    private ConnectionDiagnosticSettings _settings;
+    private Mock<ILogger<DeviceConnectionDiagnosticService>> _loggerMock;
+    private DeviceConnectionDiagnosticService _service;
+    private DeviceConnectionDiagnosticSettings _settings;
 
     [SetUp]
     public void Setup()
     {
-        _settings = new ConnectionDiagnosticSettings
+        _settings = new DeviceConnectionDiagnosticSettings
         {
             InitialPollSeconds = 60,
             MaxPollSeconds = 3600,
@@ -33,11 +33,11 @@ public class ConnectionDiagnosticServiceTests
         };
 
         _appConfigServiceMock = new Mock<IAppConfigService>();
-        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { ConnectionDiagnostic = _settings });
+        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { DeviceConnectionDiagnostic = _settings });
 
-        _loggerMock = new Mock<ILogger<ConnectionDiagnosticService>>();
+        _loggerMock = new Mock<ILogger<DeviceConnectionDiagnosticService>>();
 
-        _service = new ConnectionDiagnosticService(_appConfigServiceMock.Object, _loggerMock.Object);
+        _service = new DeviceConnectionDiagnosticService(_appConfigServiceMock.Object, _loggerMock.Object);
     }
 
     #region Constructor Tests
@@ -47,7 +47,7 @@ public class ConnectionDiagnosticServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new ConnectionDiagnosticService(null!, _loggerMock.Object));
+            new DeviceConnectionDiagnosticService(null!, _loggerMock.Object));
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class ConnectionDiagnosticServiceTests
     {
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            new ConnectionDiagnosticService(_appConfigServiceMock.Object, null!));
+            new DeviceConnectionDiagnosticService(_appConfigServiceMock.Object, null!));
     }
 
     #endregion
@@ -179,7 +179,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", authException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Open"));
         Assert.That(info.IsBlocked, Is.True);
@@ -197,7 +197,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", authException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.IsBlocked, Is.True);
         // MaxRetryReached false потому что блокировка из-за auth, а не из-за превышения попыток
@@ -216,7 +216,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.FailureCount, Is.EqualTo(2));
         Assert.That(info.ErrorCategory, Is.EqualTo("Network"));
@@ -235,7 +235,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Closed"));
         Assert.That(info.FailureCount, Is.EqualTo(2));
@@ -254,7 +254,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Open"));
         Assert.That(info.CurrentPollSeconds, Is.EqualTo(_settings.InitialPollSeconds));
@@ -282,7 +282,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Open"));
         Assert.That(info.IsBlocked, Is.True);
@@ -300,7 +300,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", socketException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
     }
@@ -316,7 +316,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", timeoutException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
     }
@@ -332,7 +332,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", genericException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Authentication"));
     }
@@ -349,7 +349,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", outerException);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Authentication"));
     }
@@ -387,15 +387,15 @@ public class ConnectionDiagnosticServiceTests
 
         // Act - первая ошибка
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        var info1 = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info1 = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
 
         // Вторая ошибка
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        var info2 = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info2 = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
 
         // Третья ошибка
         _service.RecordFailure(deviceId, "Test Device", networkException);
-        var info3 = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info3 = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
 
         // Assert
         Assert.That(info1!.CurrentPollSeconds, Is.EqualTo(60));   // Initial
@@ -423,7 +423,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordSuccess(deviceId);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info, Is.Not.Null);
         Assert.That(info!.State, Is.EqualTo("Closed"));
         Assert.That(info.FailureCount, Is.EqualTo(0));
@@ -448,7 +448,7 @@ public class ConnectionDiagnosticServiceTests
 
         // Assert
         Assert.That(_service.ShouldAllowConnection(deviceId), Is.True);
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.IsBlocked, Is.False);
     }
 
@@ -490,7 +490,7 @@ public class ConnectionDiagnosticServiceTests
 
         // Assert
         Assert.That(result, Is.True);
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("HalfOpen"));
         Assert.That(info.IsBlocked, Is.False);
     }
@@ -514,7 +514,7 @@ public class ConnectionDiagnosticServiceTests
         _service.ResetDevice(deviceId);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("HalfOpen"));
     }
 
@@ -533,7 +533,7 @@ public class ConnectionDiagnosticServiceTests
         _service.ResetDevice(deviceId);
 
         // Assert - после ручного сброса состояние HalfOpen
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("HalfOpen"));
         Assert.That(info.IsBlocked, Is.False);
         // Примечание: ShouldAllowConnection для HalfOpen возвращает true только если
@@ -554,7 +554,7 @@ public class ConnectionDiagnosticServiceTests
         _service.ResetDevice(deviceId);
 
         // Assert - FailureCount сохраняется для истории
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.FailureCount, Is.EqualTo(2));
     }
 
@@ -590,30 +590,30 @@ public class ConnectionDiagnosticServiceTests
 
     #endregion
 
-    #region GetConnectionDiagnosticInfo Tests
+    #region GetDeviceConnectionDiagnosticInfo Tests
 
     [Test]
-    public void GetConnectionDiagnosticInfo_ForUnknownDevice_ReturnsNull()
+    public void GetDeviceConnectionDiagnosticInfo_ForUnknownDevice_ReturnsNull()
     {
         // Act
-        var info = _service.GetConnectionDiagnosticInfo("unknown-device");
+        var info = _service.GetDeviceConnectionDiagnosticInfo("unknown-device");
 
         // Assert
         Assert.That(info, Is.Null);
     }
 
     [Test]
-    public void GetConnectionDiagnosticInfo_WithNullDeviceId_ReturnsNull()
+    public void GetDeviceConnectionDiagnosticInfo_WithNullDeviceId_ReturnsNull()
     {
         // Act
-        var info = _service.GetConnectionDiagnosticInfo(null!);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(null!);
 
         // Assert
         Assert.That(info, Is.Null);
     }
 
     [Test]
-    public void GetConnectionDiagnosticInfo_ReturnsCorrectData()
+    public void GetDeviceConnectionDiagnosticInfo_ReturnsCorrectData()
     {
         // Arrange
         const string deviceId = "device-1";
@@ -621,7 +621,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", authException);
 
         // Act
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
 
         // Assert
         Assert.That(info, Is.Not.Null);
@@ -633,7 +633,7 @@ public class ConnectionDiagnosticServiceTests
     }
 
     [Test]
-    public void GetConnectionDiagnosticInfo_SecondsUntilNextAttempt_CalculatedCorrectly()
+    public void GetDeviceConnectionDiagnosticInfo_SecondsUntilNextAttempt_CalculatedCorrectly()
     {
         // Arrange
         const string deviceId = "device-1";
@@ -643,7 +643,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Act
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
 
         // Assert
         Assert.That(info, Is.Not.Null);
@@ -712,7 +712,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", exception);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.ErrorCategory, Is.EqualTo(expectedCategory));
     }
 
@@ -731,7 +731,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", exception);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Network"));
     }
 
@@ -746,7 +746,7 @@ public class ConnectionDiagnosticServiceTests
         _service.RecordFailure(deviceId, "Test Device", exception);
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.ErrorCategory, Is.EqualTo("Other"));
     }
 
@@ -770,16 +770,16 @@ public class ConnectionDiagnosticServiceTests
         }
 
         // Assert
-        var info = _service.GetConnectionDiagnosticInfo(deviceId);
+        var info = _service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.CurrentPollSeconds, Is.EqualTo(120)); // Uses configured InitialPollSeconds
     }
 
     [Test]
-    public void RecordFailure_WithNullConnectionDiagnosticSettings_UsesDefaults()
+    public void RecordFailure_WithNullDeviceConnectionDiagnosticSettings_UsesDefaults()
     {
         // Arrange
-        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { ConnectionDiagnostic = null });
-        var service = new ConnectionDiagnosticService(_appConfigServiceMock.Object, _loggerMock.Object);
+        _appConfigServiceMock.Setup(x => x.GetAppCfg()).Returns(new CfgApp { DeviceConnectionDiagnostic = null });
+        var service = new DeviceConnectionDiagnosticService(_appConfigServiceMock.Object, _loggerMock.Object);
 
         const string deviceId = "device-1";
         var networkException = CreateMySqlException(2003, "Can't connect");
@@ -790,7 +790,7 @@ public class ConnectionDiagnosticServiceTests
         service.RecordFailure(deviceId, "Test Device", networkException);
 
         // Assert
-        var info = service.GetConnectionDiagnosticInfo(deviceId);
+        var info = service.GetDeviceConnectionDiagnosticInfo(deviceId);
         Assert.That(info!.State, Is.EqualTo("Open"));
         Assert.That(info.CurrentPollSeconds, Is.EqualTo(60)); // Default InitialPollSeconds
     }

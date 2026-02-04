@@ -79,7 +79,7 @@ public class Startup
 			client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.4.2");
 		});
 
-		services.AddSingleton<IConnectionDiagnosticService, ConnectionDiagnosticService>();
+		services.AddSingleton<IDeviceConnectionDiagnosticService, DeviceConnectionDiagnosticService>();
 		services.AddScoped<IStatusProvider, StatusProvider>();
 		services.AddHostedService<StatusMonitoringService>();
 	}

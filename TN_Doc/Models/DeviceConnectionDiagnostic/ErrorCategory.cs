@@ -1,4 +1,4 @@
-namespace TN_Doc.Models.ConnectionDiagnostic;
+namespace TN_Doc.Models.DeviceConnectionDiagnostic;
 
 /// <summary>
 /// Категория ошибки подключения к БД

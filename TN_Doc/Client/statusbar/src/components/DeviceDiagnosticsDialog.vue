@@ -61,14 +61,14 @@
               </div>
               <p class="cb-alert__message">{{ connectionDiagnosticMessage }}</p>
               <div class="cb-alert__stats">
-                <span v-if="connectionDiagnostic?.failureCount">
-                  Попыток: <strong>{{ connectionDiagnostic.failureCount }}</strong>
+                <span v-if="deviceConnectionDiagnostic?.failureCount">
+                  Попыток: <strong>{{ deviceConnectionDiagnostic.failureCount }}</strong>
                 </span>
-                <span v-if="connectionDiagnostic?.currentPollSeconds">
-                  Интервал: <strong>{{ connectionDiagnostic.currentPollSeconds }}с</strong>
+                <span v-if="deviceConnectionDiagnostic?.currentPollSeconds">
+                  Интервал: <strong>{{ deviceConnectionDiagnostic.currentPollSeconds }}с</strong>
                 </span>
-                <span v-if="connectionDiagnostic?.secondsUntilNextAttempt">
-                  Retry: <strong>{{ connectionDiagnostic.secondsUntilNextAttempt }}с</strong>
+                <span v-if="deviceConnectionDiagnostic?.secondsUntilNextAttempt">
+                  Retry: <strong>{{ deviceConnectionDiagnostic.secondsUntilNextAttempt }}с</strong>
                 </span>
               </div>
             </div>
@@ -187,10 +187,10 @@ onUnmounted(() => {
   document.removeEventListener('touchend', stopDrag);
 });
 
-const connectionDiagnostic = computed(() => store.selectedDevice?.connectionDiagnostic);
+const deviceConnectionDiagnostic = computed(() => store.selectedDevice?.deviceConnectionDiagnostic);
 
 const hasConnectionDiagnosticIssue = computed(() => {
-  const cd = connectionDiagnostic.value;
+  const cd = deviceConnectionDiagnostic.value;
   if (!cd) return false;
   return cd.isBlocked || cd.state !== 'Closed' || cd.failureCount > 0;
 });
@@ -223,7 +223,7 @@ const statusText = computed(() => {
 });
 
 const alertClass = computed(() => {
-  const cd = connectionDiagnostic.value;
+  const cd = deviceConnectionDiagnostic.value;
   if (!cd) return '';
 
   if (cd.errorCategory === 'Authentication') return 'cb-alert--auth';
@@ -232,7 +232,7 @@ const alertClass = computed(() => {
 });
 
 const connectionDiagnosticBadge = computed(() => {
-  const cd = connectionDiagnostic.value;
+  const cd = deviceConnectionDiagnostic.value;
   if (!cd) return '';
 
   if (cd.errorCategory === 'Authentication') return 'AUTH';
@@ -241,7 +241,7 @@ const connectionDiagnosticBadge = computed(() => {
 });
 
 const connectionDiagnosticMessage = computed(() => {
-  const cd = connectionDiagnostic.value;
+  const cd = deviceConnectionDiagnostic.value;
   if (!cd) return '';
 
   if (cd.errorCategory === 'Authentication') {

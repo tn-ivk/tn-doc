@@ -17,7 +17,7 @@ namespace TN_Doc.Controllers;
 public class StatusController : ControllerBase
 {
     private readonly IStatusProvider _statusProvider;
-    private readonly IConnectionDiagnosticService _connectionDiagnostic;
+    private readonly IDeviceConnectionDiagnosticService _connectionDiagnostic;
     private readonly IMemoryCache _cache;
     private readonly ILogger<StatusController> _logger;
 
@@ -26,7 +26,7 @@ public class StatusController : ControllerBase
 
     public StatusController(
         IStatusProvider statusProvider,
-        IConnectionDiagnosticService connectionDiagnostic,
+        IDeviceConnectionDiagnosticService connectionDiagnostic,
         IMemoryCache cache,
         ILogger<StatusController> logger)
     {

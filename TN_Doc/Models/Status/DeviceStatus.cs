@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using TN_Doc.Models.ConnectionDiagnostic;
+using TN_Doc.Models.DeviceConnectionDiagnostic;
 
 namespace TN_Doc.Models.Status;
 
@@ -39,5 +39,5 @@ public class DeviceStatus
     /// <summary>
     /// Информация о диагностике соединения (защита от блокировки БД)
     /// </summary>
-    public ConnectionDiagnosticInfo? ConnectionDiagnostic { get; set; }
+    public DeviceConnectionDiagnosticInfo? DeviceConnectionDiagnostic { get; set; }
 }

@@ -1,9 +1,9 @@
-namespace TN_Doc.Models.ConnectionDiagnostic;
+namespace TN_Doc.Models.DeviceConnectionDiagnostic;
 
 /// <summary>
 /// DTO с информацией о диагностике соединения для API ответа
 /// </summary>
-public class ConnectionDiagnosticInfo
+public class DeviceConnectionDiagnosticInfo
 {
     /// <summary>
     /// Устройство заблокировано (Open state с RequiresManualReset)

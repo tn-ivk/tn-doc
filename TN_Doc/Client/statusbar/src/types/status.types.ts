@@ -2,7 +2,7 @@
  * Типы для статус-бара TN_Doc
  */
 
-export interface ConnectionDiagnosticInfo {
+export interface DeviceConnectionDiagnosticInfo {
   isBlocked: boolean;
   state: 'Closed' | 'Open' | 'HalfOpen';
   errorCategory?: 'Authentication' | 'Network' | 'Other';
@@ -35,7 +35,7 @@ export interface DeviceStatus {
   /** Информация по каждому каналу связи */
   channels: ConnectionChannel[];
   /** Информация о диагностике соединения */
-  connectionDiagnostic?: ConnectionDiagnosticInfo;
+  deviceConnectionDiagnostic?: DeviceConnectionDiagnosticInfo;
 }
 
 export interface ConnectionStatus {

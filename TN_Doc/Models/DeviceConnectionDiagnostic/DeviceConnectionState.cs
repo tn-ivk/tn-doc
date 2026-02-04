@@ -1,6 +1,6 @@
 using System;
 
-namespace TN_Doc.Models.ConnectionDiagnostic;
+namespace TN_Doc.Models.DeviceConnectionDiagnostic;
 
 /// <summary>
 /// Внутреннее состояние диагностики соединения для устройства

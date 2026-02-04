@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using TN_Doc.Models.ConnectionDiagnostic;
+using TN_Doc.Models.DeviceConnectionDiagnostic;
 using TN_DocGeneral.Services;
 
 namespace TN_Doc.Services;
@@ -17,10 +17,10 @@ namespace TN_Doc.Services;
 /// - Network ошибки → exponential polling (60с → 1ч), после MaxRetryCount → блокировка
 /// - При успешном подключении → полный сброс всех счётчиков
 /// </summary>
-public class ConnectionDiagnosticService : IConnectionDiagnosticService
+public class DeviceConnectionDiagnosticService : IDeviceConnectionDiagnosticService
 {
     private readonly IAppConfigService _appConfigService;
-    private readonly ILogger<ConnectionDiagnosticService> _logger;
+    private readonly ILogger<DeviceConnectionDiagnosticService> _logger;
     private readonly ConcurrentDictionary<string, DeviceConnectionState> _deviceStates = new();
 
     // MySQL коды ошибок аутентификации
@@ -29,7 +29,7 @@ public class ConnectionDiagnosticService : IConnectionDiagnosticService
     // MySQL коды сетевых ошибок
     private static readonly int[] NetworkErrorCodes = { 2003, 2002, 2006, 2013 };
 
-    public ConnectionDiagnosticService(IAppConfigService appConfigService, ILogger<ConnectionDiagnosticService> logger)
+    public DeviceConnectionDiagnosticService(IAppConfigService appConfigService, ILogger<DeviceConnectionDiagnosticService> logger)
     {
         _appConfigService = appConfigService ?? throw new ArgumentNullException(nameof(appConfigService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -170,7 +170,7 @@ public class ConnectionDiagnosticService : IConnectionDiagnosticService
     }
 
     /// <inheritdoc/>
-    public ConnectionDiagnosticInfo? GetConnectionDiagnosticInfo(string deviceId)
+    public DeviceConnectionDiagnosticInfo? GetDeviceConnectionDiagnosticInfo(string deviceId)
     {
         if (string.IsNullOrEmpty(deviceId))
             return null;
@@ -178,7 +178,7 @@ public class ConnectionDiagnosticService : IConnectionDiagnosticService
         if (!_deviceStates.TryGetValue(deviceId, out var state))
             return null;
 
-        var info = new ConnectionDiagnosticInfo
+        var info = new DeviceConnectionDiagnosticInfo
         {
             IsBlocked = state.RequiresManualReset,
             State = state.State.ToString(),
@@ -249,7 +249,7 @@ public class ConnectionDiagnosticService : IConnectionDiagnosticService
     /// <summary>
     /// Обрабатывает ошибку аутентификации - немедленная блокировка
     /// </summary>
-    private void HandleAuthenticationError(DeviceConnectionState state, TN.DocData.ConnectionDiagnosticSettings settings)
+    private void HandleAuthenticationError(DeviceConnectionState state, TN.DocData.DeviceConnectionDiagnosticSettings settings)
     {
         state.State = ConnectionState.Open;
         state.RequiresManualReset = true;
@@ -263,7 +263,7 @@ public class ConnectionDiagnosticService : IConnectionDiagnosticService
     /// <summary>
     /// Обрабатывает сетевую или другую ошибку - exponential polling
     /// </summary>
-    private void HandleNetworkOrOtherError(DeviceConnectionState state, TN.DocData.ConnectionDiagnosticSettings settings)
+    private void HandleNetworkOrOtherError(DeviceConnectionState state, TN.DocData.DeviceConnectionDiagnosticSettings settings)
     {
         // Проверяем порог включения защиты
         if (state.FailureCount < settings.NetworkFailureThreshold)
@@ -312,9 +312,9 @@ public class ConnectionDiagnosticService : IConnectionDiagnosticService
     /// <summary>
     /// Получает настройки диагностики соединения из конфигурации
     /// </summary>
-    private TN.DocData.ConnectionDiagnosticSettings GetSettings()
+    private TN.DocData.DeviceConnectionDiagnosticSettings GetSettings()
     {
         var appConfig = _appConfigService.GetAppCfg();
-        return appConfig?.ConnectionDiagnostic ?? new TN.DocData.ConnectionDiagnosticSettings();
+        return appConfig?.DeviceConnectionDiagnostic ?? new TN.DocData.DeviceConnectionDiagnosticSettings();
     }
 }

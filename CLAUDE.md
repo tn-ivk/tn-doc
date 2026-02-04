@@ -67,7 +67,7 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 | Service | Назначение |
 |---------|------------|
 | `IStatusProvider` | Мониторинг здоровья системы (многоканальный) |
-| `IConnectionDiagnosticService` | Диагностика подключений устройств |
+| `IDeviceConnectionDiagnosticService` | Диагностика подключений устройств |
 | `IConfigurationService` | Управление конфигурацией и документами |
 | `PrinterService` | Платформо-зависимая печать |
 
