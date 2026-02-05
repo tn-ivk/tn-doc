@@ -69,23 +69,29 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 | `IStatusProvider` | Мониторинг здоровья системы (многоканальный) |
 | `IDeviceConnectionDiagnosticService` | Диагностика подключений устройств |
 | `IConfigurationService` | Управление конфигурацией и документами |
+| `StatusMonitoringService` | BackgroundService: периодическая проверка + SignalR push |
 | `PrinterService` | Платформо-зависимая печать |
 
 **tn.docgeneral/TN.DocGeneral/Services/** — общие для всех приложений:
 | Service | Назначение |
 |---------|------------|
 | `IAppConfigService` | Конфигурация + фабрика документов |
-| `IConfigurationCacheService` | Кэш JSON-конфигов (LRU, макс. 50) |
+| `IConfigurationCacheService` | Кэш JSON-конфигов (LRU, макс. 50), используется всеми модулями документов |
 | `IReportBuffer` | In-memory PDF хранилище |
 | `IDocModuleLoader` | Динамическая загрузка DLL модулей (LRU, макс. 5) |
+| `LoggingPathService` | Кросс-платформенное определение путей логирования |
 
 ### Vue Frontend (TN_Doc/Client/)
 
+npm workspaces монорепозиторий:
 - **statusbar/** — Vue 3 + PrimeVue + SignalR, real-time мониторинг статуса
 - **configurator/** — управление конфигурацией через `/configurator`
-- **shared/** — общие утилиты и API клиенты
+- **shared/** — общие утилиты и API клиенты (зависимость для statusbar/configurator)
 - **e2e/** — Playwright тесты
-- Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
+
+Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
+
+**SignalR Hub**: `StatusHub` (`/statusHub`) для real-time обновлений
 
 ### StatusBar: Диагностика подключений
 
@@ -95,6 +101,15 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 - Категории ошибок: Authentication, MaxRetry, Blocked
 
 Трёхцветная индикация: зелёный (все каналы), жёлтый (частичное), красный (нет связи).
+
+### Configurator: Настройки диагностики
+
+Параметры диагностики настраиваются в Configurator → вкладка "Общие" → панель "Диагностика связи с ИВК":
+- `InitialPollSeconds` (1-3600) — начальный интервал опроса
+- `MaxPollSeconds` (60-86400) — максимальный интервал
+- `PollMultiplier` (1.1-10) — множитель увеличения интервала
+- `NetworkFailureThreshold` (1-100) — порог сетевых ошибок
+- `MaxRetryCount` (1-1000) — попытки до перехода в HalfOpen
 
 ## API Endpoints
 
@@ -116,7 +131,7 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 
 | Файл | Назначение |
 |------|------------|
-| `TN_Doc/Cfg/CfgApp.json` | Главная конфигурация (устройства, ELIS, OPC) |
+| `TN_Doc/Cfg/CfgApp.json` | Главная конфигурация (устройства, ELIS, OPC, DeviceConnectionDiagnostic) |
 | `TN_Doc/Cfg/Cfg{Type}.json` | Настройки шаблона документа |
 | `TN_Doc/appsettings.json` | ASP.NET Core настройки |
 | `TN_Doc/nlog.config` | Логирование NLog |
@@ -148,10 +163,26 @@ GetPathTemplateFile()                // Путь к .frx шаблону
 
 ## Testing
 
-- **Tests.Unit/** — модульные тесты (NUnit + Moq)
-- **Tests.Integration/** — интеграционные тесты (WebApplicationFactory)
-- **TN_Doc/Client/e2e/** — E2E тесты (Playwright)
-- Naming: `MethodName_WhenCondition_ThenExpectedResult`
+```
+Tests/
+├── Tests.Unit/         # Модульные тесты (NUnit 4 + Moq)
+├── Tests.Integration/  # Интеграционные тесты (WebApplicationFactory)
+└── Tests.Shared/       # Общая тестовая инфраструктура
+TN_Doc/Client/e2e/      # E2E тесты (Playwright)
+```
+
+```bash
+# Все тесты
+dotnet test
+
+# Unit-тесты с покрытием
+dotnet test Tests/Tests.Unit --collect:"XPlat Code Coverage"
+
+# E2E (требует запущенный сервер на localhost:38509)
+cd TN_Doc/Client && npm run test:e2e
+```
+
+Naming: `MethodName_WhenCondition_ThenExpectedResult`
 
 ## Git Conventions
 

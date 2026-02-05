@@ -22,8 +22,17 @@
   - Валидация путей к файлам конфигурации
   - Ограничение доступа только к директории Cfg/
   - Unit-тесты для проверки безопасности путей
+- 🚀 **Configurator: Настройки диагностики связи с ИВК** — управление параметрами диагностики подключений
+  - Настройка начального интервала опроса (InitialPollSeconds)
+  - Настройка максимального интервала опроса (MaxPollSeconds)
+  - Множитель интервала (PollMultiplier)
+  - Порог сетевых ошибок (NetworkFailureThreshold)
+  - Максимум попыток до блокировки (MaxRetryCount)
+  - Новый тип `DeviceConnectionDiagnosticSettings` в config.types.ts
 
 ### Changed
+- Рефакторинг UI конфигуратора: добавлены design tokens для spacing system
+- Улучшена структура компонентов DeviceEditor, DeviceList, DevicesTab, DocumentTree, GeneralTab
 - Обновлена структура тестовых проектов и исправлены пути в CfgAppSyncTests
 - Удалены неиспользуемые solution folders для submodules
 - Обновлён адрес сервера БД в конфигурации разработки

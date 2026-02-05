@@ -209,6 +209,29 @@ sequenceDiagram
     Component->>CSS: Apply .status-indicator--online
 ```
 
+## Настройка диагностики (Configurator)
+
+Параметры диагностики подключений настраиваются через Configurator (`/configurator`) во вкладке "Общие".
+
+### Параметры DeviceConnectionDiagnosticSettings
+
+| Параметр | Описание | Значение по умолчанию |
+|----------|----------|----------------------|
+| `InitialPollSeconds` | Начальный интервал опроса | 60 сек |
+| `MaxPollSeconds` | Максимальный интервал опроса | 3600 сек |
+| `PollMultiplier` | Множитель увеличения интервала | 2.0 |
+| `NetworkFailureThreshold` | Порог для учёта отказа сети | 3 |
+| `MaxRetryCount` | Макс. попыток до перехода в HalfOpen | 24 |
+
+### Алгоритм увеличения интервала
+
+При каждом неудачном подключении интервал опроса увеличивается:
+```
+nextInterval = min(currentInterval × PollMultiplier, MaxPollSeconds)
+```
+
+После достижения `MaxRetryCount` попыток, канал переходит в состояние `HalfOpen` — система продолжает проверять подключение, но с максимальным интервалом.
+
 ## Real-time Communication
 
 ### SignalR Flow

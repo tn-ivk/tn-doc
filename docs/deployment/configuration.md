@@ -24,6 +24,7 @@
   - `Type`: `0` — OPC DA, `1` — OPC UA
   - `DaSettings`, `UaSettings` — параметры подключения
 - `Elis` — параметры интеграции ELIS (Use, OstKey, SiknKey, ClientName, ClientToken).
+- `DeviceConnectionDiagnostic` — настройки диагностики подключений к устройствам (InitialPollSeconds, MaxPollSeconds, PollMultiplier, NetworkFailureThreshold, MaxRetryCount).
 
 ## Редактирование
 
