@@ -1023,22 +1023,28 @@ function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray 
 }
 
 function ReadTagCacheARM(DeviceName = 'ARM', tagName, namespaceIndex = 1, indexArray = 0) {
-
     var url = "http://localhost:5010/api/OPCClientCache/";
     var result;
-    $.ajax(
-        {
+
+    try {
+        $.ajax({
             async: false,
             url: url + DeviceName + '/' + tagName + '/' + namespaceIndex + '/' + indexArray,
             type: "Get",
-            //dataType: 'json',
-            //data: {
-            //    nameTag: "ARM.ARM_OnlineReportCounter"
-            //},
             success: function (data) {
                 result = data;
             },
+            error: function(xhr, status, error) {
+                if (xhr.status === 500 || xhr.status === 404) {
+                    logError(`ReadTagCacheARM failed: ${error} (${status}) for tag ${tagName}`);
+                }
+                result = undefined;
+            }
         });
+    } catch (ex) {
+        logError(`ReadTagCacheARM exception for tag ${tagName}: ${ex.message || ex}`);
+        result = undefined;
+    }
 
     return result;
 }
