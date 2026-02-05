@@ -88,21 +88,29 @@ namespace FastReport
     private void TableAct_ManualBuild(object sender, EventArgs e)
     {
       bool ShowResultColumn = false; //.ShowResultColumn;
-      int ColumnsCount = 0; 
+      int ColumnsCount = 0;
       List&lt;TN.Doc.ActShift&gt; listShiftsData = ActShifts.Where(x =&gt; !string.IsNullOrEmpty(x.GostIndex51858)).ToList();
-         
+      if (listShiftsData == null || listShiftsData.Count == 0)
+      {
+        return; // Нет данных для отображения
+      }
+
+      int shiftCount = listShiftsData
+        .Where(act =&gt; !String.IsNullOrEmpty(act.GostIndex51858))
+        .Count();
+
       if (Engine.FinalPass == true)
       {
         if (ShowResultColumn)
         {
-          ColumnsCount = listShiftsData.Count + 1;
+          ColumnsCount = shiftCount + 1;
         }
         else
         {
           TableAct.Columns.Remove(ColumnResult);
-          ColumnsCount = listShiftsData.Count;
-        }           
-                                                    
+          ColumnsCount = shiftCount;
+        }
+
         // Calculate Dynamic Columns width
         float widthDynamicCols=(
           Page.PaperWidth-
@@ -110,56 +118,61 @@ namespace FastReport
           Page.RightMargin-
           TableAct.Columns[0].Width/Units.Millimeters-
           TableAct.Columns[1].Width/Units.Millimeters)
-          /ColumnsCount;         
+          /ColumnsCount;
 
         // Insert Columns for Volumes  (V0) &amp; fill them headers with text
         int indexColTemplate = ColumnTemplate.Index;
-        for (int i=1; i&lt;listShiftsData.Count; i++)
+        for (int i=1; i&lt;shiftCount; i++)
         {
           TableAct.Columns.Insert(indexColTemplate+1, new TableColumn());
-          
+
           foreach(TableRow row in TableAct.Rows)
             row[indexColTemplate+1].AssignAll(row[indexColTemplate]);
         }
-            
+
         // Setup Dynamic Columns Width
-        for (int i = indexColTemplate; i &lt; TableAct.ColumnCount; i++)                 
+        for (int i = indexColTemplate; i &lt; TableAct.ColumnCount; i++)
         {
           TableAct.Columns[i].Width = widthDynamicCols*Units.Millimeters;
         }
-            
+
         // Span Columns
-        TableAct[indexColTemplate,0].ColSpan=listShiftsData.Count;
-            
+        TableAct[indexColTemplate,0].ColSpan=shiftCount;
+
         // Fill TableAct with data
         double hoursPerShift = 24.0 / listShiftsData.Count;
-        
-        for (int i = 0; i &lt; (listShiftsData.Count); i++)                 
+
+        for (int i = 0, j = 0; i &lt; (listShiftsData.Count); i++)
         {
+          if(String.IsNullOrEmpty(listShiftsData[i].GostIndex51858))
+            continue;
+
           string begin = FormatTime(i * hoursPerShift);
           string end = FormatTime((i + 1) * hoursPerShift);
-          TableAct[(2+i),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
-          TableAct[(2+i),2].Text = $&quot;{begin}-{end}&quot;;            
-          TableAct[(2+i),3].Text = $&quot;Смена {i+1}&quot;;            
-          TableAct[(2+i),5].Text = listShiftsData[i].Vol_LastShift.ToString();
-          TableAct[(2+i),6].Text = listShiftsData[i].Mass_LastShift.ToString();         
-          TableAct[(2+i),8].Text = listShiftsData[i].Vol_CurrShift.ToString();           
-          TableAct[(2+i),9].Text = listShiftsData[i].Mass_CurrShift.ToString();     
-          TableAct[(2+i),11].Text = (listShiftsData[i].Vol_Gross + listShiftsData[i].DebalanceVolume).ToString();     
-          TableAct[(2+i),12].Text = (listShiftsData[i].Mass_Gross + listShiftsData[i].DebalanceBrutto).ToString();     
-          TableAct[(2+i),13].Text = listShiftsData[i].Temp.ToString(&quot;F1&quot;);     
-          TableAct[(2+i),14].Text = listShiftsData[i].Press.ToString(&quot;F2&quot;);     
-          TableAct[(2+i),15].Text = listShiftsData[i].Density.ToString(&quot;F1&quot;);     
-          TableAct[(2+i),16].Text = (listShiftsData[i].Density_correction == 0.0 ? &quot;-&quot; : listShiftsData[i].Density_correction.ToString());    
-          TableAct[(2+i),17].Text = listShiftsData[i].PassportID.ToString();     
-          TableAct[(2+i),18].Text = listShiftsData[i].Balast_Mass_Frac.ToString(&quot;F4&quot;);             
-          TableAct[(2+i),20].Text = listShiftsData[i].Ballast.Water.ToString(&quot;F2&quot;);             
-          TableAct[(2+i),21].Text = listShiftsData[i].Ballast.Chlorides.ToString(&quot;F4&quot;);             
-          TableAct[(2+i),22].Text = listShiftsData[i].Ballast.Impurity.ToString(&quot;F4&quot;);             
-          TableAct[(2+i),23].Text = listShiftsData[i].Sulfur.ToString(&quot;F2&quot;);             
-          TableAct[(2+i),24].Text = listShiftsData[i].Chloride_Salts.ToString(&quot;F1&quot;);             
-          TableAct[(2+i),25].Text = listShiftsData[i].Balast_Mass.ToString();             
-          TableAct[(2+i),26].Text = (listShiftsData[i].Net_Mass + listShiftsData[i].DebalanceNetto).ToString();     
+          TableAct[(2+j),1].Text = Begin.ToString(&quot;dd.MM.yyyy&quot;);
+          TableAct[(2+j),2].Text = $&quot;{begin}-{end}&quot;;
+          TableAct[(2+j),3].Text = $&quot;Смена {i+1}&quot;;
+          TableAct[(2+j),5].Text = listShiftsData[i].Vol_LastShift.ToString();
+          TableAct[(2+j),6].Text = listShiftsData[i].Mass_LastShift.ToString();
+          TableAct[(2+j),8].Text = listShiftsData[i].Vol_CurrShift.ToString();
+          TableAct[(2+j),9].Text = listShiftsData[i].Mass_CurrShift.ToString();
+          TableAct[(2+j),11].Text = (listShiftsData[i].Vol_Gross + listShiftsData[i].DebalanceVolume).ToString();
+          TableAct[(2+j),12].Text = (listShiftsData[i].Mass_Gross + listShiftsData[i].DebalanceBrutto).ToString();
+          TableAct[(2+j),13].Text = listShiftsData[i].Temp.ToString(&quot;F1&quot;);
+          TableAct[(2+j),14].Text = listShiftsData[i].Press.ToString(&quot;F2&quot;);
+          TableAct[(2+j),15].Text = listShiftsData[i].Density.ToString(&quot;F1&quot;);
+          TableAct[(2+j),16].Text = (listShiftsData[i].Density_correction == 0.0 ? &quot;-&quot; : listShiftsData[i].Density_correction.ToString());
+          TableAct[(2+j),17].Text = listShiftsData[i].PassportID.ToString();
+          TableAct[(2+j),18].Text = listShiftsData[i].Balast_Mass_Frac.ToString(&quot;F4&quot;);
+          TableAct[(2+j),20].Text = listShiftsData[i].Ballast.Water.ToString(&quot;F2&quot;);
+          TableAct[(2+j),21].Text = listShiftsData[i].Ballast.Chlorides.ToString(&quot;F4&quot;);
+          TableAct[(2+j),22].Text = listShiftsData[i].Ballast.Impurity.ToString(&quot;F4&quot;);
+          TableAct[(2+j),23].Text = listShiftsData[i].Sulfur.ToString(&quot;F2&quot;);
+          TableAct[(2+j),24].Text = listShiftsData[i].Chloride_Salts.ToString(&quot;F1&quot;);
+          TableAct[(2+j),25].Text = listShiftsData[i].Balast_Mass.ToString();
+          TableAct[(2+j),26].Text = (listShiftsData[i].Net_Mass + listShiftsData[i].DebalanceNetto).ToString();
+
+          j++;
         }
       }
          
