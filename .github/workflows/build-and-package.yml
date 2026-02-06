@@ -81,7 +81,7 @@ jobs:
         with:
           name: build-artifacts
           path: ./publish/
-          retention-days: 7
+          retention-days: 3
 
   # ===========================================
   # Unit Test Job
@@ -151,7 +151,7 @@ jobs:
         with:
           name: test-results-unit
           path: "**/TestResults/*.trx"
-          retention-days: 7
+          retention-days: 3
 
   # ===========================================
   # Integration Test Job
@@ -221,7 +221,7 @@ jobs:
         with:
           name: test-results-integration
           path: "**/TestResults/*.trx"
-          retention-days: 7
+          retention-days: 3
 
   # ===========================================
   # Extract Version Job
@@ -746,7 +746,7 @@ jobs:
         with:
           name: package-full
           path: ./packages/*.deb
-          retention-days: 30
+          retention-days: 7
 
   # ===========================================
   # Package Minimal (without dependencies)
@@ -1030,7 +1030,7 @@ jobs:
         with:
           name: package-minimal
           path: ./packages/*.deb
-          retention-days: 30
+          retention-days: 7
 
   # ===========================================
   # Package .NET Runtime
@@ -1144,7 +1144,7 @@ jobs:
         with:
           name: package-runtime
           path: ./packages/*.deb
-          retention-days: 30
+          retention-days: 7
 
   # ===========================================
   # Package Fonts
@@ -1229,7 +1229,7 @@ jobs:
         with:
           name: package-fonts
           path: ./packages/*.deb
-          retention-days: 30
+          retention-days: 7
 
   # ===========================================
   # Telegram Notification
