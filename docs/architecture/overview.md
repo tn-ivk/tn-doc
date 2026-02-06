@@ -100,18 +100,24 @@ graph LR
 ### 2. Business Logic Layer (Бизнес-логика)
 
 **Компоненты:**
-- `IAppConfigService` - управление конфигурацией
-- `IDocModuleLoader` - динамическая загрузка модулей документов
-- `PrinterService` - управление печатью
-- `DirectoryService` - работа с файловой системой
-- `StatusProvider` - мониторинг статусов
-- `IReportBuffer` - буфер для PDF в памяти
+- `IAppConfigService` - управление конфигурацией + фабрика документов
+- `IDocModuleLoader` - динамическая загрузка модулей документов (LRU, макс. 5)
+- `IConfigurationCacheService` - кэш JSON-конфигов (LRU, макс. 50)
+- `IConfigurationService` - управление конфигурацией и документами (веб)
+- `IDeviceConnectionDiagnosticService` - диагностика подключений устройств
+- `StatusMonitoringService` - BackgroundService: периодическая проверка + SignalR push
+- `IStatusProvider` - мониторинг здоровья системы (многоканальный)
+- `PrinterService` - платформо-зависимая печать
+- `IReportBuffer` - in-memory PDF хранилище
+- `LoggingPathService` - кросс-платформенное определение путей логирования
 
 **Ответственность:**
 - Бизнес-правила генерации документов
 - Управление конфигурацией
 - Создание экземпляров модулей документов
 - Мониторинг здоровья системы
+- Диагностика подключений к устройствам ИВК
+- Кэширование конфигурационных файлов
 
 ```mermaid
 classDiagram
@@ -204,27 +210,36 @@ graph TB
         AppConfig[AppConfigService]
         ReportBuffer[ReportBuffer]
         DocLoader[DocModuleLoader]
+        ConfigCache[ConfigurationCacheService]
+        LogPath[LoggingPathService]
     end
 
     subgraph "Scoped Services"
         DbCtx[DbContext]
         StatusProv[StatusProvider]
-        SchemaCache[DbSchemaCache]
+        ConfigSvc[ConfigurationService]
+        DiagSvc[DeviceConnectionDiagnosticService]
+    end
+
+    subgraph "Hosted Services"
+        Monitor[StatusMonitoringService]
     end
 
     subgraph "Transient Services"
         Printer[PrinterService]
-        Directory[DirectoryService]
     end
 
     SC --> AppConfig
     SC --> ReportBuffer
     SC --> DocLoader
+    SC --> ConfigCache
+    SC --> LogPath
     SC --> DbCtx
     SC --> StatusProv
-    SC --> SchemaCache
+    SC --> ConfigSvc
+    SC --> DiagSvc
+    SC --> Monitor
     SC --> Printer
-    SC --> Directory
 ```
 
 ## Configuration Architecture
@@ -266,11 +281,12 @@ graph TB
    - CORS policies
 
 2. **CfgApp.json** - основная конфигурация приложения
-   - Настройки устройств ИВК
-   - Строки подключения к БД
+   - Настройки устройств ИВК (Devices, UsedSI)
+   - Строки подключения к БД (DBConnectionStrings)
    - ELIS интеграция
-   - OPC серверы
-   - Флаги безопасности
+   - OPC серверы (ARM и per-device)
+   - Флаги безопасности (UseSecurityFeatures)
+   - Диагностика подключений (DeviceConnectionDiagnostic)
 
 3. **Cfg{DocType}.json** - конфигурация типа документа
    - Путь к шаблону
