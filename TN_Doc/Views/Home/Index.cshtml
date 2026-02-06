@@ -1,9 +1,7 @@
 ﻿@{
-    
     ViewData["Title"] = $" Модуль - документы ({ ViewData["Version"]})";
 }
-<body>
-    <div class="cont">
+<div class="cont">
         <table class="mainTable">
             <tr>
                 <td class="topPanel" colspan="2" align="right">
@@ -77,7 +75,7 @@
                 <td class="rightPanel">
                     <table class="docTable">
                         <tr>
-                            <td height="37" width="250" class="pb-1">
+                            <td height="37" width="200" class="pb-1">
                                 <input id="viewModeButton" type="button" value="Редактирование" width="100" hidden="hidden" onclick="ToggleMode()">
                             </td>
                             <td id="viewPanel" class="pb-1">
@@ -294,4 +292,3 @@
             $("#ElisRequestContent").load("/HTML/ElisRequestWindow.html");
         });
 </script>
-</body>
