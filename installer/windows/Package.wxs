@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+    <Package Name="TN_Doc - Генератор отчетов"
+             Manufacturer="АО Транснефть-Автоматизация и Метрология"
+             Version="$(var.ProductVersion)"
+             UpgradeCode="E7A14B69-3F8C-4D52-9B76-2A1D5E8F0C34"
+             Compressed="yes"
+             Language="1049">
+
+        <!-- Major upgrade: remove old version after installing new files -->
+        <MajorUpgrade DowngradeErrorMessage="Более новая версия уже установлена. Установка будет прервана."
+                      Schedule="afterInstallExecute" />
+
+        <!-- Embed all files into the MSI -->
+        <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+        <!-- Default property values (overridable via msiexec /p or UI) -->
+        <Property Id="INSTALLFOLDER" Value="C:\ProjectVU\DotNetComponents" />
+        <Property Id="SERVICENAME" Value="tn.doc" Secure="yes" />
+        <Property Id="BACKUPDIR" Value="C:\ProgramData\TN_Doc\backups" Secure="yes" />
+
+        <!-- Launch conditions -->
+        <Launch Condition="VersionNT &gt;= 603"
+                Message="Требуется Windows 10 или новее." />
+        <Launch Condition="Privileged"
+                Message="Требуются права администратора." />
+
+        <!-- Feature tree -->
+        <Feature Id="ProductFeature" Title="TN_Doc" Level="1">
+            <ComponentGroupRef Id="AppFiles" />
+            <ComponentRef Id="ServiceComponent" />
+            <ComponentRef Id="BackupScriptComponent" />
+            <ComponentRef Id="BackupDirComponent" />
+        </Feature>
+    </Package>
+</Wix>

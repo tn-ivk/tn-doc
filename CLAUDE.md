@@ -229,7 +229,7 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 | Workflow | Триггер | Назначение |
 |----------|---------|------------|
 | `tests-on-push.yml` | push в `develop*` | build → unit-test + integration-test → test-summary |
-| `build-and-package.yml` | push tag | build → test → package (.deb) → notify-telegram → create-release |
+| `build-and-package.yml` | push tag | build → test → package (.deb + .msi) → notify-telegram → create-release |
 
 **Фильтры тестов в CI**:
 ```bash
@@ -251,11 +251,17 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 
 Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.0-b42-a1b2c3d4`)
 
-Создаётся `.deb` пакет (`tn.doc-{FULL_VERSION}_amd64.deb`):
+**Linux (.deb):** `tn.doc-{FULL_VERSION}_amd64.deb`
 - Требует `dotnet-runtime-8.0 >= 8.0.13`
 - Устанавливается в `/opt/TN_Doc`, логи в `/var/log/TN_Doc`
 - Backup перед обновлением в `/var/backups/TN_Doc/`
 - Systemd unit: `TN_Doc.service`, пользователь `alphadaemon`
+
+**Windows (.msi):** `tn.doc-full-{FULL_VERSION}_win-x64.msi` (self-contained), `tn.doc-{FULL_VERSION}_win-x64.msi` (minimal)
+- WiX v6, установка в `C:\ProjectVU\DotNetComponents` (настраиваемо)
+- Windows Service с настраиваемым именем (по умолчанию `tn.doc`)
+- Backup перед обновлением в `C:\ProgramData\TN_Doc\backups\`
+- Поддержка тихой установки через `msiexec /quiet`
 
 ## External Systems
 
@@ -265,12 +271,48 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 
 ## Platform Notes
 
-| Platform | Logging | Service |
-|----------|---------|---------|
-| Windows | `TN_Doc/logs/` | `sc create TN_Doc` |
-| Linux | `/opt/TN_Doc/logs/` | systemd, требует `libgdiplus` |
+| Platform | Logging | Service | Installer |
+|----------|---------|---------|-----------|
+| Windows | `TN_Doc/logs/` | Windows Service (MSI) | `installer/windows/` (WiX v6) |
+| Linux | `/opt/TN_Doc/logs/` | systemd, требует `libgdiplus` | `.deb` пакет (CI inline) |
 
 Определение платформы в `Program.cs`: `UseWindowsService()` / `UseSystemd()`.
+
+### Windows MSI Installer
+
+Проект WiX v6 в `installer/windows/`:
+```
+installer/windows/
+├── TN_Doc.Installer.wixproj   # WiX SDK-style проект
+├── Package.wxs                 # Пакет, MajorUpgrade, Features
+├── Directories.wxs             # Структура директорий
+├── ServiceConfig.wxs           # Windows Service + бэкап
+├── Scripts/Backup.ps1          # PowerShell бэкап при обновлении
+└── UI/
+    ├── ServiceNameDlg.wxs      # Диалог имени службы
+    └── CustomInstallUI.wxs     # Кастомная UI-последовательность
+```
+
+**Локальная сборка MSI:**
+```bash
+# 1. Publish
+dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
+
+# 2. Install WiX CLI
+dotnet tool install --global wix
+wix extension add WixToolset.UI.wixext/6.0.2
+wix extension add WixToolset.Util.wixext/6.0.2
+
+# 3. Harvest + Build
+cd installer/windows
+wix heat dir "../../publish/win-x64-full" -cg AppFiles -dr INSTALLFOLDER -srd -sfrag -ag -var "bindpath.publishdir" -out HarvestedFiles.wxs
+wix build Package.wxs Directories.wxs ServiceConfig.wxs HarvestedFiles.wxs UI/ServiceNameDlg.wxs UI/CustomInstallUI.wxs -d ProductVersion=1.5.0 -bindpath:publishdir="../../publish/win-x64-full" -ext WixToolset.UI.wixext -ext WixToolset.Util.wixext -arch x64 -o TN_Doc.msi
+```
+
+**Тихая установка:**
+```cmd
+msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents" SERVICENAME="tn.doc"
+```
 
 ## Testing
 

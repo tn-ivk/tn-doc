@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Fragment>
+    <!-- ================================================================
+         Service component: installs TN_Doc.exe and registers Windows Service
+         ================================================================ -->
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="ServiceComponent" Guid="A1B2C3D4-E5F6-7890-ABCD-EF1234567890" Bitness="always64">
+        <File Id="TN_Doc.exe" Source="!(bindpath.publishdir)\TN_Doc.exe" KeyPath="yes" />
+
+        <ServiceInstall Id="TN_DocServiceInstaller"
+                        Type="ownProcess"
+                        Name="[SERVICENAME]"
+                        DisplayName="TN_Doc - Генератор отчетов ([SERVICENAME])"
+                        Description="Веб-приложение генерации технических документов ИВК"
+                        Start="auto"
+                        Account="LocalSystem"
+                        ErrorControl="normal" />
+
+        <ServiceControl Id="TN_DocServiceControl"
+                        Start="install"
+                        Stop="both"
+                        Remove="uninstall"
+                        Name="[SERVICENAME]"
+                        Wait="yes" />
+      </Component>
+
+      <!-- Scripts subfolder with backup script -->
+      <Directory Id="ScriptsFolder" Name="Scripts">
+        <Component Id="BackupScriptComponent" Guid="C3D4E5F6-A7B8-9012-CDEF-345678901234" Bitness="always64">
+          <File Id="Backup.ps1" Source="Scripts\Backup.ps1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+
+    <!-- ================================================================
+         Backup directory component: ensures C:\ProgramData\TN_Doc\backups exists
+         ================================================================ -->
+    <DirectoryRef Id="BACKUPFOLDER">
+      <Component Id="BackupDirComponent" Guid="B2C3D4E5-F6A7-8901-BCDE-F23456789012">
+        <CreateFolder KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- ================================================================
+         Backup custom action: runs Backup.ps1 from the PREVIOUS installation
+         before files are removed during a major upgrade.
+
+         On first install there is no old Backup.ps1 and no files to back up,
+         so the condition "Installed AND NOT REMOVE~=ALL" ensures it only
+         runs during upgrades.
+
+         Return="ignore" prevents backup failures from blocking the upgrade.
+         ================================================================ -->
+
+    <!-- SetProperty populates the deferred CA data (WixQuietExec64 reads it from CustomActionData) -->
+    <SetProperty Id="BackupBeforeUpgrade"
+                 Value="&quot;powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]Scripts\Backup.ps1&quot; -InstallDir &quot;[INSTALLFOLDER]&quot; -BackupDir &quot;[BACKUPDIR]&quot; -Version &quot;$(var.ProductVersion)&quot;"
+                 Before="BackupBeforeUpgrade"
+                 Sequence="execute" />
+
+    <CustomAction Id="BackupBeforeUpgrade"
+                  DllEntry="WixQuietExec64"
+                  BinaryRef="Wix4UtilCA_X64"
+                  Execute="deferred"
+                  Return="ignore"
+                  Impersonate="no" />
+
+    <InstallExecuteSequence>
+      <Custom Action="BackupBeforeUpgrade"
+              Before="RemoveFiles"
+              Condition="Installed AND NOT REMOVE~=&quot;ALL&quot;" />
+    </InstallExecuteSequence>
+  </Fragment>
+</Wix>

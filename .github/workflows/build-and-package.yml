@@ -1232,12 +1232,223 @@ jobs:
           retention-days: 7
 
   # ===========================================
+  # Build Windows (self-contained + framework-dependent)
+  # ===========================================
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    needs: [test, integration-test]
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Configure submodule URLs for GitHub (private repos)
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-docgeneral.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.docgeneral.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-tools.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/winprutil.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/winprutil.git"
+          git config --global url."https://x-access-token:${{ secrets.GH_SUBMODULES_TOKEN }}@github.com/tn-ivk/tn-utils.git".insteadOf "https://git.tncpa.ru/orpovy/ivk/tn.utils.git"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GH_SUBMODULES_TOKEN }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+          source-url: https://nuget.pkg.github.com/tn-ivk/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Add FastReport NuGet source
+        run: |
+          dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" `
+            --name fr_nuget `
+            --username "${{ secrets.FR_NUGET_USERNAME }}" `
+            --password "${{ secrets.FR_NUGET_PASSWORD }}" `
+            --store-password-in-clear-text
+
+      - name: Create directories
+        run: |
+          New-Item -ItemType Directory -Force -Path .\publish\win-x64-full | Out-Null
+          New-Item -ItemType Directory -Force -Path .\publish\win-x64-minimal | Out-Null
+          New-Item -ItemType Directory -Force -Path TN_Doc\Dll | Out-Null
+
+      - name: Build solution
+        run: dotnet build -c Release
+
+      - name: Publish self-contained (full)
+        run: dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-x64-full
+
+      - name: Publish framework-dependent (minimal)
+        run: dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish/win-x64-minimal
+
+      - name: Upload full build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-win-full
+          path: ./publish/win-x64-full/
+          retention-days: 3
+
+      - name: Upload minimal build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-win-minimal
+          path: ./publish/win-x64-minimal/
+          retention-days: 3
+
+  # ===========================================
+  # Package MSI Full (self-contained)
+  # ===========================================
+  package-msi-full:
+    name: Package MSI Full
+    runs-on: windows-latest
+    needs: [build-windows, extract-version]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download full build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts-win-full
+          path: ./publish/win-x64-full/
+
+      - name: Install WiX Toolset
+        run: |
+          dotnet tool install --global wix
+          wix extension add WixToolset.UI.wixext/6.0.2
+          wix extension add WixToolset.Util.wixext/6.0.2
+
+      - name: Harvest application files
+        working-directory: installer/windows
+        run: |
+          wix heat dir "../../publish/win-x64-full" `
+            -cg AppFiles `
+            -dr INSTALLFOLDER `
+            -srd -sfrag -ag `
+            -var "bindpath.publishdir" `
+            -out HarvestedFiles.wxs
+
+      - name: Remove TN_Doc.exe from harvested files
+        working-directory: installer/windows
+        shell: pwsh
+        run: |
+          # TN_Doc.exe is already defined in ServiceConfig.wxs, remove it from harvested to avoid duplicate
+          $content = Get-Content HarvestedFiles.wxs -Raw
+          $content = $content -replace '(?s)<Component[^>]*>[\s\S]*?<File[^>]*Source="[^"]*TN_Doc\.exe"[^>]*/?>[\s\S]*?</Component>', ''
+          Set-Content HarvestedFiles.wxs -Value $content
+
+      - name: Build MSI
+        working-directory: installer/windows
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          FULL_VERSION: ${{ needs.extract-version.outputs.full_version }}
+        run: |
+          wix build `
+            Package.wxs Directories.wxs ServiceConfig.wxs HarvestedFiles.wxs `
+            UI/ServiceNameDlg.wxs UI/CustomInstallUI.wxs `
+            -d ProductVersion=${{ needs.extract-version.outputs.version }} `
+            -bindpath:publishdir="../../publish/win-x64-full" `
+            -ext WixToolset.UI.wixext `
+            -ext WixToolset.Util.wixext `
+            -arch x64 `
+            -o "../../packages/tn.doc-full-${{ needs.extract-version.outputs.full_version }}_win-x64.msi"
+
+      - name: Upload MSI full package
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-msi-full
+          path: ./packages/*.msi
+          retention-days: 7
+
+  # ===========================================
+  # Package MSI Minimal (framework-dependent)
+  # ===========================================
+  package-msi-minimal:
+    name: Package MSI Minimal
+    runs-on: windows-latest
+    needs: [build-windows, extract-version]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download minimal build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts-win-minimal
+          path: ./publish/win-x64-minimal/
+
+      - name: Install WiX Toolset
+        run: |
+          dotnet tool install --global wix
+          wix extension add WixToolset.UI.wixext/6.0.2
+          wix extension add WixToolset.Util.wixext/6.0.2
+
+      - name: Harvest application files
+        working-directory: installer/windows
+        run: |
+          wix heat dir "../../publish/win-x64-minimal" `
+            -cg AppFiles `
+            -dr INSTALLFOLDER `
+            -srd -sfrag -ag `
+            -var "bindpath.publishdir" `
+            -out HarvestedFiles.wxs
+
+      - name: Remove TN_Doc.exe from harvested files
+        working-directory: installer/windows
+        shell: pwsh
+        run: |
+          # TN_Doc.exe is already defined in ServiceConfig.wxs, remove it from harvested to avoid duplicate
+          $content = Get-Content HarvestedFiles.wxs -Raw
+          $content = $content -replace '(?s)<Component[^>]*>[\s\S]*?<File[^>]*Source="[^"]*TN_Doc\.exe"[^>]*/?>[\s\S]*?</Component>', ''
+          Set-Content HarvestedFiles.wxs -Value $content
+
+      - name: Build MSI
+        working-directory: installer/windows
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          FULL_VERSION: ${{ needs.extract-version.outputs.full_version }}
+        run: |
+          wix build `
+            Package.wxs Directories.wxs ServiceConfig.wxs HarvestedFiles.wxs `
+            UI/ServiceNameDlg.wxs UI/CustomInstallUI.wxs `
+            -d ProductVersion=${{ needs.extract-version.outputs.version }} `
+            -bindpath:publishdir="../../publish/win-x64-minimal" `
+            -ext WixToolset.UI.wixext `
+            -ext WixToolset.Util.wixext `
+            -arch x64 `
+            -o "../../packages/tn.doc-${{ needs.extract-version.outputs.full_version }}_win-x64.msi"
+
+      - name: Upload MSI minimal package
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-msi-minimal
+          path: ./packages/*.msi
+          retention-days: 7
+
+  # ===========================================
   # Telegram Notification
   # ===========================================
   notify-telegram:
     name: Telegram Notification
     runs-on: ubuntu-latest
-    needs: [extract-version, package-minimal]
+    needs: [extract-version, package-minimal, package-msi-full, package-msi-minimal]
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
@@ -1250,6 +1461,7 @@ jobs:
         run: |
           mkdir -p ./packages
           find ./artifacts -name "*.deb" -exec cp {} ./packages/ \;
+          find ./artifacts -name "*.msi" -exec cp {} ./packages/ \;
           ls -la ./packages/
 
       - name: Send Telegram notification
@@ -1291,6 +1503,8 @@ jobs:
 
           # Получение информации о пакетах
           MINIMAL_PACKAGE=$(ls ./packages/tn.doc-[0-9]*.deb 2>/dev/null | head -n1 || echo "")
+          MSI_FULL_PACKAGE=$(ls ./packages/tn.doc-full-*.msi 2>/dev/null | head -n1 || echo "")
+          MSI_MINIMAL_PACKAGE=$(ls ./packages/tn.doc-[0-9]*.msi 2>/dev/null | head -n1 || echo "")
 
           # Формирование сообщения
           MESSAGE="🚀 *TN_Doc Build Completed*
@@ -1299,16 +1513,30 @@ jobs:
           🔗 Commit: \`${GITHUB_SHA:0:8}\`
           📋 [Pipeline](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})
 
-          *Packages:*"
+          *Packages (Linux):*"
 
           [ -n "$MINIMAL_PACKAGE" ] && MESSAGE="$MESSAGE
-          • Minimal: $(basename "$MINIMAL_PACKAGE")"
+          • DEB Minimal: $(basename "$MINIMAL_PACKAGE")"
+
+          MESSAGE="$MESSAGE
+
+          *Packages (Windows):*"
+
+          [ -n "$MSI_FULL_PACKAGE" ] && MESSAGE="$MESSAGE
+          • MSI Full: $(basename "$MSI_FULL_PACKAGE")"
+
+          [ -n "$MSI_MINIMAL_PACKAGE" ] && MESSAGE="$MESSAGE
+          • MSI Minimal: $(basename "$MSI_MINIMAL_PACKAGE")"
 
           send_message "$MESSAGE"
 
           # Отправка файлов
           sleep 1
-          [ -n "$MINIMAL_PACKAGE" ] && send_file "$MINIMAL_PACKAGE" "📦 TN_Doc Minimal v${VERSION}"
+          [ -n "$MINIMAL_PACKAGE" ] && send_file "$MINIMAL_PACKAGE" "📦 TN_Doc DEB Minimal v${VERSION}"
+          sleep 1
+          [ -n "$MSI_MINIMAL_PACKAGE" ] && send_file "$MSI_MINIMAL_PACKAGE" "📦 TN_Doc MSI Minimal v${VERSION} (Windows)"
+          sleep 1
+          [ -n "$MSI_FULL_PACKAGE" ] && send_file "$MSI_FULL_PACKAGE" "📦 TN_Doc MSI Full v${VERSION} (Windows, self-contained)"
 
           echo "Telegram notifications sent successfully"
 
@@ -1318,7 +1546,7 @@ jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs: [extract-version, package-minimal]
+    needs: [extract-version, package-minimal, package-msi-full, package-msi-minimal]
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
@@ -1333,6 +1561,7 @@ jobs:
         run: |
           mkdir -p ./packages
           find ./artifacts -name "*.deb" -exec cp {} ./packages/ \;
+          find ./artifacts -name "*.msi" -exec cp {} ./packages/ \;
           ls -la ./packages/
 
       - name: Create GitHub Release
@@ -1342,16 +1571,29 @@ jobs:
           body: |
             ## TN_Doc v${{ needs.extract-version.outputs.version }}
 
-            ### Пакеты
-            - **tn.doc** - Минимальный пакет (требует .NET Runtime)
+            ### Пакеты Linux
+            - **tn.doc** — Минимальный DEB пакет (требует .NET Runtime 8.0.13+)
 
-            ### Установка
+            ### Пакеты Windows
+            - **tn.doc-full** — MSI с встроенным .NET Runtime (self-contained)
+            - **tn.doc** — MSI минимальный (требует .NET Runtime 8.0.13+)
+
+            ### Установка (Linux)
             ```bash
-
-            # Или раздельная установка
             sudo dpkg -i tn.doc-*.deb
             ```
-          files: ./packages/*.deb
+
+            ### Установка (Windows)
+            ```cmd
+            :: Графическая установка
+            msiexec /i tn.doc-full-*.msi
+
+            :: Тихая установка с параметрами
+            msiexec /i tn.doc-full-*.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents" SERVICENAME="tn.doc"
+            ```
+          files: |
+            ./packages/*.deb
+            ./packages/*.msi
           draft: false
           prerelease: false
         env:

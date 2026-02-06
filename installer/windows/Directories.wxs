@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <!--
+      INSTALLFOLDER gets its default path from the Property defined in Package.wxs
+      (C:\ProjectVU\DotNetComponents). The user can change it via the InstallDirDlg UI.
+    -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="INSTALLFOLDER" />
+    </Directory>
+
+    <!-- Backup directory in ProgramData -->
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="TN_DocDataFolder" Name="TN_Doc">
+        <Directory Id="BACKUPFOLDER" Name="backups" />
+      </Directory>
+    </StandardDirectory>
+  </Fragment>
+</Wix>

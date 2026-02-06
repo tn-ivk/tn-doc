@@ -1,0 +1,14 @@
+<Project Sdk="WixToolset.Sdk/6.0.0">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <Platform>x64</Platform>
+    <OutputName>TN_Doc</OutputName>
+    <!-- CI passes these via -d flags, defaults for local builds -->
+    <DefineConstants>ProductVersion=1.5.0</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.*" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.*" />
+  </ItemGroup>
+</Project>
