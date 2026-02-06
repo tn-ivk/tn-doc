@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using NLog;
-using TN_Doc.Models.Services;
+using TN_DocGeneral.Services;
 
 namespace TN_Doc;
 
@@ -14,7 +14,7 @@ public class Program
     /// <param name="args"></param>
     public static void Main(string[] args)
     {
-        LogManager.Configuration.Variables["logDirectory"] = LoggingPathService.GetLogDirectory();
+        LogManager.Configuration.Variables["logDirectory"] = LoggingPathService.GetLogDirectory("TN_Doc");
         var logger = LogManager.GetCurrentClassLogger();
         try
         {

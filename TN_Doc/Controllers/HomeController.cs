@@ -176,13 +176,50 @@ namespace TN_Doc.Controllers
 
         public List<ListItem> GetListProtocolNumber(int IdDevice, IdDoc idDoc)
         {
-            _logger.LogDebug($"Загрузка списка протоколов для документа {idDoc}");
-            var list = new List<ListItem>
+            try
             {
-                new() { Id = 1, Name = "Протокол 1" },
-                new() { Id = 2, Name = "Протокол 2" }
-            };
-            return list;
+                _logger.LogDebug($"Загрузка списка протоколов для документа {idDoc} для устройства {IdDevice}");
+                var list = new List<ListItem>
+                {
+                    new() { Id = 1, Name = "Протокол 1" },
+                    new() { Id = 2, Name = "Протокол 2" }
+                };
+                return list;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Ошибка при загрузке списка протоколов для документа {idDoc} для устройства {IdDevice}");
+                return new List<ListItem>();
+            }
+        }
+
+        /// <summary>
+        /// Проверяет, использует ли документ номер протокола
+        /// </summary>
+        /// <param name="idDoc">Идентификатор документа</param>
+        /// <returns>true, если документ использует номер протокола</returns>
+        public bool IsProtocolNumberUsed(IdDoc idDoc)
+        {
+            try
+            {
+                _logger.LogTrace($"Проверка использования номера протокола для документа {idDoc}");
+                var usesProtocolNumber = idDoc switch
+                {
+                    IdDoc.KMH_PP_Areom => true,
+                    IdDoc.KMH_PV => true,
+                    IdDoc.KMH_PW => true,
+                    IdDoc.Poverka2816 => true,
+                    IdDoc.KMH_MI2816 => true,
+                    _ => false
+                };
+                _logger.LogDebug($"Документ {idDoc} {(usesProtocolNumber ? "использует" : "не использует")} номер протокола");
+                return usesProtocolNumber;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Ошибка при проверке использования номера протокола для документа {idDoc}");
+                return false;
+            }
         }
 
         /// <summary>
