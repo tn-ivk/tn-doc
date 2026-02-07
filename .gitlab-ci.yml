@@ -289,7 +289,7 @@ package-job:      # This job runs in the deploy stage.
           echo "Destination: \$BACKUP_FILE"
 
           # Создание бэкапа (исключая логи)
-          tar -czf "\$BACKUP_FILE" -C /opt TN_Doc --exclude='logs' --exclude='*.log' 2>&1
+          tar -czf "\$BACKUP_FILE" --exclude='logs' --exclude='*.log' -C /opt TN_Doc 2>&1
           if [ \$? -ne 0 ]; then
               echo "✗ ERROR: Failed to create backup"
               echo "Check available disk space and permissions"
@@ -780,7 +780,7 @@ package-minimal-job:      # Minimal package without dependencies
           echo "Destination: \$BACKUP_FILE"
 
           # Создание бэкапа (исключая логи)
-          tar -czf "\$BACKUP_FILE" -C /opt TN_Doc --exclude='logs' --exclude='*.log' 2>&1
+          tar -czf "\$BACKUP_FILE" --exclude='logs' --exclude='*.log' -C /opt TN_Doc 2>&1
           if [ \$? -ne 0 ]; then
               echo "✗ ERROR: Failed to create backup"
               echo "Check available disk space and permissions"
