@@ -1,11 +1,11 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import * as signalR from '@microsoft/signalr';
-import type { ConnectionState } from '../types/status.types';
+import type { SignalRConnectionState } from '../types/status.types';
 import { useStatusLogging } from './useStatusLogging';
 
 export function useSignalR(hubUrl: string) {
   const connection = ref<signalR.HubConnection | null>(null);
-  const connectionState = ref<ConnectionState>('disconnected');
+  const connectionState = ref<SignalRConnectionState>('disconnected');
   const error = ref<string | null>(null);
   const { log } = useStatusLogging();
 

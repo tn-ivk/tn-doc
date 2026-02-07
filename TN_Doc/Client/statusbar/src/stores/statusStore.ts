@@ -18,6 +18,7 @@ export const useStatusStore = defineStore('status', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const updateHistory = ref<StatusResponse[]>([]);
+  const selectedDeviceId = ref<string | null>(null);
 
   // Getters
   const allDevicesConnected = computed(() =>
@@ -37,6 +38,11 @@ export const useStatusStore = defineStore('status', () => {
   const healthyDevicesCount = computed(() =>
     devices.value.filter(d => d.isConnected).length
   );
+
+  const selectedDevice = computed<DeviceStatus | null>(() => {
+    if (!selectedDeviceId.value) return null;
+    return devices.value.find(d => d.id === selectedDeviceId.value) ?? null;
+  });
 
   // Actions
   async function fetchStatus() {
@@ -63,7 +69,13 @@ export const useStatusStore = defineStore('status', () => {
       devices.value = devices.value.map(d => ({
         ...d,
         isConnected: false,
-        error: 'Нет связи с сервером'
+        isFullyConnected: false,
+        error: 'Нет связи с сервером',
+        channels: d.channels?.map(ch => ({
+          ...ch,
+          isConnected: false,
+          error: 'Нет связи с сервером'
+        })) || []
       }));
 
       services.value = {
@@ -93,6 +105,28 @@ export const useStatusStore = defineStore('status', () => {
     error.value = null;
   }
 
+  function openDeviceDiagnostics(deviceId: string) {
+    selectedDeviceId.value = deviceId;
+  }
+
+  function closeDeviceDiagnostics() {
+    selectedDeviceId.value = null;
+  }
+
+  async function retryDevice(deviceId: string): Promise<DeviceStatus> {
+    const response = await apiClient.post<DeviceStatus>(
+      `/api/status/device/${deviceId}/retry`
+    );
+
+    // Обновляем устройство в списке
+    const index = devices.value.findIndex(d => d.id === deviceId);
+    if (index !== -1) {
+      devices.value[index] = response;
+    }
+
+    return response;
+  }
+
   return {
     // State
     devices,
@@ -101,14 +135,19 @@ export const useStatusStore = defineStore('status', () => {
     isLoading,
     error,
     updateHistory,
+    selectedDeviceId,
     // Getters
     allDevicesConnected,
     criticalServicesConnected,
     overallHealth,
     healthyDevicesCount,
+    selectedDevice,
     // Actions
     fetchStatus,
     updateFromSignalR,
-    clearError
+    clearError,
+    openDeviceDiagnostics,
+    closeDeviceDiagnostics,
+    retryDevice
   };
 });

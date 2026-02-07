@@ -1091,7 +1091,10 @@ function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray 
                     'ValueTag': valueTag,
                     'NamespaceIndex': namespaceIndex,
                     'IndexArray': indexArray
-                })
+                }),
+            error: function(xhr, status, error) {
+                logError('WriteTag: ' + tagName + ' - ' + xhr.status + ': ' + (xhr.responseText || error));
+            }
         });
 
     return result;
@@ -1113,6 +1116,10 @@ function ReadTagCacheARM(DeviceName = 'ARM', tagName, namespaceIndex = 1, indexA
             success: function (data) {
                 result = data;
             },
+            error: function(xhr, status, error) {
+                logWarn('ReadTagCacheARM: ' + tagName + ' - ' + xhr.status + ': ' + (xhr.responseText || error));
+                result = undefined;
+            }
         });
 
     return result;

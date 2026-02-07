@@ -22,6 +22,7 @@
               <TabList>
                 <Tab value="0">Общие</Tab>
                 <Tab value="1">Устройства</Tab>
+                <Tab value="2">Документы</Tab>
               </TabList>
               <!-- Кнопки на одном уровне с TabList -->
               <div class="header-buttons">
@@ -55,6 +56,9 @@
               <TabPanel value="1">
                 <DevicesTab />
               </TabPanel>
+              <TabPanel value="2">
+                <DocumentsTab />
+              </TabPanel>
             </TabPanels>
           </Tabs>
         </div>
@@ -79,6 +83,7 @@ import Toast from 'primevue/toast';
 
 import GeneralTab from './components/GeneralTab.vue';
 import DevicesTab from './components/DevicesTab.vue';
+import DocumentsTab from './components/DocumentsTab.vue';
 
 const toast = useToast();
 const configStore = useConfigStore();
@@ -148,6 +153,20 @@ function handleCancel() {
 </script>
 
 <style scoped>
+/* ===== Design Tokens: Spacing System (base: 4px) ===== */
+.configurator-container {
+  --space-1: 0.25rem;   /* 4px - микро-отступы */
+  --space-2: 0.5rem;    /* 8px - между элементами в строке */
+  --space-3: 0.75rem;   /* 12px - padding компонентов */
+  --space-4: 1rem;      /* 16px - gap между секциями */
+  --space-5: 1.25rem;   /* 20px - между Panel блоками */
+  --space-6: 1.5rem;    /* 24px - крупные разделители */
+
+  /* Transition tokens */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+}
+
 .configurator-container {
   display: flex;
   flex-direction: column;

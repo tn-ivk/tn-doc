@@ -88,9 +88,19 @@ export interface PrintSettings {
 }
 
 export interface Elis {
-  Use?: boolean;
-  LabHubUrl?: string;
-  ClientToken?: string;
+  Use: boolean;
+  OstKey: string;
+  SiknKey: string;
+  ClientName: string;
+  ClientToken: string;
+}
+
+export interface DeviceConnectionDiagnosticSettings {
+  InitialPollSeconds: number;
+  MaxPollSeconds: number;
+  PollMultiplier: number;
+  NetworkFailureThreshold: number;
+  MaxRetryCount: number;
 }
 
 export interface CfgApp {
@@ -100,6 +110,7 @@ export interface CfgApp {
   Elis: Elis;
   UseSecurityFeatures: boolean;
   ArmOpcConnectionSettings?: OpcConnectionSettings;
+  DeviceConnectionDiagnostic?: DeviceConnectionDiagnosticSettings;
 }
 
 export interface ValidationError {
