@@ -69,6 +69,22 @@ public static class ServiceCollectionExtensions
 		logger.Info($"Запуск приложения: {assembly.GetName().Name} версии: {appInfoProvider.Version}");
 	}
 
+	/// <summary>
+	/// Добавление сервиса записи в системный журнал ОС
+	/// </summary>
+	/// <param name="services">Коллекция сервисов</param>
+	/// <remarks>
+	/// Windows: использует Windows Event Log
+	/// Linux: использует syslog через команду logger
+	/// </remarks>
+	public static void AddSystemJournal(this IServiceCollection services)
+	{
+		if (IsWindows)
+			services.AddSingleton<ISystemJournalService, WindowsSystemJournalService>();
+		else
+			services.AddSingleton<ISystemJournalService, LinuxSystemJournalService>();
+	}
+
 	private static bool IsWindows => Environment.OSVersion.Platform != PlatformID.Unix &&
 	                                 Environment.OSVersion.Platform != PlatformID.MacOSX;
 }

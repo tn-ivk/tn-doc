@@ -7,6 +7,13 @@ export default defineConfig({
   ...createBaseConfig(__dirname),
   plugins: [vue()],
   base: '/statusbar/',
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler'
+      }
+    }
+  },
   build: {
     outDir: resolve(__dirname, '../../wwwroot/statusbar'),
     emptyOutDir: true,

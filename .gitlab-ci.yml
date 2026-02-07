@@ -4,8 +4,8 @@ variables:
     GIT_SUBMODULE_FORCE_HTTPS: "true"
     GIT_STRATEGY: clone
     DOTNET_SDK_VERSION: "8.0"
-    DOTNET_RT_VERSION: "8.0.13"   
-    PROJECT_NAME: "TN_Doc"  
+    DOTNET_RT_VERSION: "8.0.13"
+    PROJECT_NAME: "TN_Doc"
 
 workflow:
   rules:
@@ -16,10 +16,10 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
     - when: never
 
-stages:          
+stages:
   - build
   - package
-  - notify 
+  - notify
 
 build-job:
   stage: build
@@ -30,27 +30,27 @@ build-job:
     # Строить при теге в любой ветке и при обычных правилах workflow
     - if: '$CI_COMMIT_TAG'
     - when: on_success
+  variables:
+    NUGET_PACKAGES: ${CI_PROJECT_DIR}/.nuget/packages
+    DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+    DOTNET_NOLOGO: "true"
+  cache:
+    key: nuget-${CI_COMMIT_REF_SLUG}
+    paths:
+      - .nuget/packages/
   before_script:
-    # Создание директории для публикации
-    - mkdir -p ./publish
-    - mkdir -p TN_Doc/Dll
+    - mkdir -p ./publish TN_Doc/Dll
   script:
-    - echo "Adding NuGet sources..."    
     - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
     - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
-    - echo "Rebuilding solution ..."
-    - dotnet build
-    - echo "Moving to TN_Doc..."
-    - cd TN_Doc
-    - echo "Current directory after cd:$(pwd)"
-    - echo "Building the application..."
-    - dotnet publish TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ../publish
+    - dotnet build -c Release
+    - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
   artifacts:
     name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
       - ./publish/
 
-extract-version-job:       
+extract-version-job:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
   tags:
@@ -119,7 +119,7 @@ extract-version-job:
 
 package-job:      # This job runs in the deploy stage.
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - build-job
     - extract-version-job
@@ -129,7 +129,7 @@ package-job:      # This job runs in the deploy stage.
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Packaging the application into a .deb file..."
     - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-full-${FULL_VERSION}"
@@ -149,6 +149,53 @@ package-job:      # This job runs in the deploy stage.
     - if [ -f "distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then cp distrib/aspnetcore-runtime-8.0.13-linux-x64.tar.gz deb/tmp/TN_Doc/; fi
     # Копирование шрифтов в пакет (если присутствуют в репозитории)
     - if [ -d "fonts" ]; then cp -r fonts/* deb/usr/share/fonts/; fi
+    # Генерация скрипта восстановления
+    - |
+      cat << 'RESTORE_EOF' > deb/usr/local/bin/tn-doc-restore.sh
+      #!/bin/bash
+      set -e
+
+      BACKUP_DIR="/var/backups/TN_Doc"
+      OPT_DIR="/opt/TN_Doc"
+      SERVICE="TN_Doc.service"
+
+      usage() {
+          echo "Usage: sudo $0 [--list | --latest | <backup_file>]"
+          echo "  --list    Show available backups"
+          echo "  --latest  Restore latest backup"
+      }
+
+      list_backups() {
+          echo "=== Available backups ==="
+          ls -lh "$BACKUP_DIR"/*.tar.gz 2>/dev/null || echo "No backups found"
+      }
+
+      restore() {
+          local FILE="$1"
+          [ ! -f "$FILE" ] && echo "File not found: $FILE" && exit 1
+
+          echo "=== Restoring from: $FILE ==="
+          systemctl stop "$SERVICE" 2>/dev/null || true
+          rm -rf "$OPT_DIR"
+          tar -xzf "$FILE" -C /opt
+          chown -R alphadaemon:alphadaemon "$OPT_DIR"
+          chmod 755 "$OPT_DIR/TN_Doc" 2>/dev/null || true
+          systemctl start "$SERVICE"
+
+          sleep 2
+          systemctl is-active --quiet "$SERVICE" && echo "✓ Restored successfully" || echo "! Service may have failed"
+      }
+
+      [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
+
+      case "${1:-}" in
+          --list) list_backups ;;
+          --latest) restore "$(ls -t "$BACKUP_DIR"/*.tar.gz 2>/dev/null | head -1)" ;;
+          "") usage ;;
+          *) [[ "$1" != /* ]] && restore "$BACKUP_DIR/$1" || restore "$1" ;;
+      esac
+      RESTORE_EOF
+    - chmod 755 deb/usr/local/bin/tn-doc-restore.sh
     # Генерация control
     - |
       cat << EOF > deb/DEBIAN/control
@@ -185,7 +232,7 @@ package-job:      # This job runs in the deploy stage.
           # Проверка версии .NET Runtime
           REQUIRED_VERSION="8.0.13"
           INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
-          
+
           if [ -z "\$INSTALLED_VERSION" ]; then
               echo "Warning: No compatible .NET Runtime 8 version found. Will install from local archive."
               return 1
@@ -213,6 +260,55 @@ package-job:      # This job runs in the deploy stage.
           echo "Stopping TN_Doc.service..."
           systemctl stop TN_Doc.service
       fi
+
+      # === Backup section ===
+      create_backup() {
+          local OPT_DIR="/opt/TN_Doc"
+          local BACKUP_DIR="/var/backups/TN_Doc"
+          local NEW_VERSION="${VERSION}"  # Подставляется при сборке пакета
+
+          # Первая установка — бэкап не нужен
+          if [ ! -d "\$OPT_DIR" ]; then
+              echo "First installation detected, no backup needed"
+              return 0
+          fi
+
+          # Создание директории для бэкапов
+          echo "=== Creating backup before update to v\${NEW_VERSION} ==="
+          mkdir -p "\$BACKUP_DIR"
+          if [ \$? -ne 0 ]; then
+              echo "✗ ERROR: Cannot create backup directory \$BACKUP_DIR"
+              exit 1
+          fi
+
+          # Формирование имени файла
+          local TIMESTAMP=\$(date +%Y-%m-%d_%H-%M-%S)
+          local BACKUP_FILE="\${BACKUP_DIR}/\${TIMESTAMP}_TN_Doc_before-update-to_v\${NEW_VERSION}.tar.gz"
+
+          echo "Source: \$OPT_DIR"
+          echo "Destination: \$BACKUP_FILE"
+
+          # Создание бэкапа (исключая логи)
+          tar -czf "\$BACKUP_FILE" -C /opt TN_Doc --exclude='logs' --exclude='*.log' 2>&1
+          if [ \$? -ne 0 ]; then
+              echo "✗ ERROR: Failed to create backup"
+              echo "Check available disk space and permissions"
+              rm -f "\$BACKUP_FILE"
+              exit 1
+          fi
+
+          # Проверка файла
+          if [ ! -s "\$BACKUP_FILE" ]; then
+              echo "✗ ERROR: Backup file is empty"
+              exit 1
+          fi
+
+          local BACKUP_SIZE=\$(du -h "\$BACKUP_FILE" | cut -f1)
+          echo "✓ Backup created: \$BACKUP_FILE (\$BACKUP_SIZE)"
+      }
+
+      create_backup
+      # === End backup section ===
 
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
@@ -272,13 +368,13 @@ package-job:      # This job runs in the deploy stage.
       # Установка .NET Runtime
       install_dotnet_runtime() {
           echo "=== Starting .NET Runtime installation check ==="
-          
+
           # Проверяем, нужна ли установка
           REQUIRED_VERSION="8.0.13"
 
           if [ -d "/usr/bin/dotnet/shared/Microsoft.NETCore.App" ]; then
               INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
-              
+
               if [ -n "\$INSTALLED_VERSION" ] && [ "\$(printf '%s\n' "\$INSTALLED_VERSION" "\$REQUIRED_VERSION" | sort -V | head -n1)" = "\$REQUIRED_VERSION" ]; then
                   echo "✓ .NET Runtime version \$INSTALLED_VERSION is already installed and compatible"
                   echo "=== Skipping .NET Runtime installation ==="
@@ -289,9 +385,9 @@ package-job:      # This job runs in the deploy stage.
           else
               echo "! .NET Runtime directory not found, installation required"
           fi
-          
+
           echo "=== Starting .NET Runtime installation ==="
-          
+
           # Проверяем наличие локального архива
           if [ -f "/tmp/TN_Doc/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
               echo "✓ Found .NET Runtime archive"
@@ -390,7 +486,7 @@ package-job:      # This job runs in the deploy stage.
       else
           echo "! WARNING: Failed to set executable permissions"
       fi
-      
+
       chmod 644 /opt/TN_Doc/*.dll
       chown -R alphadaemon:alphadaemon /opt/TN_Doc
       if [ \$? -eq 0 ]; then
@@ -398,7 +494,7 @@ package-job:      # This job runs in the deploy stage.
       else
           echo "! WARNING: Failed to set ownership"
       fi
-      
+
       chmod u=rwx,g=rx,o=rx /opt/TN_Doc
       chown alphadaemon:alphadaemon /var/log/TN_Doc
       chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
@@ -411,7 +507,7 @@ package-job:      # This job runs in the deploy stage.
 
       # Включение и запуск сервиса
       echo "Step 6: Enabling and starting application service..."
-      
+
       # Проверка наличия необходимых файлов
       if [ -f "/usr/bin/dotnet/dotnet" ] && [ -f "/opt/TN_Doc/TN_Doc" ]; then
           echo "✓ All required binaries found"
@@ -469,7 +565,7 @@ package-job:      # This job runs in the deploy stage.
                   fi
               fi
           done
-          
+
           # Удаление systemd service
           echo "Removing systemd service..."
           systemctl disable TN_Doc.service 2>/dev/null || true
@@ -523,7 +619,7 @@ package-job:      # This job runs in the deploy stage.
 
 package-minimal-job:      # Minimal package without dependencies
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - build-job
     - extract-version-job
@@ -533,7 +629,7 @@ package-minimal-job:      # Minimal package without dependencies
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Packaging the application into a minimal .deb file..."
     - DEB_NAME="$(echo "TN_Doc" | tr '[:upper:]' '[:lower:]' | tr '_' '.')-${FULL_VERSION}"
@@ -543,8 +639,56 @@ package-minimal-job:      # Minimal package without dependencies
     - mkdir -p deb-minimal/opt/TN_Doc
     - mkdir -p deb-minimal/var/log/TN_Doc
     - mkdir -p deb-minimal/etc/systemd/system
+    - mkdir -p deb-minimal/usr/local/bin
     # Копирование только файлов приложения
     - cp -r ./publish/* deb-minimal/opt/TN_Doc/
+    # Генерация скрипта восстановления
+    - |
+      cat << 'RESTORE_EOF' > deb-minimal/usr/local/bin/tn-doc-restore.sh
+      #!/bin/bash
+      set -e
+
+      BACKUP_DIR="/var/backups/TN_Doc"
+      OPT_DIR="/opt/TN_Doc"
+      SERVICE="TN_Doc.service"
+
+      usage() {
+          echo "Usage: sudo $0 [--list | --latest | <backup_file>]"
+          echo "  --list    Show available backups"
+          echo "  --latest  Restore latest backup"
+      }
+
+      list_backups() {
+          echo "=== Available backups ==="
+          ls -lh "$BACKUP_DIR"/*.tar.gz 2>/dev/null || echo "No backups found"
+      }
+
+      restore() {
+          local FILE="$1"
+          [ ! -f "$FILE" ] && echo "File not found: $FILE" && exit 1
+
+          echo "=== Restoring from: $FILE ==="
+          systemctl stop "$SERVICE" 2>/dev/null || true
+          rm -rf "$OPT_DIR"
+          tar -xzf "$FILE" -C /opt
+          chown -R alphadaemon:alphadaemon "$OPT_DIR"
+          chmod 755 "$OPT_DIR/TN_Doc" 2>/dev/null || true
+          systemctl start "$SERVICE"
+
+          sleep 2
+          systemctl is-active --quiet "$SERVICE" && echo "✓ Restored successfully" || echo "! Service may have failed"
+      }
+
+      [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
+
+      case "${1:-}" in
+          --list) list_backups ;;
+          --latest) restore "$(ls -t "$BACKUP_DIR"/*.tar.gz 2>/dev/null | head -1)" ;;
+          "") usage ;;
+          *) [[ "$1" != /* ]] && restore "$BACKUP_DIR/$1" || restore "$1" ;;
+      esac
+      RESTORE_EOF
+    - chmod 755 deb-minimal/usr/local/bin/tn-doc-restore.sh
     # Генерация minimal control
     - |
       cat << EOF > deb-minimal/DEBIAN/control
@@ -582,7 +726,7 @@ package-minimal-job:      # Minimal package without dependencies
           # Проверка версии .NET Runtime
           REQUIRED_VERSION="8.0.13"
           INSTALLED_VERSION=\$(ls /usr/bin/dotnet/shared/Microsoft.NETCore.App 2>/dev/null | grep -E '^8\.0\.[0-9]+\$' | sort -V | tail -n 1)
-          
+
           if [ -z "\$INSTALLED_VERSION" ]; then
               echo "ERROR: No compatible .NET Runtime 8 version found in /usr/bin/dotnet/shared/Microsoft.NETCore.App"
               echo "Please install .NET Runtime 8.0.13 or later"
@@ -607,6 +751,55 @@ package-minimal-job:      # Minimal package without dependencies
           echo "Stopping TN_Doc.service..."
           systemctl stop TN_Doc.service
       fi
+
+      # === Backup section ===
+      create_backup() {
+          local OPT_DIR="/opt/TN_Doc"
+          local BACKUP_DIR="/var/backups/TN_Doc"
+          local NEW_VERSION="${VERSION}"  # Подставляется при сборке пакета
+
+          # Первая установка — бэкап не нужен
+          if [ ! -d "\$OPT_DIR" ]; then
+              echo "First installation detected, no backup needed"
+              return 0
+          fi
+
+          # Создание директории для бэкапов
+          echo "=== Creating backup before update to v\${NEW_VERSION} ==="
+          mkdir -p "\$BACKUP_DIR"
+          if [ \$? -ne 0 ]; then
+              echo "✗ ERROR: Cannot create backup directory \$BACKUP_DIR"
+              exit 1
+          fi
+
+          # Формирование имени файла
+          local TIMESTAMP=\$(date +%Y-%m-%d_%H-%M-%S)
+          local BACKUP_FILE="\${BACKUP_DIR}/\${TIMESTAMP}_TN_Doc_before-update-to_v\${NEW_VERSION}.tar.gz"
+
+          echo "Source: \$OPT_DIR"
+          echo "Destination: \$BACKUP_FILE"
+
+          # Создание бэкапа (исключая логи)
+          tar -czf "\$BACKUP_FILE" -C /opt TN_Doc --exclude='logs' --exclude='*.log' 2>&1
+          if [ \$? -ne 0 ]; then
+              echo "✗ ERROR: Failed to create backup"
+              echo "Check available disk space and permissions"
+              rm -f "\$BACKUP_FILE"
+              exit 1
+          fi
+
+          # Проверка файла
+          if [ ! -s "\$BACKUP_FILE" ]; then
+              echo "✗ ERROR: Backup file is empty"
+              exit 1
+          fi
+
+          local BACKUP_SIZE=\$(du -h "\$BACKUP_FILE" | cut -f1)
+          echo "✓ Backup created: \$BACKUP_FILE (\$BACKUP_SIZE)"
+      }
+
+      create_backup
+      # === End backup section ===
 
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
@@ -669,7 +862,7 @@ package-minimal-job:      # Minimal package without dependencies
       else
           echo "! WARNING: Failed to set executable permissions"
       fi
-      
+
       chmod 644 /opt/TN_Doc/*.dll
       chown -R alphadaemon:alphadaemon /opt/TN_Doc
       if [ \$? -eq 0 ]; then
@@ -677,7 +870,7 @@ package-minimal-job:      # Minimal package without dependencies
       else
           echo "! WARNING: Failed to set ownership"
       fi
-      
+
       chmod u=rwx,g=rx,o=rx /opt/TN_Doc
       chown alphadaemon:alphadaemon /var/log/TN_Doc
       chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
@@ -690,7 +883,7 @@ package-minimal-job:      # Minimal package without dependencies
 
       # Включение и запуск сервиса
       echo "Enabling and starting application service..."
-      
+
       # Проверка наличия необходимых файлов
       if [ -f "/opt/TN_Doc/TN_Doc" ]; then
           echo "✓ Application binary found"
@@ -741,7 +934,7 @@ package-minimal-job:      # Minimal package without dependencies
                   fi
               fi
           done
-          
+
           # Удаление systemd service
           echo "Removing systemd service..."
           systemctl disable TN_Doc.service 2>/dev/null || true
@@ -795,7 +988,7 @@ package-minimal-job:      # Minimal package without dependencies
 
 package-net-runtime-job:      # .NET Runtime standalone package
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - extract-version-job
   tags:
@@ -804,7 +997,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Creating .NET Runtime standalone package..."
     - DEB_NAME="tn.dotnet-runtime-8.0.13"
@@ -874,7 +1067,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
       # Установка .NET Runtime
       install_dotnet_runtime() {
           echo "=== Starting .NET Runtime installation ==="
-          
+
           # Проверяем наличие локального архива
           if [ -f "/tmp/dotnet-runtime/aspnetcore-runtime-8.0.13-linux-x64.tar.gz" ]; then
               echo "✓ Found .NET Runtime archive"
@@ -989,13 +1182,13 @@ package-net-runtime-job:      # .NET Runtime standalone package
 
       if [ "\$1" = "purge" ]; then
           echo "Purging .NET Runtime installation..."
-          
+
           # Удаление .NET Runtime
           if [ -d "/usr/bin/dotnet" ]; then
               rm -rf /usr/bin/dotnet
               echo "✓ .NET Runtime directory removed"
           fi
-          
+
           # Очистка переменных окружения
           for user_home in /home/administrator /home/operators /home/engineer; do
               if [ -f "\${user_home}/.profile" ]; then
@@ -1030,7 +1223,7 @@ package-net-runtime-job:      # .NET Runtime standalone package
 
 package-fonts-job:      # System fonts standalone package
   stage: package
-  image: ubuntu:latest
+  image: debian:bookworm-slim
   needs:
     - extract-version-job
   tags:
@@ -1039,7 +1232,7 @@ package-fonts-job:      # System fonts standalone package
     - if: '$CI_COMMIT_TAG'
     - when: on_success
   before_script:
-    - apt-get update && apt-get install -y dpkg-dev
+    - apt-get update -qq && apt-get install -y --no-install-recommends dpkg-dev
   script:
     - echo "Creating system fonts standalone package..."
     - DEB_NAME="tn.fonts-${VERSION}"
@@ -1169,7 +1362,7 @@ package-fonts-job:      # System fonts standalone package
 
       if [ "\$1" = "purge" ]; then
           echo "Purging TN fonts installation..."
-          
+
           # Удаление остатков шрифтов (если остались)
           for font_dir in "/usr/share/fonts/arial" "/usr/share/fonts/segoe ui" "/usr/share/fonts/tahoma"; do
               if [ -d "\$font_dir" ]; then
@@ -1182,7 +1375,7 @@ package-fonts-job:      # System fonts standalone package
                   fi
               fi
           done
-          
+
           # Обновление кэша шрифтов после удаления
           echo "Updating font cache after removal..."
           if command -v fc-cache >/dev/null 2>&1; then
@@ -1232,29 +1425,29 @@ notify-telegram-job:      # Telegram notifications with file uploads
     - apt-get update && apt-get install -y curl
   script:
     - echo "Sending Telegram notifications with packages for all built packages..."
-    
+
     # Получение информации о пакетах приложения
     - FULL_PACKAGE=$(ls ./packages/tn.doc-full-*.deb | head -n1)
     - FULL_SIZE=$(du -h "$FULL_PACKAGE" | cut -f1)
     - FULL_SIZE_BYTES=$(stat -c%s "$FULL_PACKAGE")
     - FULL_NAME=$(basename "$FULL_PACKAGE")
-    
+
     - MINIMAL_PACKAGE=$(ls ./packages/tn.doc-[0-9]*.deb | head -n1)
     - MINIMAL_SIZE=$(du -h "$MINIMAL_PACKAGE" | cut -f1)
     - MINIMAL_SIZE_BYTES=$(stat -c%s "$MINIMAL_PACKAGE")
     - MINIMAL_NAME=$(basename "$MINIMAL_PACKAGE")
-    
+
     # Получение информации о пакетах зависимостей
     - RUNTIME_PACKAGE=$(ls ./packages/tn.dotnet-runtime-*.deb | head -n1)
     - RUNTIME_SIZE=$(du -h "$RUNTIME_PACKAGE" | cut -f1)
     - RUNTIME_SIZE_BYTES=$(stat -c%s "$RUNTIME_PACKAGE")
     - RUNTIME_NAME=$(basename "$RUNTIME_PACKAGE")
-    
+
     - FONTS_PACKAGE=$(ls ./packages/tn.fonts-*.deb | head -n1)
     - FONTS_SIZE=$(du -h "$FONTS_PACKAGE" | cut -f1)
     - FONTS_SIZE_BYTES=$(stat -c%s "$FONTS_PACKAGE")
     - FONTS_NAME=$(basename "$FONTS_PACKAGE")
-    
+
     # Функция отправки сообщения
     - |
       send_message() {
@@ -1263,14 +1456,14 @@ notify-telegram-job:      # Telegram notifications with file uploads
               -d chat_id="${TELEGRAM_CHAT_ID}" \
               -d text="${message}"
       }
-    
+
     # Функция отправки файла с проверкой размера (75MB лимит)
     - |
       send_file() {
           local file_path="$1"
           local caption="$2"
           local file_size="$3"
-          
+
           # Максимальный размер файла: 75MB = 78643200 байт
           if [ "$file_size" -lt 78643200 ]; then
               echo "✅ Отправляем файл: $(basename "$file_path") ($(du -h "$file_path" | cut -f1))"
@@ -1288,7 +1481,7 @@ notify-telegram-job:      # Telegram notifications with file uploads
               send_message "⚠️ Файл $(basename "$file_path") слишком большой для отправки ($(du -h "$file_path" | cut -f1)). Максимум: 75MB"
           fi
       }
-    
+
     # Отправка первого сообщения - пакеты приложения
     - |
       APP_MESSAGE="🚀 Собраны пакеты приложения TN_Doc:
@@ -1296,23 +1489,23 @@ notify-telegram-job:      # Telegram notifications with file uploads
       📦 Полный пакет: $FULL_NAME
       📏 Размер: $FULL_SIZE
 
-      📦 Минимальный пакет: $MINIMAL_NAME  
+      📦 Минимальный пакет: $MINIMAL_NAME
       📏 Размер: $MINIMAL_SIZE
 
       🏷️ Версия: ${VERSION}
       🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
       📋 Pipeline: ${CI_PIPELINE_URL}"
-      
+
       send_message "$APP_MESSAGE"
-    
+
     # Отправка пакетов приложения
     - echo "Отправляем пакеты приложения..."
     - send_file "$FULL_PACKAGE" "📦 Полный (+ .NET Runtime) пакет TN_Doc v${VERSION}" "$FULL_SIZE_BYTES"
     - send_file "$MINIMAL_PACKAGE" "📦 TN_Doc" "$MINIMAL_SIZE_BYTES"
-    
+
     # Пауза между группами сообщений
     - sleep 2
-    
+
     # Отправка второго сообщения - пакеты зависимостей
     - |
       DEPS_MESSAGE="⚙️ Собраны пакеты зависимостей TN_Doc:
@@ -1326,14 +1519,14 @@ notify-telegram-job:      # Telegram notifications with file uploads
       🏷️ Версия: ${VERSION}
       🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
       📋 Pipeline: ${CI_PIPELINE_URL}"
-      
+
       send_message "$DEPS_MESSAGE"
-    
+
     # Отправка пакетов зависимостей
     - echo "Отправляем пакеты зависимостей..."
     - send_file "$RUNTIME_PACKAGE" "⚙️ .NET Runtime 8.0.13 для TN приложений" "$RUNTIME_SIZE_BYTES"
     - send_file "$FONTS_PACKAGE" "⚙️ Системные шрифты для TN приложений" "$FONTS_SIZE_BYTES"
-    
+
     - echo "Telegram notifications and files sent successfully"
   artifacts:
     name: "notifications-sent-${CI_COMMIT_SHORT_SHA}"

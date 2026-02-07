@@ -15,5 +15,13 @@ namespace TN_Doc.Services
         /// <param name="ct">Токен отмены</param>
         /// <returns>Статус всех систем</returns>
         Task<StatusResponse> GetStatusAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// Проверить статус конкретного устройства (с принудительной проверкой)
+        /// </summary>
+        /// <param name="deviceId">ID устройства</param>
+        /// <param name="ct">Токен отмены</param>
+        /// <returns>Статус устройства или null если устройство не найдено</returns>
+        Task<DeviceStatus?> CheckDeviceAsync(string deviceId, CancellationToken ct = default);
     }
 }

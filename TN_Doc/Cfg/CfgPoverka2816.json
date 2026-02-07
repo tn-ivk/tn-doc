@@ -24,12 +24,8 @@
         "FieldSIKN": "&nbsp;СИКН&nbsp;№&nbsp;",
         "FieldPSP": "&nbsp;ПСП&nbsp;(НСП):&nbsp;"
       },
-      "Data": {
-
-      },
-      "Footer": {
-
-      },
+      "Data": {},
+      "Footer": {},
       "Dictionarys": {
         "ProtocolType": {
           "0": "ПРОТОКОЛ КМХ РАБОЧЕГО ПП ПО РЕЗЕРВНОМУ ПП",
@@ -61,8 +57,6 @@
         }
       }
     },
-    "DataIVK": {
-
-    }
+    "DataIVK": {}
   }
 }

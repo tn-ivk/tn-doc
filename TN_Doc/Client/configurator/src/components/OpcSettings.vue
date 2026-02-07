@@ -111,21 +111,48 @@ const opcTypes = [
   { label: 'OPC UA', value: OpcType.UA }
 ];
 
-const localSettings = ref<OpcConnectionSettings>(
-  props.modelValue || {
-    Type: OpcType.UA,
-    DaSettings: {
-      Host: '127.0.0.1',
-      ProgId: 'psregulopcda_01',
-      StartPrefix: 'Root.PLC1.IVK_TN_01',
-      UpdateRate: 500
-    },
-    UaSettings: {
-      ConfigFilename: 'opcua-config.xml',
-      StartPrefix: 'ns=2;s=Root.PLC1',
-      UpdateRate: 500
+// Нормализация типа OPC: числовые значения (0, 1) → строковые (DA, UA)
+// Возвращает OpcType.UA как дефолт при неизвестном значении
+function normalizeOpcType(type: any): OpcType {
+  if (type === 0 || type === OpcType.DA) return OpcType.DA;
+  if (type === 1 || type === OpcType.UA) return OpcType.UA;
+  return OpcType.UA; // дефолт
+}
+
+const defaultDaSettings = {
+  Host: '127.0.0.1',
+  ProgId: 'psregulopcda_01',
+  StartPrefix: 'Root.PLC1.IVK_TN_01',
+  UpdateRate: 500
+};
+
+const defaultUaSettings = {
+  ConfigFilename: 'opcua-config.xml',
+  StartPrefix: 'ns=2;s=Root.PLC1',
+  UpdateRate: 500
+};
+
+const localSettings = ref<OpcConnectionSettings>({
+  Type: normalizeOpcType(props.modelValue?.Type),
+  DaSettings: props.modelValue?.DaSettings || { ...defaultDaSettings },
+  UaSettings: props.modelValue?.UaSettings || { ...defaultUaSettings }
+});
+
+// Синхронизация с внешними изменениями modelValue
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue && JSON.stringify(newValue) !== JSON.stringify(localSettings.value)) {
+      localSettings.value = {
+        ...newValue,
+        Type: normalizeOpcType(newValue.Type),
+        // Гарантируем наличие настроек для обоих типов
+        DaSettings: newValue.DaSettings || { ...defaultDaSettings },
+        UaSettings: newValue.UaSettings || { ...defaultUaSettings }
+      };
     }
-  }
+  },
+  { immediate: true, deep: true }
 );
 
 onMounted(() => {
@@ -151,7 +178,7 @@ function handleTypeChange() {
 .opc-settings {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .field {
@@ -162,12 +189,38 @@ function handleTypeChange() {
 
 .field-type-selector {
   gap: 0;
+  margin-bottom: 0.5rem;
 }
 
 .field label {
   font-weight: 600;
   color: var(--text-color);
   font-size: 0.9rem;
+}
+
+/* Стили для полей ввода в модальном окне OPC */
+:deep(.p-inputtext),
+:deep(.p-inputnumber-input) {
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.p-inputtext:hover),
+:deep(.p-inputnumber-input:hover) {
+  border-color: #B0BEC5 !important;
+}
+
+:deep(.p-inputtext:focus),
+:deep(.p-inputnumber-input:focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
 }
 
 /* Кастомные стили для переключателя OPC */

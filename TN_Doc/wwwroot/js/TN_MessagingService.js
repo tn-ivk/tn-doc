@@ -36,7 +36,10 @@ function WriteTag(GuidDevice, tagName, valueTag, namespaceIndex = 2, indexArray 
                     "ValueTag": valueTag,
                     "NamespaceIndex": namespaceIndex,
                     "IndexArray": indexArray
-                })
+                }),
+            error: function(xhr, status, error) {
+                logError('WriteTag: ' + tagName + ' - ' + xhr.status + ': ' + (xhr.responseText || error));
+            }
         });
     return result;
 }
@@ -54,6 +57,10 @@ function ReadTag(tagName, namespaceIndex = 2, indexArray = 0) {
             success: function (data) {
                 result = data;
             },
+            error: function(xhr, status, error) {
+                logWarn('ReadTag: ' + tagName + ' - ' + xhr.status + ': ' + (xhr.responseText || error));
+                result = undefined;
+            }
         });
     return result;
 }
@@ -71,6 +78,10 @@ function ReadTagCache(tagName, namespaceIndex = 2, indexArray = 0) {
             success: function (data) {
                 result = data;
             },
+            error: function(xhr, status, error) {
+                logWarn('ReadTagCache: ' + tagName + ' - ' + xhr.status + ': ' + (xhr.responseText || error));
+                result = undefined;
+            }
         });
     return result;
 }

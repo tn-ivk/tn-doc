@@ -50,6 +50,7 @@ public class Startup
 		services.AddAppInfoProvider();
 		services.AddPrinters();
 		services.AddPrinterService();
+		services.AddSystemJournal();
 		services.AddSingleton<IReportBuffer, ReportBuffer>();
 		services.AddSingleton<IAppConfigService>(sp => AppConfigService.GetInstance(Configuration));
 		services.AddSingleton<IDbSchemaCache, DbSchemaCache>();
@@ -78,6 +79,7 @@ public class Startup
 			client.DefaultRequestHeaders.Add("User-Agent", "TN_Doc-StatusChecker/1.4.2");
 		});
 
+		services.AddSingleton<IDeviceConnectionDiagnosticService, DeviceConnectionDiagnosticService>();
 		services.AddScoped<IStatusProvider, StatusProvider>();
 		services.AddHostedService<StatusMonitoringService>();
 	}

@@ -24,9 +24,7 @@
         "FieldSIKN": "СИКН №",
         "FieldPSP": "ПСП (НСП):"
       },
-      "Data": {
-
-      },
+      "Data": {},
       "Footer": {
         "FieldSIKN": ""
       },
@@ -61,8 +59,6 @@
         }
       }
     },
-    "DataIVK": {
-
-    }
+    "DataIVK": {}
   }
 }

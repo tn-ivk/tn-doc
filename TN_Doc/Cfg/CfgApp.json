@@ -70,12 +70,12 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 5,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": false,
               "Id": 0,
-              "Name": "Паспорт для нефтепродукта",
+              "Name": "Паспорт качества нефтепродукта",
               "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
               "PathToDocTemplateFile": "",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
@@ -83,7 +83,7 @@
             {
               "Use": false,
               "Id": 1,
-              "Name": "Паспорт качества на экспорт",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 16 (Экспорт)",
               "Description": "Форма паспорта качества для поставки нефти на экспорт морским транспортом. МИ 3532-2015 (Приложение 16)",
               "PathToDocTemplateFile": "/Doc/Passport/PassportExport.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
@@ -91,7 +91,7 @@
             {
               "Use": false,
               "Id": 2,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение Ж",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json"
@@ -99,7 +99,7 @@
             {
               "Use": true,
               "Id": 3,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение И)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение И",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение И)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(I).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json"
@@ -107,7 +107,7 @@
             {
               "Use": false,
               "Id": 4,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 13)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 13",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 13)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(13).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
@@ -115,7 +115,7 @@
             {
               "Use": false,
               "Id": 5,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 14",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(14).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(14).json"
@@ -123,7 +123,7 @@
             {
               "Use": false,
               "Id": 6,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 15)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 15",
               "Description": "Форма паспорта качества для поставки нефти на экспорт",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15).json"
@@ -131,7 +131,7 @@
             {
               "Use": false,
               "Id": 7,
-              "Name": "Паспорт (ТР ЕАЭС)",
+              "Name": "Паспорт качества нефти ТР ЕАЭС",
               "Description": "Форма паспорта нефти по ТР ЕАЭС 045.2017",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_EAC.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_EAC.json"
@@ -139,7 +139,7 @@
             {
               "Use": false,
               "Id": 8,
-              "Name": "石油品质报告 (МИ 3532-2015 Приложение 15)",
+              "Name": "石油品质报告 МИ 3532-2015. Приложение 15",
               "Description": "石油品质报告 Форма паспорта качества для поставки нефти на экспорт. МИ 3532-2015 (Приложение 15)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15)_China.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
@@ -147,7 +147,7 @@
             {
               "Use": false,
               "Id": 9,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж) (Экспорт)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение Ж (Экспорт)",
               "Description": "Форма паспорта качества на экспорт. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json"
@@ -162,7 +162,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 7,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": false,
@@ -286,7 +286,7 @@
           "PathToDocDll": "/Dll/KMH_PP_Areom.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP_Areom.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP_Areom.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -322,7 +322,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PU.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PU.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -358,7 +358,7 @@
           "PathToDocDll": "/Dll/KMH_PW.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PW.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PW.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -394,7 +394,7 @@
           "PathToDocDll": "/Dll/KMH_PV.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PV.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PV.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -430,7 +430,7 @@
           "PathToDocDll": "/Dll/KMH_PP.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PP.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PP.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -466,7 +466,7 @@
           "PathToDocDll": "/Dll/KMH_MI2816.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MI2816.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_MI2816.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 2,
           "TemplateDocs": [
             {
               "Use": false,
@@ -522,7 +522,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PR.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -550,7 +550,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_MPR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_MPR.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -866,7 +866,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_PU.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -1152,7 +1152,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     },
     {
       "Use": false,
@@ -1224,12 +1228,12 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": false,
               "Id": 0,
-              "Name": "Паспорт для нефтепродукта",
+              "Name": "Паспорт качества нефтепродукта",
               "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
               "PathToDocTemplateFile": "",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
@@ -1237,7 +1241,7 @@
             {
               "Use": false,
               "Id": 1,
-              "Name": "Паспорт качества на экспорт",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 16 (Экспорт)",
               "Description": "Форма паспорта качества для поставки нефти на экспорт морским транспортом. МИ 3532-2015 (Приложение 16)",
               "PathToDocTemplateFile": "/Doc/Passport/PassportExport.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
@@ -1245,7 +1249,7 @@
             {
               "Use": false,
               "Id": 2,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение Ж",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json"
@@ -1253,7 +1257,7 @@
             {
               "Use": true,
               "Id": 3,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение И)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение И",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение И)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(I).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json"
@@ -1261,7 +1265,7 @@
             {
               "Use": false,
               "Id": 4,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 13)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 13",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 13)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(13).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
@@ -1269,7 +1273,7 @@
             {
               "Use": false,
               "Id": 5,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 14",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(14).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(14).json"
@@ -1277,7 +1281,7 @@
             {
               "Use": false,
               "Id": 6,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 15)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 15",
               "Description": "Форма паспорта качества для поставки нефти на экспорт",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15).json"
@@ -1285,7 +1289,7 @@
             {
               "Use": false,
               "Id": 7,
-              "Name": "Паспорт (ТР ЕАЭС)",
+              "Name": "Паспорт качества нефти ТР ЕАЭС",
               "Description": "Форма паспорта нефти по ТР ЕАЭС 045.2017",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_EAC.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_EAC.json"
@@ -1293,7 +1297,7 @@
             {
               "Use": false,
               "Id": 8,
-              "Name": "石油品质报告 (МИ 3532-2015 Приложение 15)",
+              "Name": "石油品质报告 МИ 3532-2015. Приложение 15",
               "Description": "石油品质报告 Форма паспорта качества для поставки нефти на экспорт. МИ 3532-2015 (Приложение 15)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15)_China.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
@@ -1301,7 +1305,7 @@
             {
               "Use": false,
               "Id": 9,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж) (Экспорт)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение Ж (Экспорт)",
               "Description": "Форма паспорта качества на экспорт. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json"
@@ -1316,7 +1320,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": false,
@@ -1384,7 +1388,7 @@
           "PathToDocDll": "/Dll/Jornal.dll",
           "PathToDocConfigFile": "/Cfg/CfgJornal.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditJornal.json",
-          "LastUsedTemplateId": 1,
+          "LastUsedTemplateId": 0,
           "TemplateDocs": [
             {
               "Use": true,
@@ -1676,7 +1680,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PR.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -1704,7 +1708,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_MPR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_MPR.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2020,7 +2024,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_PU.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2306,7 +2310,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     },
     {
       "Use": false,
@@ -2378,12 +2386,12 @@
           "PathToDocDll": "/Dll/Passport.dll",
           "PathToDocConfigFile": "/Cfg/Passport/CfgPassport.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditPassport.json",
-          "LastUsedTemplateId": 2,
+          "LastUsedTemplateId": 3,
           "TemplateDocs": [
             {
               "Use": false,
               "Id": 0,
-              "Name": "Паспорт для нефтепродукта",
+              "Name": "Паспорт качества нефтепродукта",
               "Description": "Формы паспорта качества для нефтепродукта не существует, заполняется только номер. (Для получения акта)",
               "PathToDocTemplateFile": "",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportForActNP.json"
@@ -2391,7 +2399,7 @@
             {
               "Use": false,
               "Id": 1,
-              "Name": "Паспорт качества на экспорт",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 16 (Экспорт)",
               "Description": "Форма паспорта качества для поставки нефти на экспорт морским транспортом. МИ 3532-2015 (Приложение 16)",
               "PathToDocTemplateFile": "/Doc/Passport/PassportExport.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassportExport.json"
@@ -2399,7 +2407,7 @@
             {
               "Use": false,
               "Id": 2,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение Ж",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G).json"
@@ -2407,7 +2415,7 @@
             {
               "Use": true,
               "Id": 3,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение И)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение И",
               "Description": "Форма паспорта качества при приеме нефти от грузоотправителей. ГОСТ Р 50.2.040-2004 (Приложение И)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(I).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(I).json"
@@ -2415,7 +2423,7 @@
             {
               "Use": false,
               "Id": 4,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 13)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 13",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 13)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(13).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(13).json"
@@ -2423,7 +2431,7 @@
             {
               "Use": false,
               "Id": 5,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 14)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 14",
               "Description": "Форма паспорта качества при сдаче нефти на НПЗ РФ при приеме-сдаче между предприятиями трубопроводного транспорта. МИ 3532-2015 (Приложение 14)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(14).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(14).json"
@@ -2431,7 +2439,7 @@
             {
               "Use": false,
               "Id": 6,
-              "Name": "Паспорт (МИ 3532-2015 Приложение 15)",
+              "Name": "Паспорт качества нефти МИ 3532-2015. Приложение 15",
               "Description": "Форма паспорта качества для поставки нефти на экспорт",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15).json"
@@ -2439,7 +2447,7 @@
             {
               "Use": false,
               "Id": 7,
-              "Name": "Паспорт (ТР ЕАЭС)",
+              "Name": "Паспорт качества нефти ТР ЕАЭС",
               "Description": "Форма паспорта нефти по ТР ЕАЭС 045.2017",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_EAC.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_EAC.json"
@@ -2447,7 +2455,7 @@
             {
               "Use": false,
               "Id": 8,
-              "Name": "石油品质报告 (МИ 3532-2015 Приложение 15)",
+              "Name": "石油品质报告 МИ 3532-2015. Приложение 15",
               "Description": "石油品质报告 Форма паспорта качества для поставки нефти на экспорт. МИ 3532-2015 (Приложение 15)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_MI3532(15)_China.frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_MI3532(15)_China.json"
@@ -2455,7 +2463,7 @@
             {
               "Use": false,
               "Id": 9,
-              "Name": "Паспорт (ГОСТ Р50.2.40 Приложение Ж) (Экспорт)",
+              "Name": "Паспорт качества нефти ГОСТ Р50.2.40. Приложение Ж (Экспорт)",
               "Description": "Форма паспорта качества на экспорт. ГОСТ Р 50.2.040-2004 (Приложение Ж)",
               "PathToDocTemplateFile": "/Doc/Passport/Passport_GOSTR50.2.040(G)(Export_Rus).frx",
               "PathToDocEditConfigFile": "/Cfg/Passport/CfgEditPassport_GOSTR50.2.040(G)(Export_Rus).json"
@@ -2470,7 +2478,7 @@
           "PathToDocDll": "/Dll/Act.dll",
           "PathToDocConfigFile": "/Cfg/Act/CfgAct.json",
           "PathToDocEditConfigFile": "/Cfg/Act/CfgEditAct.json",
-          "LastUsedTemplateId": 5,
+          "LastUsedTemplateId": 4,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2830,7 +2838,7 @@
           "PathToDocDll": "/Dll/KMH_PR_PR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_PR_PR.json",
           "PathToDocEditConfigFile": "/Cfg/CfgEditKMH_PR_PR.json",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -2858,7 +2866,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_MPR.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_MPR.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -3174,7 +3182,7 @@
           "PathToDocDll": "/Dll/KMH_MPR_PU.dll",
           "PathToDocConfigFile": "/Cfg/CfgKMH_MPR_PU.json",
           "PathToDocEditConfigFile": "",
-          "LastUsedTemplateId": 0,
+          "LastUsedTemplateId": 1,
           "TemplateDocs": [
             {
               "Use": false,
@@ -3460,7 +3468,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     }
   ],
   "PrintSettings": {
@@ -3490,5 +3502,12 @@
       "UpdateRate": 500,
       "StartPrefix": "root.ARM.Reports"
     }
+  },
+  "DeviceConnectionDiagnostic": {
+    "InitialPollSeconds": 60,
+    "MaxPollSeconds": 3600,
+    "PollMultiplier": 2.0,
+    "NetworkFailureThreshold": 3,
+    "MaxRetryCount": 24
   }
 }
