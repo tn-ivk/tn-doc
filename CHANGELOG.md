@@ -41,6 +41,10 @@
 - 📝 Актуализирована документация (README, deployment/building, ELIS, API)
 - Обновлён FastReport.Web.Skia до 2026.1.2
 - Добавлен .gitattributes для контроля line endings
+- JS: добавлена обработка ошибок OPC API (WriteTag, ReadTag, ReadTagCache, ReadTagCacheARM) с серверным логированием
+- CI: унификация retention-days артефактов GitHub Actions (3 дня для build/test, 7 дней для пакетов)
+- Автоматическое бэкапирование проекта при установке .deb пакета
+- Обновлён docgeneral до версии 1.2.3
 
 ### Fixed
 - Исправлено отображение настроек OPC в диалогах (нормализация типа OPC)

@@ -503,6 +503,49 @@ GET /api/config-cache/health
 }
 ```
 
+### OPC API (TN_MessagingService)
+
+Клиентский JavaScript взаимодействует с OPC DA/UA серверами через TN_MessagingService (по умолчанию `localhost:5010`).
+
+#### Запись тега
+
+```http
+PUT http://localhost:5010/api/Values/
+```
+
+**Request Body:**
+```json
+{
+  "DeviceName": "IVK_TN_01",
+  "NameTag": "TagName",
+  "ValueTag": "value",
+  "NamespaceIndex": 2,
+  "IndexArray": 3
+}
+```
+
+#### Чтение тега
+
+```http
+GET http://localhost:5010/api/Values/{DeviceName}/{TagName}/{NamespaceIndex}/{IndexArray}
+```
+
+#### Чтение тега из кэша
+
+```http
+GET http://localhost:5010/api/OPCClientCache/{DeviceName}/{TagName}/{NamespaceIndex}/{IndexArray}
+```
+
+#### Обработка ошибок OPC
+
+Начиная с версии 1.5.0, все клиентские OPC-операции (`WriteTag`, `ReadTag`, `ReadTagCache`, `ReadTagCacheARM`) включают серверное логирование ошибок:
+
+- **WriteTag** — при ошибке вызывается `logError()` с именем тега, HTTP-статусом и текстом ошибки
+- **ReadTag/ReadTagCache** — при ошибке вызывается `logWarn()`, результат устанавливается в `undefined`
+- Формат лога: `{Operation}: {tagName} - {httpStatus}: {responseText || error}`
+
+Логи отправляются на сервер через `/api/ClientLog` для централизованного хранения.
+
 ### Printing API
 
 #### Печать документа
