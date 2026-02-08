@@ -3,6 +3,11 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:wix="http://wixtoolset.org/schemas/v4/wxs">
 
+  <!-- Key to find components containing TN_Doc.exe by their Id -->
+  <xsl:key name="ExeComponents"
+           match="wix:Component[wix:File[contains(@Source, 'TN_Doc.exe')]]"
+           use="@Id"/>
+
   <!-- Identity transform: copy everything by default -->
   <xsl:template match="@*|node()">
     <xsl:copy>
@@ -12,5 +17,8 @@
 
   <!-- Remove Component containing TN_Doc.exe (already defined in ServiceConfig.wxs) -->
   <xsl:template match="wix:Component[wix:File[contains(@Source, 'TN_Doc.exe')]]"/>
+
+  <!-- Remove the corresponding ComponentRef that references the removed Component -->
+  <xsl:template match="wix:ComponentRef[key('ExeComponents', @Id)]"/>
 
 </xsl:stylesheet>
