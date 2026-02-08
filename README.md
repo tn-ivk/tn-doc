@@ -185,18 +185,22 @@ sudo systemctl start tn-doc
 sudo systemctl status tn-doc
 ```
 
-### Windows (как служба)
+### Windows (через MSI пакет)
 
-```bash
-# Публикация
-dotnet publish -c Release -r win-x64 --self-contained false
+```cmd
+:: Графическая установка
+msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi
 
-# Установка службы
-sc create TN_Doc binPath="C:\path\to\TN_Doc.exe"
-sc start TN_Doc
+:: Тихая установка с параметрами
+msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc" SERVICENAME="tn.doc"
+
+:: Управление службой
+sc query tn.doc
+sc stop tn.doc
+sc start tn.doc
 ```
 
-Подробнее: [Deployment Guide](docs/deployment/linux.md)
+Подробнее: [Linux](docs/deployment/linux.md) | [Windows](docs/deployment/windows.md)
 
 ## 🔗 Связанные проекты
 

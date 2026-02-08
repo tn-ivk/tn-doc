@@ -372,5 +372,6 @@ sudo systemctl restart tn-doc
 ## См. также
 
 - [Configuration Guide](configuration.md)
+- [Windows Deployment](windows.md)
 - [Сборка проекта](../development/building.md)
 - [Руководство разработчика](../development/setup.md)

@@ -240,7 +240,7 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 | Workflow | Триггер | Назначение |
 |----------|---------|------------|
 | `tests-on-push.yml` | push в `develop*` | build → unit-test + integration-test → test-summary |
-| `build-and-package.yml` | push tag | build → test → package (.deb) → notify-telegram → create-release |
+| `build-and-package.yml` | push tag | build → test → package (.deb + .msi) → notify-telegram → create-release |
 
 **Retention артефактов**:
 - `tests-on-push.yml`: build-output — 1 день, test-results — 7 дней
@@ -266,11 +266,20 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 
 Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.0-b42-a1b2c3d4`)
 
-Создаётся `.deb` пакет (`tn.doc-{FULL_VERSION}_amd64.deb`):
+**Linux (.deb):** `tn.doc-{FULL_VERSION}_amd64.deb`
 - Требует `dotnet-runtime-8.0 >= 8.0.13`
 - Устанавливается в `/opt/TN_Doc`, логи в `/var/log/TN_Doc`
 - Backup перед обновлением в `/var/backups/TN_Doc/`
 - Systemd unit: `TN_Doc.service`, пользователь `alphadaemon`
+
+**Windows (.msi):** `tn.doc-full-{FULL_VERSION}_win-x64.msi` (self-contained), `tn.doc-{FULL_VERSION}_win-x64.msi` (minimal)
+- WiX v6, Scope perMachine, установка в `C:\ProjectVU\DotNetComponents\TN_Doc` (настраиваемо)
+- Интерфейс на русском языке (Cultures=ru-RU)
+- UI: Приветствие → Выбор пути → Имя службы → Подтверждение → Установка → Завершение
+- Windows Service с настраиваемым именем (по умолчанию `tn.doc`)
+- Очистка директории перед установкой (util:RemoveFolderEx)
+- Автоматический бэкап в `C:\ProgramData\TN_Doc\backups\` перед установкой (если директория не пуста, исключая logs/)
+- Поддержка тихой установки через `msiexec /quiet`
 
 ## External Systems
 
@@ -280,12 +289,41 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 
 ## Platform Notes
 
-| Platform | Logging | Service |
-|----------|---------|---------|
-| Windows | `TN_Doc/logs/` | `sc create TN_Doc` |
-| Linux | `/opt/TN_Doc/logs/` | systemd, требует `libgdiplus` |
+| Platform | Logging | Service | Installer |
+|----------|---------|---------|-----------|
+| Windows | `TN_Doc/logs/` | Windows Service (MSI) | `installer/windows/` (WiX v6) |
+| Linux | `/opt/TN_Doc/logs/` | systemd, требует `libgdiplus` | `.deb` пакет (CI inline) |
 
 Определение платформы в `Program.cs`: `UseWindowsService()` / `UseSystemd()`.
+
+### Windows MSI Installer
+
+Проект WiX v6 в `installer/windows/`:
+```
+installer/windows/
+├── TN_Doc.Installer.wixproj   # WiX SDK-style проект (Heat + HarvestDirectory)
+├── Package.wxs                 # Пакет, MajorUpgrade, Features, UI (WixUI_InstallDir + ServiceNameDlg), ru-RU
+├── Directories.wxs             # Структура директорий (ProgramFiles64Folder)
+├── ServiceConfig.wxs           # Windows Service + бэкап + очистка директории
+├── ExcludeMainExe.xslt         # XSLT: исключает TN_Doc.exe из harvest (определён в ServiceConfig)
+└── Scripts/Backup.ps1          # PowerShell бэкап перед установкой (исключает logs/)
+```
+
+> **Важно**: UI-элементы (WixUI, диалоги, Publish) должны быть внутри `<Package>` в Package.wxs, а не в отдельных Fragment-файлах — иначе WiX линкер отбрасывает нелинкованные фрагменты.
+
+**Локальная сборка MSI:**
+```bash
+# 1. Publish
+dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
+
+# 2. Build MSI (Heat harvesting + WiX compilation integrated via MSBuild)
+dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.0 -p:HarvestPath=../../publish/win-x64-full
+```
+
+**Тихая установка:**
+```cmd
+msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc" SERVICENAME="tn.doc"
+```
 
 ## Testing
 
