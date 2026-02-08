@@ -3,10 +3,11 @@
      xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
-    <Package Name="TN_Doc - Генератор отчетов"
+    <Package Name="TN_Doc - Модуль просмотра документов"
              Manufacturer="АО Транснефть-Автоматизация и Метрология"
              Version="$(var.ProductVersion)"
              UpgradeCode="E7A14B69-3F8C-4D52-9B76-2A1D5E8F0C34"
+             Scope="perMachine"
              Compressed="yes"
              Codepage="1251"
              Language="1049">
@@ -19,22 +20,88 @@
         <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
         <!-- Default property values (overridable via msiexec /p or UI) -->
-        <Property Id="INSTALLFOLDER" Value="C:\ProjectVU\DotNetComponents" />
+        <Property Id="INSTALLFOLDER" Value="C:\ProjectVU\DotNetComponents\TN_Doc" />
         <Property Id="SERVICENAME" Value="tn.doc" Secure="yes" />
         <Property Id="BACKUPDIR" Value="C:\ProgramData\TN_Doc\backups" Secure="yes" />
 
         <!-- Launch conditions -->
         <Launch Condition="VersionNT &gt;= 603"
                 Message="Требуется Windows 10 или новее." />
-        <Launch Condition="Privileged"
-                Message="Требуются права администратора." />
 
         <!-- Feature tree -->
         <Feature Id="ProductFeature" Title="TN_Doc" Level="1">
             <ComponentGroupRef Id="AppFiles" />
             <ComponentRef Id="ServiceComponent" />
+            <ComponentRef Id="CleanInstallDirComponent" />
             <ComponentRef Id="BackupScriptComponent" />
             <ComponentRef Id="BackupDirComponent" />
         </Feature>
+
+        <!-- ================================================================
+             UI: WixUI_InstallDir + custom ServiceNameDlg
+             Moved here from separate Fragment files so the linker includes them.
+             ================================================================ -->
+        <UI>
+            <!-- Base UI: WixUI_InstallDir, без License диалога -->
+            <!-- Цепочка: Welcome → InstallDir → ServiceName → VerifyReady → Install → Complete -->
+            <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+
+            <!-- Skip License: WelcomeDlg "Next" → InstallDirDlg -->
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog"
+                     Value="InstallDirDlg" Order="5" />
+
+            <!-- Skip License: InstallDirDlg "Back" → WelcomeDlg -->
+            <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog"
+                     Value="WelcomeDlg" Order="5" />
+
+            <!-- Custom dialog: service name input -->
+            <Dialog Id="ServiceNameDlg" Width="370" Height="270"
+                    Title="!(loc.InstallDirDlg_Title)">
+                <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44"
+                         TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15"
+                         Transparent="yes" NoPrefix="yes"
+                         Text="{\WixUI_Font_Title}Настройка службы Windows" />
+                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15"
+                         Transparent="yes" NoPrefix="yes"
+                         Text="Укажите имя службы Windows для приложения TN_Doc." />
+                <Control Id="ServiceNameLabel" Type="Text" X="20" Y="70" Width="290" Height="20"
+                         NoPrefix="yes"
+                         Text="Имя службы Windows:" />
+                <Control Id="ServiceNameEdit" Type="Edit" X="20" Y="90" Width="330" Height="18"
+                         Property="SERVICENAME" />
+                <Control Id="ServiceNameNote" Type="Text" X="20" Y="120" Width="330" Height="40"
+                         NoPrefix="yes"
+                         Text="Это имя будет использоваться для регистрации Windows Service. По умолчанию: tn.doc. Имя должно быть уникальным среди установленных служб." />
+                <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17"
+                         Text="!(loc.WixUIBack)" />
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17"
+                         Default="yes" Text="!(loc.WixUINext)" />
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17"
+                         Cancel="yes" Text="!(loc.WixUICancel)">
+                    <Publish Event="SpawnDialog" Value="CancelDlg" />
+                </Control>
+            </Dialog>
+
+            <!-- InstallDirDlg "Next" → ServiceNameDlg (override default → VerifyReadyDlg) -->
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog"
+                     Value="ServiceNameDlg" Order="5"
+                     Condition="NOT Installed" />
+
+            <!-- ServiceNameDlg "Back" → InstallDirDlg -->
+            <Publish Dialog="ServiceNameDlg" Control="Back" Event="NewDialog"
+                     Value="InstallDirDlg" />
+
+            <!-- ServiceNameDlg "Next" → VerifyReadyDlg -->
+            <Publish Dialog="ServiceNameDlg" Control="Next" Event="NewDialog"
+                     Value="VerifyReadyDlg" />
+
+            <!-- VerifyReadyDlg "Back" → ServiceNameDlg (instead of InstallDirDlg) -->
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog"
+                     Value="ServiceNameDlg" Order="5"
+                     Condition="NOT Installed" />
+        </UI>
     </Package>
 </Wix>

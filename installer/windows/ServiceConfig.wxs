@@ -12,7 +12,7 @@
         <ServiceInstall Id="TN_DocServiceInstaller"
                         Type="ownProcess"
                         Name="[SERVICENAME]"
-                        DisplayName="TN_Doc - Генератор отчетов ([SERVICENAME])"
+                        DisplayName="TN_Doc - Модуль просмотра документов ([SERVICENAME])"
                         Description="Веб-приложение генерации технических документов ИВК"
                         Start="auto"
                         Account="LocalSystem"
@@ -24,6 +24,13 @@
                         Remove="uninstall"
                         Name="[SERVICENAME]"
                         Wait="yes" />
+      </Component>
+
+      <!-- Clean install directory: removes all old files before installing new ones -->
+      <Component Id="CleanInstallDirComponent" Guid="D4E5F6A7-B8C9-0123-DEF0-456789012345" Bitness="always64">
+        <RegistryValue Root="HKLM" Key="Software\TN_Doc" Name="InstallPath"
+                       Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
+        <util:RemoveFolderEx On="install" Property="INSTALLFOLDER" />
       </Component>
 
       <!-- Scripts subfolder with backup script -->
