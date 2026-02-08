@@ -26,8 +26,9 @@
     </HarvestDirectory>
   </ItemGroup>
 
-  <!-- Bind path for ServiceConfig.wxs: !(bindpath.publishdir) -->
+  <!-- Bind paths: unnamed for SourceDir (harvested files), named for ServiceConfig.wxs -->
   <ItemGroup>
+    <BindPath Include="$(HarvestPath)" />
     <BindPath Include="$(HarvestPath)">
       <BindName>publishdir</BindName>
     </BindPath>

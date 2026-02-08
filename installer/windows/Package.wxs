@@ -8,6 +8,7 @@
              Version="$(var.ProductVersion)"
              UpgradeCode="E7A14B69-3F8C-4D52-9B76-2A1D5E8F0C34"
              Compressed="yes"
+             Codepage="1251"
              Language="1049">
 
         <!-- Major upgrade: remove old version after installing new files -->
