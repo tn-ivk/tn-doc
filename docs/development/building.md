@@ -172,28 +172,35 @@ flowchart LR
 ```yaml
 stages:
   - build
-  - test
   - package
-  - deploy
+  - notify
 
-build:
+build-job:
   stage: build
   script:
     - dotnet restore
     - dotnet build -c Release
-    - cd TN_Doc/Client && npm ci && npm run build:all
+    - dotnet publish -c Release -r linux-x64 --self-contained false
 
-test:
-  stage: test
-  script:
-    - dotnet test --no-build
-
-package:
+package-job:
   stage: package
   script:
-    - dotnet publish -c Release -r linux-x64
+    - # Создание .deb пакета с preinst/postinst скриптами
     - dpkg-deb --build ./package
+
+# Также: extract-version-job, package-minimal-job
 ```
+
+### GitHub Actions
+
+**Retention артефактов:**
+
+| Workflow | Артефакт | Хранение |
+|----------|----------|----------|
+| `tests-on-push.yml` | build-output | 1 день |
+| `tests-on-push.yml` | test-results | 7 дней |
+| `build-and-package.yml` | build/test | 3 дня |
+| `build-and-package.yml` | packages | 7 дней |
 
 ## Оптимизация сборки
 

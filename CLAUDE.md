@@ -68,7 +68,7 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 **Регистрация сервисов** (ключевые):
 ```
 Singleton: IReportBuffer, IAppConfigService, IDbSchemaCache, IConfigurationCacheService, IDocModuleLoader, IDeviceConnectionDiagnosticService, AppClientTracker
-Scoped:    IConfigurationService, IStatusProvider
+Scoped:    IConfigurationService, IStatusProvider, DocGeneral (DbContext)
 Transient: AbsPrinter (Windows/Linux), IPrinterService
 Hosted:    StatusMonitoringService (BackgroundService)
 Other:     AddMemoryCache(), AddSignalR(), AppInfoProvider (через extension method)
@@ -184,7 +184,7 @@ Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
 | `TN_Doc/Cfg/CfgApp.json` | Главная конфигурация (устройства, ELIS, OPC, DeviceConnectionDiagnostic) |
 | `TN_Doc/Cfg/Cfg{Type}.json` | Настройки шаблона документа |
 | `TN_Doc/Cfg/CfgEdit{Type}.json` | Конфигурация формы редактирования документа |
-| `TN_Doc/appsettings.json` | ASP.NET Core настройки (Kestrel порт: 5000, пути конфигов) |
+| `TN_Doc/appsettings.json` | ASP.NET Core настройки (Kestrel порт: 5000, пути конфигов: `CfgDirPath`, `RelCfgName`, `RelCfgAppName`, `UserPreferenceDirPath`, `LastUsedTemplateListFileName`) |
 | `TN_Doc/Cfg/CfgApp.Development.json` | Dev-конфиг: альтернативный адрес БД (копируется только в Debug) |
 | `TN_Doc/Cfg/Cfg.Development.json` | Dev-конфиг документа (копируется только в Debug) |
 | `TN_Doc/appsettings.Development.json` | Dev-конфиги (Trace logging, `CfgApp.Development.json`) |
@@ -343,17 +343,11 @@ cd TN_Doc/Client && npm run test:e2e
 
 ## Documentation
 
-- `docs/architecture/overview.md` — архитектура
-- `docs/architecture/document-modules.md` — модули документов
-- `docs/architecture/statusbar.md` — StatusBar архитектура
-- `docs/deployment/linux.md` — развёртывание
-- `docs/deployment/configuration.md` — конфигурация
-- `docs/development/setup.md` — настройка окружения разработчика
-- `docs/development/building.md` — сборка проекта
-- `docs/development/new-module-tutorial.md` — создание модулей
-- `docs/development/fastreport-templates.md` — шаблоны FastReport
-- `docs/api/endpoints.md` — API документация
-- `docs/integration/elis.md` — интеграция ELIS
-- `docs/ui-design.md` — UI Design гайд
+Документация в `docs/` организована по разделам: `architecture/`, `deployment/`, `development/`, `api/`, `integration/`.
+
+Ключевые файлы:
+- `docs/development/new-module-tutorial.md` — пошаговое руководство по созданию модулей документов
+- `docs/development/fastreport-templates.md` — работа с шаблонами FastReport
+- `docs/ui-design.md` — UI Design гайд (PrimeVue компоненты и стили)
 - `tech_debt/` — планы по техническому долгу (16 файлов)
-- `TN_Doc/changes.md` — changelog
+- `TN_Doc/changes.md` — внутренний changelog

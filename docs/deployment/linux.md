@@ -94,6 +94,7 @@ sequenceDiagram
     dpkg->>preinst: Запуск preinst скрипта
     preinst->>preinst: Проверка .NET Runtime
     preinst->>preinst: Создание пользователя alphadaemon
+    preinst->>preinst: Бэкап /opt/TN_Doc → /var/backups/TN_Doc/
     preinst-->>dpkg: OK
 
     dpkg->>Files: Распаковка в /opt/TN_Doc/
@@ -313,18 +314,18 @@ sudo journalctl -u tn-doc --since "1 hour ago"
 
 ## Обновление
 
+При установке нового пакета preinst скрипт автоматически создаёт бэкап текущей версии в `/var/backups/TN_Doc/` (архив tar.gz, логи исключаются).
+
 ```bash
-# Остановить службу
-sudo systemctl stop tn-doc
-
-# Установить новый пакет
+# Установить новый пакет (бэкап создаётся автоматически)
 sudo dpkg -i tn.doc-full-<FULL_VERSION>_amd64.deb
-
-# Запустить службу
-sudo systemctl start tn-doc
 
 # Проверить статус
 sudo systemctl status tn-doc
+
+# При необходимости — восстановление из бэкапа
+ls /var/backups/TN_Doc/
+sudo tar -xzf /var/backups/TN_Doc/TN_Doc_backup_<timestamp>.tar.gz -C /opt
 ```
 
 ## Удаление
