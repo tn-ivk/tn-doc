@@ -208,15 +208,14 @@ dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
 ```
 installer/windows/
 ├── TN_Doc.Installer.wixproj   # WiX SDK-style проект (Heat + HarvestDirectory)
-├── Package.wxs                 # Пакет, MajorUpgrade, Features, Codepage 1251
+├── Package.wxs                 # Пакет, MajorUpgrade, Features, UI (WixUI_InstallDir + ServiceNameDlg)
 ├── Directories.wxs             # Структура директорий (ProgramFiles64Folder)
-├── ServiceConfig.wxs           # Windows Service + бэкап при обновлении
+├── ServiceConfig.wxs           # Windows Service + бэкап + очистка директории
 ├── ExcludeMainExe.xslt         # XSLT: исключает TN_Doc.exe из harvest
-├── Scripts/Backup.ps1          # PowerShell бэкап при обновлении
-└── UI/
-    ├── ServiceNameDlg.wxs      # Диалог имени службы
-    └── CustomInstallUI.wxs     # Кастомная UI-последовательность
+└── Scripts/Backup.ps1          # PowerShell бэкап при обновлении
 ```
+
+> **Важно**: UI-элементы (WixUI, диалоги, Publish) должны быть внутри `<Package>` в Package.wxs — WiX линкер отбрасывает нелинкованные Fragment-файлы.
 
 ### Тихая установка
 
@@ -225,7 +224,7 @@ installer/windows/
 msiexec /i TN_Doc.msi
 
 :: Тихая установка с параметрами
-msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents" SERVICENAME="tn.doc"
+msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc" SERVICENAME="tn.doc"
 ```
 
 ## Автоматическая сборка (CI/CD)

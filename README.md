@@ -192,7 +192,7 @@ sudo systemctl status tn-doc
 msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi
 
 :: Тихая установка с параметрами
-msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents" SERVICENAME="tn.doc"
+msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc" SERVICENAME="tn.doc"
 
 :: Управление службой
 sc query tn.doc

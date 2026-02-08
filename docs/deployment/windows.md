@@ -51,8 +51,11 @@ msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi
 ```
 
 Мастер установки позволяет настроить:
-- **Путь установки** (по умолчанию `C:\ProjectVU\DotNetComponents`)
+- **Путь установки** (по умолчанию `C:\ProjectVU\DotNetComponents\TN_Doc`)
 - **Имя Windows Service** (по умолчанию `tn.doc`)
+
+Цепочка диалогов: Welcome → Выбор пути → Имя службы → Подтверждение → Установка → Завершение.
+Директория установки очищается перед копированием новых файлов.
 
 ### Тихая установка
 
@@ -62,7 +65,7 @@ msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet
 
 :: С пользовательскими параметрами
 msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet ^
-  INSTALLFOLDER="C:\ProjectVU\DotNetComponents" ^
+  INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc" ^
   SERVICENAME="tn.doc"
 
 :: С логированием (для диагностики)
@@ -75,7 +78,7 @@ msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet /l*v install.log
 
 | Параметр | По умолчанию | Описание |
 |----------|-------------|----------|
-| `INSTALLFOLDER` | `C:\ProjectVU\DotNetComponents` | Путь установки приложения |
+| `INSTALLFOLDER` | `C:\ProjectVU\DotNetComponents\TN_Doc` | Путь установки приложения |
 | `SERVICENAME` | `tn.doc` | Имя Windows Service |
 | `BACKUPDIR` | `C:\ProgramData\TN_Doc\backups` | Директория для бэкапов |
 
