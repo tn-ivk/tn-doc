@@ -1330,7 +1330,7 @@ jobs:
 
       - name: Build MSI
         run: |
-          dotnet build installer/windows/TN_Doc.Installer.wixproj `
+          dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
             -p:ProductVersion=${{ needs.extract-version.outputs.version }} `
             -p:HarvestPath=../../publish/win-x64-full `
             -p:OutputName=tn.doc-full-${{ needs.extract-version.outputs.full_version }}_win-x64 `
@@ -1363,7 +1363,7 @@ jobs:
 
       - name: Build MSI
         run: |
-          dotnet build installer/windows/TN_Doc.Installer.wixproj `
+          dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
             -p:ProductVersion=${{ needs.extract-version.outputs.version }} `
             -p:HarvestPath=../../publish/win-x64-minimal `
             -p:OutputName=tn.doc-${{ needs.extract-version.outputs.full_version }}_win-x64 `
