@@ -212,7 +212,7 @@ installer/windows/
 ├── Directories.wxs             # Структура директорий (ProgramFiles64Folder)
 ├── ServiceConfig.wxs           # Windows Service + бэкап + очистка директории
 ├── ExcludeMainExe.xslt         # XSLT: исключает TN_Doc.exe из harvest
-└── Scripts/Backup.ps1          # PowerShell бэкап при обновлении
+└── Scripts/Backup.ps1          # PowerShell бэкап перед установкой (исключает logs/)
 ```
 
 > **Важно**: UI-элементы (WixUI, диалоги, Publish) должны быть внутри `<Package>` в Package.wxs — WiX линкер отбрасывает нелинкованные Fragment-файлы.
