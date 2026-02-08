@@ -1439,7 +1439,7 @@ package-fonts-job:      # System fonts standalone package
       - ./packages/
 
 # ВАЖНО: WiX Toolset использует Windows API и НЕ работает на Linux runner.
-# Требуется Windows runner с Docker executor (Windows контейнеры).
+# Для MSI нужен Windows shell runner с предустановленными .NET SDK и WiX Toolset.
 # Если Windows runner недоступен — job'ы будут пропущены (allow_failure: true).
 
 package-msi-full-job:      # MSI full package (self-contained)

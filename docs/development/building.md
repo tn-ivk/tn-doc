@@ -163,7 +163,7 @@ flowchart LR
     Build --> DEB[tn.doc-full-<FULL_VERSION>_amd64.deb]
 ```
 
-`<FULL_VERSION>` задается при сборке пакета (например, `1.4.3`). Если используется CI, версия может формироваться в пайплайне вашей инфраструктуры.
+`<FULL_VERSION>` задается при сборке пакета (например, `1.5.1-b42-a1b2c3d4`). В GitLab CI значение формируется в `extract-version-job` и передается через `version.env`.
 
 ## Создание MSI пакета (Windows)
 
@@ -231,27 +231,62 @@ msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc
 
 ### GitLab CI Pipeline
 
+Ниже сокращенный фрагмент job'ов, связанных с версионированием и MSI. Linux job'ы (`build-job`, `package-job`, `package-minimal-job`) остаются в pipeline без изменений.
+
 ```yaml
 stages:
   - build
   - package
   - notify
 
-build-job:
+extract-version-job:
   stage: build
   script:
-    - dotnet restore
-    - dotnet build -c Release
-    - dotnet publish -c Release -r linux-x64 --self-contained false
+    - # Формирует VERSION/FULL_VERSION в version.env
 
-package-job:
-  stage: package
+build-windows-job:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
+  tags:
+    - orpovy
   script:
-    - # Создание .deb пакета с preinst/postinst скриптами
-    - dpkg-deb --build ./package
+    - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-x64-full
+    - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish/win-x64-minimal
 
-# Также: extract-version-job, package-minimal-job
+package-msi-full-job:
+  stage: package
+  needs:
+    - build-windows-job
+    - extract-version-job
+  tags:
+    - windows
+  script:
+    - dotnet build installer/windows/TN_Doc.Installer.wixproj ... -p:HarvestPath=../../publish/win-x64-full
+
+package-msi-minimal-job:
+  stage: package
+  needs:
+    - build-windows-job
+    - extract-version-job
+  tags:
+    - windows
+  script:
+    - dotnet build installer/windows/TN_Doc.Installer.wixproj ... -p:HarvestPath=../../publish/win-x64-minimal
+
+notify-telegram-job:
+  stage: notify
+  needs:
+    - package-job
+    - package-minimal-job
+    - job: package-msi-full-job
+      optional: true
+    - job: package-msi-minimal-job
+      optional: true
 ```
+
+MSI job'ы (`package-msi-full-job`, `package-msi-minimal-job`) выполняются на Windows `shell` runner (без `image:` в job). На runner должны быть установлены `.NET SDK 8` и `WiX Toolset v6`.
+
+Если Windows runner недоступен, MSI job'ы помечены `allow_failure: true`, а Linux-пакеты продолжают собираться и публиковаться.
 
 ### GitHub Actions
 

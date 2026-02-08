@@ -53,6 +53,17 @@
 - Исправлено сохранение конфигураций документов через кнопку "Применить"
 - CI: исправлен порядок аргументов tar в preinst скриптах — `--exclude` опции перемещены перед позиционными аргументами (GitHub Actions + GitLab CI)
 
+## [1.5.1] - 2026-02-09
+
+### Added
+- CI: добавлена сборка Windows MSI в GitLab CI (`build-windows-job`, `package-msi-full-job`, `package-msi-minimal-job`)
+- CI: в `notify-telegram-job` добавлена отправка MSI-пакетов с graceful fallback
+
+### Changed
+- CI: MSI job'ы переведены на Windows shell executor (удалено `image` из `package-msi-*`)
+- Документация по сборке и развертыванию Windows MSI приведена в соответствие с текущим pipeline
+- Версия проекта обновлена до `1.5.1`
+
 ## [1.4.3] - 2025-10-17
 
 ### Added

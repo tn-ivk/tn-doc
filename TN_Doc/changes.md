@@ -1,5 +1,10 @@
 # Список изменений:
 ## Версия 1.5.1:
+    - CI: добавлена сборка Windows MSI в GitLab CI (full + minimal)
+    - CI: добавлен `build-windows-job` для публикации win-x64 (self-contained и framework-dependent)
+    - CI: MSI job'ы переведены на Windows shell runner (убран docker image)
+    - Документация: актуализированы инструкции по сборке и развертыванию MSI
+    - Обновлена версия проекта до 1.5.1
 
 ## Версия 1.5.0:
     -⚠️Добавлен Windows MSI установщик (WiX v6): поддержка Windows Service, автобэкап перед установкой, тихая установка, русский интерфейс

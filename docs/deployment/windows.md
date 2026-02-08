@@ -42,6 +42,17 @@ graph TB
 | `tn.doc-full-*_win-x64.msi` | Self-contained: включает .NET Runtime | ~55 MB |
 | `tn.doc-*_win-x64.msi` | Minimal: требует установленный .NET Runtime 8.0.13+ | ~15 MB |
 
+## Получение MSI из GitLab CI
+
+MSI пакеты собираются в основном pipeline:
+- `build-windows-job` публикует `win-x64` бинарники (full + minimal)
+- `package-msi-full-job` собирает `tn.doc-full-*_win-x64.msi`
+- `package-msi-minimal-job` собирает `tn.doc-*_win-x64.msi`
+
+Артефакты MSI сохраняются в `./packages/*.msi` и прикладываются к уведомлению `notify-telegram-job` (опционально).
+
+Для MSI job'ов используется Windows `shell` runner (без Docker image в job). На runner требуются `.NET SDK 8` и `WiX Toolset v6`.
+
 ## Установка из MSI пакета
 
 ### Графическая установка
