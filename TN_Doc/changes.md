@@ -2,6 +2,7 @@
 ## Версия 1.5.1:
     - CI: добавлена сборка Windows MSI в GitLab CI (full + minimal)
     - CI: добавлен `build-windows-job` для публикации win-x64 (self-contained и framework-dependent)
+    - CI: в `notify-telegram-job` добавлена отправка MSI-пакетов с graceful fallback
     - CI: MSI job'ы переведены на Windows shell runner (убран docker image)
     - Документация: актуализированы инструкции по сборке и развертыванию MSI
     - Обновлена версия проекта до 1.5.1

@@ -20,9 +20,9 @@ graph TB
     end
 
     subgraph "Application"
-        App["C:\ProjectVU\DotNetComponents\"]
-        Logs["C:\ProjectVU\DotNetComponents\logs\"]
-        Config["C:\ProjectVU\DotNetComponents\Cfg\"]
+        App["C:\ProjectVU\DotNetComponents\TN_Doc\"]
+        Logs["C:\ProjectVU\DotNetComponents\TN_Doc\logs\"]
+        Config["C:\ProjectVU\DotNetComponents\TN_Doc\Cfg\"]
     end
 
     subgraph "Backup"
@@ -114,7 +114,7 @@ sequenceDiagram
 ## Структура установки
 
 ```
-C:\ProjectVU\DotNetComponents\
+C:\ProjectVU\DotNetComponents\TN_Doc\
 ├── TN_Doc.exe                  # Исполняемый файл
 ├── TN_Doc.dll                  # Основная библиотека
 ├── appsettings.json            # Конфигурация ASP.NET
@@ -215,11 +215,13 @@ msiexec /i tn.doc-full-<NEW_VERSION>_win-x64.msi /quiet
 
 ```powershell
 # Запуск скрипта бэкапа вручную
-powershell -ExecutionPolicy Bypass -File "C:\ProjectVU\DotNetComponents\Scripts\Backup.ps1" `
-  -InstallDir "C:\ProjectVU\DotNetComponents" `
+powershell -ExecutionPolicy Bypass -File "C:\ProjectVU\DotNetComponents\TN_Doc\Scripts\Backup.ps1" `
+  -InstallDir "C:\ProjectVU\DotNetComponents\TN_Doc" `
   -BackupDir "C:\ProgramData\TN_Doc\backups" `
-  -Version "1.5.1"
+  -Version "<VERSION>"
 ```
+
+`<VERSION>` обычно соответствует версии приложения из `TN_Doc/TN_Doc.csproj` (например, `1.5.1`).
 
 ## Удаление
 
@@ -250,10 +252,10 @@ tasklist /fi "imagename eq TN_Doc.exe"
 
 ```powershell
 # Последние строки лога
-Get-Content "C:\ProjectVU\DotNetComponents\logs\tn-doc-$(Get-Date -Format 'yyyy-MM-dd').log" -Tail 50
+Get-Content "C:\ProjectVU\DotNetComponents\TN_Doc\logs\tn-doc-$(Get-Date -Format 'yyyy-MM-dd').log" -Tail 50
 
 # Следить за логом в реальном времени
-Get-Content "C:\ProjectVU\DotNetComponents\logs\tn-doc-$(Get-Date -Format 'yyyy-MM-dd').log" -Wait
+Get-Content "C:\ProjectVU\DotNetComponents\TN_Doc\logs\tn-doc-$(Get-Date -Format 'yyyy-MM-dd').log" -Wait
 
 # Логи Windows Event Log
 Get-EventLog -LogName Application -Source "tn.doc" -Newest 20
@@ -268,7 +270,7 @@ Get-EventLog -LogName Application -Source "tn.doc" -Newest 20
 Get-Service -Name "tn.doc" | Format-List *
 
 # Проверить логи приложения
-Get-Content "C:\ProjectVU\DotNetComponents\logs\*.log" -Tail 50
+Get-Content "C:\ProjectVU\DotNetComponents\TN_Doc\logs\*.log" -Tail 50
 
 # Проверить Event Log
 Get-EventLog -LogName Application -EntryType Error -Newest 10
@@ -288,7 +290,7 @@ notepad install.log
 
 ```powershell
 # Проверить настройки в CfgApp.json
-Get-Content "C:\ProjectVU\DotNetComponents\Cfg\CfgApp.json" | Select-String "Server|Database|Userid"
+Get-Content "C:\ProjectVU\DotNetComponents\TN_Doc\Cfg\CfgApp.json" | Select-String "Server|Database|Userid"
 
 # Проверить доступность MySQL
 Test-NetConnection -ComputerName localhost -Port 3306

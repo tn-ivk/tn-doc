@@ -124,7 +124,7 @@ npm run build:all
 
 ## Публикация
 
-### Linux (Self-contained)
+### Linux (Framework-dependent, как в CI)
 
 ```bash
 dotnet publish TN_Doc/TN_Doc.csproj \
@@ -134,7 +134,7 @@ dotnet publish TN_Doc/TN_Doc.csproj \
   -o ./publish/linux
 ```
 
-### Windows (Self-contained)
+### Windows (Framework-dependent)
 
 ```bash
 dotnet publish TN_Doc/TN_Doc.csproj \
@@ -179,13 +179,13 @@ flowchart LR
 
 ### Локальная сборка
 
-```bash
+```powershell
 # 1. Публикация приложения (self-contained)
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
 
 # 2. Сборка MSI (harvest + компиляция интегрированы через MSBuild)
 dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
-  -p:ProductVersion=1.5.1 `
+  -p:ProductVersion=<VERSION> `
   -p:HarvestPath=../../publish/win-x64-full
 
 # Результат: installer/windows/bin/x64/Release/TN_Doc.msi
@@ -193,15 +193,17 @@ dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
 
 ### Минимальный вариант (без .NET Runtime)
 
-```bash
+```powershell
 # Framework-dependent публикация
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o publish/win-x64-minimal
 
 # Сборка MSI
 dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
-  -p:ProductVersion=1.5.1 `
+  -p:ProductVersion=<VERSION> `
   -p:HarvestPath=../../publish/win-x64-minimal
 ```
+
+`<VERSION>` берите из `TN_Doc/TN_Doc.csproj` (или из переменной `VERSION` в CI). Передавайте `-p:ProductVersion` явно, чтобы версия MSI совпадала с версией приложения.
 
 ### Структура WiX проекта
 
@@ -260,6 +262,7 @@ package-msi-full-job:
     - extract-version-job
   tags:
     - windows
+  allow_failure: true
   script:
     - dotnet build installer/windows/TN_Doc.Installer.wixproj ... -p:HarvestPath=../../publish/win-x64-full
 
@@ -270,6 +273,7 @@ package-msi-minimal-job:
     - extract-version-job
   tags:
     - windows
+  allow_failure: true
   script:
     - dotnet build installer/windows/TN_Doc.Installer.wixproj ... -p:HarvestPath=../../publish/win-x64-minimal
 
@@ -278,6 +282,8 @@ notify-telegram-job:
   needs:
     - package-job
     - package-minimal-job
+    - package-net-runtime-job
+    - package-fonts-job
     - job: package-msi-full-job
       optional: true
     - job: package-msi-minimal-job
