@@ -49,7 +49,7 @@ cd TN_Doc
 dotnet run
 ```
 
-Приложение будет доступно по адресу: `http://localhost:38509`
+Приложение будет доступно по адресу: `http://localhost:5000` (Kestrel) или `http://localhost:38509` (IIS Express)
 
 ### Сборка клиентских приложений (Vue.js)
 
