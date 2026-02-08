@@ -2,7 +2,7 @@
 
 **Система генерации технических документов и отчетов для измерительно-вычислительных комплексов (ИВК)**
 
-[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/tn-ivk/tn-doc)
+[![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)](https://github.com/tn-ivk/tn-doc)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)]()
 

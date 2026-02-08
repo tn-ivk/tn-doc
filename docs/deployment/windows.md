@@ -73,7 +73,7 @@ msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet ^
 msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi /quiet /l*v install.log
 ```
 
-`<FULL_VERSION>` формируется при сборке CI (например, `1.5.0-b42-a1b2c3d4`).
+`<FULL_VERSION>` формируется при сборке CI (например, `1.5.1-b42-a1b2c3d4`).
 
 ### Параметры установки
 
@@ -207,7 +207,7 @@ msiexec /i tn.doc-full-<NEW_VERSION>_win-x64.msi /quiet
 powershell -ExecutionPolicy Bypass -File "C:\ProjectVU\DotNetComponents\Scripts\Backup.ps1" `
   -InstallDir "C:\ProjectVU\DotNetComponents" `
   -BackupDir "C:\ProgramData\TN_Doc\backups" `
-  -Version "1.5.0"
+  -Version "1.5.1"
 ```
 
 ## Удаление

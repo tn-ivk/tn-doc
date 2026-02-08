@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc — ASP.NET Core 8.0 веб-приложение для генерации технических документов ИВК (Измерительно-вычислительный комплекс) нефтегазовой отрасли. Генерирует паспорта качества, протоколы поверки, акты приёма-сдачи через FastReport.
 
-**Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Frontend**: Vue 3 + TypeScript | **Version**: 1.5.0
+**Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Frontend**: Vue 3 + TypeScript | **Version**: 1.5.1
 
 **Ключевые зависимости**: FastReport.Web.Skia 2026.1.2, EF Core 7.0.20 + Pomelo 7.0.0 (намеренно понижена с EF 8 для совместимости с MySQL ИВК), NLog 5.4.0, Newtonsoft.Json 13.0.3.
 
@@ -264,7 +264,7 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 
 ### Версионирование и packaging
 
-Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.0-b42-a1b2c3d4`)
+Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.1-b42-a1b2c3d4`)
 
 **Linux (.deb):** `tn.doc-{FULL_VERSION}_amd64.deb`
 - Требует `dotnet-runtime-8.0 >= 8.0.13`
@@ -317,7 +317,7 @@ installer/windows/
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
 
 # 2. Build MSI (Heat harvesting + WiX compilation integrated via MSBuild)
-dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.0 -p:HarvestPath=../../publish/win-x64-full
+dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.1 -p:HarvestPath=../../publish/win-x64-full
 ```
 
 **Тихая установка:**

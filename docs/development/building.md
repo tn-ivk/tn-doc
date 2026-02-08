@@ -185,7 +185,7 @@ dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true 
 
 # 2. Сборка MSI (harvest + компиляция интегрированы через MSBuild)
 dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
-  -p:ProductVersion=1.5.0 `
+  -p:ProductVersion=1.5.1 `
   -p:HarvestPath=../../publish/win-x64-full
 
 # Результат: installer/windows/bin/x64/Release/TN_Doc.msi
@@ -199,7 +199,7 @@ dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false
 
 # Сборка MSI
 dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
-  -p:ProductVersion=1.5.0 `
+  -p:ProductVersion=1.5.1 `
   -p:HarvestPath=../../publish/win-x64-minimal
 ```
 
