@@ -5,9 +5,9 @@
       INSTALLFOLDER gets its default path from the Property defined in Package.wxs
       (C:\ProjectVU\DotNetComponents). The user can change it via the InstallDirDlg UI.
     -->
-    <Directory Id="TARGETDIR" Name="SourceDir">
+    <StandardDirectory Id="TARGETDIR">
       <Directory Id="INSTALLFOLDER" />
-    </Directory>
+    </StandardDirectory>
 
     <!-- Backup directory in ProgramData -->
     <StandardDirectory Id="CommonAppDataFolder">

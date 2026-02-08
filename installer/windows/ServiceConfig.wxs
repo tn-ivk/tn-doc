@@ -39,7 +39,7 @@
          ================================================================ -->
     <DirectoryRef Id="BACKUPFOLDER">
       <Component Id="BackupDirComponent" Guid="B2C3D4E5-F6A7-8901-BCDE-F23456789012">
-        <CreateFolder KeyPath="yes" />
+        <CreateFolder />
       </Component>
     </DirectoryRef>
 
