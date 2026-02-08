@@ -209,16 +209,17 @@ graph TB
     subgraph "Singleton Services"
         AppConfig[AppConfigService]
         ReportBuffer[ReportBuffer]
-        DocLoader[DocModuleLoader]
+        DocLoader[CachedDocModuleLoader]
         ConfigCache[ConfigurationCacheService]
         LogPath[LoggingPathService]
+        DiagSvc[DeviceConnectionDiagnosticService]
+        DbSchema[DbSchemaCache]
+        ClientTracker[AppClientTracker]
     end
 
     subgraph "Scoped Services"
-        DbCtx[DbContext]
         StatusProv[StatusProvider]
         ConfigSvc[ConfigurationService]
-        DiagSvc[DeviceConnectionDiagnosticService]
     end
 
     subgraph "Hosted Services"
@@ -234,10 +235,11 @@ graph TB
     SC --> DocLoader
     SC --> ConfigCache
     SC --> LogPath
-    SC --> DbCtx
+    SC --> DiagSvc
+    SC --> DbSchema
+    SC --> ClientTracker
     SC --> StatusProv
     SC --> ConfigSvc
-    SC --> DiagSvc
     SC --> Monitor
     SC --> Printer
 ```
