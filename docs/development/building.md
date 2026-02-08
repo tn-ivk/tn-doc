@@ -165,6 +165,69 @@ flowchart LR
 
 `<FULL_VERSION>` задается при сборке пакета (например, `1.4.3`). Если используется CI, версия может формироваться в пайплайне вашей инфраструктуры.
 
+## Создание MSI пакета (Windows)
+
+```mermaid
+flowchart LR
+    Publish[dotnet publish] --> Build[dotnet build wixproj]
+    Build --> Heat[Heat: harvest файлов]
+    Heat --> Compile[WiX: компиляция + линковка]
+    Compile --> MSI[TN_Doc.msi]
+```
+
+Проект WiX v6 расположен в `installer/windows/`. Сборка MSI выполняется через `dotnet build` с интегрированным Heat harvesting (автоматический сбор файлов из publish-директории).
+
+### Локальная сборка
+
+```bash
+# 1. Публикация приложения (self-contained)
+dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
+
+# 2. Сборка MSI (harvest + компиляция интегрированы через MSBuild)
+dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
+  -p:ProductVersion=1.5.0 `
+  -p:HarvestPath=../../publish/win-x64-full
+
+# Результат: installer/windows/bin/x64/Release/TN_Doc.msi
+```
+
+### Минимальный вариант (без .NET Runtime)
+
+```bash
+# Framework-dependent публикация
+dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o publish/win-x64-minimal
+
+# Сборка MSI
+dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
+  -p:ProductVersion=1.5.0 `
+  -p:HarvestPath=../../publish/win-x64-minimal
+```
+
+### Структура WiX проекта
+
+```
+installer/windows/
+├── TN_Doc.Installer.wixproj   # WiX SDK-style проект (Heat + HarvestDirectory)
+├── Package.wxs                 # Пакет, MajorUpgrade, Features, Codepage 1251
+├── Directories.wxs             # Структура директорий (ProgramFiles64Folder)
+├── ServiceConfig.wxs           # Windows Service + бэкап при обновлении
+├── ExcludeMainExe.xslt         # XSLT: исключает TN_Doc.exe из harvest
+├── Scripts/Backup.ps1          # PowerShell бэкап при обновлении
+└── UI/
+    ├── ServiceNameDlg.wxs      # Диалог имени службы
+    └── CustomInstallUI.wxs     # Кастомная UI-последовательность
+```
+
+### Тихая установка
+
+```cmd
+:: Графическая установка
+msiexec /i TN_Doc.msi
+
+:: Тихая установка с параметрами
+msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents" SERVICENAME="tn.doc"
+```
+
 ## Автоматическая сборка (CI/CD)
 
 ### GitLab CI Pipeline
@@ -275,3 +338,4 @@ publish/
 
 - [Setup Guide](setup.md)
 - [Deployment](../deployment/linux.md)
+- [Windows Deployment](../deployment/windows.md)

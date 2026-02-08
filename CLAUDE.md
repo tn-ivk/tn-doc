@@ -298,10 +298,11 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 Проект WiX v6 в `installer/windows/`:
 ```
 installer/windows/
-├── TN_Doc.Installer.wixproj   # WiX SDK-style проект
-├── Package.wxs                 # Пакет, MajorUpgrade, Features
-├── Directories.wxs             # Структура директорий
+├── TN_Doc.Installer.wixproj   # WiX SDK-style проект (Heat + HarvestDirectory)
+├── Package.wxs                 # Пакет, MajorUpgrade, Features, Codepage 1251
+├── Directories.wxs             # Структура директорий (ProgramFiles64Folder)
 ├── ServiceConfig.wxs           # Windows Service + бэкап
+├── ExcludeMainExe.xslt         # XSLT: исключает TN_Doc.exe из harvest (определён в ServiceConfig)
 ├── Scripts/Backup.ps1          # PowerShell бэкап при обновлении
 └── UI/
     ├── ServiceNameDlg.wxs      # Диалог имени службы
@@ -313,15 +314,8 @@ installer/windows/
 # 1. Publish
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
 
-# 2. Install WiX CLI
-dotnet tool install --global wix
-wix extension add WixToolset.UI.wixext/6.0.2
-wix extension add WixToolset.Util.wixext/6.0.2
-
-# 3. Harvest + Build
-cd installer/windows
-wix heat dir "../../publish/win-x64-full" -cg AppFiles -dr INSTALLFOLDER -srd -sfrag -ag -var "bindpath.publishdir" -out HarvestedFiles.wxs
-wix build Package.wxs Directories.wxs ServiceConfig.wxs HarvestedFiles.wxs UI/ServiceNameDlg.wxs UI/CustomInstallUI.wxs -d ProductVersion=1.5.0 -bindpath:publishdir="../../publish/win-x64-full" -ext WixToolset.UI.wixext -ext WixToolset.Util.wixext -arch x64 -o TN_Doc.msi
+# 2. Build MSI (Heat harvesting + WiX compilation integrated via MSBuild)
+dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.0 -p:HarvestPath=../../publish/win-x64-full
 ```
 
 **Тихая установка:**
