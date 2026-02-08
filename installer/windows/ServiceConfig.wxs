@@ -51,19 +51,19 @@
     </DirectoryRef>
 
     <!-- ================================================================
-         Backup custom action: runs Backup.ps1 from the PREVIOUS installation
-         before files are removed during a major upgrade.
+         Backup custom action: runs Backup.ps1 before RemoveFiles cleans
+         the install directory.
 
-         On first install there is no old Backup.ps1 and no files to back up,
-         so the condition "Installed AND NOT REMOVE~=ALL" ensures it only
-         runs during upgrades.
-
-         Return="ignore" prevents backup failures from blocking the upgrade.
+         Runs on any install/upgrade/reinstall (NOT REMOVE~="ALL" excludes
+         uninstall). On first install the script doesn't exist yet —
+         PowerShell fails silently thanks to Return="ignore".
+         On subsequent installs the script from the previous installation
+         creates a ZIP backup excluding logs/.
          ================================================================ -->
 
     <!-- SetProperty populates the deferred CA data (WixQuietExec64 reads it from CustomActionData) -->
     <SetProperty Id="BackupBeforeUpgrade"
-                 Value="&quot;powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]Scripts\Backup.ps1&quot; -InstallDir &quot;[INSTALLFOLDER]&quot; -BackupDir &quot;[BACKUPDIR]&quot; -Version &quot;$(var.ProductVersion)&quot;"
+                 Value="&quot;powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]Scripts\Backup.ps1&quot; -InstallDir &quot;[INSTALLFOLDER].&quot; -BackupDir &quot;[BACKUPDIR].&quot; -Version &quot;$(var.ProductVersion)&quot;"
                  Before="BackupBeforeUpgrade"
                  Sequence="execute" />
 
@@ -77,7 +77,7 @@
     <InstallExecuteSequence>
       <Custom Action="BackupBeforeUpgrade"
               Before="RemoveFiles"
-              Condition="Installed AND NOT REMOVE~=&quot;ALL&quot;" />
+              Condition="NOT REMOVE~=&quot;ALL&quot;" />
     </InstallExecuteSequence>
   </Fragment>
 </Wix>

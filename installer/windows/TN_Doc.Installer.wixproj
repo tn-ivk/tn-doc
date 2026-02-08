@@ -7,6 +7,7 @@
     <ProductVersion Condition="'$(ProductVersion)' == ''">1.5.0</ProductVersion>
     <HarvestPath Condition="'$(HarvestPath)' == ''">..\..\publish\win-x64-full</HarvestPath>
     <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
+    <Cultures>ru-RU</Cultures>
   </PropertyGroup>
 
   <ItemGroup>
