@@ -1331,6 +1331,7 @@ jobs:
       - name: Install WiX Toolset
         run: |
           dotnet tool install --global wix
+          wix extension add WixToolset.Heat.wixext/6.0.2
           wix extension add WixToolset.UI.wixext/6.0.2
           wix extension add WixToolset.Util.wixext/6.0.2
 
@@ -1397,6 +1398,7 @@ jobs:
       - name: Install WiX Toolset
         run: |
           dotnet tool install --global wix
+          wix extension add WixToolset.Heat.wixext/6.0.2
           wix extension add WixToolset.UI.wixext/6.0.2
           wix extension add WixToolset.Util.wixext/6.0.2
 
