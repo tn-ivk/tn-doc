@@ -1328,47 +1328,13 @@ jobs:
           name: build-artifacts-win-full
           path: ./publish/win-x64-full/
 
-      - name: Install WiX Toolset
-        run: |
-          dotnet tool install --global wix
-          wix extension add WixToolset.Heat.wixext/6.0.2
-          wix extension add WixToolset.UI.wixext/6.0.2
-          wix extension add WixToolset.Util.wixext/6.0.2
-
-      - name: Harvest application files
-        working-directory: installer/windows
-        run: |
-          wix heat dir "../../publish/win-x64-full" `
-            -cg AppFiles `
-            -dr INSTALLFOLDER `
-            -srd -sfrag -ag `
-            -var "bindpath.publishdir" `
-            -out HarvestedFiles.wxs
-
-      - name: Remove TN_Doc.exe from harvested files
-        working-directory: installer/windows
-        shell: pwsh
-        run: |
-          # TN_Doc.exe is already defined in ServiceConfig.wxs, remove it from harvested to avoid duplicate
-          $content = Get-Content HarvestedFiles.wxs -Raw
-          $content = $content -replace '(?s)<Component[^>]*>[\s\S]*?<File[^>]*Source="[^"]*TN_Doc\.exe"[^>]*/?>[\s\S]*?</Component>', ''
-          Set-Content HarvestedFiles.wxs -Value $content
-
       - name: Build MSI
-        working-directory: installer/windows
-        env:
-          VERSION: ${{ needs.extract-version.outputs.version }}
-          FULL_VERSION: ${{ needs.extract-version.outputs.full_version }}
         run: |
-          wix build `
-            Package.wxs Directories.wxs ServiceConfig.wxs HarvestedFiles.wxs `
-            UI/ServiceNameDlg.wxs UI/CustomInstallUI.wxs `
-            -d ProductVersion=${{ needs.extract-version.outputs.version }} `
-            -bindpath:publishdir="../../publish/win-x64-full" `
-            -ext WixToolset.UI.wixext `
-            -ext WixToolset.Util.wixext `
-            -arch x64 `
-            -o "../../packages/tn.doc-full-${{ needs.extract-version.outputs.full_version }}_win-x64.msi"
+          dotnet build installer/windows/TN_Doc.Installer.wixproj `
+            -p:ProductVersion=${{ needs.extract-version.outputs.version }} `
+            -p:HarvestPath=../../publish/win-x64-full `
+            -p:OutputName=tn.doc-full-${{ needs.extract-version.outputs.full_version }}_win-x64 `
+            -p:OutputPath=../../packages/
 
       - name: Upload MSI full package
         uses: actions/upload-artifact@v4
@@ -1395,47 +1361,13 @@ jobs:
           name: build-artifacts-win-minimal
           path: ./publish/win-x64-minimal/
 
-      - name: Install WiX Toolset
-        run: |
-          dotnet tool install --global wix
-          wix extension add WixToolset.Heat.wixext/6.0.2
-          wix extension add WixToolset.UI.wixext/6.0.2
-          wix extension add WixToolset.Util.wixext/6.0.2
-
-      - name: Harvest application files
-        working-directory: installer/windows
-        run: |
-          wix heat dir "../../publish/win-x64-minimal" `
-            -cg AppFiles `
-            -dr INSTALLFOLDER `
-            -srd -sfrag -ag `
-            -var "bindpath.publishdir" `
-            -out HarvestedFiles.wxs
-
-      - name: Remove TN_Doc.exe from harvested files
-        working-directory: installer/windows
-        shell: pwsh
-        run: |
-          # TN_Doc.exe is already defined in ServiceConfig.wxs, remove it from harvested to avoid duplicate
-          $content = Get-Content HarvestedFiles.wxs -Raw
-          $content = $content -replace '(?s)<Component[^>]*>[\s\S]*?<File[^>]*Source="[^"]*TN_Doc\.exe"[^>]*/?>[\s\S]*?</Component>', ''
-          Set-Content HarvestedFiles.wxs -Value $content
-
       - name: Build MSI
-        working-directory: installer/windows
-        env:
-          VERSION: ${{ needs.extract-version.outputs.version }}
-          FULL_VERSION: ${{ needs.extract-version.outputs.full_version }}
         run: |
-          wix build `
-            Package.wxs Directories.wxs ServiceConfig.wxs HarvestedFiles.wxs `
-            UI/ServiceNameDlg.wxs UI/CustomInstallUI.wxs `
-            -d ProductVersion=${{ needs.extract-version.outputs.version }} `
-            -bindpath:publishdir="../../publish/win-x64-minimal" `
-            -ext WixToolset.UI.wixext `
-            -ext WixToolset.Util.wixext `
-            -arch x64 `
-            -o "../../packages/tn.doc-${{ needs.extract-version.outputs.full_version }}_win-x64.msi"
+          dotnet build installer/windows/TN_Doc.Installer.wixproj `
+            -p:ProductVersion=${{ needs.extract-version.outputs.version }} `
+            -p:HarvestPath=../../publish/win-x64-minimal `
+            -p:OutputName=tn.doc-${{ needs.extract-version.outputs.full_version }}_win-x64 `
+            -p:OutputPath=../../packages/
 
       - name: Upload MSI minimal package
         uses: actions/upload-artifact@v4

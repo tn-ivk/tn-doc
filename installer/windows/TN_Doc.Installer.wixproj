@@ -3,12 +3,33 @@
     <OutputType>Package</OutputType>
     <Platform>x64</Platform>
     <OutputName>TN_Doc</OutputName>
-    <!-- CI passes these via -d flags, defaults for local builds -->
-    <DefineConstants>ProductVersion=1.5.0</DefineConstants>
+    <!-- Configurable properties: override via -p:PropertyName=value -->
+    <ProductVersion Condition="'$(ProductVersion)' == ''">1.5.0</ProductVersion>
+    <HarvestPath Condition="'$(HarvestPath)' == ''">..\..\publish\win-x64-full</HarvestPath>
+    <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" Version="6.0.*" />
     <PackageReference Include="WixToolset.UI.wixext" Version="6.0.*" />
     <PackageReference Include="WixToolset.Util.wixext" Version="6.0.*" />
+  </ItemGroup>
+
+  <!-- Harvest all files from publish directory -->
+  <ItemGroup>
+    <HarvestDirectory Include="$(HarvestPath)">
+      <ComponentGroupName>AppFiles</ComponentGroupName>
+      <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
+      <SuppressRootDirectory>true</SuppressRootDirectory>
+      <AutoGenerateGuids>true</AutoGenerateGuids>
+      <Transforms>ExcludeMainExe.xslt</Transforms>
+    </HarvestDirectory>
+  </ItemGroup>
+
+  <!-- Bind path for ServiceConfig.wxs: !(bindpath.publishdir) -->
+  <ItemGroup>
+    <BindPath Include="$(HarvestPath)">
+      <BindName>publishdir</BindName>
+    </BindPath>
   </ItemGroup>
 </Project>
