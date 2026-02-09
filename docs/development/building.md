@@ -183,7 +183,10 @@ flowchart LR
 # 1. Публикация приложения (self-contained)
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
 
-# 2. Сборка MSI (harvest + компиляция интегрированы через MSBuild)
+# 2. Копирование cfg-elevator в publish-директорию
+Copy-Item installer/tools/cfg-elevator-windows-amd64.exe publish/win-x64-full/cfg-elevator.exe
+
+# 3. Сборка MSI (harvest + компиляция интегрированы через MSBuild)
 dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release `
   -p:ProductVersion=<VERSION> `
   -p:HarvestPath=../../publish/win-x64-full
@@ -212,9 +215,15 @@ installer/windows/
 ├── TN_Doc.Installer.wixproj   # WiX SDK-style проект (Heat + HarvestDirectory)
 ├── Package.wxs                 # Пакет, MajorUpgrade, Features, UI (WixUI_InstallDir + ServiceNameDlg)
 ├── Directories.wxs             # Структура директорий (ProgramFiles64Folder)
-├── ServiceConfig.wxs           # Windows Service + бэкап + очистка директории
+├── ServiceConfig.wxs           # Windows Service + бэкап + очистка + миграция конфигов
 ├── ExcludeMainExe.xslt         # XSLT: исключает TN_Doc.exe из harvest
-└── Scripts/Backup.ps1          # PowerShell бэкап перед установкой (исключает logs/)
+└── Scripts/
+    ├── Backup.ps1              # PowerShell бэкап перед установкой (исключает logs/)
+    └── MigrateCfg.ps1          # PowerShell миграция конфигов через cfg-elevator
+
+installer/tools/
+├── cfg-elevator-linux-amd64            # Go бинарник для Linux
+└── cfg-elevator-windows-amd64.exe      # Go бинарник для Windows
 ```
 
 > **Важно**: UI-элементы (WixUI, диалоги, Publish) должны быть внутри `<Package>` в Package.wxs — WiX линкер отбрасывает нелинкованные Fragment-файлы.

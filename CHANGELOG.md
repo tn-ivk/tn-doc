@@ -56,11 +56,18 @@
 ## [1.5.1] - 2026-02-09
 
 ### Added
+- 🚀 **Автоматическая миграция конфигурации при обновлении** — интеграция утилиты cfg-elevator
+  - MSI (Windows): Custom Actions `CopyCfgToTemp` + `RunCfgElevator` при `WIX_UPGRADE_DETECTED`
+  - DEB (Linux): preinst копирует Cfg, postinst запускает cfg-elevator migrate + fix
+  - Лог миграции: `logs/cfg-elevator.log`
+  - Ошибки миграции не прерывают установку
+  - Бинарник cfg-elevator удаляется после миграции
 - CI: добавлена сборка Windows MSI в GitLab CI (`build-windows-job`, `package-msi-full-job`, `package-msi-minimal-job`)
 - CI: в `notify-telegram-job` добавлена отправка MSI-пакетов с graceful fallback
 
 ### Changed
 - CI: MSI job'ы переведены на Windows shell executor (удалено `image` из `package-msi-*`)
+- CI: cfg-elevator бинарники копируются в publish-директории при сборке (GitHub Actions + GitLab CI)
 - Документация по сборке и развертыванию Windows MSI приведена в соответствие с текущим pipeline
 - Версия проекта обновлена до `1.5.1`
 

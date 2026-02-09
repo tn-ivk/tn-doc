@@ -23,6 +23,7 @@ graph TB
         App[/opt/TN_Doc/]
         Logs[/opt/TN_Doc/logs/]
         Config[/opt/TN_Doc/Cfg/]
+        Backup[/var/backups/TN_Doc/]
     end
 
     subgraph "Dependencies"
@@ -35,6 +36,7 @@ graph TB
     App --> User
     App --> Logs
     App --> Config
+    App --> Backup
     App --> Runtime
     App --> libgdiplus
     App --> CUPS
@@ -95,6 +97,7 @@ sequenceDiagram
     preinst->>preinst: Проверка .NET Runtime
     preinst->>preinst: Создание пользователя alphadaemon
     preinst->>preinst: Бэкап /opt/TN_Doc → /var/backups/TN_Doc/
+    preinst->>preinst: Копирование Cfg/ → /tmp/tn_doc_old_cfg/
     preinst-->>dpkg: OK
 
     dpkg->>Files: Распаковка в /opt/TN_Doc/
@@ -102,6 +105,7 @@ sequenceDiagram
 
     dpkg->>postinst: Запуск postinst скрипта
     postinst->>postinst: Установка прав доступа
+    postinst->>postinst: Миграция конфигурации (cfg-elevator)
     postinst->>systemd: systemctl daemon-reload
     postinst->>systemd: systemctl enable tn-doc
     postinst->>systemd: systemctl start tn-doc
@@ -311,14 +315,33 @@ sudo journalctl -u tn-doc --since "1 hour ago"
 
 ## Обновление
 
-При установке нового пакета preinst скрипт автоматически создаёт бэкап текущей версии в `/var/backups/TN_Doc/` (архив tar.gz, логи исключаются).
+При установке нового пакета автоматически выполняется:
+
+1. **preinst** — подготовка к обновлению:
+   - Создание бэкапа текущей версии в `/var/backups/TN_Doc/` (архив tar.gz, логи исключаются)
+   - Копирование текущей конфигурации `Cfg/` в `/tmp/tn_doc_old_cfg/` для последующей миграции
+
+2. **dpkg** — установка новых файлов в `/opt/TN_Doc/`
+
+3. **postinst** — настройка и запуск:
+   - Установка прав доступа (chmod/chown)
+   - Миграция конфигурации через cfg-elevator:
+     - `cfg-elevator migrate` — переносит пользовательские настройки из старых конфигов в новые
+     - `cfg-elevator fix` — исправляет конфигурацию под новую версию
+     - Лог миграции: `/opt/TN_Doc/logs/cfg-elevator.log`
+     - Ошибки миграции не прерывают установку
+     - Временная папка `/tmp/tn_doc_old_cfg/` и бинарник cfg-elevator удаляются после миграции
+   - Запуск службы через systemd
 
 ```bash
-# Установить новый пакет (бэкап создаётся автоматически)
+# Установить новый пакет (бэкап и миграция выполняются автоматически)
 sudo dpkg -i tn.doc-full-<FULL_VERSION>_amd64.deb
 
 # Проверить статус
 sudo systemctl status tn-doc
+
+# Проверить лог миграции
+cat /opt/TN_Doc/logs/cfg-elevator.log
 
 # При необходимости — восстановление из бэкапа
 ls /var/backups/TN_Doc/
