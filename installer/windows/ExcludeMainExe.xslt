@@ -21,4 +21,10 @@
   <!-- Remove the corresponding ComponentRef that references the removed Component -->
   <xsl:template match="wix:ComponentRef[key('ExeComponents', @Id)]"/>
 
+  <!--
+    Note: cfg-elevator.exe is intentionally left in the harvest.
+    It is installed as a regular file and deleted by MigrateCfg.ps1 after config migration.
+    WiX gracefully handles missing files during uninstall.
+  -->
+
 </xsl:stylesheet>

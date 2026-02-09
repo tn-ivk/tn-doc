@@ -34,6 +34,7 @@
             <ComponentRef Id="ServiceComponent" />
             <ComponentRef Id="CleanInstallDirComponent" />
             <ComponentRef Id="BackupScriptComponent" />
+            <ComponentRef Id="MigrateCfgScriptComponent" />
             <ComponentRef Id="BackupDirComponent" />
         </Feature>
 

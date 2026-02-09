@@ -76,6 +76,11 @@ jobs:
       - name: Publish application
         run: dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
 
+      - name: Copy cfg-elevator to publish directory
+        run: |
+          cp installer/tools/cfg-elevator-linux-amd64 ./publish/cfg-elevator
+          chmod +x ./publish/cfg-elevator
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -489,6 +494,17 @@ jobs:
           create_backup
           # === End backup section ===
 
+          # === Copy old Cfg for migration ===
+          OLD_CFG_DIR="/opt/TN_Doc/Cfg"
+          TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+          if [ -d "$OLD_CFG_DIR" ]; then
+              echo "Copying old configuration for migration..."
+              rm -rf "$TEMP_CFG_DIR"
+              cp -r "$OLD_CFG_DIR" "$TEMP_CFG_DIR"
+              echo "✓ Old configuration saved to $TEMP_CFG_DIR"
+          fi
+          # === End copy old Cfg ===
+
           echo "Removing old TN_Doc directories..."
           OPT_DIR="/opt/TN_Doc"
           LOG_DIR="/var/log/TN_Doc"
@@ -632,6 +648,25 @@ jobs:
           chown alphadaemon:alphadaemon /var/log/TN_Doc
           chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
           echo "✓ Application permissions setup completed"
+
+          # === Config migration ===
+          TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+          CFG_ELEVATOR="/opt/TN_Doc/cfg-elevator"
+          TARGET_CFG="/opt/TN_Doc/Cfg"
+          LOG_DIR="/opt/TN_Doc/logs"
+
+          if [ -d "$TEMP_CFG_DIR" ] && [ -f "$CFG_ELEVATOR" ]; then
+              echo "=== Migrating configuration from previous version ==="
+              mkdir -p "$LOG_DIR"
+              "$CFG_ELEVATOR" migrate -s "$TEMP_CFG_DIR" -t "$TARGET_CFG" --simple-output >> "$LOG_DIR/cfg-elevator.log" 2>&1 || true
+              "$CFG_ELEVATOR" fix -t "$TARGET_CFG" --simple-output >> "$LOG_DIR/cfg-elevator.log" 2>&1 || true
+              echo "✓ Configuration migration completed (see $LOG_DIR/cfg-elevator.log)"
+              rm -rf "$TEMP_CFG_DIR"
+              rm -f "$CFG_ELEVATOR"
+          elif [ -f "$CFG_ELEVATOR" ]; then
+              rm -f "$CFG_ELEVATOR"
+          fi
+          # === End config migration ===
 
           echo "Step 5: Reloading systemd daemon..."
           systemctl daemon-reload
@@ -932,6 +967,17 @@ jobs:
           create_backup
           # === End backup section ===
 
+          # === Copy old Cfg for migration ===
+          OLD_CFG_DIR="/opt/TN_Doc/Cfg"
+          TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+          if [ -d "$OLD_CFG_DIR" ]; then
+              echo "Copying old configuration for migration..."
+              rm -rf "$TEMP_CFG_DIR"
+              cp -r "$OLD_CFG_DIR" "$TEMP_CFG_DIR"
+              echo "✓ Old configuration saved to $TEMP_CFG_DIR"
+          fi
+          # === End copy old Cfg ===
+
           for dir in "/opt/TN_Doc" "/var/log/TN_Doc"; do
               if [ -d "$dir" ]; then
                   rm -rf "$dir"
@@ -966,6 +1012,26 @@ jobs:
           chmod u=rwx,g=rx,o=rx /opt/TN_Doc
           chown alphadaemon:alphadaemon /var/log/TN_Doc
           chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
+
+          # === Config migration ===
+          TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+          CFG_ELEVATOR="/opt/TN_Doc/cfg-elevator"
+          TARGET_CFG="/opt/TN_Doc/Cfg"
+          LOG_DIR="/opt/TN_Doc/logs"
+
+          if [ -d "$TEMP_CFG_DIR" ] && [ -f "$CFG_ELEVATOR" ]; then
+              echo "=== Migrating configuration from previous version ==="
+              mkdir -p "$LOG_DIR"
+              "$CFG_ELEVATOR" migrate -s "$TEMP_CFG_DIR" -t "$TARGET_CFG" --simple-output >> "$LOG_DIR/cfg-elevator.log" 2>&1 || true
+              "$CFG_ELEVATOR" fix -t "$TARGET_CFG" --simple-output >> "$LOG_DIR/cfg-elevator.log" 2>&1 || true
+              echo "✓ Configuration migration completed (see $LOG_DIR/cfg-elevator.log)"
+              rm -rf "$TEMP_CFG_DIR"
+              rm -f "$CFG_ELEVATOR"
+          elif [ -f "$CFG_ELEVATOR" ]; then
+              rm -f "$CFG_ELEVATOR"
+          fi
+          # === End config migration ===
+
           systemctl daemon-reload
           systemctl enable TN_Doc.service
           systemctl start TN_Doc.service
@@ -1295,6 +1361,13 @@ jobs:
 
       - name: Publish framework-dependent (minimal)
         run: dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish/win-x64-minimal
+
+      - name: Copy cfg-elevator to publish directories
+        run: |
+          Copy-Item -Path installer/tools/cfg-elevator-windows-amd64.exe `
+                    -Destination ./publish/win-x64-full/cfg-elevator.exe
+          Copy-Item -Path installer/tools/cfg-elevator-windows-amd64.exe `
+                    -Destination ./publish/win-x64-minimal/cfg-elevator.exe
 
       - name: Upload full build artifacts
         uses: actions/upload-artifact@v4

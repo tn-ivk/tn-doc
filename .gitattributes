@@ -49,6 +49,9 @@
 # FastReport templates (XML-based but may contain special formatting)
 *.frx binary
 
+# Go binaries (cfg-elevator)
+installer/tools/cfg-elevator-* binary
+
 # Fonts
 *.ttf binary
 *.otf binary

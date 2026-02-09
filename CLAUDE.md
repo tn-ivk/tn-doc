@@ -304,10 +304,21 @@ installer/windows/
 ├── TN_Doc.Installer.wixproj   # WiX SDK-style проект (Heat + HarvestDirectory)
 ├── Package.wxs                 # Пакет, MajorUpgrade, Features, UI (WixUI_InstallDir + ServiceNameDlg), ru-RU
 ├── Directories.wxs             # Структура директорий (ProgramFiles64Folder)
-├── ServiceConfig.wxs           # Windows Service + бэкап + очистка директории
+├── ServiceConfig.wxs           # Windows Service + бэкап + очистка + миграция конфигов
 ├── ExcludeMainExe.xslt         # XSLT: исключает TN_Doc.exe из harvest (определён в ServiceConfig)
-└── Scripts/Backup.ps1          # PowerShell бэкап перед установкой (исключает logs/)
+├── Scripts/Backup.ps1          # PowerShell бэкап перед установкой (исключает logs/)
+└── Scripts/MigrateCfg.ps1      # PowerShell миграция конфигов через cfg-elevator
 ```
+
+**Утилита cfg-elevator** (`installer/tools/`): Go CLI для миграции пользовательских настроек при обновлении. Бинарники для Windows и Linux хранятся в репозитории и копируются в publish при сборке.
+
+**Алгоритм миграции при upgrade (MSI):**
+1. `BackupBeforeUpgrade` — ZIP-бэкап перед удалением файлов
+2. `CopyCfgToTemp` — копирует `Cfg/` в `C:\ProgramData\TN_Doc\old_cfg\`
+3. `RemoveFiles` + `InstallFiles` — штатная установка
+4. `RunCfgElevator` — `MigrateCfg.ps1` запускает `cfg-elevator migrate` + `fix`, пишет лог в `logs/cfg-elevator.log`, удаляет временные файлы
+
+Custom Actions используют `WIX_UPGRADE_DETECTED` (только при upgrade) и `Return="ignore"` (ошибки не прерывают установку).
 
 > **Важно**: UI-элементы (WixUI, диалоги, Publish) должны быть внутри `<Package>` в Package.wxs, а не в отдельных Fragment-файлах — иначе WiX линкер отбрасывает нелинкованные фрагменты.
 
@@ -316,7 +327,10 @@ installer/windows/
 # 1. Publish
 dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64-full
 
-# 2. Build MSI (Heat harvesting + WiX compilation integrated via MSBuild)
+# 2. Copy cfg-elevator to publish
+copy installer\tools\cfg-elevator-windows-amd64.exe publish\win-x64-full\cfg-elevator.exe
+
+# 3. Build MSI (Heat harvesting + WiX compilation integrated via MSBuild)
 dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.1 -p:HarvestPath=../../publish/win-x64-full
 ```
 

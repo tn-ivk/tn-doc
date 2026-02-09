@@ -45,6 +45,8 @@ build-job:
     - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - dotnet build -c Release
     - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+    - cp installer/tools/cfg-elevator-linux-amd64 ./publish/cfg-elevator
+    - chmod +x ./publish/cfg-elevator
   artifacts:
     name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
@@ -141,6 +143,8 @@ build-windows-job:      # Cross-compile Windows binaries on Linux runner
     - dotnet build -c Release
     - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-x64-full
     - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish/win-x64-minimal
+    - cp installer/tools/cfg-elevator-windows-amd64.exe ./publish/win-x64-full/cfg-elevator.exe
+    - cp installer/tools/cfg-elevator-windows-amd64.exe ./publish/win-x64-minimal/cfg-elevator.exe
   artifacts:
     name: "build-TN_Doc-win-${CI_COMMIT_SHORT_SHA}"
     paths:
@@ -340,6 +344,17 @@ package-job:      # This job runs in the deploy stage.
       create_backup
       # === End backup section ===
 
+      # === Copy old Cfg for migration ===
+      OLD_CFG_DIR="/opt/TN_Doc/Cfg"
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      if [ -d "\$OLD_CFG_DIR" ]; then
+          echo "Copying old configuration for migration..."
+          rm -rf "\$TEMP_CFG_DIR"
+          cp -r "\$OLD_CFG_DIR" "\$TEMP_CFG_DIR"
+          echo "✓ Old configuration saved to \$TEMP_CFG_DIR"
+      fi
+      # === End copy old Cfg ===
+
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
       OPT_DIR="/opt/TN_Doc"
@@ -529,6 +544,25 @@ package-job:      # This job runs in the deploy stage.
       chown alphadaemon:alphadaemon /var/log/TN_Doc
       chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
       echo "✓ Application permissions setup completed"
+
+      # === Config migration ===
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      CFG_ELEVATOR="/opt/TN_Doc/cfg-elevator"
+      TARGET_CFG="/opt/TN_Doc/Cfg"
+      LOG_DIR="/opt/TN_Doc/logs"
+
+      if [ -d "\$TEMP_CFG_DIR" ] && [ -f "\$CFG_ELEVATOR" ]; then
+          echo "=== Migrating configuration from previous version ==="
+          mkdir -p "\$LOG_DIR"
+          "\$CFG_ELEVATOR" migrate -s "\$TEMP_CFG_DIR" -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          "\$CFG_ELEVATOR" fix -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          echo "✓ Configuration migration completed (see \$LOG_DIR/cfg-elevator.log)"
+          rm -rf "\$TEMP_CFG_DIR"
+          rm -f "\$CFG_ELEVATOR"
+      elif [ -f "\$CFG_ELEVATOR" ]; then
+          rm -f "\$CFG_ELEVATOR"
+      fi
+      # === End config migration ===
 
       # Перезагрузка systemd
       echo "Step 5: Reloading systemd daemon..."
@@ -831,6 +865,17 @@ package-minimal-job:      # Minimal package without dependencies
       create_backup
       # === End backup section ===
 
+      # === Copy old Cfg for migration ===
+      OLD_CFG_DIR="/opt/TN_Doc/Cfg"
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      if [ -d "\$OLD_CFG_DIR" ]; then
+          echo "Copying old configuration for migration..."
+          rm -rf "\$TEMP_CFG_DIR"
+          cp -r "\$OLD_CFG_DIR" "\$TEMP_CFG_DIR"
+          echo "✓ Old configuration saved to \$TEMP_CFG_DIR"
+      fi
+      # === End copy old Cfg ===
+
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
       OPT_DIR="/opt/TN_Doc"
@@ -905,6 +950,25 @@ package-minimal-job:      # Minimal package without dependencies
       chown alphadaemon:alphadaemon /var/log/TN_Doc
       chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
       echo "✓ Application permissions setup completed"
+
+      # === Config migration ===
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      CFG_ELEVATOR="/opt/TN_Doc/cfg-elevator"
+      TARGET_CFG="/opt/TN_Doc/Cfg"
+      LOG_DIR="/opt/TN_Doc/logs"
+
+      if [ -d "\$TEMP_CFG_DIR" ] && [ -f "\$CFG_ELEVATOR" ]; then
+          echo "=== Migrating configuration from previous version ==="
+          mkdir -p "\$LOG_DIR"
+          "\$CFG_ELEVATOR" migrate -s "\$TEMP_CFG_DIR" -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          "\$CFG_ELEVATOR" fix -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          echo "✓ Configuration migration completed (see \$LOG_DIR/cfg-elevator.log)"
+          rm -rf "\$TEMP_CFG_DIR"
+          rm -f "\$CFG_ELEVATOR"
+      elif [ -f "\$CFG_ELEVATOR" ]; then
+          rm -f "\$CFG_ELEVATOR"
+      fi
+      # === End config migration ===
 
       # Перезагрузка systemd
       echo "Reloading systemd daemon..."
