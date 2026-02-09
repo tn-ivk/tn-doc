@@ -266,6 +266,7 @@ build-windows-job:
 
 package-msi-full-job:
   stage: package
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019
   needs:
     - build-windows-job
     - extract-version-job
@@ -277,6 +278,7 @@ package-msi-full-job:
 
 package-msi-minimal-job:
   stage: package
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019
   needs:
     - build-windows-job
     - extract-version-job
@@ -299,7 +301,8 @@ notify-telegram-job:
       optional: true
 ```
 
-MSI job'ы (`package-msi-full-job`, `package-msi-minimal-job`) выполняются на Windows `shell` runner (без `image:` в job). На runner должны быть установлены `.NET SDK 8` и `WiX Toolset v6`.
+В текущем `.gitlab-ci.yml` у MSI job'ов (`package-msi-full-job`, `package-msi-minimal-job`) указан `image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019` и tag `windows`.
+Если MSI job запускается через Windows `shell` runner, поле `image` игнорируется и на хосте должны быть установлены `.NET SDK 8` и `WiX Toolset v6`.
 
 Если Windows runner недоступен, MSI job'ы помечены `allow_failure: true`, а Linux-пакеты продолжают собираться и публиковаться.
 

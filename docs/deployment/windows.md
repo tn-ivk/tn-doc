@@ -57,7 +57,9 @@ MSI пакеты собираются в основном pipeline:
 
 Артефакты MSI сохраняются в `./packages/*.msi` и прикладываются к уведомлению `notify-telegram-job` (опционально).
 
-Для MSI job'ов используется Windows `shell` runner (без Docker image в job). На runner требуются `.NET SDK 8` и `WiX Toolset v6`.
+В текущем `.gitlab-ci.yml` для `package-msi-*` указан образ `mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019` и tag `windows`.
+Job'ы MSI помечены `allow_failure: true`, поэтому при недоступности Windows runner/образа Linux-пакеты продолжают собираться.
+Если MSI job выполняется через Windows `shell` runner, поле `image` игнорируется и на хосте должны быть установлены `.NET SDK 8` и `WiX Toolset v6`.
 
 ## Установка из MSI пакета
 
@@ -73,7 +75,7 @@ msiexec /i tn.doc-full-<FULL_VERSION>_win-x64.msi
 
 Интерфейс установщика на русском языке.
 Цепочка диалогов: Приветствие → Выбор пути → Имя службы → Подтверждение → Установка → Завершение.
-Перед установкой автоматически создаётся бэкап существующих файлов (если директория не пуста), затем директория очищается.
+Перед установкой выполняется попытка создать бэкап существующих файлов (если директория не пуста), затем директория очищается.
 
 ### Тихая установка
 
@@ -111,18 +113,21 @@ sequenceDiagram
     participant CfgElev as cfg-elevator
 
     Admin->>MSI: msiexec /i TN_Doc.msi
+    MSI->>Files: Бэкап в C:\ProgramData\TN_Doc\backups\
     alt Обновление (WIX_UPGRADE_DETECTED)
         MSI->>Service: Остановка службы
-        MSI->>Files: Бэкап в C:\ProgramData\TN_Doc\backups\
         MSI->>Files: Копирование Cfg\ в C:\ProgramData\TN_Doc\old_cfg\
-        MSI->>Files: Очистка директории установки
     end
+    MSI->>Files: Очистка директории установки
     MSI->>Files: Копирование файлов в INSTALLFOLDER
-    alt Обновление (WIX_UPGRADE_DETECTED)
-        MSI->>CfgElev: MigrateCfg.ps1 → cfg-elevator migrate + fix
-        CfgElev-->>MSI: Лог в logs\cfg-elevator.log
-        MSI->>Files: Удаление old_cfg\ и cfg-elevator.exe
+    MSI->>CfgElev: MigrateCfg.ps1 (Condition: NOT REMOVE~=ALL)
+    alt Обновление (old_cfg найден)
+        CfgElev->>CfgElev: cfg-elevator migrate + fix
+    else Первая установка (old_cfg отсутствует)
+        CfgElev->>CfgElev: Skip migration (запись в лог)
     end
+    CfgElev-->>MSI: Лог в logs\cfg-elevator.log
+    MSI->>Files: Cleanup old_cfg\ и cfg-elevator.exe (если существуют)
     MSI->>Service: Регистрация Windows Service
     MSI->>Service: Запуск службы
     Service-->>MSI: OK
@@ -145,7 +150,7 @@ C:\ProjectVU\DotNetComponents\TN_Doc\
 ├── Scripts/
 │   ├── Backup.ps1             # Скрипт бэкапа
 │   └── MigrateCfg.ps1         # Скрипт миграции конфигурации (cfg-elevator)
-├── cfg-elevator.exe            # Утилита миграции конфигов (временный, удаляется после миграции)
+├── cfg-elevator.exe            # Утилита миграции конфигов (временный, удаляется после установки/обновления скриптом)
 ├── logs/                       # Логи приложения
 └── ...
 
@@ -214,22 +219,24 @@ Get-EventLog -LogName Application -Source "tn.doc" -Newest 20
 
 Логи записываются в `<INSTALLFOLDER>\logs\`.
 
-## Обновление
+## Установка и обновление
 
 При установке/обновлении через MSI автоматически:
-1. Останавливается текущая служба (если была установлена)
-2. Создаётся бэкап в `C:\ProgramData\TN_Doc\backups\` (если директория установки не пуста, исключая `logs/`)
+1. Запускается бэкап в `C:\ProgramData\TN_Doc\backups\` (если директория установки не пуста, исключая `logs/`)
+2. Останавливается текущая служба (если была установлена)
 3. Копируется `Cfg\` во временную директорию `C:\ProgramData\TN_Doc\old_cfg\` (только при обновлении)
 4. Очищается директория установки
 5. Устанавливаются новые файлы
-6. Выполняется миграция конфигурации через cfg-elevator (только при обновлении):
-   - `cfg-elevator.exe migrate` — переносит пользовательские настройки из старых конфигов в новые
-   - `cfg-elevator.exe fix` — исправляет конфигурацию под новую версию
-   - Лог миграции: `logs\cfg-elevator.log`
+6. Выполняется `MigrateCfg.ps1` (для установки/обновления, кроме uninstall):
+   - При обновлении (когда есть `old_cfg`): выполняются `cfg-elevator.exe migrate` и `cfg-elevator.exe fix`
+   - При первой установке (когда `old_cfg` отсутствует): миграция пропускается с записью в лог
+   - Лог скрипта: `logs\cfg-elevator.log`
    - Ошибки миграции не прерывают установку
-   - Временная папка и бинарник cfg-elevator удаляются после миграции
-7. Удаляется старая версия (MajorUpgrade)
+   - `old_cfg` и `cfg-elevator.exe` удаляются в cleanup (если существуют)
+7. Удаляется старая версия (MajorUpgrade, только при обновлении)
 8. Запускается служба
+
+Примечание: на первой установке `Backup.ps1` еще не установлен, поэтому шаг бэкапа может быть пропущен без ошибки.
 
 ```cmd
 :: Обновление (графическое)
@@ -253,7 +260,7 @@ powershell -ExecutionPolicy Bypass -File "C:\ProjectVU\DotNetComponents\TN_Doc\S
 
 ### Лог миграции конфигурации
 
-При обновлении результат миграции записывается в `logs\cfg-elevator.log`:
+При установке и обновлении `MigrateCfg.ps1` пишет результат в `logs\cfg-elevator.log`:
 
 ```powershell
 # Просмотр лога миграции
@@ -261,6 +268,7 @@ Get-Content "C:\ProjectVU\DotNetComponents\TN_Doc\logs\cfg-elevator.log"
 ```
 
 Если миграция не удалась, новые конфиги будут содержать значения по умолчанию. Пользовательские настройки можно восстановить вручную из бэкапа.
+На первой установке в лог добавляется запись о `skipping migration`, после чего временный `cfg-elevator.exe` удаляется.
 
 ## Удаление
 
