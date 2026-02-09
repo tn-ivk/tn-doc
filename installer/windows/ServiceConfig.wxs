@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Fragment>
+    <!-- ================================================================
+         Service component: installs TN_Doc.exe and registers Windows Service
+         ================================================================ -->
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="ServiceComponent" Guid="A1B2C3D4-E5F6-7890-ABCD-EF1234567890" Bitness="always64">
+        <File Id="TN_Doc.exe" Source="!(bindpath.publishdir)\TN_Doc.exe" KeyPath="yes" />
+
+        <ServiceInstall Id="TN_DocServiceInstaller"
+                        Type="ownProcess"
+                        Name="[SERVICENAME]"
+                        DisplayName="TN_Doc - Модуль просмотра документов ([SERVICENAME])"
+                        Description="Веб-приложение генерации технических документов ИВК"
+                        Start="auto"
+                        Account="LocalSystem"
+                        ErrorControl="normal" />
+
+        <ServiceControl Id="TN_DocServiceControl"
+                        Start="install"
+                        Stop="both"
+                        Remove="uninstall"
+                        Name="[SERVICENAME]"
+                        Wait="yes" />
+      </Component>
+
+      <!-- Clean install directory: removes all old files before installing new ones -->
+      <Component Id="CleanInstallDirComponent" Guid="D4E5F6A7-B8C9-0123-DEF0-456789012345" Bitness="always64">
+        <RegistryValue Root="HKLM" Key="Software\TN_Doc" Name="InstallPath"
+                       Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
+        <util:RemoveFolderEx On="install" Property="INSTALLFOLDER" />
+      </Component>
+
+      <!-- Scripts subfolder with backup and migration scripts -->
+      <Directory Id="ScriptsFolder" Name="Scripts">
+        <Component Id="BackupScriptComponent" Guid="C3D4E5F6-A7B8-9012-CDEF-345678901234" Bitness="always64">
+          <File Id="Backup.ps1" Source="Scripts\Backup.ps1" KeyPath="yes" />
+        </Component>
+        <Component Id="MigrateCfgScriptComponent" Guid="F1A2B3C4-D5E6-7890-ABCD-1234567890AB" Bitness="always64">
+          <File Id="MigrateCfg.ps1" Source="Scripts\MigrateCfg.ps1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+
+    <!-- ================================================================
+         Backup directory component: ensures C:\ProgramData\TN_Doc\backups exists
+         ================================================================ -->
+    <DirectoryRef Id="BACKUPFOLDER">
+      <Component Id="BackupDirComponent" Guid="B2C3D4E5-F6A7-8901-BCDE-F23456789012">
+        <CreateFolder />
+      </Component>
+    </DirectoryRef>
+
+    <!-- ================================================================
+         Backup custom action: runs Backup.ps1 before RemoveFiles cleans
+         the install directory.
+
+         Runs on any install/upgrade/reinstall (NOT REMOVE~="ALL" excludes
+         uninstall). On first install the script doesn't exist yet —
+         PowerShell fails silently thanks to Return="ignore".
+         On subsequent installs the script from the previous installation
+         creates a ZIP backup excluding logs/.
+         ================================================================ -->
+
+    <!-- SetProperty populates the deferred CA data (WixQuietExec64 reads it from CustomActionData) -->
+    <SetProperty Id="BackupBeforeUpgrade"
+                 Value="&quot;powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]Scripts\Backup.ps1&quot; -InstallDir &quot;[INSTALLFOLDER].&quot; -BackupDir &quot;[BACKUPDIR].&quot; -Version &quot;$(var.ProductVersion)&quot;"
+                 Before="BackupBeforeUpgrade"
+                 Sequence="execute" />
+
+    <CustomAction Id="BackupBeforeUpgrade"
+                  DllEntry="WixQuietExec64"
+                  BinaryRef="Wix4UtilCA_X64"
+                  Execute="deferred"
+                  Return="ignore"
+                  Impersonate="no" />
+
+    <!-- ================================================================
+         CopyCfgToTemp: copies Cfg/ to ProgramData before files are removed.
+         Only runs on upgrade (WIX_UPGRADE_DETECTED).
+         Copies [INSTALLFOLDER]Cfg\ to C:\ProgramData\TN_Doc\old_cfg\.
+         ================================================================ -->
+
+    <SetProperty Id="CopyCfgToTemp"
+                 Value="&quot;powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -Command &quot;if (Test-Path '[INSTALLFOLDER]Cfg') { $d = 'C:\ProgramData\TN_Doc\old_cfg'; if (Test-Path $d) { Remove-Item $d -Recurse -Force }; Copy-Item '[INSTALLFOLDER]Cfg' $d -Recurse -Force }&quot;"
+                 Before="CopyCfgToTemp"
+                 Sequence="execute" />
+
+    <CustomAction Id="CopyCfgToTemp"
+                  DllEntry="WixQuietExec64"
+                  BinaryRef="Wix4UtilCA_X64"
+                  Execute="deferred"
+                  Return="ignore"
+                  Impersonate="no" />
+
+    <!-- ================================================================
+         RunCfgElevator: runs MigrateCfg.ps1 after new files are installed.
+         Runs on any install/upgrade (NOT REMOVE~="ALL" excludes uninstall).
+         On upgrade: migrates user settings from old configs to new ones.
+         On first install: skips migration, removes unused cfg-elevator binary.
+         ================================================================ -->
+
+    <SetProperty Id="RunCfgElevator"
+                 Value="&quot;powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]Scripts\MigrateCfg.ps1&quot; -CfgElevatorPath &quot;[INSTALLFOLDER]cfg-elevator.exe&quot; -OldCfgDir &quot;C:\ProgramData\TN_Doc\old_cfg&quot; -NewCfgDir &quot;[INSTALLFOLDER]Cfg&quot; -LogDir &quot;[INSTALLFOLDER]logs&quot;"
+                 Before="RunCfgElevator"
+                 Sequence="execute" />
+
+    <CustomAction Id="RunCfgElevator"
+                  DllEntry="WixQuietExec64"
+                  BinaryRef="Wix4UtilCA_X64"
+                  Execute="deferred"
+                  Return="ignore"
+                  Impersonate="no" />
+
+    <InstallExecuteSequence>
+      <Custom Action="BackupBeforeUpgrade"
+              Before="RemoveFiles"
+              Condition="NOT REMOVE~=&quot;ALL&quot;" />
+
+      <Custom Action="CopyCfgToTemp"
+              After="BackupBeforeUpgrade"
+              Condition="WIX_UPGRADE_DETECTED" />
+
+      <Custom Action="RunCfgElevator"
+              After="InstallFiles"
+              Condition="NOT REMOVE~=&quot;ALL&quot;" />
+    </InstallExecuteSequence>
+  </Fragment>
+</Wix>

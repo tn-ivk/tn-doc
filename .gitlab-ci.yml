@@ -45,6 +45,8 @@ build-job:
     - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - dotnet build -c Release
     - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+    - cp installer/tools/cfg-elevator-linux-amd64 ./publish/cfg-elevator
+    - chmod +x ./publish/cfg-elevator
   artifacts:
     name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
@@ -116,6 +118,38 @@ extract-version-job:
   artifacts:
     reports:
       dotenv: version.env
+
+build-windows-job:      # Cross-compile Windows binaries on Linux runner
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}
+  tags:
+    - orpovy
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
+  variables:
+    NUGET_PACKAGES: ${CI_PROJECT_DIR}/.nuget/packages
+    DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+    DOTNET_NOLOGO: "true"
+  cache:
+    key: nuget-win-${CI_COMMIT_REF_SLUG}
+    paths:
+      - .nuget/packages/
+  before_script:
+    - mkdir -p ./publish/win-x64-full ./publish/win-x64-minimal TN_Doc/Dll
+  script:
+    - 'dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr'
+    - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
+    - dotnet build -c Release
+    - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true -o ./publish/win-x64-full
+    - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained false -o ./publish/win-x64-minimal
+    - cp installer/tools/cfg-elevator-windows-amd64.exe ./publish/win-x64-full/cfg-elevator.exe
+    - cp installer/tools/cfg-elevator-windows-amd64.exe ./publish/win-x64-minimal/cfg-elevator.exe
+  artifacts:
+    name: "build-TN_Doc-win-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./publish/win-x64-full/
+      - ./publish/win-x64-minimal/
 
 package-job:      # This job runs in the deploy stage.
   stage: package
@@ -310,6 +344,17 @@ package-job:      # This job runs in the deploy stage.
       create_backup
       # === End backup section ===
 
+      # === Copy old Cfg for migration ===
+      OLD_CFG_DIR="/opt/TN_Doc/Cfg"
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      if [ -d "\$OLD_CFG_DIR" ]; then
+          echo "Copying old configuration for migration..."
+          rm -rf "\$TEMP_CFG_DIR"
+          cp -r "\$OLD_CFG_DIR" "\$TEMP_CFG_DIR"
+          echo "✓ Old configuration saved to \$TEMP_CFG_DIR"
+      fi
+      # === End copy old Cfg ===
+
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
       OPT_DIR="/opt/TN_Doc"
@@ -499,6 +544,25 @@ package-job:      # This job runs in the deploy stage.
       chown alphadaemon:alphadaemon /var/log/TN_Doc
       chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
       echo "✓ Application permissions setup completed"
+
+      # === Config migration ===
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      CFG_ELEVATOR="/opt/TN_Doc/cfg-elevator"
+      TARGET_CFG="/opt/TN_Doc/Cfg"
+      LOG_DIR="/opt/TN_Doc/logs"
+
+      if [ -d "\$TEMP_CFG_DIR" ] && [ -f "\$CFG_ELEVATOR" ]; then
+          echo "=== Migrating configuration from previous version ==="
+          mkdir -p "\$LOG_DIR"
+          "\$CFG_ELEVATOR" migrate -s "\$TEMP_CFG_DIR" -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          "\$CFG_ELEVATOR" fix -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          echo "✓ Configuration migration completed (see \$LOG_DIR/cfg-elevator.log)"
+          rm -rf "\$TEMP_CFG_DIR"
+          rm -f "\$CFG_ELEVATOR"
+      elif [ -f "\$CFG_ELEVATOR" ]; then
+          rm -f "\$CFG_ELEVATOR"
+      fi
+      # === End config migration ===
 
       # Перезагрузка systemd
       echo "Step 5: Reloading systemd daemon..."
@@ -801,6 +865,17 @@ package-minimal-job:      # Minimal package without dependencies
       create_backup
       # === End backup section ===
 
+      # === Copy old Cfg for migration ===
+      OLD_CFG_DIR="/opt/TN_Doc/Cfg"
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      if [ -d "\$OLD_CFG_DIR" ]; then
+          echo "Copying old configuration for migration..."
+          rm -rf "\$TEMP_CFG_DIR"
+          cp -r "\$OLD_CFG_DIR" "\$TEMP_CFG_DIR"
+          echo "✓ Old configuration saved to \$TEMP_CFG_DIR"
+      fi
+      # === End copy old Cfg ===
+
       # Удаление старых директорий
       echo "Removing old TN_Doc directories..."
       OPT_DIR="/opt/TN_Doc"
@@ -875,6 +950,25 @@ package-minimal-job:      # Minimal package without dependencies
       chown alphadaemon:alphadaemon /var/log/TN_Doc
       chmod u=rwx,g=rx,o=rx /var/log/TN_Doc
       echo "✓ Application permissions setup completed"
+
+      # === Config migration ===
+      TEMP_CFG_DIR="/tmp/tn_doc_old_cfg"
+      CFG_ELEVATOR="/opt/TN_Doc/cfg-elevator"
+      TARGET_CFG="/opt/TN_Doc/Cfg"
+      LOG_DIR="/opt/TN_Doc/logs"
+
+      if [ -d "\$TEMP_CFG_DIR" ] && [ -f "\$CFG_ELEVATOR" ]; then
+          echo "=== Migrating configuration from previous version ==="
+          mkdir -p "\$LOG_DIR"
+          "\$CFG_ELEVATOR" migrate -s "\$TEMP_CFG_DIR" -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          "\$CFG_ELEVATOR" fix -t "\$TARGET_CFG" --simple-output >> "\$LOG_DIR/cfg-elevator.log" 2>&1 || true
+          echo "✓ Configuration migration completed (see \$LOG_DIR/cfg-elevator.log)"
+          rm -rf "\$TEMP_CFG_DIR"
+          rm -f "\$CFG_ELEVATOR"
+      elif [ -f "\$CFG_ELEVATOR" ]; then
+          rm -f "\$CFG_ELEVATOR"
+      fi
+      # === End config migration ===
 
       # Перезагрузка systemd
       echo "Reloading systemd daemon..."
@@ -1408,6 +1502,50 @@ package-fonts-job:      # System fonts standalone package
     paths:
       - ./packages/
 
+# ВАЖНО: WiX Toolset использует Windows API и НЕ работает на Linux runner.
+# Для MSI нужен Windows shell runner с предустановленными .NET SDK и WiX Toolset.
+# Если Windows runner недоступен — job'ы будут пропущены (allow_failure: true).
+
+package-msi-full-job:      # MSI full package (self-contained)
+  stage: package
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019
+  needs:
+    - build-windows-job
+    - extract-version-job
+  tags:
+    - windows
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
+  allow_failure: true
+  script:
+    - New-Item -ItemType Directory -Force -Path packages | Out-Null
+    - dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release "-p:ProductVersion=${VERSION}" "-p:HarvestPath=../../publish/win-x64-full" "-p:OutputName=tn.doc-full-${FULL_VERSION}_win-x64" "-p:OutputPath=../../packages/"
+  artifacts:
+    name: "msi-full-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/*.msi
+
+package-msi-minimal-job:      # MSI minimal package (framework-dependent)
+  stage: package
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019
+  needs:
+    - build-windows-job
+    - extract-version-job
+  tags:
+    - windows
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: on_success
+  allow_failure: true
+  script:
+    - New-Item -ItemType Directory -Force -Path packages | Out-Null
+    - dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release "-p:ProductVersion=${VERSION}" "-p:HarvestPath=../../publish/win-x64-minimal" "-p:OutputName=tn.doc-${FULL_VERSION}_win-x64" "-p:OutputPath=../../packages/"
+  artifacts:
+    name: "msi-minimal-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ./packages/*.msi
+
 notify-telegram-job:      # Telegram notifications with file uploads
   stage: notify
   image: ubuntu:latest
@@ -1416,6 +1554,10 @@ notify-telegram-job:      # Telegram notifications with file uploads
     - package-minimal-job
     - package-net-runtime-job
     - package-fonts-job
+    - job: package-msi-full-job
+      optional: true
+    - job: package-msi-minimal-job
+      optional: true
   tags:
     - orpovy
   rules:
@@ -1447,6 +1589,22 @@ notify-telegram-job:      # Telegram notifications with file uploads
     - FONTS_SIZE=$(du -h "$FONTS_PACKAGE" | cut -f1)
     - FONTS_SIZE_BYTES=$(stat -c%s "$FONTS_PACKAGE")
     - FONTS_NAME=$(basename "$FONTS_PACKAGE")
+
+    # Получение информации о MSI пакетах (graceful fallback)
+    - MSI_FULL_PACKAGE=$(ls ./packages/tn.doc-full-*.msi 2>/dev/null | head -n1 || echo "")
+    - MSI_MINIMAL_PACKAGE=$(ls ./packages/tn.doc-[0-9]*.msi 2>/dev/null | head -n1 || echo "")
+    - |
+      if [ -n "$MSI_FULL_PACKAGE" ]; then
+          MSI_FULL_SIZE=$(du -h "$MSI_FULL_PACKAGE" | cut -f1)
+          MSI_FULL_SIZE_BYTES=$(stat -c%s "$MSI_FULL_PACKAGE")
+          MSI_FULL_NAME=$(basename "$MSI_FULL_PACKAGE")
+      fi
+    - |
+      if [ -n "$MSI_MINIMAL_PACKAGE" ]; then
+          MSI_MINIMAL_SIZE=$(du -h "$MSI_MINIMAL_PACKAGE" | cut -f1)
+          MSI_MINIMAL_SIZE_BYTES=$(stat -c%s "$MSI_MINIMAL_PACKAGE")
+          MSI_MINIMAL_NAME=$(basename "$MSI_MINIMAL_PACKAGE")
+      fi
 
     # Функция отправки сообщения
     - |
@@ -1482,9 +1640,9 @@ notify-telegram-job:      # Telegram notifications with file uploads
           fi
       }
 
-    # Отправка первого сообщения - пакеты приложения
+    # Отправка первого сообщения - пакеты приложения (Linux)
     - |
-      APP_MESSAGE="🚀 Собраны пакеты приложения TN_Doc:
+      APP_MESSAGE="🚀 Собраны пакеты приложения TN_Doc (Linux):
 
       📦 Полный пакет: $FULL_NAME
       📏 Размер: $FULL_SIZE
@@ -1498,8 +1656,8 @@ notify-telegram-job:      # Telegram notifications with file uploads
 
       send_message "$APP_MESSAGE"
 
-    # Отправка пакетов приложения
-    - echo "Отправляем пакеты приложения..."
+    # Отправка пакетов приложения (Linux)
+    - echo "Отправляем пакеты приложения (Linux)..."
     - send_file "$FULL_PACKAGE" "📦 Полный (+ .NET Runtime) пакет TN_Doc v${VERSION}" "$FULL_SIZE_BYTES"
     - send_file "$MINIMAL_PACKAGE" "📦 TN_Doc" "$MINIMAL_SIZE_BYTES"
 
@@ -1526,6 +1684,47 @@ notify-telegram-job:      # Telegram notifications with file uploads
     - echo "Отправляем пакеты зависимостей..."
     - send_file "$RUNTIME_PACKAGE" "⚙️ .NET Runtime 8.0.13 для TN приложений" "$RUNTIME_SIZE_BYTES"
     - send_file "$FONTS_PACKAGE" "⚙️ Системные шрифты для TN приложений" "$FONTS_SIZE_BYTES"
+
+    # Отправка третьего сообщения - пакеты Windows (MSI)
+    - |
+      if [ -n "$MSI_FULL_PACKAGE" ] || [ -n "$MSI_MINIMAL_PACKAGE" ]; then
+          sleep 2
+
+          WIN_MESSAGE="🪟 Собраны пакеты приложения TN_Doc (Windows):"
+
+          if [ -n "$MSI_FULL_PACKAGE" ]; then
+              WIN_MESSAGE="$WIN_MESSAGE
+
+      📦 Полный MSI (self-contained): $MSI_FULL_NAME
+      📏 Размер: $MSI_FULL_SIZE"
+          fi
+
+          if [ -n "$MSI_MINIMAL_PACKAGE" ]; then
+              WIN_MESSAGE="$WIN_MESSAGE
+
+      📦 Минимальный MSI: $MSI_MINIMAL_NAME
+      📏 Размер: $MSI_MINIMAL_SIZE"
+          fi
+
+          WIN_MESSAGE="$WIN_MESSAGE
+
+      🏷️ Версия: ${VERSION}
+      🔗 Коммит: ${CI_COMMIT_SHORT_SHA}
+      📋 Pipeline: ${CI_PIPELINE_URL}"
+
+          send_message "$WIN_MESSAGE"
+
+          echo "Отправляем пакеты Windows (MSI)..."
+          if [ -n "$MSI_FULL_PACKAGE" ]; then
+              send_file "$MSI_FULL_PACKAGE" "🪟 MSI Full (self-contained) TN_Doc v${VERSION}" "$MSI_FULL_SIZE_BYTES"
+          fi
+          if [ -n "$MSI_MINIMAL_PACKAGE" ]; then
+              sleep 1
+              send_file "$MSI_MINIMAL_PACKAGE" "🪟 MSI Minimal TN_Doc v${VERSION}" "$MSI_MINIMAL_SIZE_BYTES"
+          fi
+      else
+          echo "⚠️ MSI пакеты не найдены (Windows runner мог быть недоступен)"
+      fi
 
     - echo "Telegram notifications and files sent successfully"
   artifacts:
