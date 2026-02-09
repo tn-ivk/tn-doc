@@ -5,10 +5,11 @@
 - В проекте уже есть рабочая NUnit-основа: `Tests.Unit`, `Tests.Integration`, `Tests.Shared` (`TN_Doc.sln:106`, `TN_Doc.sln:108`, `TN_Doc.sln:110`).
 - Покрытие сильное по контроллерам/сервисам, но почти нет characterization по документным DLL-модулям `tn.docgeneral`.
 - Основная рекомендация: эволюционно расширять существующие `Tests.Integration` и `Tests.Shared`, без построения «параллельного мира».
+- В `Tests.Shared` уже есть полезная база для reuse: `BaseDocumentTest<T>`, `TestDataFixture`, `MockConfigHelper` (`Tests/Tests.Shared/BaseTestClass.cs:239`, `Tests/Tests.Shared/Fixtures/TestDataFixture.cs:10`, `Tests/Tests.Shared/Fixtures/MockConfigHelper.cs:10`).
 - Golden-master строить на реальных данных БД: `GetList -> GetViewDoc/GetEditDoc`, с обязательной нормализацией нестабильных полей.
 - Для high-risk модулей добавить семантические проверки поверх snapshot-сравнения, чтобы не «заморозить баг».
 - Отдельный NUnit-проект нужен только при достижении порогов по времени/секретам/изолированию тяжёлых DB-тестов.
-- В CI разделить быстрые/медленные/DB-зависимые наборы и ввести прозрачную политику обновления baseline.
+- Перед пилотом исправить CI-фильтры тестов (особенно integration), затем разделить быстрые/медленные/DB-зависимые наборы и ввести прозрачную политику обновления baseline.
 - Базовый roadmap: 2 недели (пилот + high ядро), расширенный: 4 недели (масштабирование на большую часть модулей).
 
 ---
@@ -35,12 +36,12 @@
 
 ### 1.3 Слабые места
 
-- `Tests.Shared/BaseTestClass.cs` и `BaseDocumentTest<T>` присутствуют, но фактически не используются массово в текущих тестах (`Tests/Tests.Shared/BaseTestClass.cs:24`, `Tests/Tests.Shared/BaseTestClass.cs:239`).
+- `BaseDocumentTest<T>` реализован, но сейчас не наследуется тестами (`Tests/Tests.Shared/BaseTestClass.cs:239`), из-за чего готовые assert-хелперы не дают эффекта в текущем покрытии.
 - InMemory-интеграции не покрывают реальные особенности модулей, которые завязаны на MySQL-схему и `DESCRIBE` (`tn.docgeneral/TN.DocGeneral/General.cs:499`).
 - Нет централизованного подхода к baseline/snapshot и нормализации JSON/HTML.
 - В workflows фильтры namespace не соответствуют реальным namespace тестов:
-  - Фильтр unit: `Tests.Controllers|Tests.Services|Tests.Configs` (`.github/workflows/tests-on-push.yml:139`)
-  - Фильтр integration: `Tests.Libraries.*` (`.github/workflows/tests-on-push.yml:213`)
+  - Unit-фильтр: `Tests.Controllers|Tests.Services|Tests.Configs` вместо `Tests.Unit.*` (`.github/workflows/tests-on-push.yml:139`, `.github/workflows/build-and-package.yml:149`).
+  - Integration-фильтр: `Tests.Libraries.*`, при том что namespace `Tests.Libraries.*` в репозитории отсутствует (`.github/workflows/tests-on-push.yml:213`, `.github/workflows/build-and-package.yml:219`).
   - Реальные namespace: `Tests.Unit.*`, `Tests.Integration.*` (`Tests/Tests.Unit/Services/DocGeneralTests.cs:5`, `Tests/Tests.Integration/IntegrationTestBase.cs:10`).
 
 ### 1.4 Важные архитектурные точки расширения
@@ -48,7 +49,14 @@
 - Реальная точка исполнения документных модулей: `HomeController.GetDoc/GetDocEdit/SaveDoc/UpdateDoc` (`TN_Doc/Controllers/HomeController.cs:475`, `TN_Doc/Controllers/HomeController.cs:549`, `TN_Doc/Controllers/HomeController.cs:576`, `TN_Doc/Controllers/HomeController.cs:596`).
 - Динамическая загрузка DLL-модулей через `CachedDocModuleLoader` (`TN_Doc/Startup.cs:62`, `tn.docgeneral/TN.DocGeneral/Services/CachedDocModuleLoader.cs:19`).
 - Базовый контракт всех модулей в `DocGeneral` (`tn.docgeneral/TN.DocGeneral/General.cs:182`, `tn.docgeneral/TN.DocGeneral/General.cs:192`, `tn.docgeneral/TN.DocGeneral/General.cs:196`, `tn.docgeneral/TN.DocGeneral/General.cs:201`).
-- 41 doc type в `CfgApp.json` для каждого из 3 устройств (0/1/2), что дает большой объём сценариев (`TN_Doc/Cfg/CfgApp.json`).
+- В `CfgApp.json` 41 уникальный `IdDoc`, по 41 на каждое устройство `IdDevice=0/1/2` (всего 123 конфигурации `(IdDoc, IdDevice)`), что задаёт базовый объём матрицы (`TN_Doc/Cfg/CfgApp.json`).
+- В `tn.docgeneral` сейчас 43 проекта модулей (исключая `TN.DocGeneral` и `tn.utils`), поэтому матрица тестирования должна учитывать и общие библиотеки (`Common*`) при планировании reuse.
+
+### 1.5 Существующая инфраструктура, которую нужно переиспользовать
+
+- `TestDataFixture` уже покрывает генерацию базового JSON/HTML для ключевых доменов (`Passport/Act/KMH/Poverka/Report/Jornal`) и должен быть расширен, а не заменён (`Tests/Tests.Shared/Fixtures/TestDataFixture.cs:15`, `Tests/Tests.Shared/Fixtures/TestDataFixture.cs:42`, `Tests/Tests.Shared/Fixtures/TestDataFixture.cs:73`, `Tests/Tests.Shared/Fixtures/TestDataFixture.cs:103`, `Tests/Tests.Shared/Fixtures/TestDataFixture.cs:137`, `Tests/Tests.Shared/Fixtures/TestDataFixture.cs:169`, `Tests/Tests.Shared/Fixtures/TestDataFixture.cs:197`).
+- `MockConfigHelper` уже инкапсулирует стандартную настройку `IAppConfigService` для модульных тестов (`Tests/Tests.Shared/Fixtures/MockConfigHelper.cs:10`).
+- `IntegrationTestBase` и текущие интеграционные тесты дают готовую точку расширения для characterization-кейсов в существующем проекте (`Tests/Tests.Integration/IntegrationTestBase.cs:10`).
 
 ---
 
@@ -132,8 +140,13 @@
 Нормализация HTML:
 
 - trim/whitespace normalization,
-- сортировка атрибутов,
-- удаление шумовых/случайных значений.
+- канонизация line endings (`\r\n` -> `\n`),
+- стабилизация динамических `id`/GUID в `GetEditDoc` (placeholder-замены),
+- нормализация или вырезание нестабильных inline-handler (`onchange`, `onclick`, `oninput`),
+- канонизация пустых атрибутов и self-closing тегов,
+- удаление HTML-комментариев и пустых шумовых блоков.
+
+Практический вывод: HTML normalizer нельзя оценивать как «полдня». Для первого production-ready варианта закладывать 1-1.5 дня.
 
 ## 3.3 Как хранить baseline/expected
 
@@ -154,7 +167,11 @@
   - `tn.docgeneral/Passport/Extensions/PassportExtensions.cs:31`
 - незначимый порядок коллекций,
 - технические id/временные метки,
-- динамически формируемые export file name (`FileNameForExportDoc`) во множестве модулей.
+- динамически формируемые export file name (`FileNameForExportDoc`) во множестве модулей,
+- нормализация путей (`\\` -> `/`) и line endings для кросс-платформенного сравнения (Windows/Linux),
+- фиксация инвариантной культуры форматирования чисел/дат при сравнении snapshot.
+
+Рекомендация по платформе baseline: снимать canonical baseline в том же окружении, где исполняется основной CI (Linux), а локально приводить вывод к этому формату.
 
 ## 3.5 Предохранитель от фиксации багов
 
@@ -166,24 +183,58 @@
 
 Это снижает риск «golden-master закрепил неправильное поведение».
 
+Критерий выбора snapshot/semantic:
+
+| Тип сценария | Snapshot | Semantic |
+|---|---:|---:|
+| Стабильный модуль с детерминированным JSON | Да | Опционально |
+| Модуль с ELIS/условным рендерингом | Да | Да |
+| Модуль с `SaveDoc`/SQL side effects | Да | Да |
+| Сильно шумный output (много случайных ID/GUID) | Ограниченно | Да |
+| Новый или активно меняющийся модуль | Ограниченно | Да |
+
+## 3.6 Стратегия безопасного тестирования `SaveDoc`
+
+Критично для модулей с записью в БД (`Passport`, `Report`):
+
+- `Passport` обновляет сущности и вызывает `SaveChanges()` (`tn.docgeneral/Passport/DocPassport.cs:730`, `tn.docgeneral/Passport/DocPassport.cs:893`).
+- `Report` выполняет `Database.ExecuteSqlRaw(...)` (`tn.docgeneral/Report/DocReport.cs:382`).
+
+Варианты изоляции:
+
+1. Транзакция на тест с гарантированным `Rollback` в `TearDown`.
+2. Выделенный тестовый диапазон записей (`id > N`) + идемпотентный cleanup.
+3. Snapshot/restore схемы или таблиц на уровень suite (дороже, но надёжно для nightly).
+
+Рекомендуемый порядок:
+
+1. На пилоте использовать вариант 2 (наименее рискованный организационно).
+2. Параллельно проверить вариант 1 для конкретных модулей и драйвера MySQL (чтобы убедиться, что все операции, включая `ExecuteSqlRaw`, остаются в общей транзакции теста).
+3. Для nightly livedb, если тестовые данные «плывут», перейти на вариант 3 для ограниченного набора таблиц.
+
 ---
 
 ## 4. Пошаговый план внедрения по фазам
 
-## 4.1 Фаза 0: Подготовка (2-3 дня)
+## 4.1 Фаза 0: Подготовка (3-4 дня)
 
 Цель: зафиксировать правила и подготовить основу.
 
 Задачи:
 
-1. Утвердить формат fixtures/baseline и naming.
-2. Утвердить список нормализуемых полей.
-3. Определить перечень БД/устройств для capture.
-4. Зафиксировать политику baseline update и review.
+1. Провести аудит и каталогизацию существующей test-инфраструктуры (`BaseDocumentTest<T>`, `TestDataFixture`, `MockConfigHelper`, `IntegrationTestBase`) и зафиксировать, что переиспользуем без переписывания.
+2. Исправить CI-фильтрацию тестов до старта пилота (в первую очередь integration).
+3. Утвердить формат fixtures/baseline и naming.
+4. Утвердить список нормализуемых полей (JSON/HTML/кросс-платформенные).
+5. Определить перечень БД/устройств для capture.
+6. Зафиксировать политику baseline update и review.
+7. Утвердить политику изоляции `SaveDoc`-тестов (rollback/test-record/snapshot).
 
 Критерий выхода:
 
-- есть утвержденный шаблон кейса и чек-лист обновления baseline.
+- CI действительно запускает целевые integration-тесты,
+- есть утвержденный шаблон кейса и чек-лист обновления baseline,
+- принято решение по безопасному контуру `SaveDoc`.
 
 ## 4.2 Фаза 1: Пилот (2-3 библиотеки, 5-7 дней)
 
@@ -195,10 +246,11 @@
 
 Задачи:
 
-1. Снять 10-20 кейсов на модуль.
+1. Снять 10-20 кейсов на модуль через существующую интеграционную инфраструктуру.
 2. Внедрить golden-тесты `GetViewDoc`/`GetEditDoc`.
 3. Добавить semantic-assert минимум на критические поля.
-4. Собрать статистику flaky/diff.
+4. Расширить `TestDataFixture`/`MockConfigHelper` под snapshot-процессы, без дублирования существующих генераторов.
+5. Собрать статистику flaky/diff.
 
 Критерий выхода:
 
@@ -215,8 +267,9 @@
 Задачи:
 
 1. Параметризовать повторяющиеся тестовые шаблоны.
-2. Добавить safe-сценарии для `SaveDoc` (rollback/test records).
+2. Добавить safe-сценарии для `SaveDoc` по утверждённой стратегии из раздела 3.6.
 3. Укрепить диагностику diff отчётов.
+4. Ввести технику сброса/изоляции кэша модулей в сценариях через `CachedDocModuleLoader` (`ClearCache()`), где тесты идут через `HomeController`.
 
 Критерий выхода:
 
@@ -259,8 +312,8 @@
 
 Библиотеки:
 
-- KMH: `KMH_PR_PU`, `KMH_PR_PR`, `KMH_PP`, `KMH_MPR_MPR`, `KMH_MPR_PU`, `KMH_MPR_TPR`, `KMH3265_*`, `KMH3288_MPR_TPR`, `KMH3312_*`
-- Poverka: `Poverka1974`, `Poverka1974_04`, `Poverka1974_89`, `Poverka1974_95`, `Poverka3151`, `Poverka3189`, `Poverka3265_*`, `Poverka3266`, `Poverka3267`, `Poverka3272`, `Poverka3287`, `Poverka3288`, `Poverka3312_*`
+- KMH: `KMH_PR_PU`, `KMH_PR_PR`, `KMH_PP`, `KMH_MPR_MPR`, `KMH_MPR_PU`, `KMH_MPR_TPR`, `KMH3265_PR_PU`, `KMH3265_UPR_PR`, `KMH3288_MPR_TPR`, `KMH3312_PR_PU`, `KMH3312_UPR_PR`
+- Poverka: `Poverka1974`, `Poverka1974_04`, `Poverka1974_89`, `Poverka1974_95`, `Poverka3151`, `Poverka3189`, `Poverka3265_PR_PU`, `Poverka3265_UPR_PR`, `Poverka3265_UPR_PU`, `Poverka3266`, `Poverka3267`, `Poverka3272`, `Poverka3287`, `Poverka3288`, `Poverka3312_PR_PU`, `Poverka3312_UPR_PR`
 
 Риск регрессий: средний.
 
@@ -272,6 +325,8 @@
 
 - `CommonPoverka1974`, `CommonSikn425`, частично `TN.Utils` (в контексте doc-characterization).
 
+Примечание: модулей `ActProducer` и `ActRoute` в текущем дереве `tn.docgeneral` нет; если они существуют во внешних репозиториях/ветках, их нужно добавить отдельным пунктом после подтверждения владельца.
+
 Риск регрессий: низкий-средний.
 
 Зависимость: низкая-средняя.
@@ -280,7 +335,18 @@
 
 ## 6. Интеграция в CI
 
-## 6.1 Наборы для запуска
+## 6.1 Предусловие: сначала починить фильтры
+
+До запуска пилота нужно исправить фильтры в workflow-файлах:
+
+1. `.github/workflows/tests-on-push.yml:213` и `.github/workflows/build-and-package.yml:219`:
+   - убрать `Tests.Libraries.*`, заменить на актуальные namespace/category для `Tests.Integration.*`.
+2. `.github/workflows/tests-on-push.yml:139` и `.github/workflows/build-and-package.yml:149`:
+   - синхронизировать unit-фильтрацию с реальными namespace `Tests.Unit.*` или перейти на category-based запуск.
+
+Без этого новые characterization-тесты не дадут надёжного CI gate.
+
+## 6.2 Наборы для запуска
 
 PR:
 
@@ -299,7 +365,7 @@ Nightly:
 1. `characterization-livedb` полный
 2. drift report + flaky report + baseline mismatch report
 
-## 6.2 Разделение быстрых/медленных/DB
+## 6.3 Разделение быстрых/медленных/DB
 
 Ввести категории NUnit:
 
@@ -310,7 +376,7 @@ Nightly:
 
 И запускать через фильтры category/property, а не namespace-строки.
 
-## 6.3 Политика обновления baseline
+## 6.4 Политика обновления baseline
 
 1. Baseline меняется только отдельным PR `baseline-update`.
 2. Обязателен machine-readable diff + human-readable summary.
@@ -354,13 +420,23 @@ Nightly:
    - `.github/workflows/tests-on-push.yml:194`
 2. DB-зависимые наборы запускать в контролируемом окружении с секретами.
 
+## 7.5 Риск: LRU-кэш загрузчика модулей (`CachedDocModuleLoader`)
+
+Риск: при прогоне через `HomeController` тесты проходят через кэш модулей с ограничением `MAX_CACHED_MODULES = 5`, что может влиять на порядок/состояние сценариев (`tn.docgeneral/TN.DocGeneral/Services/CachedDocModuleLoader.cs:22`).
+
+Меры:
+
+1. в suite-level setup/teardown очищать кэш (`ClearCache()`) перед пачками characterization,
+2. группировать тесты по модулям, чтобы снизить лишние eviction-циклы,
+3. для части тестов вызывать модули напрямую (минуя loader), если нужен полностью детерминированный контур без влияния LRU.
+
 ---
 
 ## 8. Оценка трудозатрат и roadmap на 2-4 недели
 
 ## 8.1 Оценка по фазам
 
-1. Фаза 0: 2-3 дня
+1. Фаза 0: 3-4 дня
 2. Фаза 1 (пилот): 5-7 дней
 3. Фаза 2 (high): 7-10 дней
 4. Фаза 3 (масштаб): 5-8 дней
@@ -374,15 +450,17 @@ Nightly:
 
 Неделя 1:
 
-1. утвердить правила baseline/normalization
-2. пилот 2-3 модуля
-3. стабилизировать diff-отчеты
+1. аудит текущей инфраструктуры + решение по reuse (`BaseDocumentTest<T>`, `TestDataFixture`, `MockConfigHelper`, `IntegrationTestBase`)
+2. исправить CI-фильтры до запуска пилота
+3. утвердить baseline/normalization policy и стратегию `SaveDoc`-изоляции
+4. запустить пилот 2-3 модуля
 
 Неделя 2:
 
-1. добавить high-risk core пул
-2. разделить PR/merge/nightly наборы
-3. formalize baseline governance
+1. стабилизировать pilot и diff-отчеты
+2. добавить high-risk core пул
+3. разделить PR/merge/nightly наборы
+4. formalize baseline governance
 
 ## 8.3 Расширенный roadmap (4 недели)
 
@@ -403,11 +481,13 @@ Nightly:
 
 ### Эпик A: Базовая инфраструктура characterization
 
-1. `TDOC-CHAR-001` Описать и утвердить формат fixture/baseline + meta schema.
-2. `TDOC-CHAR-002` Реализовать JSON normalizer в `Tests.Shared`.
-3. `TDOC-CHAR-003` Реализовать HTML normalizer в `Tests.Shared`.
-4. `TDOC-CHAR-004` Реализовать snapshot comparator + diff report.
-5. `TDOC-CHAR-005` Добавить шаблон test case loader для `IdDoc/device/record`.
+1. `TDOC-CHAR-000` Аудит и каталогизация существующей тестовой инфраструктуры (`BaseDocumentTest<T>`, `TestDataFixture`, `MockConfigHelper`, `IntegrationTestBase`) с решением по reuse/расширению.
+2. `TDOC-CHAR-001` Описать и утвердить формат fixture/baseline + meta schema.
+3. `TDOC-CHAR-002` Реализовать JSON normalizer в `Tests.Shared`.
+4. `TDOC-CHAR-003` Реализовать HTML normalizer в `Tests.Shared` (оценка: 1-1.5 дня, с GUID/id/js-канонизацией).
+5. `TDOC-CHAR-004` Реализовать snapshot comparator + diff report.
+6. `TDOC-CHAR-005` Добавить шаблон test case loader для `IdDoc/device/record`.
+7. `TDOC-CHAR-006` Оформить и внедрить стратегию безопасного тестирования `SaveDoc` (rollback/test-record/snapshot).
 
 ### Эпик B: Пилот
 
@@ -423,11 +503,12 @@ Nightly:
 2. `TDOC-CHAR-202` Добавить `KMH_PV`, `KMH_PW`, `KMH_MI2816`.
 3. `TDOC-CHAR-203` Добавить `Poverka2816`, `Poverka3380`.
 4. `TDOC-CHAR-204` Добавить SIKN425 модульный пул.
+5. `TDOC-CHAR-205` Добавить стабильный паттерн изоляции `CachedDocModuleLoader` (очистка кэша/группировка suite) для anti-flaky.
 
 ### Эпик D: CI и governance
 
-1. `TDOC-CHAR-301` Ввести категории NUnit (`fast`, `characterization`, `db`, `slow`).
-2. `TDOC-CHAR-302` Исправить CI-фильтрацию тестов под реальные namespace/category.
+1. `TDOC-CHAR-302` Исправить CI-фильтрацию тестов под реальные namespace/category (блокер перед пилотом).
+2. `TDOC-CHAR-301` Ввести категории NUnit (`fast`, `characterization`, `db`, `slow`).
 3. `TDOC-CHAR-303` Настроить nightly livedb characterization job.
 4. `TDOC-CHAR-304` Утвердить baseline update policy и review checklist.
 
@@ -443,6 +524,7 @@ Nightly:
 6. Какие комбинации `protocolNumber` обязательны для регрессионной матрицы?
 7. Храним большие baseline в Git или в внешнем artifact storage?
 8. Ночной drift должен блокировать релиз или только создавать инцидент/тикет?
+9. Есть ли в периметре продукта внешние модули `ActProducer`/`ActRoute`, которых нет в текущем репозитории `tn.docgeneral`, но которые нужно включить в матрицу?
 
 ---
 
