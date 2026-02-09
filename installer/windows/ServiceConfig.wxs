@@ -97,8 +97,9 @@
 
     <!-- ================================================================
          RunCfgElevator: runs MigrateCfg.ps1 after new files are installed.
-         Only runs on upgrade (WIX_UPGRADE_DETECTED).
-         Migrates user settings from old configs to new ones, then cleans up.
+         Runs on any install/upgrade (NOT REMOVE~="ALL" excludes uninstall).
+         On upgrade: migrates user settings from old configs to new ones.
+         On first install: skips migration, removes unused cfg-elevator binary.
          ================================================================ -->
 
     <SetProperty Id="RunCfgElevator"
@@ -124,7 +125,7 @@
 
       <Custom Action="RunCfgElevator"
               After="InstallFiles"
-              Condition="WIX_UPGRADE_DETECTED" />
+              Condition="NOT REMOVE~=&quot;ALL&quot;" />
     </InstallExecuteSequence>
   </Fragment>
 </Wix>
