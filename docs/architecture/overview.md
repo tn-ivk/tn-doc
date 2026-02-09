@@ -311,12 +311,12 @@ sequenceDiagram
     participant Provider as StatusProvider
     participant External as External Systems
 
-    Note over Monitor: Background Service (30s interval)
+    Note over Monitor: Background Service (60s interval)
 
     Vue->>SignalR: Connect to /statusHub
     SignalR->>Hub: Establish connection
 
-    loop Every 30 seconds
+    loop Every 60 seconds
         Monitor->>Provider: CheckAllStatuses()
         Provider->>External: Check DB connections
         Provider->>External: Check OPC servers

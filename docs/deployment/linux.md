@@ -55,7 +55,7 @@ wget http://build-server/tn.doc-full-<FULL_VERSION>_amd64.deb
 scp tn.doc-full-<FULL_VERSION>_amd64.deb user@server:/tmp/
 ```
 
-`<FULL_VERSION>` задается при сборке пакета (например, `1.4.3`). Если используется CI, версия может формироваться в пайплайне вашей инфраструктуры.
+`<FULL_VERSION>` задается при сборке пакета (например, `1.5.1-b42-a1b2c3d4`). В GitLab CI значение формируется в `extract-version-job` и передается через `version.env`.
 
 ### 2. Установить зависимости
 
@@ -278,10 +278,7 @@ sudo chmod 640 /opt/TN_Doc/Cfg/CfgApp.json
 
 ```bash
 # Открыть порт (если нужен внешний доступ)
-sudo ufw allow 38509/tcp
-
-# Для HTTPS
-sudo ufw allow 44357/tcp
+sudo ufw allow 5000/tcp
 ```
 
 ## Мониторинг
@@ -290,7 +287,7 @@ sudo ufw allow 44357/tcp
 
 ```bash
 # HTTP endpoint
-curl http://localhost:38509/api/status
+curl http://localhost:5000/api/status
 
 # Проверка процесса
 ps aux | grep TN_Doc

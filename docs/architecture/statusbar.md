@@ -248,7 +248,7 @@ sequenceDiagram
     SignalR->>Hub: Connect to /statusHub
     Hub-->>SignalR: Connection established
 
-    loop Every 30 seconds
+    loop Every 60 seconds
         Service->>Provider: CheckAllStatuses()
         Provider->>Provider: Query databases
         Provider->>Provider: Check OPC servers
