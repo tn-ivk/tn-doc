@@ -57,6 +57,7 @@ MSI пакеты собираются в основном pipeline:
 
 Артефакты MSI сохраняются в `./packages/*.msi` и прикладываются к уведомлению `notify-telegram-job` (опционально).
 
+GitLab pipeline для этих job'ов запускается только по тегу (`CI_COMMIT_TAG`).
 В текущем `.gitlab-ci.yml` для `package-msi-*` указан образ `mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019` и tag `windows`.
 Job'ы MSI помечены `allow_failure: true`, поэтому при недоступности Windows runner/образа Linux-пакеты продолжают собираться.
 Если MSI job выполняется через Windows `shell` runner, поле `image` игнорируется и на хосте должны быть установлены `.NET SDK 8` и `WiX Toolset v6`.

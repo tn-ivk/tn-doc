@@ -47,6 +47,7 @@
 - Обновлён docgeneral до версии 1.3.0
 - Installer (MSI): `RunCfgElevator` теперь запускается при установке/обновлении (условие `NOT REMOVE~="ALL"`); при первой установке миграция пропускается, но этап cleanup удаляет `cfg-elevator.exe`
 - CI (GitLab): для `package-msi-full-job` и `package-msi-minimal-job` указан образ `mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019`
+- CI (GitLab): `workflow.rules` ограничен запуском pipeline только по тегу (`CI_COMMIT_TAG`); правила для push в `master` и MR удалены
 
 ### Fixed
 - Исправлено отображение настроек OPC в диалогах (нормализация типа OPC)

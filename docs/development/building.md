@@ -242,9 +242,15 @@ msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc
 
 ### GitLab CI Pipeline
 
+В текущем `.gitlab-ci.yml` pipeline запускается только по тегу (`CI_COMMIT_TAG`). Push/MR без тега не создают pipeline.
 Ниже сокращенный фрагмент job'ов, связанных с версионированием и MSI. Linux job'ы (`build-job`, `package-job`, `package-minimal-job`) остаются в pipeline без изменений.
 
 ```yaml
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: never
+
 stages:
   - build
   - package
