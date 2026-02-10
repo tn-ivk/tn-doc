@@ -441,3 +441,6 @@ Desktop.ini
 /TN_Doc/Dll/*
 /TN_Doc/wwwroot/PDF/*
 /TN_Doc/wwwroot/HTML/*
+
+# Local DB dumps
+/tmp/db-dumps/**/*.sql
