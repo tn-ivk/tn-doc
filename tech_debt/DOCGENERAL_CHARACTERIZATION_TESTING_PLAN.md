@@ -604,9 +604,13 @@ Nightly:
 
 ## 9. Backlog-ready задачи (практический список)
 
+### Статус выполнения (обновлено: 2026-02-10)
+
+1. `[x]` `TDOC-CHAR-302A` Исправить namespace-фильтры в CI (hotfix) до старта пилота.
+
 ### Межэпические зависимости (`blockedBy`)
 
-1. `TDOC-CHAR-101`–`TDOC-CHAR-103` блокируются задачами инфраструктуры: `TDOC-CHAR-000`, `TDOC-CHAR-001`, `TDOC-CHAR-002`, `TDOC-CHAR-003`, `TDOC-CHAR-004`, `TDOC-CHAR-006`, `TDOC-CHAR-007`, `TDOC-CHAR-008`, `TDOC-CHAR-302A`.
+1. `TDOC-CHAR-101`–`TDOC-CHAR-103` блокируются задачами инфраструктуры: `TDOC-CHAR-000`, `TDOC-CHAR-001`, `TDOC-CHAR-002`, `TDOC-CHAR-003`, `TDOC-CHAR-004`, `TDOC-CHAR-006`, `TDOC-CHAR-007`, `TDOC-CHAR-008`. (`TDOC-CHAR-302A` выполнен 2026-02-10)
 2. `TDOC-CHAR-104` блокируется завершением `TDOC-CHAR-101`–`TDOC-CHAR-103`.
 3. `TDOC-CHAR-105` блокируется завершением `TDOC-CHAR-104`.
 4. Эпик C (`TDOC-CHAR-201`–`TDOC-CHAR-205`) блокируется стабилизацией пилота (`TDOC-CHAR-104`, `TDOC-CHAR-105`).
@@ -650,7 +654,7 @@ Nightly:
 Зависимость по этапам: `TDOC-CHAR-302A` (исправление namespace-фильтров) обязателен до пилота; `TDOC-CHAR-302B` (финальный переход на category-based фильтры) выполняется после внедрения категорий из `TDOC-CHAR-301`; `TDOC-CHAR-305` обязателен до `TDOC-CHAR-303` (nightly livedb), но не является блокером пилота.
 
 1. `TDOC-CHAR-301` Ввести категории NUnit (`fast`, `characterization`, `db`, `slow`).
-2. `TDOC-CHAR-302A` Исправить namespace-фильтры в CI (hotfix) до старта пилота.
+2. `[x]` `TDOC-CHAR-302A` Исправить namespace-фильтры в CI (hotfix) до старта пилота. (выполнено 2026-02-10)
 3. `TDOC-CHAR-302B` Перевести CI-фильтрацию на category-based запуск после внедрения `TDOC-CHAR-301`.
 4. `TDOC-CHAR-303` Настроить nightly livedb characterization job.
 5. `TDOC-CHAR-304` Утвердить baseline update policy и review checklist.
