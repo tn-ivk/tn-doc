@@ -189,15 +189,14 @@ npm run build:editor       # только document-editor
 ```
 TN_Doc/wwwroot/
 ├── statusbar/
-│   ├── index.html
 │   ├── status-bar.js
 │   ├── status-bar.css
-│   └── status-bar.[hash].js
+│   └── status-bar.*            # шрифты/иконки
 ├── configurator/
-│   ├── index.html
-│   ├── configurator.js
-│   ├── configurator.css
-│   └── configurator.[hash].js
+│   ├── .vite/manifest.json
+│   ├── configurator.[hash].js
+│   ├── configurator.[hash].css
+│   └── configurator.[hash].*   # шрифты/иконки
 └── document-editor/
     ├── index.html
     ├── assets/
@@ -578,15 +577,16 @@ ls -la ../wwwroot/statusbar/
 ls -la ../wwwroot/configurator/
 ls -la ../wwwroot/document-editor/
 
-# Ожидаемая структура каждого компонента:
-# ├── index.html
-# ├── assets/
-# │   ├── index-[hash].js
-# │   └── index-[hash].css
-# └── favicon.ico (опционально)
+# Минимальные проверки по компонентам:
+test -f ../wwwroot/statusbar/status-bar.js || exit 1
+test -f ../wwwroot/statusbar/status-bar.css || exit 1
+test -f ../wwwroot/configurator/.vite/manifest.json || exit 1
+find ../wwwroot/configurator -maxdepth 1 -name 'configurator.*.js' | grep -q . || exit 1
+test -f ../wwwroot/document-editor/index.html || exit 1
+find ../wwwroot/document-editor/assets -maxdepth 1 -name 'index-*.js' | grep -q . || exit 1
 
 # Проверить размер бандлов (должны быть оптимизированы)
-du -sh ../wwwroot/statusbar/assets/*.js ../wwwroot/configurator/assets/*.js ../wwwroot/document-editor/assets/*.js
+du -sh ../wwwroot/statusbar/ ../wwwroot/configurator/ ../wwwroot/document-editor/
 ```
 
 ### Логи сборки
@@ -594,7 +594,7 @@ du -sh ../wwwroot/statusbar/assets/*.js ../wwwroot/configurator/assets/*.js ../w
 **Development**:
 ```bash
 # Backend логи
-tail -f TN_Doc/bin/Debug/net8.0/logs/tn-doc-*.log
+tail -f TN_Doc/bin/Debug/net8.0/logs/$(date +%Y-%m-%d).log
 
 # Vue dev server логи
 # Выводятся в терминал где запущен npm run dev
@@ -639,15 +639,14 @@ TN_Doc/
 ```
 TN_Doc/wwwroot/
 ├── statusbar/                 # StatusBar production build
-│   ├── index.html             # Точка входа
 │   ├── status-bar.js          # Главный JavaScript бандл
 │   ├── status-bar.css         # Стили
-│   └── status-bar.[hash].js   # Chunked модули (code-splitting)
+│   └── status-bar.*           # Шрифты/иконки (eot, svg, ttf, woff, woff2)
 ├── configurator/              # Configurator production build
-│   ├── index.html
-│   ├── configurator.js
-│   ├── configurator.css
-│   └── configurator.[hash].js
+│   ├── .vite/manifest.json    # Vite manifest для Razor
+│   ├── configurator.[hash].js # Entry bundle и lazy chunks visual editors
+│   ├── configurator.[hash].css
+│   └── configurator.[hash].*  # Шрифты/иконки
 └── document-editor/           # Document Editor production build
     ├── index.html
     └── assets/

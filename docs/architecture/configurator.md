@@ -619,15 +619,21 @@ flowchart LR
     Source[Vue Source Files] --> TypeScript[TypeScript Compiler]
     TypeScript --> Vite[Vite Bundler]
 
-    Vite --> CSS[configurator.css]
-    Vite --> JS[configurator.js]
-    Vite --> Assets[Assets/Fonts]
+    Vite --> Manifest[.vite/manifest.json]
+    Vite --> CSS[configurator.[hash].css]
+    Vite --> Entry[configurator.[hash].js]
+    Vite --> Chunks[configurator.[hash].js (lazy chunks)]
+    Vite --> Assets[configurator.[hash].woff2/.ttf/.svg]
 
+    Manifest --> Output[wwwroot/configurator/]
     CSS --> Output[wwwroot/configurator/]
-    JS --> Output
+    Entry --> Output
+    Chunks --> Output
     Assets --> Output
 
-    Output --> ASPNet[ASP.NET Core Static Files]
+    Output --> ManifestService[IViteManifestService]
+    ManifestService --> Razor[Views/ConfiguratorView/Index.cshtml]
+    Razor --> ASPNet[ASP.NET Core Static Files]
 ```
 
 ### Development Workflow
@@ -645,30 +651,36 @@ npm run build:configurator
 
 ### Integration with ASP.NET Core
 
-**Views/Configuration/Index.cshtml**:
+**Views/ConfiguratorView/Index.cshtml**:
 ```html
+@using TN_Doc.Services
+@inject IViteManifestService ViteManifest
+@{
+    var entryFile = ViteManifest.GetEntryFile("configurator") ?? "configurator.js";
+    var cssFile = ViteManifest.GetCssFile("configurator") ?? "configurator.css";
+}
+
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="~/configurator/configurator.css" />
+    <link rel="stylesheet" href="~/configurator/@cssFile" />
 </head>
 <body>
-    <div id="configurator-app"></div>
-    <script src="~/configurator/configurator.js"></script>
+    <div id="app"></div>
+    <script type="module" src="~/configurator/@entryFile"></script>
 </body>
 </html>
 ```
 
 **Startup.cs**:
 ```csharp
+services.AddViteManifest();
 app.UseStaticFiles(); // Serves wwwroot/configurator/*
-
-app.MapControllerRoute(
-    name: "configurator",
-    pattern: "configurator",
-    defaults: new { controller = "Configuration", action = "Index" }
-);
 ```
+
+**Почему без `asp-append-version` для Configurator**:
+- Entry и lazy chunks должны иметь одинаковую схему URL (оба с hash в имени), иначе браузер может повторно выполнить `main.ts`.
+- Пути к CSS/JS берутся из `manifest.json`, поэтому cache busting сохраняется без query string.
 
 ## Security Considerations
 
@@ -942,6 +954,17 @@ return JSON.stringify(parsed, null, 2); // Форматируем
 ```
 
 **Причина бага**: По умолчанию Axios автоматически парсит JSON-ответы при `Content-Type: application/json`. Чтобы получить сырую строку, нужно явно указать `responseType: 'text'`.
+
+### 3. Исправлено переключение вкладки "Документы" -> "Общие" при клике на паспорт
+**Проблема**: при lazy-загрузке визуального редактора браузер повторно выполнял `main.ts`, из-за чего пересоздавался Pinia store и активная вкладка сбрасывалась.
+
+**Причина**: URL entry-модуля в Razor (`?v=...`) не совпадал с URL, который импортировал lazy chunk (без query string).
+
+**Решение** (коммит `16f699fd`):
+- В `vite.config.ts` включён `manifest: true`
+- Entry/CSS переведены на имена с hash (`configurator.[hash].js/.css`)
+- Добавлен `IViteManifestService` для чтения `wwwroot/configurator/.vite/manifest.json`
+- `Views/ConfiguratorView/Index.cshtml` подключает файлы из manifest без `asp-append-version`
 
 ## Roadmap
 

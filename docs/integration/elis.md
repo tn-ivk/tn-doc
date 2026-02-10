@@ -5,6 +5,8 @@
 ELIS (Единая Лабораторная Информационная Система) — это система управления лабораторными данными, которая предоставляет данные показателей качества для автоматического заполнения паспортов качества продукции.
 
 > ⚠️ В текущем UI Document Editor принимает данные ELIS через `postMessage` от родительского окна. В API TN_Doc нет эндпойнтов вида `/api/elis/*` для загрузки протоколов.
+>
+> Отдельно от этого есть callback endpoint'ы контроллера `ElisController` (`/Elis/ErrorMessage` и `/Elis/WarnMessage`) для приёма сообщений об ошибках/предупреждениях от интеграции.
 
 ## Архитектура интеграции
 
@@ -651,6 +653,37 @@ public class DocPassport : DocGeneral, IDocUpdater, IDocumentEditor
 }
 ```
 
+### Backend: Callback ошибок ELIS и запись в системный журнал ОС
+
+```csharp
+public class ElisController : Controller
+{
+    private readonly ILogger<ElisController> _logger;
+    private readonly ISystemJournalService _systemJournal;
+
+    [HttpPost]
+    [AllowAnonymous]
+    public void ErrorMessage(string msg)
+    {
+        if (string.IsNullOrEmpty(msg))
+            return;
+
+        _logger.LogError(msg);
+        _systemJournal.WriteError(msg, "ELIS");
+    }
+
+    public void WarnMessage(string msg)
+    {
+        if (string.IsNullOrEmpty(msg))
+            return;
+
+        _logger.LogWarning(msg);
+    }
+}
+```
+
+`ErrorMessage` логирует ошибку в NLog и дополнительно отправляет её в системный журнал ОС, а `WarnMessage` пишет только warning в обычный лог приложения.
+
 ### Frontend: Использование useElisIntegration
 
 ```typescript
@@ -936,7 +969,18 @@ _logger.LogWarning(
     timeout,
     sampleId
 );
+
+// callback об ошибке от ELIS (через ElisController)
+_logger.LogError(msg);
+_systemJournal.WriteError(msg, "ELIS");
 ```
+
+**Как это работает по ОС:**
+
+| ОС | Куда пишется | Детали |
+|----|--------------|--------|
+| Windows | Application Event Log | Source: `.NET Runtime`, тип: `Error`, `EventId=1000`, сообщение: `[ELIS] ...` |
+| Linux | syslog/journald | Команда `logger -p user.err -t TN_Doc:ELIS -- <message>` |
 
 ## Тестирование
 
@@ -977,7 +1021,10 @@ curl -k https://labhub.company.com/api/health
 openssl s_client -connect labhub.company.com:443 -cert /opt/TN_Doc/Cert/elis-client.crt
 
 # Логи ELIS запросов
-grep "ELIS" /opt/TN_Doc/logs/tn-doc-$(date +%Y-%m-%d).log
+grep "ELIS" /opt/TN_Doc/logs/$(date +%Y-%m-%d).log
+
+# Linux: записи ELIS в системном журнале ОС
+journalctl -t TN_Doc:ELIS -p err --since "today"
 ```
 
 ## См. также
@@ -991,6 +1038,11 @@ grep "ELIS" /opt/TN_Doc/logs/tn-doc-$(date +%Y-%m-%d).log
 ---
 
 ## История изменений документации
+
+**2026-01-16** - Актуализация по системному журналу ОС для ELIS
+- ✅ Добавлен backend-поток для `ElisController.ErrorMessage` + `ISystemJournalService`
+- ✅ Описано различие между `ErrorMessage` (NLog + системный журнал) и `WarnMessage` (только NLog)
+- ✅ Добавлены диагностические команды для Linux (`journalctl -t TN_Doc:ELIS`)
 
 **v1.4.4 (2025-01-20)** - Обновление алгоритма заполнения и передача полного протокола
 - ✅ **Передача полного протокола ELIS на бэкенд:**

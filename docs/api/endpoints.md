@@ -93,6 +93,16 @@ POST /api/documents/{deviceId}/{docType}/update/{id}
 - `GET /api/Configurator/document-config?path=Cfg/CfgPassport.json` — загрузить конфиг документа.
 - `POST /api/Configurator/document-config` — сохранить конфиг документа.
 
+## ELIS Callback Endpoints
+
+Базовый путь: `/Elis`
+
+- `POST /Elis/ErrorMessage?msg=...` — принять сообщение об ошибке от ELIS.
+  - Пишет ошибку в application log (`ILogger`/NLog).
+  - Дополнительно пишет ошибку в системный журнал ОС через `ISystemJournalService` с источником `ELIS`.
+- `/Elis/WarnMessage?msg=...` — принять предупреждение от ELIS.
+  - Пишет только warning в application log.
+
 ## Status API
 
 Базовый путь: `/api/Status`

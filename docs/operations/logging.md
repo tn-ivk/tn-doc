@@ -7,6 +7,7 @@
 - [Конфигурация логирования](#конфигурация-логирования)
 - [Уровни логирования](#уровни-логирования)
 - [Просмотр логов](#просмотр-логов)
+- [Системный журнал ОС (ELIS)](#системный-журнал-ос-elis)
 - [Копирование логов](#копирование-логов)
 - [Ротация и архивирование](#ротация-и-архивирование)
 - [Устранение проблем](#устранение-проблем)
@@ -181,7 +182,7 @@ Get-ChildItem "C:\Program Files\TN_Doc\logs\*.log" |
 ```
 1. Win+R → eventvwr.msc
 2. Windows Logs → Application
-3. Фильтр по источнику "TN_Doc"
+3. Для ошибок ELIS фильтр по источнику ".NET Runtime" и поиску "[ELIS]"
 ```
 
 ### Linux
@@ -235,6 +236,38 @@ journalctl -u tn_doc -f
 
 # Экспорт логов в файл
 journalctl -u tn_doc --since "2025-01-20" --until "2025-01-21" > tn_doc_logs.txt
+```
+
+## Системный журнал ОС (ELIS)
+
+С `2026-01-16` ошибки из `ElisController.ErrorMessage` пишутся не только в NLog-файлы, но и в системный журнал ОС через `ISystemJournalService`.
+
+### Windows (Event Log)
+
+- Источник: `.NET Runtime`
+- Тип события: `Error`
+- EventId: `1000`
+- Формат сообщения: `[ELIS] <текст ошибки>`
+
+```powershell
+# Последние ошибки ELIS из Application log
+Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='.NET Runtime'; Level=2} |
+  Where-Object { $_.Message -like '*[ELIS]*' } |
+  Select-Object -First 20 TimeCreated, Id, ProviderName, Message
+```
+
+### Linux (syslog / journald)
+
+- Запись выполняется командой `logger`
+- Приоритет: `user.err`
+- Тег: `TN_Doc:ELIS`
+
+```bash
+# ELIS ошибки по tag (если journald собирает syslog)
+journalctl -t TN_Doc:ELIS -p err --since "today"
+
+# Альтернатива через syslog-файл
+grep "TN_Doc:ELIS" /var/log/syslog
 ```
 
 ---
@@ -523,6 +556,33 @@ type "C:\Program Files\TN_Doc\logs\internal-nlog-log.txt"
 xmllint --noout /opt/TN_Doc/nlog.config  # Linux
 ```
 
+### Проблема: Ошибки ELIS не видны в системном журнале ОС
+
+**Проверки:**
+
+1. **Проверить, что сообщение пришло в `ElisController.ErrorMessage`:**
+```bash
+grep "ELIS" /opt/TN_Doc/logs/$(date +%Y-%m-%d).log
+```
+
+2. **Linux: проверить наличие `logger`:**
+```bash
+which logger
+logger --version
+```
+
+3. **Linux: проверить запись по тегу `TN_Doc:ELIS`:**
+```bash
+journalctl -t TN_Doc:ELIS -p err --since "today"
+```
+
+4. **Windows: проверить Application log по `.NET Runtime`:**
+```powershell
+Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='.NET Runtime'; Level=2} |
+  Where-Object { $_.Message -like '*[ELIS]*' } |
+  Select-Object -First 20 TimeCreated, Message
+```
+
 ### Проблема: Логи занимают слишком много места
 
 **Диагностика:**
@@ -665,4 +725,4 @@ tnlogsize      # Размер директории логов
 
 ---
 
-_Последнее обновление: 2025-01-21_
+_Последнее обновление: 2026-02-09_
