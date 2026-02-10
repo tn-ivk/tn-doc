@@ -6,6 +6,7 @@
 - [Расположение логов](#расположение-логов)
 - [Конфигурация логирования](#конфигурация-логирования)
 - [Уровни логирования](#уровни-логирования)
+- [Клиентские JS-логи](#клиентские-js-логи)
 - [Просмотр логов](#просмотр-логов)
 - [Копирование логов](#копирование-логов)
 - [Ротация и архивирование](#ротация-и-архивирование)
@@ -89,6 +90,48 @@ TN_Doc/nlog.config
 4. **Логгер** - имя класса, который записал лог
 5. **Process ID** - идентификатор процесса
 6. **Thread ID** - идентификатор потока
+
+---
+
+## Клиентские JS-логи
+
+Клиентская часть отправляет сообщения в серверный лог через endpoint:
+
+```http
+POST /api/ClientLog/logging
+Content-Type: application/json
+```
+
+Формат payload:
+
+```json
+{
+  "level": "Error",
+  "message": "ReadTagCache failed: Not Found (error) for tag ARM.Tag1"
+}
+```
+
+Источник сообщений:
+- `TN_Doc/wwwroot/js/Logger.js` — общий JS-логгер (`logTrace`, `logDebug`, `logInfo`, `logWarn`, `logError`)
+- `TN_Doc/wwwroot/js/TN_MessagingService.js` — `ReadTagCache(...)`
+- `TN_Doc/wwwroot/js/Common.js` — `ReadTagCacheARM(...)`
+
+С февраля 2026 в `ReadTagCache` и `ReadTagCacheARM` добавлены:
+- обработка `404/500` через error callback
+- `try/catch` вокруг AJAX-вызовов
+- отправка ошибок в серверный лог через `logError(...)`
+
+Типовые сообщения в логах:
+- `ReadTagCache failed: ... for tag ...`
+- `ReadTagCache exception for tag ...`
+- `ReadTagCacheARM failed: ... for tag ...`
+- `ReadTagCacheARM exception for tag ...`
+
+Быстрый поиск таких событий:
+
+```bash
+grep -E "ReadTagCache|ReadTagCacheARM" /opt/TN_Doc/logs/$(date +%Y-%m-%d).log
+```
 
 ---
 
@@ -664,4 +707,4 @@ tnlogsize      # Размер директории логов
 
 ---
 
-_Последнее обновление: 2026-01-19_
+_Последнее обновление: 2026-02-09_

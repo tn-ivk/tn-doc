@@ -34,11 +34,37 @@
 
 ---
 
-## [Unreleased] - Планируемая функциональность (из ветки ELIS)
+## [Unreleased] - 2026-02-09
+
+### Added
+- `ConfigEncodingTests` для автоматической проверки JSON-конфигураций в `TN_Doc/Cfg`:
+  - отсутствие символов замены `U+FFFD`
+  - валидность UTF-8
+  - корректность JSON-синтаксиса
+- Negative unit-тесты для `PrinterService`, `WindowsPrinter`, `LinuxPrinter` (проверки null/empty/exception, платформенных и конкурентных сценариев).
+
+### Changed
+- Рефакторинг unit-тестов на использование реальных компонентов через Reflection вместо тестовых наследников/дублей:
+  - `HomeControllerTests` (создание контроллера через `RuntimeHelpers.GetUninitializedObject`)
+  - `PrinterServiceTests`, `WindowsPrinterTests`, `LinuxPrinterTests`
+- Обновлен submodule `tn.docgeneral` до `ee8641af`:
+  - `KMH_PP_Areom` поддерживает старый и новый формат данных протокола (через `Protokol.version` и fallback-логику)
+  - улучшено логирование и трассировка в `DocKMH_PP_Areom`
+  - `DocGeneral._logger` сделан `protected` для переиспользования в потомках
+
+### Fixed
+- Исправлена кодировка `FieldSIKN` в 27 JSON-конфигах (`TN_Doc/Cfg/*`): удалены поврежденные символы, приведено к корректному значению `СИКН`.
+- Добавлена обработка ошибок в `ReadTagCache` и `ReadTagCacheARM`:
+  - обработка HTTP `404/500`
+  - `try/catch` вокруг AJAX-вызовов
+  - отправка ошибок в серверный лог через `Logger.js` (`/api/ClientLog/logging`)
+
+### Documentation
+- Обновлены `docs/development/testing.md` и `docs/configs/passport.md` (учтен запуск `ConfigEncodingTests`, актуализированы примеры тестов и чек-листы проверок).
+
+### Planned Features (ветка docs-elis)
 
 > **Примечание**: Следующие функции были реализованы в ветке docs-elis и будут постепенно портированы в стабильную версию.
-
-### Planned Features
 
 - Механизм связанных параметров (master-slave) для паспорта качества
   - Поле `SlaveKey` в конфигурации параметров

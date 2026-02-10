@@ -15,6 +15,13 @@ TN_Doc использует комплексную стратегию тести
 - **Microsoft.EntityFrameworkCore.InMemory** — для тестирования с in-memory БД
 - **coverlet.collector** — для сбора покрытия кода
 
+## Последние изменения (январь 2026)
+
+- Добавлен `ConfigEncodingTests` для проверки всех JSON-конфигов в `TN_Doc/Cfg` (UTF-8, отсутствие `U+FFFD`, валидный JSON).
+- `HomeControllerTests` переведён на создание реального `HomeController` через Reflection (`RuntimeHelpers.GetUninitializedObject`) вместо test-double.
+- Усилен набор negative-тестов для `PrinterService`, `WindowsPrinter`, `LinuxPrinter` (пустые параметры, исключения, платформенные сценарии, пограничные случаи строковых значений).
+- Обновлены примеры в документации тестов под текущую тестовую архитектуру (без `TestableHomeController`).
+
 ---
 
 ## Структура тестовых проектов

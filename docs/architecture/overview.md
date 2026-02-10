@@ -66,6 +66,8 @@ graph TB
 **Ключевые файлы UI:**
 - `TN_Doc/Views/Home/Index.cshtml` — главная страница (выбор устройства/документа, просмотр PDF, модальные окна)
 - `TN_Doc/wwwroot/js/Common.js` — логика UI, загрузка документов, переключение режимов
+- `TN_Doc/wwwroot/js/TN_MessagingService.js` — чтение/запись OPC-тегов и работа с кэшем OPC-клиента
+- `TN_Doc/wwwroot/js/Logger.js` — отправка клиентских логов в backend (`/api/ClientLog/logging`)
 - `TN_Doc/wwwroot/js/DirEditorComponentScript.js` — редактор справочников (DirEditor)
 - `TN_Doc/wwwroot/HTML/*.html` — HTML‑шаблоны редактирования (загружаются в iframe)
 
@@ -73,6 +75,11 @@ graph TB
 - `Home/GetDocEdit` вызывает `DocGeneral.GetEditDoc()`
 - HTML‑форма редактирования подгружается в iframe (класс `FR`)
 - Сохранение выполняется через `Home/SaveDoc` / `Home/UpdateDoc`
+
+**Клиентское чтение OPC кэша (актуализация 2026-02):**
+- `ReadTagCache` (`TN_MessagingService.js`) и `ReadTagCacheARM` (`Common.js`) используют синхронные AJAX GET на `http://localhost:5010/api/OPCClientCache/...`.
+- Для ответов `404/500` и исключений JavaScript выполняется логирование через `logError(...)` в `Logger.js`.
+- Если `CurrentDeviceName` не задан, `ReadTagCache` возвращает `undefined` и пишет предупреждение через `logWarn(...)`.
 
 ## Business Logic Layer
 
@@ -112,4 +119,3 @@ sequenceDiagram
 ## Интеграция с ELIS (статус)
 
 В текущем коде присутствуют модели ELIS и контроллер для логирования ошибок, но отсутствуют REST‑эндпоинты загрузки протоколов и фронтенд‑редактор. Детали — в `docs/integration/elis.md`.
-

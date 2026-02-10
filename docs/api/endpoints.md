@@ -100,6 +100,37 @@ POST /Elis/WarnMessage?msg=сообщение
 
 Логирует предупреждение от ELIS.
 
+## API клиентского логирования
+
+Базовый путь: `/api/ClientLog`
+
+Контроллер: `ClientLogController` (`[ApiController]`)
+
+### Отправить клиентский лог
+
+```http
+POST /api/ClientLog/logging
+Content-Type: application/json
+
+{
+  "level": "Error",
+  "message": "ReadTagCache failed: Not Found (error) for tag ARM.Tag1"
+}
+```
+
+Поддерживаемые уровни:
+- `Trace`
+- `Debug`
+- `Info`
+- `Warn` / `Warning`
+- `Error` / `Fatal` / `Critical`
+
+**Возвращает:**
+- `200 OK` — лог принят и записан в серверный лог
+- `400 BadRequest` — пустой `level`/`message` или неизвестный уровень
+
+Используется клиентскими скриптами `TN_Doc/wwwroot/js/Logger.js`, `TN_Doc/wwwroot/js/TN_MessagingService.js`, `TN_Doc/wwwroot/js/Common.js`.
+
 ## Печать
 
 Базовый путь: `/Print`
