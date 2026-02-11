@@ -28,10 +28,13 @@
 <script setup lang="ts">
 import FormFieldWithHistory from './FormFieldWithHistory.vue';
 import type { FormField } from '@/types/document.types';
+import { useFieldHistory } from '@/composables/useFieldHistory';
+import { useDocumentStore } from '@/stores/documentStore';
+import { normalizeForComparison } from '@/utils/field-compare-utils';
 
 const DEFAULT_VALUE = '\u2015'; // Длинное тире ―
 
-defineProps<{
+const props = defineProps<{
   field: FormField;
   modelValue: any;
   invalidChars?: string[];
@@ -42,8 +45,41 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: any): void;
 }>();
 
+const store = useDocumentStore();
+const { trackManualChange, trackReturnToElis } = useFieldHistory();
+
+/**
+ * Обработчик кнопки сброса на значение по умолчанию.
+ * Если значение изменилось — записывает ручное изменение в историю
+ * (или ReturnToELIS, если дефолт совпадает с оригиналом ELIS).
+ */
 function handleReset() {
-  emit('update:modelValue', DEFAULT_VALUE);
+  const newValue = DEFAULT_VALUE;
+  const previousValue = props.modelValue;
+
+  // Если значение не изменилось — ничего не делаем
+  if (previousValue === newValue) {
+    return;
+  }
+
+  // Трекаем изменение в истории (аналогично FormFieldWithHistory.handleChange)
+  const fieldKey = props.field.key;
+  const elisOriginal = store.formData[`${fieldKey}__elisOriginal`];
+
+  if (elisOriginal !== undefined) {
+    const normalizedNew = normalizeForComparison(props.field.type, newValue);
+    const normalizedOriginal = normalizeForComparison(props.field.type, elisOriginal);
+
+    if (normalizedNew === normalizedOriginal) {
+      trackReturnToElis(fieldKey, newValue, previousValue, props.field.type);
+    } else {
+      trackManualChange(fieldKey, newValue, previousValue, props.field.type);
+    }
+  } else {
+    trackManualChange(fieldKey, newValue, previousValue, props.field.type);
+  }
+
+  emit('update:modelValue', newValue);
 }
 </script>
 
