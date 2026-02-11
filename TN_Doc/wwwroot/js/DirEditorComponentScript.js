@@ -1602,8 +1602,6 @@ function _addSaveButtonHandler() {
             AddClassToElement('.modal-header>.close-menu >.btn > i > .fa-flooppy', 'd-none')
             try {
                 _saveQpAndDict();
-                // Закрытие модального окна после успешного сохранения
-                $('#modal-window').modal('hide');
             } finally {
                 RemoveClassToElement('.modal-header>.close-menu> .btn > i > .fa-flooppy', 'd-none')
                 AddClassToElement('.modal-header>.close-menu> .btn >  i > .fa-spin', 'd-none')
