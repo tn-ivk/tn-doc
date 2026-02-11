@@ -1317,7 +1317,7 @@ function _convertStableCellToEditCell(cell, type) {
             break;
         case 'combobox-params':
             let qpId = Number(cell.closest('table').dataset.qpId);
-            let params = qpCfgsDictionaries['QpsInfo'][qpId]['Parameters'];
+            let params = [...qpCfgsDictionaries['QpsInfo'][qpId]['Parameters']].sort((a, b) => a.Id - b.Id);
             let counterParams = 1;
             let cbEl = document.createElement('select');
             let optDef = document.createElement('option');
@@ -2123,8 +2123,8 @@ function _renderParameterSelector(qpId, qps, container) {
     // Получаем уникальные параметры из методов
     let parameters = qps["Parameters"];
     let methods = qps["Methods"];
-    let usedParameterIds = [...new Set(methods.map(m => m.IdParameter))];
-    
+    let usedParameterIds = [...new Set(methods.map(m => m.IdParameter))].sort((a, b) => a - b);
+
     // Добавляем опции для каждого используемого параметра
     for (let parameterId of usedParameterIds) {
         let parameter = parameters.find(p => p.Id === parameterId);
