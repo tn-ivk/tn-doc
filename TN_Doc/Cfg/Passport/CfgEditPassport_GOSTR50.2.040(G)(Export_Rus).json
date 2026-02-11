@@ -374,17 +374,6 @@
       ]
     },
     {
-      "Id": 2,
-      "Use": true,
-      "Key": "AccrSertifNumber",
-      "KeyELIS": "AccreditationNumber",
-      "ElisAlias": [
-        "accreditationNumber"
-      ],
-      "Type": "text",
-      "Name": "Номер аттестата аккредитации"
-    },
-    {
       "Id": 3,
       "Use": true,
       "Key": "Laboratory",
@@ -498,6 +487,17 @@
       "ElisAlias": [
         "endPeriodTime"
       ]
+    },
+    {
+      "Id": 2,
+      "Use": true,
+      "Key": "AccrSertifNumber",
+      "KeyELIS": "AccreditationNumber",
+      "ElisAlias": [
+        "accreditationNumber"
+      ],
+      "Type": "text",
+      "Name": "Номер аттестата аккредитации"
     },
     {
       "Id": 16,

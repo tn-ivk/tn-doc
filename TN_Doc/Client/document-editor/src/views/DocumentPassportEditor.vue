@@ -38,7 +38,17 @@
                     </div>
                   </td>
                   <td class="editor-input-cell">
+                    <!-- Поле с кнопкой сброса на значение по умолчанию -->
+                    <TextFieldWithReset
+                      v-if="row.field.key === 'AccrSertifNumber'"
+                      :field="row.field"
+                      :modelValue="store.formData[row.field.key]"
+                      :invalidChars="store.config?.invalidChars || []"
+                      @update:modelValue="(value) => store.updateField(row.field.key, value)"
+                    />
+                    <!-- Обычное поле -->
                     <FormFieldWithHistory
+                      v-else
                       :field="row.field"
                       :modelValue="store.formData[row.field.key]"
                       :hide-label="true"
@@ -117,6 +127,7 @@ import { logger } from '@tn-doc/shared';
 import { computed, nextTick, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import FormFieldWithHistory from '@/components/FormFieldWithHistory.vue';
+import TextFieldWithReset from '@/components/TextFieldWithReset.vue';
 import SignerFieldGroup from '@/components/SignerFieldGroup.vue';
 import DateRangeFieldGroup from '@/components/DateRangeFieldGroup.vue';
 import PassportQualityTable from '@/components/passport/PassportQualityTable.vue';
