@@ -110,6 +110,14 @@
     border-bottom: none;
 }
 
+/* Уменьшаем отступы в ячейках таблицы пользователей */
+.users-table td {
+    padding: 4px 4px;
+}
+.users-table th {
+    padding: 12px 6px;
+}
+
 .group-selector-wrapper {
     flex: 0 0 auto;
     margin-bottom: 16px; /* Увеличено согласно M3 spacing */
