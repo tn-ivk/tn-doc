@@ -17,7 +17,49 @@ logger.setGlobalContext({
 
 logger.info('Configurator: инициализация приложения');
 
+// Глобальный перехват необработанных JS-ошибок
+window.onerror = (message, source, lineno, colno, error) => {
+  logger.error('Configurator: глобальная ошибка JS', {
+    message: String(message),
+    source,
+    lineno,
+    colno,
+    stack: error?.stack
+  });
+};
+
+// Глобальный перехват необработанных Promise rejection
+window.onunhandledrejection = (event: PromiseRejectionEvent) => {
+  const reason = event.reason;
+  logger.error('Configurator: необработанный Promise rejection', {
+    message: reason?.message || String(reason),
+    stack: reason?.stack
+  });
+};
+
 const app = createApp(App);
+
+// Перехват ошибок рендеринга Vue-компонентов
+app.config.errorHandler = (err, instance, info) => {
+  const error = err instanceof Error ? err : new Error(String(err));
+  const componentName = instance?.$options?.name || instance?.$options?.__name || 'Unknown';
+  logger.error(`Configurator: ошибка Vue [${componentName}] ${info}`, {
+    message: error.message,
+    stack: error.stack,
+    component: componentName,
+    lifecycleHook: info
+  });
+};
+
+// Перехват предупреждений Vue (полезно для диагностики проблем с компонентами)
+app.config.warnHandler = (msg, instance, trace) => {
+  const componentName = instance?.$options?.name || instance?.$options?.__name || 'Unknown';
+  logger.warn(`Configurator: предупреждение Vue [${componentName}]`, {
+    message: msg,
+    component: componentName,
+    trace
+  });
+};
 
 const CustomPreset = definePreset(Aura, {
   semantic: {
@@ -48,4 +90,6 @@ app.use(PrimeVue, {
 });
 app.use(ToastService);
 
+logger.info('Configurator: монтирование приложения');
 app.mount('#app');
+logger.info('Configurator: приложение смонтировано');

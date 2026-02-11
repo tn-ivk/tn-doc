@@ -72,6 +72,7 @@
 import { onMounted, onBeforeUnmount, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useToast } from 'primevue/usetoast';
+import { logger } from '@tn-doc/shared';
 import { useConfigStore } from './stores/configStore';
 
 import Tabs from 'primevue/tabs';
@@ -90,12 +91,20 @@ const configStore = useConfigStore();
 const { currentConfig, isLoading, isSaving, isDirty, error } = storeToRefs(configStore);
 
 onMounted(async () => {
+  logger.info('App: компонент смонтирован, ожидание инициализации сервера...');
+
   // Задержка 2 секунды перед первым запросом, чтобы сервер успел инициализироваться
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   try {
+    logger.debug('App: запрос загрузки конфигурации');
     await configStore.loadConfig();
+    logger.info('App: конфигурация загружена успешно');
   } catch (e: any) {
+    logger.error('App: ошибка загрузки конфигурации', {
+      message: e.message,
+      stack: e.stack
+    });
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
@@ -121,7 +130,9 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
 
 async function handleSave() {
   try {
+    logger.info('App: сохранение конфигурации');
     await configStore.saveConfig();
+    logger.info('App: конфигурация сохранена успешно');
     toast.add({
       severity: 'success',
       summary: 'Успешно',
@@ -129,6 +140,10 @@ async function handleSave() {
       life: 3000
     });
   } catch (e: any) {
+    logger.error('App: ошибка сохранения конфигурации', {
+      message: e.message,
+      stack: e.stack
+    });
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
