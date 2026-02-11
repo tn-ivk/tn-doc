@@ -20,7 +20,7 @@
     "src": "../node_modules/primeicons/fonts/primeicons.woff2"
   },
   "src/components/visual-editors/PassportConfigEditor.vue": {
-    "file": "configurator.DZmGJE46.js",
+    "file": "configurator.ZTst8cHo.js",
     "name": "PassportConfigEditor",
     "src": "src/components/visual-editors/PassportConfigEditor.vue",
     "isDynamicEntry": true,
@@ -32,7 +32,7 @@
     ]
   },
   "src/main.ts": {
-    "file": "configurator.BJ7jPLOK.js",
+    "file": "configurator.BJQVlihC.js",
     "name": "main",
     "src": "src/main.ts",
     "isEntry": true,
@@ -40,7 +40,7 @@
       "src/components/visual-editors/PassportConfigEditor.vue"
     ],
     "css": [
-      "configurator.CObmrcoR.css"
+      "configurator.CnYHTyhu.css"
     ],
     "assets": [
       "configurator.DMOk5skT.eot",

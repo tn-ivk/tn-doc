@@ -3,14 +3,14 @@
     <Toast />
 
     <div class="configurator-content">
-      <div v-if="error" class="alert alert-danger" role="alert">
+      <div v-if="error" class="error-banner" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
         {{ error }}
       </div>
 
-      <div v-if="isLoading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="sr-only">Загрузка...</span>
-        </div>
+      <div v-if="isLoading" class="loading-container">
+        <i class="pi pi-spinner pi-spin loading-spinner" aria-hidden="true"></i>
+        <span class="loading-text">Загрузка конфигурации...</span>
       </div>
 
       <div v-else-if="currentConfig" class="configurator-main">
@@ -91,10 +91,7 @@ const configStore = useConfigStore();
 const { currentConfig, isLoading, isSaving, isDirty, error } = storeToRefs(configStore);
 
 onMounted(async () => {
-  logger.info('App: компонент смонтирован, ожидание инициализации сервера...');
-
-  // Задержка 2 секунды перед первым запросом, чтобы сервер успел инициализироваться
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  logger.info('App: компонент смонтирован, загрузка конфигурации...');
 
   try {
     logger.debug('App: запрос загрузки конфигурации');
@@ -109,7 +106,7 @@ onMounted(async () => {
       severity: 'error',
       summary: 'Ошибка',
       detail: 'Не удалось загрузить конфигурацию: ' + e.message,
-      life: 5000
+      life: 10000
     });
   }
 
@@ -176,6 +173,7 @@ function handleCancel() {
   flex-direction: column;
   height: 100%;
   min-height: calc(90vh - 56px); /* вычитаем высоту modal-header */
+  background-color: #ffffff;
 }
 
 .configurator-content {
@@ -183,6 +181,46 @@ function handleCancel() {
   overflow: hidden;
   min-height: 0; /* важно для корректной усадки flex-элемента и отсутствия лишнего скролла */
   padding: 0;
+}
+
+/* Индикатор загрузки */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+  color: #555;
+}
+
+.loading-spinner {
+  font-size: 2rem;
+  color: #1b6ec2;
+}
+
+.loading-text {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* Баннер ошибки */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 1rem;
+  background-color: #fff0f0;
+  border: 1px solid #e53935;
+  border-radius: 4px;
+  color: #c62828;
+  font-size: 0.9rem;
+}
+
+.error-banner i {
+  flex-shrink: 0;
+  font-size: 1.1rem;
 }
 
 .configurator-main {
@@ -310,11 +348,6 @@ function handleCancel() {
 
 .ml-2 {
   margin-left: 0.5rem;
-}
-
-.py-5 {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
 }
 
 /* Компактные вкладки */

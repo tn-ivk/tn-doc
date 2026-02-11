@@ -23,6 +23,7 @@
         html, body {
             height: 100%;
             overflow: hidden;
+            background-color: #ffffff;
         }
         body {
             margin: 0;
@@ -32,11 +33,40 @@
         #app {
             width: 100%;
             height: 100vh;
+            background-color: #ffffff;
+        }
+        /* Fallback-индикатор загрузки (виден до монтирования Vue) */
+        .app-loading-fallback {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            font-size: 0.95rem;
+            gap: 0.75rem;
+        }
+        .app-loading-fallback .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #1b6ec2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app">
+        <!-- Fallback: виден пока Vue не смонтировался, затем заменяется Vue-компонентом -->
+        <div class="app-loading-fallback">
+            <div class="spinner"></div>
+            <span>Загрузка конфигуратора...</span>
+        </div>
+    </div>
 
     <!-- Configurator script (путь из manifest с хэшем, БЕЗ asp-append-version) -->
     <script type="module" src="~/configurator/@entryFile"></script>

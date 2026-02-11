@@ -10,7 +10,7 @@ export const useConfigStore = defineStore('config', () => {
   const originalConfig = ref<CfgApp | null>(null);
   const currentConfig = ref<CfgApp | null>(null);
   const selectedDeviceIds = ref<number[]>([]);
-  const isLoading = ref(false);
+  const isLoading = ref(true);
   const isSaving = ref(false);
   const error = ref<string | null>(null);
   const validationErrors = ref<Map<string, string>>(new Map());
