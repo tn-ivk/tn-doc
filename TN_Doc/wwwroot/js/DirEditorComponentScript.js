@@ -1969,18 +1969,17 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
     
     // Группируем методы по параметрам
     let methodsByParameter = _groupMethodsByParameter(methods, parameters);
-    
+
     // Создаем контейнер для таблиц
     let tablesContainer = document.createElement('div');
     tablesContainer.classList.add('methods-tables-container');
     tablesContainer.dataset.qpId = counter;
     baseDiv.appendChild(tablesContainer);
-    
-    // Создаем таблицу для каждого параметра
-    for (let [parameterId, parameterMethods] of Object.entries(methodsByParameter)) {
-        let parameter = parameters.find(p => p.Id === parseInt(parameterId));
-        if (!parameter) continue;
-        
+
+    // Создаем таблицу для каждого используемого параметра (включая те, у которых нет методов)
+    let usedParameters = parameters.filter(p => p.Use).sort((a, b) => a.Id - b.Id);
+    for (let parameter of usedParameters) {
+        let parameterMethods = methodsByParameter[parameter.Id] || [];
         _createParameterMethodsTable(counter, parameter, parameterMethods, tablesContainer);
     }
     
@@ -2120,19 +2119,15 @@ function _renderParameterSelector(qpId, qps, container) {
     select.dataset.qpId = qpId;
     selectorDiv.appendChild(select);
     
-    // Получаем уникальные параметры из методов
+    // Получаем все используемые параметры (Use === true), отсортированные по Id
     let parameters = qps["Parameters"];
-    let methods = qps["Methods"];
-    let usedParameterIds = [...new Set(methods.map(m => m.IdParameter))].sort((a, b) => a - b);
+    let usedParameters = parameters.filter(p => p.Use).sort((a, b) => a.Id - b.Id);
 
     // Добавляем опции для каждого используемого параметра
-    for (let parameterId of usedParameterIds) {
-        let parameter = parameters.find(p => p.Id === parameterId);
-        if (!parameter) continue;
-        
+    for (let parameter of usedParameters) {
         let option = document.createElement('option');
-        option.value = parameterId;
-        option.textContent = parameter.Name || `Параметр ${parameterId}`;
+        option.value = parameter.Id;
+        option.textContent = parameter.Name || `Параметр ${parameter.Id}`;
         select.appendChild(option);
     }
     
