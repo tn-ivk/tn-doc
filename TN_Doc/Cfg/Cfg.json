@@ -98,10 +98,12 @@
             "O": "Ирековна",
             "Factory": "Испытательная лаборатория нефти ЛПДС \"Нурлино\"",
             "Post": "Заведующий лабораторией",
+            "LicId": 0,
+            "FIO": "Ткаченко В.И.",
+            "IOF": "В.И. Ткаченко",
             "UseFullNameSeparator": true,
             "UseFullNameWhiteSpace": true,
-            "UseShortFullNameForm": true,
-            "LicId": 0
+            "UseShortFullNameForm": true
           }
         ],
         "UsersGroup": [

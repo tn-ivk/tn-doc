@@ -1,4 +1,4 @@
-{
+﻿{
   "Methods": [
     {
       "Id": 37,
@@ -19,36 +19,6 @@
       "LimitValue": 0,
       "LimitValueString": "-",
       "IsDefault": false
-    },
-    {
-      "Id": 39,
-      "Use": true,
-      "IdParameter": 9,
-      "Name": "ГОСТ 6370-2018",
-      "LimitValueActivate": true,
-      "LimitValue": 0.05,
-      "LimitValueString": "Более 0,050",
-      "IsDefault": true
-    },
-    {
-      "Id": 40,
-      "Use": true,
-      "IdParameter": 10,
-      "Name": "ГОСТ Р 51947-2002",
-      "LimitValueActivate": true,
-      "LimitValue": 4,
-      "LimitValueString": "Более 4,00",
-      "IsDefault": true
-    },
-    {
-      "Id": 41,
-      "Use": true,
-      "IdParameter": 11,
-      "Name": "ГОСТ 1756-2000",
-      "LimitValueActivate": false,
-      "LimitValue": 0,
-      "LimitValueString": "",
-      "IsDefault": true
     },
     {
       "Id": 42,
@@ -108,7 +78,7 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "",
-      "IsDefault": true
+      "IsDefault": false
     },
     {
       "Id": 48,
@@ -118,7 +88,107 @@
       "LimitValueActivate": false,
       "LimitValue": 0,
       "LimitValueString": "",
+      "IsDefault": true
+    },
+    {
+      "Id": 50,
+      "Use": true,
+      "IdParameter": 13,
+      "Name": "ГОСТ 2177-99, метод Б",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "",
+      "IsDefault": true
+    },
+    {
+      "Id": 51,
+      "Use": true,
+      "IdParameter": 15,
+      "Name": "ГОСТ 11851-2018, метод А",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "",
+      "IsDefault": true
+    },
+    {
+      "Id": 52,
+      "Use": true,
+      "IdParameter": 16,
+      "Name": "ГОСТ Р 50802-2021",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "",
+      "IsDefault": true
+    },
+    {
+      "Id": 53,
+      "Use": true,
+      "IdParameter": 17,
+      "Name": "ГОСТ Р 50802-2021",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "",
+      "IsDefault": true
+    },
+    {
+      "Id": 54,
+      "Use": true,
+      "IdParameter": 18,
+      "Name": "ГОСТ Р 52247-2021, метод А",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "",
       "IsDefault": false
+    },
+    {
+      "Id": 55,
+      "Use": true,
+      "IdParameter": 18,
+      "Name": "ГОСТ Р 52247-2021, метод В",
+      "LimitValueActivate": true,
+      "LimitValue": 0.5,
+      "LimitValueString": "Менее 0,5",
+      "IsDefault": true
+    },
+    {
+      "Id": 56,
+      "Use": true,
+      "IdParameter": 9,
+      "Name": "ГОСТ 6370-2018",
+      "LimitValueActivate": true,
+      "LimitValue": 0.004,
+      "LimitValueString": "Менее 0,0040",
+      "IsDefault": true
+    },
+    {
+      "Id": 57,
+      "Use": true,
+      "IdParameter": 10,
+      "Name": "ГОСТ Р 51947-2002",
+      "LimitValueActivate": true,
+      "LimitValue": 1,
+      "LimitValueString": "Менее 1,000",
+      "IsDefault": true
+    },
+    {
+      "Id": 58,
+      "Use": true,
+      "IdParameter": 11,
+      "Name": "ГОСТ 1756-2000",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "",
+      "IsDefault": true
+    },
+    {
+      "Id": 59,
+      "Use": true,
+      "IdParameter": 7,
+      "Name": "ГОСТ 21534-2021, метод А, часть 1",
+      "LimitValueActivate": false,
+      "LimitValue": 0,
+      "LimitValueString": "",
+      "IsDefault": true
     }
   ],
   "Parameters": [
@@ -199,7 +269,8 @@
       "Use": true,
       "Edit": true,
       "IsBallast": true,
-      "RequiredFill": true
+      "RequiredFill": true,
+      "SlaveKey": "Chloride_Salts.MassFraction"
     },
     {
       "Id": 8,
