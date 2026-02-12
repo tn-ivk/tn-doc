@@ -8,7 +8,7 @@ import type { FieldHistoryEntry } from '@/types/history.types';
 import { DataSource } from '@/types/history.types';
 import { normalizeValue } from '@/utils/passport-utils';
 import { normalizeForComparison, resolveFieldTypeForComparison } from '@/utils/field-compare-utils';
-import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
+import { normalizeDecimalValue, isWithinFractionDigits } from '@/composables/usePassportNormalization';
 import { compactAllFieldsHistory } from '@/utils/history-utils';
 
 const MANUAL_AUTHOR = 'Пользователь';
@@ -148,13 +148,8 @@ export const useDocumentStore = defineStore('document', () => {
 
         // Проверка количества знаков после запятой
         if (paramSchema.roundValue && measurement) {
-          const normalized = measurement.replace(',', '.');
-          const parts = normalized.split('.');
-          if (parts.length > 1) {
-            const fractional = parts[1].replace(/0+$/, '');
-            if (fractional.length > paramSchema.roundValue) {
-              return true;
-            }
+          if (!isWithinFractionDigits(measurement, paramSchema.roundValue)) {
+            return true;
           }
         }
       }

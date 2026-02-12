@@ -1,3 +1,18 @@
+/**
+ * Проверяет, что количество значащих знаков после запятой не превышает roundValue.
+ * Хвостовые нули не учитываются (например, "1,10" при roundValue=1 считается валидным).
+ */
+export function isWithinFractionDigits(
+  value: string,
+  roundValue: number
+): boolean {
+  const normalized = value.replace(',', '.');
+  const parts = normalized.split('.');
+  if (parts.length <= 1) return true;
+  const fractional = parts[1].replace(/0+$/, '');
+  return fractional.length <= roundValue;
+}
+
 export function normalizeDecimalValue(
   value: string | number | null | undefined,
   roundValue: number | null | undefined

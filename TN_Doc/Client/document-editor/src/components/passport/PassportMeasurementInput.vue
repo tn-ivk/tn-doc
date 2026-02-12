@@ -24,7 +24,7 @@
 import { computed } from 'vue';
 import InputNumber from 'primevue/inputnumber';
 import type { PassportQualityParameter } from '@/types/passport.types';
-import { normalizeDecimalValue } from '@/composables/usePassportNormalization';
+import { normalizeDecimalValue, isWithinFractionDigits } from '@/composables/usePassportNormalization';
 
 interface Props {
   parameter: PassportQualityParameter;
@@ -68,21 +68,8 @@ const isValid = computed(() => {
 
   // Проверка количества знаков после запятой
   if (props.parameter.roundValue && props.parameter.values.measurement) {
-    const value = props.parameter.values.measurement.replace(',', '.');
-    const parts = value.split('.');
-    console.log('[VALIDATION]', {
-      name: props.parameter.name,
-      measurement: props.parameter.values.measurement,
-      roundValue: props.parameter.roundValue,
-      parts,
-      fractional: parts.length > 1 ? parts[1] : 'N/A',
-      fractionalTrimmed: parts.length > 1 ? parts[1].replace(/0+$/, '') : 'N/A',
-    });
-    if (parts.length > 1) {
-      const fractional = parts[1].replace(/0+$/, '');
-      if (fractional.length > props.parameter.roundValue) {
-        return false;
-      }
+    if (!isWithinFractionDigits(props.parameter.values.measurement, props.parameter.roundValue)) {
+      return false;
     }
   }
 
@@ -105,13 +92,8 @@ const validationMessage = computed(() => {
 
   // Проверка количества знаков после запятой
   if (props.parameter.roundValue && props.parameter.values.measurement) {
-    const value = props.parameter.values.measurement.replace(',', '.');
-    const parts = value.split('.');
-    if (parts.length > 1) {
-      const fractional = parts[1].replace(/0+$/, '');
-      if (fractional.length > props.parameter.roundValue) {
-        return `макс ${props.parameter.roundValue} знаков`;
-      }
+    if (!isWithinFractionDigits(props.parameter.values.measurement, props.parameter.roundValue)) {
+      return `макс ${props.parameter.roundValue} знаков`;
     }
   }
 
