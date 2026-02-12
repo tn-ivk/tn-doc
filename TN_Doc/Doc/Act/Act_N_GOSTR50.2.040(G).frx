@@ -221,7 +221,7 @@ namespace FastReport
       
       for (int n = 0; n &lt; resultListGostIndex51858.Count; n++)
       {
-        GostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  listGostIndex51858[n]);
+        GostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  resultListGostIndex51858[n]);
         TableAdditionlInfo.PrintRow(1);
         TableAdditionlInfo.PrintColumns();                                             
       }

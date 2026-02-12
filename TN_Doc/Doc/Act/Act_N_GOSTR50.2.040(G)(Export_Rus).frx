@@ -218,14 +218,16 @@ namespace FastReport
       TableAdditionlInfo.PrintColumns();                                             
          
       //Fill &amp; Draw dynamic Rows
-      List &lt;string&gt; listExtendGostIndex51858 = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858 ?? new List&lt;string&gt;() {&quot;-.-.-.-&quot;, &quot;-.-.-.-&quot;, &quot;-.-.-.-&quot;, &quot;-.-.-.-&quot;};
-      List &lt;string&gt; filtredListExtendGostIndex51858 = listExtendGostIndex51858.Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      List &lt;string&gt; listExtendGostIndex51858 = (DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858 ?? new List&lt;string&gt;()).Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
       List &lt;string&gt; distListExtendGostIndex51858 = listExtendGostIndex51858.Distinct().ToList();
-      List &lt;string&gt; resultListExtendGostIndex51858 = distListExtendGostIndex51858.Count == 1 ? distListExtendGostIndex51858 : listExtendGostIndex51858;     
-      
-      ExtendGostIndex51858.Text = $&quot;Обозначение нефти: &lt;u&gt; {String.Join(&quot; &lt;/u&gt; по ГОСТ Р 51858, &lt;u&gt; &quot;, resultListExtendGostIndex51858.ToArray())}&lt;/u&gt; по ГОСТ Р 51858.&quot;;
-      TableAdditionlInfo.PrintRow(1);
-      TableAdditionlInfo.PrintColumns();                                             
+      List &lt;string&gt; resultListExtendGostIndex51858 = distListExtendGostIndex51858.Count == 1 ? distListExtendGostIndex51858 : listExtendGostIndex51858;
+
+      for (int n = 0; n &lt; resultListExtendGostIndex51858.Count; n++)
+      {
+        ExtendGostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;,  resultListExtendGostIndex51858[n]);
+        TableAdditionlInfo.PrintRow(1);
+        TableAdditionlInfo.PrintColumns();
+      }                                             
       
       }
       
