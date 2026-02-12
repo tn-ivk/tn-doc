@@ -150,8 +150,11 @@ export const useDocumentStore = defineStore('document', () => {
         if (paramSchema.roundValue && measurement) {
           const normalized = measurement.replace(',', '.');
           const parts = normalized.split('.');
-          if (parts.length > 1 && parts[1].length > paramSchema.roundValue) {
-            return true;
+          if (parts.length > 1) {
+            const fractional = parts[1].replace(/0+$/, '');
+            if (fractional.length > paramSchema.roundValue) {
+              return true;
+            }
           }
         }
       }

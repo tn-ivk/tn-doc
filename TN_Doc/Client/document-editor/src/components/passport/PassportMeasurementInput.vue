@@ -70,8 +70,19 @@ const isValid = computed(() => {
   if (props.parameter.roundValue && props.parameter.values.measurement) {
     const value = props.parameter.values.measurement.replace(',', '.');
     const parts = value.split('.');
-    if (parts.length > 1 && parts[1].length > props.parameter.roundValue) {
-      return false;
+    console.log('[VALIDATION]', {
+      name: props.parameter.name,
+      measurement: props.parameter.values.measurement,
+      roundValue: props.parameter.roundValue,
+      parts,
+      fractional: parts.length > 1 ? parts[1] : 'N/A',
+      fractionalTrimmed: parts.length > 1 ? parts[1].replace(/0+$/, '') : 'N/A',
+    });
+    if (parts.length > 1) {
+      const fractional = parts[1].replace(/0+$/, '');
+      if (fractional.length > props.parameter.roundValue) {
+        return false;
+      }
     }
   }
 
@@ -96,8 +107,11 @@ const validationMessage = computed(() => {
   if (props.parameter.roundValue && props.parameter.values.measurement) {
     const value = props.parameter.values.measurement.replace(',', '.');
     const parts = value.split('.');
-    if (parts.length > 1 && parts[1].length > props.parameter.roundValue) {
-      return `макс ${props.parameter.roundValue} знаков`;
+    if (parts.length > 1) {
+      const fractional = parts[1].replace(/0+$/, '');
+      if (fractional.length > props.parameter.roundValue) {
+        return `макс ${props.parameter.roundValue} знаков`;
+      }
     }
   }
 
