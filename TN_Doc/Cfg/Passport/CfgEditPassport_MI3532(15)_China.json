@@ -634,6 +634,7 @@
       "Id": 5,
       "Use": true,
       "Key": "SIKN_Number",
+      "Edit": false,
       "Type": "text",
       "Name": "СИКН №"
     },
