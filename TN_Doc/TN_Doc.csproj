@@ -51,6 +51,13 @@
     </None>
   </ItemGroup>
 
+  <!-- Vite manifest файлы (MSBuild исключает .dot-директории из glob по умолчанию) -->
+  <ItemGroup>
+    <Content Include="wwwroot\configurator\.vite\manifest.json" />
+    <Content Include="wwwroot\document-editor\.vite\manifest.json" Condition="Exists('wwwroot\document-editor\.vite\manifest.json')" />
+    <Content Include="wwwroot\statusbar\.vite\manifest.json" Condition="Exists('wwwroot\statusbar\.vite\manifest.json')" />
+  </ItemGroup>
+
   <!-- Статические файлы и библиотеки -->
   <ItemGroup>
     <None Include="wwwroot\js\signalr\dist\browser\signalr.js;wwwroot\js\signalr\dist\browser\signalr.js.map;wwwroot\js\signalr\dist\browser\signalr.min.js;wwwroot\js\signalr\dist\browser\signalr.min.js.map" />
