@@ -76,11 +76,21 @@ jobs:
       - name: Publish application
         run: dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
 
+      # Копирование .vite manifest-файлов (MSBuild может исключать .dot-директории)
+      - name: Ensure Vite manifests in publish output
+        run: |
+          find TN_Doc/wwwroot -name ".vite" -type d | while read dir; do
+            rel="${dir#TN_Doc/}"
+            mkdir -p "./publish/$rel"
+            cp -r "$dir"/* "./publish/$rel/"
+          done
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: ./publish/
+          include-hidden-files: true
           retention-days: 7
 
   # ===========================================

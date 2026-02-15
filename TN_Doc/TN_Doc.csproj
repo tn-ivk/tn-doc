@@ -53,9 +53,7 @@
 
   <!-- Vite manifest файлы (MSBuild исключает .dot-директории из glob по умолчанию) -->
   <ItemGroup>
-    <Content Include="wwwroot\configurator\.vite\manifest.json" />
-    <Content Include="wwwroot\document-editor\.vite\manifest.json" Condition="Exists('wwwroot\document-editor\.vite\manifest.json')" />
-    <Content Include="wwwroot\statusbar\.vite\manifest.json" Condition="Exists('wwwroot\statusbar\.vite\manifest.json')" />
+    <Content Include="wwwroot\**\.vite\**" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- Статические файлы и библиотеки -->

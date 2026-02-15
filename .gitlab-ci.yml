@@ -45,6 +45,8 @@ build-job:
     - 'dotnet nuget add source "https://nuget.xn--90aia9aifhdb2cxbdg.xn--p1ai/api/v3/index.json" --name fr_nuget --username "$FR_NUGET_USERNAME" --password "$FR_NUGET_PASSWORD" --store-password-in-clear-text'
     - dotnet build -c Release
     - dotnet publish TN_Doc/TN_Doc.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+    # Копирование .vite manifest-файлов (MSBuild может исключать .dot-директории)
+    - find TN_Doc/wwwroot -name ".vite" -type d | while read dir; do rel="${dir#TN_Doc/}"; mkdir -p "./publish/$rel"; cp -r "$dir"/* "./publish/$rel/"; done
   artifacts:
     name: "build-TN_Doc-${CI_COMMIT_SHORT_SHA}"
     paths:
