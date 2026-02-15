@@ -222,8 +222,8 @@
   font-size: 14px;
   font-family: Arial, sans-serif !important;
   max-height: 90vh;
-  min-width: 700px;
-  max-width: 900px;
+  min-width: 1050px;
+  max-width: 1350px;
 }
 
 #elisProtocolView .modal-header {
