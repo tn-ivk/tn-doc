@@ -39,12 +39,6 @@ function updateField(index: number, field: keyof PassportAdditionalField, value:
       size="small"
       stripedRows
     >
-      <Column field="Key" header="Ключ" :style="{ width: '200px' }">
-        <template #body="{ data }">
-          <code class="field-key">{{ data.Key }}</code>
-        </template>
-      </Column>
-
       <Column field="Name" header="Наименование" :style="{ minWidth: '250px' }">
         <template #body="{ data, index }">
           <InputText
@@ -96,15 +90,6 @@ function updateField(index: number, field: keyof PassportAdditionalField, value:
   padding: 0.5rem;
   font-weight: 600;
   background: var(--md-surface-variant, #F5F5F5);
-}
-
-.field-key {
-  font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 0.85rem;
-  background: var(--md-surface-variant, #ECEFF1);
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  word-break: break-all;
 }
 
 .name-input {

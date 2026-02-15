@@ -77,12 +77,6 @@ function clearSlaveKey(index: number) {
       size="small"
       stripedRows
     >
-      <Column field="Key" header="Ключ" :style="{ width: '180px' }">
-        <template #body="{ data }">
-          <code class="param-key">{{ data.Key }}</code>
-        </template>
-      </Column>
-
       <Column field="Name" header="Название" :style="{ minWidth: '250px' }">
         <template #body="{ data }">
           <span class="param-name">{{ data.Name }}</span>
@@ -193,15 +187,6 @@ function clearSlaveKey(index: number) {
   padding: 0.5rem;
   font-weight: 600;
   background: var(--md-surface-variant, #F5F5F5);
-}
-
-.param-key {
-  font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 0.85rem;
-  background: var(--md-surface-variant, #ECEFF1);
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  word-break: break-all;
 }
 
 .param-name {
