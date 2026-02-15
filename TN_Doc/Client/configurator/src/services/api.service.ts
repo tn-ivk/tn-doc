@@ -1,4 +1,5 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios, { type AxiosInstance, type AxiosError } from 'axios';
+import { logger } from '@tn-doc/shared';
 import type { CfgApp, ValidationResult } from '../types/config.types';
 
 /**
@@ -60,6 +61,38 @@ class ApiService {
         'Content-Type': 'application/json'
       }
     });
+
+    // Логирование HTTP-ошибок через interceptor
+    this.api.interceptors.response.use(
+      (response) => response,
+      (error: AxiosError) => {
+        const url = error.config?.url || 'unknown';
+        const method = error.config?.method?.toUpperCase() || 'unknown';
+
+        if (error.response) {
+          // Сервер ответил с ошибочным статусом
+          logger.error(`ApiService: HTTP ${error.response.status} на ${method} ${url}`, {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            data: typeof error.response.data === 'string'
+              ? error.response.data.substring(0, 500)
+              : JSON.stringify(error.response.data)?.substring(0, 500)
+          });
+        } else if (error.request) {
+          // Запрос отправлен, но ответ не получен
+          logger.error(`ApiService: нет ответа на ${method} ${url}`, {
+            message: error.message
+          });
+        } else {
+          // Ошибка при формировании запроса
+          logger.error(`ApiService: ошибка запроса ${method} ${url}`, {
+            message: error.message
+          });
+        }
+
+        return Promise.reject(error);
+      }
+    );
   }
 
   /**
