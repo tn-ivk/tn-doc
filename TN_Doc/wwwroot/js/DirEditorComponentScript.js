@@ -1415,7 +1415,7 @@ function _addLicHandler() {
             return aid > cid ? aid : cid;
         })['Id'] : 0;
         appDictionaries['Licenses'].push({
-            Id: maxId + 1, Use: false, LicensesDate: "", LicensesNumber: ""
+            Id: maxId + 1, Use: true, LicensesDate: "", LicensesNumber: ""
         })
         _clearRowTable('.licences-table')
         _renderAndAddHandlerLicencesTable();
@@ -1443,8 +1443,8 @@ function _addUserHandler() {
             return aid > cid ? aid : cid;
         })['Id'] : 0;
         appDictionaries['Users'].push({
-            Use: false,
-            Id: maxId + 1, 
+            Use: true,
+            Id: maxId + 1,
             IdGroup: selectedGroupId,
             F: "",
             I: "", 
