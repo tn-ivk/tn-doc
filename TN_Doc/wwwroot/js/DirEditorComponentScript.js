@@ -1302,7 +1302,7 @@ function _convertStableCellToEditCell(cell, type) {
             break;
         case 'combobox-params':
             let qpId = Number(cell.closest('table').dataset.qpId);
-            let params = qpCfgsDictionaries['QpsInfo'][qpId]['Parameters'];
+            let params = [...qpCfgsDictionaries['QpsInfo'][qpId]['Parameters']].sort((a, b) => a.Id - b.Id);
             let counterParams = 1;
             let cbEl = document.createElement('select');
             let optDef = document.createElement('option');
@@ -1579,8 +1579,6 @@ function _addSaveButtonHandler() {
             AddClassToElement('.modal-header>.close-menu >.btn > i > .fa-flooppy', 'd-none')
             try {
                 _saveQpAndDict();
-                // Закрытие модального окна после успешного сохранения
-                $('#modal-window').modal('hide');
             } finally {
                 RemoveClassToElement('.modal-header>.close-menu> .btn > i > .fa-flooppy', 'd-none')
                 AddClassToElement('.modal-header>.close-menu> .btn >  i > .fa-spin', 'd-none')
@@ -1946,11 +1944,10 @@ function _renderQpConfigsMethodsTable(counter, qps, baseDiv) {
     tablesContainer.dataset.qpId = counter;
     baseDiv.appendChild(tablesContainer);
     
-    // Создаем таблицу для каждого параметра
-    for (let [parameterId, parameterMethods] of Object.entries(methodsByParameter)) {
-        let parameter = parameters.find(p => p.Id === parseInt(parameterId));
-        if (!parameter) continue;
-        
+    // Создаем таблицу для каждого используемого параметра (включая те, у которых нет методов)
+    let usedParameters = parameters.filter(p => p.Use).sort((a, b) => a.Id - b.Id);
+    for (let parameter of usedParameters) {
+        let parameterMethods = methodsByParameter[parameter.Id] || [];
         _createParameterMethodsTable(counter, parameter, parameterMethods, tablesContainer);
     }
     
@@ -2090,19 +2087,15 @@ function _renderParameterSelector(qpId, qps, container) {
     select.dataset.qpId = qpId;
     selectorDiv.appendChild(select);
     
-    // Получаем уникальные параметры из методов
+    // Получаем все используемые параметры (Use === true), отсортированные по Id
     let parameters = qps["Parameters"];
-    let methods = qps["Methods"];
-    let usedParameterIds = [...new Set(methods.map(m => m.IdParameter))];
-    
+    let usedParameters = parameters.filter(p => p.Use).sort((a, b) => a.Id - b.Id);
+
     // Добавляем опции для каждого используемого параметра
-    for (let parameterId of usedParameterIds) {
-        let parameter = parameters.find(p => p.Id === parameterId);
-        if (!parameter) continue;
-        
+    for (let parameter of usedParameters) {
         let option = document.createElement('option');
-        option.value = parameterId;
-        option.textContent = parameter.Name || `Параметр ${parameterId}`;
+        option.value = parameter.Id;
+        option.textContent = parameter.Name || `Параметр ${parameter.Id}`;
         select.appendChild(option);
     }
     
