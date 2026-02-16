@@ -966,6 +966,21 @@ return JSON.stringify(parsed, null, 2); // Форматируем
 - Добавлен `IViteManifestService` для чтения `wwwroot/configurator/.vite/manifest.json`
 - `Views/ConfiguratorView/Index.cshtml` подключает файлы из manifest без `asp-append-version`
 
+### 4. Исправлена потеря `.vite/manifest.json` в publish/CI
+**Проблема**: при `dotnet publish` и передаче артефактов между jobs скрытая директория `.vite/` могла теряться, из-за чего `ViteManifestService` возвращал fallback-имена без hash и Configurator открывался с 404/пустым экраном.
+
+**Решение**:
+- В `TN_Doc.csproj` явно включён `wwwroot/**/.vite/**` в publish output.
+- В GitLab CI добавлено копирование директории `.vite` после `dotnet publish`.
+- В GitHub Actions (`upload-artifact`) включена передача hidden files.
+
+### 5. Упрощён visual editor паспорта
+**Изменение**: из таблиц визуального редактора удалена колонка `Key`:
+- `ParametersSection.vue` — больше не отображает колонку "Ключ".
+- `AdditionalFieldsSection.vue` — больше не отображает колонку "Ключ".
+
+Ключи продолжают использоваться как идентификаторы в JSON и не изменяются при сохранении.
+
 ## Roadmap
 
 ### v1.4.5+ Планируемые улучшения

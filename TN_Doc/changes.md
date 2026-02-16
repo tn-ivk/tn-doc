@@ -1,4 +1,26 @@
 # Список изменений:
+## Версия 1.4.3.68:
+    - Act_N_GOSTR50.2.040(G)(Export_Rus): при разных обозначениях нефти по ГОСТ Р 51858 для смен выводится чередование блоков "масса нетто прописью + обозначение ГОСТ"
+    - Act_N_GOSTR50.2.040(G)(Export_Rus): при одном обозначении для всего акта сохранён прежний механизм вывода общей массы нетто прописью
+    - up tn.docgeneral: добавлены NumberToWords и свойство Net_Mass_InWords для посменного вывода
+
+## Версия 1.4.3.67:
+    - CI/CD: исправлена потеря `wwwroot/configurator/.vite/manifest.json` при сборке deb-пакета
+    - .gitlab-ci.yml/.github workflow: добавлена передача скрытой директории `.vite` между job-ами
+    - TN_Doc.csproj: явное включение `wwwroot/**/.vite/**` в publish output
+
+## Версия 1.4.3.66:
+    - Configurator: включён Vite manifest в publish output (исключён пустой экран из-за 404 на hashed bundle)
+
+## Версия 1.4.3.65:
+    - Configurator: убрана колонка "Ключ" в визуальном редакторе паспорта (Parameters/AdditionalInfo)
+
+## Версия 1.4.3.64:
+    - Passport: поле `SIKN_Number` в AdditionalInfo сделано нередактируемым (`Edit = false`) для рабочих конфигов
+
+## Версия 1.4.3.63:
+    - Passport: валидация дробной части игнорирует хвостовые/незначащие нули при проверке `RoundValue`
+
 ## Версия 1.4.3.57:
     - Act: исправлено использование shiftCount вместо listShiftsData.Count для колонок
     - Act: исправлен формат даты смены (dd.MM.yyyy вместо dd:MM:yyyy)

@@ -1039,6 +1039,10 @@ journalctl -t TN_Doc:ELIS -p err --since "today"
 
 ## История изменений документации
 
+**2026-02-15** - Актуализация UI просмотра протокола ELIS
+- ✅ Зафиксированы новые размеры окна просмотра протокола (`min-width: 1050px`, `max-width: 1350px`)
+- ✅ Добавлена ссылка на актуальные стили в `wwwroot/css/elisRequestWindow.css`
+
 **2026-01-16** - Актуализация по системному журналу ОС для ELIS
 - ✅ Добавлен backend-поток для `ElisController.ErrorMessage` + `ISystemJournalService`
 - ✅ Описано различие между `ErrorMessage` (NLog + системный журнал) и `WarnMessage` (только NLog)
