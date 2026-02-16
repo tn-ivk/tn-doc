@@ -34,7 +34,7 @@
 
 ---
 
-## [Unreleased] - 2026-02-09
+## [Unreleased] - 2026-02-16
 
 ### Added
 - `ConfigEncodingTests` для автоматической проверки JSON-конфигураций в `TN_Doc/Cfg`:
@@ -51,6 +51,13 @@
   - `KMH_PP_Areom` поддерживает старый и новый формат данных протокола (через `Protokol.version` и fallback-логику)
   - улучшено логирование и трассировка в `DocKMH_PP_Areom`
   - `DocGeneral._logger` сделан `protected` для переиспользования в потомках
+- Обновлена вёрстка главной страницы (`TN_Doc/Views/Home/Index.cshtml`, `TN_Doc/wwwroot/css/LeftPanel.css`, `TN_Doc/wwwroot/css/site.css`):
+  - ограничена ширина комбобокса шаблона документа: `max-width: 450px`
+  - увеличена ширина кнопки «Получить данные»: `40% → 45%`, добавлен `white-space: nowrap`
+  - удалён лишний тег `<body>` из `Index.cshtml`
+  - уменьшена ширина ячейки кнопки режима редактирования: `250px → 200px`
+  - добавлен `overflow: hidden` для контейнера `.cont`
+  - удалено дублирование блока sticky footer в `site.css`
 
 ### Fixed
 - Исправлена кодировка `FieldSIKN` в 27 JSON-конфигах (`TN_Doc/Cfg/*`): удалены поврежденные символы, приведено к корректному значению `СИКН`.
