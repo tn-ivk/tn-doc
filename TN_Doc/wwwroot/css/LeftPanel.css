@@ -356,6 +356,11 @@ select.invalid-cell-content {
     padding-top: 1px;
 }
 
+/* Подпись направления в списке отчётов */
+.direction-caption {
+    font-size: 8pt !important;
+}
+
 /* Стили для заголовка таблицы DataTable */
 #DataTable thead th {
     padding: 0.25rem 0.5rem;
