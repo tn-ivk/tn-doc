@@ -7,6 +7,17 @@ export enum OpcType {
   UA = 'UA'
 }
 
+export enum IvkType {
+  TN01 = 'TN01',
+  TN02 = 'TN02'
+}
+
+export interface IvkTypePreset {
+  database: string;
+  opcUaPrefix: string;
+  opcDaSuffix: string;
+}
+
 export interface OpcDaSettings {
   StartPrefix: string;
   Host: string;

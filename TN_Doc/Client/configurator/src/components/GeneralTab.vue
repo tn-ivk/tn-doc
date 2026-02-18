@@ -1,5 +1,23 @@
 <template>
   <div class="general-tab">
+    <!-- Тип ИВК -->
+    <Panel header="Тип ИВК" class="settings-panel ivk-type-panel">
+      <div class="settings-container">
+        <div class="field field-horizontal">
+          <label for="ivk-type">Тип комплекса:</label>
+          <Select
+            id="ivk-type"
+            v-model="selectedIvkType"
+            :options="ivkTypeOptions"
+            option-label="label"
+            option-value="value"
+            placeholder="Не выбрано"
+            class="field-input-flex"
+          />
+        </div>
+      </div>
+    </Panel>
+
     <div class="field field-horizontal">
       <label for="export-path">Путь экспорта документов:</label>
       <InputText
@@ -193,15 +211,35 @@ import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import ToggleSwitch from 'primevue/toggleswitch';
 import SelectButton from 'primevue/selectbutton';
+import Select from 'primevue/select';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import OpcSettings from './OpcSettings.vue';
-import { OpcType } from '../types/config.types';
+import { OpcType, IvkType } from '../types/config.types';
+import { detectIvkType, applyIvkType } from '../utils/ivkTypeUtils';
 
 const configStore = useConfigStore();
 const { currentConfig } = storeToRefs(configStore);
 
 const showOpcDialog = ref(false);
+
+// Тип ИВК
+const ivkTypeOptions = [
+  { label: 'Не выбрано', value: null },
+  { label: 'ТН-01', value: IvkType.TN01 },
+  { label: 'ТН-02', value: IvkType.TN02 }
+];
+
+const selectedIvkType = computed({
+  get: () => {
+    if (!currentConfig.value?.Devices) return null;
+    return detectIvkType(currentConfig.value.Devices);
+  },
+  set: (value: IvkType | null) => {
+    if (!value || !currentConfig.value?.Devices) return;
+    applyIvkType(currentConfig.value.Devices, value);
+  }
+});
 
 const exportPath = computed({
   get: () => currentConfig.value?.ExportDoc?.Path || '',
@@ -501,6 +539,38 @@ const diagMaxRetryCount = computed({
 
 :deep(.p-panel-content) {
   padding: 0.5rem 0.75rem;
+}
+
+/* Стили для Select (комбобокс типа ИВК) */
+:deep(.field-input-flex.p-select) {
+  flex: 1;
+  border: 1px solid #CFD8DC !important;
+  border-radius: 8px !important;
+  height: 37px !important;
+  background-color: #ffffff !important;
+  font-size: 15px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+:deep(.field-input-flex.p-select:hover) {
+  border-color: #B0BEC5 !important;
+}
+
+:deep(.field-input-flex.p-select.p-focus) {
+  outline: none !important;
+  border-color: #1E88E5 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.35) !important;
+}
+
+:deep(.field-input-flex.p-select .p-select-label) {
+  padding: 6px 10px !important;
+  color: #212121 !important;
+  font-size: 15px !important;
+}
+
+/* Панель типа ИВК — первая на вкладке */
+.ivk-type-panel {
+  margin-bottom: var(--space-4);
 }
 
 /* Стили для поля "Путь экспорта документов" */
