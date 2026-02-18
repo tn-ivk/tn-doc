@@ -15,6 +15,9 @@ export const useConfigStore = defineStore('config', () => {
   const validationErrors = ref<Map<string, string>>(new Map());
   const dirtyDocumentConfigs = ref<Map<string, string>>(new Map());
 
+  // Internal flag: prevents re-triggering auto-selection after user manually deselects
+  let deviceAutoSelected = false;
+
   // Computed
   const isDirty = computed(() => {
     if (dirtyDocumentConfigs.value.size > 0) return true;
@@ -42,6 +45,8 @@ export const useConfigStore = defineStore('config', () => {
       const config = await apiService.getConfig();
       originalConfig.value = _.cloneDeep(config);
       currentConfig.value = _.cloneDeep(config);
+
+      autoSelectFirstDevice();
     } catch (e: any) {
       error.value = e.message || 'Не удалось загрузить конфигурацию';
       throw e;
@@ -121,6 +126,17 @@ export const useConfigStore = defineStore('config', () => {
     deviceIds.forEach(deviceId => {
       updateDeviceSettings(deviceId, field, value);
     });
+  }
+
+  function autoSelectFirstDevice() {
+    if (deviceAutoSelected || selectedDeviceIds.value.length > 0) return;
+    if (!currentConfig.value?.Devices?.length) return;
+
+    deviceAutoSelected = true;
+
+    const enabledDevice = currentConfig.value.Devices.find(d => d.Use === true);
+    const targetDevice = enabledDevice || currentConfig.value.Devices[0];
+    selectedDeviceIds.value = [targetDevice.IdDevice];
   }
 
   function selectDevices(ids: number[]) {
