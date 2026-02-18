@@ -1,10 +1,10 @@
 <template>
   <div class="devices-tab">
-    <Splitter class="devices-splitter">
-      <SplitterPanel :size="15" :minSize="15">
+    <Splitter class="devices-splitter" @resizeend="onResizeEnd">
+      <SplitterPanel :size="panelSizes[0]" :minSize="10">
         <DeviceList />
       </SplitterPanel>
-      <SplitterPanel :size="70">
+      <SplitterPanel :size="panelSizes[1]">
         <DeviceEditor />
       </SplitterPanel>
     </Splitter>
@@ -12,10 +12,36 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import DeviceList from './DeviceList.vue';
 import DeviceEditor from './DeviceEditor.vue';
+
+const STORAGE_KEY = 'devices-splitter-sizes';
+const DEFAULT_SIZES = [12, 88];
+
+function loadSizes(): number[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length === 2 && parsed.every((v: unknown) => typeof v === 'number')) {
+        return parsed;
+      }
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_SIZES;
+}
+
+const panelSizes = ref(loadSizes());
+
+function onResizeEnd(event: { sizes: number[] }) {
+  panelSizes.value = event.sizes;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(event.sizes));
+  } catch { /* ignore */ }
+}
 </script>
 
 <style scoped>
