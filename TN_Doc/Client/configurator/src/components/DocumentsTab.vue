@@ -1,10 +1,10 @@
 <template>
   <div class="documents-tab">
-    <Splitter class="documents-splitter">
-      <SplitterPanel :size="30" :minSize="15">
+    <Splitter class="documents-splitter" @resizeend="onResizeEnd">
+      <SplitterPanel :size="panelSizes[0]" :minSize="10">
         <DocumentTree @node-select="handleNodeSelect" />
       </SplitterPanel>
-      <SplitterPanel :size="70">
+      <SplitterPanel :size="panelSizes[1]">
         <DocumentConfigEditor :selected-node="selectedNode" />
       </SplitterPanel>
     </Splitter>
@@ -18,6 +18,31 @@ import SplitterPanel from 'primevue/splitterpanel';
 import DocumentTree from './DocumentTree.vue';
 import DocumentConfigEditor from './DocumentConfigEditor.vue';
 import type { DocumentTreeNode } from '../types/document.types';
+
+const STORAGE_KEY = 'documents-splitter-sizes';
+const DEFAULT_SIZES = [20, 80];
+
+function loadSizes(): number[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length === 2 && parsed.every((v: unknown) => typeof v === 'number')) {
+        return parsed;
+      }
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_SIZES;
+}
+
+const panelSizes = ref(loadSizes());
+
+function onResizeEnd(event: { sizes: number[] }) {
+  panelSizes.value = event.sizes;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(event.sizes));
+  } catch { /* ignore */ }
+}
 
 const selectedNode = ref<DocumentTreeNode | null>(null);
 
