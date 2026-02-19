@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
@@ -23,6 +24,9 @@ public class AppConfigServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        // Сброс синглтона, чтобы тесты не зависели от порядка выполнения
+        var field = typeof(AppConfigService).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic);
+        field?.SetValue(null, null);
         _testBasePath = Path.Combine(Path.GetTempPath(), "AppConfigServiceTests");
         Directory.CreateDirectory(_testBasePath);
         Directory.CreateDirectory(Path.Combine(_testBasePath, "Cfg"));
@@ -64,14 +68,14 @@ public class AppConfigServiceTests
 
         // Создаем тестовые данные
         var root = new Root();
-        var cfgApp = new CfgApp 
-        { 
-            Devices = new List<Device> 
-            { 
-                new Device 
-                { 
-                    IdDevice = 1, 
-                    Name = "Test Device",
+        var cfgApp = new CfgApp
+        {
+            Devices = new List<Device>
+            {
+                new Device
+                {
+                    IdDevice = 1,
+                    Name = "Test Device TN01",
                     Docs = new List<Document>
                     {
                         new Document
@@ -84,8 +88,31 @@ public class AppConfigServiceTests
                             }
                         }
                     },
+                    DBConnectionStrings = new List<DBConnectionString>
+                    {
+                        new DBConnectionString { Use = true, Server = "localhost", Database = "IVK_TN_01_test", Userid = "user", Password = "pass", ConnectionTimeout = 30 }
+                    },
                     Elis = new Elis { Use = true }
-                } 
+                },
+                new Device
+                {
+                    IdDevice = 2,
+                    Name = "Test Device TN02",
+                    Docs = new List<Document>(),
+                    DBConnectionStrings = new List<DBConnectionString>
+                    {
+                        new DBConnectionString { Use = true, Server = "localhost", Database = "IVK_TN_02_test", Userid = "user", Password = "pass", ConnectionTimeout = 30 }
+                    },
+                    Elis = new Elis { Use = false }
+                },
+                new Device
+                {
+                    IdDevice = 3,
+                    Name = "Test Device No DB",
+                    Docs = new List<Document>(),
+                    DBConnectionStrings = new List<DBConnectionString>(),
+                    Elis = new Elis { Use = false }
+                }
             },
             Elis = new Elis { Use = true }
         };
@@ -308,5 +335,57 @@ public class AppConfigServiceTests
 
         // Assert
         Assert.That(result, Is.False);
+    }
+
+    /// <summary>
+    /// Проверяет, что GetDeviceType возвращает TN01 для БД с именем IVK_TN_01.
+    /// </summary>
+    [Test]
+    public void GetDeviceType_WhenDatabaseIsIvkTn01_ThenReturnsTN01()
+    {
+        // Act
+        var result = _appConfigService.GetDeviceType(1);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(IvkDeviceType.TN01));
+    }
+
+    /// <summary>
+    /// Проверяет, что GetDeviceType возвращает TN02 для БД без IVK_TN_01 в имени.
+    /// </summary>
+    [Test]
+    public void GetDeviceType_WhenDatabaseIsNotIvkTn01_ThenReturnsTN02()
+    {
+        // Act
+        var result = _appConfigService.GetDeviceType(2);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(IvkDeviceType.TN02));
+    }
+
+    /// <summary>
+    /// Проверяет, что GetDeviceType возвращает TN02 при пустых строках подключения.
+    /// </summary>
+    [Test]
+    public void GetDeviceType_WhenNoConnectionStrings_ThenReturnsTN02()
+    {
+        // Act
+        var result = _appConfigService.GetDeviceType(3);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(IvkDeviceType.TN02));
+    }
+
+    /// <summary>
+    /// Проверяет, что GetDeviceType возвращает TN02 для несуществующего устройства.
+    /// </summary>
+    [Test]
+    public void GetDeviceType_WhenDeviceNotFound_ThenReturnsTN02()
+    {
+        // Act
+        var result = _appConfigService.GetDeviceType(-1);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(IvkDeviceType.TN02));
     }
 }
