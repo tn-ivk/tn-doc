@@ -1,7 +1,7 @@
 /* Стили для кастомного dropdown меню */
 
 /* Убираем стрелку у dropdown-toggle кнопки меню */
-.mainTable button.dropdown-toggle::after {
+table.mainTable button.dropdown-toggle::after {
     display: none;
 }
 

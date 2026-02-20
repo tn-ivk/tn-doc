@@ -744,8 +744,8 @@ function InitTableDocs() {
     table = $('#DataTable').DataTable(
         {
             select: true,
-            scrollY: '100%',
-            scrollCollapse: false,
+            scrollY: 'calc(60vh - var(--status-bar-height, 28px))',
+            scrollCollapse: true,
             paging: false,
             info: false,
             ordering: false,

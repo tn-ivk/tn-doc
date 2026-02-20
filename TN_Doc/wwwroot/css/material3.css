@@ -152,7 +152,7 @@ input:focus, select:focus, textarea:focus, .form-control:focus, .filterDatepicke
 /* Align selects with buttons - reverted */
 
 /* Buttons */
-.btn, .mainTable input[type=button], .mainTable button, .filterButton, button {
+.btn, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   border-radius: var(--md-radius) !important;
   padding: 6px 12px !important; /* Reduced padding to fit height */
   font-family: var(--md-font-family) !important;
@@ -177,12 +177,12 @@ button i.fa {
   /* keep default alignment */
 }
 
-.btn-primary, .mainTable input[type=button], .mainTable button, .filterButton, button {
+.btn-primary, table.mainTable input[type=button], table.mainTable button, .filterButton, button {
   background: var(--md-primary) !important;
   color: #fff !important;
   border: 1px solid color-mix(in srgb, var(--md-primary) 80%, #000) !important;
 }
-.btn-primary:hover, .mainTable input[type=button]:hover, .mainTable button:hover, .filterButton:hover, button:hover {
+.btn-primary:hover, table.mainTable input[type=button]:hover, table.mainTable button:hover, .filterButton:hover, button:hover {
   background: var(--md-primary-hover) !important;
 }
 .btn-outline-primary {
@@ -204,8 +204,8 @@ button i.fa {
 button:disabled,
 input[type="button"]:disabled,
 .filterButton:disabled,
-.mainTable input[type=button]:disabled,
-.mainTable button:disabled,
+table.mainTable input[type=button]:disabled,
+table.mainTable button:disabled,
 .icon-btn.save-btn:disabled {
   background: var(--md-disabled-bg) !important;
   color: var(--md-disabled-text) !important;
@@ -358,12 +358,11 @@ table tbody tr[style*="background"] td {
 }
 .text-secondary { color: var(--md-text-secondary) !important; }
 
-/* Fix legacy borders in layout containers */
-.mainTable > .leftPanel,
-.mainTable > .rightPanel,
-.filterRow,
-.filterTableHost,
+/* Fix legacy borders in layout tables */
+table.mainTable > tbody > tr > td,
+table.filterTable td,
 .searched-table {
   border-color: var(--md-outline) !important;
 }
+
 
