@@ -740,11 +740,20 @@ function GetDataWithSpinner() {
     }, 10);
 }
 
+function fitTableHeight() {
+    var sb = document.querySelector('.dataTables_scrollBody');
+    if (!sb) return;
+    var bar = document.querySelector('.status-bar');
+    var bottom = bar ? bar.getBoundingClientRect().top : (window.innerHeight - 28);
+    var h = Math.max(100, Math.floor(bottom - sb.getBoundingClientRect().top - 2));
+    sb.style.maxHeight = h + 'px';
+}
+
 function InitTableDocs() {
     table = $('#DataTable').DataTable(
         {
             select: true,
-            scrollY: 'calc(60vh - var(--status-bar-height, 28px))',
+            scrollY: '100px',
             scrollCollapse: true,
             paging: false,
             info: false,
@@ -810,6 +819,12 @@ function InitTableDocs() {
             }
         }
     });
+
+    // Подогнать высоту таблицы под доступное пространство
+    requestAnimationFrame(fitTableHeight);
+    $(window).on('resize', fitTableHeight);
+    // Пересчитать после монтирования Vue StatusBar
+    setTimeout(fitTableHeight, 600);
 }
 
 function InitElement() {
