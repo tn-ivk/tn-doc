@@ -122,7 +122,7 @@ div.table-content > table > tr > td > div > button{
     margin-left: 0.3vh!important;
 }
 
-table.mainTable select  {
+.mainTable select  {
     line-height: 1.5;
     color: var(--md-text-muted);
     background-color: var(--md-white);
@@ -132,8 +132,8 @@ table.mainTable select  {
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-table.mainTable input[type=button],
-table.mainTable button {
+.mainTable input[type=button],
+.mainTable button {
     background-color: var(--md-primary);
     color: var(--md-white);
     border: none;
@@ -144,8 +144,8 @@ table.mainTable button {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-table.mainTable input[type=button]:hover,
-table.mainTable button:hover {
+.mainTable input[type=button]:hover,
+.mainTable button:hover {
     background-color: var(--md-primary-hover);
 }
 
@@ -158,8 +158,8 @@ table.mainTable button:hover {
 }
 
 .sorting_disabled,
-table.filterTable td,
-div.cont > table > tbody > tr > td{
+.mainTable > .leftPanel,
+.mainTable > .rightPanel{
     border: 1px solid var(--md-border) !important;
 
 }

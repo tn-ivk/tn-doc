@@ -744,8 +744,8 @@ function InitTableDocs() {
     table = $('#DataTable').DataTable(
         {
             select: true,
-            scrollY: 'calc(60vh - var(--status-bar-height, 28px))',
-            scrollCollapse: true,
+            scrollY: '100%',
+            scrollCollapse: false,
             paging: false,
             info: false,
             ordering: false,
@@ -1789,10 +1789,13 @@ function ApplicationSecurity(tagName, tagValue) {
     } else if (tagName == 'root.ARM.Reports.AllowExport') {
         $("#ComboboxExportFormat").prop("disabled", !tagValue);
         $("#ButtonExport").prop("disabled", !tagValue);
-    } else if (tagName == 'root.ARM.Reports.ShowEditDictionaries')
-        $("#ButtonDictionaries").prop("hidden", !tagValue);
-    else if (tagName == 'root.ARM.Reports.AllowEditDictionaries')
-        $("#ButtonDictionaries").prop("disabled", !tagValue);
+    } else if (tagName == 'root.ARM.Reports.ShowEditDictionaries') {
+        // Скрыть/показать кнопку меню
+        $("#MenuButton").prop("hidden", !tagValue);
+    } else if (tagName == 'root.ARM.Reports.AllowEditDictionaries') {
+        // Заблокировать/разблокировать кнопку меню
+        $("#MenuButton").prop("disabled", !tagValue);
+    }
 }
 
 function ClearDataElis() {
