@@ -1111,10 +1111,10 @@
         {
           "Use": true,
           "GuidDevice": 0,
-          "Server": "192.168.3.7",
+          "Server": "192.168.90.39",
           "Userid": "user",
           "Password": "mJKuyb&9!2@m",
-          "Database": "ivk_tn",
+          "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
         {
