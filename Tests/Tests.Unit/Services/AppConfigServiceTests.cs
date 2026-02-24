@@ -351,10 +351,10 @@ public class AppConfigServiceTests
     }
 
     /// <summary>
-    /// Проверяет, что GetDeviceType возвращает TN02 для БД без IVK_TN_01 в имени.
+    /// Проверяет, что GetDeviceType возвращает TN02 для БД с IVK_TN_02 в имени.
     /// </summary>
     [Test]
-    public void GetDeviceType_WhenDatabaseIsNotIvkTn01_ThenReturnsTN02()
+    public void GetDeviceType_WhenDatabaseIsIvkTn02_ThenReturnsTN02()
     {
         // Act
         var result = _appConfigService.GetDeviceType(2);
@@ -364,28 +364,28 @@ public class AppConfigServiceTests
     }
 
     /// <summary>
-    /// Проверяет, что GetDeviceType возвращает TN02 при пустых строках подключения.
+    /// Проверяет, что GetDeviceType возвращает TN01 при пустых строках подключения (по умолчанию).
     /// </summary>
     [Test]
-    public void GetDeviceType_WhenNoConnectionStrings_ThenReturnsTN02()
+    public void GetDeviceType_WhenNoConnectionStrings_ThenReturnsTN01()
     {
         // Act
         var result = _appConfigService.GetDeviceType(3);
 
         // Assert
-        Assert.That(result, Is.EqualTo(IvkDeviceType.TN02));
+        Assert.That(result, Is.EqualTo(IvkDeviceType.TN01));
     }
 
     /// <summary>
-    /// Проверяет, что GetDeviceType возвращает TN02 для несуществующего устройства.
+    /// Проверяет, что GetDeviceType возвращает TN01 для несуществующего устройства (по умолчанию).
     /// </summary>
     [Test]
-    public void GetDeviceType_WhenDeviceNotFound_ThenReturnsTN02()
+    public void GetDeviceType_WhenDeviceNotFound_ThenReturnsTN01()
     {
         // Act
         var result = _appConfigService.GetDeviceType(-1);
 
         // Assert
-        Assert.That(result, Is.EqualTo(IvkDeviceType.TN02));
+        Assert.That(result, Is.EqualTo(IvkDeviceType.TN01));
     }
 }

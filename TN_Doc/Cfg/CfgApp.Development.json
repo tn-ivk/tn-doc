@@ -1113,7 +1113,7 @@
           "GuidDevice": 0,
           "Server": "192.168.90.39",
           "Userid": "user",
-          "Password": "mJKuyb&9!2@m",
+          "Password": "$1$wTyMtj5RiQDGxNOaXc0BSn7HZpaCdEZTo1a1Oq8fz3s=",
           "Database": "IVK_TN_01",
           "ConnectionTimeout": 1
         },
@@ -1152,7 +1152,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     },
     {
       "Use": false,
@@ -2306,7 +2310,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     },
     {
       "Use": false,
@@ -3460,7 +3468,11 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
-      "InvalidChars" : ["\"", "'", "\\"]
+      "InvalidChars": [
+        "\"",
+        "'",
+        "\\"
+      ]
     }
   ],
   "PrintSettings": {
