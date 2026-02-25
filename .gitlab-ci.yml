@@ -660,6 +660,7 @@ package-job:      # This job runs in the deploy stage.
     - chmod 755 deb/DEBIAN/preinst deb/DEBIAN/postinst deb/DEBIAN/prerm deb/DEBIAN/postrm
     - chmod 644 deb/DEBIAN/control
     - chmod 755 deb/opt/TN_Doc/TN_Doc
+    - chmod 755 deb/opt/TN_Doc/cfg-elevator || true
     - chmod 644 deb/opt/TN_Doc/*.dll 2>/dev/null || true
     - echo "Creating control.tar.xz..."
     - tar -cJf control.tar.xz -C deb/DEBIAN .
@@ -1059,6 +1060,7 @@ package-minimal-job:      # Minimal package without dependencies
     - chmod 755 deb-minimal/DEBIAN/preinst deb-minimal/DEBIAN/postinst deb-minimal/DEBIAN/prerm deb-minimal/DEBIAN/postrm
     - chmod 644 deb-minimal/DEBIAN/control
     - chmod 755 deb-minimal/opt/TN_Doc/TN_Doc
+    - chmod 755 deb-minimal/opt/TN_Doc/cfg-elevator || true
     - chmod 644 deb-minimal/opt/TN_Doc/*.dll 2>/dev/null || true
     - echo "Creating minimal control.tar.xz..."
     - tar -cJf control.tar.xz -C deb-minimal/DEBIAN .
