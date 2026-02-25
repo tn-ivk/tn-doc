@@ -12,8 +12,10 @@ hubConnection.on("Receive", function (deviceName, tagName, tagValue) {
 
     if (deviceName == CurrentDeviceName) {
 
-        if (tagName == GetFullNameTag('ARM.ARM_OnlineReportCounter'))
+        if (tagName == GetFullNameTag('ARM.ARM_OnlineReportCounter')) {
+            logDebug(`SignalR Receive: ARM_OnlineReportCounter=${tagValue}, device=${deviceName}, вызов GetDoc(). currentId=${currentId}, IdDoc=${$('#ComboboxDocGUID').val()}`);
             GetDoc();
+        }
     } else if (deviceName == 'ARM') {
         ApplicationSecurity(tagName, tagValue);
     }
@@ -801,12 +803,15 @@ function InitTableDocs() {
                     else if (item.key == 'DirId') DirId = item.value;
                 });
 
+                logDebug(`ReportIncomplete: клик по незавершённому отчёту, id=${currentId}, BIKId=${BIKId}, DirId=${DirId}, device=${CurrentDeviceName}, prefix=${PrefixTag}`);
+
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_BIKId'), BIKId, 2, 0);
                 if (PrefixTag === "IVK_TN_01") {
                     WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport_DirId'), DirId, 2, 0);
                 }
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_OnlineReportType'), currentId, 2, 0);
                 WriteTag(CurrentDeviceName, GetFullNameTag('ARM.ARM_GetOnlineReport'), true, 2, 0);
+                logTrace(`ReportIncomplete: OPC-теги записаны, ожидание ARM_OnlineReportCounter`);
             } else {
                 GetDoc();
             }
@@ -907,19 +912,26 @@ function GetData() {
 
 async function GetDoc() {
     $('.FR').attr('src', '');
-    
+
+    var idDoc = $('#ComboboxDocGUID').val();
+    var idDevice = $('#ComboboxDevice').val();
+    logTrace(`GetDoc: IdDevice=${idDevice}, IdDoc=${idDoc}, id=${currentId}`);
     $.ajax(
         {
             async: true,
             url: 'Home/GetDoc',
             type: 'GET',
             data: {
-                IdDevice: $('#ComboboxDevice').val(),
-                IdDoc: $('#ComboboxDocGUID').val(),
+                IdDevice: idDevice,
+                IdDoc: idDoc,
                 id: currentId,
                 protocolNumber: $('#ComboboxProtocolNumber').val()
             },
+            error: function(xhr, status, error) {
+                logError(`GetDoc: ошибка запроса Home/GetDoc — ${xhr.status}: ${xhr.responseText || error}, IdDoc=${idDoc}, id=${currentId}`);
+            },
             success: async function (data) {
+                logTrace(`GetDoc: ответ от Home/GetDoc = ${data}, IdDoc=${idDoc}, id=${currentId}`);
                 if (data)
                     $('.FR').attr('src', '/PDF/PDF.pdf#toolbar=0&view=FitH');
 
