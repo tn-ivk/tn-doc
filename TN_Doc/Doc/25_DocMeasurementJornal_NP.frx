@@ -141,27 +141,11 @@ namespace FastReport
       
     public void  DrawTableSigners()
     {
-      Dictionary&lt;string,string&gt; dictSignersFIO = new Dictionary&lt;string,string&gt; ();         
-         
-      if (DataIVK.TableMeasurementJornal.DataARM == null)
-      {   
-        dictSignersFIO.Add(&quot;DeliveryIOF1&quot;, &quot;&quot;);
-        dictSignersFIO.Add(&quot;ReceiveIOF1&quot;, &quot;&quot;);
-        dictSignersFIO.Add(&quot;DeliveryIOF2&quot;, &quot;&quot;);
-        dictSignersFIO.Add(&quot;ReceiveIOF2&quot;, &quot;&quot;);
-      }
-      else
-      {
-        PropertyInfo[] props =  DataIVK.TableMeasurementJornal.DataARM.AdditionalData.GetType().GetProperties();
-        foreach (var prop in props)
-        {
-          dictSignersFIO.Add(prop.Name, prop.GetValue(DataIVK.TableMeasurementJornal.DataARM.AdditionalData, null).ToString());
-        }
-      }
-      DeliveryIOF1.Text =dictSignersFIO[&quot;DeliveryIOF1&quot;];
-      ReceiveIOF1.Text =dictSignersFIO[&quot;ReceiveIOF1&quot;];
-      DeliveryIOF2.Text =dictSignersFIO[&quot;DeliveryIOF2&quot;];
-      ReceiveIOF2.Text =dictSignersFIO[&quot;ReceiveIOF2&quot;];       
+      var dataArm = DataIVK.TableMeasurementJornal.DataARM;
+      DeliveryIOF1.Text = dataArm != null ? dataArm.DeliveryFIO1 ?? &quot;&quot; : &quot;&quot;;
+      ReceiveIOF1.Text = dataArm != null ? dataArm.ReceiveFIO1 ?? &quot;&quot; : &quot;&quot;;
+      DeliveryIOF2.Text = dataArm != null ? dataArm.DeliveryFIO2 ?? &quot;&quot; : &quot;&quot;;
+      ReceiveIOF2.Text = dataArm != null ? dataArm.ReceiveFIO2 ?? &quot;&quot; : &quot;&quot;;
     }  
       
     private void PageFooter_BeforeLayout(object sender, EventArgs e)
