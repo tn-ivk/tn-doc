@@ -351,6 +351,18 @@ graph TB
     Activator --> Instance[DocGeneral Instance]
 ```
 
+## Client-side Logging
+
+Начиная с v1.5.2, клиентские приложения (Configurator) используют shared-модуль `Logger` (`TN_Doc/Client/shared/src/logger.ts`), который отправляет структурированные логи на сервер через `/api/ClientLog/logging`.
+
+**Возможности:**
+- Уровни логирования: `Trace`, `Debug`, `Info`, `Warn`, `Error`
+- Глобальный контекст (например, `{ app: 'Configurator' }`)
+- Перехват необработанных ошибок (`window.onerror`, `onunhandledrejection`)
+- Перехват ошибок Vue (`app.config.errorHandler`)
+- Interceptor Axios для логирования HTTP-ошибок (статус, URL, метод, ответ)
+- В dev-режиме — дублирование в `console`
+
 ## Security & Error Handling
 
 ```mermaid
