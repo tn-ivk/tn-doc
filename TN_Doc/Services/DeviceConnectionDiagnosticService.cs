@@ -36,7 +36,10 @@ public class DeviceConnectionDiagnosticService : IDeviceConnectionDiagnosticServ
     }
 
     /// <inheritdoc/>
-    public bool HasBlockedDevices => _deviceStates.Values.Any(s => s.RequiresManualReset);
+    public bool HasBlockedDevices => _deviceStates.Values.Any(s =>
+    {
+        lock (s.SyncRoot) return s.RequiresManualReset;
+    });
 
     /// <inheritdoc/>
     public bool ShouldAllowConnection(string deviceId)
@@ -47,30 +50,33 @@ public class DeviceConnectionDiagnosticService : IDeviceConnectionDiagnosticServ
         if (!_deviceStates.TryGetValue(deviceId, out var state))
             return true;
 
-        // Если состояние Active - всегда разрешаем
-        if (state.State == ConnectionState.Active)
-            return true;
-
-        // Если требуется ручной сброс - запрещаем
-        if (state.RequiresManualReset)
+        lock (state.SyncRoot)
         {
-            _logger.LogDebug("Device {DeviceId} blocked: requires manual reset (category: {Category})",
-                deviceId, state.ErrorCategory);
+            // Если состояние Active - всегда разрешаем
+            if (state.State == ConnectionState.Active)
+                return true;
+
+            // Если требуется ручной сброс - запрещаем
+            if (state.RequiresManualReset)
+            {
+                _logger.LogDebug("Device {DeviceId} blocked: requires manual reset (category: {Category})",
+                    deviceId, state.ErrorCategory);
+                return false;
+            }
+
+            // Проверяем, истёк ли интервал опроса
+            if (state.NextAllowedAttempt.HasValue && DateTime.Now >= state.NextAllowedAttempt.Value)
+            {
+                // Переводим в Recovering для пробного подключения
+                state.State = ConnectionState.Recovering;
+                _logger.LogDebug("Device {DeviceId} transitioning to Recovering state", deviceId);
+                return true;
+            }
+
+            _logger.LogDebug("Device {DeviceId} blocked: poll interval active until {NextAttempt}",
+                deviceId, state.NextAllowedAttempt);
             return false;
         }
-
-        // Проверяем, истёк ли интервал опроса
-        if (state.NextAllowedAttempt.HasValue && DateTime.Now >= state.NextAllowedAttempt.Value)
-        {
-            // Переводим в Recovering для пробного подключения
-            state.State = ConnectionState.Recovering;
-            _logger.LogDebug("Device {DeviceId} transitioning to Recovering state", deviceId);
-            return true;
-        }
-
-        _logger.LogDebug("Device {DeviceId} blocked: poll interval active until {NextAttempt}",
-            deviceId, state.NextAllowedAttempt);
-        return false;
     }
 
     /// <inheritdoc/>
@@ -81,23 +87,26 @@ public class DeviceConnectionDiagnosticService : IDeviceConnectionDiagnosticServ
 
         if (_deviceStates.TryGetValue(deviceId, out var state))
         {
-            var previousState = state.State;
-            var previousFailures = state.FailureCount;
+            lock (state.SyncRoot)
+            {
+                var previousState = state.State;
+                var previousFailures = state.FailureCount;
 
-            // Полный сброс состояния
-            state.State = ConnectionState.Active;
-            state.ErrorCategory = ErrorCategory.None;
-            state.LastError = null;
-            state.FailureCount = 0;
-            state.MaxPollRetryCount = 0;
-            state.CurrentPollSeconds = 0;
-            state.NextAllowedAttempt = null;
-            state.LastFailureTime = null;
-            state.RequiresManualReset = false;
+                // Полный сброс состояния
+                state.State = ConnectionState.Active;
+                state.ErrorCategory = ErrorCategory.None;
+                state.LastError = null;
+                state.FailureCount = 0;
+                state.MaxPollRetryCount = 0;
+                state.CurrentPollSeconds = 0;
+                state.NextAllowedAttempt = null;
+                state.LastFailureTime = null;
+                state.RequiresManualReset = false;
 
-            _logger.LogInformation(
-                "Device {DeviceId} recovered: {PreviousState} → Active (was {FailureCount} failures)",
-                deviceId, previousState, previousFailures);
+                _logger.LogInformation(
+                    "Device {DeviceId} recovered: {PreviousState} → Active (was {FailureCount} failures)",
+                    deviceId, previousState, previousFailures);
+            }
         }
     }
 
@@ -116,28 +125,31 @@ public class DeviceConnectionDiagnosticService : IDeviceConnectionDiagnosticServ
             DeviceName = deviceName
         });
 
-        state.DeviceName = deviceName;
-        state.ErrorCategory = category;
-        state.LastError = exception.Message;
-        state.LastFailureTime = DateTime.Now;
-        state.FailureCount++;
-
-        switch (category)
+        lock (state.SyncRoot)
         {
-            case ErrorCategory.Authentication:
-                HandleAuthenticationError(state, settings);
-                break;
+            state.DeviceName = deviceName;
+            state.ErrorCategory = category;
+            state.LastError = exception.Message;
+            state.LastFailureTime = DateTime.Now;
+            state.FailureCount++;
 
-            case ErrorCategory.Network:
-            case ErrorCategory.Other:
-                HandleNetworkOrOtherError(state, settings);
-                break;
+            switch (category)
+            {
+                case ErrorCategory.Authentication:
+                    HandleAuthenticationError(state, settings);
+                    break;
+
+                case ErrorCategory.Network:
+                case ErrorCategory.Other:
+                    HandleNetworkOrOtherError(state, settings);
+                    break;
+            }
+
+            _logger.LogWarning(
+                "Device {DeviceId} ({DeviceName}) failure #{Count}: {Category} - {Error}. State: {State}, Poll: {Poll}s",
+                deviceId, deviceName, state.FailureCount, category, exception.Message,
+                state.State, state.CurrentPollSeconds);
         }
-
-        _logger.LogWarning(
-            "Device {DeviceId} ({DeviceName}) failure #{Count}: {Category} - {Error}. State: {State}, Poll: {Poll}s",
-            deviceId, deviceName, state.FailureCount, category, exception.Message,
-            state.State, state.CurrentPollSeconds);
     }
 
     /// <inheritdoc/>
@@ -148,22 +160,25 @@ public class DeviceConnectionDiagnosticService : IDeviceConnectionDiagnosticServ
 
         if (_deviceStates.TryGetValue(deviceId, out var state))
         {
-            var previousState = state.State;
-            var previousCategory = state.ErrorCategory;
+            lock (state.SyncRoot)
+            {
+                var previousState = state.State;
+                var previousCategory = state.ErrorCategory;
 
-            // Сброс для новой попытки (но сохраняем историю ошибки)
-            state.State = ConnectionState.Recovering;
-            state.RequiresManualReset = false;
-            state.NextAllowedAttempt = null;
-            state.CurrentPollSeconds = 0;
-            state.MaxPollRetryCount = 0;
-            // FailureCount не сбрасываем - покажет историю
+                // Сброс для новой попытки (но сохраняем историю ошибки)
+                state.State = ConnectionState.Recovering;
+                state.RequiresManualReset = false;
+                state.NextAllowedAttempt = null;
+                state.CurrentPollSeconds = 0;
+                state.MaxPollRetryCount = 0;
+                // FailureCount не сбрасываем - покажет историю
 
-            _logger.LogInformation(
-                "Device {DeviceId} manually reset: {PreviousState} ({Category}) → Recovering",
-                deviceId, previousState, previousCategory);
+                _logger.LogInformation(
+                    "Device {DeviceId} manually reset: {PreviousState} ({Category}) → Recovering",
+                    deviceId, previousState, previousCategory);
 
-            return true;
+                return true;
+            }
         }
 
         return false;
@@ -178,25 +193,28 @@ public class DeviceConnectionDiagnosticService : IDeviceConnectionDiagnosticServ
         if (!_deviceStates.TryGetValue(deviceId, out var state))
             return null;
 
-        var info = new DeviceConnectionDiagnosticInfo
+        lock (state.SyncRoot)
         {
-            IsBlocked = state.RequiresManualReset,
-            State = state.State.ToString(),
-            ErrorCategory = state.ErrorCategory != ErrorCategory.None ? state.ErrorCategory.ToString() : null,
-            LastError = state.LastError,
-            FailureCount = state.FailureCount,
-            MaxRetryReached = state.RequiresManualReset && state.ErrorCategory != ErrorCategory.Authentication,
-            CurrentPollSeconds = state.CurrentPollSeconds
-        };
+            var info = new DeviceConnectionDiagnosticInfo
+            {
+                IsBlocked = state.RequiresManualReset,
+                State = state.State.ToString(),
+                ErrorCategory = state.ErrorCategory != ErrorCategory.None ? state.ErrorCategory.ToString() : null,
+                LastError = state.LastError,
+                FailureCount = state.FailureCount,
+                MaxRetryReached = state.RequiresManualReset && state.ErrorCategory != ErrorCategory.Authentication,
+                CurrentPollSeconds = state.CurrentPollSeconds
+            };
 
-        // Вычисляем время до следующей попытки
-        if (!state.RequiresManualReset && state.NextAllowedAttempt.HasValue)
-        {
-            var secondsRemaining = (int)(state.NextAllowedAttempt.Value - DateTime.Now).TotalSeconds;
-            info.SecondsUntilNextAttempt = Math.Max(0, secondsRemaining);
+            // Вычисляем время до следующей попытки
+            if (!state.RequiresManualReset && state.NextAllowedAttempt.HasValue)
+            {
+                var secondsRemaining = (int)(state.NextAllowedAttempt.Value - DateTime.Now).TotalSeconds;
+                info.SecondsUntilNextAttempt = Math.Max(0, secondsRemaining);
+            }
+
+            return info;
         }
-
-        return info;
     }
 
     /// <summary>
