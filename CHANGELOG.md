@@ -7,6 +7,8 @@
 
 ## [Unreleased]
 
+## [1.5.2] - 2026-02-26
+
 ### Added
 - 🚀 **Configurator: Вкладка "Документы"** — редактирование JSON-конфигураций документов
   - DocumentsTab: древовидная структура типов документов
@@ -29,6 +31,11 @@
   - Порог сетевых ошибок (NetworkFailureThreshold)
   - Максимум попыток до блокировки (MaxRetryCount)
   - Новый тип `DeviceConnectionDiagnosticSettings` в config.types.ts
+- 🚀 **Configurator: Комбобокс выбора типа ИВК** — автоматическая подстановка имён БД и настроек OPC для TN-01/TN-02
+- 🚀 **Client Logger** — модуль `Logger` (`shared/src/logger.ts`) для отправки фронтенд-логов на сервер через `/api/ClientLog/logging`
+  - Глобальный перехват ошибок (`window.onerror`, `onunhandledrejection`, Vue errorHandler)
+  - Interceptor Axios для логирования HTTP-ошибок
+  - Интегрирован в Configurator
 
 ### Changed
 - Рефакторинг UI конфигуратора: добавлены design tokens для spacing system
@@ -48,6 +55,13 @@
 - Installer (MSI): `RunCfgElevator` теперь запускается при установке/обновлении (условие `NOT REMOVE~="ALL"`); при первой установке миграция пропускается, но этап cleanup удаляет `cfg-elevator.exe`
 - CI (GitLab): для `package-msi-full-job` и `package-msi-minimal-job` указан образ `mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK_VERSION}-windowsservercore-ltsc2019`
 - CI (GitLab): `workflow.rules` ограничен запуском pipeline только по тегу (`CI_COMMIT_TAG`); правила для push в `master` и MR удалены
+- **Главная страница**: макет переведён с `<table>` на `<div>` + flexbox; высота DataTable автоматически заполняет доступное пространство
+- **Конфигуратор**: автовыбор первого активного устройства на вкладке «Устройства»
+- **Конфигуратор**: размеры Splitter-панелей сохраняются в localStorage
+- **Справочники**: чекбокс «Активен» установлен по умолчанию при добавлении записи (лицензии, пользователи)
+- **Справочники**: параметры отсортированы по Id, отображаются все используемые параметры
+- **CSS**: селекторы `table.mainTable` заменены на `.mainTable` (рефакторинг после перехода на div-layout)
+- Доработка логики скрытия/блокировки `#MenuButton` (вместо `#ButtonDictionaries`) в зависимости от роли текущего пользователя
 
 ### Fixed
 - Исправлено отображение настроек OPC в диалогах (нормализация типа OPC)
@@ -55,6 +69,10 @@
 - Унифицирован базовый путь для чтения и записи конфигураций
 - Исправлено сохранение конфигураций документов через кнопку "Применить"
 - CI: исправлен порядок аргументов tar в preinst скриптах — `--exclude` опции перемещены перед позиционными аргументами (GitHub Actions + GitLab CI)
+- Jornal: исправлена ошибка обращения к `DataARM.AdditionalData` в шаблонах FastReport
+- Act: исправлена логика вывода обозначения нефти по ГОСТ Р 51858
+- CI: добавлен `chmod +x` для `cfg-elevator` в deb-пакетах
+- Справочники: модальное окно больше не закрывается автоматически после сохранения (убрано преждевременное закрытие)
 
 ## [1.5.1] - 2026-02-09
 
@@ -233,7 +251,8 @@
 - 📝 **Documentation** - Обновление документации
 - 🔧 **Maintenance** - Техническое обслуживание кода
 
-[Unreleased]: https://github.com/tn-ivk/tn-doc/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/tn-ivk/tn-doc/compare/v1.5.2...HEAD
+[1.5.2]: https://github.com/tn-ivk/tn-doc/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/tn-ivk/tn-doc/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/tn-ivk/tn-doc/compare/v1.4.3...v1.5.0
 [1.4.3]: https://github.com/tn-ivk/tn-doc/compare/v1.4.2...v1.4.3

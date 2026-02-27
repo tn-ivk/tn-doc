@@ -102,13 +102,19 @@ namespace FastReport
     private void Table1SourceData_ManualBuild(object sender, EventArgs e)
     {
       //// ==== Get Data from classes
-      List &lt;string&gt; listTable1Detectors=
-        DataIVK.TableKMH_MPR_PU.Protokol.Table1.DetName.Where
-      (i =&gt; i.Length &gt; 1 &amp; String.IsNullOrEmpty(i) == false).ToList();
-         
-      List &lt;string&gt; listTable1V0=
-        DataIVK.TableKMH_MPR_PU.Protokol.Table1.V0.Where
-      (i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      var rawDetName = DataIVK.TableKMH_MPR_PU.Protokol.Table1.DetName;
+      var rawV0 = DataIVK.TableKMH_MPR_PU.Protokol.Table1.V0;
+
+      List &lt;string&gt; listTable1Detectors = new List&lt;string&gt;();
+      List &lt;string&gt; listTable1V0 = new List&lt;string&gt;();
+      for (int idx = 0; idx &lt; rawDetName.Count; idx++)
+      {
+        if (rawDetName[idx].Length &gt; 1 &amp;&amp; !String.IsNullOrEmpty(rawDetName[idx]))
+        {
+          listTable1Detectors.Add(rawDetName[idx]);
+          listTable1V0.Add(idx &lt; rawV0.Count ? rawV0[idx] : &quot;-&quot;);
+        }
+      }
          
       //Setup Columns width                                                                                           
       //int sumDynamicCols=Table1SourceData.ColumnCount;                                                                                                                                

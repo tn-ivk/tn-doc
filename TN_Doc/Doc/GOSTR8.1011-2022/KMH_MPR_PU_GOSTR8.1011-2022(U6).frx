@@ -78,8 +78,19 @@ namespace FastReport
       {
         JToken jsonTable1 = JTableKMH_MPR_PU[&quot;Protokol&quot;][&quot;Table1&quot;]; 
 
-        List&lt;string&gt; listDetName = jsonTable1[&quot;DetName&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
-        List&lt;string&gt; listV0 = jsonTable1[&quot;V0&quot;].Where(x=&gt;x.ToString()!=&quot;-&quot;).Select(x=&gt;x.ToString()).ToList();
+        var rawDetName = jsonTable1[&quot;DetName&quot;].Select(x=&gt;x.ToString()).ToList();
+        var rawV0 = jsonTable1[&quot;V0&quot;].Select(x=&gt;x.ToString()).ToList();
+
+        List&lt;string&gt; listDetName = new List&lt;string&gt;();
+        List&lt;string&gt; listV0 = new List&lt;string&gt;();
+        for (int idx = 0; idx &lt; rawDetName.Count; idx++)
+        {
+          if (rawDetName[idx] != &quot;-&quot;)
+          {
+            listDetName.Add(rawDetName[idx]);
+            listV0.Add(idx &lt; rawV0.Count ? rawV0[idx] : &quot;-&quot;);
+          }
+        }
 
         List&lt;TableRow&gt; rows = new List&lt;TableRow&gt;();
         

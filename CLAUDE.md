@@ -99,7 +99,6 @@ Custom PDF middleware перехватывает `/PDF/PDF.pdf` и отдаёт 
 | `PrinterService` | Платформо-зависимая печать (Windows/Linux) |
 | `ISystemJournalService` | Запись в системный журнал ОС (Event Log / syslog) |
 | `IDbSchemaCache` | Кэш схемы БД (проверка наличия колонки DataARM) |
-| `DirectoryService` | Работа со справочниками (DirEditor) |
 | `AppClientTracker` | Отслеживание подключённых клиентов |
 | `Validators/` | `DbConfigValidator`, `OpcConfigValidator` — валидация конфигураций |
 
