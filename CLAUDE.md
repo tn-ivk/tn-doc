@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc — ASP.NET Core 8.0 веб-приложение для генерации технических документов ИВК (Измерительно-вычислительный комплекс) нефтегазовой отрасли. Генерирует паспорта качества, протоколы поверки, акты приёма-сдачи через FastReport.
 
-**Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Frontend**: Vue 3 + TypeScript | **Version**: 1.5.1
+**Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Frontend**: Vue 3 + TypeScript | **Version**: 1.5.2
 
 **Ключевые зависимости**: FastReport.Web.Skia 2026.1.2, EF Core 7.0.20 + Pomelo 7.0.0 (намеренно понижена с EF 8 для совместимости с MySQL ИВК), NLog 5.4.0, Newtonsoft.Json 13.0.3.
 
@@ -105,7 +105,7 @@ Custom PDF middleware перехватывает `/PDF/PDF.pdf` и отдаёт 
 **tn.docgeneral/TN.DocGeneral/Services/** — общие для всех приложений:
 | Service | Назначение |
 |---------|------------|
-| `IAppConfigService` | Конфигурация + фабрика документов (partial: Devices, Documents, Dictionaries, Elis, LastUsedTemplate) |
+| `IAppConfigService` | Конфигурация + фабрика документов (partial: Devices, Documents, Dictionaries, Elis, LastUsedTemplate). Включает `GetDeviceType()` — определение типа ИВК (`IvkDeviceType`: TN01/TN02) по имени БД |
 | `IConfigurationCacheService` | LRU-кэш JSON-конфигов (макс. 50), кэширует raw JSON |
 | `IReportBuffer` | In-memory PDF хранилище (последний PDF) |
 | `IDocModuleLoader` | Динамическая загрузка DLL модулей (LRU метаданных, макс. 5) |
@@ -207,6 +207,8 @@ GetPathTemplateFile()                // Путь к .frx шаблону
 
 **Доступные в наследниках**: `_appConfig`, `_configCache`, `_deviceId`, `CfgGeneral`, `CurrentCfgDevice`, `LoadCfg<T>()`.
 
+**Подключение к БД**: `OnConfiguring()` выполняет параллельную проверку каналов (`IsActiveConnect()` с `async/await` и `CancellationToken`) для выбора активного подключения. `DBtService` и `MySqlConnection` корректно освобождаются через `using`.
+
 **Типичная структура модуля** (пример: Passport/):
 ```
 Passport/
@@ -216,6 +218,10 @@ Passport/
 ├── Elis/                     # ELIS интеграция (если нужна)
 └── html.html                 # HTML шаблон формы редактирования
 ```
+
+**Типы устройств** (`TN.DocGeneral/Cfg/IvkDeviceType.cs`): enum `IvkDeviceType` (None, TN01, TN02) — определяет тип ИВК по имени БД (`IVK_TN_01` → TN01, `ivk_tn` → TN02).
+
+**Модели Report** (`tn.docgeneral/Report/Models/`): модели данных отчётов вынесены из DocReport.cs — `Report`, `Line`, `SIKN`, `BIK`, `DataARM`, `TableReport` и др. Enum `DirectionNameSource` (Database/Config) управляет источником имён направлений.
 
 **Важно**: использовать `Path.Combine()` для кросс-платформенности.
 
@@ -263,7 +269,7 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 
 ### Версионирование и packaging
 
-Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.1-b42-a1b2c3d4`)
+Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.2-b42-a1b2c3d4`)
 
 **Linux (.deb):** `tn.doc-{FULL_VERSION}_amd64.deb`
 - Требует `dotnet-runtime-8.0 >= 8.0.13`
@@ -330,7 +336,7 @@ dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true 
 copy installer\tools\cfg-elevator-windows-amd64.exe publish\win-x64-full\cfg-elevator.exe
 
 # 3. Build MSI (Heat harvesting + WiX compilation integrated via MSBuild)
-dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.1 -p:HarvestPath=../../publish/win-x64-full
+dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.2 -p:HarvestPath=../../publish/win-x64-full
 ```
 
 **Тихая установка:**
