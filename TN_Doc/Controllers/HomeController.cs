@@ -385,7 +385,6 @@ public class HomeController : Controller
         ViewData["Version"] = provider.Version;
         try
         {
-            FastReport.Utils.Config.EnableScriptSecurity = false;
             _fr.EnableMargins = true;
             _fr.Mode = WebReportMode.Preview;
             _fr.SinglePage = true;
