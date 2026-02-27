@@ -122,6 +122,7 @@ Custom PDF middleware перехватывает `/PDF/PDF.pdf` и отдаёт 
 | `IReportBuffer` → `ReportBuffer` | In-memory PDF хранилище (последний PDF) |
 | `IDocModuleLoader` → `CachedDocModuleLoader` | Динамическая загрузка DLL модулей (LRU метаданных, макс. 5) |
 | `LoggingPathService` | Кросс-платформенное определение путей логирования (static) |
+| `DirectionNameService` | Определение наименований направлений (static): None/Database/Config, с учётом типа ИВК (TN01/TN02) |
 
 ### Controllers
 
@@ -203,7 +204,7 @@ Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
 
 | Файл | Назначение |
 |------|------------|
-| `TN_Doc/Cfg/CfgApp.json` | Главная конфигурация (устройства, ELIS, OPC, DeviceConnectionDiagnostic) |
+| `TN_Doc/Cfg/CfgApp.json` | Главная конфигурация (устройства, ELIS, OPC, DeviceConnectionDiagnostic, DirectionNameSource) |
 | `TN_Doc/Cfg/Cfg{Type}.json` | Настройки шаблона документа |
 | `TN_Doc/Cfg/CfgEdit{Type}.json` | Конфигурация формы редактирования документа |
 | `TN_Doc/appsettings.json` | ASP.NET Core настройки (Kestrel: `localhost:5000`, пути: `CfgDirPath`, `RelCfgName`, `RelCfgAppName`, `UserPreferenceDirPath`, `LastUsedTemplateListFileName`) |
@@ -230,9 +231,11 @@ GetPeriodDocument(int id) → PeriodDocument            // Период доку
 GetPathTemplateFile() → string                       // Путь к .frx шаблону
 ```
 
-**Доступные в наследниках**: `_appConfig`, `_configCache`, `_deviceId`, `CfgGeneral`, `CurrentCfgDevice`, `DictionarysDoc`, `LoadCfg<T>()`, `PathToRootDirectory`, `PathToDocConfigFile`.
+**Доступные в наследниках**: `_appConfig`, `_configCache`, `_deviceId`, `CfgGeneral`, `CurrentCfgDevice`, `DictionarysDoc`, `DirectionNameSource`, `LoadCfg<T>()`, `PathToRootDirectory`, `PathToDocConfigFile`.
 
 **Вспомогательные static-методы**: `ArrByteToString()`, `StringToHexArrByte()`, `UnixTimestampToDatetime()`, `DatetimeToUnixTimestamp()`, `NormalizeDecimalString()`, `MapPropertiesByName<T>()`.
+
+**Наименования направлений**: `DirectionNameSource` (enum: `None`, `Database`, `Config`) задаётся на уровне устройства в `CfgApp.json`. Сервис `DirectionNameService.GetDirectionName()` возвращает наименование СИКН/направления с учётом типа ИВК: TN01 — СИКН + направление, TN02 — только СИКН.
 
 **Подключение к БД**: `OnConfiguring()` выполняет параллельную проверку всех `DBConnectionStrings` устройства и использует первый активный канал (failover).
 

@@ -1,5 +1,8 @@
 # Список изменений:
 ## Версия 1.5.2:
+    -⚠️DirectionNameSource: перенесён с уровня документа на уровень устройства (CfgApp.json), добавлен DirectionNameService
+    -🐞OnConfiguring: исправлена утечка MySqlConnection и sync-over-async
+    - Удалён неиспользуемый Home.cs (19 мёртвых классов) и DirectoryService
     -🐞KMH_MPR_PU: исправлена ошибка IndexOutOfRange при формировании Table1 в шаблонах FastReport (несогласованная фильтрация DetName и V0):
         - 23_KMH_MPR_PU_Release_version.frx
         - KMH_MPR_PU_GOSTR8.1011-2022(U6).frx
