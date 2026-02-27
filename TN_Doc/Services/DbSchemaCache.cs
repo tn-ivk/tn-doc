@@ -62,7 +62,7 @@ public class DbSchemaCache : IDbSchemaCache
                 return false;
             }
 
-            var dbService = new DBtService(cfgDevice.DBConnectionStrings.Where(x => x.Use).ToList());
+            using var dbService = new DBtService(cfgDevice.DBConnectionStrings.Where(x => x.Use).ToList());
             var fields = dbService.GetTableInfo(tableName);
 
             var hasDataArm = fields.Any(f => string.Equals(f.Field, "DataARM", StringComparison.OrdinalIgnoreCase));
