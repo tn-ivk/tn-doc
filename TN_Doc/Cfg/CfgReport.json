@@ -247,7 +247,7 @@
             "Width": 0
           }
         },
-        "DirectionNameSource": "Database",
+        "DirectionNameSource": "None",
         "IncompleteReports": [
           {
             "Use": true,
