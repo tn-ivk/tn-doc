@@ -23,9 +23,7 @@
       "Header": {
         "FieldSIKN": "СИКН"
       },
-      "Data": {
-        "DirectionNameSource": "None"
-      },
+      "Data": {},
       "Footer": {},
       "Dictionarys": {}
     },
