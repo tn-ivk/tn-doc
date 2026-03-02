@@ -117,7 +117,7 @@ Custom PDF middleware перехватывает `/PDF/PDF.pdf` и отдаёт 
 
 | Service | Назначение |
 |---------|------------|
-| `IAppConfigService` → `AppConfigService` | Конфигурация + фабрика документов (partial: Devices, Documents, Dictionaries, Elis, LastUsedTemplate) |
+| `IAppConfigService` → `AppConfigService` | Конфигурация + фабрика документов (partial: Devices, Documents, Dictionaries, Elis, LastUsedTemplate). Singleton через `AppConfigService.GetInstance(configuration)`. Принимает `ConfigLoadMode`: `CfgAppOnly` (только CfgApp.json, для MessagingService) / `Full` (все конфиги, для TN_Doc) |
 | `IConfigurationCacheService` → `ConfigurationCacheService` | LRU-кэш JSON-конфигов (макс. 50), кэширует raw JSON |
 | `IReportBuffer` → `ReportBuffer` | In-memory PDF хранилище (последний PDF) |
 | `IDocModuleLoader` → `CachedDocModuleLoader` | Динамическая загрузка DLL модулей (LRU метаданных, макс. 5) |
@@ -235,7 +235,21 @@ GetPathTemplateFile() → string                       // Путь к .frx ша�
 
 **Вспомогательные static-методы**: `ArrByteToString()`, `StringToHexArrByte()`, `UnixTimestampToDatetime()`, `DatetimeToUnixTimestamp()`, `NormalizeDecimalString()`, `MapPropertiesByName<T>()`.
 
-**Наименования направлений**: `DirectionNameSource` (enum: `None`, `Database`, `Config`) задаётся на уровне устройства в `CfgApp.json`. Сервис `DirectionNameService.GetDirectionName()` возвращает наименование СИКН/направления с учётом типа ИВК: TN01 — СИКН + направление, TN02 — только СИКН.
+**Наименования направлений**: `DirectionNameSource` (enum: `None`, `Database`, `Config`) задаётся на уровне устройства в `CfgApp.json`. Сервис `DirectionNameService.GetDirectionName()` возвращает HTML-строку наименования с учётом типа ИВК: TN01 — СИКН + направление, TN02 — только СИКН. Возвращает `<br><span class="direction-caption">...</span>` или пустую строку.
+
+**IDirectionItem** (интерфейс для модулей с направлениями): документный класс должен реализовывать `IDirectionItem` на своих моделях, которые передаются в `DirectionNameService.GetDirectionName()`:
+```csharp
+public interface IDirectionItem
+{
+    int BIK_ID { get; }
+    int? DIR_ID { get; }
+    byte[] SiknName { get; }   // Из БД — байты имени СИКН (MySQL charset latin1)
+    byte[] DirName { get; }    // Из БД — байты имени направления
+}
+```
+`DirectionNameService.JoinNames()` и `WrapDirectionHtml()` — вспомогательные static-методы, доступны для прямого использования.
+
+**IvkDeviceType**: enum (`TN01`, `TN02`) доступен в наследниках через protected `DeviceType` (задаётся из `CfgApp.json → AppConfigService.GetDeviceType(idDevice)`). Определяет режим форматирования отчётов.
 
 **Подключение к БД**: `OnConfiguring()` выполняет параллельную проверку всех `DBConnectionStrings` устройства и использует первый активный канал (failover).
 
@@ -405,6 +419,14 @@ cd TN_Doc/Client && npm run test:e2e
 
 **InternalsVisibleTo**: `TN_Doc.csproj` → `Tests.Unit` (доступ к internal классам).
 
+## Known Tech Debt
+
+| Проблема | Расположение | Документ |
+|----------|-------------|----------|
+| **IvkTypeResolver inconsistency** — тип ИВК определяется по-разному в backend (`tn.docgeneral`: по активным `DBConnectionStrings.Where(x => x.Use)`) и во frontend configurator (по всем строкам с отдельными правилами). Может приводить к расхождению режима логики документов и состояния "Не выбрано" в конфигураторе. | `tn.docgeneral/Services/AppConfigService.Devices.cs`, `Client/configurator/` | `tech_debt/IVK_TYPE_RESOLVER_UNIFICATION_PLAN.md` |
+
+Полный список (~20 планов) — в `tech_debt/`. Актуальные приоритеты: `TEST_COVERAGE_PLAN.md`, `SECURITY_HARDENING_PLAN.md`, `ASYNC_EXPORT_PLAN.md`.
+
 ## Git Conventions
 
 - **Commit messages**: русский язык, формат `Область: описание`
@@ -449,5 +471,6 @@ cd TN_Doc/Client && npm run test:e2e
 | `development/fastreport-templates.md` | Работа с шаблонами FastReport |
 | `integration/elis.md` | Интеграция с ELIS |
 | `ui-design.md` | UI Design гайд (PrimeVue) |
+| `tn.docgeneral/DESIGN_DOCUMENTATION.md` | Material Design 3 цвета, типографика, компоненты (кнопки, таблицы, панели) |
 
-`tech_debt/` — планы технического долга (~19 документов: тестирование, безопасность, OpenTelemetry, оптимизация FastReport и др.).
+`tech_debt/` — планы технического долга (~20 документов: тестирование, безопасность, OpenTelemetry, оптимизация FastReport и др.).
