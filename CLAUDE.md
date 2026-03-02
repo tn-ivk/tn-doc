@@ -425,7 +425,7 @@ cd TN_Doc/Client && npm run test:e2e
 |----------|-------------|----------|
 | **IvkTypeResolver inconsistency** — тип ИВК определяется по-разному в backend (`tn.docgeneral`: по активным `DBConnectionStrings.Where(x => x.Use)`) и во frontend configurator (по всем строкам с отдельными правилами). Может приводить к расхождению режима логики документов и состояния "Не выбрано" в конфигураторе. | `tn.docgeneral/Services/AppConfigService.Devices.cs`, `Client/configurator/` | `tech_debt/IVK_TYPE_RESOLVER_UNIFICATION_PLAN.md` |
 
-Полный список (~20 планов) — в `tech_debt/`. Актуальные приоритеты: `TEST_COVERAGE_PLAN.md`, `SECURITY_HARDENING_PLAN.md`, `ASYNC_EXPORT_PLAN.md`.
+Единственный оставшийся план — в `tech_debt/IVK_TYPE_RESOLVER_UNIFICATION_PLAN.md`.
 
 ## Git Conventions
 
