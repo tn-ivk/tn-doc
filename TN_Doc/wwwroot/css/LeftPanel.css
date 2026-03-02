@@ -14,22 +14,23 @@ input[type=number] {
 
 /***************************************************/
 .cont {
-    height: 100%;
-    width: 100%;
-    min-height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 98%;
+    width: 98%;
 }
 
 .mainTable {
-    display: flex;
+    position: absolute;
     width: 100%;
     height: 100%;
-    min-height: 0;
     font-size: 10pt;
 }
 
-.mainTable > .leftPanel,
-.mainTable > .rightPanel {
+.mainTable > tbody > tr > td {
     border: 1px solid black;
+    border-collapse: collapse;
 }
 
 .topPanel {
@@ -37,71 +38,26 @@ input[type=number] {
 }
 
 .leftPanel {
-    display: flex;
-    flex-direction: column;
     width: 400px;
-    min-width: 320px;
-    max-width: 420px;
-    min-height: 0;
-}
-
-.rightPanel {
-    flex: 1 1 auto;
-    min-width: 0;
-    min-height: 0;
 }
 
 .filterTable {
-    display: flex;
-    flex-direction: column;
     width: 100%;
     height: 100%;
-    min-height: 0;
+    border-collapse: collapse;
+    border-top-style: hidden;
+    border-left-style: hidden;
+    border-right-style: hidden;
 }
 
-.filterRow {
-    border-bottom: 1px solid black;
+.filterTable > tbody > tr > td {
+    border: 1px solid black;
+    border-collapse: collapse;
 }
 
-.filterRow:not(.filterRowButton):not(.filterRowTable) {
-    display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
-    align-items: center;
-    min-height: 35px;
-}
-
-.filterLabel {
+/* Left padding for filter labels (exclude row with DataTable) */
+.filterTable > tbody > tr:not(:has(#DataTable)) > td:first-child {
     padding-left: 4px;
-    margin: 0;
-}
-
-.filterField {
-    min-width: 0;
-}
-
-.filterRowButton {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    min-height: 35px;
-    padding: 0 4px;
-}
-
-.filterActions {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.filterRowTable {
-    flex: 1 1 auto;
-    min-height: 0;
-    border-bottom: none;
-}
-
-.filterTableHost {
-    height: 100%;
-    min-height: 0;
 }
 
 .searched-table {
@@ -400,6 +356,11 @@ select.invalid-cell-content {
     padding-top: 1px;
 }
 
+/* Подпись направления в списке отчётов */
+.direction-caption {
+    font-size: 8pt !important;
+}
+
 /* Стили для заголовка таблицы DataTable */
 #DataTable thead th {
     padding: 0.25rem 0.5rem;
@@ -428,31 +389,3 @@ select.invalid-cell-content {
     margin-right: 0.5em;
 }
 
-/* DataTables in left panel: fill all available height in flex container */
-#DataTable_wrapper {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-
-#DataTable_wrapper .dataTables_scroll {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-
-#DataTable_wrapper .dataTables_scrollHead {
-    flex: 0 0 auto;
-}
-
-#DataTable_wrapper .dataTables_scrollBody {
-    flex: 1 1 auto;
-    min-height: 0;
-    height: auto !important;
-    max-height: none !important;
-    overflow-y: auto !important;
-    padding-bottom: 1px;
-    scrollbar-gutter: stable;
-}

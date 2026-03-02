@@ -1152,6 +1152,7 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
+      "DirectionNameSource": "None",
       "InvalidChars": [
         "\"",
         "'",
@@ -2310,6 +2311,7 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
+      "DirectionNameSource": "None",
       "InvalidChars": [
         "\"",
         "'",
@@ -3468,6 +3470,7 @@
           "StartPrefix": "IVK_TN_01"
         }
       },
+      "DirectionNameSource": "None",
       "InvalidChars": [
         "\"",
         "'",

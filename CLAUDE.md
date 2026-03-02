@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TN_Doc — ASP.NET Core 8.0 веб-приложение для генерации технических документов ИВК (Измерительно-вычислительный комплекс) нефтегазовой отрасли. Генерирует паспорта качества, протоколы поверки, акты приёма-сдачи через FastReport.
 
-**Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Frontend**: Vue 3 + TypeScript | **Version**: 1.5.1
+**Framework**: .NET 8.0 | **Runtime**: 8.0.13+ | **Frontend**: Vue 3 + TypeScript | **Version**: 1.5.2
 
-**Ключевые зависимости**: FastReport.Web.Skia 2026.1.2, EF Core 7.0.20 + Pomelo 7.0.0 (намеренно понижена с EF 8 для совместимости с MySQL ИВК), NLog 5.4.0, Newtonsoft.Json 13.0.3.
+**Ключевые зависимости**: FastReport.Web.Skia 2026.1.2, EF Core 7.0.20 + Pomelo 7.0.0 (намеренно понижена с EF 8 для совместимости с MySQL ИВК), NLog 5.4.0, Newtonsoft.Json 13.0.3, SkiaSharp.NativeAssets.Linux 2.88.9, HarfBuzzSharp.NativeAssets.Linux 8.3.1.1.
 
 ## Quick Start
 
@@ -18,11 +18,14 @@ dotnet nuget add source "https://nuget.ortpr.ru/v3/index.json" --name ortpr
 dotnet nuget add source "https://nuget.fast-report.com/api/v3/index.json" --name fr_nuget \
   --username "<USERNAME>" --password "<PASSWORD>" --store-password-in-clear-text
 
-# 2. Build & Run
+# 2. Submodules
+git submodule update --init --recursive
+
+# 3. Build & Run
 dotnet restore && dotnet build
 cd TN_Doc && dotnet run  # http://localhost:5000 (Kestrel), http://localhost:38509 (IIS Express dev)
 
-# 3. Vue components (Node.js >=18.0.0)
+# 4. Vue components (Node.js >=18.0.0, npm >=8.0.0)
 cd TN_Doc/Client && npm install && npm run build:all
 ```
 
@@ -37,6 +40,8 @@ dotnet build TN_Doc/TN_Doc.csproj         # Только основной про
 
 # Тестирование (NUnit)
 dotnet test                                              # Все тесты
+dotnet test Tests/Tests.Unit                             # Только unit-тесты
+dotnet test Tests/Tests.Integration                      # Только интеграционные
 dotnet test --filter "ClassName=AppConfigServiceTests"   # Конкретный класс
 dotnet test --filter "FullyQualifiedName~TestName"       # По имени метода
 
@@ -45,9 +50,11 @@ cd TN_Doc/Client
 npm run dev               # StatusBar с hot reload
 npm run dev:configurator  # Configurator с hot reload
 npm run build:all         # Production сборка обоих
+npm run type-check        # TypeScript проверка всех workspaces
 
-# E2E тесты (Playwright)
+# E2E тесты (Playwright, требует запущенный сервер на localhost:38509)
 npm run test:e2e          # Все E2E тесты
+npm run test:e2e:headed   # С видимым окном браузера
 npm run test:e2e:ui       # Playwright UI mode
 ```
 
@@ -65,81 +72,101 @@ HTTP Request → HomeController → IDocModuleLoader.LoadDocsModule(options, idD
 
 ### DI и Middleware Pipeline (Startup.cs)
 
-**Регистрация сервисов** (ключевые):
+**Регистрация сервисов** (в порядке регистрации):
 ```
-Singleton: IReportBuffer, IAppConfigService, IDbSchemaCache, IConfigurationCacheService, IDocModuleLoader, IDeviceConnectionDiagnosticService, AppClientTracker
-Scoped:    IConfigurationService, IStatusProvider, DocGeneral (DbContext)
-Transient: AbsPrinter (Windows/Linux), IPrinterService
-Hosted:    StatusMonitoringService (BackgroundService)
-Other:     AddMemoryCache(), AddSignalR(), AppInfoProvider (через extension method)
+Logging:    AddLogging() with NLog, LoggingPathService.GetLogDirectory("TN_Doc")
+CORS:       AddCors("CorsPolicy") — AllowAnyHeader, AllowAnyMethod, AllowCredentials
+Extensions: ConfigAppDirectory(), AddAppInfoProvider(), AddPrinters(), AddPrinterService(), AddSystemJournal()
+Singleton:  IReportBuffer, IAppConfigService (factory), IDbSchemaCache, IConfigurationCacheService,
+            IDocModuleLoader (CachedDocModuleLoader), IDeviceConnectionDiagnosticService, AppClientTracker
+Scoped:     IConfigurationService, IStatusProvider, DocGeneral (DbContext)
+Hosted:     StatusMonitoringService (BackgroundService)
+Other:      AddControllersWithViews(), AddSignalR(), AddMemoryCache()
 HttpClient: "MessagingService" (localhost:5010, timeout 2s), "Elis" (timeout 5s)
 ```
 
 **Middleware pipeline** (порядок важен):
 ```
-DeveloperExceptionPage / ExceptionHandler → PDF Interceptor (custom) →
-StaticFiles → Routing → CORS → AppClientTrackingMiddleware → Endpoints (MVC + SignalR)
+CacheInvalidator registration → DeveloperExceptionPage / ExceptionHandler →
+PDF Interceptor (inline, /PDF/PDF.pdf) → StaticFiles → Routing → CORS →
+AppClientTrackingMiddleware → Endpoints (MVC default route + SignalR /statusHub)
 ```
 
 Custom PDF middleware перехватывает `/PDF/PDF.pdf` и отдаёт PDF из `IReportBuffer` без записи на диск.
 
-При старте регистрируется callback для автоинвалидации кэша: `CfgFileRW.RegisterCacheInvalidator(...)`.
+При старте регистрируется callback: `CfgFileRW.RegisterCacheInvalidator(filePath => configCache.ClearCache(filePath))` — автоинвалидация кэша при изменении JSON-файлов.
 
 ### Key Services
 
-Сервисы разделены между двумя проектами:
-
 **TN_Doc/Services/** — специфичные для веб-приложения:
+
 | Service | Назначение |
 |---------|------------|
-| `IStatusProvider` | Мониторинг здоровья системы (многоканальный) |
-| `IDeviceConnectionDiagnosticService` | Circuit breaker для подключений (защита MySQL от max_connect_errors) |
-| `IConfigurationService` | CRUD для CfgApp.json и Cfg*.json документов |
-| `StatusMonitoringService` | BackgroundService: периодическая проверка + SignalR push |
-| `PrinterService` | Платформо-зависимая печать (Windows/Linux) |
-| `ISystemJournalService` | Запись в системный журнал ОС (Event Log / syslog) |
-| `IDbSchemaCache` | Кэш схемы БД (проверка наличия колонки DataARM) |
-| `AppClientTracker` | Отслеживание подключённых клиентов |
-| `Validators/` | `DbConfigValidator`, `OpcConfigValidator` — валидация конфигураций |
+| `IStatusProvider` → `StatusProvider` | Мониторинг здоровья системы (многоканальный) |
+| `IDeviceConnectionDiagnosticService` → `DeviceConnectionDiagnosticService` | Circuit breaker для подключений (защита MySQL от max_connect_errors) |
+| `IConfigurationService` → `ConfigurationService` | CRUD для CfgApp.json и Cfg*.json (с Path Traversal защитой) |
+| `StatusMonitoringService` (BackgroundService) | Периодическая проверка + SignalR push обновлений |
+| `IPrinterService` → `PrinterService` | Платформо-зависимая печать (Windows/Linux) |
+| `ISystemJournalService` → `WindowsSystemJournalService` / `LinuxSystemJournalService` | Запись в Event Log / syslog |
+| `IDbSchemaCache` → `DbSchemaCache` | Кэш схемы БД (проверка наличия колонки DataARM) |
+| `AppClientTracker` | Отслеживание подключённых клиентов (Singleton) |
+| `Validators/DbConfigValidator` | Валидация connection strings (server, database, timeout) |
+| `Validators/OpcConfigValidator` | Валидация OPC DA/UA настроек (Host, ProgId, UpdateRate) |
 
 **tn.docgeneral/TN.DocGeneral/Services/** — общие для всех приложений:
+
 | Service | Назначение |
 |---------|------------|
-| `IAppConfigService` | Конфигурация + фабрика документов (partial: Devices, Documents, Dictionaries, Elis, LastUsedTemplate) |
-| `IConfigurationCacheService` | LRU-кэш JSON-конфигов (макс. 50), кэширует raw JSON |
-| `IReportBuffer` | In-memory PDF хранилище (последний PDF) |
-| `IDocModuleLoader` | Динамическая загрузка DLL модулей (LRU метаданных, макс. 5) |
-| `LoggingPathService` | Кросс-платформенное определение путей логирования |
+| `IAppConfigService` → `AppConfigService` | Конфигурация + фабрика документов (partial: Devices, Documents, Dictionaries, Elis, LastUsedTemplate). Singleton через `AppConfigService.GetInstance(configuration)`. Принимает `ConfigLoadMode`: `CfgAppOnly` (только CfgApp.json, для MessagingService) / `Full` (все конфиги, для TN_Doc) |
+| `IConfigurationCacheService` → `ConfigurationCacheService` | LRU-кэш JSON-конфигов (макс. 50), кэширует raw JSON |
+| `IReportBuffer` → `ReportBuffer` | In-memory PDF хранилище (последний PDF) |
+| `IDocModuleLoader` → `CachedDocModuleLoader` | Динамическая загрузка DLL модулей (LRU метаданных, макс. 5) |
+| `LoggingPathService` | Кросс-платформенное определение путей логирования (static) |
+| `DirectionNameService` | Определение наименований направлений (static): None/Database/Config, с учётом типа ИВК (TN01/TN02) |
 
 ### Controllers
 
 | Controller | Route | Назначение |
 |------------|-------|------------|
-| `HomeController` | `/` | Генерация документов через FastReport |
-| `StatusController` | `/api/status` | Мониторинг статуса устройств (кэш 5 сек) |
-| `ConfiguratorController` | `/api/configurator` | CRUD конфигурации |
-| `ConfigCacheController` | `/api/config-cache` | Управление кэшем |
-| `ConfiguratorViewController` | `/configurator` | SPA страница конфигуратора |
-| `PrintController` | `/Print` | Печать документов |
+| `HomeController` | `/` (default MVC) | Генерация документов через FastReport |
+| `StatusController` | `api/status` | Мониторинг статуса устройств (кэш 5 сек) |
+| `ConfiguratorController` | `api/configurator` | CRUD конфигурации CfgApp.json и Cfg*.json |
+| `ConfigCacheController` | `api/config-cache` | Управление LRU-кэшем (статистика, очистка, health) |
+| `ConfiguratorViewController` | `/configurator` | SPA страница конфигуратора (Razor View) |
+| `PrintController` | `Print/[action]` | Печать документов (GetListPrinters, PrintDoc) |
 | `PdfController` | `/PDF/PDF.pdf` | PDF из IReportBuffer |
-| `ExportController` | `/Export` | Экспорт в PDF/Excel/ODS/XML |
-| `ElisController` | `/Elis` | Обработка ошибок ELIS |
-| `DirEditorController` | `/DirEditor` | Редактирование справочников |
-| `ClientLogController` | `/api/ClientLog` | Проксирование логов из Vue в NLog |
+| `ExportController` | (default MVC) | Экспорт в PDF/Excel/ODS/XML |
+| `ElisController` | (default MVC) | Обработка ошибок ELIS |
+| `DirEditorController` | `DirEditor/` | Редактирование справочников и QP-конфигов |
+| `ClientLogController` | `api/clientlog` | Проксирование логов из Vue в NLog (`POST /logging`) |
 
 ### Vue Frontend (TN_Doc/Client/)
 
-npm workspaces монорепозиторий:
-- **statusbar/** — Vue 3 + PrimeVue 4 + SignalR, real-time мониторинг статуса
-- **configurator/** — управление конфигурацией через `/configurator`
-- **shared/** — общие утилиты и API клиенты (зависимость для statusbar/configurator)
-- **e2e/** — Playwright тесты
+npm workspaces монорепозиторий (`@tn-doc/client@1.4.2`):
+- **statusbar/** — Vue 3 + PrimeVue 4 + SignalR + Pinia, real-time мониторинг статуса
+- **configurator/** — Vue 3 + PrimeVue 4 + Axios + Lodash, управление конфигурацией
+- **shared/** — общие модули: `ApiClient` (HTTP клиент), `Logger` (глобальный перехват ошибок)
+- **e2e/** — Playwright тесты (Chromium, Firefox, WebKit, Mobile Chrome)
 
 Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
 
 **Vite config** (`vite.config.base.ts`): alias `@` → `src/`, `@shared` → `../shared/src`. Proxy `/api` и `/statusHub` на `localhost:38509`.
 
-**SignalR Hub**: `StatusHub` (`/statusHub`) — при подключении клиента отправляет текущий статус, `StatusMonitoringService` пушит обновления через `statusUpdated`.
+**Client Logger** (`shared/src/logger.ts`): глобальный перехват ошибок (`window.onerror`, `onunhandledrejection`, Vue `errorHandler`) + Axios HTTP interceptor → `POST /api/clientlog/logging`.
+
+**SignalR Hub**: `StatusHub` (`/statusHub`) — при подключении клиента выполняет внеочередной опрос устройств (recovery mechanism) и отправляет текущий статус. `StatusMonitoringService` пушит обновления через `statusUpdated`.
+
+### Configurator Features
+
+Две основные вкладки:
+
+**Вкладка "Общие":**
+- Комбобокс типа ИВК (TN-01/TN-02) с автоподстановкой БД и OPC
+- Диагностика связи с ИВК: `InitialPollSeconds` (1-3600), `MaxPollSeconds` (60-86400), `PollMultiplier` (1.1-10), `NetworkFailureThreshold` (1-100), `MaxRetryCount` (1-1000)
+
+**Вкладка "Документы":**
+- DocumentTree — дерево конфигурационных файлов документов
+- DocumentConfigEditor → JsonConfigEditor (Monaco) — редактирование JSON-конфигов
 
 ### StatusBar: Диагностика подключений
 
@@ -150,15 +177,6 @@ Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
 
 Трёхцветная индикация: зелёный (все каналы), жёлтый (частичное), красный (нет связи).
 
-### Configurator: Настройки диагностики
-
-Параметры диагностики настраиваются в Configurator → вкладка "Общие" → панель "Диагностика связи с ИВК":
-- `InitialPollSeconds` (1-3600) — начальный интервал опроса
-- `MaxPollSeconds` (60-86400) — максимальный интервал
-- `PollMultiplier` (1.1-10) — множитель увеличения интервала
-- `NetworkFailureThreshold` (1-100) — порог сетевых ошибок
-- `MaxRetryCount` (1-1000) — попытки до перехода в HalfOpen
-
 ## API Endpoints
 
 ### Status API (`/api/status`)
@@ -167,7 +185,7 @@ Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
 - `POST /api/status/device/{deviceId}/retry` — сброс диагностики подключения
 
 ### Configurator API (`/api/configurator`)
-- `GET/POST /api/configurator/config` — CfgApp.json
+- `GET/POST /api/configurator/config` — CfgApp.json (чтение/запись)
 - `POST /api/configurator/validate` — валидация конфигурации
 - `GET/POST /api/configurator/document-config` — Cfg*.json документов
 
@@ -176,36 +194,64 @@ Build output: `wwwroot/statusbar/`, `wwwroot/configurator/`
 - `POST /api/config-cache/clear` — очистить кэш
 - `GET /api/config-cache/health` — проверка работоспособности сервиса
 
+### DirEditor API (`/DirEditor`)
+- `GET /DirEditor/GetDir` — получить справочники
+- `POST /DirEditor/SetDir` — сохранить справочники
+- `GET /DirEditor/GetQpConfigs` — получить QP-конфигурации
+- `POST /DirEditor/SetQpConfigs` — сохранить QP-конфигурации
+
 ## Configuration Files
 
 | Файл | Назначение |
 |------|------------|
-| `TN_Doc/Cfg/CfgApp.json` | Главная конфигурация (устройства, ELIS, OPC, DeviceConnectionDiagnostic) |
+| `TN_Doc/Cfg/CfgApp.json` | Главная конфигурация (устройства, ELIS, OPC, DeviceConnectionDiagnostic, DirectionNameSource) |
 | `TN_Doc/Cfg/Cfg{Type}.json` | Настройки шаблона документа |
 | `TN_Doc/Cfg/CfgEdit{Type}.json` | Конфигурация формы редактирования документа |
-| `TN_Doc/appsettings.json` | ASP.NET Core настройки (Kestrel порт: 5000, пути конфигов: `CfgDirPath`, `RelCfgName`, `RelCfgAppName`, `UserPreferenceDirPath`, `LastUsedTemplateListFileName`) |
-| `TN_Doc/Cfg/CfgApp.Development.json` | Dev-конфиг: альтернативный адрес БД (копируется только в Debug) |
-| `TN_Doc/Cfg/Cfg.Development.json` | Dev-конфиг документа (копируется только в Debug) |
-| `TN_Doc/appsettings.Development.json` | Dev-конфиги (Trace logging, `CfgApp.Development.json`) |
+| `TN_Doc/appsettings.json` | ASP.NET Core настройки (Kestrel: `localhost:5000`, пути: `CfgDirPath`, `RelCfgName`, `RelCfgAppName`, `UserPreferenceDirPath`, `LastUsedTemplateListFileName`) |
+| `TN_Doc/Cfg/CfgApp.Development.json` | Dev-конфиг: альтернативный адрес БД |
+| `TN_Doc/Cfg/Cfg.Development.json` | Dev-конфиг документа |
+| `TN_Doc/appsettings.Development.json` | Dev-конфиги (Trace logging, `CfgApp.Development.json`, `Cfg.Development.json`) |
 | `TN_Doc/nlog.config` | Логирование NLog (File + Console в Debug) |
 
-Dev-файлы (`CfgApp.Development.json`, `Cfg.Development.json`) копируются в output только при `Configuration=Debug` и **не публикуются**.
+Dev-файлы (`*.Development.json`) копируются в output только при `Configuration=Debug` и **не публикуются**.
 
 ## Document Module Interface
 
 Базовый класс `DocGeneral` (tn.docgeneral/TN.DocGeneral/General.cs) — наследует `DbContext`:
 
 ```csharp
-// Обязательные методы для реализации в модуле
-GetList() / GetList(UTBegin, UTEnd)  // Список документов
-GetViewDoc(id)                       // JSON данные для отчёта
-GetViewDoc(id, protocolNumber)       // Для документов с несколькими протоколами
-GetEditDoc(id)                       // HTML форма редактирования
-SaveDoc(jsonData)                    // Сохранение документа
-GetPathTemplateFile()                // Путь к .frx шаблону
+// Обязательные виртуальные методы для переопределения в модуле
+GetList() → List<RequestListDocs>                    // Список документов
+GetList(long UTBegin, long UTEnd) → List<RequestListDocs>  // С фильтром по времени
+GetViewDoc(int id) → object                          // JSON данные для отчёта
+GetViewDoc(int id, int protocolNumber) → object      // Для документов с протоколами
+GetEditDoc(int id) → string                          // HTML форма редактирования
+SaveDoc(string jsonData) → bool                      // Сохранение документа
+GetPeriodDocument(int id) → PeriodDocument            // Период документа
+GetPathTemplateFile() → string                       // Путь к .frx шаблону
 ```
 
-**Доступные в наследниках**: `_appConfig`, `_configCache`, `_deviceId`, `CfgGeneral`, `CurrentCfgDevice`, `LoadCfg<T>()`.
+**Доступные в наследниках**: `_appConfig`, `_configCache`, `_deviceId`, `CfgGeneral`, `CurrentCfgDevice`, `DictionarysDoc`, `DirectionNameSource`, `LoadCfg<T>()`, `PathToRootDirectory`, `PathToDocConfigFile`.
+
+**Вспомогательные static-методы**: `ArrByteToString()`, `StringToHexArrByte()`, `UnixTimestampToDatetime()`, `DatetimeToUnixTimestamp()`, `NormalizeDecimalString()`, `MapPropertiesByName<T>()`.
+
+**Наименования направлений**: `DirectionNameSource` (enum: `None`, `Database`, `Config`) задаётся на уровне устройства в `CfgApp.json`. Сервис `DirectionNameService.GetDirectionName()` возвращает HTML-строку наименования с учётом типа ИВК: TN01 — СИКН + направление, TN02 — только СИКН. Возвращает `<br><span class="direction-caption">...</span>` или пустую строку.
+
+**IDirectionItem** (интерфейс для модулей с направлениями): документный класс должен реализовывать `IDirectionItem` на своих моделях, которые передаются в `DirectionNameService.GetDirectionName()`:
+```csharp
+public interface IDirectionItem
+{
+    int BIK_ID { get; }
+    int? DIR_ID { get; }
+    byte[] SiknName { get; }   // Из БД — байты имени СИКН (MySQL charset latin1)
+    byte[] DirName { get; }    // Из БД — байты имени направления
+}
+```
+`DirectionNameService.JoinNames()` и `WrapDirectionHtml()` — вспомогательные static-методы, доступны для прямого использования.
+
+**IvkDeviceType**: enum (`TN01`, `TN02`) доступен в наследниках через protected `DeviceType` (задаётся из `CfgApp.json → AppConfigService.GetDeviceType(idDevice)`). Определяет режим форматирования отчётов.
+
+**Подключение к БД**: `OnConfiguring()` выполняет параллельную проверку всех `DBConnectionStrings` устройства и использует первый активный канал (failover).
 
 **Типичная структура модуля** (пример: Passport/):
 ```
@@ -228,7 +274,7 @@ tn_toolsfastreport/     → git.tncpa.ru/orpovy/ivk/tn_toolsfastreport.git
 winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 ```
 
-В CI URL перезаписываются на GitHub-зеркала (`tn-ivk/*`) с `GH_SUBMODULES_TOKEN`.
+В CI URL перезаписываются на GitHub-зеркала (`tn-ivk/tn-docgeneral`, `tn-ivk/tn-tools`, `tn-ivk/tn-utils`) с `GH_SUBMODULES_TOKEN`.
 
 ## CI/CD
 
@@ -238,7 +284,7 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 
 | Workflow | Триггер | Назначение |
 |----------|---------|------------|
-| `tests-on-push.yml` | push в `develop*` | build → unit-test + integration-test → test-summary |
+| `tests-on-push.yml` | push в `develop*` | build → unit-test + integration-test (параллельно) → test-summary |
 | `build-and-package.yml` | push tag | build → test → package (.deb + .msi) → notify-telegram → create-release |
 
 **Retention артефактов**:
@@ -254,16 +300,17 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 ```
 
 **Секреты CI**:
+
 | Секрет | Назначение |
 |--------|------------|
-| `GH_SUBMODULES_TOKEN` | Доступ к приватным субмодулям |
+| `GH_SUBMODULES_TOKEN` | Доступ к приватным субмодулям на GitHub |
 | `FR_NUGET_USERNAME/PASSWORD` | FastReport NuGet feed |
 | `TELEGRAM_BOT_TOKEN/CHAT_ID` | Уведомления в Telegram |
 | `PROJECT_API_TOKEN` | GitLab API (build number) |
 
 ### Версионирование и packaging
 
-Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.1-b42-a1b2c3d4`)
+Формат: `{VERSION}-b{BUILD_NUMBER}-{SHORT_SHA}` (пример: `1.5.2-b42-a1b2c3d4`)
 
 **Linux (.deb):** `tn.doc-{FULL_VERSION}_amd64.deb`
 - Требует `dotnet-runtime-8.0 >= 8.0.13`
@@ -276,9 +323,8 @@ winprutil/              → git.tncpa.ru/orpovy/ivk/winprutil.git
 - Интерфейс на русском языке (Cultures=ru-RU)
 - UI: Приветствие → Выбор пути → Имя службы → Подтверждение → Установка → Завершение
 - Windows Service с настраиваемым именем (по умолчанию `tn.doc`)
-- Очистка директории перед установкой (util:RemoveFolderEx)
-- Автоматический бэкап в `C:\ProgramData\TN_Doc\backups\` перед установкой (если директория не пуста, исключая logs/)
-- Поддержка тихой установки через `msiexec /quiet`
+- Автоматический бэкап в `C:\ProgramData\TN_Doc\backups\` перед установкой
+- Поддержка тихой установки: `msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="..." SERVICENAME="tn.doc"`
 
 ## External Systems
 
@@ -330,22 +376,30 @@ dotnet publish TN_Doc/TN_Doc.csproj -c Release -r win-x64 --self-contained true 
 copy installer\tools\cfg-elevator-windows-amd64.exe publish\win-x64-full\cfg-elevator.exe
 
 # 3. Build MSI (Heat harvesting + WiX compilation integrated via MSBuild)
-dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.1 -p:HarvestPath=../../publish/win-x64-full
-```
-
-**Тихая установка:**
-```cmd
-msiexec /i TN_Doc.msi /quiet INSTALLFOLDER="C:\ProjectVU\DotNetComponents\TN_Doc" SERVICENAME="tn.doc"
+dotnet build installer/windows/TN_Doc.Installer.wixproj -c Release -p:ProductVersion=1.5.2 -p:HarvestPath=../../publish/win-x64-full
 ```
 
 ## Testing
 
 ```
 Tests/
-├── Tests.Unit/         # Модульные тесты (NUnit 4 + Moq)
-├── Tests.Integration/  # Интеграционные тесты (WebApplicationFactory)
-└── Tests.Shared/       # Общая тестовая инфраструктура
-TN_Doc/Client/e2e/      # E2E тесты (Playwright)
+├── Tests.Unit/              # Модульные тесты (NUnit 4 + Moq)
+│   ├── Controllers/         # 7 контроллеров (Home, Print, Pdf, Export, Elis, DirEditor, ClientLog)
+│   └── Services/            # 8 сервисов (AppConfig, CfgAppSync, ConfigurationCache, Configuration,
+│                            #   DbSchemaCache, DeviceConnectionDiagnostic, DocGeneral, Users)
+├── Tests.Integration/       # Интеграционные тесты (WebApplicationFactory)
+│   ├── Controllers/         # HomeController, StatusController
+│   ├── Services/            # AppConfigService
+│   ├── Data/                # Database integration
+│   └── IntegrationTestBase.cs
+└── Tests.Shared/            # Общая тестовая инфраструктура
+    ├── BaseTestClass.cs     # In-memory DbContext, Moq моки, temp-директории
+    ├── BaseDocumentTest<T>  # Типизированные assert-методы для модулей документов
+    ├── TestHelpers.cs       # Общие хелперы
+    └── Fixtures/
+        ├── TestDataFixture.cs   # Фабрики JSON/HTML для всех типов документов
+        └── MockConfigHelper.cs  # Моки конфигурации
+TN_Doc/Client/e2e/           # E2E тесты (Playwright)
 ```
 
 ```bash
@@ -361,20 +415,28 @@ cd TN_Doc/Client && npm run test:e2e
 
 **Naming**: `MethodName_WhenCondition_ThenExpectedResult`
 
-**Playwright**: baseURL `localhost:38509`, браузеры: Chromium, Firefox, WebKit, Mobile Chrome. Retries: 2 в CI.
+**Playwright**: baseURL `localhost:38509`, браузеры: Chromium, Firefox, WebKit, Mobile Chrome. Retries: 2 в CI. Кодогенератор: `npm run codegen --workspace=e2e`.
 
 **InternalsVisibleTo**: `TN_Doc.csproj` → `Tests.Unit` (доступ к internal классам).
+
+## Known Tech Debt
+
+| Проблема | Расположение | Документ |
+|----------|-------------|----------|
+| **IvkTypeResolver inconsistency** — тип ИВК определяется по-разному в backend (`tn.docgeneral`: по активным `DBConnectionStrings.Where(x => x.Use)`) и во frontend configurator (по всем строкам с отдельными правилами). Может приводить к расхождению режима логики документов и состояния "Не выбрано" в конфигураторе. | `tn.docgeneral/Services/AppConfigService.Devices.cs`, `Client/configurator/` | `tech_debt/IVK_TYPE_RESOLVER_UNIFICATION_PLAN.md` |
+
+Полный список (~20 планов) — в `tech_debt/`. Актуальные приоритеты: `TEST_COVERAGE_PLAN.md`, `SECURITY_HARDENING_PLAN.md`, `ASYNC_EXPORT_PLAN.md`.
 
 ## Git Conventions
 
 - **Commit messages**: русский язык, формат `Область: описание`
 - **НИКОГДА** не добавлять AI attribution в коммиты
 - FastReport `.frx` — бинарные (в `.gitattributes`), редактировать через FastReport Designer
-- `.gitattributes`: LF для кода, CRLF для .bat/.cmd/.ps1
+- `.gitattributes`: LF для кода (.cs, .json, .ts, .vue, .sh), CRLF для .bat/.cmd/.ps1, binary для .frx/.exe/.dll/cfg-elevator
 
 ## Changelog Format
 
-**`TN_Doc/changes.md`** — внутренний changelog (отличается от CHANGELOG.md):
+**`TN_Doc/changes.md`** — внутренний changelog для `generate_changes.go`:
 
 ```markdown
 ## Версия X.Y.Z:
@@ -394,11 +456,21 @@ cd TN_Doc/Client && npm run test:e2e
 
 ## Documentation
 
-Документация в `docs/` организована по разделам: `architecture/`, `deployment/`, `development/`, `api/`, `integration/`.
+Документация в `docs/` организована по разделам:
 
-Ключевые файлы:
-- `docs/development/new-module-tutorial.md` — пошаговое руководство по созданию модулей документов
-- `docs/development/fastreport-templates.md` — работа с шаблонами FastReport
-- `docs/ui-design.md` — UI Design гайд (PrimeVue компоненты и стили)
-- `tech_debt/` — планы по техническому долгу (16 файлов)
-- `TN_Doc/changes.md` — внутренний changelog
+| Раздел | Содержание |
+|--------|------------|
+| `api/endpoints.md` | Справка по API |
+| `architecture/overview.md` | Архитектура проекта |
+| `architecture/document-modules.md` | Модули документов |
+| `architecture/statusbar.md` | StatusBar архитектура |
+| `deployment/linux.md`, `windows.md` | Развёртывание |
+| `deployment/configuration.md` | Конфигурация |
+| `development/setup.md`, `building.md` | Настройка dev-окружения |
+| `development/new-module-tutorial.md` | Создание модулей документов |
+| `development/fastreport-templates.md` | Работа с шаблонами FastReport |
+| `integration/elis.md` | Интеграция с ELIS |
+| `ui-design.md` | UI Design гайд (PrimeVue) |
+| `tn.docgeneral/DESIGN_DOCUMENTATION.md` | Material Design 3 цвета, типографика, компоненты (кнопки, таблицы, панели) |
+
+`tech_debt/` — планы технического долга (~20 документов: тестирование, безопасность, OpenTelemetry, оптимизация FastReport и др.).

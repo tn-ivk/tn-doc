@@ -2,70 +2,72 @@
     
     ViewData["Title"] = $" Модуль просмотра документов ({ ViewData["Version"]})";
 }
-<div class="cont">
-    <div class="mainTable">
-        <div class="leftPanel">
-            <div class="filterTable">
-                <div class="filterRow">
-                    <label class="filterLabel" for="ComboboxDevice">
-                        Устройство:
-                    </label>
-                    <div class="filterField">
-                        <select class="filterSelect" id="ComboboxDevice"></select>
-                    </div>
-                </div>
-                <div class="filterRow">
-                    <label class="filterLabel" for="ComboboxDocGUID">
-                        Документ:
-                    </label>
-                    <div class="filterField">
-                        <select class="filterSelect" id="ComboboxDocGUID"></select>
-                    </div>
-                </div>
-                <div class="filterRow">
-                    <label class="filterLabel" for="DatepickerBegin">
-                        Дата начала:
-                    </label>
-                    <div class="filterField">
-                        <input class="filterDatepicker" id="DatepickerBegin"/>
-                    </div>
-                </div>
-                <div class="filterRow">
-                    <label class="filterLabel" for="DatepickerEnd">
-                        Дата окончания:
-                    </label>
-                    <div class="filterField">
-                        <input class="filterDatepicker" id="DatepickerEnd"/>
-                    </div>
-                </div>
-                <div class="filterRow filterRowButton">
-                    <div class="filterActions">
-                        <button class="filterButton" id="ButtonGetData" type="button" onclick="GetDataWithSpinner()">
-                            <span id="ButtonGetDataSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
-                            <span id="ButtonGetDataText">Получить данные</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="filterRow filterRowTable">
-                    <div class="filterTableHost">
-                        <table id="DataTable" class="display compact searched-table" style="width: 100%; height: 100%;">
-                            <thead>
-                            <tr>
-                                <th>Документ</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td height="25"></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="rightPanel">
-            <table class="docTable">
+<body>
+    <div class="cont">
+        <table class="mainTable">
+            <tr>
+                <td class="leftPanel">
+                    <table class="filterTable">
+                        <tr>
+                            <td height="25" width="150">
+                                Устройство:
+                            </td>
+                            <td height="25">
+                                <select class="filterSelect" id="ComboboxDevice"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25">
+                                Документ:
+                            </td>
+                            <td height="25">
+                                <select class="filterSelect" id="ComboboxDocGUID"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25">
+                                Дата начала:
+                            </td>
+                            <td height="25">
+                                <input class="filterDatepicker" id="DatepickerBegin"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25">
+                                Дата окончания:
+                            </td>
+                            <td height="25">
+                                <input class="filterDatepicker" id="DatepickerEnd"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25" colspan="2" align="right">
+                                <button class="filterButton" id="ButtonGetData" type="button" onclick="GetDataWithSpinner()">
+                                    <span id="ButtonGetDataSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+                                    <span id="ButtonGetDataText">Получить данные</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" valign="top">
+                                <table id="DataTable" class="display compact searched-table" style="width: 100%; height: 100%;">
+                                    <thead>
+                                    <tr>
+                                        <th>Документ</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td height="25"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="rightPanel">
+                    <table class="docTable">
                         <tr>
                             <td height="37" width="250">
                                 <input id="viewModeButton" type="button" value="Редактирование" width="100" hidden="hidden" onclick="ToggleMode()">
@@ -110,10 +112,11 @@
                                 <iframe name=print_frame class="FR" src=""></iframe>
                             </td>
                         </tr>
-            </table>
-        </div>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </div>
-</div>
 
     
     @*todo: вынести в отдельный  html*@
@@ -323,3 +326,4 @@
             }
         });
 </script>
+</body>
