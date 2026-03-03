@@ -9,6 +9,7 @@ using TN.DocData;
 using TN_DocGeneral.Dictionaries;
 using TN_DocGeneral.Interfaces;
 using TN_DocGeneral.Services;
+using DocDataBik = TN.DocData.BIK;
 
 namespace Tests.Unit.Services;
 
@@ -86,8 +87,8 @@ public class DirectionNameServiceTests
         {
             BIKs =
             [
-                new BIK { Id = 1, Name = "Sikn A" },
-                new BIK { Id = 2, Name = "Sikn B" }
+                new DocDataBik { Id = 1, Name = "Sikn A" },
+                new DocDataBik { Id = 2, Name = "Sikn B" }
             ],
             Directions =
             [
@@ -108,7 +109,7 @@ public class DirectionNameServiceTests
         var method = typeof(DocReport).GetMethod("BuildIncompleteList", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.That(method, Is.Not.Null, "Private method BuildIncompleteList should exist");
 
-        var sikns = new List<BIK>
+        var sikns = new List<DocDataBik>
         {
             new() { Id = 100, Name = "Sikn A" },
             new() { Id = 200, Name = "Sikn B" }
@@ -129,7 +130,7 @@ public class DirectionNameServiceTests
         Assert.That(docs.Count, Is.EqualTo(4));
 
         var pairs = docs.Select(x => $"{GetPropertyValue(x, "BIKId")}:{GetPropertyValue(x, "DirId")}").ToList();
-        CollectionAssert.AreEquivalent(new[] { "100:10", "100:20", "200:10", "200:20" }, pairs);
+        Assert.That(pairs, Is.EquivalentTo(new[] { "100:10", "100:20", "200:10", "200:20" }));
         Assert.That(docs.All(x => x.Description.Contains("Incomplete report<br><span class=\"direction-caption\">")), Is.True);
     }
 
