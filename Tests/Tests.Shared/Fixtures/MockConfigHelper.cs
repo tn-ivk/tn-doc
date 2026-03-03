@@ -132,9 +132,6 @@ public static class MockConfigHelper
 
         mockAppConfig.Setup(x => x.GetDeviceName(idDevice))
             .Returns($"Test Device {idDevice}");
-
-        mockAppConfig.Setup(x => x.GetDeviceType(It.IsAny<int>()))
-            .Returns(IvkDeviceType.TN01);
     }
 
     /// <summary>

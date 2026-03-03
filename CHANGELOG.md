@@ -9,10 +9,13 @@
 
 ### Changed
 - Refactor: `DirectionNameSource` перенесён с уровня конфигурации документа (`Cfg{Type}.json`) на уровень устройства (`CfgApp.json → Device.DirectionNameSource`)
-- Добавлен `DirectionNameService` — централизованный сервис определения наименований направлений (None/Database/Config) с учётом типа ИВК (TN01/TN02)
+- Refactor: `DirectionNameService` — универсальный алгоритм определения наименований направлений, независимый от типа ИВК
 - Удалён неиспользуемый `Home.cs` с 19 мёртвыми классами
 - Удалён неиспользуемый `DirectoryService`
 - Исправлена утечка `MySqlConnection` и sync-over-async в `OnConfiguring`
+
+### Removed
+- ❗ `IvkDeviceType` (enum TN01/TN02) — удалён вместе с `GetDeviceType()`. Направления теперь определяются по данным (DIR_ID/DirName), а не по типу устройства
 
 ## [1.5.2] - 2026-02-26
 
