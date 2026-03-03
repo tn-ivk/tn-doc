@@ -867,7 +867,7 @@ internal static class ReflectionExtensions
     /// <summary>
     /// Получает backing field для auto-property
     /// </summary>
-    public static FieldInfo? GetBackingField(this PropertyInfo property)
+    public static FieldInfo GetBackingField(this PropertyInfo property)
     {
         var declaringType = property.DeclaringType;
         if (declaringType == null) return null;

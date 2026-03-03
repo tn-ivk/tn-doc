@@ -249,7 +249,7 @@ public interface IDirectionItem
 ```
 `DirectionNameService.JoinNames()` и `WrapDirectionHtml()` — вспомогательные static-методы, доступны для прямого использования.
 
-**IvkDeviceType**: enum (`TN01`, `TN02`) доступен в наследниках через protected `DeviceType` (задаётся из `CfgApp.json → AppConfigService.GetDeviceType(idDevice)`). Определяет режим форматирования отчётов.
+**IvkDeviceType / DeviceType**: удалены из `tn.docgeneral`. Форматирование направлений теперь определяется data-driven алгоритмом (`DirectionNameService`) на основе `DirectionNameSource` и фактических данных (`BIK_ID`, `DIR_ID`, `SiknName`, `DirName`), без определения типа ИВК через `GetDeviceType(...)`.
 
 **Подключение к БД**: `OnConfiguring()` выполняет параллельную проверку всех `DBConnectionStrings` устройства и использует первый активный канал (failover).
 
