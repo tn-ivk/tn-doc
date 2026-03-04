@@ -148,7 +148,7 @@ namespace FastReport
           var begin = string.Empty;
           var end = string.Empty;
           var date = &quot;-&quot;;
-          if(i &lt; DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT.Count)
+          if(DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT != null &amp;&amp; i &lt; DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT.Count)
           {
             var samplingBeginTs = DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].Begin;
             var samplingEndTs = DataIVK.TableResultActAndPassport.ResultActAndPassport.PassportPeriodDT[i].End;
