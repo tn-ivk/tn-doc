@@ -218,23 +218,42 @@ namespace FastReport
       TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
 
       // Определяем обозначения нефти по ГОСТ для каждой смены
-      List &lt;string&gt; listExtendGostIndex51858 = (DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858 ?? new List&lt;string&gt;()).Where(i =&gt; !String.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
+      var listActs = DataIVK.TableResultActAndPassport.ResultActAndPassport.Act;
+      List &lt;string&gt; fullExtendGost = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858 ?? new List&lt;string&gt;();
+
+      // Независимо отфильтрованный список ГОСТ (для ветки else)
+      List &lt;string&gt; listExtendGostIndex51858 = fullExtendGost.Where(i =&gt; !String.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
       List &lt;string&gt; distListExtendGostIndex51858 = listExtendGostIndex51858.Distinct().ToList();
 
-      if (distListExtendGostIndex51858.Count &gt; 1 &amp;&amp; activeShifts != null &amp;&amp; activeShifts.Count &gt; 1)
+      // ГОСТ-список, выровненный по индексам activeShifts через оригинальные позиции в listActs
+      List &lt;string&gt; activeShiftGosts = new List&lt;string&gt;();
+      if (activeShifts != null &amp;&amp; listActs != null)
+      {
+        foreach (var shift in activeShifts)
+        {
+          int idx = listActs.IndexOf(shift);
+          activeShiftGosts.Add((idx &gt;= 0 &amp;&amp; idx &lt; fullExtendGost.Count) ? fullExtendGost[idx] : &quot;&quot;);
+        }
+      }
+      List &lt;string&gt; distinctActiveGosts = activeShiftGosts.Where(g =&gt; !String.IsNullOrEmpty(g) &amp;&amp; !g.Contains(&quot;-&quot;)).Distinct().ToList();
+
+      if (distinctActiveGosts.Count &gt; 1 &amp;&amp; activeShifts != null &amp;&amp; activeShifts.Count &gt; 1)
       {
         // Разные обозначения ГОСТ для смен — чередуем: масса прописью + ГОСТ для каждой смены
-        int count = Math.Min(activeShifts.Count, listExtendGostIndex51858.Count);
-        for (int i = 0; i &lt; count; i++)
+        for (int i = 0; i &lt; activeShifts.Count; i++)
         {
           string inWords = activeShifts[i].Net_Mass_InWords ?? &quot;&quot;;
           WholePart.Text = string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {1}&lt;/u&gt; т.&quot;, i + 1, inWords);
           TableAdditionlInfo.PrintRow(0);
           TableAdditionlInfo.PrintColumns();
 
-          ExtendGostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;, listExtendGostIndex51858[i]);
-          TableAdditionlInfo.PrintRow(1);
-          TableAdditionlInfo.PrintColumns();
+          string gost = activeShiftGosts[i];
+          if (!String.IsNullOrEmpty(gost) &amp;&amp; !gost.Contains(&quot;-&quot;))
+          {
+            ExtendGostIndex51858.Text = string.Format(&quot;Обозначение нефти: &lt;u&gt; {0}&lt;/u&gt; по ГОСТ Р 51858.&quot;, gost);
+            TableAdditionlInfo.PrintRow(1);
+            TableAdditionlInfo.PrintColumns();
+          }
         }
       }
       else
