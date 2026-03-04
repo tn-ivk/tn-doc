@@ -105,7 +105,7 @@ namespace FastReport
       if (int.TryParse(usedShiftStrInit, out usedShiftInit) &amp;&amp; usedShiftInit &gt;= 1)
         listShiftsData = listActs.Take(usedShiftInit).ToList();
       else
-        listShiftsData = listActs.Where(i =&gt; !i.Vol_LastShift.Contains(&quot;-&quot;) &amp;&amp; !String.IsNullOrEmpty(i.Vol_LastShift)).ToList();
+        listShiftsData = listActs.Where(i =&gt; !String.IsNullOrEmpty(i.Vol_LastShift) &amp;&amp; !i.Vol_LastShift.Contains(&quot;-&quot;)).ToList();
       
       shiftCount = listShiftsData
         .Where(act =&gt; !String.IsNullOrEmpty(act.Vol_LastShift) &amp;&amp; ! act.Vol_LastShift.Contains(&quot;-&quot;))
@@ -218,7 +218,7 @@ namespace FastReport
       TableAdditionlInfo.Columns[0].Width=(Page.PaperWidth-Page.LeftMargin-Page.RightMargin)*Units.Millimeters;
 
       // Определяем обозначения нефти по ГОСТ для каждой смены
-      List &lt;string&gt; listExtendGostIndex51858 = (DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858 ?? new List&lt;string&gt;()).Where(i =&gt; ! i.Contains(&quot;-&quot;)  &amp; String.IsNullOrEmpty(i) == false).ToList();
+      List &lt;string&gt; listExtendGostIndex51858 = (DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ExtendGostIndex51858 ?? new List&lt;string&gt;()).Where(i =&gt; !String.IsNullOrEmpty(i) &amp;&amp; !i.Contains(&quot;-&quot;)).ToList();
       List &lt;string&gt; distListExtendGostIndex51858 = listExtendGostIndex51858.Distinct().ToList();
 
       if (distListExtendGostIndex51858.Count &gt; 1 &amp;&amp; activeShifts != null &amp;&amp; activeShifts.Count &gt; 1)
@@ -240,7 +240,7 @@ namespace FastReport
       else
       {
         // Одно обозначение ГОСТ для всего акта — исходная масса из ИВК + одна строка ГОСТ
-        string wholePart = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords.WholePart;
+        string wholePart = DataIVK.TableResultActAndPassport.ResultActAndPassport.Common.ValueInWords?.WholePart ?? &quot;&quot;;
         int startIndexTon = wholePart.IndexOf(&quot; тон&quot;);
 
         if (startIndexTon != -1)
