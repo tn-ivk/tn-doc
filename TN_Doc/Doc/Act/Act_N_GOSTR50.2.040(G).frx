@@ -237,7 +237,7 @@ namespace FastReport
         for (int i = 0; i &lt; activeShifts.Count; i++)
         {
           string inWords = activeShifts[i].Net_Mass_InWords ?? &quot;&quot;;
-          WholePart.Text = string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {1}&lt;/u&gt; т.&quot;, i + 1, inWords);
+          WholePart.Text = string.Format(&quot;Масса нефти нетто (прописью) &lt;u&gt; {0}&lt;/u&gt; т.&quot;, inWords);
           TableAdditionlInfo.PrintRow(0);
           TableAdditionlInfo.PrintColumns();
 
